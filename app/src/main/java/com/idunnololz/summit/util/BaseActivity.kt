@@ -1,0 +1,103 @@
+package com.idunnololz.summit.util
+
+import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Color
+import android.os.Build
+import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
+import com.idunnololz.summit.R
+
+abstract class BaseActivity : AppCompatActivity() {
+
+    companion object {
+        private val TAG = BaseActivity::class.java.canonicalName
+    }
+
+    private var customNavigationBar = false
+    private var navigationBarColor = 0
+
+    private val logTag: String = javaClass.canonicalName ?: "UNKNOWN_CLASS"
+
+    fun runOnUiThreadSafe(f: () -> Unit) {
+        if (!isFinishing) {
+            runOnUiThread {
+                try {
+                    f()
+                } catch (e: IllegalStateException) {/* meh */
+                }
+            }
+        }
+    }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleHelper.setLocale(base))
+    }
+
+    override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
+        if (overrideConfiguration != null) {
+            val uiMode = overrideConfiguration.uiMode
+            overrideConfiguration.setTo(baseContext.resources.configuration)
+            overrideConfiguration.uiMode = uiMode
+        }
+        super.applyOverrideConfiguration(overrideConfiguration)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MyLog.d(logTag, "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MyLog.d(logTag, "onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MyLog.d(logTag, "onDestroy")
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val key = getString(R.string.pref_key_navigation_bar_color)
+            if (PreferenceUtil.preferences.contains(key)) {
+                customNavigationBar = true
+                navigationBarColor = PreferenceUtil.preferences.getInt(key, 0)
+            } else {
+                customNavigationBar = false
+            }
+
+            if (customNavigationBar) {
+                window.navigationBarColor = navigationBarColor
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val red = Color.red(navigationBarColor)
+                    val green = Color.green(navigationBarColor)
+                    val blue = Color.blue(navigationBarColor)
+
+                    if (red * 0.299 + green * 0.587 + blue * 0.114 > 186) {
+                        requestWindowFeature(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                        var flags = window.decorView.systemUiVisibility
+                        flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                        window.decorView.systemUiVisibility = flags
+                    }
+                }
+            }
+        }
+        super.onCreate(savedInstanceState)
+        MyLog.d(logTag, "onCreate")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MyLog.d(logTag, "onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MyLog.d(logTag, "onResume")
+    }
+}

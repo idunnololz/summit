@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/idunnololz/Documents/Projects/YARR/app/src/main/res/drawable/add_comment_background.xml" value="0.1665" />
+        <entry key="..\:/Users/idunnololz/Documents/Projects/YARR/app/src/main/res/drawable/ic_baseline_screen_rotation_24.xml" value="0.1665" />
+        <entry key="..\:/Users/idunnololz/Documents/Projects/YARR/app/src/main/res/drawable/locked_overlay.xml" value="0.1665" />
+        <entry key="..\:/Users/idunnololz/Documents/Projects/YARR/app/src/main/res/layout/exo_playback_control_view.xml" value="0.17255434782608695" />
+        <entry key="..\:/Users/idunnololz/Documents/Projects/YARR/app/src/main/res/layout/full_content_video_view.xml" value="0.17255434782608695" />
+        <entry key="..\:/Users/idunnololz/Documents/Projects/YARR/app/src/main/res/layout/post_comment_expanded_item.xml" value="0.28229166666666666" />
+        <entry key="..\:/Users/idunnololz/Documents/Projects/YARR/app/src/main/res/menu/video_menu.xml" value="0.2109375" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

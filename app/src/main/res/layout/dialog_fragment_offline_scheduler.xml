@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?textAppearanceHeadline3"
+            android:text="@string/offline_scheduler_title_text"
+            android:layout_margin="@dimen/padding"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/enableText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/enable"
+            android:textAppearance="?textAppearanceBody1"
+            android:gravity="start"
+            android:layout_marginStart="@dimen/padding"
+            android:layout_marginEnd="@dimen/padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/enableSwitch"
+            app:layout_constraintBottom_toBottomOf="@+id/enableSwitch"
+            app:layout_constraintEnd_toEndOf="@+id/enableSwitch" />
+
+        <Switch
+            android:id="@+id/enableSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding"
+            android:layout_marginEnd="@dimen/padding"
+            android:layout_marginTop="@dimen/padding"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/enableRowBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="enableText,enableSwitch" />
+
+        <com.idunnololz.summit.view.DayPicker
+            android:id="@+id/dayPicker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding"
+            android:layout_marginEnd="@dimen/padding"
+            android:layout_marginTop="@dimen/padding"
+            app:layout_constraintTop_toBottomOf="@+id/enableRowBottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TimePicker
+            android:id="@+id/timePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_half"
+            app:layout_constraintTop_toBottomOf="@+id/dayPicker"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Background set programatically -->
+        <View
+            android:id="@+id/disableOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/colorSurface"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/dayPicker"
+            app:layout_constraintBottom_toBottomOf="@+id/timePicker" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Important theme colors -->
+    <color name="colorPrimary">@color/orangeTheme</color>
+    <color name="colorPrimaryDark">@color/orangeDarkTheme</color>
+    <color name="colorSecondary">@color/orangeTheme</color>
+    <color name="colorAccent">@color/orangeTheme</color>
+    <color name="colorActionModeBackground">@color/googleBackground</color>
+    <color name="colorSnackbarBackground">@color/googleBackground</color>
+    <color name="colorOnSnackbarBackground">@color/white97</color>
+    <color name="colorOnPrimary">@color/white97</color>
+    <color name="colorOnSecondary">@color/white97</color>
+    <color name="colorOnBackground">@color/white97</color>
+    <color name="colorOnSurface">@color/white97</color>
+    <color name="colorText">@color/white66</color>
+    <color name="colorTextTitle">@color/white97</color>
+    <color name="colorTextInverted">@color/black</color>
+
+    <color name="colorBackground">@color/black</color>
+    <color name="colorWindowBackground">@color/colorSurface</color>
+    <color name="colorSurface">#202225</color>
+    <color name="colorLink">#0079d3</color>
+
+    <color name="colorHighlight">@color/black10</color>
+
+    <color name="drawer_bg">@color/white</color>
+
+    <color name="colorSurfaceShade">@color/black10</color>
+
+    <color name="colorCardBackground">@color/colorSurface</color>
+
+    <color name="itemTreeVeinColor">@color/black33</color>
+    <color name="itemCostColor">#ffa700</color>
+    <color name="colorOverlay">@color/black50</color>
+
+    <color name="appBarBackground">@color/colorSurface</color>
+
+    <color name="colorDivider">#3b3b3d</color>
+
+    <color name="colorQuoteLine">@color/white66</color>
+
+    <!-- This color MUST be a solid color to avoid UI issues -->
+    <color name="colorThreadLines">#3b3b3d</color>
+
+    <color name="colorSpoilerRevealed">@color/white10</color>
+    <!-- Important theme colors end -->
+
+</resources>

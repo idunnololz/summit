@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/day1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/padding_quarter"
+        android:layout_marginBottom="@dimen/padding_quarter"
+        android:layout_marginEnd="@dimen/padding_quarter"
+        android:layout_marginRight="@dimen/padding_quarter"
+        style="@style/DayPickerDayStyle"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/day2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/day2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_margin="@dimen/padding_quarter"
+        style="@style/DayPickerDayStyle"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintStart_toEndOf="@+id/day1"
+        app:layout_constraintEnd_toStartOf="@+id/day3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/day3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_margin="@dimen/padding_quarter"
+        style="@style/DayPickerDayStyle"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintStart_toEndOf="@+id/day2"
+        app:layout_constraintEnd_toStartOf="@+id/day4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/day4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_margin="@dimen/padding_quarter"
+        style="@style/DayPickerDayStyle"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintStart_toEndOf="@+id/day3"
+        app:layout_constraintEnd_toStartOf="@+id/day5"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/day5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_margin="@dimen/padding_quarter"
+        style="@style/DayPickerDayStyle"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintStart_toEndOf="@+id/day4"
+        app:layout_constraintEnd_toStartOf="@+id/day6"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/day6"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_margin="@dimen/padding_quarter"
+        style="@style/DayPickerDayStyle"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintStart_toEndOf="@+id/day5"
+        app:layout_constraintEnd_toStartOf="@+id/day7"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/day7"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/padding_quarter"
+        android:layout_marginBottom="@dimen/padding_quarter"
+        android:layout_marginStart="@dimen/padding_quarter"
+        android:layout_marginLeft="@dimen/padding_quarter"
+        style="@style/DayPickerDayStyle"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintStart_toEndOf="@+id/day6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</merge>

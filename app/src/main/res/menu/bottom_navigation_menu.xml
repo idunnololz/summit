@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/main"
+        android:icon="@drawable/baseline_home_black_24"
+        android:title="@string/home" />
+    <item
+        android:id="@+id/offline"
+        android:icon="@drawable/ic_network_strength_off_black_24dp"
+        android:title="@string/offline" />
+    <item
+        android:id="@+id/history"
+        android:icon="@drawable/baseline_history_black_24"
+        android:title="@string/history" />
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/baseline_settings_black_24"
+        android:title="@string/settings" />
+</menu>

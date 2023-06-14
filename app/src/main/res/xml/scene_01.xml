@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        app:constraintSetStart="@+id/collapsed"
+        app:constraintSetEnd="@+id/expanded"
+        app:duration="300"
+        app:motionInterpolator="easeInOut">
+        <OnSwipe
+            app:touchAnchorId="@+id/bg"
+            app:touchAnchorSide="top"
+            app:dragDirection="dragUp"
+            app:maxAcceleration="16" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/collapsed">
+        <Constraint
+            android:id="@+id/overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/black50"
+            android:alpha="0"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <Constraint
+            android:id="@+id/bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/colorSurface"
+            app:layout_constraintTop_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <Constraint
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/subreddit_filter_bg"
+            android:padding="@dimen/padding_half"
+            android:layout_marginStart="@dimen/padding_half"
+            android:layout_marginEnd="@dimen/padding_half"
+            android:layout_marginTop="@dimen/padding_half"
+            android:maxLines="1"
+            android:inputType="text"
+            android:alpha="0"
+            app:layout_constraintTop_toTopOf="@+id/bg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <Constraint
+            android:id="@+id/subredditsRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/padding_half"
+            android:layout_marginBottom="@dimen/padding_quarter"
+            app:layout_constraintTop_toBottomOf="@+id/searchView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/expanded">
+        <Constraint
+            android:id="@+id/overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/black50"
+            android:alpha="1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <Constraint
+            android:id="@+id/bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/colorSurface"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/subredditsRecyclerView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <Constraint
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/subreddit_filter_bg"
+            android:padding="@dimen/padding_half"
+            android:layout_marginStart="@dimen/padding_half"
+            android:layout_marginEnd="@dimen/padding_half"
+            android:layout_marginTop="@dimen/padding_half"
+            android:maxLines="1"
+            android:inputType="text"
+            android:alpha="1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <Constraint
+            android:id="@+id/subredditsRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/padding_half"
+            android:layout_marginBottom="@dimen/padding_quarter"
+            app:layout_constraintTop_toBottomOf="@+id/searchView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </ConstraintSet>
+
+</MotionScene>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="action_button_margin">16dp</dimen>
+
+    <dimen name="padding">16dp</dimen>
+    <dimen name="padding_half">8dp</dimen>
+    <dimen name="padding_quarter">4dp</dimen>
+
+
+    <dimen name="reddit_content_horizontal_padding">16dp</dimen>
+    <dimen name="reddit_content_horizontal_padding_for_downvote">14dp</dimen>
+
+    <dimen name="fastscroll__handle_corner">0dp</dimen>
+    <dimen name="fastscroll__handle_height">48dp</dimen>
+    <dimen name="fastscroll__handle_clickable_width">24dp</dimen>
+    <dimen name="thread_line_total_size">16dp</dimen>
+    <dimen name="reward_icon_size">16dp</dimen>
+    <dimen name="comment_top_overdraw">24dp</dimen>
+
+    <dimen name="tabs_text_size">12sp</dimen>
+
+    <dimen name="custom_ab_height">40dp</dimen>
+
+    <dimen name="menu_item_icon_size">24dp</dimen>
+</resources>

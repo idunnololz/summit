@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/search"
+        android:title="@string/search"
+        android:icon="@drawable/baseline_search_black_24"
+        android:orderInCategory="100"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:iconTint="?attr/colorControlNormal" />
+
+    <item
+        android:id="@+id/clear_history"
+        android:title="@string/clear_history"
+        android:orderInCategory="200"
+        app:showAsAction="never" />
+</menu>

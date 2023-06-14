@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="@dimen/padding">
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:lines="4"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:padding="@dimen/padding"
+        android:background="@drawable/add_comment_background"
+        android:gravity="start|top"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.idunnololz.summit.view.LoadingView
+        android:id="@+id/loadingView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:text="@string/cancel"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+        app:layout_constraintEnd_toStartOf="@+id/saveEditsButton" />
+
+    <Button
+        android:id="@+id/saveEditsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button"
+        android:text="@string/save_edits"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,161 @@
+<resources>
+
+    <!-- Please DO NOT change this. This is a specific value that is used by the app to select what language the champion/item/rune/mastery data should be in.
+    This string is specifically chosen by me so DO NOT change it. -->
+    <string name="locale">en</string>
+
+    <string name="app_name">Summit</string>
+
+    <string name="error_network">Network error. Please check your internet connection and try again.</string>
+    <string name="error_network_timeout">Network error. The request took too long. Please try again.</string>
+    <string name="error_unknown">Unknown error. Please try again.</string>
+    <string name="error_loading_build">Error loading build</string>
+    <string name="error_website">There was an error on the server. Please try again later.</string>
+    <string name="error_server_maintenance">Server is under maintenance. Please try again later.</string>
+
+    <!-- Button text. -->
+    <string name="retry">Retry</string>
+    <string name="award_count_format">%1$dx</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
+    <string name="error_auth_state_tokens_do_not_match">Auth session invalid. Please try signing in again.</string>
+    <string name="error_auth_access_denied">Sign in failed.</string>
+    <string name="error_auth_unsupported_response_type">Client error. Unsupported response type.</string>
+    <string name="error_auth_invalid_scope">Client error. Invalid scope.</string>
+    <string name="auth_success">Authentication successful!</string>
+    <string name="score_hidden">Score hidden</string>
+    <string name="offline">Offline</string>
+    <string name="save">Save</string>
+    <string name="save_success_format">File saved to %1$s</string>
+    <string name="image_viewer">Image viewer</string>
+    <string name="image_saved">Image saved.</string>
+    <string name="view">View</string>
+    <string name="error_external_activity_not_found">Could not find an app on this device for file type %1$s.</string>
+    <string name="image_saved_format">Image saved at %1$s.</string>
+    <string name="error_downloading_image">There was an error downloading the image.</string>
+    <string name="prev">Prev</string>
+    <string name="next">Next</string>
+    <string name="normal_channel_name">Normal channel</string>
+    <string name="normal_channel_description">General channel for most notifications</string>
+    <string name="offline_notification_title">Summit</string>
+    <string name="offline_notification_message">Downloading offline data…</string>
+    <string name="offline_ticker_text">Downloading offline data</string>
+    <string name="page_format">Page %1$d</string>
+    <string name="nsfw">NSFW</string>
+    <string name="popular">Popular</string>
+    <string name="all">All</string>
+    <string name="feeds">Feeds</string>
+    <string name="communities">Communities</string>
+    <string name="recents">Recents</string>
+    <string name="spoiler">Spoiler</string>
+    <string name="reveal_warning_nsfw">This post is marked as NSFW</string>
+    <string name="reveal_warning_spoiler">This post is marked as a spoiler</string>
+    <string name="reveal_warning_default">This post is hidden</string>
+    <string name="show_post_question">Show post?</string>
+    <string name="let_go_to_go_back">Let go to go back</string>
+    <string name="share">Share</string>
+    <string name="copy_link_address">Copy link address</string>
+    <string name="copy_link_text">Copy link text</string>
+    <string name="share_link">Share link</string>
+    <string name="go_to">Go to…</string>
+    <string name="go_to_description">Enter a reddit link to visit</string>
+    <string name="url_hint">Url</string>
+    <string name="invalid_link">Invalid link</string>
+    <string name="unsupported_video_type">Unsupported video type</string>
+    <string name="error_downloading_video">There was an error downloading the video.</string>
+    <string name="server_results">More results</string>
+    <string name="no_results_found">No results found</string>
+    <string name="storage_usage_legend_format">%1$s - %2$s</string>
+    <string name="offline_files">Offline files</string>
+    <string name="download_offline_data">Download offline data</string>
+    <string name="schedule_offline_download">Schedule offline download</string>
+    <string name="removed_by_mod_message">This post has been removed by the moderators of %1$s.</string>
+    <string name="history">History</string>
+    <string name="video_saved_format">Video saved at %1$s.</string>
+    <string name="offline_scheduler_title_text">Pick a time to automatically refresh Reddit</string>
+    <string name="enable">Enable</string>
+    <string name="last_fetched_format">Last fetched: %1$s.</string>
+    <string name="offline_data_not_downloaded_yet">Offline data not downloaded yet.</string>
+    <string name="downloading_offline_data">Downloading offline data…</string>
+    <string name="search">Search</string>
+    <string name="account">Account</string>
+    <string name="basics">Basics</string>
+    <string name="add_account">Add account</string>
+    <string name="karma_format">%1$s karma</string>
+    <string name="loading">Loading…</string>
+    <string name="sign_out">Sign out</string>
+    <string name="theme">Theme</string>
+    <string name="locked_post_message">This thread has been locked by the moderators of %1$s. New comments cannot be posted.</string>
+    <string name="sort">Sort…</string>
+    <string name="sort_order_hot">Hot</string>
+    <string name="sort_order_new">New</string>
+    <string name="sort_order_top">Top</string>
+    <string name="sort_order_rising">Rising</string>
+    <string name="time_frame_now">Now</string>
+    <string name="time_frame_today">Today</string>
+    <string name="time_frame_this_week">This week</string>
+    <string name="time_frame_this_month">This month</string>
+    <string name="time_frame_this_year">This year</string>
+    <string name="time_frame_all_time">All time</string>
+    <string name="layout">Layout</string>
+    <string name="list">List</string>
+    <string name="card">Card</string>
+    <string name="full">Full</string>
+    <string name="removed_by_op_message">This post was deleted by the person who originally posted it.</string>
+    <string name="subreddit_state_format">%1$s - Page %2$s</string>
+    <string name="error_history_entry_corrupt">Error. The selected history item is corrupted and cannot be used.</string>
+    <string name="error_history_entry_deleted">Error. This history item was deleted.</string>
+    <string name="clear_history">Clear history</string>
+    <string name="sort_comments_by">Sort comments by</string>
+    <string name="best">Best</string>
+    <string name="top">Top</string>
+    <string name="controversial">Controversial</string>
+    <string name="old">Old</string>
+    <string name="random">Random</string>
+    <string name="q_a"><![CDATA[Q & A]]></string>
+    <string name="raw_comment">Raw comment</string>
+    <string name="comments_coming_soon">Posting comments is currently not supported. This feature will be added soon.</string>
+    <string name="clear_offline_data">Clear offline data</string>
+    <string name="auth_required_title">Authorization required</string>
+    <string name="log_in">Log In</string>
+    <string name="cancel">Cancel</string>
+    <string name="auth_required_body">You must sign in to perform that action.</string>
+    <string name="processing_link">Processing link…</string>
+    <string name="error_unable_to_handle_link">Unable to handle link %1$s</string>
+    <string name="add_comment">Add comment</string>
+    <string name="posting_comment">Posting comment…</string>
+    <string name="edit_comment">Edit comment</string>
+    <string name="delete_comment">Delete comment</string>
+    <string name="delete_comment_confirm">Are you sure you want to delete this comment?</string>
+    <string name="save_edits">Save edits</string>
+    <string name="error_post_comment_failed">There was an error posting your comment</string>
+    <string name="error_edit_comment_failed">There was an error editing your comment</string>
+    <string name="about">About</string>
+    <string name="pref_key_about">pref_key_about</string>
+    <string name="pref_key_build_version">pref_key_build_version</string>
+    <string name="pref_title_build_version">Build version</string>
+    <string name="build_version">Version %1$s</string>
+    <string name="set_as_home_page">Set as home page</string>
+    <string name="home_page_set">Home page will be changed on next app start.</string>
+    <string name="open_in_browser">Open in browser</string>
+    <string name="save_hq">Save highest quality</string>
+    <plurals name="replies_format">
+        <item quantity="one">%1$d more reply</item>
+        <item quantity="other">%1$d more replies</item>
+    </plurals>
+    <plurals name="children_count_format">
+        <item quantity="one">(%1$d child)</item>
+        <item quantity="other">(%1$d children)</item>
+    </plurals>
+    <plurals name="point_count_format">
+        <item quantity="one">%1$s point</item>
+        <item quantity="other">%1$s points</item>
+    </plurals>
+
+
+    <string-array name="theme_type_entries">
+        <item>Day</item>
+        <item>Night</item>
+        <item>System default</item>
+    </string-array>
+</resources>

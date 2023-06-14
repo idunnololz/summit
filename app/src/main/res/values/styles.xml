@@ -1,0 +1,153 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+        <!-- Ensure the notification bar is the right color -->
+
+        <!-- No need to do this since we are setting it programatically -->
+        <!-- <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item> -->
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <item name="android:cacheColorHint">@color/black</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="appBarLayoutStyle">@style/MyApp.Widget.MaterialComponents.AppBarLayout.Primary
+        </item>
+
+        <!--Material type attributes-->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.MyTheme.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.MyTheme.Headline5</item>
+        <!-- Don't change 6 since it's used for toolbar -->
+        <!-- <item name="textAppearanceHeadline6">@style/TextAppearance.MyTheme.Headline6</item> -->
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.MyTheme.Subtitle2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.MyTheme.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.MyTheme.Body2</item>
+        <item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.MyTheme.Caption</item>
+        <item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>
+
+        <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
+
+        <item name="popupMenuStyle">@style/MyApp.Widget.MaterialComponents.PopupMenu</item>
+    </style>
+
+    <style name="AppTheme.Transparent" parent="AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="AppTheme.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/colorWindowBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+
+        <!--Material type attributes-->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.MyTheme.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.MyTheme.Headline5</item>
+        <!-- Don't change 6 since it's used for toolbar -->
+        <!-- <item name="textAppearanceHeadline6">@style/TextAppearance.MyTheme.Headline6</item> -->
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.MyTheme.Subtitle2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.MyTheme.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.MyTheme.Body2</item>
+        <item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.MyTheme.Caption</item>
+        <item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>
+
+        <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Alert" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/colorWindowBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+
+        <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Alert.Transparent">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
+
+    <!-- The launcher theme. It sets the main window background to the launch_screen drawable -->
+    <style name="AppTheme.Launcher">
+        <item name="android:windowBackground">@color/black</item>
+        <!-- Optional, on Android 5+ you can modify the colorPrimaryDark color to match the windowBackground color for further branding-->
+        <!-- <item name="colorPrimaryDark">@android:color/white</item> -->
+    </style>
+
+    <style name="MyApp.Widget.MaterialComponents.PopupMenu" parent="@style/Widget.MaterialComponents.PopupMenu">
+        <item name="android:popupBackground">@color/colorSurface</item>
+    </style>
+
+    <style name="MyApp.Widget.MaterialComponents.AppBarLayout.Primary" parent="Widget.MaterialComponents.AppBarLayout.Primary">
+        <item name="android:background">@color/appBarBackground</item>
+    </style>
+
+    <style name="MyApp.Widget.MaterialComponents.Button.TextButton.Icon" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:textColor">@color/colorTextTitle</item>
+        <item name="iconTint">@color/colorTextTitle</item>
+    </style>
+
+    <style name="MyApp.Widget.AppCompat.ImageButton" parent="Widget.AppCompat.ImageButton">
+        <item name="tint">?attr/colorControlNormal</item>
+        <item name="iconTint">?attr/colorControlNormal</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/colorDivider</item>
+    </style>
+
+    <style name="HorizontalDivider">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/colorDivider</item>
+    </style>
+
+    <style name="DayPickerDayStyle">
+        <item name="android:textAppearance">?textAppearanceBody1</item>
+        <item name="android:textColor">@color/colorTextTitle</item>
+    </style>
+</resources>

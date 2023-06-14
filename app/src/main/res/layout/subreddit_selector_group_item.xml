@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceOverline"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:minWidth="@dimen/padding"
+        android:minHeight="@dimen/padding"
+        android:maxWidth="@dimen/padding"
+        android:maxHeight="@dimen/padding"
+        android:layout_marginStart="@dimen/padding_half"
+        android:layout_marginLeft="@dimen/padding_half"
+        app:layout_constraintStart_toEndOf="@+id/titleTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/titleTextView"
+        app:layout_constraintBottom_toBottomOf="@+id/titleTextView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2016 The Android Open Source Project
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<!-- Padding set programatically -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="bottom"
+    android:layoutDirection="ltr"
+    android:background="@color/colorOverlay"
+    android:id="@+id/controllerRootView">
+
+    <ImageButton
+        android:id="@+id/exo_more"
+        android:layout_width="40dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_more_vert_black_24"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/exo_volume_control"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_volume_up_black_24"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@+id/exo_more"
+        app:layout_constraintTop_toTopOf="@+id/exo_more"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_more" />
+
+    <ImageButton
+        android:id="@+id/exo_rotate_control"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@+id/exo_volume_control"
+        app:layout_constraintTop_toTopOf="@+id/exo_more"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_more" />
+
+    <ImageButton
+        android:id="@id/exo_prev"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/baseline_skip_previous_black_36"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/barrier"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="exo_play,exo_pause"
+        app:barrierDirection="start" />
+
+    <ImageButton
+        android:id="@+id/exo_play"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/baseline_play_arrow_black_48"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exo_more"
+        app:layout_constraintBottom_toTopOf="@+id/bottomPlaceholder" />
+
+    <ImageButton
+        android:id="@+id/exo_pause"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/baseline_pause_black_48"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exo_more"
+        app:layout_constraintBottom_toTopOf="@+id/bottomPlaceholder" />
+
+    <TextView
+        android:id="@id/exo_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:includeFontPadding="false"
+        android:textColor="#FFBEBEBE"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bottomPlaceholder"
+        app:layout_constraintBottom_toBottomOf="@+id/bottomPlaceholder" />
+
+    <View
+        android:id="@id/exo_progress_placeholder"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="26dp"
+        app:layout_constraintStart_toEndOf="@+id/exo_position"
+        app:layout_constraintEnd_toStartOf="@+id/exo_duration"
+        app:layout_constraintTop_toTopOf="@+id/bottomPlaceholder"
+        app:layout_constraintBottom_toBottomOf="@+id/bottomPlaceholder" />
+
+    <TextView
+        android:id="@id/exo_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginEnd="4dp"
+        android:includeFontPadding="false"
+        android:textColor="#FFBEBEBE"
+        app:layout_constraintEnd_toStartOf="@+id/exo_fullscreen"
+        app:layout_constraintTop_toTopOf="@+id/bottomPlaceholder"
+        app:layout_constraintBottom_toBottomOf="@+id/bottomPlaceholder" />
+
+    <ImageButton
+        android:id="@+id/exo_fullscreen"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_fullscreen_black_24"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bottomPlaceholder"
+        app:layout_constraintBottom_toBottomOf="@+id/bottomPlaceholder" />
+
+    <View
+        android:id="@+id/bottomPlaceholder"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

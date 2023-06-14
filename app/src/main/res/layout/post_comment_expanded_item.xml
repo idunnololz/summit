@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/threadLinesContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
+        android:layout_marginLeft="@dimen/reddit_content_horizontal_padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"></LinearLayout>
+
+    <View
+        android:id="@+id/startGuideLine"
+        android:layout_width="@dimen/padding_quarter"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <View
+        android:id="@+id/topHotspot"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
+        app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
+        app:layout_constraintStart_toEndOf="@+id/headerView"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/headerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fadingEdge="horizontal"
+        android:requiresFadingEdge="horizontal"
+        android:scrollbars="none"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
+        app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintEnd_toStartOf="@+id/collapseSectionButton">
+
+        <com.idunnololz.summit.view.RedditHeaderView
+            android:id="@+id/headerContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </HorizontalScrollView>
+
+    <ImageButton
+        android:id="@+id/collapseSectionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:src="@drawable/baseline_expand_less_black_18"
+        android:background="?selectableItemBackgroundBorderless"
+        android:paddingStart="@dimen/reddit_content_horizontal_padding"
+        android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+        app:layout_constraintStart_toEndOf="@+id/headerView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/media_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/padding_half"
+        app:layout_constraintTop_toBottomOf="@+id/headerView"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBody1"
+        android:layout_marginTop="@dimen/padding_quarter"
+        android:textColor="@color/colorTextTitle"
+        android:textIsSelectable="true"
+        android:layout_marginEnd="@dimen/padding_half"
+        app:layout_constraintTop_toBottomOf="@+id/media_container"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="text"
+        app:barrierDirection="bottom" />
+
+    <ImageButton
+        android:id="@+id/moreButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_more_horiz_black_18"
+        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintEnd_toStartOf="@+id/controlsDivider2" />
+
+    <View
+        android:id="@+id/controlsDivider2"
+        android:layout_height="0dp"
+        android:layout_width="1dp"
+        android:background="@color/colorDivider"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintEnd_toStartOf="@+id/commentButton"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton" />
+
+    <ImageButton
+        android:id="@+id/commentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_comment_black_18"
+        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintEnd_toStartOf="@+id/controlsDivider" />
+
+    <View
+        android:id="@+id/controlsDivider"
+        android:layout_height="0dp"
+        android:layout_width="1dp"
+        android:background="@color/colorDivider"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintEnd_toStartOf="@+id/upvoteButton"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton" />
+
+    <ImageButton
+        android:id="@+id/upvoteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_up_bold_black_24dp"
+        android:padding="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:tint="?colorControlNormal"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintEnd_toStartOf="@+id/upvoteCount" />
+
+    <TextView
+        android:id="@+id/upvoteCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintEnd_toStartOf="@+id/downvoteButton" />
+
+    <ImageButton
+        android:id="@+id/downvoteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_down_bold_black_24dp"
+        android:paddingStart="@dimen/padding_half"
+        android:paddingLeft="@dimen/padding_half"
+        android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"
+        android:paddingRight="@dimen/reddit_content_horizontal_padding_for_downvote"
+        android:background="?selectableItemBackgroundBorderless"
+        app:tint="?colorControlNormal"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/padding_quarter"
+        android:layout_marginRight="@dimen/padding_quarter"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/startGuideLine" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

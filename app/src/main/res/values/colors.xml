@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Important theme colors -->
+    <color name="colorPrimary">@color/orangeTheme</color>
+    <color name="colorPrimaryDark">@color/orangeDarkTheme</color>
+    <color name="colorSecondary">@color/orangeTheme</color>
+    <color name="colorAccent">@color/orangeTheme</color>
+    <color name="colorActionModeBackground">@color/googleBackground</color>
+    <color name="colorSnackbarBackground">@color/googleBackground</color>
+    <color name="colorOnSnackbarBackground">@color/white97</color>
+    <color name="colorOnPrimary">@color/white97</color>
+    <color name="colorOnSecondary">@color/black97</color>
+    <color name="colorOnBackground">@color/black97</color>
+    <color name="colorOnSurface">@color/black97</color>
+    <color name="colorText">@color/black70</color>
+    <color name="colorTextTitle">@color/black97</color>
+    <color name="colorTextInverted">@color/white</color>
+
+    <color name="colorBackground">#f6f6f6</color>
+    <color name="colorWindowBackground">@color/colorSurface</color>
+    <color name="colorSurface">@color/white</color>
+    <color name="colorLink">#0079d3</color>
+
+    <color name="colorHighlight">@color/black10</color>
+
+    <color name="drawer_bg">@color/white</color>
+
+    <color name="colorSurfaceShade">@color/black10</color>
+
+    <color name="colorCardBackground">@color/colorSurface</color>
+
+    <color name="itemTreeVeinColor">@color/black33</color>
+    <color name="itemCostColor">#ffa700</color>
+    <color name="colorOverlay">@color/black50</color>
+
+    <color name="appBarBackground">@color/colorSurface</color>
+
+    <color name="colorDivider">#bbbbbb</color>
+
+    <color name="colorQuoteLine">#bbbbbb</color>
+
+    <!-- This color MUST be a solid color to avoid UI issues -->
+    <color name="colorThreadLines">#cccccc</color>
+
+    <color name="colorSpoilerRevealed">@color/black10</color>
+    <!-- Important theme colors end -->
+
+    <color name="blueTheme">#1f97f3</color>
+    <color name="blueDarkTheme">#1677d2</color>
+    <color name="orangeTheme">#f97a2f</color>
+    <color name="orangeDarkTheme">#ac4304</color>
+
+    <color name="googleBackground">#FF202124</color>
+    <color name="googleSurface">#FF35373a</color>
+
+    <color name="upvoteColor">#ff4500</color>
+    <color name="downvoteColor">#7193ff</color>
+
+
+    <color name="white05">#0DFFFFFF</color>
+    <color name="white10">#1AFFFFFF</color>
+    <color name="white20">#33FFFFFF</color>
+    <color name="white30">#4CFFFFFF</color>
+    <color name="white50">#80FFFFFF</color>
+    <color name="white66">#A8FFFFFF</color>
+    <color name="white97">#F7FFFFFF</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="black">#000</color>
+    <color name="black97">#F7000000</color>
+    <color name="black80">#CC000000</color>
+    <color name="black70">#B3000000</color>
+    <color name="black50">#80000000</color>
+    <color name="black33">#54000000</color>
+    <color name="black20">#33000000</color>
+    <color name="black15">#26000000</color>
+    <color name="black10">#1A000000</color>
+
+
+    <color name="style_red">#F44336</color>
+    <color name="style_purple">#9C27B0</color>
+    <color name="style_amber">#FFC107</color>
+    <color name="style_orange">#FF9800</color>
+    <color name="style_green">#4CAF50</color>
+    <color name="style_teal">#009688</color>
+    <color name="style_blue">#2196F3</color>
+    <color name="style_indigo">#3F51B5</color>
+    <color name="style_blue_gray">#607D8B</color>
+    <color name="style_brown">#795548</color>>
+    <color name="style_pink">#E91E63</color>
+
+    <color name="gray">#808080</color>
+
+    <color name="style_amber10">#1AFFC107</color>
+
+</resources>

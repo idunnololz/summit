@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground">
+
+    <HorizontalScrollView
+        android:id="@+id/headerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_half"
+        android:paddingStart="@dimen/reddit_content_horizontal_padding"
+        android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+        android:fadingEdge="horizontal"
+        android:requiresFadingEdge="horizontal"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.idunnololz.summit.view.RedditHeaderView
+            android:id="@+id/headerContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceHeadline4"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
+        android:layout_marginRight="@dimen/reddit_content_horizontal_padding"
+        android:layout_marginTop="@dimen/padding_quarter"
+        app:layout_constraintTop_toBottomOf="@+id/headerView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="title"
+        app:barrierDirection="bottom" />
+
+    <LinearLayout
+        android:id="@+id/fullContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/padding_half"
+        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/bottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="fullContent"
+        app:barrierDirection="bottom" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/commentButton"
+        style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/reddit_content_horizontal_padding"
+        android:paddingLeft="@dimen/reddit_content_horizontal_padding"
+        app:icon="@drawable/baseline_comment_black_18"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bottomBarrier" />
+
+    <ImageButton
+        android:id="@+id/upvoteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_up_bold_black_24dp"
+        android:padding="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintEnd_toStartOf="@+id/upvoteCount" />
+
+    <TextView
+        android:id="@+id/upvoteCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintEnd_toStartOf="@+id/downvoteButton" />
+
+    <ImageButton
+        android:id="@+id/downvoteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_down_bold_black_24dp"
+        android:paddingStart="@dimen/padding_half"
+        android:paddingLeft="@dimen/padding_half"
+        android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"
+        android:paddingRight="@dimen/reddit_content_horizontal_padding_for_downvote"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
