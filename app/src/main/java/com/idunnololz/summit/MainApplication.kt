@@ -18,10 +18,11 @@ import com.idunnololz.summit.reddit_actions.RedditAction
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.video.ExoPlayerManager
+import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.plugins.RxJavaPlugins
 import java.util.*
 
-
+@HiltAndroidApp
 class MainApplication : Application() {
 
     companion object {

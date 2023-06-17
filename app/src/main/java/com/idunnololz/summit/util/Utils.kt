@@ -29,6 +29,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.reddit_objects.RedditObject
@@ -874,5 +875,20 @@ object Utils {
         }
 
         return "${nf.format(totalBytes)} $suffix"
+    }
+
+
+    // convert a data class to a map
+    fun <T> T.serializeToMap(): Map<String, String> {
+        return convert()
+    }
+
+    // convert an object of type I to type O
+    private inline fun <I, reified O> I.convert(): O {
+        val json = gson.toJson(this)
+        return gson.fromJson(
+            json,
+            object : TypeToken<O>() {}.type,
+        )
     }
 }

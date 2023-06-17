@@ -18,7 +18,7 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.reddit_objects.UserInfo
 import com.idunnololz.summit.util.PreferenceUtil
-import com.idunnololz.summit.util.Status
+import com.idunnololz.summit.util.StatefulData
 
 class AccountSettingsFragment : BasePreferenceFragment() {
 
@@ -68,13 +68,12 @@ class AccountSettingsFragment : BasePreferenceFragment() {
         requireMainActivity().insetRootViewAutomatically(viewLifecycleOwner, view)
 
         userInfoViewModel.userInfoLiveData.observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-                Status.SUCCESS -> {
+            when (it) {
+                is StatefulData.Error -> {}
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
                     refreshAccountsUi(it.data)
-                }
-                Status.FAILED -> {
                 }
             }
         })
@@ -89,19 +88,20 @@ class AccountSettingsFragment : BasePreferenceFragment() {
         }
 
         userInfoViewModel.signOutLiveData.observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                    signOutDialog.show()
-                }
-                Status.SUCCESS -> {
-                    signOutDialog.dismiss()
-                }
-                Status.FAILED -> {
+            when (it) {
+                is StatefulData.Error -> {
                     signOutDialog.dismiss()
 
                     AlertDialogFragment.Builder()
                         .setMessage(R.string.error_unknown)
                         .createAndShow(parentFragmentManager, "asdf")
+                }
+                is StatefulData.Loading -> {
+                    signOutDialog.show()
+                }
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    signOutDialog.dismiss()
                 }
             }
         })

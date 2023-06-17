@@ -17,12 +17,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
+import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.tabs.TabSubredditState
+import com.idunnololz.summit.tabs.TabCommunityState
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.Status
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.moshi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import java.lang.RuntimeException
@@ -81,18 +83,19 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
         historyViewModel?.loadHistory()
         historyViewModel?.historyEntriesLiveData?.observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.showDefaultErrorMessageFor(it.error)
+                }
+                is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
-                Status.SUCCESS -> {
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
                     binding.loadingView.hideAll()
                     binding.swipeRefreshLayout.isRefreshing = false
 
                     adapter.setItems(it.data)
-                }
-                Status.FAILED -> {
-                    binding.loadingView.showDefaultErrorMessageFor(it.requireError())
                 }
             }
         })
@@ -177,8 +180,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                                 .setMessage(R.string.error_history_entry_deleted)
                                 .createAndShow(this@HistoryFragment, "asdf")
                         } else {
-                            val state =
-                                Utils.gson.fromJson(it.extras, TabSubredditState::class.java)
+                            val state = moshi.adapter(TabCommunityState::class.java).fromJson(it.extras)
                             requireMainActivity().restoreTabState(state)
                         }
                     }, {

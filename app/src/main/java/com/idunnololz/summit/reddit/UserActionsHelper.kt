@@ -7,7 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.R
 import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.reddit_actions.ActionInfo
-import com.idunnololz.summit.util.Status
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 
 object UserActionsHelper {
@@ -31,13 +31,12 @@ object UserActionsHelper {
             onVoteChangedFn(dir)
 
             PendingActionsManager.instance.voteOn(id, dir, lifecycleOwner) {
-                when (it.status) {
-                    Status.LOADING -> {
-                    }
-                    Status.SUCCESS -> {
+                when (it) {
+                    is StatefulData.Error -> {}
+                    is StatefulData.Loading -> {}
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
                         onVoteChangedFn((it.data.info as ActionInfo.VoteActionInfo).dir)
-                    }
-                    Status.FAILED -> {
                     }
                 }
             }

@@ -1,11 +1,13 @@
 package com.idunnololz.summit.history
 
 import android.content.Context
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.db.MainDatabase
-import com.idunnololz.summit.reddit.SubredditViewState
-import com.idunnololz.summit.reddit_objects.ListingItem
-import com.idunnololz.summit.tabs.TabSubredditState
+import com.idunnololz.summit.lemmy.CommunityViewState
+import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.tabs.TabCommunityState
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.moshi
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -42,14 +44,14 @@ class HistoryManager(
             .getAllLiteHistoryEntries()
             .subscribeOn(scheduler)
 
-    fun recordVisit(jsonUrl: String, saveReason: HistorySaveReason, originalPost: ListingItem?) {
+    fun recordVisit(jsonUrl: String, saveReason: HistorySaveReason, post: PostView?) {
         val ts = System.currentTimeMillis()
         val newEntry = HistoryEntry(
             id = 0,
             type = HistoryEntry.TYPE_PAGE_VISIT,
             reason = saveReason,
             url = jsonUrl,
-            shortDesc = originalPost?.title ?: "",
+            shortDesc = post?.post?.name ?: "",
             ts = ts,
             extras = ""
         )
@@ -60,7 +62,7 @@ class HistoryManager(
     fun recordSubredditState(
         tabId: String,
         saveReason: HistorySaveReason,
-        state: SubredditViewState,
+        state: CommunityViewState,
         shortDesc: String
     ) {
         val ts = System.currentTimeMillis()
@@ -68,10 +70,10 @@ class HistoryManager(
             id = 0,
             type = HistoryEntry.TYPE_SUBREDDIT_STATE,
             reason = saveReason,
-            url = state.subredditState.currentUrl,
+            url = state.toUrl(),
             shortDesc = shortDesc,
             ts = ts,
-            extras = Utils.gson.toJson(TabSubredditState(tabId = tabId, viewState = state))
+            extras = Utils.gson.toJson(TabCommunityState(tabId = tabId, viewState = state))
         )
         recordHistoryEntry(historyEntry)
     }
@@ -88,8 +90,6 @@ class HistoryManager(
     }
 
     private fun recordHistoryEntry(newEntry: HistoryEntry) {
-        val gson = Utils.gson
-
         mainDatabase
             .historyDao()
             .getLastHistoryEntryWithType(newEntry.type)
@@ -111,11 +111,12 @@ class HistoryManager(
                         }
                     HistoryEntry.TYPE_SUBREDDIT_STATE -> {
                         // Url for subreddit state is actually the tab id...
-                        val oldState =
-                            gson.fromJson(lastEntry.extras, TabSubredditState::class.java)
-                        val newState = gson.fromJson(newEntry.extras, TabSubredditState::class.java)
-                        if (oldState.tabId == newState.tabId &&
-                            oldState.viewState.subredditState.currentPageIndex == newState.viewState.subredditState.currentPageIndex
+                        val adapter = moshi.adapter(TabCommunityState::class.java)
+                        val oldState = adapter.fromJson(lastEntry.extras)
+                        val newState = adapter.fromJson(newEntry.extras)
+                        if (oldState?.tabId == newState?.tabId &&
+                            oldState?.viewState?.communityState?.currentPageIndex ==
+                            newState?.viewState?.communityState?.currentPageIndex
                         ) {
                             // just update the last entry
                             lastEntry.copy(

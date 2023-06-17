@@ -1,8 +1,10 @@
 package com.idunnololz.summit.tabs
 
-import com.idunnololz.summit.reddit.SubredditViewState
+import com.idunnololz.summit.lemmy.CommunityViewState
+import com.squareup.moshi.JsonClass
 
-data class TabSubredditState(
+@JsonClass(generateAdapter = true)
+data class TabCommunityState(
     val tabId: String,
-    val viewState: SubredditViewState
+    val viewState: CommunityViewState
 )

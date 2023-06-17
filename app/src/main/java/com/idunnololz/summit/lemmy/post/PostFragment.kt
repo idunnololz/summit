@@ -1,7 +1,6 @@
-package com.idunnololz.summit.post
+package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -20,9 +19,9 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.text.buildSpannedString
 import androidx.core.view.ViewCompat
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -39,17 +38,25 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.LemmyListView
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
+import com.idunnololz.summit.lemmy.LemmyContentHelper
+import com.idunnololz.summit.lemmy.LemmyHeaderHelper
+import com.idunnololz.summit.lemmy.getFormattedAuthor
+import com.idunnololz.summit.lemmy.getFormattedTitle
+import com.idunnololz.summit.lemmy.getLikesWithLikesManager
+import com.idunnololz.summit.lemmy.getUpvoteText
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.post.PostFragment.Item.*
+import com.idunnololz.summit.lemmy.post.PostFragment.Item.*
+import com.idunnololz.summit.lemmy.toCommunity
 import com.idunnololz.summit.reddit.*
-import com.idunnololz.summit.reddit.ext.PostItem
-import com.idunnololz.summit.reddit.ext.flattenPostData
 import com.idunnololz.summit.reddit.ext.getFormattedTitle
 import com.idunnololz.summit.reddit_actions.ActionInfo
 import com.idunnololz.summit.reddit_actions.RedditAction
@@ -61,8 +68,9 @@ import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.LoadingView
 import com.idunnololz.summit.view.RedditHeaderView
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.AlertDialogFragmentListener {
     companion object {
         private val TAG = PostFragment::class.java.canonicalName
@@ -73,11 +81,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
     private val args: PostFragmentArgs by navArgs()
 
-    private lateinit var postViewModel: PostViewModel
+    private val postViewModel: PostViewModel by viewModels()
 
     private lateinit var adapter: RedditObjectAdapter
-
-    private lateinit var jsonUrl: String
 
     private var offlineManager = OfflineManager.instance
 
@@ -90,9 +96,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
         postponeEnterTransition()
 
-        postViewModel = ViewModelProvider(this).get(PostViewModel::class.java)
         adapter = RedditObjectAdapter(context, args.reveal) {
-            postViewModel.fetchPostData(RedditUtils.toJsonUrl(args.url), force = true)
+//            postViewModel.fetchPostData(RedditUtils.toJsonUrl(args.url), force = true)
         }
 
         sharedElementEnterTransition = SharedElementTransition()
@@ -118,14 +123,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
         requireMainActivity().apply {
             insetRootViewAutomatically(viewLifecycleOwner, view)
-            getCustomAppBarController().setSubreddit(args.currentSubreddit ?: "")
+            getCustomAppBarController().setCommunity(args.currentCommunity)
             getCustomAppBarController().clearPageIndex()
         }
 
         val context = requireContext()
         val swipeRefreshLayout = binding.swipeRefreshLayout
 
-        jsonUrl = RedditUtils.toJsonUrl(args.url)
+//        jsonUrl = RedditUtils.toJsonUrl(args.url)
 
         (activity as MainActivity).apply {
             hideActionBar()
@@ -135,13 +140,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     getView()?.translationY = it.toFloat()
             }
 
-            getCustomAppBarController().setup(
+            getCustomAppBarControllerOld().setup(
                 { controller, url ->
-                    val action =
-                        PostFragmentDirections.actionPostFragmentToSubredditFragment(url = url)
-                    findNavController().navigate(action)
-                    Utils.hideKeyboard(activity)
-                    controller.hide()
+//                    val action =
+//                        PostFragmentDirections.actionPostFragmentToSubredditFragment(url = url)
+//                    findNavController().navigate(action)
+//                    Utils.hideKeyboard(activity)
+//                    controller.hide()
+
+                    // TODO()
                 },
                 {
                     PopupMenu(context, it).apply {
@@ -173,23 +180,23 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         fun setCommentsSortOrderAndRefresh(sortOrder: CommentsSortOrder) {
                             swipeRefreshLayout.isRefreshing = true
                             postViewModel.setCommentsSortOrder(sortOrder)
-                            postViewModel.fetchPostData(RedditUtils.toJsonUrl(args.url), force = true)
+//                            postViewModel.fetchPostData(RedditUtils.toJsonUrl(args.url), force = true)
                         }
 
                         setOnMenuItemClickListener {
                             when (it.itemId) {
                                 R.id.share -> {
-                                    val sendIntent: Intent = Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        putExtra(
-                                            Intent.EXTRA_TEXT,
-                                            RedditUtils.toSharedLink(args.url)
-                                        )
-                                        type = "text/plain"
-                                    }
-
-                                    val shareIntent = Intent.createChooser(sendIntent, null)
-                                    startActivity(shareIntent)
+//                                    val sendIntent: Intent = Intent().apply {
+//                                        action = Intent.ACTION_SEND
+//                                        putExtra(
+//                                            Intent.EXTRA_TEXT,
+//                                            RedditUtils.toSharedLink(args.url)
+//                                        )
+//                                        type = "text/plain"
+//                                    }
+//
+//                                    val shareIntent = Intent.createChooser(sendIntent, null)
+//                                    startActivity(shareIntent)
                                     true
                                 }
                                 R.id.go_to -> {
@@ -236,49 +243,42 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             forceRefresh()
         }
 
-        if (postViewModel.redditObjects.value?.status != Status.SUCCESS) {
-            args.originalPost?.let { originalPost ->
-                adapter.setStartingData(listOf(ListingItemObject(originalPost)))
-                onMainListingItemRetreived(originalPost)
-            } ?: binding.loadingView.showProgressBar()
-        }
-        postViewModel.fetchPostData(jsonUrl)
+        args.post?.let { post ->
+            adapter.setStartingData(
+                PostViewModel.PostData(
+                    PostViewModel.ListView.PostListView(post),
+                    listOf(),
+            ))
+            onMainListingItemRetreived(post)
+        } ?: binding.loadingView.showProgressBar()
 
-        HistoryManager.instance.recordVisit(
-            jsonUrl = jsonUrl,
-            saveReason = HistorySaveReason.LOADING,
-            originalPost = args.originalPost
-        )
-
-        postViewModel.redditObjects.observe(viewLifecycleOwner,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {
-                        adapter.isLoaded = false
-                    }
-                    Status.SUCCESS -> {
-                        swipeRefreshLayout.isRefreshing = false
-
-                        binding.loadingView.hideAll()
-
-                        adapter.setData(it.data)
-
-                        if (!hasConsumedJumpToComments && args.jumpToComments) {
-                            hasConsumedJumpToComments = true
-
-                            (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-                                1,
-                                0
-                            )
-                        }
-                    }
-                    Status.FAILED -> {
-                        adapter.setError(it.requireError())
-                        swipeRefreshLayout.isRefreshing = false
+        postViewModel.postData.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.showDefaultErrorMessageFor(it.error)
+                }
+                is StatefulData.Loading -> {
+                    if (!adapter.hasStartingData()) {
+                        binding.loadingView.showProgressBar()
                     }
                 }
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+                    adapter.setData(it.data)
+                }
             }
-        )
+        }
+
+        postViewModel.fetchPostData(args.id)
+
+        args.post?.getUrl()?.let { url ->
+            HistoryManager.instance.recordVisit(
+                jsonUrl = url,
+                saveReason = HistorySaveReason.LOADING,
+                post = args.post
+            )
+        }
 
         postViewModel.redditMoreComments.observe(viewLifecycleOwner) {
             adapter.setMoreCommentData(it)
@@ -301,20 +301,24 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
     }
 
     private fun forceRefresh() {
-        postViewModel.fetchPostData(jsonUrl, force = true)
+        postViewModel.fetchPostData(args.id, force = true)
     }
 
-    fun onMainListingItemRetreived(listingItem: ListingItem) {
+    fun onMainListingItemRetreived(post: PostView) {
         (activity as? MainActivity)?.apply {
-            getCustomAppBarController().setSubreddit(args.currentSubreddit ?: listingItem.subredditNamePrefixed)
+            getCustomAppBarController().setCommunity(
+                args.currentCommunity ?: post.community.toCommunity()
+            )
             getCustomAppBarController().clearPageIndex()
         }
 
-        HistoryManager.instance.recordVisit(
-            jsonUrl = jsonUrl,
-            saveReason = HistorySaveReason.LOADED,
-            originalPost = listingItem
-        )
+        post.getUrl()?.let { url ->
+            HistoryManager.instance.recordVisit(
+                jsonUrl = url,
+                saveReason = HistorySaveReason.LOADED,
+                post = post,
+            )
+        }
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
@@ -438,19 +442,20 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         }
 
         data class HeaderItem(
-            val listingItem: ListingItem,
+            val postView: PostView,
             var videoState: VideoState?
-        ) : Item(TYPE_LISTING_ITEM, listingItem.name)
+        ) : Item(TYPE_LISTING_ITEM, postView.getUniqueKey())
 
         data class CommentItem(
-            val commentItem: RedditCommentItem,
+            val comment: CommentView,
             val depth: Int,
             val baseDepth: Int,
             val isExpanded: Boolean,
-            val isPending: Boolean
+            val isPending: Boolean,
+            val view: PostViewModel.ListView.CommentListView,
         ) : Item(
             if (isExpanded) TYPE_COMMENT_EXPANDED_ITEM else TYPE_COMMENT_COLLAPSED_ITEM,
-            commentItem.name
+            "comment_${comment.comment.id}"
         )
 
         data class MoreCommentsItem(
@@ -561,8 +566,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
         private var items: List<Item> = listOf()
 
-        private val redditHeaderHelper = RedditHeaderHelper(context)
-        private val redditThreadLinesHelper = RedditThreadLinesHelper(context)
+        private val lemmyHeaderHelper = LemmyHeaderHelper(context)
+        private val lemmyContentHelper = LemmyContentHelper(
+            context, this@PostFragment, offlineManager, ExoPlayerManager.get(this@PostFragment)
+        )
+        private val threadLinesHelper = ThreadLinesHelper(context)
         private val redditContentHelper = RedditContentHelper(
             context, this@PostFragment, offlineManager, ExoPlayerManager.get(this@PostFragment)
         )
@@ -577,7 +585,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         private var composeCommentItems: HashMap<String, ComposeCommentItem> = hashMapOf()
         private var editCommentItems: HashMap<String, EditCommentItem> = hashMapOf()
 
-        private var rawData: List<RedditObject>? = null
+        private val collapsedPaths = mutableSetOf<String>()
+
+        private var rawData: PostViewModel.PostData? = null
 
         private var tempSize = Size()
 
@@ -585,16 +595,16 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         var isLoaded: Boolean = false
         private var error: Throwable? = null
 
-        val onRedditActionChangedCallback: (DataWithState<RedditAction>) -> Unit = {
-            if (it.status == Status.SUCCESS) {
+        val onRedditActionChangedCallback: (StatefulData<RedditAction>) -> Unit = {
+            if (it is StatefulData.Success) {
                 val actionInfo = it.data.info
                 if (actionInfo is ActionInfo.CommentActionInfo) {
                     removeComposeCommentItemFor(actionInfo.parentId)
                 } else if (actionInfo is ActionInfo.EditActionInfo) {
                     removeEditCommentItemFor(actionInfo.thingId)
                 }
-            } else if (it.status == Status.FAILED) {
-                val error = it.requireError() as PendingActionsManager.PendingActionsException
+            } else if (it is StatefulData.Error) {
+                val error = it.error as PendingActionsManager.PendingActionsException
                 val actionInfo = error.redditAction.info
                 if (actionInfo is ActionInfo.CommentActionInfo) {
                     setComposeCommentItemErrorFor(actionInfo.parentId, error = error.cause)
@@ -659,29 +669,29 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     } else {
                         // this is an incremental update... Only update the stats, do not update content...
                         val h = holder as HeaderViewHolder
+                        val post = item.postView
+                        val postKey = post.getUniqueKey()
 
-                        redditHeaderHelper.populateHeaderSpan(
-                            h.headerContainer, item.listingItem, listAuthor = false
+                        lemmyHeaderHelper.populateHeaderSpan(
+                            h.headerContainer, post, listAuthor = false
                         )
 
-                        h.titleTextView.text = item.listingItem.getFormattedTitle()
-                        h.authorTextView.text = RedditUtils.formatAuthor(item.listingItem.author)
+                        h.titleTextView.text = post.getFormattedTitle()
+                        h.authorTextView.text = post.getFormattedAuthor()
 
-                        h.commentButton.text =
-                            RedditUtils.abbrevNumber(item.listingItem.numComments.toLong())
-                        h.upvoteCount.text = RedditUtils.getUpvoteText(item.listingItem)
+                        h.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
+                        h.upvoteCount.text = post.getUpvoteText()
+                        h.commentButton.isEnabled = !post.post.locked
                         h.commentButton.setOnClickListener {
-                            handleCommentClick(item.listingItem.name)
+                            handleCommentClick(postKey)
                         }
 
-                        h.commentButton.isEnabled = !item.listingItem.locked
-
-                        redditContentHelper.setupFullContent(
-                            reveal = revealAll || revealedItems.contains(item.listingItem.name),
+                        lemmyContentHelper.setupFullContent(
+                            reveal = revealAll || revealedItems.contains(postKey),
                             tempSize = tempSize,
                             videoViewMaxHeight = (binding.recyclerView.height - Utils.convertDpToPixel(16f)).toInt(),
                             fullImageViewTransitionName = "post_image",
-                            listingItem = item.listingItem,
+                            postView = post,
                             rootView = h.itemView,
                             fullContentContainerView = h.fullContentContainerView,
                             onFullImageViewClickListener = { v, url ->
@@ -707,7 +717,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                                 }
                             },
                             onRevealContentClickedFn = {
-                                revealedItems.add(item.listingItem.name)
+                                revealedItems.add(postKey)
                                 notifyItemChanged(h.adapterPosition)
                             },
                             lazyUpdate = true,
@@ -715,8 +725,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         )
 
                         UserActionsHelper.setupActions(
-                            item.listingItem.name,
-                            item.listingItem.getLikesWithLikesManager(),
+                            post.getUniqueKey(),
+                            post.getLikesWithLikesManager(),
                             viewLifecycleOwner,
                             childFragmentManager,
                             h.upvoteButton,
@@ -726,15 +736,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                             if (h.bindingAdapterPosition < 0) {
                                 return@a
                             }
-                            item.listingItem.likes = when {
-                                onVote > 0 -> true
-                                onVote < 0 -> false
-                                else -> null
-                            }
-                            (items[h.bindingAdapterPosition] as HeaderItem).listingItem.likes =
-                                item.listingItem.likes
+//                            item.listingItem.likes = when {
+//                                onVote > 0 -> true
+//                                onVote < 0 -> false
+//                                else -> null
+//                            }
+//                            (items[h.bindingAdapterPosition] as HeaderItem).postView.counts.upvotes =
+//                                item.listingItem.likes
                             notifyItemChanged(h.bindingAdapterPosition, Unit)
-                            Log.d(TAG, "onVote(): $onVote. new state: ${item.listingItem.likes}")
+//                            Log.d(TAG, "onVote(): $onVote. new state: ${item.listingItem.likes}")
                         }
                     }
                 }
@@ -772,33 +782,33 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     Log.d(TAG, "Post item is bound!")
                     val h = holder as HeaderViewHolder
                     val item = items[position] as HeaderItem
+                    val post = item.postView
+                    val postKey = post.getUniqueKey()
 
                     setupTransitionAnimation(h.titleTextView)
 
                     ViewCompat.setTransitionName(h.titleTextView, "title")
 
-                    redditHeaderHelper.populateHeaderSpan(
-                        h.headerContainer, item.listingItem, listAuthor = false
+                    lemmyHeaderHelper.populateHeaderSpan(
+                        h.headerContainer, item.postView, listAuthor = false
                     )
 
-                    h.titleTextView.text = item.listingItem.getFormattedTitle()
-                    h.authorTextView.text = RedditUtils.formatAuthor(item.listingItem.author)
+                    h.titleTextView.text = post.getFormattedTitle()
+                    h.authorTextView.text = post.getFormattedAuthor()
 
-                    h.commentButton.text =
-                        RedditUtils.abbrevNumber(item.listingItem.numComments.toLong())
-                    h.upvoteCount.text = RedditUtils.getUpvoteText(item.listingItem)
-
-                    h.commentButton.isEnabled = !item.listingItem.locked
+                    h.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
+                    h.upvoteCount.text = post.getUpvoteText()
+                    h.commentButton.isEnabled = !post.post.locked
                     h.commentButton.setOnClickListener {
-                        handleCommentClick(item.listingItem.name)
+                        handleCommentClick(postKey)
                     }
 
-                    redditContentHelper.setupFullContent(
-                        reveal = revealAll || revealedItems.contains(item.listingItem.name),
+                    lemmyContentHelper.setupFullContent(
+                        reveal = revealAll || revealedItems.contains(postKey),
                         tempSize = tempSize,
                         videoViewMaxHeight = (binding.recyclerView.height - Utils.convertDpToPixel(16f)).toInt(),
                         fullImageViewTransitionName = "post_image",
-                        listingItem = item.listingItem,
+                        postView = post,
                         rootView = h.itemView,
                         fullContentContainerView = h.fullContentContainerView,
                         onFullImageViewClickListener = { v, url ->
@@ -824,16 +834,16 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                             }
                         },
                         onRevealContentClickedFn = {
-                            revealedItems.add(item.listingItem.name)
-                            notifyItemChanged(h.adapterPosition)
+                            revealedItems.add(postKey)
+                            notifyItemChanged(h.absoluteAdapterPosition)
                         },
                         videoState = item.videoState
                     )
 
-                    Log.d(TAG, "header vote state: ${item.listingItem.likes}")
+                    Log.d(TAG, "header vote state: ${item.postView.counts.upvotes}")
                     UserActionsHelper.setupActions(
-                        item.listingItem.name,
-                        item.listingItem.getLikesWithLikesManager(),
+                        post.getUniqueKey(),
+                        post.getLikesWithLikesManager(),
                         viewLifecycleOwner,
                         childFragmentManager,
                         h.upvoteButton,
@@ -843,15 +853,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         if (h.bindingAdapterPosition < 0) {
                             return@a
                         }
-                        item.listingItem.likes = when {
-                            onVote > 0 -> true
-                            onVote < 0 -> false
-                            else -> null
-                        }
-                        (items[h.bindingAdapterPosition] as HeaderItem).listingItem.likes =
-                            item.listingItem.likes
+//                        item.listingItem.likes = when {
+//                            onVote > 0 -> true
+//                            onVote < 0 -> false
+//                            else -> null
+//                        }
+//                        (items[h.bindingAdapterPosition] as HeaderItem).listingItem.likes =
+//                            item.listingItem.likes
                         notifyItemChanged(h.bindingAdapterPosition, Unit)
-                        Log.d(TAG, "onVote(): $onVote. new state: ${item.listingItem.likes}")
+//                        Log.d(TAG, "onVote(): $onVote. new state: ${item.listingItem.likes}")
                     }
 
                     h.itemView.tag = item
@@ -860,14 +870,28 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     val h = holder as CommentExpandedViewHolder
                     val b = h.binding
                     val item = items[position] as CommentItem
-                    val body = item.commentItem.body
+                    val comment = item.comment
+                    val body = comment.comment.content
 
-                    redditThreadLinesHelper.populateThreadLines(
+                    threadLinesHelper.populateThreadLines(
                         b.threadLinesContainer, item.depth, item.baseDepth
                     )
-                    redditHeaderHelper.populateHeaderSpan(b.headerContainer, item.commentItem)
+                    lemmyHeaderHelper.populateHeaderSpan(b.headerContainer, item.comment)
 
-                    RedditUtils.bindRedditText(b.text, body)
+                    if (comment.comment.deleted) {
+                        b.text.text = buildSpannedString {
+                            append(context.getString(R.string.deleted))
+                            setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+                        }
+                    } else if (comment.comment.removed) {
+                        b.text.text = buildSpannedString {
+                            append(context.getString(R.string.removed))
+                            setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+                        }
+                    } else {
+                        RedditUtils.bindRedditText(b.text, body)
+                    }
+
                     b.text.movementMethod = CustomLinkMovementMethod().apply {
                         onLinkLongClickListener = DefaultLinkLongClickListener(context)
                     }
@@ -931,7 +955,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         b.mediaContainer.visibility = View.GONE
                     }
 
-                    b.upvoteCount.text = RedditUtils.getUpvoteText(item.commentItem)
+                    b.upvoteCount.text = item.comment.getUpvoteText()
 
                     b.collapseSectionButton.setOnClickListener {
                         collapseSection(h.bindingAdapterPosition)
@@ -940,52 +964,50 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         collapseSection(h.bindingAdapterPosition)
                     }
                     b.commentButton.setOnClickListener {
-                        handleCommentClick(item.commentItem.name)
+                        handleCommentClick(item.comment.getUniqueKey())
                     }
-                    b.moreButton.setOnClickListener {
-                        Log.d(TAG, "Item: $item")
-                        Log.d(TAG, "Body: ${Utils.fromHtml(item.commentItem.bodyHtml)}")
-
-                        RedditUtils.bindRedditText(b.text, body)
-                        redditHeaderHelper.populateHeaderSpan(b.headerContainer, item.commentItem)
-
-                        PopupMenu(context, b.moreButton).apply {
-                            inflate(R.menu.menu_comment_item)
-
-                            if (!item.commentItem.canModPost) {
-                                menu.setGroupVisible(R.id.mod_post_actions, false)
-                                //menu.findItem(R.id.edit_comment).isVisible = false
-                            }
-
-                            setOnMenuItemClickListener {
-                                when (it.itemId) {
-                                    R.id.raw_comment -> {
-                                        val action =
-                                            PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
-                                                commentItemStr = Utils.gson.toJson(item.commentItem)
-                                            )
-                                        findNavController().navigate(action)
-                                    }
-                                    R.id.edit_comment -> {
-                                        handleEditClick(item.commentItem)
-                                    }
-                                    R.id.delete_comment -> {
-                                        AlertDialogFragment.Builder()
-                                            .setMessage(R.string.delete_comment_confirm)
-                                            .setPositiveButton(android.R.string.yes)
-                                            .setNegativeButton(android.R.string.no)
-                                            .setExtra(EXTRA_COMMENT_ID, item.commentItem.name)
-                                            .createAndShow(
-                                                childFragmentManager,
-                                                CONFIRM_DELETE_COMMENT_TAG
-                                            )
-                                    }
-                                }
-                                true
-                            }
-                        }.show()
-                    }
-                    if (item.commentItem.locked) {
+//                    b.moreButton.setOnClickListener {
+//
+//                        RedditUtils.bindRedditText(b.text, body)
+//                        redditHeaderHelper.populateHeaderSpan(b.headerContainer, item.commentItem)
+//
+//                        PopupMenu(context, b.moreButton).apply {
+//                            inflate(R.menu.menu_comment_item)
+//
+//                            if (!item.commentItem.canModPost) {
+//                                menu.setGroupVisible(R.id.mod_post_actions, false)
+//                                //menu.findItem(R.id.edit_comment).isVisible = false
+//                            }
+//
+//                            setOnMenuItemClickListener {
+//                                when (it.itemId) {
+//                                    R.id.raw_comment -> {
+//                                        val action =
+//                                            PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
+//                                                commentItemStr = Utils.gson.toJson(item.commentItem)
+//                                            )
+//                                        findNavController().navigate(action)
+//                                    }
+//                                    R.id.edit_comment -> {
+//                                        handleEditClick(item.commentItem)
+//                                    }
+//                                    R.id.delete_comment -> {
+//                                        AlertDialogFragment.Builder()
+//                                            .setMessage(R.string.delete_comment_confirm)
+//                                            .setPositiveButton(android.R.string.yes)
+//                                            .setNegativeButton(android.R.string.no)
+//                                            .setExtra(EXTRA_COMMENT_ID, item.commentItem.name)
+//                                            .createAndShow(
+//                                                childFragmentManager,
+//                                                CONFIRM_DELETE_COMMENT_TAG
+//                                            )
+//                                    }
+//                                }
+//                                true
+//                            }
+//                        }.show()
+//                    }
+                    if (item.comment.comment.distinguished) {
                         b.overlay.visibility = View.VISIBLE
                         b.overlay.setBackgroundResource(R.drawable.locked_overlay)
                     } else {
@@ -993,18 +1015,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     }
 
                     UserActionsHelper.setupActions(
-                        item.commentItem.name,
-                        item.commentItem.likes,
+                        comment.getUniqueKey(),
+                        comment.getLikesWithLikesManager(),
                         viewLifecycleOwner,
                         childFragmentManager,
                         b.upvoteButton,
                         b.downvoteButton
                     ) { onVote ->
-                        item.commentItem.likes = when {
-                            onVote > 0 -> true
-                            onVote < 0 -> false
-                            else -> null
-                        }
+//                        item.commentItem.likes = when {
+//                            onVote > 0 -> true
+//                            onVote < 0 -> false
+//                            else -> null
+//                        }
                         notifyItemChanged(h.adapterPosition)
                     }
 
@@ -1014,11 +1036,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     val h = holder as CommentCollapsedViewHolder
                     val item = items[position] as CommentItem
 
-                    redditThreadLinesHelper.populateThreadLines(
+                    threadLinesHelper.populateThreadLines(
                         h.threadLinesContainer, item.depth, item.baseDepth
                     )
-                    redditHeaderHelper.populateHeaderSpan(
-                        h.headerView, item.commentItem, detailed = true
+                    lemmyHeaderHelper.populateHeaderSpan(
+                        h.headerView, item.comment, detailed = true
                     )
 
                     h.expandSectionButton.setOnClickListener {
@@ -1027,7 +1049,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     h.topHotspot.setOnClickListener {
                         expandSection(h.adapterPosition)
                     }
-                    if (item.commentItem.locked) {
+                    if (item.comment.comment.distinguished) {
                         h.overlay.visibility = View.VISIBLE
                         h.overlay.setBackgroundResource(R.drawable.locked_overlay)
                     } else {
@@ -1040,7 +1062,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     val h = holder as MoreCommentsViewHolder
                     val item = items[position] as MoreCommentsItem
 
-                    redditThreadLinesHelper.populateThreadLines(
+                    threadLinesHelper.populateThreadLines(
                         h.threadLinesContainer, item.depth, item.baseDepth
                     )
                     h.moreButton.text = context.resources.getQuantityString(
@@ -1341,50 +1363,76 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             var mainListingItemSeen = false
             val newItems =
                 if (error == null) {
-                    val redditObjects = rawData.flattenPostData(moreCommentsMap)
-                    val finalItems = arrayListOf<Item>()
+//                    val redditObjects = rawData.flattenPostData(moreCommentsMap)
+                    val finalItems = mutableListOf<Item>()
 
-                    redditObjects.forEach { redditObject ->
-                        when (redditObject) {
-                            is PostItem.ContentItem -> {
-                                if (!mainListingItemSeen) {
-                                    mainListingItemSeen = true
-                                    onMainListingItemRetreived(redditObject.listingItem)
-                                }
+                    rawData.postView.let {
+                        if (!mainListingItemSeen) {
+                            mainListingItemSeen = true
+                            onMainListingItemRetreived(it.post)
+                        }
 
-                                finalItems += HeaderItem(redditObject.listingItem, args.videoState)
+                        finalItems += HeaderItem(it.post, args.videoState)
 
-                                composeCommentItems[redditObject.listingItem.name]?.let {
-                                    finalItems += it
-                                }
-                            }
-                            is PostItem.CommentItem -> {
-                                editCommentItems[redditObject.commentItem.name]?.let {
-                                    finalItems += it
-                                } ?: run {
-                                    finalItems += CommentItem(
-                                        redditObject.commentItem,
-                                        redditObject.depth,
-                                        0,
-                                        !redditObject.commentItem.collapsed,
-                                        redditObject.isPending
-                                    )
-                                }
-
-                                composeCommentItems[redditObject.commentItem.name]?.let {
-                                    finalItems += it
-                                }
-                            }
-                            is PostItem.MoreCommentsItem -> {
-                                finalItems += MoreCommentsItem(
-                                    redditObject.moreItem,
-                                    redditObject.depth,
-                                    0,
-                                    redditObject.linkId
-                                )
-                            }
+                        composeCommentItems[it.post.getUniqueKey()]?.let {
+                            finalItems += it
                         }
                     }
+
+                    rawData.commentTree.flatten().forEach {
+                        finalItems += CommentItem(
+                            it.comment,
+                            it.comment.getDepth(),
+                            0,
+                            !it.isCollapsed,
+                            false,
+                            view = it,
+                        )
+                    }
+
+
+//
+//                    redditObjects.forEach { redditObject ->
+//                        when (redditObject) {
+//                            is PostItem.ContentItem -> {
+//                                if (!mainListingItemSeen) {
+//                                    mainListingItemSeen = true
+//                                    onMainListingItemRetreived(redditObject.listingItem)
+//                                }
+//
+//                                finalItems += HeaderItem(redditObject.listingItem, args.videoState)
+//
+//                                composeCommentItems[redditObject.listingItem.name]?.let {
+//                                    finalItems += it
+//                                }
+//                            }
+//                            is PostItem.CommentItem -> {
+//                                editCommentItems[redditObject.commentItem.name]?.let {
+//                                    finalItems += it
+//                                } ?: run {
+//                                    finalItems += CommentItem(
+//                                        redditObject.commentItem,
+//                                        redditObject.depth,
+//                                        0,
+//                                        !redditObject.commentItem.collapsed,
+//                                        redditObject.isPending
+//                                    )
+//                                }
+//
+//                                composeCommentItems[redditObject.commentItem.name]?.let {
+//                                    finalItems += it
+//                                }
+//                            }
+//                            is PostItem.MoreCommentsItem -> {
+//                                finalItems += MoreCommentsItem(
+//                                    redditObject.moreItem,
+//                                    redditObject.depth,
+//                                    0,
+//                                    redditObject.linkId
+//                                )
+//                            }
+//                        }
+//                    }
 
                     if (!isLoaded) {
                         finalItems += listOf(ProgressItem())
@@ -1433,13 +1481,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             }
         }
 
-        fun setStartingData(data: List<RedditObject>) {
+        fun setStartingData(data: PostViewModel.PostData) {
             rawData = data
 
             refreshItems()
         }
 
-        fun setData(data: List<RedditObject>) {
+        fun hasStartingData(): Boolean = rawData?.postView != null
+
+        fun setData(data: PostViewModel.PostData) {
             if (!isLoaded) {
                 isLoaded = true
             }
@@ -1453,8 +1503,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         private fun collapseSection(position: Int) {
             if (position < 0) return
 
-            val commentItem = (items[position] as CommentItem).commentItem
-            commentItem.collapsed = true
+            val commentItem = (items[position] as CommentItem).view
+            commentItem.isCollapsed = true
 
             refreshItems(refreshHeader = false)
         }
@@ -1462,8 +1512,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         private fun expandSection(position: Int) {
             if (position < 0) return
 
-            val commentItem = (items[position] as CommentItem).commentItem
-            commentItem.collapsed = false
+            val commentItem = (items[position] as CommentItem).view
+            commentItem.isCollapsed = false
 
             refreshItems(refreshHeader = false)
         }

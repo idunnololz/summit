@@ -3,6 +3,7 @@ package com.idunnololz.summit.reddit
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.idunnololz.summit.lemmy.Community
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.reddit_objects.ListingItem
 import com.idunnololz.summit.reddit_objects.ListingObject
@@ -35,7 +36,7 @@ class RedditPageLoader {
     var onPostLoadedListener: ((RedditObjectsWebsiteAdapter) -> Unit)? = null
 
     val defaultSubreddit = PreferenceUtil.getDefaultPage()
-    private var _currentSubreddit: String = defaultSubreddit
+    private var _currentSubreddit: Community = defaultSubreddit
         private set
 
     val currentSubreddit = MutableLiveData<String>()
@@ -187,7 +188,7 @@ class RedditPageLoader {
         )
 
     fun createRedditState(): SubredditState =
-        SubredditState(pages, currentPageIndex, _currentSubreddit, getSharedLinkForCurrentPage())
+        SubredditState(pages, currentPageIndex, "", getSharedLinkForCurrentPage())
 
     fun restoreState(state: SubredditState?) {
         state ?: return
@@ -256,13 +257,6 @@ class RedditPageLoader {
     }
 
     private fun updateSubreddit(subreddit: String?) {
-        if (subreddit == null) {
-            Log.d(TAG, "Subreddit is null. Defaulting to $defaultSubreddit")
-            _currentSubreddit = RedditUtils.normalizeSubredditPath(defaultSubreddit)
-            return
-        }
-
-        _currentSubreddit = RedditUtils.normalizeSubredditPath(subreddit)
     }
 
     private fun fetchPage(force: Boolean = false) {
@@ -273,13 +267,11 @@ class RedditPageLoader {
             popAllPages()
         }
 
-        currentSubreddit.postValue(_currentSubreddit)
-
         val url = getUrlForPage(sortOrder = sortOrder, after = after)
         onListingPageLoadStartListener?.invoke()
 
         // rpc = reddit page cache
-        val key = "__rpc_${_currentSubreddit.replace("/", ".")}_${sortOrder.getKey()}_${after}__"
+        val key = ""//""__rpc_${_currentSubreddit.replace("/", ".")}_${sortOrder.getKey()}_${after}__"
 
         fun onLoaded(adapter: RedditListingWebsiteAdapter) {
             if (adapter.isSuccess()) {

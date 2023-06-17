@@ -31,8 +31,8 @@ import java.util.concurrent.CountDownLatch
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
-
-@UnstableApi class OfflineManager(
+@SuppressLint("UnsafeOptInUsageError")
+class OfflineManager(
     private val context: Context
 ) {
 
@@ -49,6 +49,7 @@ import kotlin.collections.LinkedHashMap
         }
     }
 
+    val downloadInProgressDir = File(context.filesDir, "dl")
     val imagesDir = File(context.filesDir, "imgs")
     val videosDir = File(context.filesDir, "videos")
     val videoCacheDir = File(context.cacheDir, "videos")
@@ -266,16 +267,25 @@ import kotlin.collections.LinkedHashMap
             currentTask = task
         }
 
-        val downloadedFile = File(destDir, getFilenameForUrl(url))
+        val fileName = getFilenameForUrl(url)
+        val downloadedFile = File(destDir, fileName)
+        val downloadingFile = File(downloadInProgressDir, fileName)
         Log.d(TAG, "dl file: " + downloadedFile.absolutePath)
-        1
+
         if (!force && downloadedFile.exists()) {
             return downloadedFile
         }
 
+        downloadInProgressDir.parentFile?.mkdirs()
         downloadedFile.parentFile?.mkdirs()
 
-        val error = saveToFileFn(downloadedFile)
+        val error = saveToFileFn(downloadingFile)
+
+        if (downloadedFile.exists()) {
+            downloadedFile.delete()
+        }
+
+        downloadingFile.renameTo(downloadedFile)
         if (error != null) {
             throw error
         } else {
@@ -287,22 +297,29 @@ import kotlin.collections.LinkedHashMap
         url: String,
         listener: TaskListener,
         errorListener: TaskFailedListener? = null
-    ): Registration = fetchGeneric(url, imagesDir, false, { destFile ->
-        val req = Request.Builder()
-            .url(url)
-            .build()
+    ): Registration = fetchGeneric(
+        url = url,
+        destDir = imagesDir,
+        force = false,
+        saveToFileFn = { destFile ->
+            val req = Request.Builder()
+                .url(url)
+                .build()
 
-        val response = Client.get().newCall(req).execute()
-        val sink: BufferedSink = destFile.sink().buffer()
-        response.body?.source()?.let {
-            sink.writeAll(it)
-        }
-        sink.close()
+            val response = Client.get().newCall(req).execute()
+            val sink: BufferedSink = destFile.sink().buffer()
+            response.body?.source()?.let {
+                sink.writeAll(it)
+            }
+            sink.close()
 
-        Log.d(TAG, "Downloaded image from $url")
+            Log.d(TAG, "Downloaded image from $url")
 
-        null
-    }, listener, errorListener)
+            null
+        },
+        listener = listener,
+        errorListener = errorListener
+    )
 
     fun calculateImageMaxSizeIfNeeded(file: File) {
         if (hasMaxImageSizeHint(file)) {

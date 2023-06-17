@@ -79,13 +79,14 @@ class SubredditTabsFragment : BaseFragment<FragmentSubredditTabsBinding>() {
                 }
 
                 onSubredditSelectedListener = { _, url ->
-                    val tabId = tabsManager.addNewTab(
-                        TabItem.PageTabItem.newTabItem(tabId = "", url = url)
-                    )
-
-                    Utils.hideKeyboard(activity)
-                    switchTabs(tabId)
-                    hide()
+                    TODO()
+//                    val tabId = tabsManager.addNewTab(
+//                        TabItem.PageTabItem.newTabItem(tabId = "", url = url)
+//                    )
+//
+//                    Utils.hideKeyboard(activity)
+//                    switchTabs(tabId)
+//                    hide()
                 }
             }
         }
@@ -187,44 +188,45 @@ class SubredditTabsFragment : BaseFragment<FragmentSubredditTabsBinding>() {
         }
 
         fun setTabs(allTabs: List<TabItem>) {
-            val newItems = allTabs.map {
-                when (it) {
-                    is TabItem.PageTabItem -> {
-                        TabViewItem(
-                            it.pageDetails.url,
-                            it.tabId,
-                            it.previewPath,
-                            it.previewSignature
-                        )
-                    }
-                }
-            }
-            val oldItems = items
-
-            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    val oldItem = oldItems[oldItemPosition]
-                    val newItem = newItems[newItemPosition]
-
-                    return oldItem.tabId == newItem.tabId
-                }
-
-                override fun getOldListSize(): Int = oldItems.size
-
-                override fun getNewListSize(): Int = newItems.size
-
-                override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int
-                ): Boolean {
-                    val oldItem = oldItems[oldItemPosition]
-                    val newItem = newItems[newItemPosition]
-                    return areItemsTheSame(oldItemPosition, newItemPosition) && oldItem == newItem
-                }
-
-            })
-            this.items = newItems
-            diff.dispatchUpdatesTo(this)
+            val newItems = TODO()
+//                allTabs.map {
+//                when (it) {
+//                    is TabItem.PageTabItem -> {
+//                        TabViewItem(
+//                            it.pageDetails.url,
+//                            it.tabId,
+//                            it.previewPath,
+//                            it.previewSignature
+//                        )
+//                    }
+//                }
+//            }
+//            val oldItems = items
+//
+//            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+//                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//                    val oldItem = oldItems[oldItemPosition]
+//                    val newItem = newItems[newItemPosition]
+//
+//                    return oldItem.tabId == newItem.tabId
+//                }
+//
+//                override fun getOldListSize(): Int = oldItems.size
+//
+//                override fun getNewListSize(): Int = newItems.size
+//
+//                override fun areContentsTheSame(
+//                    oldItemPosition: Int,
+//                    newItemPosition: Int
+//                ): Boolean {
+//                    val oldItem = oldItems[oldItemPosition]
+//                    val newItem = newItems[newItemPosition]
+//                    return areItemsTheSame(oldItemPosition, newItemPosition) && oldItem == newItem
+//                }
+//
+//            })
+//            this.items = newItems
+//            diff.dispatchUpdatesTo(this)
         }
     }
 }

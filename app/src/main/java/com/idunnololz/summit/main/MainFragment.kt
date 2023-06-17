@@ -19,10 +19,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMainBinding
-import com.idunnololz.summit.post.PostFragmentArgs
 import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.subreddit.SubredditFragment
-import com.idunnololz.summit.subreddit.SubredditFragmentArgs
+import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.tabs.*
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.attachNavHostFragment
@@ -73,7 +72,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
                 currentNavController?.navigate(
                     R.id.subredditFragment,
-                    tabItem.toSubredditFragmentArgs()
+                    tabItem.toCommunityFragmentArgs()
                 )
             }
         }
@@ -108,7 +107,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             firstFragmentTag,
             R.navigation.subreddit,
             R.id.innerNavHostContainer,
-            firstTab.toSubredditFragmentArgs()
+            firstTab.toCommunityFragmentArgs()
         )
 
         attachNavHostFragment(childFragmentManager, navHostFragment, true)
@@ -182,17 +181,19 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         if (pathSegments.size >= 1) {
             if (pathSegments[0].equals("r", ignoreCase = true)) {
                 if (pathSegments.size == 2) {
-                    currentNavController?.navigate(
-                        R.id.subredditFragment,
-                        SubredditFragmentArgs(
-                            url = RedditUtils.extractPrefixedSubreddit(uri.toString())
-                        ).toBundle()
-                    )
+//                    currentNavController?.navigate(
+//                        R.id.subredditFragment,
+//                        CommunityFragmentArgs(
+//                            url = RedditUtils.extractPrefixedSubreddit(uri.toString())
+//                        ).toBundle()
+//                    )
                 } else if (pathSegments.size > 2) {
-                    currentNavController?.navigate(
-                        R.id.postFragment,
-                        PostFragmentArgs(url = uri.toString(), originalPost = null).toBundle()
-                    )
+//                    currentNavController?.navigate(
+//                        R.id.postFragment,
+//                        PostFragmentArgs(url = uri.toString()).toBundle()
+//                    )
+
+                    TODO()
                 } else {
                     Log.d(TAG, "Unable to handle uri $uri")
 
@@ -201,10 +202,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         .createAndShow(childFragmentManager, "error")
                 }
             } else if (pathSegments[0].equals("comments", ignoreCase = true)) {
-                currentNavController?.navigate(
-                    R.id.postFragment,
-                    PostFragmentArgs(url = uri.toString(), originalPost = null).toBundle()
-                )
+//                currentNavController?.navigate(
+//                    R.id.postFragment,
+//                    PostFragmentArgs(url = uri.toString()).toBundle()
+//                )
+                TODO()
             } else {
                 Log.d(TAG, "Unable to handle uri $uri")
 
@@ -294,7 +296,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             newlySelectedItemTag,
             R.navigation.subreddit,
             R.id.innerNavHostContainer,
-            currentTab.toSubredditFragmentArgs()
+            currentTab.toCommunityFragmentArgs()
         )
 
         setCurrentNavController(selectedFragment.navController)
@@ -383,19 +385,19 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         )
     }
 
-    fun TabItem.toSubredditFragmentArgs(): Bundle = when (this) {
+    fun TabItem.toCommunityFragmentArgs(): Bundle = when (this) {
         is TabItem.PageTabItem ->
-            SubredditFragmentArgs(url = pageDetails.url).toBundle()
+            CommunityFragmentArgs(community = pageDetails.community).toBundle()
     }
 
-    fun restoreTabState(state: TabSubredditState) {
+    fun restoreTabState(state: TabCommunityState) {
         // we need to check if tab is still open since user could have closed it
         if (tabsManager.getTab(state.tabId) == null) {
             // tab was closed... restore it
             tabsManager.addNewTab(
                 TabItem.PageTabItem.newTabItem(
                     tabId = state.tabId,
-                    url = state.viewState.subredditState.subreddit
+                    community = state.viewState.communityState.community
                 )
             )
         }
@@ -413,7 +415,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     binding.rootView.post(this)
                 } else {
                     val curFrag = childFragmentManager.getCurrentNavigationFragment()
-                    if (curFrag is SubredditFragment) {
+                    if (curFrag is CommunityFragment) {
                         curFrag.restoreState(state.viewState, reload = true)
                     } else {
                         // Pop the back stack to the start destination of the current navController graph

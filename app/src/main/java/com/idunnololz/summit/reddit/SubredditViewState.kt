@@ -3,11 +3,11 @@ package com.idunnololz.summit.reddit
 import android.content.Context
 import android.os.Bundle
 import com.idunnololz.summit.R
-import com.idunnololz.summit.subreddit.RedditViewModel
+import com.idunnololz.summit.lemmy.community.CommunityViewModel
 
 data class SubredditViewState(
     val subredditState: SubredditState,
-    val pageScrollStates: List<RedditViewModel.PageScrollState>
+    val pageScrollStates: List<CommunityViewModel.PageScrollState>
 ) {
     companion object {
 

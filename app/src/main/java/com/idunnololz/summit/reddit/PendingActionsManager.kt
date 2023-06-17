@@ -17,8 +17,8 @@ import com.idunnololz.summit.db.MainDatabase
 import com.idunnololz.summit.reddit_actions.ActionInfo
 import com.idunnololz.summit.reddit_actions.RedditAction
 import com.idunnololz.summit.reddit_objects.RedditCommentItem
-import com.idunnololz.summit.util.DataWithState
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.Do
@@ -120,7 +120,7 @@ class PendingActionsManager(private val context: Context) {
         id: String,
         dir: Int,
         lifecycleOwner: LifecycleOwner,
-        cb: (DataWithState<RedditAction>) -> Unit
+        cb: (StatefulData<RedditAction>) -> Unit
     ) {
         Single
             .create<RedditAction> { emitter ->
@@ -164,7 +164,7 @@ class PendingActionsManager(private val context: Context) {
         parentId: String,
         text: String,
         lifecycleOwner: LifecycleOwner,
-        cb: (DataWithState<RedditAction>) -> Unit
+        cb: (StatefulData<RedditAction>) -> Unit
     ) {
         Single
             .create<RedditAction> { emitter ->
@@ -194,7 +194,7 @@ class PendingActionsManager(private val context: Context) {
         thingId: String,
         text: String,
         lifecycleOwner: LifecycleOwner,
-        cb: (DataWithState<RedditAction>) -> Unit
+        cb: (StatefulData<RedditAction>) -> Unit
     ) {
         Single
             .create<RedditAction> { emitter ->
@@ -218,7 +218,7 @@ class PendingActionsManager(private val context: Context) {
     fun deleteComment(
         commentId: String,
         lifecycleOwner: LifecycleOwner,
-        cb: (DataWithState<RedditAction>) -> Unit
+        cb: (StatefulData<RedditAction>) -> Unit
     ) {
         Single
             .create<RedditAction> { emitter ->
@@ -246,7 +246,7 @@ class PendingActionsManager(private val context: Context) {
     private fun createLiveDataAndRegisterCallback(
         action: RedditAction,
         lifecycleOwner: LifecycleOwner,
-        cb: (DataWithState<RedditAction>) -> Unit
+        cb: (StatefulData<RedditAction>) -> Unit
     ) {
         val countDownLatch = CountDownLatch(1)
 

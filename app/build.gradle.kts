@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.parcelize")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -52,7 +53,6 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.core)
     implementation(libs.fragment.ktx)
-    implementation(libs.okhttp)
     implementation(libs.material)
     implementation(libs.cardview)
     implementation(libs.recyclerview)
@@ -89,6 +89,13 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
 
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp.okhttp)
+    implementation(libs.okhttp.logging.intercepter)
+
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.retrofit2.converter.gson)
+
     implementation(libs.markwon.core)
     implementation(libs.markwon.ext.tables)
     implementation(libs.markwon.simple.ext)
@@ -100,6 +107,12 @@ dependencies {
 
     implementation(libs.browser)
 
+    implementation(libs.moshi)
+    implementation(libs.moshi.adapter)
+    ksp(libs.moshi.kotlin.codegen)
+
+    implementation("io.arrow-kt:arrow-core:1.2.0-RC")
+
     // TODO: Remove the following deps
     implementation("org.apmem.tools:layouts:1.10@aar")
     implementation("commons-io:commons-io:2.6")
@@ -110,4 +123,14 @@ dependencies {
     implementation(libs.rx.rxjava)
     implementation(libs.rx.rxandroid)
     implementation(libs.work.rxjava2)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+
+    implementation(libs.threeten.abp)
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }

@@ -180,8 +180,8 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/closeButton">
 
-                    <com.idunnololz.summit.view.RedditSortOrderView
-                        android:id="@+id/redditSortOrderView"
+                    <com.idunnololz.summit.view.LemmySortOrderView
+                        android:id="@+id/sort_order_view"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent" />
 

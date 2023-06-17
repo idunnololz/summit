@@ -1,5 +1,6 @@
 package com.idunnololz.summit.video
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -22,7 +23,7 @@ import kotlin.collections.HashMap
 /**
  * Facilitates exoplayer reuse
  */
-@UnstableApi
+@SuppressLint("UnsafeOptInUsageError")
 class ExoPlayerManager(
     private val context: Context
 ) {

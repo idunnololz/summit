@@ -139,13 +139,13 @@ class SubredditSelectorController(
         disposables.clear()
     }
 
-    fun setSubredditsState(it: DataWithState<List<SubredditItem>>) {
-        when (it.status) {
-            Status.LOADING -> {
-            }
-            Status.SUCCESS ->
+    fun setSubredditsState(it: StatefulData<List<SubredditItem>>) {
+        when (it) {
+            is StatefulData.Error -> {}
+            is StatefulData.Loading -> {}
+            is StatefulData.NotStarted -> {}
+            is StatefulData.Success -> {
                 adapter.setData(it.data)
-            Status.FAILED -> {
             }
         }
     }

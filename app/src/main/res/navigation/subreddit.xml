@@ -6,13 +6,13 @@
 
     <fragment
         android:id="@+id/subredditFragment"
-        android:name="com.idunnololz.summit.subreddit.SubredditFragment"
+        android:name="com.idunnololz.summit.lemmy.community.CommunityFragment"
         android:label="SubredditFragment">
         <argument
-            android:name="url"
+            android:name="community"
             android:defaultValue="@null"
             app:nullable="true"
-            app:argType="string" />
+            app:argType="com.idunnololz.summit.lemmy.Community" />
         <argument
             android:name="pages"
             android:defaultValue="@null"
@@ -45,11 +45,20 @@
     </fragment>
     <fragment
         android:id="@+id/postFragment"
-        android:name="com.idunnololz.summit.post.PostFragment"
+        android:name="com.idunnololz.summit.lemmy.post.PostFragment"
         android:label="PostFragment">
         <argument
-            android:name="url"
-            app:argType="string" />
+            android:name="id"
+            app:argType="integer" />
+        <argument
+            android:name="currentCommunity"
+            app:argType="com.idunnololz.summit.lemmy.Community"
+            app:nullable="true" />
+        <argument
+            android:name="post"
+            app:argType="com.idunnololz.summit.api.dto.PostView"
+            app:nullable="true"
+            android:defaultValue="@null"/>
         <argument
             android:name="jumpToComments"
             android:defaultValue="false"
@@ -59,19 +68,10 @@
             android:defaultValue="false"
             app:argType="boolean" />
         <argument
-            android:name="currentSubreddit"
-            android:defaultValue="@null"
-            app:nullable="true"
-            app:argType="string" />
-        <argument
             android:name="videoState"
             android:defaultValue="@null"
             app:nullable="true"
             app:argType="com.idunnololz.summit.video.VideoState"/>
-        <argument
-            android:name="originalPost"
-            app:nullable="true"
-            app:argType="com.idunnololz.summit.reddit_objects.ListingItem" />
         <action
             android:id="@+id/action_postFragment_to_imageViewerFragment"
             app:destination="@id/imageViewerFragment" />

@@ -10,7 +10,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentRedirectHandlerBinding
 import com.idunnololz.summit.reddit.RedditUtils
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.Status
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.view.LoadingView
 
 /**
@@ -53,15 +53,15 @@ class RedirectHandlerDialogFragment : BaseDialogFragment<DialogFragmentRedirectH
         }
 
         viewModel.redirectResult.observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {
+            when (it) {
+                is StatefulData.Error -> {
+                    loadingView.showDefaultErrorMessageFor(it.error)
                 }
-                Status.SUCCESS -> {
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
                     RedditUtils.openRedditUrl(requireContext(), it.data.finalUrl)
                     dismiss()
-                }
-                Status.FAILED -> {
-                    loadingView.showDefaultErrorMessageFor(it.requireError())
                 }
             }
         })

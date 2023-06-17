@@ -139,6 +139,9 @@
     <string name="home_page_set">Home page will be changed on next app start.</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="save_hq">Save highest quality</string>
+    <string name="local">Local</string>
+    <string name="deleted">[deleted]</string>
+    <string name="removed">removed</string>
     <plurals name="replies_format">
         <item quantity="one">%1$d more reply</item>
         <item quantity="other">%1$d more replies</item>

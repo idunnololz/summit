@@ -19,7 +19,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.reddit_objects.UserInfo
 import com.idunnololz.summit.util.PreferenceUtil
-import com.idunnololz.summit.util.Status
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 
 class SettingsFragment : BasePreferenceFragment() {
@@ -71,13 +71,12 @@ class SettingsFragment : BasePreferenceFragment() {
         requireMainActivity().insetRootViewAutomatically(viewLifecycleOwner, view)
 
         userInfoViewModel.userInfoLiveData.observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-                Status.SUCCESS -> {
+            when (it) {
+                is StatefulData.Error -> {}
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
                     refreshAccountsUi(it.data)
-                }
-                Status.FAILED -> {
                 }
             }
         })

@@ -26,24 +26,26 @@ import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.offline.OfflineFragment
-import com.idunnololz.summit.post.PostFragment
+import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.preview.ImageViewerFragment
 import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.reddit.RedditUtils
 import com.idunnololz.summit.redirect.RedirectHandlerDialogFragment
 import com.idunnololz.summit.settings.AccountSettingsFragment
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.subreddit.SubredditFragment
+import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.tabs.SubredditTabsFragment
-import com.idunnololz.summit.tabs.TabSubredditState
+import com.idunnololz.summit.tabs.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getCurrentNavigationFragment
 import com.idunnololz.summit.util.ext.setupWithNavController
 import com.idunnololz.summit.video.ExoPlayerManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
     companion object {
@@ -80,6 +82,7 @@ class MainActivity : BaseActivity() {
     private var showNotificationBarBg: Boolean = true
 
     private lateinit var redditAppBarController: RedditAppBarController
+    private lateinit var lemmyAppBarController: LemmyAppBarController
 
     private val insetsChangedLiveData = MutableLiveData<Int>()
 
@@ -105,6 +108,7 @@ class MainActivity : BaseActivity() {
         setupForFullScreen()
 
         redditAppBarController = RedditAppBarController(this, binding.customAppBar)
+        lemmyAppBarController = LemmyAppBarController(this, binding.customAppBar)
 
         if (savedInstanceState == null) {
             setupBottomNavigationBar()
@@ -613,7 +617,8 @@ class MainActivity : BaseActivity() {
         return subredditSelectorController
     }
 
-    fun getCustomAppBarController(): RedditAppBarController = redditAppBarController
+    fun getCustomAppBarControllerOld(): RedditAppBarController = redditAppBarController
+    fun getCustomAppBarController() = lemmyAppBarController
 
     private fun updateToolbarHeight() {
         if (toolbarHeight == 0) {
@@ -680,7 +685,8 @@ class MainActivity : BaseActivity() {
         })
     }
 
-    fun restoreTabState(state: TabSubredditState) {
+    fun restoreTabState(state: TabCommunityState?) {
+        state ?: return
         if (binding.bottomNavigationView.selectedItemId != R.id.main) {
             binding.bottomNavigationView.selectedItemId = R.id.main
         }
@@ -698,7 +704,7 @@ class MainActivity : BaseActivity() {
                 disableCustomAppBar()
                 showNotificationBarBg()
             }
-            SubredditFragment::class -> {
+            CommunityFragment::class -> {
                 hideActionBar()
                 enableBottomNavViewScrolling()
                 showNotificationBarBg()

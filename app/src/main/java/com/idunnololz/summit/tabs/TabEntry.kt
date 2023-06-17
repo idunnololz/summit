@@ -5,9 +5,10 @@ import androidx.navigation.NavController
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.lemmy.Community
+import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.main.MainFragmentArgs
-import com.idunnololz.summit.post.PostFragmentArgs
-import com.idunnololz.summit.reddit_objects.ListingItem
 import com.idunnololz.summit.tabs.TabEntryType.TYPE_PAGE
 import com.idunnololz.summit.util.Utils
 
@@ -71,8 +72,14 @@ sealed class TabItem(
             TabEntry.makePageTabEntry(tabId, sortId, previewPath, previewSignature, pageDetails)
 
         companion object {
-            fun newTabItem(tabId: String, url: String): PageTabItem =
-                PageTabItem(tabId, 0, null, null, PageDetails(url, false, null))
+            fun newTabItem(tabId: String, community: Community): PageTabItem =
+                PageTabItem(
+                    tabId = tabId,
+                    sortId = 0,
+                    previewPath = null,
+                    previewSignature = null,
+                    pageDetails = PageDetails(community, false, null)
+                )
         }
     }
 }
@@ -82,30 +89,31 @@ object TabEntryType {
 }
 
 data class PageDetails(
-    val url: String,
+    val community: Community,
     val jumpToComments: Boolean,
-    val originalPost: ListingItem?
+    val post: PostView?
 )
 
 fun TabEntry.navigate(navController: NavController) {
     when (type) {
         TYPE_PAGE -> {
-            val pageDetails = Utils.gson.fromJson(extras, PageDetails::class.java)
-            val uri = Uri.parse(pageDetails.url)
-            if (uri.pathSegments.size == 2 && uri.pathSegments[0] == "r") {
-                navController.navigate(
-                    R.id.mainFragment,
-                    MainFragmentArgs(pageDetails.url).toBundle()
-                )
-            } else {
-                navController.navigate(
-                    R.id.postFragment, PostFragmentArgs(
-                        url = pageDetails.url,
-                        jumpToComments = pageDetails.jumpToComments,
-                        originalPost = pageDetails.originalPost
-                    ).toBundle()
-                )
-            }
+//            val pageDetails = Utils.gson.fromJson(extras, PageDetails::class.java)
+//            val uri = Uri.parse(pageDetails.url)
+//            if (uri.pathSegments.size == 2 && uri.pathSegments[0] == "r") {
+//                navController.navigate(
+//                    R.id.mainFragment,
+//                    MainFragmentArgs(pageDetails.url).toBundle()
+//                )
+//            } else {
+//                TODO()
+//                navController.navigate(
+//                    R.id.postFragment, PostFragmentArgs(
+//                        url = pageDetails.url,
+//                        jumpToComments = pageDetails.jumpToComments,
+//                        post = pageDetails.post
+//                    ).toBundle()
+//                )
+//            }
         }
     }
 }

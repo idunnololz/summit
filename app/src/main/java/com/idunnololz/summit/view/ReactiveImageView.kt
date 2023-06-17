@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.RecordingCanvas
 import android.graphics.drawable.RippleDrawable
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
@@ -79,6 +81,9 @@ class ReactiveImageView : AppCompatImageView {
     }
 
     override fun onDraw(canvas: Canvas) {
+        if (!canvas.isHardwareAccelerated) {
+            return
+        }
         super.onDraw(canvas)
         if (drawOverlay) {
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)

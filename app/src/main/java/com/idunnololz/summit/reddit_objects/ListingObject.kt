@@ -162,159 +162,39 @@ class ListingItem(
     }
 }
 
+@Parcelize
 class AllPreviewInfo(
     val images: List<FullImagePreviewInfo>?
-) : Parcelable {
-    constructor(parcel: Parcel) : this(parcel.createTypedArrayList(FullImagePreviewInfo)) {
-    }
+) : Parcelable
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeTypedList(images)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<AllPreviewInfo> {
-        override fun createFromParcel(parcel: Parcel): AllPreviewInfo {
-            return AllPreviewInfo(parcel)
-        }
-
-        override fun newArray(size: Int): Array<AllPreviewInfo?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
-
+@Parcelize
 class FullImagePreviewInfo(
     val source: PreviewInfo,
     val resolutions: List<PreviewInfo>,
     val variants: ImageVariantsPreviewInfo,
     val id: String
-) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readParcelable(PreviewInfo::class.java.classLoader)!!,
-        parcel.createTypedArrayList(PreviewInfo)!!,
-        parcel.readParcelable(ImageVariantsPreviewInfo::class.java.classLoader)!!,
-        parcel.readString() ?: ""
-    ) {
-    }
+) : Parcelable
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(source, flags)
-        parcel.writeTypedList(resolutions)
-        parcel.writeParcelable(variants, flags)
-        parcel.writeString(id)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<FullImagePreviewInfo> {
-        override fun createFromParcel(parcel: Parcel): FullImagePreviewInfo {
-            return FullImagePreviewInfo(parcel)
-        }
-
-        override fun newArray(size: Int): Array<FullImagePreviewInfo?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
-
+@Parcelize
 class ImageVariantsPreviewInfo(
     val obfuscated: ImagePreviewInfo?,
     val nsfw: ImagePreviewInfo?
-) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readParcelable(ImagePreviewInfo::class.java.classLoader),
-        parcel.readParcelable(ImagePreviewInfo::class.java.classLoader)
-    ) {
-    }
+) : Parcelable
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(obfuscated, flags)
-        parcel.writeParcelable(nsfw, flags)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ImageVariantsPreviewInfo> {
-        override fun createFromParcel(parcel: Parcel): ImageVariantsPreviewInfo {
-            return ImageVariantsPreviewInfo(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ImageVariantsPreviewInfo?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
-
+@Parcelize
 class ImagePreviewInfo(
     val source: PreviewInfo,
     val resolutions: List<PreviewInfo>
-) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readParcelable(PreviewInfo::class.java.classLoader)!!,
-        parcel.createTypedArrayList(PreviewInfo)!!
-    ) {
-    }
+) : Parcelable
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(source, flags)
-        parcel.writeTypedList(resolutions)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ImagePreviewInfo> {
-        override fun createFromParcel(parcel: Parcel): ImagePreviewInfo {
-            return ImagePreviewInfo(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ImagePreviewInfo?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
-
+@Parcelize
 class PreviewInfo(
     private val url: String,
     val width: Int,
     val height: Int
 ) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
-        parcel.readInt(),
-        parcel.readInt()
-    ) {
-    }
 
     fun getUrl(): String = Utils.fromHtml(url).toString()
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(url)
-        parcel.writeInt(width)
-        parcel.writeInt(height)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<PreviewInfo> {
-        override fun createFromParcel(parcel: Parcel): PreviewInfo {
-            return PreviewInfo(parcel)
-        }
-
-        override fun newArray(size: Int): Array<PreviewInfo?> {
-            return arrayOfNulls(size)
-        }
-    }
 }
 
 class MediaInfo(
@@ -407,6 +287,7 @@ class OembedInfo(
     }
 }
 
+@Parcelize
 class VideoInfo(
     val fallbackurl: String,
     val height: Int,
@@ -417,46 +298,7 @@ class VideoInfo(
     val hlsUrl: String,
     val isGif: Boolean,
     val transcodingStatus: String
-) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
-        parcel.readInt(),
-        parcel.readInt(),
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readInt(),
-        parcel.readString() ?: "",
-        parcel.readByte() != 0.toByte(),
-        parcel.readString() ?: ""
-    ) {
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(fallbackurl)
-        parcel.writeInt(height)
-        parcel.writeInt(width)
-        parcel.writeString(scrubberMediaUrl)
-        parcel.writeString(dashUrl)
-        parcel.writeInt(duration)
-        parcel.writeString(hlsUrl)
-        parcel.writeByte(if (isGif) 1 else 0)
-        parcel.writeString(transcodingStatus)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<VideoInfo> {
-        override fun createFromParcel(parcel: Parcel): VideoInfo {
-            return VideoInfo(parcel)
-        }
-
-        override fun newArray(size: Int): Array<VideoInfo?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
+) : Parcelable
 
 class AwardInfo(
     val count: Int,
