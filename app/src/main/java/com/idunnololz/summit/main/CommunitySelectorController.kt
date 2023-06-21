@@ -48,6 +48,7 @@ typealias CommunitySelectedListener =
 
 class CommunitySelectorController @AssistedInject constructor(
     @Assisted private val context: Context,
+    private val offlineManager: OfflineManager,
     private val lemmyApiClient: AccountAwareLemmyClient,
     private val recentCommunityManager: RecentCommunityManager,
 ) {
@@ -63,8 +64,6 @@ class CommunitySelectorController @AssistedInject constructor(
     private lateinit var motionLayout: MotionLayout
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: EditText
-
-    private val offlineManager = OfflineManager.instance
 
     private var coroutineScope = createCoroutineScope()
 
@@ -275,7 +274,7 @@ class CommunitySelectorController @AssistedInject constructor(
             ) { item, b, h ->
                 val community = item.community
 
-                b.icon.setImageResource(R.drawable.ic_subreddit_default)
+                b.icon.load(R.drawable.ic_subreddit_default)
                 offlineManager.fetchImage(h.itemView, community.community.icon) {
                     b.icon.load(it)
                 }

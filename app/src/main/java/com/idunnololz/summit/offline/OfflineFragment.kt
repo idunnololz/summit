@@ -19,15 +19,19 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.setProgressCompat
 import com.idunnololz.summit.view.StorageUsageItem
 import com.idunnololz.summit.view.StorageUsageView
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.RuntimeException
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OfflineFragment : BaseFragment<FragmentOfflineBinding>(), OfflineSchedulerDialogFragment.OfflineSchedulerListener {
 
     private var progressListener: OfflineDownloadProgressListener? = null
 
     private var adapter: OfflineItemsAdapter? = null
 
-    private val offlineManager = OfflineManager.instance
+    @Inject
+    lateinit var offlineManager: OfflineManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,11 +68,11 @@ class OfflineFragment : BaseFragment<FragmentOfflineBinding>(), OfflineScheduler
 //        }
 
         progressListener =
-            OfflineManager.instance.addOfflineDownloadProgressListener { _, progress ->
+            offlineManager.addOfflineDownloadProgressListener { _, progress ->
                 adapter?.updateOfflineDownload(progress)
             }
 
-        adapter = OfflineItemsAdapter(context)
+        adapter = OfflineItemsAdapter(context, offlineManager)
         adapter?.refreshItems()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -82,7 +86,7 @@ class OfflineFragment : BaseFragment<FragmentOfflineBinding>(), OfflineScheduler
     }
 
     override fun onDestroyView() {
-        OfflineManager.instance.removeOfflineDownloadProgressListener(progressListener)
+        offlineManager.removeOfflineDownloadProgressListener(progressListener)
         super.onDestroyView()
     }
 
@@ -126,7 +130,8 @@ class OfflineFragment : BaseFragment<FragmentOfflineBinding>(), OfflineScheduler
     }
 
     private inner class OfflineItemsAdapter(
-        private val context: Context
+        private val context: Context,
+        private val offlineManager: OfflineManager,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val inflater = LayoutInflater.from(context)
@@ -256,17 +261,17 @@ class OfflineFragment : BaseFragment<FragmentOfflineBinding>(), OfflineScheduler
                     listOf(
                         StorageUsageItem(
                             "Images",
-                            Utils.getSizeOfFile(OfflineManager.instance.imagesDir),
+                            Utils.getSizeOfFile(offlineManager.imagesDir),
                             colors[0]
                         ),
                         StorageUsageItem(
                             "Videos",
-                            Utils.getSizeOfFile(OfflineManager.instance.videosDir),
+                            Utils.getSizeOfFile(offlineManager.videosDir),
                             colors[1]
                         ),
                         StorageUsageItem(
                             "VideosCache",
-                            Utils.getSizeOfFile(OfflineManager.instance.videoCacheDir),
+                            Utils.getSizeOfFile(offlineManager.videoCacheDir),
                             colors[2]
                         )
                     )

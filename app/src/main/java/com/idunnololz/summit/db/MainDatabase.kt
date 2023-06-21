@@ -32,8 +32,12 @@ import com.idunnololz.summit.util.moshi
         LemmyAction::class,
     ],
     autoMigrations = [
+        AutoMigration (
+            from = 20,
+            to = 21
+        ),
     ],
-    version = 20,
+    version = 21,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class)

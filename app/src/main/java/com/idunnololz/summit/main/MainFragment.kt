@@ -14,6 +14,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
@@ -21,12 +22,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMainBinding
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
+import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
+import com.idunnololz.summit.main.communities_pane.CommunitiesPaneViewModel
 import com.idunnololz.summit.user.*
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.attachNavHostFragment
@@ -52,10 +55,14 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     private val args: MainFragmentArgs by navArgs()
 
+    private val communitiesPaneViewModel: CommunitiesPaneViewModel by viewModels()
+
     private lateinit var firstFragmentTag: String
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
+    lateinit var communitiesPaneController: CommunitiesPaneController
 
     private val fragmentTags = hashSetOf<String>()
 
@@ -81,7 +88,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     }
 
     private val onNavigationItemReselectedListener =
-        BottomNavigationView.OnNavigationItemReselectedListener a@{
+        NavigationBarView.OnItemReselectedListener a@{
             if (it.itemId == R.id.mainFragment) {
                 val tabId = userCommunitiesManager.currentTabId.value ?: return@a
 
@@ -102,7 +109,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         savedInstanceState?.getStringArrayList(SIS_FRAGMENT_TAGS)?.forEach {
             fragmentTags.add(it)
         }
-        val callback = requireActivity().onBackPressedDispatcher.addCallback(this,
+        requireActivity().onBackPressedDispatcher.addCallback(this,
             onBackPressedCallback
         )
     }
@@ -120,6 +127,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        communitiesPaneController = communitiesPaneViewModel.createController(
+            binding.startPanel,
+            viewLifecycleOwner,
+        )
 
         val firstTab = checkNotNull(
             userCommunitiesManager.getTab(UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID))
@@ -235,7 +247,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         })
 
-        navHostFragment.navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.postFragment || destination.id == R.id.communityFragment) {
                 binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
                 binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
@@ -243,6 +255,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
                 binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
             }
+        }
+
+        requireMainActivity().apply {
+            this.insetViewAutomaticallyByMargins(this, binding.startPanel.recyclerView)
         }
     }
 
@@ -464,7 +480,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             sharedViewModel.addTab(
                 UserCommunityItem(
                     id = state.tabId,
-                    communityRef = state.viewState.communityState.communityRef
+                    communityRef = state.viewState.communityState.communityRef,
+
                 )
             )
         }

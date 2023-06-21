@@ -13,6 +13,7 @@ import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import okhttp3.Request
 import okio.BufferedSink
@@ -22,26 +23,21 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.util.*
 import java.util.concurrent.CountDownLatch
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.RuntimeException
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
 @SuppressLint("UnsafeOptInUsageError")
-class OfflineManager(
-    private val context: Context
+@Singleton
+class OfflineManager @Inject constructor(
+    @ApplicationContext private val context: Context
 ) {
 
     companion object {
 
         private val TAG = OfflineManager::class.java.simpleName
-
-        @SuppressLint("StaticFieldLeak") // application context
-        lateinit var instance: OfflineManager
-            private set
-
-        fun initialize(context: Context) {
-            instance = OfflineManager(context.applicationContext)
-        }
     }
 
     val downloadInProgressDir = File(context.filesDir, "dl")

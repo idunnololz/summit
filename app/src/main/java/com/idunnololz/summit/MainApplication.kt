@@ -142,7 +142,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         ExoPlayerManager.initialize(context)
         DataFiles.initialize(context)
         DataCache.initialize(context)
-        OfflineManager.initialize(context)
         OfflineScheduleManager.initialize(context)
         
         Fresco.initialize(this)

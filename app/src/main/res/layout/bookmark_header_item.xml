@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/bookmarks_title"
+        android:text="@string/bookmarked_communities"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceTitleMedium"
+        android:layout_marginStart="@dimen/dialog_padding"
+        android:layout_marginTop="@dimen/dialog_padding"
+        android:layout_marginBottom="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        style="?attr/materialIconButtonStyle"
+        android:id="@+id/add_community"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:layout_marginEnd="@dimen/padding_half"
+        app:icon="@drawable/baseline_add_24"
+        app:iconTint="?colorControlNormal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bookmarks_title"
+        app:layout_constraintBottom_toBottomOf="@+id/bookmarks_title" />
+</androidx.constraintlayout.widget.ConstraintLayout>

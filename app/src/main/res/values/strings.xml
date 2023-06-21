@@ -141,6 +141,9 @@
     <string name="add_account">Add account</string>
     <string name="add_another_account">Add another account</string>
     <string name="accounts_and_settings"><![CDATA[Accounts & Settings]]></string>
+    <string name="bookmarked_communities">Bookmarked communities</string>
+    <string name="subscriptions">Subscriptions</string>
+    <string name="no_subscriptions">No subscriptions</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

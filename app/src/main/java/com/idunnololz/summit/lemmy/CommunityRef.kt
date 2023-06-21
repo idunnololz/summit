@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.os.Parcelable
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
 import com.idunnololz.summit.api.dto.CommunitySafe
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -62,6 +61,6 @@ sealed interface CommunityRef : Parcelable {
         }
 }
 
-fun CommunitySafe.toCommunity(): CommunityRef.CommunityRefByObj {
+fun CommunitySafe.toCommunityRef(): CommunityRef.CommunityRefByObj {
     return CommunityRef.CommunityRefByObj(this)
 }

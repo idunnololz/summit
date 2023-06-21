@@ -87,12 +87,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     private lateinit var adapter: PostsAdapter
 
-    private var offlineManager = OfflineManager.instance
-
     private var hasConsumedJumpToComments: Boolean = false
 
     @Inject
     lateinit var historyManager: HistoryManager
+
+    @Inject
+    lateinit var offlineManager: OfflineManager
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
