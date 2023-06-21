@@ -5,11 +5,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
@@ -60,6 +63,25 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
 
     private val offlineManager = OfflineManager.instance
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                downloadImage()
+            } else {
+                Snackbar.make(
+                    binding.root,
+                    R.string.error_downloading_image_permission_denied,
+                    Snackbar.LENGTH_LONG,
+                ).setAction(R.string.help) {
+                    val i = Intent(Intent.ACTION_VIEW)
+                    i.data = Uri.parse(LinkUtils.APP_PERMISSIONS_HELP_ARTICLE)
+                    Utils.safeLaunchExternalIntent(requireContext(), i)
+                }.show()
+            }
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -76,8 +98,6 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
             sharedElementReturnTransition = SharedElementTransition()
         }
 
-        setHasOptionsMenu(true)
-
         setBinding(FragmentImageViewerBinding.inflate(inflater, container, false))
 
         return binding.root
@@ -88,24 +108,26 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
 
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
+
         (activity as? MainActivity)?.setupActionBar(R.string.image_viewer, true)
 
         requireMainActivity().let {
-            val toolbar = it.binding.toolbar
-            it.windowInsets.observe(viewLifecycleOwner, Observer {
+            val toolbarHeight = it.getToolbarHeight()
+            it.windowInsets.observe(viewLifecycleOwner) {
                 binding.rootView.getConstraintSet(R.id.normal)
                     .setMargin(
                         R.id.dismiss_warning,
                         ConstraintSet.TOP,
-                        it.top + toolbar.layoutParams.height
+                        it.top + toolbarHeight
                     )
                 binding.rootView.getConstraintSet(R.id.exiting)
                     .setMargin(
                         R.id.dismiss_warning,
                         ConstraintSet.TOP,
-                        it.top + toolbar.layoutParams.height
+                        it.top + toolbarHeight
                     )
-            })
+            }
         }
 
         binding.loadingView.showProgressBar()
@@ -124,6 +146,37 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
         binding.imageView.post {
             startPostponedEnterTransition()
         }
+
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_image_viewer, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                when (menuItem.itemId) {
+                    R.id.save -> {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            requestPermissionLauncher.launch(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            )
+                        } else {
+                            downloadImage()
+                        }
+                        true
+                    }
+                    R.id.openInBrowser -> {
+                        Utils.openExternalLink(context, args.url)
+                        true
+                    }
+                    else -> false
+                }
+
+        })
     }
 
     override fun onDestroyView() {
@@ -136,39 +189,6 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
         (requireActivity() as MainActivity).showSystemUI(false)
         websiteAdapterLoader?.destroy()
         super.onDestroy()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_image_viewer, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.save -> {
-                val context = context ?: return true
-                // Here, thisActivity is the current activity
-                if (ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    requestPermissions(
-                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        PERMISSION_REQUEST_EXTERNAL_WRITE
-                    )
-                } else {
-                    downloadImage()
-                }
-                return true
-            }
-            R.id.openInBrowser -> {
-                val context = context ?: return true
-                Utils.openExternalLink(context, args.url)
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onRequestPermissionsResult(

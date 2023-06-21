@@ -5,7 +5,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.db.MainDatabase
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
-import com.idunnololz.summit.tabs.TabCommunityState
+import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.moshi
 import io.reactivex.Scheduler
@@ -60,7 +60,7 @@ class HistoryManager(
     }
 
     fun recordSubredditState(
-        tabId: String,
+        tabId: Long,
         saveReason: HistorySaveReason,
         state: CommunityViewState,
         shortDesc: String

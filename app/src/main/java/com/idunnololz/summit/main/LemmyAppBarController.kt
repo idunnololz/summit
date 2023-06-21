@@ -1,52 +1,89 @@
 package com.idunnololz.summit.main
 
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import coil.load
+import com.google.android.material.chip.Chip
+import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunitySafe
-import com.idunnololz.summit.lemmy.Community
-import com.idunnololz.summit.lemmy.CommunitySortOrder
-import com.idunnololz.summit.reddit.RedditSortOrder
-import com.idunnololz.summit.view.LemmySortOrderView
-import com.idunnololz.summit.view.RedditSortOrderView
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.view.TabsImageButton
 
-class LemmyAppBarController(private val mainActivity: MainActivity, v: View) {
+class LemmyAppBarController(
+    private val mainActivity: MainActivity,
+    v: View
+) {
 
     private val TAG = "RedditAppBarController"
 
     private val context = mainActivity
 
     private val rootView: View = v
-    private val customActionBar: View = v.findViewById(R.id.customActionBar)
-    private val subredditTextView: TextView = v.findViewById(R.id.subredditTextView)
+    private val customActionBar: ViewGroup = v.findViewById(R.id.customActionBar)
+    private val accountChip: Chip = v.findViewById(R.id.account_chip)
+    private val accountImageView: ShapeableImageView = v.findViewById(R.id.account_image_view)
+    private val communityTextView: Chip = v.findViewById(R.id.communityTextView)
     private val pageTextView: TextView = v.findViewById(R.id.pageTextView)
     private val abTabsImageView: TabsImageButton = v.findViewById(R.id.abTabsImageView)
     private val abOverflowButton: ImageButton = v.findViewById(R.id.abOverflowButton)
-    private val sortOrderView: LemmySortOrderView = v.findViewById(R.id.sort_order_view)
+
+    private var currentCommunity: CommunityRef? = null
+    private var defaultCommunity: CommunityRef? = null
 
     fun setup(
-        subredditSelectedListener: SubredditSelectedListener,
-        abOverflowClickListener: View.OnClickListener
+        communitySelectedListener: CommunitySelectedListener,
+        abOverflowClickListener: View.OnClickListener,
+        onAccountClick: (currentAccount: Account?) -> Unit,
     ) {
-        subredditTextView.setOnClickListener {
-            val controller = mainActivity.showSubredditSelector()
-            controller.onSubredditSelectedListener = subredditSelectedListener
+        accountChip.setOnClickListener {
+            onAccountClick(null)
+        }
+        accountImageView.setOnClickListener {
+            val account = it.tag as? Account
+            onAccountClick(account)
+        }
+        communityTextView.setOnClickListener {
+            val controller = mainActivity.showCommunitySelector()
+            controller.onCommunitySelectedListener = communitySelectedListener
         }
         customActionBar.setOnClickListener {
-            val controller = mainActivity.showSubredditSelector()
-            controller.onSubredditSelectedListener = subredditSelectedListener
+            val controller = mainActivity.showCommunitySelector()
+            controller.onCommunitySelectedListener = communitySelectedListener
         }
         abOverflowButton.setOnClickListener(abOverflowClickListener)
+
+        abTabsImageView.visibility = View.GONE
     }
 
-    fun setCommunity(community: Community?) {
-        subredditTextView.text = community?.getName(context) ?: ""
+    fun setCommunity(communityRef: CommunityRef?, isHome: Boolean) {
+        currentCommunity = communityRef
+
+        updateCommunityButton()
+    }
+
+    fun setDefaultCommunity(defaultCommunity: CommunityRef?) {
+        this.defaultCommunity = defaultCommunity
+
+        updateCommunityButton()
+    }
+
+    private fun updateCommunityButton() {
+        communityTextView.text = currentCommunity?.getName(context) ?: ""
+        val isHome = currentCommunity == defaultCommunity
+
+        if (isHome) {
+            communityTextView.isChipIconVisible = true
+            communityTextView.setChipIconResource(R.drawable.baseline_home_18)
+        } else {
+            communityTextView.isChipIconVisible = false
+        }
     }
 
     fun setPageIndex(
@@ -76,26 +113,23 @@ class LemmyAppBarController(private val mainActivity: MainActivity, v: View) {
         pageTextView.setOnClickListener(null)
     }
 
-    fun setupSortOrderSelector(
-        lifecycleOwner: LifecycleOwner,
-        currentSortOrder: CommunitySortOrder,
-        onSortOrderChangedListener: LemmySortOrderView.OnSortOrderChangedListener
-    ) {
-        sortOrderView.registerOnSortOrderChangedListener(onSortOrderChangedListener)
-        if (sortOrderView.getSelection() != currentSortOrder) {
-            sortOrderView.setSelection(currentSortOrder)
+    fun onAccountChanged(it: AccountView?) {
+        if (it == null) {
+            accountChip.visibility = View.VISIBLE
+            accountImageView.visibility = View.INVISIBLE
+//            accountButton.setImageResource(R.drawable.baseline_add_24)
+//            val padding = Utils.convertDpToPixel(10f).toInt()
+//            accountButton.setPadding(padding, padding, padding, padding)
+//            accountButton.imageTintList = ColorStateList.valueOf(context.getColorFromAttribute(
+//                androidx.appcompat.R.attr.colorControlNormal))
+        } else {
+            accountChip.visibility = View.INVISIBLE
+            accountImageView.visibility = View.VISIBLE
+
+            accountImageView.tag = it.account
+            accountImageView.load(it.profileImage) {
+                placeholder(R.drawable.baseline_person_24)
+            }
         }
-
-        lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onPause(owner: LifecycleOwner) {
-                super.onPause(owner)
-                sortOrderView.unregisterOnSortOrderChangedListener(onSortOrderChangedListener)
-            }
-
-            override fun onResume(owner: LifecycleOwner) {
-                super.onResume(owner)
-                sortOrderView.registerOnSortOrderChangedListener(onSortOrderChangedListener)
-            }
-        })
     }
 }

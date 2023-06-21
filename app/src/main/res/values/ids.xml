@@ -3,5 +3,22 @@
     <item name="thumbnail_reg" type="id" />
     <item name="offline_manager_registrations" type="id" />
     <item name="view_type" type="id" />
+    <item name="is_footer" type="id"/>
     <item name="bettermovementmethod_highlight_background_span" type="id" />
+
+    <item name="sort_order_active" type="id"/>
+    <item name="sort_order_hot" type="id"/>
+    <item name="sort_order_top" type="id"/>
+    <item name="sort_order_new" type="id"/>
+    <item name="sort_order_old" type="id"/>
+    <item name="sort_order_most_comments" type="id"/>
+    <item name="sort_order_new_comments" type="id"/>
+
+    <item name="sort_order_top_day" type="id"/>
+    <item name="sort_order_top_week" type="id"/>
+    <item name="sort_order_top_month" type="id"/>
+    <item name="sort_order_top_year" type="id"/>
+    <item name="sort_order_top_all_time" type="id"/>
+
+    <item name="account_actions_manager_reg_id" type="id"/>
 </resources>

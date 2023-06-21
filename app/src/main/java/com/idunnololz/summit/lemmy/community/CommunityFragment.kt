@@ -11,15 +11,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -33,34 +32,33 @@ import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.api.dto.PostType
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSubredditBinding
+import com.idunnololz.summit.databinding.MainFooterItemBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.CommunityViewState
-import com.idunnololz.summit.lemmy.getFormattedTitle
-import com.idunnololz.summit.lemmy.getLikesWithLikesManager
+import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.lemmy.getShortDesc
-import com.idunnololz.summit.lemmy.getUpvoteText
+import com.idunnololz.summit.lemmy.utils.getUpvoteText
 import com.idunnololz.summit.lemmy.toCommunity
+import com.idunnololz.summit.lemmy.utils.VoteUiHandler
+import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.reddit.LikesManager
-import com.idunnololz.summit.reddit.RedditContentHelper
-import com.idunnololz.summit.reddit.RedditHeaderHelper
-import com.idunnololz.summit.reddit.RedditPageLoader
-import com.idunnololz.summit.reddit.RedditSortOrder
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.reddit.SubredditViewState
-import com.idunnololz.summit.reddit.UserActionsHelper
-import com.idunnololz.summit.reddit.getShortDesc
-import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.SharedElementTransition
@@ -68,18 +66,20 @@ import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.addDefaultAnim
-import com.idunnololz.summit.util.ext.drawToBitmap
 import com.idunnololz.summit.util.ext.forceShowIcons
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
+import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.video.ExoPlayerManager
-import com.idunnololz.summit.view.LemmySortOrderView
 import com.idunnololz.summit.view.RedditHeaderView
-import com.idunnololz.summit.view.RedditSortOrderView
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
+class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNavigator,
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private const val TAG = "SubredditFragment"
@@ -87,41 +87,121 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
 
     private val args: CommunityFragmentArgs by navArgs()
 
-    private val communityViewModel: CommunityViewModel by viewModels()
+    private val viewModel: CommunityViewModel by viewModels()
 
     private var adapter: ListingItemAdapter? = null
 
     private var shouldScrollToTopAfterFresh = false
 
-    private val onSortOrderChangedListener =
-        object : LemmySortOrderView.OnSortOrderChangedListener {
-            override fun onSortOrderChanged(newSortOrder: CommunitySortOrder) {
-                communityViewModel.setSortOrder(newSortOrder)
+    private val _sortByMenu: BottomMenu by lazy {
+        BottomMenu(requireContext()).apply {
+            addItem(R.id.sort_order_active, R.string.sort_order_active)
+            addItem(R.id.sort_order_hot, R.string.sort_order_hot)
+            addItem(R.id.sort_order_top, R.string.sort_order_top, R.drawable.baseline_chevron_right_24)
+            addItem(R.id.sort_order_new, R.string.sort_order_new)
+            addItem(R.id.sort_order_old, R.string.sort_order_old)
+            addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
+            addItem(R.id.sort_order_new_comments, R.string.sort_order_new_comments)
+            setTitle(R.string.sort_by)
+
+            setOnMenuItemClickListener { menuItem ->
+                when(menuItem.id) {
+                    R.id.sort_order_active ->
+                        viewModel.setSortOrder(CommunitySortOrder.Active)
+                    R.id.sort_order_hot ->
+                        viewModel.setSortOrder(CommunitySortOrder.Hot)
+                    R.id.sort_order_top ->
+                        getMainActivity()?.showBottomMenu(getSortByTopMenu())
+                    R.id.sort_order_new ->
+                        viewModel.setSortOrder(CommunitySortOrder.New)
+                    R.id.sort_order_old ->
+                        viewModel.setSortOrder(CommunitySortOrder.Old)
+                    R.id.sort_order_most_comments ->
+                        viewModel.setSortOrder(CommunitySortOrder.MostComments)
+                    R.id.sort_order_new_comments ->
+                        viewModel.setSortOrder(CommunitySortOrder.NewComments)
+                }
             }
         }
+    }
+
+    private val _sortByTopMenu: BottomMenu by lazy {
+        BottomMenu(requireContext()).apply {
+            addItem(R.id.sort_order_top_day, R.string.time_frame_today)
+            addItem(R.id.sort_order_top_week, R.string.time_frame_this_week)
+            addItem(R.id.sort_order_top_month, R.string.time_frame_this_month)
+            addItem(R.id.sort_order_top_year, R.string.time_frame_this_year)
+            addItem(R.id.sort_order_top_all_time, R.string.time_frame_all_time)
+            setTitle(R.string.sort_by_top)
+
+            setOnMenuItemClickListener { menuItem ->
+                when(menuItem.id) {
+                    R.id.sort_order_top_day ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.Today))
+                    R.id.sort_order_top_week ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisWeek))
+                    R.id.sort_order_top_month ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisMonth))
+                    R.id.sort_order_top_year ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisYear))
+                    R.id.sort_order_top_all_time ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.AllTime))
+                }
+            }
+        }
+    }
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val context = requireContext()
         if (adapter == null) {
-            adapter = ListingItemAdapter(context)
+            adapter = ListingItemAdapter(
+                context,
+                onNextClick = {
+                    viewModel.fetchNextPage(clearPagePosition = true)
+                },
+                onPrevClick = {
+                    viewModel.fetchPrevPage()
+                },
+                onSignInRequired = {
+                    PreAuthDialogFragment.newInstance()
+                        .show(childFragmentManager, "asdf")
+                },
+                onInstanceMismatch = { accountInstance, apiInstance ->
+                    AlertDialogFragment.Builder()
+                        .setTitle(R.string.error_account_instance_mismatch_title)
+                        .setMessage(
+                            getString(R.string.error_account_instance_mismatch,
+                                accountInstance,
+                                apiInstance)
+                        )
+                        .setNegativeButton(R.string.go_to_account_instance)
+                        .createAndShow(childFragmentManager, "onInstanceMismatch")
+                },
+                viewModel.voteUiHandler
+            )
             onSelectedLayoutChanged()
         }
 
-        communityViewModel.changeCommunity(args.community)
+        viewModel.changeCommunity(args.communityRef)
 
         if (savedInstanceState != null) {
             restoreState(CommunityViewState.restoreFromBundle(savedInstanceState), reload = false)
-        } else if (args.pages != null) {
-            val pages: List<String> = args.pages?.split(',') ?: listOf()
-            communityViewModel.setPages(pages.map { RedditPageLoader.PageInfo(it, 0) }, args.pageIndex)
         }
 
         val callback = object : OnBackPressedCallback(true /* enabled by default */) {
             override fun handleOnBackPressed() {
-                if (communityViewModel.currentPageIndex.value != 0) {
-                    communityViewModel.fetchPrevPage()
+                if (viewModel.currentPageIndex.value != 0) {
+                    viewModel.fetchPrevPage()
                 } else {
                     isEnabled = false
                     requireActivity().onBackPressed()
@@ -154,6 +234,17 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.doOnPreDraw {
+            adapter?.contentMaxWidth = binding.recyclerView.width
+        }
+
+        runOnReady {
+            onReady()
+        }
+    }
+
+    private fun onReady() {
+        val view = binding.root
         checkNotNull(view.findNavController())
 
         val mainActivity = requireMainActivity()
@@ -164,17 +255,17 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
             }
         }
 
-        mainActivity.insetRootViewAutomatically(viewLifecycleOwner, view)
+        mainActivity.insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
 
         val context = requireContext()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             shouldScrollToTopAfterFresh = true
-            communityViewModel.fetchCurrentPage(true)
+            viewModel.fetchCurrentPage(true)
             binding.recyclerView.scrollToPosition(0)
         }
         binding.loadingView.setOnRefreshClickListener {
-            communityViewModel.fetchCurrentPage(true)
+            viewModel.fetchCurrentPage(true)
         }
 
         binding.recyclerView.adapter = adapter
@@ -206,11 +297,11 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                 val layoutManager = (recyclerView.layoutManager as LinearLayoutManager)
                 val lastPos = layoutManager.findLastVisibleItemPosition()
                 if (lastPos == adapter.itemCount - 1) {
-                    communityViewModel.setPagePositionAtBottom(pageIndex)
+                    viewModel.setPagePositionAtBottom(pageIndex)
                 } else {
                     val firstPos = layoutManager.findFirstVisibleItemPosition()
                     val firstView = layoutManager.findViewByPosition(firstPos)
-                    communityViewModel.setPagePosition(pageIndex, firstPos, firstView?.top ?: 0)
+                    viewModel.setPagePosition(pageIndex, firstPos, firstView?.top ?: 0)
                 }
             }
         })
@@ -218,69 +309,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
         setupMainActivityButtons()
         scheduleStartPostponedTransition(binding.rootView)
 
-        communityViewModel.loadedListingData.observe(viewLifecycleOwner,
-            Observer a@{
-                when (it) {
-                    is StatefulData.Error -> {
-                        binding.swipeRefreshLayout.isRefreshing = false
-                        binding.recyclerView.visibility = View.GONE
-                        binding.loadingView.showDefaultErrorMessageFor(it.error)
-                    }
-                    is StatefulData.Loading -> {
-                        binding.loadingView.showProgressBar()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        val adapter = adapter ?: return@a
-
-//                        adapter.setItems(it.data.pageIndex, it.data.listingData)
-
-                        adapter.curDataSource = it.data.url
-
-                        if (shouldScrollToTopAfterFresh) {
-                            shouldScrollToTopAfterFresh = false
-                            binding.recyclerView.scrollToPosition(0)
-                        } else {
-                            val pagePosition = communityViewModel.getPagePosition(it.data.pageIndex)
-                            if (pagePosition.isAtBottom) {
-                                (binding.recyclerView.layoutManager as LinearLayoutManager)
-                                    .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
-                            } else if (pagePosition.itemIndex != 0 || pagePosition.offset != 0) {
-                                (binding.recyclerView.layoutManager as LinearLayoutManager)
-                                    .scrollToPositionWithOffset(
-                                        pagePosition.itemIndex,
-                                        pagePosition.offset
-                                    )
-                            } else {
-                                binding.recyclerView.scrollToPosition(0)
-                            }
-                        }
-
-                        binding.swipeRefreshLayout.isRefreshing = false
-                        binding.recyclerView.visibility = View.VISIBLE
-                        binding.loadingView.hideAll()
-
-                        // delay screenshot due to fade transition
-                        binding.loadingView.postDelayed({
-                            if (ViewCompat.isLaidOut(binding.recyclerView)) {
-                                val bgColor = ContextCompat.getColor(
-                                    context,
-                                    R.color.colorBackground
-                                )
-                                TabsManager.instance.currentTabId.value?.let {
-                                    TabsManager.instance.updateTabPreview(
-                                        it,
-                                        binding.recyclerView.drawToBitmap(backgroundColor = bgColor)
-                                    )
-                                }
-                            }
-                        }, 1000)
-                    }
-                }
-            }
-        )
-
-        communityViewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
+        viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
             when (it) {
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -296,13 +325,13 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
 
                     adapter.setItems(it.data.pageIndex, it.data)
 
-                    adapter.curDataSource = it.data.url
+                    adapter.curDataSource = it.data.instance
 
                     if (shouldScrollToTopAfterFresh) {
                         shouldScrollToTopAfterFresh = false
                         binding.recyclerView.scrollToPosition(0)
                     } else {
-                        val pagePosition = communityViewModel.getPagePosition(it.data.pageIndex)
+                        val pagePosition = viewModel.getPagePosition(it.data.pageIndex)
                         if (pagePosition.isAtBottom) {
                             (binding.recyclerView.layoutManager as LinearLayoutManager)
                                 .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
@@ -314,64 +343,54 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                                 )
                         } else {
                             binding.recyclerView.scrollToPosition(0)
+                            getMainActivity()?.showCustomAppBar()
                         }
                     }
 
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.recyclerView.visibility = View.VISIBLE
                     binding.loadingView.hideAll()
-
-                    // delay screenshot due to fade transition
-                    binding.loadingView.postDelayed({
-                        if (ViewCompat.isLaidOut(binding.recyclerView)) {
-                            val bgColor = ContextCompat.getColor(
-                                context,
-                                R.color.colorBackground
-                            )
-                            TabsManager.instance.currentTabId.value?.let {
-                                TabsManager.instance.updateTabPreview(
-                                    it,
-                                    binding.recyclerView.drawToBitmap(backgroundColor = bgColor)
-                                )
-                            }
-                        }
-                    }, 1000)
                 }
             }
         }
 
-        requireMainActivity().getCustomAppBarController().setupSortOrderSelector(
-            viewLifecycleOwner, communityViewModel.getCurrentSortOrder(), onSortOrderChangedListener)
+        viewModel.accountChanged.observe(viewLifecycleOwner) {
+            shouldScrollToTopAfterFresh = true
+            adapter?.reset()
+        }
 
         if (adapter?.getItems().isNullOrEmpty()) {
-            communityViewModel.fetchCurrentPage()
+            viewModel.fetchCurrentPage()
         }
     }
 
     override fun onResume() {
         super.onResume()
 
-        val customAppBarController = requireMainActivity().getCustomAppBarController()
+        runOnReady {
+            val customAppBarController = requireMainActivity().getCustomAppBarController()
 
-        communityViewModel.currentCommunity.observe(viewLifecycleOwner) {
-            customAppBarController.setCommunity(it)
-        }
-        communityViewModel.currentPageIndex.observe(viewLifecycleOwner) {
-            Log.d(TAG, "Current page: $it")
-            customAppBarController.setPageIndex(it) { pageIndex ->
-                communityViewModel.fetchPage(pageIndex)
+            viewModel.currentCommunityRef.observe(viewLifecycleOwner) {
+                val currentDefaultPage = preferences.getDefaultPage()
+                customAppBarController.setCommunity(it, it == currentDefaultPage)
+            }
+            viewModel.currentPageIndex.observe(viewLifecycleOwner) {
+                Log.d(TAG, "Current page: $it")
+                customAppBarController.setPageIndex(it) { pageIndex ->
+                    viewModel.fetchPage(pageIndex)
+                }
             }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        communityViewModel.createState()?.writeToBundle(outState)
+        viewModel.createState()?.writeToBundle(outState)
         super.onSaveInstanceState(outState)
     }
 
     override fun onPause() {
         val context = requireContext()
-        val viewState = communityViewModel.createState()
+        val viewState = viewModel.createState()
         if (viewState != null) {
             HistoryManager.instance.recordSubredditState(
                 tabId = MainFragment.getIdFromTag(parentFragment?.tag ?: ""),
@@ -390,9 +409,44 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
     }
 
     fun restoreState(state: CommunityViewState?, reload: Boolean) {
-        communityViewModel.restoreFromState(state ?: return)
+        viewModel.restoreFromState(state ?: return)
         if (reload)
-            communityViewModel.fetchCurrentPage()
+            viewModel.fetchCurrentPage()
+    }
+
+    private fun getSortByMenu(): BottomMenu {
+        when (viewModel.getCurrentSortOrder()) {
+            CommunitySortOrder.Active -> _sortByMenu.setChecked(R.id.sort_order_active)
+            CommunitySortOrder.Hot -> _sortByMenu.setChecked(R.id.sort_order_hot)
+            CommunitySortOrder.New -> _sortByMenu.setChecked(R.id.sort_order_new)
+            is CommunitySortOrder.TopOrder -> _sortByMenu.setChecked(R.id.sort_order_top)
+            CommunitySortOrder.MostComments -> _sortByMenu.setChecked(R.id.sort_order_most_comments)
+            CommunitySortOrder.NewComments -> _sortByMenu.setChecked(R.id.sort_order_new_comments)
+            CommunitySortOrder.Old -> _sortByMenu.setChecked(R.id.sort_order_old)
+        }
+
+        return _sortByMenu
+    }
+    private fun getSortByTopMenu(): BottomMenu {
+        when (val order = viewModel.getCurrentSortOrder()) {
+            is CommunitySortOrder.TopOrder -> {
+                when (order.timeFrame) {
+                    CommunitySortOrder.TimeFrame.Today ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_day)
+                    CommunitySortOrder.TimeFrame.ThisWeek ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_week)
+                    CommunitySortOrder.TimeFrame.ThisMonth ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_month)
+                    CommunitySortOrder.TimeFrame.ThisYear ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_year)
+                    CommunitySortOrder.TimeFrame.AllTime ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_all_time)
+                }
+            }
+            else -> {}
+        }
+
+        return _sortByTopMenu
     }
 
     private fun setupMainActivityButtons() {
@@ -401,16 +455,15 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
             val context = this
 
             getCustomAppBarController().setup(
-                { controller, url ->
-                    TODO()
-//                    val action = CommunityFragmentDirections.actionSubredditFragmentSwitchSubreddit(
-//                        community =
-//                    )
-//                    findNavController().navigate(action)
-//                    Utils.hideKeyboard(activity)
-//                    controller.hide()
+                communitySelectedListener = { controller, communityRef ->
+                    val action = CommunityFragmentDirections.actionSubredditFragmentSwitchSubreddit(
+                        communityRef = communityRef
+                    )
+                    findNavController().navigate(action)
+                    Utils.hideKeyboard(activity)
+                    controller.hide()
                 },
-                {
+                abOverflowClickListener = {
                     PopupMenu(context, it).apply {
                         inflate(R.menu.menu_fragment_main)
                         forceShowIcons()
@@ -419,9 +472,11 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                             CommunityLayout.LIST -> {
                                 menu.findItem(R.id.layoutList)
                             }
+
                             CommunityLayout.CARD -> {
                                 menu.findItem(R.id.layoutCard)
                             }
+
                             CommunityLayout.FULL -> {
                                 menu.findItem(R.id.layoutFull)
                             }
@@ -439,11 +494,11 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                             setSpan(StyleSpan(Typeface.BOLD), 0, length, 0)
                         }
 
-                        val currentSubreddit = communityViewModel.currentCommunity.value
-                        val currentDefaultPage = PreferenceUtil.getDefaultPage()
+                        val currentCommunityRef = viewModel.currentCommunityRef.value
+                        val currentDefaultPage = preferences.getDefaultPage()
 
                         menu.findItem(R.id.set_as_default).isVisible =
-                            currentSubreddit != null && currentSubreddit != currentDefaultPage
+                            currentCommunityRef != null && currentCommunityRef != currentDefaultPage
 
                         setOnMenuItemClickListener {
                             when (it.itemId) {
@@ -452,7 +507,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                                         action = Intent.ACTION_SEND
                                         putExtra(
                                             Intent.EXTRA_TEXT,
-                                            communityViewModel.getSharedLinkForCurrentPage()
+                                            viewModel.getSharedLinkForCurrentPage()
                                         )
                                         type = "text/plain"
                                     }
@@ -461,33 +516,33 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                                     startActivity(shareIntent)
                                     true
                                 }
-                                R.id.go_to -> {
-                                    findNavController().navigate(R.id.goToDialogFragment)
-                                    true
-                                }
+
                                 R.id.sort -> {
-                                    expandCustomActionBar()
+                                    showBottomMenu(getSortByMenu())
                                     true
                                 }
+
                                 R.id.layoutList -> {
                                     PreferenceUtil.setSubredditLayout(CommunityLayout.LIST)
                                     onSelectedLayoutChanged()
                                     true
                                 }
+
                                 R.id.layoutCard -> {
                                     PreferenceUtil.setSubredditLayout(CommunityLayout.CARD)
                                     onSelectedLayoutChanged()
                                     true
                                 }
+
                                 R.id.layoutFull -> {
                                     PreferenceUtil.setSubredditLayout(CommunityLayout.FULL)
                                     onSelectedLayoutChanged()
                                     true
                                 }
+
                                 R.id.set_as_default -> {
-                                    if (currentSubreddit != null) {
-                                        PreferenceUtil.setDefaultPage(currentSubreddit)
-                                        TabsManager.instance.onDefaultPageChanged()
+                                    if (currentCommunityRef != null) {
+                                        viewModel.setDefaultPage(currentCommunityRef)
 
                                         Snackbar.make(
                                             requireMainActivity().getSnackbarContainer(),
@@ -497,11 +552,31 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                                     }
                                     true
                                 }
+
                                 else -> false
                             }
                         }
                     }.show()
+                },
+                onAccountClick = {
+                    AccountsAndSettingsDialogFragment.newInstance()
+                        .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
                 })
+        }
+    }
+
+    override fun navigateToSignInScreen() {
+        val direction = CommunityFragmentDirections.actionCommunityFragmentToLogin()
+        findNavController().navigateSafe(direction)
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+        if (tag == "onInstanceMismatch") {
+            dialog.dismiss()
+            viewModel.resetToAccountInstance()
         }
     }
 
@@ -511,7 +586,8 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
 
     private sealed class Item {
         class PostItem(
-            val postView: PostView
+            val postView: PostView,
+            val instance: String,
         ) : Item()
 
         class FooterItem(val hasMore: Boolean) : Item()
@@ -532,15 +608,13 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
         val fullContentContainerView: ViewGroup = itemView.findViewById(R.id.fullContent)
     }
 
-    private class FooterViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
-        val prevButton: Button = itemView.findViewById(R.id.prevButton)
-        val nextButton: Button = itemView.findViewById(R.id.nextButton)
-    }
-
     private inner class ListingItemAdapter(
-        private val context: Context
+        private val context: Context,
+        private val onNextClick: () -> Unit,
+        private val onPrevClick: () -> Unit,
+        private val onSignInRequired: () -> Unit,
+        private val onInstanceMismatch: (String, String) -> Unit,
+        private val voteUiHandler: VoteUiHandler,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var pageIndex: Int? = null
@@ -558,14 +632,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
 
         private val offlineManager = OfflineManager.instance
 
-        private val redditHeaderHelper = RedditHeaderHelper(context)
-        private val redditContentHelper = RedditContentHelper(
-            context,
-            this@CommunityFragment,
-            offlineManager,
-            ExoPlayerManager.get(this@CommunityFragment)
-        )
-
         private val lemmyHeaderHelper = LemmyHeaderHelper(context)
         private val lemmyContentHelper = LemmyContentHelper(
             context,
@@ -582,6 +648,8 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
 
         var curDataSource: String? = null
 
+        var contentMaxWidth: Int = 0
+
         override fun getItemViewType(position: Int): Int = when (items[position]) {
             is Item.PostItem -> when (layout) {
                 CommunityLayout.LIST -> R.layout.listing_item_list
@@ -597,7 +665,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                 R.layout.listing_item_list -> ListingItemViewHolder(v)
                 R.layout.listing_item_card -> ListingItemViewHolder(v)
                 R.layout.listing_item_full -> ListingItemViewHolder(v)
-                R.layout.main_footer_item -> FooterViewHolder(v)
+                R.layout.main_footer_item -> ViewBindingViewHolder(MainFooterItemBinding.bind(v))
                 else -> throw RuntimeException("Unknown view type: $viewType")
             }
         }
@@ -626,21 +694,14 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
 
                         h.commentButton.isEnabled = !item.postView.post.locked
 
-                        UserActionsHelper.setupActions(
-                            item.postView.getUniqueKey(),
-                            item.postView.getLikesWithLikesManager(),
-                            viewLifecycleOwner,
-                            childFragmentManager,
+                        voteUiHandler.bind(
+                            item.instance,
+                            item.postView,
                             h.upvoteButton,
-                            h.downvoteButton
-                        ) { onVote ->
-//                            item.postView.my_vote = when {
-//                                onVote > 0 -> true
-//                                onVote < 0 -> false
-//                                else -> null
-//                            }
-                            notifyItemChanged(h.absoluteAdapterPosition, Unit)
-                        }
+                            h.downvoteButton,
+                            onSignInRequired = onSignInRequired,
+                            onInstanceMismatch = onInstanceMismatch,
+                        )
                     }
                 }
                 else -> {
@@ -707,6 +768,19 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                     h.image?.setOnClickListener(null)
                     h.image?.isClickable = false
 
+                    fun onItemClick() {
+                        val action = CommunityFragmentDirections.actionMainFragmentToPostFragment(
+                            instance = item.instance,
+                            id = item.postView.post.id,
+                            reveal = revealedItems.contains(item.postView.getUniqueKey()),
+                            post = item.postView,
+                            currentCommunity = item.postView.community.toCommunity(),
+                            videoState = lemmyContentHelper.getState(h.fullContentContainerView).videoState?.let {
+                                it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
+                            })
+                        findNavController().navigateSafe(action)
+                    }
+
                     fun showFullContent() {
                         lemmyContentHelper.setupFullContent(
                             reveal = isRevealed,
@@ -715,6 +789,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                                     - Utils.convertDpToPixel(56f)
                                     - Utils.convertDpToPixel(16f)
                                     ).toInt(),
+                            contentMaxWidth = contentMaxWidth,
                             fullImageViewTransitionName = "full_image_$position",
                             postView = item.postView,
                             rootView = h.itemView,
@@ -741,6 +816,18 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                                     )
                                 }
 
+                            },
+                            onImageClickListener = { url ->
+                                val action =
+                                    CommunityFragmentDirections.actionMainFragmentToImageViewerFragment(
+                                        title = null,
+                                        url = url,
+                                        mimeType = null
+                                    )
+                                findNavController().navigateSafe(action)
+                            },
+                            onItemClickListener = {
+                                onItemClick()
                             },
                             onRevealContentClickedFn = {
                                 revealedItems.add(item.postView.getUniqueKey())
@@ -778,6 +865,19 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                         PostType.Text -> {
                             if (thumbnailUrl == null) {
                                 h.image?.visibility = View.GONE
+
+                                // see if this text post has additional content
+                                val hasAdditionalContent =
+                                    !item.postView.post.body.isNullOrBlank() ||
+                                            !item.postView.post.url.isNullOrBlank()
+
+                                if (hasAdditionalContent) {
+                                    showDefaultImage()
+                                    h.iconImage?.setOnClickListener {
+                                        toggleItem(h.absoluteAdapterPosition, item)
+                                        notifyItemChanged(h.absoluteAdapterPosition)
+                                    }
+                                }
                             } else {
                                 loadAndShowImage()
                             }
@@ -818,22 +918,11 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                     h.upvoteCount.text = item.postView.getUpvoteText()
 
                     h.itemView.setOnClickListener {
-                        val extras = FragmentNavigatorExtras(
-                            h.title to "title"
-                        )
-
-                        val action = CommunityFragmentDirections.actionMainFragmentToPostFragment(
-                            id = item.postView.post.id,
-                            reveal = revealedItems.contains(item.postView.getUniqueKey()),
-                            post = item.postView,
-                            currentCommunity = item.postView.community.toCommunity(),
-                            videoState = redditContentHelper.getState(h.fullContentContainerView).videoState?.let {
-                                it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
-                            })
-                        findNavController().navigateSafe(action, extras)
+                        onItemClick()
                     }
                     h.commentButton.setOnClickListener {
                         val action = CommunityFragmentDirections.actionMainFragmentToPostFragment(
+                            instance = item.instance,
                             id = item.postView.post.id,
                             jumpToComments = true,
                             reveal = revealedItems.contains(item.postView.getUniqueKey()),
@@ -844,38 +933,36 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
                     }
                     h.commentButton.isEnabled = !item.postView.post.locked
 
-                    UserActionsHelper.setupActions(
-                        item.postView.getUniqueKey(),
-                        item.postView.getLikesWithLikesManager(),
-                        viewLifecycleOwner,
-                        childFragmentManager,
+                    voteUiHandler.bind(
+                        item.instance,
+                        item.postView,
                         h.upvoteButton,
-                        h.downvoteButton
-                    ) { onVote ->
-                        notifyItemChanged(h.adapterPosition, Unit)
-                    }
+                        h.downvoteButton,
+                        onSignInRequired = onSignInRequired,
+                        onInstanceMismatch,
+                    )
 
                     if (isCard || isFullView) {
                         showFullContent()
                     }
                 }
                 R.layout.main_footer_item -> {
-                    val h = holder as FooterViewHolder
+                    val b = holder.getBinding<MainFooterItemBinding>()
                     val item = items[position] as Item.FooterItem
                     if (item.hasMore) {
-                        h.nextButton.visibility = View.VISIBLE
-                        h.nextButton.setOnClickListener {
-                            communityViewModel.fetchNextPage(clearPagePosition = true)
+                        b.nextButton.visibility = View.VISIBLE
+                        b.nextButton.setOnClickListener {
+                            onNextClick()
                         }
                     } else {
-                        h.nextButton.visibility = View.INVISIBLE
+                        b.nextButton.visibility = View.INVISIBLE
                     }
-                    if (communityViewModel.currentPageIndex.value == 0) {
-                        h.prevButton.visibility = View.INVISIBLE
+                    if (viewModel.currentPageIndex.value == 0) {
+                        b.prevButton.visibility = View.INVISIBLE
                     } else {
-                        h.prevButton.visibility = View.VISIBLE
-                        h.prevButton.setOnClickListener {
-                            communityViewModel.fetchPrevPage()
+                        b.prevButton.visibility = View.VISIBLE
+                        b.prevButton.setOnClickListener {
+                            onPrevClick()
                         }
                     }
                 }
@@ -887,7 +974,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
 
             offlineManager.cancelFetch(holder.itemView)
             if (holder is ListingItemViewHolder) {
-                redditContentHelper.recycleFullContent(
+                lemmyContentHelper.recycleFullContent(
                     holder.fullContentContainerView
                 )
             }
@@ -912,9 +999,9 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
         }
 
         fun refreshItems() {
-            val newItems = rawData?.let {
-                it.posts
-                    .map { Item.PostItem(it) } + Item.FooterItem(it.hasMore)
+            val newItems = rawData?.let { data ->
+                data.posts
+                    .map { Item.PostItem(it, data.instance) } + Item.FooterItem(data.hasMore)
             } ?: listOf()
             val oldItems = items
 
@@ -955,6 +1042,11 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>() {
         fun setLayout(communityLayout: CommunityLayout) {
             layout = communityLayout
             notifyDataSetChanged()
+        }
+
+        fun reset() {
+            rawData = null
+            refreshItems()
         }
     }
 }

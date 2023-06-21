@@ -10,16 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
-import com.idunnololz.summit.auth.RedditAuthManager
-import com.idunnololz.summit.reddit_objects.UserInfo
 import com.idunnololz.summit.util.PreferenceUtil
-import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 
 class SettingsFragment : BasePreferenceFragment() {
@@ -30,8 +25,6 @@ class SettingsFragment : BasePreferenceFragment() {
         private const val PREF_KEY_ADD_PREFERENCE = "PREF_KEY_ADD_PREFERENCE"
         private const val PREF_KEY_ACCOUNT = "PREF_KEY_ACCOUNT"
     }
-
-    private val authManager = RedditAuthManager.instance
 
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
 
@@ -68,18 +61,7 @@ class SettingsFragment : BasePreferenceFragment() {
         Log.d(TAG, "onViewCreated()")
         super.onViewCreated(view, savedInstanceState)
 
-        requireMainActivity().insetRootViewAutomatically(viewLifecycleOwner, view)
-
-        userInfoViewModel.userInfoLiveData.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is StatefulData.Error -> {}
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    refreshAccountsUi(it.data)
-                }
-            }
-        })
+        requireMainActivity().insetViewAutomaticallyByMargins(viewLifecycleOwner, view)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -127,73 +109,11 @@ class SettingsFragment : BasePreferenceFragment() {
 
 
     fun loadUserInfo() {
-        val userInfo = authManager.getCachedUserInfo()
-        refreshAccountsUi(userInfo)
-
-        userInfoViewModel.fetchUserInfo()
     }
 
     private fun removePreference(key: String) {
         findPreference<Preference>(key)?.let {
             it.parent?.removePreference(it)
-        }
-    }
-
-    private fun ensureAddAccountPref(): Preference {
-        removePreference(PREF_KEY_ACCOUNT)
-        findPreference<Preference>(PREF_KEY_ADD_PREFERENCE)?.let {
-            return it
-        }
-
-        val accountCategory = findPreference<PreferenceCategory>(R.string.pref_key_account)
-        val addAccountPref = Preference(requireContext()).apply {
-            title = getString(R.string.add_account)
-            key = PREF_KEY_ADD_PREFERENCE
-            isIconSpaceReserved = false
-
-            setOnPreferenceClickListener {
-                if (!authManager.showPreSignInIfNeeded(childFragmentManager)) {
-                    loadUserInfo()
-                }
-
-                true
-            }
-        }
-        accountCategory.addPreference(addAccountPref)
-        return addAccountPref
-    }
-
-    private fun ensureAccountPref(): Preference {
-        removePreference(PREF_KEY_ADD_PREFERENCE)
-        findPreference<Preference>(PREF_KEY_ACCOUNT)?.let {
-            return it
-        }
-
-        val accountCategory = findPreference<PreferenceCategory>(R.string.pref_key_account)
-        val addAccountPref = Preference(requireContext()).apply {
-            key = PREF_KEY_ACCOUNT
-        }
-        accountCategory.addPreference(addAccountPref)
-        return addAccountPref
-    }
-
-    private fun refreshAccountsUi(userInfo: UserInfo?) {
-        if (userInfo == null) {
-            ensureAddAccountPref()
-        } else {
-            ensureAccountPref().apply {
-                bindUserInfo(this@SettingsFragment, userInfo)
-
-                setOnPreferenceClickListener {
-                    val action =
-                        SettingsFragmentDirections.actionSettingsFragmentToAccountSettingsFragment(
-                            userInfo.id
-                        )
-                    findNavController().navigate(action)
-
-                    true
-                }
-            }
         }
     }
 }

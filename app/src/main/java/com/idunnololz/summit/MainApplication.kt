@@ -6,24 +6,27 @@ import android.content.res.Configuration
 import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.hilt.work.HiltWorkerFactory
+import coil.Coil
+import coil.ImageLoader
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.google.android.gms.security.ProviderInstaller
-import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.OfflineScheduleManager
-import com.idunnololz.summit.reddit.*
-import com.idunnololz.summit.reddit_actions.ActionInfo
-import com.idunnololz.summit.reddit_actions.RedditAction
-import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.util.*
+import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.plugins.RxJavaPlugins
 import java.util.*
+import javax.inject.Inject
+
 
 @HiltAndroidApp
-class MainApplication : Application() {
+class MainApplication : Application(), androidx.work.Configuration.Provider {
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     companion object {
         private val TAG = MainApplication::class.java.simpleName
@@ -130,66 +133,18 @@ class MainApplication : Application() {
             startTime = System.currentTimeMillis()
         }
 
-        checkTls()
-
         NotificationHelper.registerNotificationChannels(context)
 
         // Needs to be initialized first
         ExoPlayerManager.initialize(context)
-        TabsManager.initialize(context)
         DataFiles.initialize(context)
         DataCache.initialize(context)
         OfflineManager.initialize(context)
         OfflineScheduleManager.initialize(context)
-        RedditAuthManager.initialize(context)
-        PendingActionsManager.initialize(context)
-        RecentSubredditsManager.initialize(context)
         HistoryManager.initialize(context)
-        LikesManager.initialize(context)
-        PendingCommentsManager.initialize(context)
-        PendingEditsManager.initialize(context)
 
         Fresco.initialize(this)
 
-        val likesManager = LikesManager.instance
-        PendingActionsManager.instance.addActionCompleteListener(object :
-            PendingActionsManager.OnActionChangedListener {
-            override fun onActionAdded(action: RedditAction) {
-                when (action.info) {
-                    is ActionInfo.VoteActionInfo -> {
-                        likesManager.setPendingLike(action.info.id, action.info.dir)
-                    }
-                    is ActionInfo.CommentActionInfo -> {}
-                    is ActionInfo.DeleteCommentActionInfo -> {}
-                    is ActionInfo.EditActionInfo -> {}
-                    is ActionInfo.UnknownActionInfo -> {}
-                }
-            }
-
-            override fun onActionFailed(action: RedditAction) {
-                when (action.info) {
-                    is ActionInfo.VoteActionInfo -> {
-                        likesManager.clearPendingLike(action.info.id)
-                    }
-                    is ActionInfo.CommentActionInfo -> {}
-                    is ActionInfo.DeleteCommentActionInfo -> {}
-                    is ActionInfo.EditActionInfo -> {}
-                    is ActionInfo.UnknownActionInfo -> {}
-                }
-            }
-
-            override fun onActionComplete(action: RedditAction) {
-                when (action.info) {
-                    is ActionInfo.VoteActionInfo -> {
-                        likesManager.setLike(action.info.id, action.info.dir)
-                    }
-                    is ActionInfo.CommentActionInfo -> {}
-                    is ActionInfo.DeleteCommentActionInfo -> {}
-                    is ActionInfo.EditActionInfo -> {}
-                    is ActionInfo.UnknownActionInfo -> {}
-                }
-            }
-        })
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "Perf. Everything else: " + (System.currentTimeMillis() - startTime))
@@ -220,15 +175,18 @@ class MainApplication : Application() {
 //        }
 
         OfflineScheduleManager.instance.setupAlarms()
+
+        Coil.setImageLoader(
+            ImageLoader.Builder(context)
+                .crossfade(IMAGE_LOAD_CROSS_FADE_DURATION_MS.toInt())
+                .okHttpClient(Client.get())
+                .build(),
+        )
     }
 
-    private fun checkTls() {
-        if (Build.VERSION.SDK_INT < 21) {
-            try {
-                ProviderInstaller.installIfNeeded(this)
-            } catch (e: Exception) {
-                Log.e(TAG, "", e)
-            }
-        }
+    override fun getWorkManagerConfiguration(): androidx.work.Configuration {
+        return androidx.work.Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
     }
 }

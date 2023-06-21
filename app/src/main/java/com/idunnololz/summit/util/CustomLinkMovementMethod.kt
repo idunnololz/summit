@@ -8,19 +8,25 @@ import android.text.method.LinkMovementMethod
 import android.text.style.BackgroundColorSpan
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
+import android.util.Log
+import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.TextView
 import com.idunnololz.summit.R
+import io.noties.markwon.image.AsyncDrawableSpan
 
 class CustomLinkMovementMethod : LinkMovementMethod() {
 
     var onLinkClickListener: OnLinkClickListener? = null
     var onLinkLongClickListener: OnLinkLongClickListener? = null
+
+    var onImageClickListener: ((url: String) -> Unit)? = null
+
     private val touchedLineBounds = RectF()
     private var isUrlHighlighted = false
-    private var clickableSpanUnderTouchOnActionDown: ClickableSpan? = null
+    private var clickableSpanUnderTouchOnActionDown: Any? = null
     private var activeTextViewHashcode = 0
     private var ongoingLongPressTimer: LongPressTimer? = null
     private var wasLongPressRegistered = false
@@ -56,7 +62,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
             textView.autoLinkMask = 0
         }
 
-        val clickableSpanUnderTouch: ClickableSpan? =
+        val clickableSpanUnderTouch: Any? =
             findClickableSpanUnderTouch(textView, text, event)
         if (event.action == MotionEvent.ACTION_DOWN) {
             clickableSpanUnderTouchOnActionDown = clickableSpanUnderTouch
@@ -163,39 +169,47 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
 
     private fun dispatchUrlClick(
         textView: TextView,
-        clickableSpan: ClickableSpan,
+        clickableSpan: Any,
         bounds: RectF
     ) {
-        val clickableSpanWithText =
-            ClickableSpanWithText.ofSpan(textView, clickableSpan)
-        val handled = onLinkClickListener?.onClick(
-            textView,
-            clickableSpanWithText.url,
-            clickableSpanWithText.text,
-            bounds
-        ) ?: false
-        if (!handled) {
-            // Let Android handle this click.
-            clickableSpanWithText.span.onClick(textView)
+        if (clickableSpan is ClickableSpan) {
+            val clickableSpanWithText =
+                ClickableSpanWithText.ofSpan(textView, clickableSpan)
+            val handled = onLinkClickListener?.onClick(
+                textView,
+                clickableSpanWithText.url,
+                clickableSpanWithText.text,
+                bounds
+            ) ?: false
+            if (!handled) {
+                // Let Android handle this click.
+                clickableSpanWithText.span.onClick(textView)
+            }
+        } else if (clickableSpan is AsyncDrawableSpan) {
+            onImageClickListener?.invoke(clickableSpan.drawable.destination)
         }
     }
 
     private fun dispatchUrlLongClick(
         textView: TextView,
-        clickableSpan: ClickableSpan,
+        clickableSpan: Any,
         bounds: RectF
     ) {
-        val clickableSpanWithText =
-            ClickableSpanWithText.ofSpan(textView, clickableSpan)
-        val handled = onLinkLongClickListener?.onLongClick(
-            textView,
-            clickableSpanWithText.url,
-            clickableSpanWithText.text,
-            bounds
-        ) ?: false
-        if (!handled) {
-            // Let Android handle this long click as a short-click.
-            clickableSpanWithText.span.onClick(textView)
+        if (clickableSpan is ClickableSpan) {
+            val clickableSpanWithText =
+                ClickableSpanWithText.ofSpan(textView, clickableSpan)
+            val handled = onLinkLongClickListener?.onLongClick(
+                textView,
+                clickableSpanWithText.url,
+                clickableSpanWithText.text,
+                bounds
+            ) ?: false
+            if (!handled) {
+                // Let Android handle this long click as a short-click.
+                clickableSpanWithText.span.onClick(textView)
+            }
+        } else if (clickableSpan is AsyncDrawableSpan) {
+            onImageClickListener?.invoke(clickableSpan.drawable.destination)
         }
     }
 
@@ -219,7 +233,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
      */
     private fun highlightUrl(
         textView: TextView,
-        clickableSpan: ClickableSpan?,
+        clickableSpan: Any?,
         text: Spannable
     ) {
         if (isUrlHighlighted) {
@@ -243,7 +257,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         textView: TextView,
         text: Spannable,
         event: MotionEvent
-    ): ClickableSpan? {
+    ): Any? {
         // So we need to find the location in text where touch was made, regardless of whether the TextView
         // has scrollable text. That is, not the entire text is currently visible.
         var touchX = event.x.toInt()
@@ -265,11 +279,17 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         touchedLineBounds.bottom = layout.getLineBottom(touchedLine).toFloat()
         return if (touchedLineBounds.contains(touchX.toFloat(), touchY.toFloat())) {
             // Find a ClickableSpan that lies under the touched area.
-            val spans: Array<ClickableSpan> = text.getSpans(
+            val clickableSpans: Array<ClickableSpan> = text.getSpans(
                 touchOffset, touchOffset,
                 ClickableSpan::class.java
             )
-            for (span in spans) {
+            for (span in clickableSpans) {
+                return span
+            }
+
+            val drawableSpans = text.getSpans(
+                touchOffset, touchOffset, AsyncDrawableSpan::class.java)
+            for (span in drawableSpans) {
                 return span
             }
             // No ClickableSpan found under the touched location.

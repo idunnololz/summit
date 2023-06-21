@@ -104,7 +104,7 @@ class AlertDialogFragment : DialogFragment() {
         var positiveTextId = args.getInt(EXTRA_POSITIVE_TEXT, 0)
         val negativeTextId = args.getInt(EXTRA_NEGATIVE_TEXT, 0)
 
-        val builder = AlertDialog.Builder(activity, R.style.AppTheme_Dialog_Alert).setIcon(icon)
+        val builder = AlertDialog.Builder(activity, R.style.Theme_App_Dialog).setIcon(icon)
 
         if (title != 0) {
             builder.setTitle(title)

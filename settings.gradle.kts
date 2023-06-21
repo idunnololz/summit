@@ -1,5 +1,7 @@
 include(":app")
-rootProject.name="YARR"
+include(":overlappingPane")
+
+rootProject.name="summit"
 
 pluginManagement {
     repositories {

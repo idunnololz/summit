@@ -1,8 +1,6 @@
 package com.idunnololz.summit.util
 
 import android.util.Log
-import com.idunnololz.summit.auth.AccessTokenAuthenticator
-import com.idunnololz.summit.auth.RedditInterceptor
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import java.io.File
@@ -26,8 +24,6 @@ object Client {
             .connectTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
-            .authenticator(AccessTokenAuthenticator())
-            .addInterceptor(RedditInterceptor())
             .cache(cache)
             .enableTls12()
             .build()

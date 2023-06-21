@@ -46,7 +46,7 @@ class OfflineFragment : BaseFragment<FragmentOfflineBinding>(), OfflineScheduler
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireMainActivity().insetRootViewAutomatically(viewLifecycleOwner, view)
+        requireMainActivity().insetViewAutomaticallyByMargins(viewLifecycleOwner, view)
 
         val context = requireContext()
 

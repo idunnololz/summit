@@ -33,7 +33,7 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context, R.style.AppTheme_Dialog)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context, R.style.Theme_App_Dialog)
 
         val preferences = PreferenceUtil.preferences
 

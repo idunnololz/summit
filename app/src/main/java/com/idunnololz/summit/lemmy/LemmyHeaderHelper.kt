@@ -5,20 +5,15 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.format.DateUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.reddit.RedditHeaderHelper
 import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.reddit_objects.ListingItem
-import com.idunnololz.summit.reddit_objects.RedditCommentItem
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
@@ -32,7 +27,6 @@ import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.view.RedditHeaderView
 import com.idunnololz.summit.view.RewardView
-import java.util.*
 
 class LemmyHeaderHelper(
     private val context: Context
@@ -202,7 +196,8 @@ class LemmyHeaderHelper(
     fun populateHeaderSpan(
         headerContainer: RedditHeaderView,
         item: CommentView,
-        detailed: Boolean = false
+        detailed: Boolean = false,
+        childrenCount: Int? = null,
     ) {
         var sb = SpannableStringBuilder()
 //        if (item.creator.mode) {
@@ -347,13 +342,14 @@ class LemmyHeaderHelper(
             )
 //            }
 
-//            appendSeparator(sb)
-//            val count = RedditUtils.countCommentChildren(item)
-//            sb.append(
-//                headerContainer.context.resources.getQuantityString(
-//                    R.plurals.children_count_format, count, count
-//                )
-//            )
+            if (childrenCount != null) {
+                appendSeparator(sb)
+                sb.append(
+                    headerContainer.context.resources.getQuantityString(
+                        R.plurals.children_count_format, childrenCount, childrenCount
+                    )
+                )
+            }
         } else {
 //            appendAwards(headerContainer, item.allAwardings, sb)
         }

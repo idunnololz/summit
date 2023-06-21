@@ -1,14 +1,30 @@
 package com.idunnololz.summit.reddit
 
+import android.content.Context
+import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.CommentSortType
+
 enum class CommentsSortOrder(
     val key: String
 ) {
-    CONFIDENCE("confidence"),
-    TOP("top"),
-    NEW("new"),
-    CONTROVERSIAL("controversial"),
-    OLD("old"),
-    RANDOM("random"),
-    QA("qa"),
-    //LIVE("live") // apparently this is dead https://www.reddit.com/r/redditdev/comments/5kv2zn/what_is_confidence_and_live_sorts_in_apiset/
+    Hot("hot"),
+    Top("top"),
+    New("new"),
+    Old("old"),
 }
+
+fun CommentsSortOrder.getLocalizedName(context: Context) =
+    when (this) {
+        CommentsSortOrder.Hot -> context.getString(R.string.sort_order_hot)
+        CommentsSortOrder.Top -> context.getString(R.string.sort_order_top)
+        CommentsSortOrder.New -> context.getString(R.string.sort_order_new)
+        CommentsSortOrder.Old -> context.getString(R.string.sort_order_old)
+    }
+
+fun CommentsSortOrder.toApiSortOrder(): CommentSortType =
+    when (this) {
+        CommentsSortOrder.Hot -> CommentSortType.Hot
+        CommentsSortOrder.Top -> CommentSortType.Top
+        CommentsSortOrder.New -> CommentSortType.New
+        CommentsSortOrder.Old -> CommentSortType.Old
+    }

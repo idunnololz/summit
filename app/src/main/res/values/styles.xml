@@ -1,7 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <style name="Theme.App.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/googleBackground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Theme.App</item>
+
+        <item name="android:statusBarColor">@color/googleBackground</item>
+        <item name="android:navigationBarColor">@color/googleBackground</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+    </style>
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+    <style name="Theme.App" parent="Theme.Material3.Dark">
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
         <!-- Ensure the notification bar is the right color -->
 
         <!-- No need to do this since we are setting it programatically -->
@@ -13,11 +29,17 @@
         <item name="android:cacheColorHint">@color/black</item>
 
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
+        <item name="colorSurface">@color/colorSurface</item>
+
+        <item name="colorToolbar">@color/toolbarColor</item>
 
         <item name="appBarLayoutStyle">@style/MyApp.Widget.MaterialComponents.AppBarLayout.Primary
         </item>
@@ -41,25 +63,27 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
 
         <item name="popupMenuStyle">@style/MyApp.Widget.MaterialComponents.PopupMenu</item>
+
+        <item name="android:dialogTheme">@style/Theme.App.Dialog</item>
+        <item name="android:alertDialogTheme">@style/Theme.App.Dialog</item>
+
+        <item name="actionOverflowMenuStyle">@style/Widget.Material3.PopupMenu.Overflow</item>
+
+        <item name="elevationOverlayColor">@color/white10</item>
+
+        <item name="materialCardViewStyle">@style/MyApp.Widget.Material3.CardView</item>
     </style>
 
-    <style name="AppTheme.Transparent" parent="AppTheme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
-    </style>
+    <style name="Theme.App.Dialog" parent="Theme.Material3.Dark.Dialog.Alert">
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="android:windowBackground">@drawable/dialog_background</item>
 
-    <style name="AppTheme.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:colorBackground">@color/colorBackground</item>
-        <item name="android:windowBackground">@color/colorWindowBackground</item>
         <item name="colorSurface">@color/colorSurface</item>
 
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
@@ -86,7 +110,7 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
 
-    <style name="AppTheme.Dialog.Alert" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+    <style name="Theme.App.Dialog.Alert" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
@@ -104,16 +128,9 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
 
-    <style name="AppTheme.Dialog.Alert.Transparent">
+    <style name="Theme.App.Dialog.Alert.Transparent">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
-    </style>
-
-    <!-- The launcher theme. It sets the main window background to the launch_screen drawable -->
-    <style name="AppTheme.Launcher">
-        <item name="android:windowBackground">@color/black</item>
-        <!-- Optional, on Android 5+ you can modify the colorPrimaryDark color to match the windowBackground color for further branding-->
-        <!-- <item name="colorPrimaryDark">@android:color/white</item> -->
     </style>
 
     <style name="MyApp.Widget.MaterialComponents.PopupMenu" parent="@style/Widget.MaterialComponents.PopupMenu">
@@ -140,14 +157,23 @@
         <item name="android:background">@color/colorDivider</item>
     </style>
 
-    <style name="HorizontalDivider">
-        <item name="android:layout_width">1dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:background">@color/colorDivider</item>
-    </style>
-
     <style name="DayPickerDayStyle">
         <item name="android:textAppearance">?textAppearanceBody1</item>
         <item name="android:textColor">@color/colorTextTitle</item>
     </style>
+
+
+    <style name="CircleImageView">
+        <item name="shapeAppearanceOverlay">@style/CircleImageViewAppearanceOverlay</item>
+        <item name="android:foreground">@drawable/circle_ripple</item>
+    </style>
+
+    <style name="CircleImageViewAppearanceOverlay">
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="MyApp.Widget.Material3.CardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+    </style>
+
 </resources>

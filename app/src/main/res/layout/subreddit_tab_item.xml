@@ -38,7 +38,7 @@
                 android:paddingStart="@dimen/padding"
                 android:paddingEnd="@dimen/padding"
                 android:layout_height="40dp"
-                android:src="@drawable/baseline_close_black_18"
+                android:src="@drawable/baseline_close_18"
                 android:background="?selectableItemBackgroundBorderless"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -54,7 +54,7 @@
                 android:id="@+id/thumbnail"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintDimensionRatio="H,4:4"
+                app:layout_constraintDimensionRatio="H,2:2"
                 app:layout_constraintTop_toBottomOf="@+id/barrier"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

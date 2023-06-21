@@ -18,8 +18,12 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "0.1.2"
+
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
     }
     buildTypes {
         release {
@@ -49,6 +53,8 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(project(":overlappingPane"))
+
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.appcompat)
     implementation(libs.core)
@@ -59,9 +65,12 @@ dependencies {
     implementation(libs.preference.ktx)
     implementation(libs.gson)
     implementation(libs.constraintlayout)
-    implementation(libs.lifecycle.extensions)
     implementation(libs.jsoup)
     implementation(libs.swiperefreshlayout)
+
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.extensions)
+    implementation(libs.lifecycle.livedata.ktx)
 
     implementation(libs.media3.core)
     implementation(libs.media3.ui)
@@ -102,6 +111,7 @@ dependencies {
     implementation(libs.markwon.html)
     implementation(libs.markwon.ext.strikethrough)
     implementation(libs.markwon.linkify)
+    implementation(libs.markwon.image.coil)
 
     implementation(libs.work.runtime.ktx)
 
@@ -112,6 +122,13 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
+
+    implementation(libs.hilt.common)
+    implementation(libs.hilt.work)
+    implementation(libs.core.splashscreen)
+
+    implementation("dev.zacsweers.moshix:moshi-sealed-runtime:0.22.1")
+    ksp("dev.zacsweers.moshix:moshi-sealed-codegen:0.22.1")
 
     // TODO: Remove the following deps
     implementation("org.apmem.tools:layouts:1.10@aar")

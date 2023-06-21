@@ -1,20 +1,21 @@
 package com.idunnololz.summit.lemmy.post
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
-import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.account.AccountActionsManager
+import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.reddit.CommentsSortOrder
-import com.idunnololz.summit.reddit_objects.*
-import com.idunnololz.summit.reddit_website_adapter.MoreChildrenWebsiteAdapter
+import com.idunnololz.summit.reddit.toApiSortOrder
 import com.idunnololz.summit.util.StatefulLiveData
-import com.idunnololz.summit.util.Utils.hashSha256
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.LinkedHashMap
@@ -22,32 +23,85 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val lemmyApiClient: LemmyApiClient
+    private val lemmyApiClient: AccountAwareLemmyClient,
+    private val accountActionsManager: AccountActionsManager,
 ) : ViewModel() {
     companion object {
         private const val TAG = "PostViewModel"
     }
 
+    private var postRef: PostRef? = null
+
+    val voteUiHandler: VoteUiHandler = accountActionsManager.voteUiHandler
     private var loader: WebsiteAdapterLoader? = null
 
     private var commentLoaders = ArrayList<WebsiteAdapterLoader>()
 
-    var commentsSortOrder: CommentsSortOrder? = null
-        private set
+    private var postView: PostView? = null
+    private var comments: List<CommentView>? = null
+
+    val commentsSortOrderLiveData = MutableLiveData(CommentsSortOrder.Top)
 
     val postData = StatefulLiveData<PostData>()
-    val redditMoreComments = MutableLiveData<HashMap<String, List<CommentItemObject>>>()
 
     init {
-        redditMoreComments.postValue(HashMap())
+        commentsSortOrderLiveData.observeForever {
+            val postRef = postRef
+            if (postRef != null) {
+                fetchPostData(postRef.instance, postRef.id, fetchPostData = false)
+            }
+        }
     }
 
-    fun fetchPostData(postId: Int, force: Boolean = false) {
+    val instance: String
+        get() = lemmyApiClient.instance
+
+    fun fetchPostData(
+        instance: String,
+        postId: Int,
+        fetchPostData: Boolean = true,
+        fetchCommentData: Boolean = true,
+        force: Boolean = false
+    ) {
+        postRef = PostRef(instance, postId)
         postData.setIsLoading()
 
+        val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
+
         viewModelScope.launch {
-            val post = lemmyApiClient.fetchPost(null, Either.Left(postId))
-            val comments = lemmyApiClient.fetchComments(null, Either.Left(postId))
+            lemmyApiClient.changeInstance(instance)
+
+            val post = if (fetchPostData) {
+                lemmyApiClient.fetchPost(Either.Left(postId), force)
+                    .fold(
+                        onSuccess = { it },
+                        onFailure = {
+                            postData.postError(it)
+                            null
+                        },
+                    )
+            } else {
+                this@PostViewModel.postView
+            }
+            this@PostViewModel.postView = post
+
+            val comments = if (fetchCommentData) {
+                lemmyApiClient.fetchComments(Either.Left(postId), sortOrder, force)
+                    .fold(
+                        onSuccess = { it },
+                        onFailure = {
+                            postData.postError(it)
+                            null
+                        },
+                    )
+            } else {
+                this@PostViewModel.comments
+            }
+            this@PostViewModel.comments = comments
+
+            if (post == null || comments == null) {
+                return@launch
+            }
 
             postData.postValue(
                 PostData(
@@ -59,60 +113,7 @@ class PostViewModel @Inject constructor(
     }
 
     fun fetchMoreComments(url: String, parentId: String, force: Boolean = false) {
-        commentLoaders.add(
-            WebsiteAdapterLoader().apply {
-                add(
-                    MoreChildrenWebsiteAdapter(),
-                    url,
-                    "morechildren:${hashSha256(url)}"
-                )
-                setOnEachAdapterLoadedListener {
-                    if (it is MoreChildrenWebsiteAdapter) {
-                        if (it.isSuccess()) {
-
-                            val map = redditMoreComments.value ?: HashMap()
-
-                            it.get().json?.data?.things?.filterIsInstance<CommentItemObject>()
-                                ?.let { commentItemObjects ->
-
-                                    // result is flattened... try to unflatten
-
-                                    val dict = commentItemObjects.associateBy { it.data?.name }
-                                    val topLevel: MutableList<CommentItemObject> =
-                                        commentItemObjects.toMutableList()
-
-                                    commentItemObjects.forEach {
-                                        val p = dict[it.data?.parentId]
-                                        if (p != null) {
-                                            topLevel.remove(it)
-
-                                            p.data?.replies =
-                                                ListingObject(
-                                                    kind = "Listing",
-                                                    data = ListingData(
-                                                        modHash = "clientSided",
-                                                        dist = 0,
-                                                        children = ((p.data?.replies as? ListingObject)
-                                                            ?.data?.children ?: listOf()) + listOf(
-                                                            it
-                                                        )
-                                                    )
-                                                )
-                                        }
-                                    }
-
-
-                                    map[parentId] = topLevel
-                                }
-
-                            redditMoreComments.postValue(map)
-                        } else {
-                            Log.e(TAG, "Error loading more comments: ${it.error}")
-                        }
-                    }
-                }
-            }.load(forceRefetch = force)
-        )
+        TODO()
     }
 
     override fun onCleared() {
@@ -123,10 +124,6 @@ class PostViewModel @Inject constructor(
         for (l in commentLoaders) {
             l.destroy()
         }
-    }
-
-    fun setCommentsSortOrder(sortOrder: CommentsSortOrder) {
-        commentsSortOrder = sortOrder
     }
 
     data class PostData(
@@ -152,7 +149,7 @@ class PostViewModel @Inject constructor(
         var depth: Int,
     )
 
-    fun buildCommentsTreeListView(
+    private fun buildCommentsTreeListView(
         comments: List<CommentView>?,
         parentComment: Boolean,
     ): List<CommentNodeData> {
@@ -163,14 +160,14 @@ class PostViewModel @Inject constructor(
             firstComment?.getDepth() ?: 0
         }
 
-        comments?.forEach { cv ->
-            val depth = cv.comment.getDepth().minus(depthOffset)
+        comments?.forEach { comment ->
+            val depth = comment.comment.getDepth().minus(depthOffset)
             val node = CommentNodeData(
-                commentView = ListView.CommentListView(cv),
+                commentView = ListView.CommentListView(comment),
                 children = mutableListOf(),
                 depth,
             )
-            map[cv.comment.id] = node
+            map[comment.comment.id] = node
         }
 
         val tree = mutableListOf<CommentNodeData>()
@@ -205,14 +202,22 @@ class PostViewModel @Inject constructor(
             null
         }
     }
+
+    fun setCommentsSortOrder(sortOrder: CommentsSortOrder) {
+        commentsSortOrderLiveData.value = sortOrder
+    }
+
+    fun deleteComment(commentId: String) {
+        TODO()
+    }
 }
 
-fun List<PostViewModel.CommentNodeData>.flatten(): MutableList<PostViewModel.ListView.CommentListView> {
-    val result = mutableListOf<PostViewModel.ListView.CommentListView>()
+fun List<PostViewModel.CommentNodeData>.flatten(): MutableList<PostViewModel.CommentNodeData> {
+    val result = mutableListOf<PostViewModel.CommentNodeData>()
 
     fun PostViewModel.CommentNodeData.flattenRecursive() {
 
-        result.add(this.commentView)
+        result.add(this)
 
         if (this.commentView.isCollapsed) {
             return

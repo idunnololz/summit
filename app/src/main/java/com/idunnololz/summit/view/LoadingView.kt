@@ -8,8 +8,13 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.ApiException
+import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.ServerApiException
+import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.scrape.LoaderException
 import com.idunnololz.summit.util.AnimationUtils
 
@@ -141,8 +146,12 @@ class LoadingView : ConstraintLayout {
     }
 
     fun showErrorWithRetry(msg: Int) {
+        showErrorWithRetry(context.getString(msg))
+    }
+
+    fun showErrorWithRetry(msg: String) {
         show(errorText = true, positiveButton = true)
-        bindErrorText(context.getString(msg))
+        bindErrorText(msg)
         bindPositiveButton(context.getString(R.string.retry)) { v ->
             showProgressBar()
             onRefreshClickListener(v)
@@ -170,6 +179,21 @@ class LoadingView : ConstraintLayout {
     fun showDefaultErrorMessageFor(t: Throwable) {
         when (t) {
             is LoaderException -> showDefaultErrorMessageFor(t.errorCode)
+            is ApiException ->
+                when (t) {
+                    is ClientApiException -> {
+                        Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
+                        if (t is ServerTimeoutException) {
+                            showErrorWithRetry(R.string.error_server_timeout)
+                        } else {
+                            showErrorWithRetry(R.string.error_unknown)
+                            FirebaseCrashlytics.getInstance().recordException(t)
+                        }
+                    }
+                    is ServerApiException ->
+                        showErrorWithRetry(
+                            context.getString(R.string.error_server, t.errorCode.toString()))
+                }
             else -> {
                 Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
                 showErrorWithRetry(R.string.error_unknown)

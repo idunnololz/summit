@@ -4,9 +4,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -15,19 +19,23 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.discord.panels.OverlappingPanelsLayout
+import com.discord.panels.PanelState
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMainBinding
-import com.idunnololz.summit.reddit.RedditUtils
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
-import com.idunnololz.summit.tabs.*
+import com.idunnololz.summit.user.*
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.getCurrentNavigationFragment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     companion object {
@@ -36,8 +44,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         private val SIS_FRAGMENT_TAGS = "SIS_FRAGMENT_TAGS"
 
 
-        fun getTagForTab(tabId: String): String = "innerFragment:$tabId"
-        fun getIdFromTag(tag: String): String = tag.split(":")[1]
+        fun getTagForTab(tabId: Long): String = "innerFragment:$tabId"
+        fun getIdFromTag(tag: String): Long = tag.split(":")[1].toLong()
     }
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
@@ -46,7 +54,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     private lateinit var firstFragmentTag: String
 
-    private val tabsManager = TabsManager.instance
+    @Inject
+    lateinit var userCommunitiesManager: UserCommunitiesManager
 
     private val fragmentTags = hashSetOf<String>()
 
@@ -61,17 +70,27 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             //tabsManager.persistTabBackstack(controller.saveState())
         }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (currentNavController?.navigateUp() == false) {
+                if (!findNavController().navigateUp()) {
+                    getMainActivity()?.finish()
+                }
+            }
+        }
+    }
+
     private val onNavigationItemReselectedListener =
         BottomNavigationView.OnNavigationItemReselectedListener a@{
             if (it.itemId == R.id.main) {
-                val tabId = tabsManager.currentTabId.value ?: return@a
+                val tabId = userCommunitiesManager.currentTabId.value ?: return@a
 
-                val tabItem = checkNotNull(tabsManager.getTab(tabId))
+                val tabItem = checkNotNull(userCommunitiesManager.getTab(tabId))
 
-                currentNavController?.popBackStack(R.id.subreddit, false)
+                currentNavController?.popBackStack(R.id.community, false)
 
                 currentNavController?.navigate(
-                    R.id.subredditFragment,
+                    R.id.communityFragment,
                     tabItem.toCommunityFragmentArgs()
                 )
             }
@@ -83,6 +102,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         savedInstanceState?.getStringArrayList(SIS_FRAGMENT_TAGS)?.forEach {
             fragmentTags.add(it)
         }
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(this,
+            onBackPressedCallback
+        )
     }
 
     override fun onCreateView(
@@ -91,7 +113,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         savedInstanceState: Bundle?
     ): View {
         postponeEnterTransition()
-        setHasOptionsMenu(true) // required so that we can handle up press
 
         setBinding(FragmentMainBinding.inflate(inflater, container, false))
         return binding.root
@@ -100,24 +121,25 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val firstTab = checkNotNull(tabsManager.getTab(TabsManager.FIRST_FRAGMENT_TAB_ID))
-        firstFragmentTag = getTagForTab(firstTab.tabId)
+        val firstTab = checkNotNull(
+            userCommunitiesManager.getTab(UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID))
+        firstFragmentTag = getTagForTab(firstTab.id)
         val navHostFragment = obtainNavHostFragment(
             childFragmentManager,
             firstFragmentTag,
-            R.navigation.subreddit,
+            R.navigation.community,
             R.id.innerNavHostContainer,
             firstTab.toCommunityFragmentArgs()
         )
 
         attachNavHostFragment(childFragmentManager, navHostFragment, true)
-        if (tabsManager.currentTabId.value == TabsManager.FIRST_FRAGMENT_TAB_ID) {
+        if (userCommunitiesManager.currentTabId.value == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
             setCurrentNavController(navHostFragment.navController)
         }
 
-        tabsManager.getAllTabs().forEach { tab ->
-            if (tabsManager.currentTabId.value != TabsManager.FIRST_FRAGMENT_TAB_ID) {
-                childFragmentManager.findFragmentByTag(getTagForTab(tab.tabId))?.let {
+        userCommunitiesManager.getAllUserCommunities().forEach { tab ->
+            if (userCommunitiesManager.currentTabId.value != UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
+                childFragmentManager.findFragmentByTag(getTagForTab(tab.id))?.let {
                     detachNavHostFragment(
                         childFragmentManager,
                         it as NavHostFragment
@@ -128,27 +150,18 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         childFragmentManager.addOnBackStackChangedListener {
             if (childFragmentManager.backStackEntryCount == 0) {
-                if (tabsManager.currentTabId.value != firstTab.tabId) {
-                    tabsManager.currentTabId.value = firstTab.tabId
+                if (userCommunitiesManager.currentTabId.value != firstTab.id) {
+                    userCommunitiesManager.currentTabId.value = firstTab.id
                     setCurrentNavController(navHostFragment.navController)
                 }
             }
         }
 
-        requireMainActivity().apply {
-            binding.abTabsImageView.setOnClickListener {
-                findNavController().navigate(R.id.subredditTabsFragment)
-            }
-        }
-
-        tabsManager.tabsChangedLiveData.observe(viewLifecycleOwner) {
-            if (!it.isLoading) {
-                requireMainActivity().binding.abTabsImageView.setTabs(it.getTabsCount())
-            }
+        userCommunitiesManager.userCommunitiesChangedLiveData.observe(viewLifecycleOwner) {
             purgeUnusedFragments()
         }
 
-        tabsManager.currentTabId.observe(viewLifecycleOwner) { tabIndex ->
+        userCommunitiesManager.currentTabId.observe(viewLifecycleOwner) { tabIndex ->
             changeTab(tabIndex)
         }
 
@@ -166,6 +179,70 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         binding.rootView.post {
             startPostponedEnterTransition()
+        }
+
+        binding.rootView.registerStartPanelStateListeners(object : OverlappingPanelsLayout.PanelStateListener {
+            override fun onPanelStateChange(panelState: PanelState) {
+                Log.d(TAG, "panelState: ${panelState}")
+                when (panelState) {
+                    PanelState.Closed -> {
+                        getMainActivity()?.setNavUiOpenness(0f)
+                    }
+                    is PanelState.Closing -> {
+                        getMainActivity()?.setNavUiOpenness(panelState.progress)
+                    }
+                    PanelState.Opened -> {
+                        getMainActivity()?.setNavUiOpenness(100f)
+                    }
+                    is PanelState.Opening -> {
+                        getMainActivity()?.setNavUiOpenness(panelState.progress)
+                    }
+                }
+            }
+        })
+        binding.rootView.registerEndPanelStateListeners(object : OverlappingPanelsLayout.PanelStateListener {
+            override fun onPanelStateChange(panelState: PanelState) {
+                Log.d(TAG, "panelState: ${panelState}")
+                when (panelState) {
+                    PanelState.Closed -> {
+                        getMainActivity()?.setNavUiOpenness(0f)
+                    }
+                    is PanelState.Closing -> {
+                        getMainActivity()?.setNavUiOpenness(panelState.progress)
+                    }
+                    PanelState.Opened -> {
+                        getMainActivity()?.setNavUiOpenness(100f)
+                    }
+                    is PanelState.Opening -> {
+                        getMainActivity()?.setNavUiOpenness(panelState.progress)
+                    }
+                }
+            }
+        })
+
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                val currentNavController = currentNavController
+                if (menuItem.itemId == android.R.id.home && currentNavController != null) {
+                    return currentNavController.navigateUp()
+                }
+                return false
+            }
+
+        })
+
+        navHostFragment.navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            if (destination.id == R.id.postFragment || destination.id == R.id.communityFragment) {
+                binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+                binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+            } else {
+                binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
+                binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
+            }
         }
     }
 
@@ -224,15 +301,15 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     }
 
     private var lastNavHostFragment: NavHostFragment? = null
-    private fun changeTab(tabIndex: String?) {
-        tabIndex ?: return
+    private fun changeTab(tabId: Long?) {
+        tabId ?: return
 
         lastNavHostFragment?.navController?.removeOnDestinationChangedListener(
             onDestinationChangedListener
         )
 
         val selectedNavHostFragment =
-            updateAttachedFragment(checkNotNull(tabsManager.getTab(tabIndex)))
+            updateAttachedFragment(checkNotNull(userCommunitiesManager.getTab(tabId)))
         selectedNavHostFragment.navController.addOnDestinationChangedListener(
             onDestinationChangedListener
         )
@@ -279,22 +356,14 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         Log.d(TAG, "onDestroyView()")
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val currentNavController = currentNavController
-        if (item.itemId == android.R.id.home && currentNavController != null) {
-            return currentNavController.navigateUp()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun updateAttachedFragment(currentTab: TabItem): NavHostFragment {
+    private fun updateAttachedFragment(currentTab: UserCommunityItem): NavHostFragment {
         val fragmentManager = childFragmentManager
         fragmentManager.popBackStack(firstFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-        val newlySelectedItemTag = getTagForTab(currentTab.tabId)
+        val newlySelectedItemTag = getTagForTab(currentTab.id)
         val selectedFragment = obtainNavHostFragment(
             childFragmentManager,
             newlySelectedItemTag,
-            R.navigation.subreddit,
+            R.navigation.community,
             R.id.innerNavHostContainer,
             currentTab.toCommunityFragmentArgs()
         )
@@ -316,8 +385,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 .setPrimaryNavigationFragment(selectedFragment)
                 .apply {
                     // Detach all other Fragments
-                    tabsManager.getAllTabs().forEach { tab ->
-                        if (getTagForTab(tab.tabId) != newlySelectedItemTag) {
+                    userCommunitiesManager.getAllUserCommunities().forEach { tab ->
+                        if (getTagForTab(tab.id) != newlySelectedItemTag) {
                             detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
                         }
                     }
@@ -337,7 +406,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     private fun purgeUnusedFragments() {
         val unusedFragmentTags = fragmentTags
             .map { getIdFromTag(it) }
-            .filter { tabsManager.getTab(it) == null }
+            .filter { userCommunitiesManager.getTab(it) == null }
             .map { getTagForTab(it) }
 
         purgeFragments(unusedFragmentTags)
@@ -385,25 +454,23 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         )
     }
 
-    fun TabItem.toCommunityFragmentArgs(): Bundle = when (this) {
-        is TabItem.PageTabItem ->
-            CommunityFragmentArgs(community = pageDetails.community).toBundle()
-    }
+    fun UserCommunityItem.toCommunityFragmentArgs(): Bundle =
+        CommunityFragmentArgs(communityRef = communityRef).toBundle()
 
     fun restoreTabState(state: TabCommunityState) {
         // we need to check if tab is still open since user could have closed it
-        if (tabsManager.getTab(state.tabId) == null) {
+        if (userCommunitiesManager.getTab(state.tabId) == null) {
             // tab was closed... restore it
-            tabsManager.addNewTab(
-                TabItem.PageTabItem.newTabItem(
-                    tabId = state.tabId,
-                    community = state.viewState.communityState.community
+            sharedViewModel.addTab(
+                UserCommunityItem(
+                    id = state.tabId,
+                    communityRef = state.viewState.communityState.communityRef
                 )
             )
         }
 
-        if (tabsManager.currentTabId.value != state.tabId) {
-            tabsManager.currentTabId.value = state.tabId
+        if (userCommunitiesManager.currentTabId.value != state.tabId) {
+            userCommunitiesManager.currentTabId.value = state.tabId
         }
 
         val runnable = object : Runnable {

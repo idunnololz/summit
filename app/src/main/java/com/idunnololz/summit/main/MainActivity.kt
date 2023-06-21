@@ -3,7 +3,6 @@ package com.idunnololz.summit.main
 import android.animation.ValueAnimator
 import android.content.Intent
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,39 +10,47 @@ import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.offline.OfflineFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.preview.ImageViewerFragment
 import com.idunnololz.summit.preview.VideoViewerFragment
-import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.redirect.RedirectHandlerDialogFragment
 import com.idunnololz.summit.settings.AccountSettingsFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragment
-import com.idunnololz.summit.tabs.SubredditTabsFragment
-import com.idunnololz.summit.tabs.TabCommunityState
+import com.idunnololz.summit.login.LoginFragment
+import com.idunnololz.summit.saved.SavedFragment
+import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
-import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getCurrentNavigationFragment
-import com.idunnololz.summit.util.ext.setupWithNavController
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
+import kotlin.math.max
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -52,7 +59,7 @@ class MainActivity : BaseActivity() {
         private val TAG = MainActivity::class.java.canonicalName
     }
 
-    private lateinit var sharedViewModel: SharedViewModel
+    private val sharedViewModel: SharedViewModel by viewModels()
 
     var toolbarTextView: TextView? = null
         private set
@@ -61,10 +68,11 @@ class MainActivity : BaseActivity() {
     // this can also be obtained via (an)other method(s)
     private var toolbarHeight: Int = 0
 
-    private var enableCustomAppBarVerticalOffsetListener = false
     private var lastCustomAppBarOffset = -1f
 
-    lateinit var binding: ActivityMainBinding
+    private var lastToolbarAppBarOffset = -1f
+
+    private lateinit var binding: ActivityMainBinding
 
     val headerOffset = MutableLiveData<Int>()
     val bottomNavViewOffset = MutableLiveData<Int>()
@@ -73,15 +81,14 @@ class MainActivity : BaseActivity() {
     private var animatingBottomNavView = false
     private var enableBottomNavViewScrolling = false
 
-    private lateinit var viewModel: MainActivityViewModel
+    private val viewModel: MainActivityViewModel by viewModels()
 
-    private var subredditSelectorController: SubredditSelectorController? = null
+    private var communitySelectorController: CommunitySelectorController? = null
 
-    private var currentNavController: LiveData<NavController>? = null
+    private var currentNavController: NavController? = null
 
     private var showNotificationBarBg: Boolean = true
 
-    private lateinit var redditAppBarController: RedditAppBarController
     private lateinit var lemmyAppBarController: LemmyAppBarController
 
     private val insetsChangedLiveData = MutableLiveData<Int>()
@@ -89,36 +96,68 @@ class MainActivity : BaseActivity() {
     private val onNavigationItemReselectedListeners =
         mutableListOf<BottomNavigationView.OnNavigationItemReselectedListener>()
 
+    private var currentBottomMenu: BottomMenu? = null
+    private var lastInsets: MainActivityInsets = MainActivityInsets()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         super.onCreate(savedInstanceState)
 
-        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
-        viewModel.loadSubreddits()
-        viewModel.subredditsLiveData.observe(this, Observer {
-            subredditSelectorController?.setSubredditsState(it)
-        })
+        viewModel.communities.observe(this) {
+            communitySelectorController?.setCommunities(it)
+        }
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
 
-        setupNotificationBarBg()
         setupActionBar()
         setupCustomActionBar()
-        setupForFullScreen()
+        registerInsetsHandler()
+        registerCurrentAccountListener()
+        registerDefaultCommunityListener()
 
-        redditAppBarController = RedditAppBarController(this, binding.customAppBar)
         lemmyAppBarController = LemmyAppBarController(this, binding.customAppBar)
 
-        if (savedInstanceState == null) {
-            setupBottomNavigationBar()
-        } // Else, need to wait for onRestoreInstanceState
-
-        bottomNavViewOffset.observe(this, Observer {
+        bottomNavViewOffset.observe(this) {
             binding.bottomNavigationView.translationY = it.toFloat()
-        })
+        }
 
         handleIntent(intent)
+
+        runOnReady(this) {
+            viewModel.loadCommunities()
+
+            if (savedInstanceState == null) {
+                setupBottomNavigationBar()
+            } // Else, need to wait for onRestoreInstanceState
+        }
+
+        // Set up an OnPreDrawListener to the root view.
+        val content: View = findViewById(android.R.id.content)
+        content.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    // Check whether the initial data is ready.
+                    return if (viewModel.isReady.value == true) {
+                        // The content is ready. Start drawing.
+                        content.viewTreeObserver.removeOnPreDrawListener(this)
+                        true
+                    } else {
+                        // The content isn't ready. Suspend.
+                        false
+                    }
+                }
+            }
+        )
+    }
+
+    private fun registerDefaultCommunityListener() {
+        viewModel.defaultCommunity.observe(this) {
+            lemmyAppBarController.setDefaultCommunity(it)
+        }
     }
 
     override fun onDestroy() {
@@ -129,65 +168,42 @@ class MainActivity : BaseActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        // Now that BottomNavigationBar has restored its instance state
-        // and its selectedItemId, we can proceed with setting up the
-        // BottomNavigationBar with Navigation
-        setupBottomNavigationBar()
+
+        runOnReady(this) {
+            // Now that BottomNavigationBar has restored its instance state
+            // and its selectedItemId, we can proceed with setting up the
+            // BottomNavigationBar with Navigation
+            setupBottomNavigationBar()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean =
-        currentNavController?.value?.navigateUp() ?: false
-
-    fun expandCustomActionBar() {
-        val anim =
-            ValueAnimator.ofInt(binding.customAppBar.height, Utils.convertDpToPixel(86f).toInt())
-        anim.addUpdateListener { valueAnimator ->
-            val newHeight = valueAnimator.animatedValue as Int
-            binding.customActionBar.layoutParams = binding.customActionBar.layoutParams.apply {
-                height = newHeight
-            }
-
-            if (valueAnimator.animatedFraction == 1f) {
-                binding.sortGroup.visibility = View.VISIBLE
-            }
-        }
-        anim.duration = 300
-        anim.start()
-    }
-
-    fun collapseCustomActionBar() {
-        val anim =
-            ValueAnimator.ofInt(
-                binding.customAppBar.height,
-                resources.getDimensionPixelSize(R.dimen.custom_ab_height)
-            )
-        anim.addUpdateListener { valueAnimator ->
-            val newHeight = valueAnimator.animatedValue as Int
-            binding.customActionBar.layoutParams = binding.customActionBar.layoutParams.apply {
-                height = newHeight
-            }
-        }
-        anim.duration = 300
-        anim.start()
-
-        binding.sortGroup.visibility = View.GONE
-    }
+        currentNavController?.navigateUp() ?: false
 
     private fun setupBottomNavigationBar() {
-        val navGraphIds = listOf(
-            R.navigation.main,
-            R.navigation.offline,
-            R.navigation.history,
-            R.navigation.settings
-        )
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
-        // Setup the bottom navigation view with a list of navigation graphs
-        val controller = binding.bottomNavigationView.setupWithNavController(
-            navGraphIds = navGraphIds,
-            fragmentManager = supportFragmentManager,
-            containerId = R.id.navHostContainer,
-            intent = intent
-        )
+        val navController = navHostFragment.navController
+        val inflater = navController.navInflater
+        val graph = inflater.inflate(R.navigation.main)
+        navController.graph = graph
+
+        binding.bottomNavigationView.setupWithNavController(navController)
+
+//        val navGraphIds = listOf(
+//            R.navigation.main,
+//            R.navigation.saved,
+//            R.navigation.history,
+//        )
+//
+//        // Setup the bottom navigation view with a list of navigation graphs
+//        val controller = binding.bottomNavigationView.setupWithNavController(
+//            navGraphIds = navGraphIds,
+//            fragmentManager = supportFragmentManager,
+//            containerId = R.id.navHostContainer,
+//            intent = intent
+//        )
 
         binding.bottomNavigationView.setOnItemReselectedListener { menuItem ->
             Log.d(TAG, "Reselected nav item: ${menuItem.itemId}")
@@ -197,7 +213,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        currentNavController = controller
+        currentNavController = navHostFragment.navController
     }
 
     fun registerOnNavigationItemReselectedListener(
@@ -212,69 +228,70 @@ class MainActivity : BaseActivity() {
         onNavigationItemReselectedListeners.remove(onNavigationItemReselectedListener)
     }
 
-    private fun setupForFullScreen() {
-        showSystemUI(false)
+    private fun registerInsetsHandler() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val systemBarsInsets = insets.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.systemBars(),
+            )
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()) // keyboard
+            val imeHeight = imeInsets.bottom
+            val topInset = systemBarsInsets.top
+            val bottomInset = max(systemBarsInsets.bottom, imeHeight)
+            val leftInset = systemBarsInsets.left
+            val rightInset = systemBarsInsets.right
 
-        binding.rootView.systemUiVisibility =
-            SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            lastInsets = MainActivityInsets(
+                imeHeight = imeHeight,
+                topInset = topInset,
+                bottomInset = bottomInset,
+                leftInset = leftInset,
+                rightInset = rightInset,
+            )
 
-        window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
-            // Note that system bars will only be "visible" if none of the
-            // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
-            handleSystemUiVisibility(visibility)
-        }
+            Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.contentView) { _, insets ->
             // Move toolbar below status bar
             binding.appBar.layoutParams = (binding.appBar.layoutParams as ViewGroup.MarginLayoutParams).apply {
                 //topMargin = insets.systemWindowInsetTop
-                leftMargin = insets.systemWindowInsetLeft
-                rightMargin = insets.systemWindowInsetRight
+                leftMargin = leftInset
+                rightMargin = rightInset
             }
-            binding.appBar.updatePadding(top = insets.systemWindowInsetTop)
+            binding.toolbarContainer.updatePadding(top = topInset)
+
             binding.customAppBar.layoutParams =
                 (binding.customAppBar.layoutParams as ViewGroup.MarginLayoutParams).apply {
-                    topMargin = insets.systemWindowInsetTop
-                    leftMargin = insets.systemWindowInsetLeft
-                    rightMargin = insets.systemWindowInsetRight
+                    leftMargin = leftInset
+                    rightMargin = rightInset
                 }
             binding.bottomNavigationView.layoutParams =
                 (binding.bottomNavigationView.layoutParams as ViewGroup.MarginLayoutParams).apply {
-                    leftMargin = insets.systemWindowInsetLeft
-                    rightMargin = insets.systemWindowInsetRight
+                    leftMargin = leftInset
+                    rightMargin = rightInset
                 }
+            binding.customActionBar.updatePadding(top = topInset)
 
             // Move our RecyclerView below toolbar + 10dp
             windowInsets.value = checkNotNull(windowInsets.value).apply {
-                left = insets.systemWindowInsetLeft
-                top = insets.systemWindowInsetTop
-                right = insets.systemWindowInsetRight
-                bottom = insets.systemWindowInsetBottom
+                left = leftInset
+                top = topInset
+                right = rightInset
+                bottom = bottomInset
             }
+            binding.bottomNavigationView.layoutParams =
+                (binding.bottomNavigationView.layoutParams as ViewGroup.MarginLayoutParams).apply {
+                    leftMargin = leftInset
+                    rightMargin = rightInset
+                }
+            binding.snackbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = binding.bottomNavigationView.height
+            }
+            binding.bottomNavigationView.updatePadding(bottom = bottomInset)
 
-            val statusBarHeight = insets.systemWindowInsetTop
-            onStatusBarHeightChanged(statusBarHeight)
+            onStatusBarHeightChanged(topInset)
 
             insetsChangedLiveData.postValue(0)
 
-            insets
-        }
-    }
-
-    private fun handleSystemUiVisibility(visibility: Int) {
-        if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
-            // The system bars are visible. Make any desired
-            // adjustments to your UI, such as showing the action bar or
-            // other navigational controls.
-            showNotificationBarBgIfNeeded()
-            Log.d(TAG, "System UI visible!")
-        } else {
-            // The system bars are NOT visible. Make any desired
-            // adjustments to your UI, such as hiding the action bar or
-            // other navigational controls.
-            hideNotificationBarBgIfNeeded()
-            Log.d(TAG, "System UI not visible!")
+            WindowInsetsCompat.CONSUMED
         }
     }
 
@@ -327,16 +344,21 @@ class MainActivity : BaseActivity() {
         enableBottomNavViewScrolling = false
     }
 
+    fun setNavUiOpenness(progress: Float) {
+        binding.customAppBar.translationY = -binding.customAppBar.height * progress
+        binding.bottomNavigationView.translationY =
+            binding.bottomNavigationView.height * progress
+    }
+
     fun disableCustomAppBar() {
-        fixCustomAppBar()
-        enableCustomAppBarVerticalOffsetListener = false
+        binding.customAppBar.removeOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
         binding.customAppBar.animate()
             .translationY(-binding.customAppBar.height.toFloat())
             .withEndAction {
                 binding.customAppBar.visibility = View.INVISIBLE
             }
 
-        subredditSelectorController?.hide()
+        communitySelectorController?.hide()
 
         ValueAnimator.ofInt(headerOffset.value ?: 0, 0).apply {
             duration = 300
@@ -346,17 +368,21 @@ class MainActivity : BaseActivity() {
         }.start()
     }
 
+    private val customAppBarOnOffsetChangedListener =
+        AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            lastCustomAppBarOffset = verticalOffset.toFloat()
+            headerOffset.value = verticalOffset + appBarLayout.height
+
+            val percentShown = abs(lastCustomAppBarOffset) / binding.customAppBar.height
+            if (!animatingBottomNavView)
+                bottomNavViewOffset.value =
+                    (percentShown * binding.bottomNavigationView.height).toInt()
+        }
+
     fun enableCustomAppBar() {
+        binding.customAppBar.addOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
         val customAppBar = binding.customAppBar
-        binding.customActionBar.layoutParams =
-            (binding.customActionBar.layoutParams as AppBarLayout.LayoutParams).apply {
-                scrollFlags =
-                    AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
-                            AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
-                            AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
-            }
         headerOffset.value = (customAppBar.height + lastCustomAppBarOffset).toInt()
-        enableCustomAppBarVerticalOffsetListener = true
         customAppBar.visibility = View.VISIBLE
         customAppBar.animate()
             .translationY(0f)
@@ -376,20 +402,24 @@ class MainActivity : BaseActivity() {
         }.start()
     }
 
-    var lastScrollFlags: Int = 0
-    fun fixCustomAppBar() {
-        binding.customActionBar.layoutParams =
-            (binding.customActionBar.layoutParams as AppBarLayout.LayoutParams).apply {
-                lastScrollFlags = scrollFlags
+    var lastScrollFlagsToolbar: Int = 0
+    fun fixToolbar() {
+        binding.toolbarContainer.layoutParams =
+            (binding.toolbarContainer.layoutParams as AppBarLayout.LayoutParams).apply {
+                lastScrollFlagsToolbar = scrollFlags
                 scrollFlags = 0
             }
     }
 
-    fun unfixCustomAppBar() {
-        binding.customActionBar.layoutParams =
-            (binding.customActionBar.layoutParams as AppBarLayout.LayoutParams).apply {
-                scrollFlags = lastScrollFlags
+    fun unfixToolbar() {
+        binding.toolbarContainer.layoutParams =
+            (binding.toolbarContainer.layoutParams as AppBarLayout.LayoutParams).apply {
+                scrollFlags = lastScrollFlagsToolbar
             }
+    }
+
+    fun showCustomAppBar() {
+        binding.customAppBar.setExpanded(true)
     }
 
     fun showBottomNav() {
@@ -426,27 +456,27 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        intent ?: return
-
-        val data = intent.data ?: return
-        if (data.authority == "auth") {
-            RedditAuthManager.instance.handleAuthAttempt(data, supportFragmentManager)
-        } else if (RedditUtils.isUriReddit(data)) {
-            if (RedditUtils.isUriGallery(data) && data.pathSegments.size >= 2) {
-                RedirectHandlerDialogFragment.newInstance(LinkUtils.getRedirectLink(data.pathSegments[1]))
-                    .show(supportFragmentManager, "asd")
-            } else if (RedditUtils.isUriRedirect(data)) {
-                RedirectHandlerDialogFragment.newInstance(data.toString())
-                    .show(supportFragmentManager, "asd")
-            } else {
-                if (binding.bottomNavigationView.selectedItemId != R.id.main) {
-                    binding.bottomNavigationView.selectedItemId = R.id.main
-                }
-                executeWhenMainFragmentAvailable { mainFragment ->
-                    mainFragment.navigateToUri(data)
-                }
-            }
-        }
+//        intent ?: return
+//
+//        val data = intent.data ?: return
+//        if (data.authority == "auth") {
+//            RedditAuthManager.instance.handleAuthAttempt(data, supportFragmentManager)
+//        } else if (RedditUtils.isUriReddit(data)) {
+//            if (RedditUtils.isUriGallery(data) && data.pathSegments.size >= 2) {
+//                RedirectHandlerDialogFragment.newInstance(LinkUtils.getRedirectLink(data.pathSegments[1]))
+//                    .show(supportFragmentManager, "asd")
+//            } else if (RedditUtils.isUriRedirect(data)) {
+//                RedirectHandlerDialogFragment.newInstance(data.toString())
+//                    .show(supportFragmentManager, "asd")
+//            } else {
+//                if (binding.bottomNavigationView.selectedItemId != R.id.main) {
+//                    binding.bottomNavigationView.selectedItemId = R.id.main
+//                }
+//                executeWhenMainFragmentAvailable { mainFragment ->
+//                    mainFragment.navigateToUri(data)
+//                }
+//            }
+//        }
     }
 
     private fun executeWhenMainFragmentAvailable(fn: (MainFragment) -> Unit) {
@@ -465,27 +495,7 @@ class MainActivity : BaseActivity() {
         navigateToPageRunnable.run()
     }
 
-    private fun setupNotificationBarBg() {
-        // get the status bar height
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // handled by inset listener
-        } else {
-            binding.contentView.post {
-                val rectangle = Rect()
-                val window = window
-                window.decorView.getWindowVisibleDisplayFrame(rectangle)
-                val statusBarHeight = rectangle.top
-                onStatusBarHeightChanged(statusBarHeight)
-            }
-        }
-    }
-
     private fun onStatusBarHeightChanged(statusBarHeight: Int) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            // before kitkat, apps cannot draw under the status bar
-            return
-        }
-
         val lp = binding.notificationBarBg.layoutParams
         if (lp.height != statusBarHeight) {
             Log.d(TAG, "New status bar height: $statusBarHeight")
@@ -509,21 +519,13 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupCustomActionBar() {
-        binding.customAppBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            if (enableCustomAppBarVerticalOffsetListener) {
-                lastCustomAppBarOffset = verticalOffset.toFloat()
-                headerOffset.value = verticalOffset + appBarLayout.height
-
-                val percentShown = abs(lastCustomAppBarOffset) / binding.customAppBar.height
-                if (!animatingBottomNavView)
-                    bottomNavViewOffset.value =
-                        (percentShown * binding.bottomNavigationView.height).toInt()
+        binding.customActionBar.layoutParams =
+            (binding.customActionBar.layoutParams as AppBarLayout.LayoutParams).apply {
+                scrollFlags =
+                    AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
+                            AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
+                            AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
             }
-        }
-
-        binding.closeButton.setOnClickListener {
-            collapseCustomActionBar()
-        }
     }
 
     fun setupActionBar(@StringRes title: Int, showUp: Boolean) {
@@ -561,9 +563,29 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun showActionBar() {
-        hideActionBar(false)
+    private val onOffsetChangedListener = AppBarLayout.OnOffsetChangedListener {
+            appBarLayout, verticalOffset ->
 
+        lastToolbarAppBarOffset = verticalOffset.toFloat()
+        headerOffset.value = verticalOffset + appBarLayout.height
+
+        val percentShown = abs(lastToolbarAppBarOffset) / binding.appBar.height
+        if (!animatingBottomNavView)
+            bottomNavViewOffset.value =
+                (percentShown * binding.bottomNavigationView.height).toInt()
+    }
+    fun showActionBar() {
+        setSupportActionBar(binding.toolbar)
+
+        hideActionBar(false)
+        unfixToolbar()
+
+        binding.toolbarContainer.updateLayoutParams<AppBarLayout.LayoutParams> {
+            scrollFlags =
+                AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
+                        AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
+                        AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
+        }
 //        val supportActionBar = supportActionBar ?: return
 //        if (supportActionBar.isShowing) return
         binding.appBar.visibility = View.VISIBLE
@@ -575,8 +597,14 @@ class MainActivity : BaseActivity() {
 //        supportActionBar.show()
     }
 
+    fun enableScrollingBottomNavByActionBar() {
+        binding.appBar.addOnOffsetChangedListener(onOffsetChangedListener)
+    }
+
     fun hideActionBar(hideToolbar: Boolean = true) {
+        binding.appBar.removeOnOffsetChangedListener(onOffsetChangedListener)
         if (hideToolbar) {
+            fixToolbar()
 //            val supportActionBar = supportActionBar ?: return
 //            if (!supportActionBar.isShowing) {
 //                return
@@ -592,32 +620,25 @@ class MainActivity : BaseActivity() {
         updateToolbarHeight()
     }
 
-    private fun createOrGetSubredditSelectorController(): SubredditSelectorController =
-        subredditSelectorController ?: SubredditSelectorController(this).also {
-            it.inflate(binding.overlayContainer)
-//            it.setTopMargin(customActionBar.height)
-            it.onVisibilityChangedCallback = { isVisible ->
-                if (isVisible) {
-                    fixCustomAppBar()
-                } else {
-                    unfixCustomAppBar()
-                }
+    private fun createOrGetSubredditSelectorController(): CommunitySelectorController =
+        communitySelectorController
+            ?: viewModel.communitySelectorControllerFactory.create(this).also {
+                it.inflate(binding.overlayContainer)
+                it.setCommunities(viewModel.communities.value)
+                communitySelectorController = it
             }
-            subredditSelectorController = it
+
+    fun showCommunitySelector(): CommunitySelectorController {
+        val communitySelectorController = createOrGetSubredditSelectorController()
+
+        viewModel.communities.value.let {
+            communitySelectorController.setCommunities(it)
         }
 
-    fun showSubredditSelector(): SubredditSelectorController {
-        val subredditSelectorController = createOrGetSubredditSelectorController()
-
-        viewModel.subredditsLiveData.value?.let {
-            subredditSelectorController.setSubredditsState(it)
-        }
-
-        subredditSelectorController.show()
-        return subredditSelectorController
+        communitySelectorController.show(lastInsets)
+        return communitySelectorController
     }
 
-    fun getCustomAppBarControllerOld(): RedditAppBarController = redditAppBarController
     fun getCustomAppBarController() = lemmyAppBarController
 
     private fun updateToolbarHeight() {
@@ -635,8 +656,8 @@ class MainActivity : BaseActivity() {
     }
 
     fun onBackPressed(force: Boolean) {
-        if (!force && subredditSelectorController?.isVisible == true) {
-            subredditSelectorController?.hide()
+        if (!force && communitySelectorController?.isVisible == true) {
+            communitySelectorController?.hide()
         } else {
             super.onBackPressed()
         }
@@ -646,34 +667,30 @@ class MainActivity : BaseActivity() {
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
         // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
-                    // Set the content to appear under the system bars so that the
-                    // content doesn't resize when the system bars hide and show.
-                    or SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    // Hide the nav bar and status bar
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN)
-        }
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                // Set the content to appear under the system bars so that the
+                // content doesn't resize when the system bars hide and show.
+                or SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                // Hide the nav bar and status bar
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN)
     }
 
     // Shows the system bars by removing all the flags
     // except for the ones that make the content appear under the system bars.
     fun showSystemUI(animate: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            window.decorView.systemUiVisibility = (SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or if (resources.getBoolean(R.bool.isLightTheme)) {
-                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            } else 0)
-        }
+        window.decorView.systemUiVisibility = (SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or if (resources.getBoolean(R.bool.isLightTheme)) {
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        } else 0)
     }
 
-    fun insetRootViewAutomatically(lifecycleOwner: LifecycleOwner, rootView: View) {
-        insetsChangedLiveData.observe(lifecycleOwner, Observer {
+    fun insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
             val lp = rootView.layoutParams as ViewGroup.MarginLayoutParams
             val insets = checkNotNull(windowInsets.value)
 
@@ -682,7 +699,33 @@ class MainActivity : BaseActivity() {
             lp.leftMargin = insets.left
             lp.rightMargin = insets.right
             rootView.requestLayout()
-        })
+        }
+    }
+
+    fun insetViewExceptBottomAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val lp = rootView.layoutParams as ViewGroup.MarginLayoutParams
+            val insets = checkNotNull(windowInsets.value)
+
+            lp.topMargin = insets.top
+            lp.leftMargin = insets.left
+            lp.rightMargin = insets.right
+            rootView.requestLayout()
+        }
+    }
+
+
+    fun insetViewExceptTopAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = checkNotNull(windowInsets.value)
+
+            rootView.setPadding(
+                insets.left,
+                0,
+                insets.right,
+                insets.bottom
+            )
+        }
     }
 
     fun restoreTabState(state: TabCommunityState?) {
@@ -697,26 +740,19 @@ class MainActivity : BaseActivity() {
 
     inline fun <reified T> setupForFragment() {
         when (T::class) {
-            SubredditTabsFragment::class -> {
-                hideActionBar()
-                disableBottomNavViewScrolling()
-                showBottomNav()
-                disableCustomAppBar()
-                showNotificationBarBg()
-            }
             CommunityFragment::class -> {
                 hideActionBar()
                 enableBottomNavViewScrolling()
+                showBottomNav()
                 showNotificationBarBg()
                 enableCustomAppBar()
             }
             PostFragment::class -> {
                 hideActionBar()
-                enableBottomNavViewScrolling()
-                enableCustomAppBar()
+                disableBottomNavViewScrolling()
+                hideBottomNav()
                 showNotificationBarBg()
-
-                collapseCustomActionBar()
+                disableCustomAppBar()
             }
             VideoViewerFragment::class -> {
                 hideActionBar()
@@ -726,8 +762,9 @@ class MainActivity : BaseActivity() {
                 hideNotificationBarBg()
             }
             ImageViewerFragment::class -> {
+                showActionBar()
                 disableBottomNavViewScrolling()
-                hideBottomNav()
+//                hideBottomNav()
                 disableCustomAppBar()
                 hideNotificationBarBg()
             }
@@ -759,9 +796,46 @@ class MainActivity : BaseActivity() {
                 disableCustomAppBar()
                 showNotificationBarBg()
             }
+            LoginFragment::class -> {
+                hideActionBar()
+                disableBottomNavViewScrolling()
+                showBottomNav()
+                disableCustomAppBar()
+                showNotificationBarBg()
+            }
+            SavedFragment::class -> {
+                hideActionBar()
+                disableBottomNavViewScrolling()
+                showBottomNav()
+                disableCustomAppBar()
+                showNotificationBarBg()
+            }
             else -> throw RuntimeException("No setup instructions for type: ${T::class.java.canonicalName}")
         }
     }
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
+    fun getToolbarHeight() = binding.toolbar.layoutParams.height
+    fun getTabsButton() = binding.abTabsImageView
+
+    private fun registerCurrentAccountListener() {
+        viewModel.currentAccount.observe(this) {
+            lemmyAppBarController.onAccountChanged(it)
+        }
+    }
+
+    fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {
+        viewModel.isReady.observe(lifecycleOwner) {
+            if (it == true) {
+                cb()
+            }
+        }
+    }
+
+    fun showBottomMenu(bottomMenu: BottomMenu) {
+        currentBottomMenu?.close()
+        bottomMenu.setInsets(lastInsets.topInset, lastInsets.bottomInset)
+        bottomMenu.show(binding.bottomSheetContainer)
+        currentBottomMenu = bottomMenu
+    }
 }

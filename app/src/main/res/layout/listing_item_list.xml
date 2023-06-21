@@ -120,7 +120,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingLeft="@dimen/reddit_content_horizontal_padding"
-        app:icon="@drawable/baseline_comment_black_18"
+        app:icon="@drawable/baseline_comment_18"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bottomBarrier" />
 

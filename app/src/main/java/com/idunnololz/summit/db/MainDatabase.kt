@@ -1,37 +1,46 @@
 package com.idunnololz.summit.db
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.history.HistoryConverters
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.history.HistoryEntry
-import com.idunnololz.summit.reddit_actions.RedditAction
-import com.idunnololz.summit.reddit_actions.RedditActionDao
-import com.idunnololz.summit.tabs.TabEntry
-import com.idunnololz.summit.tabs.TabsDao
+import com.idunnololz.summit.lemmy.actions.LemmyAction
+import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
+import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
+import com.idunnololz.summit.user.UserCommunityEntry
+import com.idunnololz.summit.user.UserCommunitiesConverters
+import com.idunnololz.summit.user.UserCommunitiesDao
+import com.idunnololz.summit.util.moshi
 
 /**
  * Db that contains actions taken by the user. This is necessary to cache all of the user's actions.
  */
 @Database(
     entities = [
-        RedditAction::class,
-        TabEntry::class,
+        UserCommunityEntry::class,
         HistoryEntry::class,
-        Account::class
+        Account::class,
+        LemmyAction::class,
     ],
-    version = 16
+    autoMigrations = [
+    ],
+    version = 20,
+    exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class)
 abstract class MainDatabase : RoomDatabase() {
 
-    abstract fun redditActionDao(): RedditActionDao
-    abstract fun tabsDao(): TabsDao
+    abstract fun lemmyActionsDao(): LemmyActionsDao
+    abstract fun userCommunitiesDao(): UserCommunitiesDao
     abstract fun historyDao(): HistoryDao
     abstract fun accountDao(): AccountDao
 
@@ -46,14 +55,25 @@ abstract class MainDatabase : RoomDatabase() {
             }
 
         private fun buildDatabase(context: Context): MainDatabase {
-            val db = Room
+            val moshi = moshi
+
+            return Room
                 .databaseBuilder(
                     context.applicationContext,
                     MainDatabase::class.java, "main.db"
                 )
                 .fallbackToDestructiveMigration()
+                .addTypeConverter(LemmyActionConverters(moshi))
+                .addTypeConverter(UserCommunitiesConverters(moshi))
+                .addMigrations(MIGRATION_19_20)
                 .build()
-            return db
         }
+    }
+}
+
+val MIGRATION_19_20 = object : Migration(19, 20) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS tabs;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `user_communities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sortOrder` INTEGER NOT NULL, `communitySortOrder` TEXT NOT NULL, `ref` TEXT)")
     }
 }

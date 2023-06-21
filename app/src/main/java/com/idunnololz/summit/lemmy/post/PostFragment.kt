@@ -1,17 +1,19 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
-import android.text.SpannableString
 import android.text.TextWatcher
-import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -20,7 +22,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
+import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -35,35 +39,30 @@ import com.facebook.drawee.drawable.ScalingUtils
 import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.snackbar.Snackbar
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.LemmyListView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.auth.RedditAuthManager
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
-import com.idunnololz.summit.lemmy.getFormattedAuthor
-import com.idunnololz.summit.lemmy.getFormattedTitle
-import com.idunnololz.summit.lemmy.getLikesWithLikesManager
-import com.idunnololz.summit.lemmy.getUpvoteText
-import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.lemmy.utils.getFormattedAuthor
+import com.idunnololz.summit.lemmy.utils.getFormattedTitle
+import com.idunnololz.summit.lemmy.utils.getUpvoteText
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.lemmy.post.PostFragment.Item.*
-import com.idunnololz.summit.lemmy.toCommunity
+import com.idunnololz.summit.lemmy.utils.VoteUiHandler
+import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.reddit.*
-import com.idunnololz.summit.reddit.ext.getFormattedTitle
-import com.idunnololz.summit.reddit_actions.ActionInfo
-import com.idunnololz.summit.reddit_actions.RedditAction
-import com.idunnololz.summit.reddit_objects.*
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.addDefaultAnim
-import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.LoadingView
@@ -71,7 +70,9 @@ import com.idunnololz.summit.view.RedditHeaderView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.AlertDialogFragmentListener {
+class PostFragment : BaseFragment<FragmentPostBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener,
+    SignInNavigator {
     companion object {
         private val TAG = PostFragment::class.java.canonicalName
 
@@ -81,13 +82,36 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
     private val args: PostFragmentArgs by navArgs()
 
-    private val postViewModel: PostViewModel by viewModels()
+    private val viewModel: PostViewModel by viewModels()
 
-    private lateinit var adapter: RedditObjectAdapter
+    private lateinit var adapter: PostsAdapter
 
     private var offlineManager = OfflineManager.instance
 
     private var hasConsumedJumpToComments: Boolean = false
+
+    private val _sortByMenu: BottomMenu by lazy {
+        BottomMenu(requireContext()).apply {
+            addItem(R.id.sort_order_hot, R.string.sort_order_hot)
+            addItem(R.id.sort_order_top, R.string.sort_order_top)
+            addItem(R.id.sort_order_new, R.string.sort_order_new)
+            addItem(R.id.sort_order_old, R.string.sort_order_old)
+            setTitle(R.string.sort_by)
+
+            setOnMenuItemClickListener { menuItem ->
+                when(menuItem.id) {
+                    R.id.sort_order_hot ->
+                        viewModel.setCommentsSortOrder(CommentsSortOrder.Hot)
+                    R.id.sort_order_top ->
+                        viewModel.setCommentsSortOrder(CommentsSortOrder.Top)
+                    R.id.sort_order_new ->
+                        viewModel.setCommentsSortOrder(CommentsSortOrder.New)
+                    R.id.sort_order_old ->
+                        viewModel.setCommentsSortOrder(CommentsSortOrder.Old)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,9 +120,29 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
         postponeEnterTransition()
 
-        adapter = RedditObjectAdapter(context, args.reveal) {
-//            postViewModel.fetchPostData(RedditUtils.toJsonUrl(args.url), force = true)
-        }
+        adapter = PostsAdapter(
+            context,
+            args.instance,
+            args.reveal,
+            viewModel.voteUiHandler,
+            onRefreshClickCb = {
+                forceRefresh()
+            },
+            onSignInRequired = {
+                PreAuthDialogFragment.newInstance()
+                    .show(childFragmentManager, "asdf")
+            },
+            onInstanceMismatch = { accountInstance, apiInstance ->
+                AlertDialogFragment.Builder()
+                    .setTitle(R.string.error_account_instance_mismatch_title)
+                    .setMessage(
+                        getString(R.string.error_account_instance_mismatch,
+                            accountInstance,
+                            apiInstance)
+                    )
+                    .createAndShow(childFragmentManager, "aa")
+            },
+        )
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
@@ -121,125 +165,32 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
+
         requireMainActivity().apply {
-            insetRootViewAutomatically(viewLifecycleOwner, view)
-            getCustomAppBarController().setCommunity(args.currentCommunity)
-            getCustomAppBarController().clearPageIndex()
+            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+            setupActionBar(
+                "",
+                showUp = false,
+                animateActionBarIn = false,
+            )
+
+            setSupportActionBar(binding.toolbar)
+
+            supportActionBar?.setDisplayShowHomeEnabled(true)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.title =
+                viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
         }
 
-        val context = requireContext()
         val swipeRefreshLayout = binding.swipeRefreshLayout
 
-//        jsonUrl = RedditUtils.toJsonUrl(args.url)
-
-        (activity as MainActivity).apply {
-            hideActionBar()
-
-            headerOffset.observe(viewLifecycleOwner) {
-                if (it != null)
-                    getView()?.translationY = it.toFloat()
-            }
-
-            getCustomAppBarControllerOld().setup(
-                { controller, url ->
-//                    val action =
-//                        PostFragmentDirections.actionPostFragmentToSubredditFragment(url = url)
-//                    findNavController().navigate(action)
-//                    Utils.hideKeyboard(activity)
-//                    controller.hide()
-
-                    // TODO()
-                },
-                {
-                    PopupMenu(context, it).apply {
-                        inflate(R.menu.menu_fragment_post)
-
-                        val selectedItem = when (postViewModel.commentsSortOrder) {
-                            CommentsSortOrder.CONFIDENCE -> menu.findItem(R.id.comments_order_confidence)
-                            CommentsSortOrder.TOP -> menu.findItem(R.id.comments_order_top)
-                            CommentsSortOrder.NEW -> menu.findItem(R.id.comments_order_new)
-                            CommentsSortOrder.CONTROVERSIAL -> menu.findItem(R.id.comments_order_controversial)
-                            CommentsSortOrder.OLD -> menu.findItem(R.id.comments_order_old)
-                            CommentsSortOrder.RANDOM -> menu.findItem(R.id.comments_order_random)
-                            CommentsSortOrder.QA -> menu.findItem(R.id.comments_order_qa)
-                            null -> menu.findItem(R.id.comments_order_confidence)
-                        }
-
-                        selectedItem?.let { selectedItem ->
-                            selectedItem.title = SpannableString(selectedItem.title).apply {
-                                setSpan(
-                                    ForegroundColorSpan(context.getColorCompat(R.color.colorPrimary)),
-                                    0,
-                                    length,
-                                    0
-                                )
-                                setSpan(StyleSpan(Typeface.BOLD), 0, length, 0)
-                            }
-                        }
-
-                        fun setCommentsSortOrderAndRefresh(sortOrder: CommentsSortOrder) {
-                            swipeRefreshLayout.isRefreshing = true
-                            postViewModel.setCommentsSortOrder(sortOrder)
-//                            postViewModel.fetchPostData(RedditUtils.toJsonUrl(args.url), force = true)
-                        }
-
-                        setOnMenuItemClickListener {
-                            when (it.itemId) {
-                                R.id.share -> {
-//                                    val sendIntent: Intent = Intent().apply {
-//                                        action = Intent.ACTION_SEND
-//                                        putExtra(
-//                                            Intent.EXTRA_TEXT,
-//                                            RedditUtils.toSharedLink(args.url)
-//                                        )
-//                                        type = "text/plain"
-//                                    }
-//
-//                                    val shareIntent = Intent.createChooser(sendIntent, null)
-//                                    startActivity(shareIntent)
-                                    true
-                                }
-                                R.id.go_to -> {
-                                    findNavController().navigate(R.id.goToDialogFragment)
-                                    true
-                                }
-                                R.id.comments_order_confidence -> {
-                                    setCommentsSortOrderAndRefresh(CommentsSortOrder.CONFIDENCE)
-                                    true
-                                }
-                                R.id.comments_order_top -> {
-                                    setCommentsSortOrderAndRefresh(CommentsSortOrder.TOP)
-                                    true
-                                }
-                                R.id.comments_order_new -> {
-                                    setCommentsSortOrderAndRefresh(CommentsSortOrder.NEW)
-                                    true
-                                }
-                                R.id.comments_order_controversial -> {
-                                    setCommentsSortOrderAndRefresh(CommentsSortOrder.CONTROVERSIAL)
-                                    true
-                                }
-                                R.id.comments_order_old -> {
-                                    setCommentsSortOrderAndRefresh(CommentsSortOrder.OLD)
-                                    true
-                                }
-                                R.id.comments_order_random -> {
-                                    setCommentsSortOrderAndRefresh(CommentsSortOrder.RANDOM)
-                                    true
-                                }
-                                R.id.comments_order_qa -> {
-                                    setCommentsSortOrderAndRefresh(CommentsSortOrder.QA)
-                                    true
-                                }
-                                else -> false
-                            }
-                        }
-                    }.show()
-                }
-            )
-        }
-
         swipeRefreshLayout.setOnRefreshListener {
+            forceRefresh()
+        }
+        binding.loadingView.setOnRefreshClickListener {
             forceRefresh()
         }
 
@@ -249,13 +200,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     PostViewModel.ListView.PostListView(post),
                     listOf(),
             ))
-            onMainListingItemRetreived(post)
+            onMainListingItemRetrieved(post)
         } ?: binding.loadingView.showProgressBar()
 
-        postViewModel.postData.observe(viewLifecycleOwner) {
+        viewModel.postData.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
-                    binding.loadingView.showDefaultErrorMessageFor(it.error)
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    binding.loadingView.hideAll()
+                    adapter.setError(it.error)
                 }
                 is StatefulData.Loading -> {
                     if (!adapter.hasStartingData()) {
@@ -264,13 +217,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
                     adapter.setData(it.data)
                 }
             }
         }
 
-        postViewModel.fetchPostData(args.id)
+        viewModel.fetchPostData(args.instance, args.id)
 
         args.post?.getUrl()?.let { url ->
             HistoryManager.instance.recordVisit(
@@ -278,10 +232,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                 saveReason = HistorySaveReason.LOADING,
                 post = args.post
             )
-        }
-
-        postViewModel.redditMoreComments.observe(viewLifecycleOwner) {
-            adapter.setMoreCommentData(it)
         }
 
         binding.recyclerView.adapter = adapter
@@ -292,26 +242,65 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
-            (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(1, 0)
+            (binding.recyclerView.layoutManager as LinearLayoutManager)
+                .scrollToPositionWithOffset(1, 0)
         }
 
         binding.recyclerView.post {
             startPostponedEnterTransition()
         }
+
+        viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {
+            getMainActivity()?.supportActionBar?.title =
+                viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+        }
+
+        binding.root.doOnPreDraw {
+            adapter.contentMaxWidth = binding.recyclerView.width
+        }
+
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_fragment_post, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                when (menuItem.itemId) {
+                    R.id.share -> {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                LinkUtils.postIdToLink(viewModel.instance, args.id)
+                            )
+                            type = "text/plain"
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        startActivity(shareIntent)
+                        true
+                    }
+
+                    R.id.sort_comments_by -> {
+                        getMainActivity()?.showBottomMenu(getSortByMenu())
+                        true
+                    }
+                    else -> false
+                }
+
+        })
+    }
+
+    override fun navigateToSignInScreen() {
+        val direction = PostFragmentDirections.actionPostFragmentToLogin()
+        findNavController().navigateSafe(direction)
     }
 
     private fun forceRefresh() {
-        postViewModel.fetchPostData(args.id, force = true)
+        viewModel.fetchPostData(args.instance, args.id, force = true)
     }
 
-    fun onMainListingItemRetreived(post: PostView) {
-        (activity as? MainActivity)?.apply {
-            getCustomAppBarController().setCommunity(
-                args.currentCommunity ?: post.community.toCommunity()
-            )
-            getCustomAppBarController().clearPageIndex()
-        }
-
+    fun onMainListingItemRetrieved(post: PostView) {
         post.getUrl()?.let { url ->
             HistoryManager.instance.recordVisit(
                 jsonUrl = url,
@@ -321,14 +310,25 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         }
     }
 
+    private fun getSortByMenu(): BottomMenu {
+        when (viewModel.commentsSortOrderLiveData.value) {
+            CommentsSortOrder.Hot -> _sortByMenu.setChecked(R.id.sort_order_hot)
+            CommentsSortOrder.Top -> _sortByMenu.setChecked(R.id.sort_order_top)
+            CommentsSortOrder.New -> _sortByMenu.setChecked(R.id.sort_order_new)
+            CommentsSortOrder.Old -> _sortByMenu.setChecked(R.id.sort_order_old)
+            else -> {}
+        }
+
+        return _sortByMenu
+    }
+
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
         when (tag) {
             CONFIRM_DELETE_COMMENT_TAG -> {
                 val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
-                if (commentId != null)
-                    PendingActionsManager.instance.deleteComment(commentId, this) {
-                        forceRefresh()
-                    }
+                if (commentId != null) {
+                    viewModel.deleteComment(commentId)
+                }
             }
         }
     }
@@ -398,12 +398,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                 val translationX = view.translationX
                 val translationY = view.translationY
                 var topOverdraw = topOverdraw
-                val totalDepth = if (tag is CommentItem) {
-                    tag.depth - tag.baseDepth
-                } else if (tag is MoreCommentsItem) {
-                    tag.depth - tag.baseDepth
-                } else {
-                    -1
+                val totalDepth = when (tag) {
+                    is CommentItem -> {
+                        tag.depth - tag.baseDepth
+                    }
+                    else -> {
+                        -1
+                    }
                 }
 
                 if (lastTag is ComposeCommentItem || lastTag is EditCommentItem) {
@@ -453,17 +454,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             val isExpanded: Boolean,
             val isPending: Boolean,
             val view: PostViewModel.ListView.CommentListView,
+            val childrenCount: Int,
         ) : Item(
             if (isExpanded) TYPE_COMMENT_EXPANDED_ITEM else TYPE_COMMENT_COLLAPSED_ITEM,
             "comment_${comment.comment.id}"
         )
-
-        data class MoreCommentsItem(
-            val moreItem: MoreItem,
-            val depth: Int,
-            val baseDepth: Int,
-            val linkId: String
-        ) : Item(TYPE_MORE_COMMENTS_ITEM, moreItem.name)
 
         data class ComposeCommentItem(
             override val id: String,
@@ -485,7 +480,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             var error: Throwable? = null
         ) : Item(TYPE_EDIT_COMMENT_ITEM, id)
 
-        class ProgressItem() : Item(TYPE_PROGRESS, "wew_pls_no_progress")
+        class ProgressOrErrorItem(
+            val error: Throwable? = null
+        ) : Item(TYPE_PROGRESS, "wew_pls_no_progress")
     }
 
     class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -556,10 +553,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         }
     }
 
-    private inner class RedditObjectAdapter(
+    private inner class PostsAdapter(
         private val context: Context,
+        private val instance: String,
         private val revealAll: Boolean,
-        private val onRefreshClickCb: () -> Unit
+        private val voteUiHandler: VoteUiHandler,
+        private val onRefreshClickCb: () -> Unit,
+        private val onSignInRequired: () -> Unit,
+        private val onInstanceMismatch: (String, String) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val inflater = LayoutInflater.from(context)
@@ -571,9 +572,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             context, this@PostFragment, offlineManager, ExoPlayerManager.get(this@PostFragment)
         )
         private val threadLinesHelper = ThreadLinesHelper(context)
-        private val redditContentHelper = RedditContentHelper(
-            context, this@PostFragment, offlineManager, ExoPlayerManager.get(this@PostFragment)
-        )
 
         private var parentHeight: Int = 0
 
@@ -581,11 +579,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
          * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
          */
         private var revealedItems = mutableSetOf<String>()
-        private var moreCommentsMap: Map<String, List<CommentItemObject>> = mapOf()
         private var composeCommentItems: HashMap<String, ComposeCommentItem> = hashMapOf()
         private var editCommentItems: HashMap<String, EditCommentItem> = hashMapOf()
-
-        private val collapsedPaths = mutableSetOf<String>()
 
         private var rawData: PostViewModel.PostData? = null
 
@@ -595,36 +590,50 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         var isLoaded: Boolean = false
         private var error: Throwable? = null
 
-        val onRedditActionChangedCallback: (StatefulData<RedditAction>) -> Unit = {
-            if (it is StatefulData.Success) {
-                val actionInfo = it.data.info
-                if (actionInfo is ActionInfo.CommentActionInfo) {
-                    removeComposeCommentItemFor(actionInfo.parentId)
-                } else if (actionInfo is ActionInfo.EditActionInfo) {
-                    removeEditCommentItemFor(actionInfo.thingId)
+        var contentMaxWidth = 0
+            set(value) {
+                if (value == field) {
+                    return
                 }
-            } else if (it is StatefulData.Error) {
-                val error = it.error as PendingActionsManager.PendingActionsException
-                val actionInfo = error.redditAction.info
-                if (actionInfo is ActionInfo.CommentActionInfo) {
-                    setComposeCommentItemErrorFor(actionInfo.parentId, error = error.cause)
+                field = value
 
-                    Snackbar.make(
-                        requireMainActivity().getSnackbarContainer(),
-                        R.string.error_post_comment_failed,
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                } else if (actionInfo is ActionInfo.EditActionInfo) {
-                    setEditCommentItemErrorFor(actionInfo.thingId, error = error.cause)
-
-                    Snackbar.make(
-                        requireMainActivity().getSnackbarContainer(),
-                        R.string.error_edit_comment_failed,
-                        Snackbar.LENGTH_LONG
-                    ).show()
+                for (i in 0.. items.lastIndex) {
+                    if (items[i] is Item.HeaderItem) {
+                        notifyItemChanged(i)
+                    }
                 }
             }
-        }
+
+//        val onRedditActionChangedCallback: (StatefulData<RedditAction>) -> Unit = {
+//            if (it is StatefulData.Success) {
+//                val actionInfo = it.data.info
+//                if (actionInfo is ActionInfo.CommentActionInfo) {
+//                    removeComposeCommentItemFor(actionInfo.parentId)
+//                } else if (actionInfo is ActionInfo.EditActionInfo) {
+//                    removeEditCommentItemFor(actionInfo.thingId)
+//                }
+//            } else if (it is StatefulData.Error) {
+//                val error = it.error as PendingActionsManager.PendingActionsException
+//                val actionInfo = error
+//                if (actionInfo is ActionInfo.CommentActionInfo) {
+//                    setComposeCommentItemErrorFor(actionInfo.parentId, error = error.cause)
+//
+//                    Snackbar.make(
+//                        requireMainActivity().getSnackbarContainer(),
+//                        R.string.error_post_comment_failed,
+//                        Snackbar.LENGTH_LONG
+//                    ).show()
+//                } else if (actionInfo is ActionInfo.EditActionInfo) {
+//                    setEditCommentItemErrorFor(actionInfo.thingId, error = error.cause)
+//
+//                    Snackbar.make(
+//                        requireMainActivity().getSnackbarContainer(),
+//                        R.string.error_edit_comment_failed,
+//                        Snackbar.LENGTH_LONG
+//                    ).show()
+//                }
+//            }
+//        }
 
         override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
             is HeaderItem -> R.layout.post_header_item
@@ -633,8 +642,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     R.layout.post_comment_expanded_item
                 else
                     R.layout.post_comment_collapsed_item
-            is MoreCommentsItem -> R.layout.post_more_comments_item
-            is ProgressItem -> R.layout.generic_loading_item
+            is ProgressOrErrorItem -> R.layout.generic_loading_item
             is ComposeCommentItem -> R.layout.compose_comment_item
             is EditCommentItem -> R.layout.edit_comment_item
         }
@@ -690,6 +698,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                             reveal = revealAll || revealedItems.contains(postKey),
                             tempSize = tempSize,
                             videoViewMaxHeight = (binding.recyclerView.height - Utils.convertDpToPixel(16f)).toInt(),
+                            contentMaxWidth = contentMaxWidth,
                             fullImageViewTransitionName = "post_image",
                             postView = post,
                             rootView = h.itemView,
@@ -716,36 +725,36 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                                     )
                                 }
                             },
+                            onImageClickListener = { url ->
+                                val action =
+                                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
+                                        title = null,
+                                        url = url,
+                                        mimeType = null
+                                    )
+                                findNavController().navigate(
+                                    action, NavOptions.Builder()
+                                        .addDefaultAnim()
+                                        .build()
+                                )
+                            },
                             onRevealContentClickedFn = {
                                 revealedItems.add(postKey)
                                 notifyItemChanged(h.adapterPosition)
                             },
                             lazyUpdate = true,
+                            onItemClickListener = {},
                             videoState = item.videoState
                         )
 
-                        UserActionsHelper.setupActions(
-                            post.getUniqueKey(),
-                            post.getLikesWithLikesManager(),
-                            viewLifecycleOwner,
-                            childFragmentManager,
+                        voteUiHandler.bind(
+                            instance,
+                            item.postView,
                             h.upvoteButton,
-                            h.downvoteButton
-                        ) a@{ onVote ->
-                            Log.d(TAG, "onVote(): $onVote")
-                            if (h.bindingAdapterPosition < 0) {
-                                return@a
-                            }
-//                            item.listingItem.likes = when {
-//                                onVote > 0 -> true
-//                                onVote < 0 -> false
-//                                else -> null
-//                            }
-//                            (items[h.bindingAdapterPosition] as HeaderItem).postView.counts.upvotes =
-//                                item.listingItem.likes
-                            notifyItemChanged(h.bindingAdapterPosition, Unit)
-//                            Log.d(TAG, "onVote(): $onVote. new state: ${item.listingItem.likes}")
-                        }
+                            h.downvoteButton,
+                            onSignInRequired,
+                            onInstanceMismatch,
+                        )
                     }
                 }
                 is ComposeCommentItem -> {
@@ -807,6 +816,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         reveal = revealAll || revealedItems.contains(postKey),
                         tempSize = tempSize,
                         videoViewMaxHeight = (binding.recyclerView.height - Utils.convertDpToPixel(16f)).toInt(),
+                        contentMaxWidth = contentMaxWidth,
                         fullImageViewTransitionName = "post_image",
                         postView = post,
                         rootView = h.itemView,
@@ -833,36 +843,37 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                                 )
                             }
                         },
+                        onImageClickListener = { url ->
+                            val action =
+                                PostFragmentDirections.actionPostFragmentToImageViewerFragment(
+                                    title = null,
+                                    url = url,
+                                    mimeType = null
+                                )
+                            findNavController().navigate(
+                                action, NavOptions.Builder()
+                                    .addDefaultAnim()
+                                    .build()
+                            )
+                        },
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
                             notifyItemChanged(h.absoluteAdapterPosition)
                         },
+                        onItemClickListener = {},
                         videoState = item.videoState
                     )
 
                     Log.d(TAG, "header vote state: ${item.postView.counts.upvotes}")
-                    UserActionsHelper.setupActions(
-                        post.getUniqueKey(),
-                        post.getLikesWithLikesManager(),
-                        viewLifecycleOwner,
-                        childFragmentManager,
+
+                    voteUiHandler.bind(
+                        instance,
+                        item.postView,
                         h.upvoteButton,
-                        h.downvoteButton
-                    ) a@{ onVote ->
-                        Log.d(TAG, "onVote(): $onVote")
-                        if (h.bindingAdapterPosition < 0) {
-                            return@a
-                        }
-//                        item.listingItem.likes = when {
-//                            onVote > 0 -> true
-//                            onVote < 0 -> false
-//                            else -> null
-//                        }
-//                        (items[h.bindingAdapterPosition] as HeaderItem).listingItem.likes =
-//                            item.listingItem.likes
-                        notifyItemChanged(h.bindingAdapterPosition, Unit)
-//                        Log.d(TAG, "onVote(): $onVote. new state: ${item.listingItem.likes}")
-                    }
+                        h.downvoteButton,
+                        onSignInRequired,
+                        onInstanceMismatch,
+                    )
 
                     h.itemView.tag = item
                 }
@@ -894,6 +905,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
                     b.text.movementMethod = CustomLinkMovementMethod().apply {
                         onLinkLongClickListener = DefaultLinkLongClickListener(context)
+                        onImageClickListener = { url ->
+                            val action =
+                                PostFragmentDirections.actionPostFragmentToImageViewerFragment(
+                                    title = null,
+                                    url = url,
+                                    mimeType = null
+                                )
+                            findNavController().navigate(
+                                action, NavOptions.Builder()
+                                    .addDefaultAnim()
+                                    .build()
+                            )
+                        }
                     }
 
                     val giphyLinks = RedditUtils.findGiphyLinks(body)
@@ -964,49 +988,77 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         collapseSection(h.bindingAdapterPosition)
                     }
                     b.commentButton.setOnClickListener {
-                        handleCommentClick(item.comment.getUniqueKey())
+
+
+                        AlertDialogFragment.Builder()
+                            .setMessage(R.string.coming_soon)
+                            .setPositiveButton(android.R.string.ok)
+                            .createAndShow(
+                                childFragmentManager,
+                                CONFIRM_DELETE_COMMENT_TAG
+                            )
+//                        handleCommentClick(item.comment.getUniqueKey())
                     }
-//                    b.moreButton.setOnClickListener {
-//
-//                        RedditUtils.bindRedditText(b.text, body)
-//                        redditHeaderHelper.populateHeaderSpan(b.headerContainer, item.commentItem)
-//
-//                        PopupMenu(context, b.moreButton).apply {
-//                            inflate(R.menu.menu_comment_item)
-//
-//                            if (!item.commentItem.canModPost) {
+                    b.moreButton.setOnClickListener {
+
+                        PopupMenu(context, b.moreButton).apply {
+                            inflate(R.menu.menu_comment_item)
+
+                            if (BuildConfig.DEBUG) {
+                                menu.findItem(R.id.raw_comment).isVisible = true
+                            }
+
+//                            if (item.comment.creator.id) {
 //                                menu.setGroupVisible(R.id.mod_post_actions, false)
 //                                //menu.findItem(R.id.edit_comment).isVisible = false
 //                            }
-//
-//                            setOnMenuItemClickListener {
-//                                when (it.itemId) {
-//                                    R.id.raw_comment -> {
-//                                        val action =
-//                                            PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
-//                                                commentItemStr = Utils.gson.toJson(item.commentItem)
-//                                            )
-//                                        findNavController().navigate(action)
-//                                    }
-//                                    R.id.edit_comment -> {
-//                                        handleEditClick(item.commentItem)
-//                                    }
-//                                    R.id.delete_comment -> {
+
+                            setOnMenuItemClickListener {
+                                when (it.itemId) {
+                                    R.id.raw_comment -> {
+                                        val action =
+                                            PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
+                                                commentItemStr = Utils.gson.toJson(item.comment)
+                                            )
+                                        findNavController().navigate(action)
+                                    }
+                                    R.id.edit_comment -> {
+
+                                        AlertDialogFragment.Builder()
+                                            .setMessage(R.string.coming_soon)
+                                            .setPositiveButton(android.R.string.ok)
+                                            .createAndShow(
+                                                childFragmentManager,
+                                                CONFIRM_DELETE_COMMENT_TAG
+                                            )
+
+//                                        handleEditClick(item.comment)
+                                    }
+                                    R.id.delete_comment -> {
 //                                        AlertDialogFragment.Builder()
 //                                            .setMessage(R.string.delete_comment_confirm)
 //                                            .setPositiveButton(android.R.string.yes)
 //                                            .setNegativeButton(android.R.string.no)
-//                                            .setExtra(EXTRA_COMMENT_ID, item.commentItem.name)
+//                                            .setExtra(EXTRA_COMMENT_ID, item.comment.comment.id.toString())
 //                                            .createAndShow(
 //                                                childFragmentManager,
 //                                                CONFIRM_DELETE_COMMENT_TAG
 //                                            )
-//                                    }
-//                                }
-//                                true
-//                            }
-//                        }.show()
-//                    }
+
+
+                                        AlertDialogFragment.Builder()
+                                            .setMessage(R.string.coming_soon)
+                                            .setPositiveButton(android.R.string.ok)
+                                            .createAndShow(
+                                                childFragmentManager,
+                                                CONFIRM_DELETE_COMMENT_TAG
+                                            )
+                                    }
+                                }
+                                true
+                            }
+                        }.show()
+                    }
                     if (item.comment.comment.distinguished) {
                         b.overlay.visibility = View.VISIBLE
                         b.overlay.setBackgroundResource(R.drawable.locked_overlay)
@@ -1014,21 +1066,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         b.overlay.visibility = View.GONE
                     }
 
-                    UserActionsHelper.setupActions(
-                        comment.getUniqueKey(),
-                        comment.getLikesWithLikesManager(),
-                        viewLifecycleOwner,
-                        childFragmentManager,
+                    voteUiHandler.bind(
+                        instance,
+                        item.comment,
                         b.upvoteButton,
-                        b.downvoteButton
-                    ) { onVote ->
-//                        item.commentItem.likes = when {
-//                            onVote > 0 -> true
-//                            onVote < 0 -> false
-//                            else -> null
-//                        }
-                        notifyItemChanged(h.adapterPosition)
-                    }
+                        b.downvoteButton,
+                        onSignInRequired,
+                        onInstanceMismatch,
+                    )
 
                     h.itemView.tag = item
                 }
@@ -1040,14 +1085,17 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                         h.threadLinesContainer, item.depth, item.baseDepth
                     )
                     lemmyHeaderHelper.populateHeaderSpan(
-                        h.headerView, item.comment, detailed = true
+                        headerContainer = h.headerView,
+                        item = item.comment,
+                        detailed = true,
+                        childrenCount = item.childrenCount
                     )
 
                     h.expandSectionButton.setOnClickListener {
-                        expandSection(h.adapterPosition)
+                        expandSection(h.absoluteAdapterPosition)
                     }
                     h.topHotspot.setOnClickListener {
-                        expandSection(h.adapterPosition)
+                        expandSection(h.absoluteAdapterPosition)
                     }
                     if (item.comment.comment.distinguished) {
                         h.overlay.visibility = View.VISIBLE
@@ -1058,35 +1106,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
                     h.itemView.tag = item
                 }
-                R.layout.post_more_comments_item -> {
-                    val h = holder as MoreCommentsViewHolder
-                    val item = items[position] as MoreCommentsItem
-
-                    threadLinesHelper.populateThreadLines(
-                        h.threadLinesContainer, item.depth, item.baseDepth
-                    )
-                    h.moreButton.text = context.resources.getQuantityString(
-                        R.plurals.replies_format, item.moreItem.count, item.moreItem.count
-                    )
-
-                    h.moreButton.setOnClickListener {
-                        val url = LinkUtils.getLinkForMoreChildren(
-                            item.linkId,
-                            item.moreItem.children,
-                            postViewModel.commentsSortOrder?.key
-                        )
-                        Log.d(TAG, "Url $url")
-
-                        postViewModel.fetchMoreComments(url, item.moreItem.parentId)
-                    }
-
-                    h.itemView.tag = item
-                }
                 R.layout.generic_loading_item -> {
                     val h = holder as LoadingViewHolder
-                    val error = error
-                    if (error != null) {
-                        h.loadingView.showDefaultErrorMessageFor(error)
+                    val item = items[position] as ProgressOrErrorItem
+
+                    if (item.error != null) {
+                        h.loadingView.showDefaultErrorMessageFor(item.error)
                     } else if (!isLoaded) {
                         h.loadingView.showProgressBar()
                     }
@@ -1108,11 +1133,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     bindComposeCommentView(h, item, item.isPosting)
 
                     h.addComment.setOnClickListener a@{
-                        if (h.adapterPosition < 0) return@a
+                        if (h.absoluteAdapterPosition < 0) return@a
 
                         val autoTransition = AutoTransition()
 
-                        val item = items[h.adapterPosition] as ComposeCommentItem
+                        val item = items[h.absoluteAdapterPosition] as ComposeCommentItem
                         if (item.isPosting) return@a
 
                         item.isPosting = true
@@ -1126,12 +1151,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
                         bindComposeCommentView(h, item, item.isPosting)
 
-                        PendingActionsManager.instance.comment(
-                            item.parentId,
-                            item.comment.toString(),
-                            this@PostFragment,
-                            onRedditActionChangedCallback
-                        )
+//                        PendingActionsManager.instance.comment(
+//                            item.parentId,
+//                            item.comment.toString(),
+//                            this@PostFragment,
+//                            onRedditActionChangedCallback
+//                        )
                     }
                 }
                 R.layout.edit_comment_item -> {
@@ -1148,11 +1173,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                     bindEditCommentView(h, item, item.isPosting)
 
                     h.saveEditsButton.setOnClickListener a@{
-                        if (h.adapterPosition < 0) return@a
+                        if (h.absoluteAdapterPosition < 0) return@a
 
                         val autoTransition = AutoTransition()
 
-                        val item = items[h.adapterPosition] as EditCommentItem
+                        val item = items[h.absoluteAdapterPosition] as EditCommentItem
                         if (item.isPosting) return@a
 
                         item.isPosting = true
@@ -1166,12 +1191,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
                         bindEditCommentView(h, item, item.isPosting)
 
-                        PendingActionsManager.instance.edit(
-                            item.commentName,
-                            item.comment.toString(),
-                            this@PostFragment,
-                            onRedditActionChangedCallback
-                        )
+//                        PendingActionsManager.instance.edit(
+//                            item.commentName,
+//                            item.comment.toString(),
+//                            this@PostFragment,
+//                            onRedditActionChangedCallback
+//                        )
                     }
                 }
             }
@@ -1294,14 +1319,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
             super.onViewRecycled(holder)
 
-            val item = if (holder.adapterPosition >= 0) {
-                items[holder.adapterPosition]
+            val item = if (holder.absoluteAdapterPosition >= 0) {
+                items[holder.absoluteAdapterPosition]
             } else {
                 null
             }
 
             if (holder is HeaderViewHolder) {
-                val state = redditContentHelper.recycleFullContent(holder.fullContentContainerView)
+                val state = lemmyContentHelper.recycleFullContent(holder.fullContentContainerView)
 
                 (item as? HeaderItem)?.videoState = state.videoState
             } else if (holder is ComposeCommentViewHolder) {
@@ -1324,33 +1349,33 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
         }
 
         private fun handleCommentClick(id: String) {
-            val notSignedIn = RedditAuthManager.instance.showPreSignInIfNeeded(childFragmentManager)
-
-            if (notSignedIn) return
-
-            composeCommentItems[id] = ComposeCommentItem(
-                id = "$id:comment",
-                parentId = id,
-                depth = 0,
-                baseDepth = 0,
-                comment = ""
-            )
-            refreshItems(refreshHeader = false)
+//            val notSignedIn = RedditAuthManager.instance.showPreSignInIfNeeded(childFragmentManager)
+//
+//            if (notSignedIn) return
+//
+//            composeCommentItems[id] = ComposeCommentItem(
+//                id = "$id:comment",
+//                parentId = id,
+//                depth = 0,
+//                baseDepth = 0,
+//                comment = ""
+//            )
+//            refreshItems(refreshHeader = false)
         }
 
-        private fun handleEditClick(commentItem: RedditCommentItem) {
-            val notSignedIn = RedditAuthManager.instance.showPreSignInIfNeeded(childFragmentManager)
-
-            if (notSignedIn) return
-
-            editCommentItems[commentItem.name] = EditCommentItem(
-                id = commentItem.name,
-                commentName = commentItem.name,
-                depth = 0,
-                baseDepth = 0,
-                comment = commentItem.body
-            )
-            refreshItems(refreshHeader = false)
+        private fun handleEditClick(commentItem: CommentView) {
+//            val notSignedIn = RedditAuthManager.instance.showPreSignInIfNeeded(childFragmentManager)
+//
+//            if (notSignedIn) return
+//
+//            editCommentItems[commentItem.getUniqueKey()] = EditCommentItem(
+//                id = commentItem.getUniqueKey(),
+//                commentName = commentItem.getUniqueKey(),
+//                depth = 0,
+//                baseDepth = 0,
+//                comment = commentItem.comment.content
+//            )
+//            refreshItems(refreshHeader = false)
         }
 
         /**
@@ -1363,13 +1388,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             var mainListingItemSeen = false
             val newItems =
                 if (error == null) {
-//                    val redditObjects = rawData.flattenPostData(moreCommentsMap)
                     val finalItems = mutableListOf<Item>()
 
                     rawData.postView.let {
                         if (!mainListingItemSeen) {
                             mainListingItemSeen = true
-                            onMainListingItemRetreived(it.post)
+                            onMainListingItemRetrieved(it.post)
                         }
 
                         finalItems += HeaderItem(it.post, args.videoState)
@@ -1381,12 +1405,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 
                     rawData.commentTree.flatten().forEach {
                         finalItems += CommentItem(
-                            it.comment,
-                            it.comment.getDepth(),
+                            it.commentView.comment,
+                            it.commentView.comment.getDepth(),
                             0,
-                            !it.isCollapsed,
+                            !it.commentView.isCollapsed,
                             false,
-                            view = it,
+                            view = it.commentView,
+                            it.children?.size ?: 0,
                         )
                     }
 
@@ -1435,12 +1460,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
 //                    }
 
                     if (!isLoaded) {
-                        finalItems += listOf(ProgressItem())
+                        finalItems += listOf(ProgressOrErrorItem())
                     }
 
                     finalItems
                 } else {
-                    listOf(ProgressItem())
+                    listOf(ProgressOrErrorItem(error))
                 }
 
             val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
@@ -1458,18 +1483,16 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
                 ): Boolean {
                     val oldItem = oldItems[oldItemPosition]
                     val newItem = newItems[newItemPosition]
-                    return oldItem.type == newItem.type && areItemsTheSame(
-                        oldItemPosition,
-                        newItemPosition
-                    )
-                            && when (oldItem) {
+                    return when (oldItem) {
                         is ComposeCommentItem -> {
                             oldItem.isPosting == (newItem as ComposeCommentItem).isPosting
                         }
                         is EditCommentItem -> {
                             oldItem.isPosting == (newItem as EditCommentItem).isPosting
                         }
-                        else -> true
+
+                        is HeaderItem -> true
+                        else -> oldItem == newItem
                     }
                 }
 
@@ -1516,12 +1539,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(), AlertDialogFragment.Al
             commentItem.isCollapsed = false
 
             refreshItems(refreshHeader = false)
-        }
-
-        fun setMoreCommentData(moreCommentMap: HashMap<String, List<CommentItemObject>>?) {
-            this.moreCommentsMap = moreCommentMap ?: return
-
-            refreshItems()
         }
 
         fun setError(error: Throwable) {

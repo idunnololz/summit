@@ -9,12 +9,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:layout_marginTop="@dimen/padding_half" />
+        android:layout_marginTop="@dimen/padding" />
 
     <com.idunnololz.summit.view.LoadingView
         android:id="@+id/loadingView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="@dimen/padding_half" />
+        android:layout_marginTop="@dimen/padding" />
 </FrameLayout>

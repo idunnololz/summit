@@ -11,6 +11,8 @@ object AnimationUtils {
 
     private const val DEFAULT_ANIMATION_DURATION_MS: Long = 300
 
+    const val IMAGE_LOAD_CROSS_FADE_DURATION_MS: Long = 200
+
     fun makeAnimationControllerFor(view: View): AnimationController = AnimationController(view)
 
     fun animateInView(view: View, duration: Long, startDelay: Long, force: Boolean) {

@@ -1,57 +1,59 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.graphics.Bitmap
 import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.AccountActionsManager
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.lemmy.Community
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.RecentCommunityManager
-import com.idunnololz.summit.lemmy.post.PostsRepository
+import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
-import com.idunnololz.summit.reddit.*
-import com.idunnololz.summit.reddit_objects.ListingData
-import com.idunnololz.summit.scrape.LoaderException
-import com.idunnololz.summit.scrape.WebsiteAdapter
+import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
-import com.idunnololz.summit.util.Utils
+import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import okhttp3.Dispatcher
 import java.lang.RuntimeException
 import javax.inject.Inject
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
-    private val lemmyApiClient: LemmyApiClient,
     private val postsRepository: PostsRepository,
     private val recentCommunityManager: RecentCommunityManager,
+    private val accountManager: AccountManager,
+    private val userCommunitiesManager: UserCommunitiesManager,
+    private val accountActionsManager: AccountActionsManager,
 ) : ViewModel() {
 
     companion object {
         private val TAG = CommunityViewModel::class.java.canonicalName
     }
 
-    class LoadedListingData(
-        val listingData: ListingData,
-        val url: String,
-        val pageIndex: Int
-    )
-
     class LoadedPostsData(
         val posts: List<PostView>,
-        val url: String,
+        val instance: String,
         val pageIndex: Int,
         val hasMore: Boolean,
     )
 
     @Parcelize
+    @JsonClass(generateAdapter = true)
     class PageScrollState(
         var isAtBottom: Boolean = false,
         var itemIndex: Int = 0,
@@ -59,22 +61,34 @@ class CommunityViewModel @Inject constructor(
     ) : Parcelable
 
     private var pagePositions = arrayListOf<PageScrollState>()
-    private val disposables = CompositeDisposable()
 
-    val loadedListingData = StatefulLiveData<LoadedListingData>()
-    val currentCommunity = MutableLiveData<Community>(Community.All())
+    val currentCommunityRef = MutableLiveData<CommunityRef>(CommunityRef.All())
     val currentPageIndex = MutableLiveData<Int>(0)
-    private val communityChangeObserver = Observer<Community> {
+    private val communityRefChangeObserver = Observer<CommunityRef> {
         recentCommunityManager.addRecentCommunity(it)
     }
     val loadedPostsData = StatefulLiveData<LoadedPostsData>()
 
-    init {
-//        viewModelScope.launch {
-//            lemmyApiClient.getCommunity(null, Either.left())
-//        }
-        currentCommunity.observeForever(communityChangeObserver)
+    val voteUiHandler = accountActionsManager.voteUiHandler
 
+    val accountChanged = MutableLiveData<Unit>()
+
+    init {
+        currentCommunityRef.observeForever(communityRefChangeObserver)
+
+        accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
+            override suspend fun onAccountChanged(newAccount: Account?) {
+                postsRepository.reset()
+
+                accountChanged.postValue(Unit)
+            }
+        })
+
+        viewModelScope.launch {
+            accountManager.currentAccount.collect {
+                fetchCurrentPage()
+            }
+        }
     }
 
     fun fetchPrevPage(force: Boolean = false) {
@@ -109,32 +123,45 @@ class CommunityViewModel @Inject constructor(
     }
 
     private fun fetchCurrentPageInternal(force: Boolean) {
+        loadedPostsData.setIsLoading()
+
         val currentPage = requireNotNull(currentPageIndex.value)
         viewModelScope.launch {
-            val result = postsRepository.getPage(currentPage, null, force)
-            loadedPostsData.postValue(
-                LoadedPostsData(
-                    result.posts,
-                    postsRepository.getSite(),
-                    currentPage,
-                    result.hasMore,
-                )
-            )
+            val result = postsRepository.getPage(
+                currentPage, force)
+
+            result
+                .onSuccess {
+                    loadedPostsData.postValue(
+                        LoadedPostsData(
+                            posts = it.posts,
+                            instance = it.instance,
+                            pageIndex = currentPage,
+                            hasMore = it.hasMore,
+                        )
+                    )
+                }
+                .onFailure {
+                    loadedPostsData.postError(it)
+                }
         }
     }
 
-    fun changeCommunity(community: Community?) {
-        postsRepository.setCommunity(community)
-    }
+    fun changeCommunity(communityRef: CommunityRef?) {
+        if (communityRef == null) {
+            return
+        }
 
-    fun setPages(pages: List<RedditPageLoader.PageInfo>, pageIndex: Int) {
-        currentPageIndex.value = pageIndex
+        val communityRefSafe: CommunityRef = communityRef
+
+        currentCommunityRef.value = communityRefSafe
+        postsRepository.setCommunity(communityRef)
     }
 
     fun createState(): CommunityViewState? {
         return CommunityViewState(
             CommunityState(
-                community = currentCommunity.value ?: return null,
+                communityRef = currentCommunityRef.value ?: return null,
                 pages = listOf(),
                 currentPageIndex = currentPageIndex.value ?: return null,
             ),
@@ -144,7 +171,7 @@ class CommunityViewModel @Inject constructor(
 
     fun restoreFromState(state: CommunityViewState?) {
         state ?: return
-        currentCommunity.value = state.communityState.community
+        currentCommunityRef.value = state.communityState.communityRef
         currentPageIndex.value = state.communityState.currentPageIndex
         pagePositions = ArrayList(state.pageScrollStates)
     }
@@ -183,14 +210,9 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun setSortOrder(newSortOrder: CommunitySortOrder) {
-        TODO()
-//        if (redditPageLoader.sortOrder == newSortOrder) return
-//
-//        redditPageLoader.sortOrder = newSortOrder
-//        redditPageLoader.resetPages()
-//        pagePositions.clear()
-//        redditPageLoader.fetchCurrentPage()
-//        currentPageIndex.value = 0
+        postsRepository.sortOrder = newSortOrder
+
+        reset()
     }
 
     fun getCurrentSortOrder(): CommunitySortOrder = postsRepository.sortOrder
@@ -198,7 +220,28 @@ class CommunityViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        disposables.clear()
-        currentCommunity.removeObserver(communityChangeObserver)
+        currentCommunityRef.removeObserver(communityRefChangeObserver)
     }
+
+    fun setDefaultPage(currentCommunityRef: CommunityRef) {
+        viewModelScope.launch {
+            userCommunitiesManager.setDefaultPage(currentCommunityRef)
+        }
+    }
+
+    fun resetToAccountInstance() {
+        val account = accountManager.currentAccount.value ?: return
+        changeCommunity(CommunityRef.All(account.instance))
+
+        reset()
+    }
+
+    private fun reset() {
+        currentPageIndex.value = 0
+        fetchCurrentPage()
+    }
+
+    data class CurrentCommunity(
+        private val communityRef: CommunityRef,
+    )
 }

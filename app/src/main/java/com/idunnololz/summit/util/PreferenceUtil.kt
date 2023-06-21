@@ -2,7 +2,7 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.idunnololz.summit.lemmy.Community
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 
 import java.util.HashSet
@@ -119,27 +119,6 @@ object PreferenceUtil {
         return set
     }
 
-    fun getDefaultPage(): Community {
-        val communityJson = preferences.getString(KEY_DEFAULT_PAGE, null)
-        val community = if (communityJson == null) {
-            null
-        } else {
-            try {
-                moshi.adapter(Community::class.java)
-                    .fromJson(communityJson)
-            } catch (e: Exception) {
-                null
-            }
-        }
-
-        return community ?: Community.All()
-    }
-
-    fun setDefaultPage(community: Community) {
-        preferences.edit()
-            .putString(KEY_DEFAULT_PAGE, moshi.adapter(Community::class.java).toJson(community))
-            .apply()
-    }
 
     fun getSubredditLayout(): CommunityLayout =
         try {

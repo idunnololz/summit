@@ -77,25 +77,6 @@ class AuthDialogFragment : BaseDialogFragment<DialogFragmentAuthBinding>() {
     }
 
     private fun doSuccessAction(code: String) {
-        // We want this request to go through no matter what...
-        val disposable = Single
-            .fromCallable {
-                RedditAuthManager.instance.fetchToken(code)
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                binding.loadingView.hideAll()
-
-                binding.successTextView.setText(R.string.auth_success)
-                binding.successTextView.visibility = View.VISIBLE
-
-                binding.successTextView.postDelayed({
-                    dismiss()
-                }, 3000)
-            }, {
-                showError(getString(R.string.error_network))
-            })
     }
 
     fun showError(text: String) {

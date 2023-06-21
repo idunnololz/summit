@@ -14,5 +14,6 @@
     <item
         android:id="@+id/raw_comment"
         android:title="@string/raw_comment"
-        android:orderInCategory="100" />
+        android:orderInCategory="100"
+        android:visible="false"/>
 </menu>

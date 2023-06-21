@@ -25,7 +25,7 @@
                 android:layout_weight="1">
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/navHostContainer"
+                    android:id="@+id/nav_host_fragment"
                     android:name="androidx.navigation.fragment.NavHostFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -53,20 +53,20 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@android:color/transparent"></com.google.android.material.appbar.MaterialToolbar>
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs"
-                android:paddingLeft="6dp"
-                android:paddingRight="6dp"
+            <LinearLayout
+                android:id="@+id/toolbar_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:visibility="gone" />
+                android:orientation="vertical">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/transparent">
+
+                </com.google.android.material.appbar.MaterialToolbar>
+            </LinearLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -91,120 +91,126 @@
             android:layout_width="match_parent">
 
             <!-- Scrollflags set programatically -->
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <FrameLayout
                 android:id="@+id/customActionBar"
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/custom_ab_height"
-                android:background="@color/appBarBackground"
-                android:animateLayoutChanges="true">
+                android:layout_height="wrap_content"
+                android:background="@color/appBarBackground">
 
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintGuide_begin="@dimen/custom_ab_height"
-                    android:orientation="horizontal" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/customActionBarContent"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/custom_ab_height"
+                    android:animateLayoutChanges="true">
 
-                <Button
-                    android:id="@+id/subredditTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="@dimen/padding_half"
-                    android:minWidth="0dp"
-                    android:paddingStart="@dimen/padding_half"
-                    android:paddingEnd="@dimen/padding_half"
-                    android:textAppearance="?textAppearanceHeadline4"
-                    android:textStyle="bold"
-                    android:gravity="start|center_vertical"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    style="?attr/materialButtonOutlinedStyle"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/pageTextView"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/guideline" />
-
-                <TextView
-                    tools:text="Page 1"
-                    android:id="@+id/pageTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:paddingStart="@dimen/padding"
-                    android:paddingEnd="@dimen/reddit_content_horizontal_padding"
-                    android:gravity="center"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/guideline" />
-
-                <com.idunnololz.summit.view.TabsImageButton
-                    android:id="@+id/abTabsImageView"
-                    android:layout_width="40dp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/baseline_crop_square_black_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/guideline"
-                    app:layout_constraintEnd_toStartOf="@+id/abOverflowButton" />
-
-                <ImageButton
-                    android:id="@+id/abOverflowButton"
-                    android:layout_width="40dp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/baseline_more_horiz_black_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/guideline"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <View
-                    android:id="@+id/divider"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:background="@color/colorDivider"
-                    app:layout_constraintTop_toTopOf="@+id/guideline"
-                    app:layout_constraintBottom_toBottomOf="@+id/guideline"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <HorizontalScrollView
-                    android:id="@+id/redditSortOrderContainer"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="@dimen/padding"
-                    android:layout_marginEnd="@dimen/padding"
-                    app:layout_constraintTop_toTopOf="@+id/guideline"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/closeButton">
-
-                    <com.idunnololz.summit.view.LemmySortOrderView
-                        android:id="@+id/sort_order_view"
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content"
+                        app:layout_constraintGuide_begin="@dimen/custom_ab_height"
+                        android:orientation="horizontal" />
 
-                </HorizontalScrollView>
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/account_image_view"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:textAppearance="?textAppearanceHeadline4"
+                        android:gravity="start|center_vertical"
+                        android:padding="8dp"
+                        android:foreground="@drawable/account_ripple"
+                        android:layout_marginStart="@dimen/padding_half"
+                        android:layout_marginEnd="@dimen/padding_quarter"
+                        android:visibility="invisible"
+                        android:scaleType="centerCrop"
+                        style="@style/CircleImageView"
+                        app:layout_constraintDimensionRatio="W,1:1"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/pageTextView"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/guideline" />
 
-                <ImageButton
-                    android:id="@+id/closeButton"
-                    android:layout_width="40dp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/baseline_close_black_18"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintTop_toTopOf="@+id/guideline"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/account_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:minWidth="0dp"
+                        android:textAppearance="?textAppearanceHeadline4"
+                        android:textStyle="bold"
+                        android:gravity="start|center_vertical"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:layout_marginStart="@dimen/padding_quarter"
+                        android:visibility="invisible"
+                        app:chipIcon="@drawable/baseline_add_24"
+                        app:chipIconTint="?colorControlNormal"
+                        app:textStartPadding="0dp"
+                        app:textEndPadding="0dp"
+                        app:chipStartPadding="4dp"
+                        app:chipEndPadding="4dp"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/communityTextView"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/guideline" />
 
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/sortGroup"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="divider,closeButton,redditSortOrderContainer" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/communityTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:minWidth="0dp"
+                        android:paddingStart="@dimen/padding_half"
+                        android:paddingEnd="@dimen/padding_half"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:gravity="start|center_vertical"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        style="@style/Widget.Material3.Chip.Assist"
+                        app:chipIconTint="?colorControlNormal"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toEndOf="@+id/account_image_view"
+                        app:layout_constraintEnd_toStartOf="@+id/pageTextView"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/guideline" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        tools:text="Page 1"
+                        android:id="@+id/pageTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:paddingStart="@dimen/padding"
+                        android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+                        android:gravity="center"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/guideline" />
+
+                    <com.idunnololz.summit.view.TabsImageButton
+                        android:id="@+id/abTabsImageView"
+                        android:layout_width="40dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/baseline_crop_square_black_24"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/guideline"
+                        app:layout_constraintEnd_toStartOf="@+id/abOverflowButton" />
+
+                    <ImageButton
+                        android:id="@+id/abOverflowButton"
+                        android:layout_width="40dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/baseline_more_horiz_black_24"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/guideline"
+                        app:layout_constraintEnd_toEndOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </FrameLayout>
         </com.google.android.material.appbar.AppBarLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -213,6 +219,13 @@
         android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></FrameLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/bottom_sheet_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false">
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <LinearLayout
         android:id="@+id/notificationBarBgContainer"
@@ -225,6 +238,6 @@
             android:id="@+id/notificationBarBg"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="?attr/colorSurface" />
+            android:background="@color/black33" />
     </LinearLayout>
 </FrameLayout>

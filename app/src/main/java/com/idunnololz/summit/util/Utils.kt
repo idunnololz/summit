@@ -32,8 +32,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.reddit_objects.RedditObject
-import com.idunnololz.summit.reddit_objects.RedditObjectTypeAdapter
 import java.io.*
 import java.security.MessageDigest
 import java.text.NumberFormat
@@ -53,7 +51,6 @@ object Utils {
 
     val gson: Gson by lazy {
         GsonBuilder()
-            .registerTypeAdapter(RedditObject::class.java, RedditObjectTypeAdapter())
             //.registerTypeAdapter(RedditObject::class.java, RedditObjectSerializer())
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create()

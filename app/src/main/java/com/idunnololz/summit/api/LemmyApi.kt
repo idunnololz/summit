@@ -3,6 +3,8 @@ package com.idunnololz.summit.api
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import com.idunnololz.summit.api.LemmyApiClient.Companion.API_VERSION
+import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockCommunityResponse
 import com.idunnololz.summit.api.dto.BlockPerson
@@ -32,6 +34,7 @@ import com.idunnololz.summit.api.dto.GetRepliesResponse
 import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.Login
 import com.idunnololz.summit.api.dto.LoginResponse
 import com.idunnololz.summit.api.dto.MarkAllAsRead
@@ -49,237 +52,250 @@ import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.SearchResponse
 import okhttp3.Cache
+import okhttp3.CacheControl
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Response
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.QueryMap
 import retrofit2.http.Url
+import java.util.concurrent.TimeUnit
 
-const val VERSION = "v3"
-const val DEFAULT_INSTANCE = "lemmy.ml"
 
 interface LemmyApi {
     @GET("site")
-    suspend fun getSite(@QueryMap form: Map<String, String>): Response<GetSiteResponse>
+    fun getSite(@QueryMap form: Map<String, String>): Call<GetSiteResponse>
 
     /**
      * Get / fetch posts, with various filters.
      */
     @GET("post/list")
-    suspend fun getPosts(@QueryMap form: Map<String, String>): Response<GetPostsResponse>
+    fun getPosts(@QueryMap form: Map<String, String>): Call<GetPostsResponse>
 
     /**
      * Get / fetch a post.
      */
     @GET("post")
-    suspend fun getPost(@QueryMap form: Map<String, String>): Response<GetPostResponse>
+    fun getPost(@QueryMap form: Map<String, String>): Call<GetPostResponse>
+    @GET("post")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getPostNoCache(@QueryMap form: Map<String, String>): Call<GetPostResponse>
 
     /**
      * Log into lemmy.
      */
     @POST("user/login")
-    suspend fun login(@Body form: Login): Response<LoginResponse>
+    fun login(@Body form: Login): Call<LoginResponse>
 
     /**
      * Like / vote on a post.
      */
     @POST("post/like")
-    suspend fun likePost(@Body form: CreatePostLike): Response<PostResponse>
+    fun likePost(@Body form: CreatePostLike): Call<PostResponse>
 
     /**
      * Like / vote on a comment.
      */
     @POST("comment/like")
-    suspend fun likeComment(@Body form: CreateCommentLike): Response<CommentResponse>
+    fun likeComment(@Body form: CreateCommentLike): Call<CommentResponse>
 
     /**
      * Create a comment.
      */
     @POST("comment")
-    suspend fun createComment(@Body form: CreateComment): Response<CommentResponse>
+    fun createComment(@Body form: CreateComment): Call<CommentResponse>
 
     /**
      * Edit a comment.
      */
     @PUT("comment")
-    suspend fun editComment(@Body form: EditComment): Response<CommentResponse>
+    fun editComment(@Body form: EditComment): Call<CommentResponse>
 
     /**
      * Delete a comment.
      */
     @POST("comment/delete")
-    suspend fun deleteComment(@Body form: DeleteComment): Response<CommentResponse>
+    fun deleteComment(@Body form: DeleteComment): Call<CommentResponse>
 
     /**
      * Save a post.
      */
     @PUT("post/save")
-    suspend fun savePost(@Body form: SavePost): Response<PostResponse>
+    fun savePost(@Body form: SavePost): Call<PostResponse>
 
     /**
      * Save a comment.
      */
     @PUT("comment/save")
-    suspend fun saveComment(@Body form: SaveComment): Response<CommentResponse>
+    fun saveComment(@Body form: SaveComment): Call<CommentResponse>
 
     /**
      * Get / fetch comments.
      */
     @GET("comment/list")
-    suspend fun getComments(@QueryMap form: Map<String, String>): Response<GetCommentsResponse>
+    fun getComments(@QueryMap form: Map<String, String>): Call<GetCommentsResponse>
+    @GET("comment/list")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getCommentsNoCache(@QueryMap form: Map<String, String>): Call<GetCommentsResponse>
 
     /**
      * Get / fetch a community.
      */
     @GET("community")
-    suspend fun getCommunity(@QueryMap form: Map<String, String>): Response<GetCommunityResponse>
+    fun getCommunity(@QueryMap form: Map<String, String>): Call<GetCommunityResponse>
+
+    /**
+     * Get / fetch a community.
+     */
+    @GET("community/list")
+    fun getCommunityList(@QueryMap form: Map<String, String>): Call<ListCommunitiesResponse>
 
     /**
      * Get the details for a person.
      */
     @GET("user")
-    suspend fun getPersonDetails(@QueryMap form: Map<String, String>): Response<GetPersonDetailsResponse>
+    fun getPersonDetails(@QueryMap form: Map<String, String>): Call<GetPersonDetailsResponse>
 
     /**
      * Get comment replies.
      */
     @GET("user/replies")
-    suspend fun getReplies(@QueryMap form: Map<String, String>): Response<GetRepliesResponse>
+    fun getReplies(@QueryMap form: Map<String, String>): Call<GetRepliesResponse>
 
     /**
      * Mark a comment as read.
      */
     @POST("comment/mark_as_read")
-    suspend fun markCommentReplyAsRead(@Body form: MarkCommentReplyAsRead): Response<CommentResponse>
+    fun markCommentReplyAsRead(@Body form: MarkCommentReplyAsRead): Call<CommentResponse>
 
     /**
      * Mark a person mention as read.
      */
     @POST("user/mention/mark_as_read")
-    suspend fun markPersonMentionAsRead(@Body form: MarkPersonMentionAsRead): Response<PersonMentionResponse>
+    fun markPersonMentionAsRead(@Body form: MarkPersonMentionAsRead): Call<PersonMentionResponse>
 
     /**
      * Mark a private message as read.
      */
     @POST("private_message/mark_as_read")
-    suspend fun markPrivateMessageAsRead(@Body form: MarkPrivateMessageAsRead): Response<PrivateMessageResponse>
+    fun markPrivateMessageAsRead(@Body form: MarkPrivateMessageAsRead): Call<PrivateMessageResponse>
 
     /**
      * Mark all replies as read.
      */
     @POST("user/mark_all_as_read")
-    suspend fun markAllAsRead(@Body form: MarkAllAsRead): Response<GetRepliesResponse>
+    fun markAllAsRead(@Body form: MarkAllAsRead): Call<GetRepliesResponse>
 
     /**
      * Get mentions for your user.
      */
     @GET("user/mention")
-    suspend fun getPersonMentions(@QueryMap form: Map<String, String>): Response<GetPersonMentionsResponse>
+    fun getPersonMentions(@QueryMap form: Map<String, String>): Call<GetPersonMentionsResponse>
 
     /**
      * Get / fetch private messages.
      */
     @GET("private_message/list")
-    suspend fun getPrivateMessages(@QueryMap form: Map<String, String>): Response<PrivateMessagesResponse>
+    fun getPrivateMessages(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
 
     /**
      * Create a private message.
      */
     @POST("private_message")
-    suspend fun createPrivateMessage(@Body form: CreatePrivateMessage): Response<PrivateMessageResponse>
+    fun createPrivateMessage(@Body form: CreatePrivateMessage): Call<PrivateMessageResponse>
 
     /**
      * Get your unread counts
      */
     @GET("user/unread_count")
-    suspend fun getUnreadCount(@QueryMap form: Map<String, String>): Response<GetUnreadCountResponse>
+    fun getUnreadCount(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
 
     /**
      * Follow / subscribe to a community.
      */
     @POST("community/follow")
-    suspend fun followCommunity(@Body form: FollowCommunity): Response<CommunityResponse>
+    fun followCommunity(@Body form: FollowCommunity): Call<CommunityResponse>
 
     /**
      * Create a post.
      */
     @POST("post")
-    suspend fun createPost(@Body form: CreatePost): Response<PostResponse>
+    fun createPost(@Body form: CreatePost): Call<PostResponse>
 
     /**
      * Edit a post.
      */
     @PUT("post")
-    suspend fun editPost(@Body form: EditPost): Response<PostResponse>
+    fun editPost(@Body form: EditPost): Call<PostResponse>
 
     /**
      * Delete a post.
      */
     @POST("post/delete")
-    suspend fun deletePost(@Body form: DeletePost): Response<PostResponse>
+    fun deletePost(@Body form: DeletePost): Call<PostResponse>
 
     /**
      * Search lemmy.
      */
     @GET("search")
-    suspend fun search(@QueryMap form: Map<String, String>): Response<SearchResponse>
+    fun search(@QueryMap form: Map<String, String>): Call<SearchResponse>
 
     /**
      * Fetch metadata for any given site.
      */
     @GET("post/site_metadata")
-    suspend fun getSiteMetadata(@QueryMap form: Map<String, String>): Response<GetSiteMetadataResponse>
+    fun getSiteMetadata(@QueryMap form: Map<String, String>): Call<GetSiteMetadataResponse>
 
     /**
      * Report a comment.
      */
     @POST("comment/report")
-    suspend fun createCommentReport(@Body form: CreateCommentReport): Response<CommentReportResponse>
+    fun createCommentReport(@Body form: CreateCommentReport): Call<CommentReportResponse>
 
     /**
      * Report a post.
      */
     @POST("post/report")
-    suspend fun createPostReport(@Body form: CreatePostReport): Response<PostReportResponse>
+    fun createPostReport(@Body form: CreatePostReport): Call<PostReportResponse>
 
     /**
      * Block a person.
      */
     @POST("user/block")
-    suspend fun blockPerson(@Body form: BlockPerson): Response<BlockPersonResponse>
+    fun blockPerson(@Body form: BlockPerson): Call<BlockPersonResponse>
 
     /**
      * Block a community.
      */
     @POST("community/block")
-    suspend fun blockCommunity(@Body form: BlockCommunity): Response<BlockCommunityResponse>
+    fun blockCommunity(@Body form: BlockCommunity): Call<BlockCommunityResponse>
 
     /**
      * Save your user settings.
      */
     @PUT("user/save_user_settings")
-    suspend fun saveUserSettings(@Body form: SaveUserSettings): Response<LoginResponse>
+    fun saveUserSettings(@Body form: SaveUserSettings): Call<LoginResponse>
 
     /**
      * Upload an image.
      */
     @Multipart
     @POST
-    suspend fun uploadImage(
+    fun uploadImage(
         @Url url: String,
         @Header("Cookie") token: String,
         @Part filePart: MultipartBody.Part,
-    ): Response<PictrsImages>
+    ): Call<PictrsImages>
 
     companion object {
 
@@ -287,8 +303,11 @@ interface LemmyApi {
 
         private var okHttpClient: OkHttpClient? = null
 
-        private fun hasNetwork(context: Context): Boolean? {
-            var isConnected: Boolean? = false // Initial Value
+        private const val CACHE_CONTROL_HEADER = "Cache-Control"
+        private const val CACHE_CONTROL_NO_CACHE = "no-cache"
+
+        private fun hasNetwork(context: Context): Boolean {
+            var isConnected = false // Initial Value
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
             if (activeNetwork != null && activeNetwork.isConnected)
@@ -301,6 +320,11 @@ interface LemmyApi {
                 apis[instance] = it
             }
         }
+
+        fun okHttpClient(context: Context) =
+            okHttpClient ?: getOkHttpClient(context).also {
+                okHttpClient = it
+            }
 
         private fun buildInstance(
             context: Context,
@@ -315,7 +339,7 @@ interface LemmyApi {
             }
 
             val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            interceptor.level = HttpLoggingInterceptor.Level.BASIC
 
             val cacheSize = (10 * 1024 * 1024).toLong() // 10MB
             val myCache = Cache(context.cacheDir, cacheSize)
@@ -323,24 +347,35 @@ interface LemmyApi {
                 // Specify the cache we created earlier.
                 .cache(myCache)
                 // Add an Interceptor to the OkHttpClient.
-                .addInterceptor { chain ->
+                .addInterceptor a@{ chain ->
 
                     // Get the request from the chain.
                     var request = chain.request()
+
+                    val shouldUseCache = request.header(CACHE_CONTROL_HEADER) != CACHE_CONTROL_NO_CACHE
+                    if (!shouldUseCache) return@a chain.proceed(request)
 
                     /*
                     *  Leveraging the advantage of using Kotlin,
                     *  we initialize the request and change its header depending on whether
                     *  the device is connected to Internet or not.
                     */
-                    request = if (hasNetwork(context)!!)
+                    request = if (hasNetwork(context))
                     /*
                     *  If there is Internet, get the cache that was stored 5 seconds ago.
                     *  If the cache is older than 5 seconds, then discard it,
                     *  and indicate an error in fetching the response.
                     *  The 'max-age' attribute is responsible for this behavior.
                     */
-                        request.newBuilder().header("Cache-Control", "public, max-age=" + 5).build()
+                        request.newBuilder()
+                            .header(
+                                CACHE_CONTROL_HEADER,
+                                CacheControl.Builder()
+                                    .maxAge(10, TimeUnit.MINUTES)
+                                    .build()
+                                    .toString()
+                            )
+                            .build()
                     else
                     /*
                     *  If there is no Internet, get the cache that was stored 7 days ago.
@@ -349,7 +384,16 @@ interface LemmyApi {
                     *  The 'max-stale' attribute is responsible for this behavior.
                     *  The 'only-if-cached' attribute indicates to not retrieve new data; fetch the cache only instead.
                     */
-                        request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
+                        request.newBuilder()
+                            .header(
+                                CACHE_CONTROL_HEADER,
+                                CacheControl.Builder()
+                                    .maxAge(7, TimeUnit.DAYS)
+                                    .onlyIfCached()
+                                    .build()
+                                    .toString())
+                            .removeHeader("Pragma")
+                            .build()
                     // End of if-else statement
 
                     // Add the modified request to the chain.
@@ -373,18 +417,19 @@ interface LemmyApi {
         private fun buildApi(context: Context, instance: String): LemmyApiWithSite {
             return LemmyApiWithSite(
                 Retrofit.Builder()
-                    .baseUrl("https://$instance/api/$VERSION/")
+                    .baseUrl("https://$instance/api/$API_VERSION/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(getOkHttpClient(context))
                     .build()
                     .create(LemmyApi::class.java),
-                "https://$instance"
+                instance
             )
         }
     }
 }
 
+
 class LemmyApiWithSite(
     private val lemmyApi: LemmyApi,
-    val site: String,
+    val instance: String,
 ): LemmyApi by lemmyApi

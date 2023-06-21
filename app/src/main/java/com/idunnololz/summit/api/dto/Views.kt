@@ -1,10 +1,9 @@
 package com.idunnololz.summit.api.dto
 
 import android.os.Parcelable
-import com.idunnololz.summit.reddit_objects.PreviewInfo
-import com.idunnololz.summit.reddit_objects.VideoInfo
+import com.idunnololz.summit.util.PreviewInfo
+import com.idunnololz.summit.video.VideoSizeHint
 import kotlinx.parcelize.Parcelize
-import java.lang.Integer.max
 
 data class PersonViewSafe(
     val person: PersonSafe,
@@ -95,11 +94,7 @@ data class PostView(
     fun getDomain(): String? = community.domain
 
     fun getPreviewInfo(): PreviewInfo? {
-        return PreviewInfo(
-            getThumbnailUrl(true) ?: return null,
-            200,
-            200
-        )
+        return null
     }
 
     fun getUrl(): String? {
@@ -108,27 +103,17 @@ data class PostView(
     }
 
     fun getThumbnailPreviewInfo(): PreviewInfo? {
-        return PreviewInfo(
-            getThumbnailUrl(true) ?: return null,
-            200,
-            200
-        )
+        return null
     }
 
-    fun getVideoInfo(): VideoInfo? {
+    fun getVideoInfo(): VideoSizeHint? {
         if (post.embed_video_url == null) {
             return null
         }
-        return VideoInfo(
-            "",
+        return VideoSizeHint(
             0,
             0,
-            "",
-            post.embed_video_url ?: "",
-            0,
-            "",
-            true,
-            "",
+            post.embed_video_url,
         )
     }
 
@@ -136,9 +121,9 @@ data class PostView(
         if (post.thumbnail_url != null) {
             return PostType.Image
         }
-        if (post.embed_video_url != null) {
-            return PostType.Video
-        }
+//        if (post.embed_video_url != null) {
+//            return PostType.Video
+//        }
         return PostType.Text
     }
 }

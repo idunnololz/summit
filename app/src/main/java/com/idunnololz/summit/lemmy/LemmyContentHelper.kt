@@ -1,36 +1,55 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.text.method.LinkMovementMethod
+import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
+import androidx.core.view.get
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import coil.load
 import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostType
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.ImageViewerFragmentArgs
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragmentArgs
 import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.reddit_objects.PreviewInfo
+import com.idunnololz.summit.util.CustomLinkMovementMethod
+import com.idunnololz.summit.util.DefaultLinkLongClickListener
+import com.idunnololz.summit.util.PreviewInfo
+import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
+import com.idunnololz.summit.util.ext.addDefaultAnim
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
+import com.idunnololz.summit.video.getVideoState
 import com.idunnololz.summit.view.CustomPlayerView
 import com.idunnololz.summit.view.LoadingView
 
@@ -56,6 +75,8 @@ class LemmyContentHelper(
         reveal: Boolean,
         tempSize: Size,
         videoViewMaxHeight: Int,
+        contentMaxWidth: Int,
+
         fullImageViewTransitionName: String,
         postView: PostView,
 
@@ -63,9 +84,12 @@ class LemmyContentHelper(
         fullContentContainerView: ViewGroup,
 
         onFullImageViewClickListener: (imageView: ImageView?, url: String) -> Unit,
+        onImageClickListener: (url: String) -> Unit,
+        onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         lazyUpdate: Boolean = false,
-        videoState: VideoState? = null
+        videoState: VideoState? = null,
+
     ) {
         if (!lazyUpdate) {
             fullContentContainerView.removeAllViews()
@@ -78,7 +102,6 @@ class LemmyContentHelper(
 //            listingItem
 //        }
         val targetPostView = postView
-//        val postType = listingItem.getType()
 
         @Suppress("UNCHECKED_CAST")
         fun <T : View> getView(@LayoutRes resId: Int): T =
@@ -96,13 +119,17 @@ class LemmyContentHelper(
         fun addFooter() {
             if (lazyUpdate) {
                 // remove previous footers...
-                for (i in 1 until fullContentContainerView.childCount) {
-                    fullContentContainerView.removeViewAt(1)
+                for (i in 0 until fullContentContainerView.childCount) {
+                    val v = fullContentContainerView[i]
+                    if (v.getTag(R.id.is_footer) == true) {
+                        fullContentContainerView.removeViewAt(i)
+                    }
                 }
             }
 
             if (postView.post.locked) {
                 val postRemovedView = getView<View>(R.layout.full_content_post_locked_view)
+                postRemovedView.setTag(R.id.is_footer, true)
                 val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
@@ -123,6 +150,7 @@ class LemmyContentHelper(
 
             if (postView.post.removed) {
                 val postRemovedView = getView<View>(R.layout.full_content_post_removed_view)
+                postRemovedView.setTag(R.id.is_footer, true)
                 val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
@@ -140,6 +168,7 @@ class LemmyContentHelper(
                 cardView.setContentPadding(0, 0, 0, 0)
             } else if (postView.post.deleted) {
                 val postRemovedView = getView<View>(R.layout.full_content_post_removed_view)
+                postRemovedView.setTag(R.id.is_footer, true)
                 val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
@@ -207,7 +236,7 @@ class LemmyContentHelper(
                 ?: postView.getThumbnailPreviewInfo()
             RedditUtils.setImageViewSizeBasedOnPreview(context, previewInfo, rootView, imageView)
 
-            imageView.setImageResource(0)
+            imageView.load(null)
 
             if (!previewInfo?.getUrl().isNullOrBlank()) {
                 val url = checkNotNull(previewInfo).getUrl()
@@ -215,15 +244,7 @@ class LemmyContentHelper(
                     offlineManager.calculateImageMaxSizeIfNeeded(it)
                     offlineManager.getMaxImageSizeHint(it, tempSize)
 
-                    Glide.with(rootView)
-                        .load(it)
-                        .dontTransform()
-                        .apply {
-                            if (tempSize.width > 0) {
-                                override(tempSize.width, tempSize.height)
-                            }
-                        }
-                        .into(imageView)
+                    imageView.load(it)
                 }
 
                 if (attachClickHandler) {
@@ -237,8 +258,7 @@ class LemmyContentHelper(
             }
         }
 
-        fun appendUiForExternalOrRedditUrl() {
-            val url = requireNotNull(targetPostView.post.url)
+        fun appendUiForExternalOrInternalUrl(url: String) {
             val externalContentView =
                 getView<View>(R.layout.full_content_external_content_view)
             val thumbnailView = externalContentView.findViewById<ImageView>(R.id.thumbnail)
@@ -247,12 +267,14 @@ class LemmyContentHelper(
 
             loadPreviewInfo(thumbnailView)
 
-            externalContentTextView.text = targetPostView.getDomain()
+            externalContentTextView.text = Uri.parse(url).host ?: url
             externalContentView.setOnClickListener {
                 val uri = Uri.parse(url)
                 if (RedditUtils.isUriReddit(uri)) {
                     RedditUtils.openRedditUrl(context, url)
-                } else if (uri.path?.endsWith(".jpg") == true || uri.path?.endsWith(".png") == true) {
+                } else if (uri.path?.endsWith(".jpg") == true ||
+                    uri.path?.endsWith(".jpeg") == true ||
+                    uri.path?.endsWith(".png") == true) {
                     val args = ImageViewerFragmentArgs(
                         null,
                         url,
@@ -341,55 +363,61 @@ class LemmyContentHelper(
                             offlineManager.calculateImageMaxSizeIfNeeded(it)
                             offlineManager.getMaxImageSizeHint(it, tempSize)
 
-                            Glide.with(fragment)
-                                .load(it)
-                                .apply {
-                                    if (tempSize.width > 0 && tempSize.height > 0) {
-                                        override(tempSize.width, tempSize.height)
+                            fullImageView.load(it) {
+                                listener { request, result ->
+                                    val d = result.drawable
+                                    if (d is BitmapDrawable) {
+                                        offlineManager.setImageSizeHint(
+                                            imageUrl,
+                                            d.bitmap.width,
+                                            d.bitmap.height
+                                        )
+                                        Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
                                     }
                                 }
-                                .into(fullImageView)
+                            }
                         }, {
                             loadingView?.showDefaultErrorMessageFor(it)
                         })
                     }
 
-                    // try to guess image size...
-                    if (!offlineManager.hasImageSizeHint(imageUrl)) {
-                        var width = 0
-                        var height = 0
-//                        targetPostView.preview?.images?.first()?.source?.let {
-//                            width = it.width
-//                            height = it.height
-//                        }
-                        rootView.measure(
-                            View.MeasureSpec.makeMeasureSpec(
-                                Utils.getScreenWidth(context),
-                                View.MeasureSpec.EXACTLY
-                            ),
-                            View.MeasureSpec.makeMeasureSpec(
-                                Utils.getScreenHeight(context),
-                                View.MeasureSpec.AT_MOST
-                            )
-                        )
-                        if (width != 0 && height != 0) {
-                            val thumbnailHeight =
-                                (fullImageView.measuredWidth * (height.toDouble() / width)).toInt()
-                            offlineManager.setImageSizeHint(
-                                imageUrl,
-                                fullImageView.measuredWidth,
-                                thumbnailHeight
-                            )
+                    offlineManager.getImageSizeHint(imageUrl, tempSize)
+                    if (tempSize.width > 0 && tempSize.height > 0) {
+                        val thumbnailMaxHeight =
+                            (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+                        fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                            this.height = thumbnailMaxHeight
                         }
                     }
 
-                    offlineManager.getImageSizeHint(imageUrl, tempSize)
-                    if (tempSize.width > 0 && tempSize.height > 0) {
-                        fullImageView.layoutParams = fullImageView.layoutParams.apply {
-                            this.width = tempSize.width
-                            this.height = tempSize.height
-                        }
-                    }
+                    // try to guess image size...
+//                    if (!offlineManager.hasImageSizeHint(imageUrl)) {
+//                        var width = 0
+//                        var height = 0
+//                        targetListingItem.preview?.images?.first()?.source?.let {
+//                            width = it.width
+//                            height = it.height
+//                        }
+//                        rootView.measure(
+//                            View.MeasureSpec.makeMeasureSpec(
+//                                Utils.getScreenWidth(context),
+//                                View.MeasureSpec.EXACTLY
+//                            ),
+//                            View.MeasureSpec.makeMeasureSpec(
+//                                Utils.getScreenHeight(context),
+//                                View.MeasureSpec.AT_MOST
+//                            )
+//                        )
+//                        if (width != 0 && height != 0) {
+//                            val thumbnailHeight =
+//                                (fullImageView.measuredWidth * (height.toDouble() / width)).toInt()
+//                            offlineManager.setImageSizeHint(
+//                                targetListingItem.url,
+//                                fullImageView.measuredWidth,
+//                                thumbnailHeight
+//                            )
+//                        }
+//                    }
 
                     loadingView?.setOnRefreshClickListener {
                         fetchFullImage()
@@ -500,98 +528,95 @@ class LemmyContentHelper(
                     }
                 }
                 PostType.Text -> {
-
                 }
+            }
+
+            if (!postView.post.body.isNullOrBlank()) {
+                val content = postView.post.body
+                if (RedditUtils.needsWebView(content)) {
+                    val fullTextView = getView<View>(R.layout.full_content_web_view)
+                    val webView: WebView = fullTextView.findViewById(R.id.webView)
+                    val textColorHex = String.format(
+                        "#%06X",
+                        (0xFFFFFF and context.getColorCompat(R.color.colorText))
+                    )
+                    val bgColorHex = String.format(
+                        "#%06X",
+                        (0xFFFFFF and context.getColorCompat(R.color.colorBackground))
+                    )
+                    val aLinkColorHex = String.format(
+                        "#%06X",
+                        (0xFFFFFF and context.getColorCompat(R.color.colorLink))
+                    )
+                    val cssText = "<head><style type=\"text/css\">" +
+                            "body{margin:0;padding:0;color:${textColorHex};background-color:${bgColorHex};}" +
+                            "a{color:${aLinkColorHex}}" +
+                            "td{border-bottom:1px solid ${textColorHex};}" +
+                            "table{border-collapse:collapse;}" +
+                            "</style></head>"
+
+                    webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
+                    webView.settings.apply {
+                        javaScriptEnabled = false
+                    }
+
+                    webView.setBackgroundColor(0) // transparent
+
+                    // Need to base 64 encode html due to stupid bug...
+                    val html =
+                        "<html>$cssText<body>${Utils.fromHtml(content)}</body></html>"
+                    val b64 = Base64.encodeToString(html.toByteArray(), Base64.DEFAULT)
+                    webView.loadData(
+                        b64,
+                        "text/html; charset=utf-8",
+                        "base64"
+                    )
+                    webView.isVerticalScrollBarEnabled = false
+                    webView.webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            super.onPageFinished(view, url)
+
+                            webView.viewTreeObserver.addOnPreDrawListener(object :
+                                ViewTreeObserver.OnPreDrawListener {
+                                override fun onPreDraw(): Boolean {
+                                    if (webView.measuredHeight != 0) {
+                                        webView.layoutParams = webView.layoutParams.apply {
+                                            width = webView.measuredWidth
+                                            height = webView.measuredHeight
+                                        }
+                                        webView.viewTreeObserver.removeOnPreDrawListener(this)
+                                    }
+                                    return true
+                                }
+                            })
+                        }
+                    }
+                } else {
+                    val fullTextView = getView<View>(R.layout.full_content_text_view)
+                    val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
+                    bodyTextView.visibility = View.VISIBLE
+                    RedditUtils.bindRedditText(bodyTextView, content)
+                    bodyTextView.movementMethod = CustomLinkMovementMethod().apply {
+                        onLinkLongClickListener = DefaultLinkLongClickListener(context)
+                        this.onImageClickListener = onImageClickListener
+                    }
+                    bodyTextView.setOnClickListener {
+                        onItemClickListener()
+                    }
+                }
+            }
+
+            if (targetPostView.post.embed_video_url != null) {
+                appendUiForExternalOrInternalUrl(targetPostView.post.embed_video_url )
+            } else if (targetPostView.post.url != null &&
+                targetPostView.post.thumbnail_url != targetPostView.post.url) {
+                appendUiForExternalOrInternalUrl(targetPostView.post.url)
             }
 //            when (postType) {
 //                ListingItemType.DEFAULT_SELF -> {
-//                    if (listingItem.selftextHtml == null) {
-//                        // do nothing...
-//                    } else if (RedditUtils.needsWebView(listingItem.selftextHtml)) {
-//                        val fullTextView = getView<View>(R.layout.full_content_web_view)
-//                        val fullImageView = fullTextView.findViewById<ImageView>(R.id.fullImage)
-//                        val webView: WebView = fullTextView.findViewById(R.id.webView)
-//                        val textColorHex = String.format(
-//                            "#%06X",
-//                            (0xFFFFFF and ContextCompat.getColor(context, R.color.colorText))
-//                        )
-//                        val bgColorHex = String.format(
-//                            "#%06X",
-//                            (0xFFFFFF and ContextCompat.getColor(context, R.color.colorBackground))
-//                        )
-//                        val aLinkColorHex = String.format(
-//                            "#%06X",
-//                            (0xFFFFFF and ContextCompat.getColor(context, R.color.colorLink))
-//                        )
-//                        val cssText = "<head><style type=\"text/css\">" +
-//                                "body{margin:0;padding:0;color:${textColorHex};background-color:${bgColorHex};}" +
-//                                "a{color:${aLinkColorHex}}" +
-//                                "td{border-bottom:1px solid ${textColorHex};}" +
-//                                "table{border-collapse:collapse;}" +
-//                                "</style></head>"
-//
-//                        if (Build.VERSION.SDK_INT >= 19) {
-//                            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-//                        } else {
-//                            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-//                        }
-//
-//                        webView.settings.apply {
-//                            javaScriptEnabled = false
-//                        }
-//
-//                        webView.setBackgroundColor(0) // transparent
-//
-//                        // Need to base 64 encode html due to stupid bug...
-//                        val html =
-//                            "<html>$cssText<body>${Utils.fromHtml(targetListingItem.selftextHtml)}</body></html>"
-//                        val b64 = Base64.encodeToString(html.toByteArray(), Base64.DEFAULT)
-//                        webView.loadData(
-//                            b64,
-//                            "text/html; charset=utf-8",
-//                            "base64"
-//                        )
-//                        webView.isVerticalScrollBarEnabled = false
-//                        webView.webViewClient = object : WebViewClient() {
-//                            override fun onPageFinished(view: WebView?, url: String?) {
-//                                super.onPageFinished(view, url)
-//
-//                                webView.viewTreeObserver.addOnPreDrawListener(object :
-//                                    ViewTreeObserver.OnPreDrawListener {
-//                                    override fun onPreDraw(): Boolean {
-//                                        if (webView.measuredHeight != 0) {
-//                                            webView.layoutParams = webView.layoutParams.apply {
-//                                                width = webView.measuredWidth
-//                                                height = webView.measuredHeight
-//                                            }
-//                                            webView.viewTreeObserver.removeOnPreDrawListener(this)
-//                                        }
-//                                        return true
-//                                    }
-//                                })
-//                            }
-//                        }
-//                        loadPreviewInfo(fullImageView, attachClickHandler = true)
-//                    } else {
-//                        val fullTextView = getView<View>(R.layout.full_content_text_view)
-//                        val fullImageView = fullTextView.findViewById<ImageView>(R.id.fullImage)
-//                        val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
-//                        bodyTextView.visibility = View.VISIBLE
-//                        bodyTextView.text =
-//                            RedditUtils.formatBodyText(
-//                                context,
-//                                listingItem.selftextHtml
-//                            )
-//                        bodyTextView.movementMethod = LinkMovementMethod.getInstance()
-//                        loadPreviewInfo(fullImageView, attachClickHandler = true)
-//                    }
-//
-//                    if (!targetListingItem.isDomainSelf()) {
-//                        appendUiForExternalOrRedditUrl()
-//                    }
 //                }
 //                ListingItemType.REDDIT_IMAGE -> {
-
 //                }
 //                ListingItemType.REDDIT_VIDEO -> {
 //                }
@@ -632,5 +657,39 @@ class LemmyContentHelper(
         }
 
         addFooter()
+    }
+
+    fun recycleFullContent(
+        fullContentContainerView: ViewGroup
+    ): RecycledState = getState(fullContentContainerView, recycle = true)
+
+    fun getState(
+        fullContentContainerView: ViewGroup,
+        recycle: Boolean = false
+    ): RecycledState {
+        val stateBuilder = RecycledState.Builder()
+
+        if (fullContentContainerView.childCount == 0) return stateBuilder.build()
+
+        for (i in 0 until fullContentContainerView.childCount) {
+            val c = fullContentContainerView.getChildAt(0)
+            val viewId = c.getTag(R.id.view_type) as Int
+
+            if (viewId == R.layout.full_content_video_view) {
+                val playerView = c.findViewById<CustomPlayerView>(R.id.playerView)
+                stateBuilder.setVideoState(playerView?.player?.getVideoState())
+
+                if (recycle) {
+                    exoPlayerManager.release(playerView.player)
+                }
+            }
+
+            if (recycle) {
+                fullContentContainerView.removeViewAt(0)
+                viewRecycler.addRecycledView(c, viewId)
+            }
+        }
+
+        return stateBuilder.build()
     }
 }

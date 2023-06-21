@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import android.net.Uri
+import com.idunnololz.summit.api.LemmyApiClient
 import okhttp3.CacheControl
 import okhttp3.Request
 import okhttp3.Response
@@ -8,6 +9,8 @@ import org.jsoup.HttpStatusException
 
 object LinkUtils {
 
+
+    const val APP_PERMISSIONS_HELP_ARTICLE = "https://support.google.com/android/answer/9431959"
 
     fun downloadSite(url: String, cache: Boolean = false): String {
         val response = doRequest(url, cache)
@@ -95,4 +98,7 @@ object LinkUtils {
 
     fun getRedirectLink(thingId: String): String =
         "https://www.reddit.com/$thingId"
+
+    fun postIdToLink(instance: String, postId: Int) =
+        "https://${instance}/post/$postId"
 }

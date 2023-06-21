@@ -5,45 +5,12 @@
     <item
         android:id="@+id/share"
         android:title="@string/share"
-        android:orderInCategory="100" />
-    <item
-        android:id="@+id/go_to"
-        android:title="@string/go_to"
-        android:orderInCategory="200" />
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_share_24"
+        app:showAsAction="ifRoom"
+        app:iconTint="?attr/colorControlNormal"/>
     <item
         android:id="@+id/sort_comments_by"
         android:title="@string/sort_comments_by"
-        android:orderInCategory="300">
-
-        <menu>
-            <item
-                android:id="@+id/comments_order_confidence"
-                android:title="@string/best"
-                android:orderInCategory="100" />
-            <item
-                android:id="@+id/comments_order_top"
-                android:title="@string/top"
-                android:orderInCategory="200" />
-            <item
-                android:id="@+id/comments_order_new"
-                android:title="@string/sort_order_new"
-                android:orderInCategory="300" />
-            <item
-                android:id="@+id/comments_order_controversial"
-                android:title="@string/controversial"
-                android:orderInCategory="300" />
-            <item
-                android:id="@+id/comments_order_old"
-                android:title="@string/old"
-                android:orderInCategory="300" />
-            <item
-                android:id="@+id/comments_order_random"
-                android:title="@string/random"
-                android:orderInCategory="300" />
-            <item
-                android:id="@+id/comments_order_qa"
-                android:title="@string/q_a"
-                android:orderInCategory="300" />
-        </menu>
-    </item>
+        android:orderInCategory="300"/>
 </menu>

@@ -9,16 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.Preference
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.auth.RedditAuthManager
-import com.idunnololz.summit.reddit_objects.UserInfo
 import com.idunnololz.summit.util.PreferenceUtil
-import com.idunnololz.summit.util.StatefulData
 
 class AccountSettingsFragment : BasePreferenceFragment() {
 
@@ -28,9 +23,7 @@ class AccountSettingsFragment : BasePreferenceFragment() {
 
     private val args: AccountSettingsFragmentArgs by navArgs()
 
-    private val authManager = RedditAuthManager.instance
-
-    private val userInfoViewModel: UserInfoViewModel by activityViewModels()
+    private val viewModel: UserInfoViewModel by activityViewModels()
 
     private var signOutDialog: Dialog? = null
 
@@ -65,46 +58,16 @@ class AccountSettingsFragment : BasePreferenceFragment() {
         Log.d(TAG, "onViewCreated()")
         super.onViewCreated(view, savedInstanceState)
 
-        requireMainActivity().insetRootViewAutomatically(viewLifecycleOwner, view)
-
-        userInfoViewModel.userInfoLiveData.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is StatefulData.Error -> {}
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    refreshAccountsUi(it.data)
-                }
-            }
-        })
+        requireMainActivity().insetViewAutomaticallyByMargins(viewLifecycleOwner, view)
 
         val signOutDialog = AlertDialog.Builder(
-            context, R.style.AppTheme_Dialog_Alert_Transparent
+            context, R.style.Theme_App_Dialog_Alert_Transparent
         ).apply {
             setCancelable(false)
             setView(LayoutInflater.from(context).inflate(R.layout.sign_out_dialog, null, false))
         }.create().also {
             signOutDialog = it
         }
-
-        userInfoViewModel.signOutLiveData.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is StatefulData.Error -> {
-                    signOutDialog.dismiss()
-
-                    AlertDialogFragment.Builder()
-                        .setMessage(R.string.error_unknown)
-                        .createAndShow(parentFragmentManager, "asdf")
-                }
-                is StatefulData.Loading -> {
-                    signOutDialog.show()
-                }
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    signOutDialog.dismiss()
-                }
-            }
-        })
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -113,10 +76,7 @@ class AccountSettingsFragment : BasePreferenceFragment() {
         // Load the preferences from an XML resource
         setPreferencesFromResource(R.xml.preferences_account, rootKey)
 
-        loadUserInfo()
-
         findPreference<Preference>(R.string.pref_key_sign_out).setOnPreferenceClickListener {
-            userInfoViewModel.signOut()
             true
         }
     }
@@ -127,25 +87,5 @@ class AccountSettingsFragment : BasePreferenceFragment() {
         )
 
         super.onDestroyView()
-    }
-
-    fun loadUserInfo() {
-        val userInfo = authManager.getCachedUserInfo()
-        refreshAccountsUi(userInfo)
-
-        userInfoViewModel.fetchUserInfo()
-    }
-
-    private fun refreshAccountsUi(userInfo: UserInfo?) {
-        if (userInfo == null) {
-            findPreference<Preference>(R.string.pref_key_account).apply {
-                title = getString(R.string.loading)
-                summary = getString(R.string.loading)
-            }
-        } else {
-            findPreference<Preference>(R.string.pref_key_account).apply {
-                bindUserInfo(this@AccountSettingsFragment, userInfo)
-            }
-        }
     }
 }

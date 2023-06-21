@@ -9,21 +9,18 @@ import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
-import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.tabs.TabCommunityState
+import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.moshi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -37,7 +34,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         private const val TAG = "HistoryFragment"
     }
 
-    private var historyViewModel: HistoryViewModel? = null
+    private val historyViewModel: HistoryViewModel by viewModels()
 
     private lateinit var adapter: HistoryEntryAdapter
 
@@ -47,7 +44,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
     private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
         override fun onHistoryChanged() {
-            historyViewModel?.loadHistory()
+            historyViewModel.loadHistory()
         }
     }
 
@@ -75,21 +72,27 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
         adapter = HistoryEntryAdapter(context)
 
-        requireMainActivity().insetRootViewAutomatically(viewLifecycleOwner, view)
-
-        historyViewModel = ViewModelProvider(this).get(HistoryViewModel::class.java)
+        requireMainActivity().apply {
+            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+            headerOffset.observe(viewLifecycleOwner) {
+                if (it != null)
+                    getView()?.translationY = it.toFloat()
+            }
+        }
 
         historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)
 
-        historyViewModel?.loadHistory()
-        historyViewModel?.historyEntriesLiveData?.observe(viewLifecycleOwner, Observer {
+        historyViewModel.loadHistory()
+        historyViewModel.historyEntriesLiveData.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
                 }
+
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
+
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     binding.loadingView.hideAll()
@@ -98,21 +101,22 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                     adapter.setItems(it.data)
                 }
             }
-        })
+        }
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
+        binding.fastScroller.setRecyclerView(binding.recyclerView)
+
         binding.swipeRefreshLayout.setOnRefreshListener {
-            historyViewModel?.loadHistory()
+            historyViewModel.loadHistory()
         }
 
         requireMainActivity().let {
-            val toolbar = it.binding.toolbar
             it.windowInsets.observe(viewLifecycleOwner) {
                 binding.rootView.setPadding(
                     binding.rootView.paddingLeft,
-                    toolbar.layoutParams.height,
+                    0,
                     binding.rootView.paddingRight,
                     binding.rootView.paddingBottom
                 )

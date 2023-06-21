@@ -16,7 +16,11 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/subredditTabsFragment"
-        android:name="com.idunnololz.summit.tabs.SubredditTabsFragment"
-        android:label="SubredditTabsFragment" />
+        android:id="@+id/savedFragment"
+        android:name="com.idunnololz.summit.saved.SavedFragment"
+        android:label="SavedFragment" />
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.idunnololz.summit.history.HistoryFragment"
+        android:label="HistoryFragment" />
 </navigation>

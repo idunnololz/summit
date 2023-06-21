@@ -8,7 +8,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.idunnololz.summit.R
-import com.idunnololz.summit.reddit_objects.AwardInfo
 
 class RewardView : LinearLayout {
 
@@ -34,18 +33,6 @@ class RewardView : LinearLayout {
             context.resources.getDimensionPixelOffset(R.dimen.padding_quarter), 0,
             context.resources.getDimensionPixelOffset(R.dimen.padding_quarter), 0
         )
-    }
-
-    fun setAward(awardInfo: AwardInfo) {
-        if (awardInfo.count == 1) {
-            textView.visibility = View.GONE
-        } else {
-            textView.visibility = View.VISIBLE
-            textView.text = context.getString(R.string.award_count_format, awardInfo.count)
-        }
-        Glide.with(this)
-            .load(awardInfo.iconUrl)
-            .into(rewardIcon)
     }
 
 }
