@@ -26,7 +26,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import coil.load
-import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostType
@@ -200,10 +199,7 @@ class LemmyContentHelper(
 
             if (!previewInfo?.getUrl().isNullOrBlank()) {
                 offlineManager.fetchImage(rootView, checkNotNull(previewInfo).getUrl()) {
-                    Glide.with(rootView)
-                        .load(it)
-                        .dontTransform()
-                        .into(fullImageView)
+                    fullImageView.load(it)
                 }
             } else {
                 fullImageView.visibility = View.GONE

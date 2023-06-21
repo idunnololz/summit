@@ -133,7 +133,7 @@
         android:id="@+id/exo_fullscreen"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/baseline_fullscreen_black_24"
+        android:src="@drawable/baseline_fullscreen_24"
         android:background="?selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottomPlaceholder"

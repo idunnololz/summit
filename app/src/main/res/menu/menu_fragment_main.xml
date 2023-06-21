@@ -14,7 +14,7 @@
         android:id="@+id/layout"
         android:title="@string/layout"
         android:orderInCategory="400"
-        android:icon="@drawable/round_view_compact_black_24"
+        android:icon="@drawable/baseline_view_comfy_24"
         app:iconTint="?attr/colorControlNormal">
 
         <menu>
@@ -22,7 +22,7 @@
                 android:id="@+id/layoutList"
                 android:title="@string/list"
                 android:orderInCategory="100"
-                android:icon="@drawable/baseline_list_black_24"
+                android:icon="@drawable/baseline_list_24"
                 app:iconTint="?attr/colorControlNormal" />
             <item
                 android:id="@+id/layoutCard"
@@ -42,7 +42,7 @@
         android:id="@+id/set_as_default"
         android:title="@string/set_as_home_page"
         android:orderInCategory="500"
-        android:icon="@drawable/baseline_home_black_24"
+        android:icon="@drawable/baseline_home_24"
         app:iconTint="?attr/colorControlNormal">
 
     </item>

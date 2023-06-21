@@ -14,13 +14,12 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
-import androidx.lifecycle.Observer
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.gif.GifDrawable
-import com.bumptech.glide.request.RequestListener
+import coil.drawable.MovieDrawable
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
@@ -32,9 +31,6 @@ import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.view.GalleryImageView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import org.apache.commons.io.FilenameUtils
 import java.io.IOException
 
@@ -50,14 +46,14 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
 
     private val args: ImageViewerFragmentArgs by navArgs()
 
+    private val viewModel: ImageViewerViewModel by viewModels()
+
     private lateinit var decorView: View
     private var showingUi = true
 
     private var url: String? = null
     private lateinit var fileName: String
     private var mimeType: String? = null
-
-    private var downloadAndSaveImageDisposable: Disposable? = null
 
     private var websiteAdapterLoader: WebsiteAdapterLoader? = null
 
@@ -145,6 +141,49 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
 
         binding.imageView.post {
             startPostponedEnterTransition()
+        }
+
+        viewModel.downloadResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Error -> {}
+                is StatefulData.Loading -> {}
+                is StatefulData.Success -> {
+                    it.data
+                        .onSuccess { downloadResult ->
+                            try {
+                                val uri = downloadResult.uri
+                                val mimeType = downloadResult.mimeType
+
+                                val snackbarMsg = getString(R.string.image_saved_format, downloadResult.uri)
+                                Snackbar.make(
+                                    requireMainActivity().getSnackbarContainer(),
+                                    snackbarMsg,
+                                    Snackbar.LENGTH_LONG
+                                ).setAction(R.string.view) {
+                                    if (!isAdded) {
+                                        return@setAction
+                                    }
+
+                                    Utils.safeLaunchExternalIntentWithErrorDialog(
+                                        context,
+                                        parentFragmentManager,
+                                        Intent(Intent.ACTION_VIEW).apply {
+                                            flags =
+                                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                            setDataAndType(uri, mimeType)
+                                        })
+                                }.show()
+                            } catch (e: IOException) {/* do nothing */
+                            }
+                        }
+                        .onFailure {
+                            FirebaseCrashlytics.getInstance().recordException(it)
+                            Snackbar.make(binding.rootView, R.string.error_downloading_image, Snackbar.LENGTH_LONG)
+                                .show()
+                        }
+                }
+            }
         }
 
         addMenuProvider(object : MenuProvider {
@@ -326,50 +365,19 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
     private fun downloadImage() {
         val context = context ?: return
         offlineManager.fetchImageWithError(binding.rootView, url, {
-            downloadAndSaveImageDisposable?.dispose()
-            downloadAndSaveImageDisposable = FileDownloadHelper
-                .downloadFile(
-                    context,
-                    fileName,
-                    url,
-                    it,
-                    mimeType = mimeType
-                )
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ downloadResult ->
-                    try {
-                        val uri = downloadResult.uri
-                        val mimeType = downloadResult.mimeType
-
-                        val snackbarMsg = getString(R.string.image_saved_format, downloadResult.uri)
-                        Snackbar.make(
-                            requireMainActivity().getSnackbarContainer(),
-                            snackbarMsg,
-                            Snackbar.LENGTH_LONG
-                        ).setAction(R.string.view) {
-                            if (!isAdded) {
-                                return@setAction
-                            }
-
-                            Utils.safeLaunchExternalIntentWithErrorDialog(
-                                context,
-                                parentFragmentManager,
-                                Intent(Intent.ACTION_VIEW).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                    setDataAndType(uri, mimeType)
-                                })
-                        }.show()
-                    } catch (e: IOException) {/* do nothing */
-                    }
-                }, { e ->
-                    FirebaseCrashlytics.getInstance().recordException(e)
-                    Snackbar.make(binding.rootView, R.string.error_downloading_image, Snackbar.LENGTH_LONG)
-                        .show()
-                })
+            viewModel.downloadFile(
+                context,
+                fileName,
+                url,
+                it,
+                mimeType = mimeType
+            )
         }, {
-            Snackbar.make(binding.rootView, R.string.error_downloading_image, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(
+                binding.rootView,
+                R.string.error_downloading_image,
+                Snackbar.LENGTH_LONG
+            ).show()
         })
     }
 
@@ -381,44 +389,32 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
             offlineManager.calculateImageMaxSizeIfNeeded(it)
             offlineManager.getMaxImageSizeHint(it, tempSize)
 
-            Glide.with(this)
-                .load(it)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: com.bumptech.glide.request.target.Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
+            val request = ImageRequest.Builder(binding.imageView.context)
+                .data(it)
+                .target(object : Target {
+                    override fun onError(error: Drawable?) {
+                        super.onError(error)
                         binding.loadingView.showErrorWithRetry(R.string.error_downloading_image)
-                        return false
                     }
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: com.bumptech.glide.request.target.Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
+                    override fun onStart(placeholder: Drawable?) {
+                        super.onStart(placeholder)
+                    }
+
+                    override fun onSuccess(result: Drawable) {
+                        super.onSuccess(result)
+
                         binding.loadingView.hideAll()
-                        if (resource is GifDrawable) {
-                            binding.imageView.post {
-                                resource.setVisible(true, true)
-                            }
-                        }
-                        return false
-                    }
 
-                })
-                .also {
-                    if (tempSize.height != -1 && Utils.getScreenHeight(requireContext()) > tempSize.height * 4) {
-                        it.override(tempSize.width * 4, tempSize.height * 4)
-                    } else if (tempSize.height == -1) {
-                        it.centerInside()
+                        binding.imageView.setImageDrawable(result)
+
+                        if (result is MovieDrawable) {
+                            result.start()
+                        }
                     }
-                }
-                .into(binding.imageView)
+                })
+                .build()
+            binding.imageView.context.imageLoader.enqueue(request)
         }, {
             binding.loadingView.showDefaultErrorMessageFor(it)
         })

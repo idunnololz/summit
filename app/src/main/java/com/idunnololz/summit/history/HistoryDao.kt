@@ -11,29 +11,29 @@ import io.reactivex.Single
 interface HistoryDao {
 
     @Query("SELECT * FROM history ORDER BY ts")
-    fun getAllHistoryEntries(): Single<List<HistoryEntry>>
+    suspend fun getAllHistoryEntries(): List<HistoryEntry>
 
     @Query("SELECT id, url, shortDesc, ts, type, reason FROM history ORDER BY ts DESC")
-    fun getAllLiteHistoryEntries(): Single<List<LiteHistoryEntry>>
+    suspend fun getAllLiteHistoryEntries(): List<LiteHistoryEntry>
 
     @Query("SELECT * FROM history WHERE id = :entryId")
-    fun getHistoryEntry(entryId: Long): Single<HistoryEntry>
+    suspend fun getHistoryEntry(entryId: Long): HistoryEntry?
 
     @Query("SELECT * FROM history ORDER BY ts DESC LIMIT 1")
-    fun getLastHistoryEntry(): Single<HistoryEntry>
+    suspend fun getLastHistoryEntry(): HistoryEntry?
 
     @Query("SELECT * FROM history WHERE type = :type ORDER BY ts DESC LIMIT 1")
-    fun getLastHistoryEntryWithType(type: Int): Single<HistoryEntry>
+    suspend fun getLastHistoryEntryWithType(type: Int): HistoryEntry?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertHistoryEntry(historyEntry: HistoryEntry): Single<Long>
+    suspend fun insertHistoryEntry(historyEntry: HistoryEntry): Long
 
     @Delete
-    fun delete(historyEntry: HistoryEntry): Completable
+    suspend fun delete(historyEntry: HistoryEntry)
 
     @Query("DELETE FROM history WHERE id = :id")
-    fun deleteById(id: Long): Completable
+    suspend fun deleteById(id: Long)
 
     @Query("DELETE FROM history")
-    fun deleteAllHistoryEntries(): Completable
+    suspend fun deleteAllHistoryEntries()
 }

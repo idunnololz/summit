@@ -2,35 +2,38 @@ package com.idunnololz.summit.history
 
 import android.content.Context
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.db.MainDatabase
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.moshi
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class HistoryManager(
-    private val context: Context
+@Singleton
+class HistoryManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
-    companion object {
-        const val FIRST_FRAGMENT_TAB_ID: Long = 0
-
-        lateinit var instance: HistoryManager
-
-        fun initialize(context: Context) {
-            instance = HistoryManager(context)
-        }
-    }
 
     interface OnHistoryChangedListener {
         fun onHistoryChanged()
     }
 
-    private val scheduler: Scheduler = Schedulers.from(Executors.newSingleThreadExecutor())
+    private val coroutineScope = coroutineScopeFactory.create()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val dbContext = Dispatchers.Default.limitedParallelism(1)
 
     private val historyChangedListeners = arrayListOf<OnHistoryChangedListener>()
 
@@ -38,25 +41,29 @@ class HistoryManager(
         MainDatabase.getInstance(context)
     }
 
-    fun getEntireHistory(): Single<List<LiteHistoryEntry>> =
+    suspend fun getEntireHistory(): List<LiteHistoryEntry> = withContext(Dispatchers.IO) {
         mainDatabase
             .historyDao()
             .getAllLiteHistoryEntries()
-            .subscribeOn(scheduler)
+    }
 
     fun recordVisit(jsonUrl: String, saveReason: HistorySaveReason, post: PostView?) {
-        val ts = System.currentTimeMillis()
-        val newEntry = HistoryEntry(
-            id = 0,
-            type = HistoryEntry.TYPE_PAGE_VISIT,
-            reason = saveReason,
-            url = jsonUrl,
-            shortDesc = post?.post?.name ?: "",
-            ts = ts,
-            extras = ""
-        )
+        coroutineScope.launch {
+            withContext(dbContext) {
+                val ts = System.currentTimeMillis()
+                val newEntry = HistoryEntry(
+                    id = 0,
+                    type = HistoryEntry.TYPE_PAGE_VISIT,
+                    reason = saveReason,
+                    url = jsonUrl,
+                    shortDesc = post?.post?.name ?: "",
+                    ts = ts,
+                    extras = ""
+                )
 
-        recordHistoryEntry(newEntry)
+                recordHistoryEntry(newEntry)
+            }
+        }
     }
 
     fun recordSubredditState(
@@ -65,39 +72,46 @@ class HistoryManager(
         state: CommunityViewState,
         shortDesc: String
     ) {
-        val ts = System.currentTimeMillis()
-        val historyEntry = HistoryEntry(
-            id = 0,
-            type = HistoryEntry.TYPE_SUBREDDIT_STATE,
-            reason = saveReason,
-            url = state.toUrl(),
-            shortDesc = shortDesc,
-            ts = ts,
-            extras = Utils.gson.toJson(TabCommunityState(tabId = tabId, viewState = state))
-        )
-        recordHistoryEntry(historyEntry)
+        coroutineScope.launch {
+            withContext(dbContext) {
+                val ts = System.currentTimeMillis()
+                val historyEntry = HistoryEntry(
+                    id = 0,
+                    type = HistoryEntry.TYPE_SUBREDDIT_STATE,
+                    reason = saveReason,
+                    url = state.toUrl(),
+                    shortDesc = shortDesc,
+                    ts = ts,
+                    extras = Utils.gson.toJson(TabCommunityState(tabId = tabId, viewState = state))
+                )
+                recordHistoryEntry(historyEntry)
+            }
+        }
     }
 
     fun removeEntry(id: Long) {
-        mainDatabase
-            .historyDao()
-            .deleteById(id)
-            .doAfterTerminate {
-                historyChangedListeners.forEach { it.onHistoryChanged() }
+        coroutineScope.launch {
+            withContext(dbContext) {
+                mainDatabase
+                    .historyDao()
+                    .deleteById(id)
             }
-            .subscribeOn(scheduler)
-            .subscribe()
+            historyChangedListeners.forEach { it.onHistoryChanged() }
+        }
     }
 
-    private fun recordHistoryEntry(newEntry: HistoryEntry) {
-        mainDatabase
-            .historyDao()
-            .getLastHistoryEntryWithType(newEntry.type)
-            .map a@{ lastEntry ->
-                if (lastEntry.type != newEntry.type) {
-                    return@a newEntry
-                }
+    private suspend fun recordHistoryEntry(newEntry: HistoryEntry) {
+        val lastEntry = withContext(Dispatchers.IO) {
+            mainDatabase
+                .historyDao()
+                .getLastHistoryEntryWithType(newEntry.type)
+        }
 
+
+        val entryToInsert = try {
+            if (lastEntry?.type != newEntry.type) {
+                newEntry
+            } else {
                 when (newEntry.type) {
                     HistoryEntry.TYPE_PAGE_VISIT ->
                         if (lastEntry.url == newEntry.url) {
@@ -109,6 +123,7 @@ class HistoryManager(
                         } else {
                             newEntry
                         }
+
                     HistoryEntry.TYPE_SUBREDDIT_STATE -> {
                         // Url for subreddit state is actually the tab id...
                         val adapter = moshi.adapter(TabCommunityState::class.java)
@@ -128,36 +143,34 @@ class HistoryManager(
                             newEntry
                         }
                     }
+
                     else -> newEntry
                 }
             }
-            .onErrorReturn { newEntry }
-            .flatMap { entryToInsert ->
-                mainDatabase.historyDao()
-                    .insertHistoryEntry(entryToInsert)
-            }
-            .doAfterTerminate {
-                historyChangedListeners.forEach { it.onHistoryChanged() }
-            }
-            .subscribeOn(scheduler)
-            .subscribe()
+        } catch (e: Exception) {
+            newEntry
+        }
+
+        mainDatabase.historyDao()
+            .insertHistoryEntry(entryToInsert)
+
+        historyChangedListeners.forEach { it.onHistoryChanged() }
     }
 
-    fun getHistoryEntry(id: Long): Single<HistoryEntry> =
+    suspend fun getHistoryEntry(id: Long): HistoryEntry? = withContext(Dispatchers.IO) {
         mainDatabase
             .historyDao()
             .getHistoryEntry(id)
-            .subscribeOn(scheduler)
+    }
 
-    fun clearHistory() {
-        mainDatabase
-            .historyDao()
-            .deleteAllHistoryEntries()
-            .doAfterTerminate {
-                historyChangedListeners.forEach { it.onHistoryChanged() }
-            }
-            .subscribeOn(scheduler)
-            .subscribe()
+    suspend fun clearHistory() {
+        withContext(Dispatchers.IO) {
+            mainDatabase
+                .historyDao()
+                .deleteAllHistoryEntries()
+        }
+
+        historyChangedListeners.forEach { it.onHistoryChanged() }
     }
 
     fun registerOnHistoryChangedListener(l: OnHistoryChangedListener) {

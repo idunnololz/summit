@@ -31,7 +31,6 @@ class LemmyAppBarController(
     private val accountImageView: ShapeableImageView = v.findViewById(R.id.account_image_view)
     private val communityTextView: Chip = v.findViewById(R.id.communityTextView)
     private val pageTextView: TextView = v.findViewById(R.id.pageTextView)
-    private val abTabsImageView: TabsImageButton = v.findViewById(R.id.abTabsImageView)
     private val abOverflowButton: ImageButton = v.findViewById(R.id.abOverflowButton)
 
     private var currentCommunity: CommunityRef? = null
@@ -58,8 +57,6 @@ class LemmyAppBarController(
             controller.onCommunitySelectedListener = communitySelectedListener
         }
         abOverflowButton.setOnClickListener(abOverflowClickListener)
-
-        abTabsImageView.visibility = View.GONE
     }
 
     fun setCommunity(communityRef: CommunityRef?, isHome: Boolean) {

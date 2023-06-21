@@ -2,7 +2,6 @@ package com.idunnololz.summit.preview
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
@@ -17,20 +16,14 @@ import androidx.fragment.app.viewModels
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import org.apache.commons.io.FilenameUtils
 
 
 class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {

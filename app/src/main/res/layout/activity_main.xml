@@ -171,6 +171,7 @@
                         android:singleLine="true"
                         style="@style/Widget.Material3.Chip.Assist"
                         app:chipIconTint="?colorControlNormal"
+                        app:layout_constrainedWidth="true"
                         app:layout_constraintHorizontal_bias="0"
                         app:layout_constraintStart_toEndOf="@+id/account_image_view"
                         app:layout_constraintEnd_toStartOf="@+id/pageTextView"
@@ -189,16 +190,6 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintBottom_toBottomOf="@+id/guideline" />
-
-                    <com.idunnololz.summit.view.TabsImageButton
-                        android:id="@+id/abTabsImageView"
-                        android:layout_width="40dp"
-                        android:layout_height="0dp"
-                        android:src="@drawable/baseline_crop_square_black_24"
-                        android:background="?selectableItemBackgroundBorderless"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="@+id/guideline"
-                        app:layout_constraintEnd_toStartOf="@+id/abOverflowButton" />
 
                     <ImageButton
                         android:id="@+id/abOverflowButton"

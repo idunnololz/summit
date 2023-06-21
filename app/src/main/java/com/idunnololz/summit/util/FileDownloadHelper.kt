@@ -16,6 +16,7 @@ import android.webkit.MimeTypeMap
 import com.idunnololz.summit.R
 import com.idunnololz.summit.offline.OfflineManager
 import io.reactivex.Single
+import kotlinx.coroutines.runInterruptible
 import okhttp3.Request
 import okio.*
 import org.apache.commons.io.FilenameUtils
@@ -299,13 +300,13 @@ object FileDownloadHelper {
 //        emitter.onSuccess(result)
 //    }
 //
-    fun downloadFile(
+    suspend fun downloadFile(
         c: Context,
         destFileName: String,
         url: String?,
         cacheFile: File? = null,
         mimeType: String? = null
-    ): Single<DownloadResult> = Single.create { emitter ->
+    ): Result<DownloadResult> {
         val context = c.applicationContext
         val mimeType = mimeType
             ?: MimeTypeMap.getSingleton()
@@ -326,8 +327,7 @@ object FileDownloadHelper {
             val contentResolver = context.contentResolver
 
             uriOrFilePath = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)?.toString() ?: run {
-                emitter.onError(RuntimeException("Unable to insert into content resolver"))
-                return@create
+                return Result.failure(RuntimeException("Unable to insert into content resolver"))
             }
             uriOrFilePath.let {
                 contentResolver.openOutputStream(Uri.parse(uriOrFilePath))
@@ -335,9 +335,7 @@ object FileDownloadHelper {
         } else {
             val dlDir = context?.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
             if (dlDir == null || !dlDir.exists() && !dlDir.mkdirs()) {
-                @Suppress("ThrowableNotThrown")
-                emitter.onError(RuntimeException("Unable to make directory: $dlDir"))
-                return@create
+                return Result.failure(RuntimeException("Unable to make directory: $dlDir"))
             }
 
             val tokens = destFileName.split('.', limit = 2)
@@ -348,39 +346,39 @@ object FileDownloadHelper {
         }
 
         if (outputStream == null) {
-            @Suppress("ThrowableNotThrown")
-            emitter.onError(RuntimeException("Output stream was null!"))
-            return@create
+            return Result.failure(RuntimeException("Output stream was null!"))
         }
 
-        try {
-            Log.d(TAG, "Writing to file")
-            val sink: BufferedSink = outputStream.sink().buffer()
-            if (cacheFile?.exists() == true) {
-                sink.writeAll(cacheFile.source())
-            } else {
-                val request = Request.Builder()
-                    .url(checkNotNull(url))
-                    .header("User-Agent", "Chrome")
-                    .build()
+        val error = runInterruptible a@{
+            try {
+                Log.d(TAG, "Writing to file")
+                val sink: BufferedSink = outputStream.sink().buffer()
+                if (cacheFile?.exists() == true) {
+                    sink.writeAll(cacheFile.source())
+                } else {
+                    val request = Request.Builder()
+                        .url(checkNotNull(url))
+                        .header("User-Agent", "Chrome")
+                        .build()
 
-                val response = Client.get().newCall(request).execute()
-                try {
-                    val body = response.body
-                    if (body != null) {
-                        sink.writeAll(body.source())
-                    } else {
-                        emitter.onError(DownloadException())
-                        return@create
+                    val response = Client.get().newCall(request).execute()
+                    try {
+                        val body = response.body
+                        if (body != null) {
+                            sink.writeAll(body.source())
+                        } else {
+                            return@a DownloadException()
+                        }
+                    } finally {
+                        response.body?.close()
                     }
-                } finally {
-                    response.body?.close()
                 }
+                sink.close()
+
+                null
+            } catch (e: Exception) {
+                return@a e
             }
-            sink.close()
-        } catch (e: Exception) {
-            emitter.onError(e)
-            return@create
         }
 
         val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -401,7 +399,8 @@ object FileDownloadHelper {
                 true)
             downloadManager.getUriForDownloadedFile(id)
         }
-        emitter.onSuccess(DownloadResult(uri, uriOrFilePath, mimeType))
+
+        return Result.success(DownloadResult(uri, uriOrFilePath, mimeType))
     }
 
     class DownloadException : java.lang.Exception()

@@ -10,6 +10,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,33 +19,40 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.reddit.getLocalizedName
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.moshi
-import io.reactivex.android.schedulers.AndroidSchedulers
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
     companion object {
         private const val TAG = "HistoryFragment"
     }
 
-    private val historyViewModel: HistoryViewModel by viewModels()
+    private val viewModel: HistoryViewModel by viewModels()
 
     private lateinit var adapter: HistoryEntryAdapter
 
-    private val historyManager = HistoryManager.instance
+    @Inject
+    lateinit var historyManager: HistoryManager
 
     private val disposables = CompositeDisposable()
 
     private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
         override fun onHistoryChanged() {
-            historyViewModel.loadHistory()
+            viewModel.loadHistory()
         }
     }
 
@@ -74,16 +82,25 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
         requireMainActivity().apply {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
-            headerOffset.observe(viewLifecycleOwner) {
-                if (it != null)
-                    getView()?.translationY = it.toFloat()
-            }
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+            setupActionBar(
+                getString(R.string.history),
+                showUp = false,
+                animateActionBarIn = false,
+            )
+
+            setSupportActionBar(binding.toolbar)
+
+            supportActionBar?.setDisplayShowHomeEnabled(true)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setTitle(getString(R.string.history))
         }
 
         historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)
 
-        historyViewModel.loadHistory()
-        historyViewModel.historyEntriesLiveData.observe(viewLifecycleOwner) {
+        viewModel.loadHistory()
+        viewModel.historyEntriesLiveData.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
@@ -109,19 +126,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            historyViewModel.loadHistory()
-        }
-
-        requireMainActivity().let {
-            it.windowInsets.observe(viewLifecycleOwner) {
-                binding.rootView.setPadding(
-                    binding.rootView.paddingLeft,
-                    0,
-                    binding.rootView.paddingRight,
-                    binding.rootView.paddingBottom
-                )
-            }
-            it.setupActionBar(getString(R.string.history), false)
+            viewModel.loadHistory()
         }
     }
 
@@ -153,7 +158,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                 return true
             }
             R.id.clear_history -> {
-                historyManager.clearHistory()
+                viewModel.clearHistory()
                 return true
             }
             else ->
@@ -176,23 +181,31 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                 )
             }
             HistoryEntry.TYPE_SUBREDDIT_STATE -> {
-                val d = historyManager.getHistoryEntry(data.id)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        if (it == null) {
+                lifecycleScope.launch {
+                    val entry = try {
+                        withContext(Dispatchers.IO) {
+                            historyManager.getHistoryEntry(data.id)
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.error_history_entry_corrupt)
+                                .createAndShow(this@HistoryFragment, "asdf")
+                        }
+                        return@launch
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        if (entry == null) {
                             AlertDialogFragment.Builder()
                                 .setMessage(R.string.error_history_entry_deleted)
                                 .createAndShow(this@HistoryFragment, "asdf")
                         } else {
-                            val state = moshi.adapter(TabCommunityState::class.java).fromJson(it.extras)
+                            val state = moshi.adapter(TabCommunityState::class.java).fromJson(entry.extras)
                             requireMainActivity().restoreTabState(state)
                         }
-                    }, {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.error_history_entry_corrupt)
-                            .createAndShow(this@HistoryFragment, "asdf")
-                    })
-                disposables.add(d)
+                    }
+                }
             }
         }
     }

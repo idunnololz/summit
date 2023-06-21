@@ -68,6 +68,7 @@ import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.LoadingView
 import com.idunnololz.summit.view.RedditHeaderView
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostFragment : BaseFragment<FragmentPostBinding>(),
@@ -89,6 +90,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     private var offlineManager = OfflineManager.instance
 
     private var hasConsumedJumpToComments: Boolean = false
+
+    @Inject
+    lateinit var historyManager: HistoryManager
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -227,7 +231,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         viewModel.fetchPostData(args.instance, args.id)
 
         args.post?.getUrl()?.let { url ->
-            HistoryManager.instance.recordVisit(
+            historyManager.recordVisit(
                 jsonUrl = url,
                 saveReason = HistorySaveReason.LOADING,
                 post = args.post
@@ -302,7 +306,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     fun onMainListingItemRetrieved(post: PostView) {
         post.getUrl()?.let { url ->
-            HistoryManager.instance.recordVisit(
+            historyManager.recordVisit(
                 jsonUrl = url,
                 saveReason = HistorySaveReason.LOADED,
                 post = post,

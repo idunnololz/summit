@@ -8,13 +8,11 @@ import android.view.View
 import androidx.media3.database.ExoDatabaseProvider
 import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
-import com.bumptech.glide.util.Util.assertMainThread
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.*
 import okhttp3.Request
 import okio.BufferedSink
@@ -523,14 +521,14 @@ class OfflineManager(
     fun getLastSuccessfulOfflineDownloadTime(): Long =
         PreferenceUtil.preferences.getLong(PreferenceUtil.KEY_LAST_SUCCESSFUL_OFFLINE_DOWNLOAD, -1)
 
-    fun postProgressUpdate(message: String, progress: Double) {
-        val copy = offlineDownloadProgressListeners.toList()
-        AndroidSchedulers.mainThread().scheduleDirect {
-            for (l in copy) {
-                l(message, progress)
-            }
-        }
-    }
+//    fun postProgressUpdate(message: String, progress: Double) {
+//        val copy = offlineDownloadProgressListeners.toList()
+//        AndroidSchedulers.mainThread().scheduleDirect {
+//            for (l in copy) {
+//                l(message, progress)
+//            }
+//        }
+//    }
 
     fun addOfflineDownloadProgressListener(listener: OfflineDownloadProgressListener): OfflineDownloadProgressListener {
         offlineDownloadProgressListeners.add(listener)
