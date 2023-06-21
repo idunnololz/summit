@@ -1,6 +1,7 @@
 package com.idunnololz.summit.main
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -30,6 +31,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
@@ -94,7 +96,7 @@ class MainActivity : BaseActivity() {
     private val insetsChangedLiveData = MutableLiveData<Int>()
 
     private val onNavigationItemReselectedListeners =
-        mutableListOf<BottomNavigationView.OnNavigationItemReselectedListener>()
+        mutableListOf<NavigationBarView.OnItemReselectedListener>()
 
     private var currentBottomMenu: BottomMenu? = null
     private var lastInsets: MainActivityInsets = MainActivityInsets()
@@ -217,13 +219,13 @@ class MainActivity : BaseActivity() {
     }
 
     fun registerOnNavigationItemReselectedListener(
-        onNavigationItemReselectedListener: BottomNavigationView.OnNavigationItemReselectedListener
+        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener
     ) {
         onNavigationItemReselectedListeners.add(onNavigationItemReselectedListener)
     }
 
     fun unregisterOnNavigationItemReselectedListener(
-        onNavigationItemReselectedListener: BottomNavigationView.OnNavigationItemReselectedListener
+        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener
     ) {
         onNavigationItemReselectedListeners.remove(onNavigationItemReselectedListener)
     }
@@ -295,6 +297,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 

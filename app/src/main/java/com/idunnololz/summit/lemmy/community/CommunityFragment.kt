@@ -49,7 +49,7 @@ import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.utils.getUpvoteText
-import com.idunnololz.summit.lemmy.toCommunity
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.main.MainActivity
@@ -95,6 +95,9 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
     @Inject
     lateinit var historyManager: HistoryManager
+
+    @Inject
+    lateinit var offlineManager: OfflineManager
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -169,6 +172,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
         if (adapter == null) {
             adapter = ListingItemAdapter(
                 context,
+                offlineManager,
                 onNextClick = {
                     viewModel.fetchNextPage(clearPagePosition = true)
                 },
@@ -613,6 +617,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
     private inner class ListingItemAdapter(
         private val context: Context,
+        private val offlineManager: OfflineManager,
         private val onNextClick: () -> Unit,
         private val onPrevClick: () -> Unit,
         private val onSignInRequired: () -> Unit,
@@ -632,8 +637,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
          * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
          */
         private var revealedItems = mutableSetOf<String>()
-
-        private val offlineManager = OfflineManager.instance
 
         private val lemmyHeaderHelper = LemmyHeaderHelper(context)
         private val lemmyContentHelper = LemmyContentHelper(
@@ -777,7 +780,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                             id = item.postView.post.id,
                             reveal = revealedItems.contains(item.postView.getUniqueKey()),
                             post = item.postView,
-                            currentCommunity = item.postView.community.toCommunity(),
+                            currentCommunity = item.postView.community.toCommunityRef(),
                             videoState = lemmyContentHelper.getState(h.fullContentContainerView).videoState?.let {
                                 it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
                             })
@@ -929,7 +932,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                             id = item.postView.post.id,
                             jumpToComments = true,
                             reveal = revealedItems.contains(item.postView.getUniqueKey()),
-                            currentCommunity = item.postView.community.toCommunity(),
+                            currentCommunity = item.postView.community.toCommunityRef(),
                             post = item.postView,
                         )
                         findNavController().navigateSafe(action)

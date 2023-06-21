@@ -12,7 +12,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,7 +34,7 @@ class UserCommunitiesManager @Inject constructor(
         private set
 
     private val idToUserCommunity = HashMap<Long, UserCommunityItem>()
-    private val allTabs = arrayListOf<UserCommunityItem>()
+    private val userCommunityItems = arrayListOf<UserCommunityItem>()
 
     private val coroutineScope = coroutineScopeFactory.create()
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -61,7 +60,9 @@ class UserCommunitiesManager @Inject constructor(
                     addCommunityOrUpdateInternal(it)
                 }
 
-                nextAvailableSortId = checkNotNull(allTabs.maxByOrNull { it.sortOrder }).sortOrder + 1
+                nextAvailableSortId = checkNotNull(
+                    userCommunityItems.maxByOrNull { it.sortOrder }
+                ).sortOrder + 1
 
                 isLoading = false
                 userCommunitiesChangedLiveData.postValue(Unit)
@@ -91,7 +92,7 @@ class UserCommunitiesManager @Inject constructor(
         removeCommunityInternal(tab)
     }
 
-    fun getAllUserCommunities(): List<UserCommunityItem> = allTabs
+    fun getAllUserCommunities(): List<UserCommunityItem> = userCommunityItems
 
     suspend fun setDefaultPage(currentCommunityRef: CommunityRef) {
         preferences.setDefaultPage(currentCommunityRef)
@@ -116,11 +117,11 @@ class UserCommunitiesManager @Inject constructor(
 
         idToUserCommunity[communityItem.id] = communityItem
 
-        val oldTabIndex = allTabs.indexOfFirst { it.id == communityItem.id }
+        val oldTabIndex = userCommunityItems.indexOfFirst { it.id == communityItem.id }
         if (oldTabIndex == -1) {
-            allTabs.add(communityItem)
+            userCommunityItems.add(communityItem)
         } else {
-            allTabs[oldTabIndex] = communityItem
+            userCommunityItems[oldTabIndex] = communityItem
         }
 
         newCommunityItem
@@ -128,7 +129,7 @@ class UserCommunitiesManager @Inject constructor(
 
     private suspend fun removeCommunityInternal(community: UserCommunityItem) = withContext(dbContext) {
         idToUserCommunity.remove(community.id)
-        allTabs.remove(community)
+        userCommunityItems.remove(community)
 
         if (currentTabId.value == community.id) {
             currentTabId.value = FIRST_FRAGMENT_TAB_ID
@@ -139,7 +140,7 @@ class UserCommunitiesManager @Inject constructor(
 
     private fun clearTabsInternal() {
         idToUserCommunity.clear()
-        allTabs.clear()
+        userCommunityItems.clear()
     }
 
     private fun makeHomeTab(): UserCommunityItem =

@@ -131,7 +131,7 @@ class AccountAwareLemmyClient @Inject constructor(
         apiClient.login(instance, username, password)
 
     suspend fun fetchSiteWithRetry(
-        auth: String?,
+        auth: String? = currentAccount?.jwt,
     ): Result<GetSiteResponse> =
         apiClient.fetchSiteWithRetry(auth)
 

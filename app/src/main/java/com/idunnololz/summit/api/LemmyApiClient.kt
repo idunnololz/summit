@@ -37,7 +37,9 @@ typealias CommentId = Int
 
 const val COMMENTS_DEPTH_MAX = 6
 
-class LemmyApiClient @Inject constructor(@ApplicationContext private val context: Context){
+class LemmyApiClient @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
 
     companion object {
         private const val TAG = "LemmyApiClient"

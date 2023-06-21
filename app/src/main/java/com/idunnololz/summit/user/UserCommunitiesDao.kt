@@ -35,6 +35,8 @@ data class UserCommunityEntry(
     val communitySortOrder: CommunitySortOrder,
     @ColumnInfo(name = "ref")
     val communityRef: CommunityRef?,
+    @ColumnInfo(name = "iconUrl")
+    val iconUrl: String?,
 )
 
 data class UserCommunityItem(
@@ -42,16 +44,17 @@ data class UserCommunityItem(
     val sortOrder: Long = 0L,
     val communitySortOrder: CommunitySortOrder = CommunitySortOrder.Active,
     val communityRef: CommunityRef,
+    val iconUrl: String? = null,
 )
 
 fun UserCommunityItem.toEntry() =
     UserCommunityEntry(
-        id, sortOrder, communitySortOrder, communityRef
+        id, sortOrder, communitySortOrder, communityRef, iconUrl
     )
 
 fun UserCommunityEntry.toItem(): UserCommunityItem? {
     return UserCommunityItem(
-        id, sortOrder, communitySortOrder, communityRef ?: return null
+        id, sortOrder, communitySortOrder, communityRef ?: return null, iconUrl
     )
 }
 

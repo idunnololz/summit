@@ -31,9 +31,12 @@ import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.view.GalleryImageView
+import dagger.hilt.android.AndroidEntryPoint
 import org.apache.commons.io.FilenameUtils
 import java.io.IOException
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
 
     companion object {
@@ -57,7 +60,8 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
 
     private var websiteAdapterLoader: WebsiteAdapterLoader? = null
 
-    private val offlineManager = OfflineManager.instance
+    @Inject
+    lateinit var offlineManager: OfflineManager
 
     private val requestPermissionLauncher =
         registerForActivityResult(
