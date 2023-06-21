@@ -1,30 +1,34 @@
 package com.idunnololz.summit.history
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.util.StatefulLiveData
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HistoryViewModel : ViewModel() {
+@HiltViewModel
+class HistoryViewModel @Inject constructor(
+    private val historyManager: HistoryManager,
+) : ViewModel() {
 
     val historyEntriesLiveData = StatefulLiveData<List<LiteHistoryEntry>>()
 
-    val disposables = CompositeDisposable()
-
     fun loadHistory() {
-        val d = HistoryManager.instance.getEntireHistory()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                historyEntriesLiveData.postValue(it)
-            }, {
-                historyEntriesLiveData.postError(it)
-            })
-        disposables.add(d)
+        viewModelScope.launch {
+            try {
+                val entireHistory = historyManager.getEntireHistory()
+
+                historyEntriesLiveData.postValue(entireHistory)
+            } catch (e: Exception) {
+                historyEntriesLiveData.postError(e)
+            }
+        }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-
-        disposables.clear()
+    fun clearHistory() {
+        viewModelScope.launch {
+            historyManager.clearHistory()
+        }
     }
 }

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.widget.TextViewCompat
-import com.bumptech.glide.Glide
+import coil.load
 import com.google.android.material.textview.MaterialTextView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
@@ -46,10 +46,7 @@ class FlairView : LinearLayout {
 
                         val iconSize =
                             context.resources.getDimensionPixelSize(R.dimen.reward_icon_size)
-                        Glide.with(this)
-                            .load(url)
-                            .override(iconSize, iconSize)
-                            .into(view)
+                        view.load(url)
                     } else {
                         val view = MaterialTextView(context)
                         TextViewCompat.setTextAppearance(

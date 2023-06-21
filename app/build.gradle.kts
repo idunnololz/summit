@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 2
-        versionName = "0.1.2"
+        versionCode = 4
+        versionName = "0.1.3"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -86,6 +86,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.coil)
+    implementation(libs.coil.gif)
 
     implementation(libs.fresco.fresco)
     implementation(libs.fresco.animated.webp)
@@ -133,13 +134,7 @@ dependencies {
     // TODO: Remove the following deps
     implementation("org.apmem.tools:layouts:1.10@aar")
     implementation("commons-io:commons-io:2.6")
-    implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("org.apache.commons:commons-lang3:3.11")
-    implementation(libs.glide)
-
-    implementation(libs.rx.rxjava)
-    implementation(libs.rx.rxandroid)
-    implementation(libs.work.rxjava2)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

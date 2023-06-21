@@ -657,7 +657,7 @@ class MainActivity : BaseActivity() {
 
     fun onBackPressed(force: Boolean) {
         if (!force && communitySelectorController?.isVisible == true) {
-            communitySelectorController?.hide()
+            communitySelectorController?.onBackPressed()
         } else {
             super.onBackPressed()
         }
@@ -764,7 +764,7 @@ class MainActivity : BaseActivity() {
             ImageViewerFragment::class -> {
                 showActionBar()
                 disableBottomNavViewScrolling()
-//                hideBottomNav()
+                hideBottomNav()
                 disableCustomAppBar()
                 hideNotificationBarBg()
             }
@@ -776,11 +776,11 @@ class MainActivity : BaseActivity() {
                 showNotificationBarBg()
             }
             HistoryFragment::class -> {
-                showActionBar()
+                hideActionBar()
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar()
                 showNotificationBarBg()
+                disableCustomAppBar()
             }
             SettingsFragment::class -> {
                 hideActionBar()
@@ -816,7 +816,6 @@ class MainActivity : BaseActivity() {
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
     fun getToolbarHeight() = binding.toolbar.layoutParams.height
-    fun getTabsButton() = binding.abTabsImageView
 
     private fun registerCurrentAccountListener() {
         viewModel.currentAccount.observe(this) {

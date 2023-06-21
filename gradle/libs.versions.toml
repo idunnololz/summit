@@ -12,6 +12,7 @@ moshi = "1.15.0"
 media3 = "1.0.2"
 fresco = "2.6.0"
 work = "2.8.1"
+coil = "2.4.0"
 
 [libraries]
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -74,8 +75,6 @@ markwon-image-coil = { module = "io.noties.markwon:image-coil", version.ref = "m
 rx-rxandroid = { module = "io.reactivex.rxjava2:rxandroid", version = "2.1.1" }
 rx-rxjava = { module = "io.reactivex.rxjava2:rxjava", version = "2.2.9" }
 
-glide = { module = "com.github.bumptech.glide:glide", version = "4.11.0"}
-
 json = { module = "org.json:json", version = "20230227" }
 threeten-abp = { module = "com.jakewharton.threetenabp:threetenabp", version = "1.4.6" }
 jsoup = { module = "org.jsoup:jsoup", version = "1.16.1" }
@@ -85,7 +84,8 @@ mp-android-chart = { module = "com.github.PhilJay:MPAndroidChart", version = "v3
 disklrucache = { module = "com.jakewharton:disklrucache", version = "2.0.2" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version = "22.0.0" }
 billing-ktx = { module = "com.android.billingclient:billing-ktx", version = "5.2.0" }
-coil = { module = "io.coil-kt:coil", version = "2.4.0" }
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coil" }
 asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflater", version = "1.0.0" }
 okio = { module = "com.squareup.okio:okio", version = "3.3.0" }
 zoom-layout = { module = "com.otaliastudios:zoomlayout", version = "1.9.0" }

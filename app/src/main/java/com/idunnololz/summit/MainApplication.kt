@@ -4,11 +4,14 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.hilt.work.HiltWorkerFactory
 import coil.Coil
 import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.offline.OfflineManager
@@ -141,8 +144,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         DataCache.initialize(context)
         OfflineManager.initialize(context)
         OfflineScheduleManager.initialize(context)
-        HistoryManager.initialize(context)
-
+        
         Fresco.initialize(this)
 
 
@@ -180,6 +182,13 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             ImageLoader.Builder(context)
                 .crossfade(IMAGE_LOAD_CROSS_FADE_DURATION_MS.toInt())
                 .okHttpClient(Client.get())
+                .components {
+                    if (SDK_INT >= 28) {
+                        add(ImageDecoderDecoder.Factory())
+                    } else {
+                        add(GifDecoder.Factory())
+                    }
+                }
                 .build(),
         )
     }

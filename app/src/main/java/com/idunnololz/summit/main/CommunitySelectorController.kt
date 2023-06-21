@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.updateLayoutParams
@@ -15,7 +16,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommonLemmyInstance
@@ -153,6 +154,7 @@ class CommunitySelectorController @AssistedInject constructor(
     }
 
     fun show(insets: MainActivityInsets) {
+
         isVisible = true
         rootView?.visibility = View.VISIBLE
         motionLayout.transitionToState(R.id.expanded)
@@ -166,6 +168,14 @@ class CommunitySelectorController @AssistedInject constructor(
             rootView?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 topMargin = it
             }
+        }
+    }
+
+    fun onBackPressed() {
+        if (searchView.text.isNullOrBlank()) {
+            hide()
+        } else {
+            searchView.setText("")
         }
     }
 
@@ -267,9 +277,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
                 b.icon.setImageResource(R.drawable.ic_subreddit_default)
                 offlineManager.fetchImage(h.itemView, community.community.icon) {
-                    Glide.with(context)
-                        .load(it)
-                        .into(b.icon)
+                    b.icon.load(it)
                 }
 
                 b.textView.text = item.text

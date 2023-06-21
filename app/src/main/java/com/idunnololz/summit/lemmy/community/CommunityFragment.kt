@@ -93,6 +93,9 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
     private var shouldScrollToTopAfterFresh = false
 
+    @Inject
+    lateinit var historyManager: HistoryManager
+
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
             addItem(R.id.sort_order_active, R.string.sort_order_active)
@@ -392,7 +395,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
         val context = requireContext()
         val viewState = viewModel.createState()
         if (viewState != null) {
-            HistoryManager.instance.recordSubredditState(
+            historyManager.recordSubredditState(
                 tabId = MainFragment.getIdFromTag(parentFragment?.tag ?: ""),
                 saveReason = HistorySaveReason.LEAVE_SCREEN,
                 state = viewState,

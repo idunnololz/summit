@@ -61,9 +61,9 @@ class RecentCommunityManager @Inject constructor() {
                 if (toRemove == 0) break
             }
         }
+        val resultsList = ArrayList(recents.values)
 
         coroutineScope.launch(Dispatchers.Default) {
-            val resultsList = ArrayList(recents.values)
             // serialize
             PreferenceUtil.preferences.edit()
                 .putString(PREF_KEY_RECENT_COMMUNITIES, adapter.toJson(

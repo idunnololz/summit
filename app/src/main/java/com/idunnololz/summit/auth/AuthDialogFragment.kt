@@ -9,9 +9,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentAuthBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.PreferenceUtil
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
 class AuthDialogFragment : BaseDialogFragment<DialogFragmentAuthBinding>() {
 

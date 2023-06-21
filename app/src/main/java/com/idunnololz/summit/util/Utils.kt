@@ -889,3 +889,12 @@ object Utils {
         )
     }
 }
+
+
+/**
+ * Throws an [java.lang.IllegalArgumentException] if called on a thread other than the main
+ * thread.
+ */
+fun assertMainThread() {
+    require(Looper.myLooper() == Looper.getMainLooper()) { "You must call this method on the main thread" }
+}

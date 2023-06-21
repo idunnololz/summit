@@ -56,7 +56,7 @@
         android:id="@+id/collapseSectionButton"
         android:layout_width="wrap_content"
         android:layout_height="36dp"
-        android:src="@drawable/baseline_expand_less_black_18"
+        android:src="@drawable/baseline_expand_less_18"
         android:background="?selectableItemBackgroundBorderless"
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding"

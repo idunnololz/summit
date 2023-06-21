@@ -82,7 +82,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     private val onNavigationItemReselectedListener =
         BottomNavigationView.OnNavigationItemReselectedListener a@{
-            if (it.itemId == R.id.main) {
+            if (it.itemId == R.id.mainFragment) {
                 val tabId = userCommunitiesManager.currentTabId.value ?: return@a
 
                 val tabItem = checkNotNull(userCommunitiesManager.getTab(tabId))
