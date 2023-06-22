@@ -14,13 +14,8 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.retry
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
@@ -75,23 +70,26 @@ class AccountAwareLemmyClient @Inject constructor(
         )
     }
 
-    suspend fun fetchPost(
+    suspend fun fetchPostWithRetry(
         id: Either<PostId, CommentId>,
         force: Boolean,
-    ): Result<PostView> =
+    ): Result<PostView> = retry {
         apiClient.fetchPost(accountForInstance(), id, force)
+    }
 
-    suspend fun fetchComments(
+    suspend fun fetchCommentsWithRetry(
         id: Either<PostId, CommentId>,
         sort: CommentSortType,
         force: Boolean,
-    ): Result<List<CommentView>> =
+    ): Result<List<CommentView>> = retry {
         apiClient.fetchComments(accountForInstance(), id, sort, force)
+    }
 
-    suspend fun getCommunity(
+    suspend fun fetchCommunityWithRetry(
         idOrName: Either<Int, String>,
-    ): Result<CommunityView> =
+    ): Result<CommunityView> = retry {
         apiClient.getCommunity(accountForInstance(), idOrName)
+    }
 
     suspend fun search(
         communityId: Int? = null,
@@ -121,6 +119,19 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int = 50,
     ): Result<List<CommunityView>> = retry {
         apiClient.fetchCommunities(accountForInstance(), sortType, listingType, page, limit)
+    }
+
+    suspend fun followCommunityWithRetry(
+        communityId: Int,
+        subscribe: Boolean
+    ): Result<CommunityView> {
+        val account = accountForInstance()
+
+        return if (account != null) {
+            apiClient.followCommunityWithRetry(communityId, subscribe, account)
+        } else {
+            Result.failure(NotAuthenticatedException())
+        }
     }
 
     suspend fun login(

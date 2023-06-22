@@ -15,6 +15,7 @@
     <color name="colorTextInverted">@color/white</color>
     <color name="colorTextFaint">@color/black50</color>
     <color name="colorSecondaryContainer">@color/white</color>
+    <color name="colorSelected">@color/black10</color>
 
     <color name="colorBackground">#f6f6f6</color>
     <color name="colorWindowBackground">@color/colorSurface</color>

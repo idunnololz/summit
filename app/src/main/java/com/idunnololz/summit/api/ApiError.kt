@@ -1,6 +1,6 @@
 package com.idunnololz.summit.api
 
-import java.lang.RuntimeException
+import kotlin.RuntimeException
 
 class ServerApiException(val errorCode: Int) : ApiException(
     "Server error. Code: ${errorCode}"
@@ -23,5 +23,12 @@ class AccountInstanceMismatchException(
  */
 class ServerTimeoutException(errorCode: Int):
     ClientApiException("Timed out waiting for server to respond", errorCode)
-
 sealed class ApiException(msg: String) : RuntimeException(msg)
+
+
+/**
+ * 50/50 could be the server or the user network
+ */
+class SocketTimeoutException():
+    NetworkException("Timed out waiting for server to respond")
+sealed class NetworkException(msg: String) : RuntimeException(msg)

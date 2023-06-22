@@ -82,7 +82,7 @@ class PostsRepository @Inject constructor(
                     is CommunityRef.CommunityRefByObj ->
                         fetchPage(
                             pageIndex = currentPageInternal,
-                            communityIdOrName = Either.Left(communityRef.community.id),
+                            communityIdOrName = Either.Right(communityRef.getServerId()),
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.All,
                         )
@@ -96,7 +96,7 @@ class PostsRepository @Inject constructor(
                     is CommunityRef.CommunityRefByName ->
                         fetchPage(
                             pageIndex = currentPageInternal,
-                            communityIdOrName = Either.Right(communityRef.name),
+                            communityIdOrName = Either.Right(communityRef.getServerId()),
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.All,
                         )
@@ -135,14 +135,14 @@ class PostsRepository @Inject constructor(
         this.communityRef = communityRef ?: CommunityRef.All()
 
         if (communityRef is CommunityRef.Local) {
-            if (communityRef.site != null) {
-                apiClient.changeInstance(communityRef.site)
+            if (communityRef.instance != null) {
+                apiClient.changeInstance(communityRef.instance)
             } else {
                 apiClient.defaultInstance()
             }
         } else if (communityRef is CommunityRef.All) {
-            if (communityRef.site != null) {
-                apiClient.changeInstance(communityRef.site)
+            if (communityRef.instance != null) {
+                apiClient.changeInstance(communityRef.instance)
             } else {
                 apiClient.defaultInstance()
             }

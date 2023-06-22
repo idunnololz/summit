@@ -144,6 +144,13 @@
     <string name="bookmarked_communities">Bookmarked communities</string>
     <string name="subscriptions">Subscriptions</string>
     <string name="no_subscriptions">No subscriptions</string>
+    <string name="error_socket_timeout">Timeout trying to reach the server. The server is either overloaded or there is an issue with your internet connection.</string>
+    <string name="no_posts">No posts found.</string>
+    <string name="remove_bookmark">Remove bookmark</string>
+    <string name="bookmark_community">Bookmark community</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="unsubscribe">Unsubscribe</string>
+    <string name="remove">Remove</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

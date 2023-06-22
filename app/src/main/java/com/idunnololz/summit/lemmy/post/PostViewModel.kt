@@ -10,7 +10,6 @@ import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.reddit.CommentsSortOrder
@@ -72,7 +71,7 @@ class PostViewModel @Inject constructor(
             lemmyApiClient.changeInstance(instance)
 
             val post = if (fetchPostData) {
-                lemmyApiClient.fetchPost(Either.Left(postId), force)
+                lemmyApiClient.fetchPostWithRetry(Either.Left(postId), force)
                     .fold(
                         onSuccess = { it },
                         onFailure = {
@@ -86,7 +85,7 @@ class PostViewModel @Inject constructor(
             this@PostViewModel.postView = post
 
             val comments = if (fetchCommentData) {
-                lemmyApiClient.fetchComments(Either.Left(postId), sortOrder, force)
+                lemmyApiClient.fetchCommentsWithRetry(Either.Left(postId), sortOrder, force)
                     .fold(
                         onSuccess = { it },
                         onFailure = {

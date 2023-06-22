@@ -13,8 +13,10 @@ import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
+import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.scrape.LoaderException
 import com.idunnololz.summit.util.AnimationUtils
 
@@ -193,6 +195,12 @@ class LoadingView : ConstraintLayout {
                     is ServerApiException ->
                         showErrorWithRetry(
                             context.getString(R.string.error_server, t.errorCode.toString()))
+                }
+            is NetworkException ->
+                when (t) {
+                    is SocketTimeoutException ->
+                        showErrorWithRetry(
+                            context.getString(R.string.error_socket_timeout))
                 }
             else -> {
                 Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
