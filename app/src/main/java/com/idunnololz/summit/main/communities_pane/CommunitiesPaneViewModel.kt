@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountInfoManager
 import com.idunnololz.summit.api.dto.CommunitySafe
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,15 +35,38 @@ class CommunitiesPaneViewModel @Inject constructor(
                 updateCommunities()
             }
         }
+
+        viewModelScope.launch {
+            userCommunitiesManager.userCommunitiesChangedFlow.collect {
+                userCommunities = userCommunitiesManager.getAllUserCommunities()
+
+                updateCommunities()
+            }
+        }
     }
 
-    fun createController(binding: CommunitiesPaneBinding, viewLifecycleOwner: LifecycleOwner) =
-        communitiesPaneControllerFactory.create(this, binding, viewLifecycleOwner)
+    fun createController(
+        binding: CommunitiesPaneBinding,
+        viewLifecycleOwner: LifecycleOwner,
+        onCommunitySelected: OnCommunitySelected,
+    ) =
+        communitiesPaneControllerFactory.create(
+            this,
+            binding,
+            viewLifecycleOwner,
+            onCommunitySelected,
+        )
 
     fun loadCommunities() {
         userCommunities = userCommunitiesManager.getAllUserCommunities()
         accountInfoManager.fetchAccountInfo()
         updateCommunities()
+    }
+
+    fun deleteUserCommunity(id: Long) {
+        viewModelScope.launch {
+            userCommunitiesManager.deleteUserCommunity(id)
+        }
     }
 
     private fun updateCommunities() {

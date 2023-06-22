@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.updateLayoutParams
@@ -30,6 +29,7 @@ import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
@@ -97,7 +97,7 @@ class CommunitySelectorController @AssistedInject constructor(
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
                 onCommunitySelectedListener?.invoke(
                     this@CommunitySelectorController,
-                    CommunityRef.CommunityRefByName(searchView.text.toString())
+                    CommunityRef.CommunityRefByName(searchView.text.toString(), null)
                 )
                 searchView.setText("")
                 return@OnKeyListener true
@@ -284,7 +284,7 @@ class CommunitySelectorController @AssistedInject constructor(
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
                         this@CommunitySelectorController,
-                        CommunityRef.CommunityRefByObj(community.community)
+                        community.community.toCommunityRef()
                     )
                 }
 
@@ -363,19 +363,19 @@ class CommunitySelectorController @AssistedInject constructor(
                         CommunityRef.All(),
                     ),
                     Item.StaticChildItem(
-                        CommonLemmyInstance.LemmyMl.site,
+                        CommonLemmyInstance.LemmyMl.instance,
                         R.drawable.ic_subreddit_home,
-                        CommunityRef.Local(CommonLemmyInstance.LemmyMl.site),
+                        CommunityRef.Local(CommonLemmyInstance.LemmyMl.instance),
                     ),
                     Item.StaticChildItem(
-                        CommonLemmyInstance.LemmyWorld.site,
+                        CommonLemmyInstance.LemmyWorld.instance,
                         R.drawable.ic_subreddit_home,
-                        CommunityRef.Local(CommonLemmyInstance.LemmyWorld.site),
+                        CommunityRef.Local(CommonLemmyInstance.LemmyWorld.instance),
                     ),
                     Item.StaticChildItem(
-                        CommonLemmyInstance.Beehaw.site,
+                        CommonLemmyInstance.Beehaw.instance,
                         R.drawable.ic_subreddit_home,
-                        CommunityRef.Local(CommonLemmyInstance.Beehaw.site),
+                        CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
                     ),
                 )
                     .plus(makeRecentItems(query))

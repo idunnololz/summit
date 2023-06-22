@@ -25,6 +25,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -71,23 +72,20 @@ class CommunityViewModel @Inject constructor(
 
     val voteUiHandler = accountActionsManager.voteUiHandler
 
-    val accountChanged = MutableLiveData<Unit>()
-
     init {
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
         accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
             override suspend fun onAccountChanged(newAccount: Account?) {
                 postsRepository.reset()
-
-                accountChanged.postValue(Unit)
             }
         })
 
         viewModelScope.launch {
-            accountManager.currentAccount.collect {
-                fetchCurrentPage()
-            }
+            accountManager.currentAccountOnChange
+                .collect {
+                    reset()
+                }
         }
     }
 
@@ -237,7 +235,14 @@ class CommunityViewModel @Inject constructor(
     }
 
     private fun reset() {
+        loadedPostsData.postValue(LoadedPostsData(
+            posts = listOf(),
+            instance = postsRepository.instance,
+            pageIndex = 0,
+            hasMore = false
+        ))
         currentPageIndex.value = 0
+        setPagePositionAtTop(0)
         fetchCurrentPage()
     }
 

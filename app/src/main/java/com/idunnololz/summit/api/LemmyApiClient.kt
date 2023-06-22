@@ -9,6 +9,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.CreateCommentLike
 import com.idunnololz.summit.api.dto.CreatePostLike
+import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetComments
 import com.idunnololz.summit.api.dto.GetCommunity
 import com.idunnololz.summit.api.dto.GetPost
@@ -30,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import retrofit2.Call
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 typealias PostId = Int
@@ -45,16 +47,16 @@ class LemmyApiClient @Inject constructor(
         private const val TAG = "LemmyApiClient"
 
         const val API_VERSION = "v3"
-        val DEFAULT_INSTANCE = CommonLemmyInstance.LemmyMl.site
+        val DEFAULT_INSTANCE = CommonLemmyInstance.LemmyMl.instance
 
         val DEFAULT_LEMMY_INSTANCES = listOf(
-            CommonLemmyInstance.Beehaw.site,
+            CommonLemmyInstance.Beehaw.instance,
             "feddit.de",
             "feddit.it",
             "lemmy.ca",
-            CommonLemmyInstance.LemmyMl.site,
+            CommonLemmyInstance.LemmyMl.instance,
             "lemmy.one",
-            CommonLemmyInstance.LemmyWorld.site,
+            CommonLemmyInstance.LemmyWorld.instance,
             "lemmygrad.ml",
             "midwest.social",
             "mujico.org",
@@ -357,6 +359,29 @@ class LemmyApiClient @Inject constructor(
             )
     }
 
+    suspend fun followCommunityWithRetry(
+        communityId: Int,
+        follow: Boolean,
+        account: Account,
+    ): Result<CommunityView> = retry {
+
+        val form = FollowCommunity(
+            community_id = communityId,
+            follow = follow,
+            auth = account.jwt,
+        )
+
+        retrofitErrorHandler { api.followCommunity(form) }
+            .fold(
+                onSuccess = {
+                    Result.success(it.community_view)
+                },
+                onFailure = {
+                    Result.failure(it)
+                }
+            )
+    }
+
     val instance: String
         get() = api.instance
 
@@ -368,6 +393,9 @@ class LemmyApiClient @Inject constructor(
                 call().execute()
             }
         } catch (e: Exception) {
+            if (e is SocketTimeoutException) {
+                return Result.failure(com.idunnololz.summit.api.SocketTimeoutException())
+            }
             return Result.failure(e)
         }
         if (res.isSuccessful) {

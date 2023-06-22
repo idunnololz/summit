@@ -34,10 +34,10 @@ data class CommunityViewState(
 
 fun CommunityViewState.toUrl(): String {
     val baseUrl = when (val community = this.communityState.communityRef) {
-        is CommunityRef.All -> "https://lemmy.world/home/data_type/Post/listing_type/All/data_type/Post"
+        is CommunityRef.All -> "https://lemmy.world/home/data_type/Post/listing_type/All"
         is CommunityRef.CommunityRefByObj -> "${community.community.communityUrl}/data_type/Post"
-        is CommunityRef.Local -> "${community.site}/home/data_type/Post/listing_type/Local"
-        is CommunityRef.CommunityRefByName -> "https://${DEFAULT_INSTANCE}/c/${community.name}"
+        is CommunityRef.Local -> "${community.instance}/home/data_type/Post/listing_type/Local"
+        is CommunityRef.CommunityRefByName -> "https://${DEFAULT_INSTANCE}/c/${community.getServerId()}/data_type/Post"
     }
     return "${baseUrl}/sort/Active/page/${this.communityState.currentPageIndex}"
 }

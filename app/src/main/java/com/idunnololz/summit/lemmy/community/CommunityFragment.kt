@@ -57,6 +57,7 @@ import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomDividerItemDecoration
@@ -82,7 +83,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
-        private const val TAG = "SubredditFragment"
+        private const val TAG = "CommunityFragment"
     }
 
     private val args: CommunityFragmentArgs by navArgs()
@@ -98,6 +99,9 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var userCommunitiesManager: UserCommunitiesManager
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -266,6 +270,10 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
         val context = requireContext()
 
+        (parentFragment?.parentFragment as? MainFragment)?.updateCommunityInfoPane(
+            requireNotNull(viewModel.currentCommunityRef.value)
+        )
+
         binding.swipeRefreshLayout.setOnRefreshListener {
             shouldScrollToTopAfterFresh = true
             viewModel.fetchCurrentPage(true)
@@ -302,11 +310,12 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                 val adapter = adapter ?: return
                 val pageIndex = adapter.pageIndex ?: return
                 val layoutManager = (recyclerView.layoutManager as LinearLayoutManager)
+                val firstPos = layoutManager.findLastVisibleItemPosition()
                 val lastPos = layoutManager.findLastVisibleItemPosition()
-                if (lastPos == adapter.itemCount - 1) {
+                if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
+                    // firstPos != 0 - ensures that the page is scrollable even
                     viewModel.setPagePositionAtBottom(pageIndex)
                 } else {
-                    val firstPos = layoutManager.findFirstVisibleItemPosition()
                     val firstView = layoutManager.findViewByPosition(firstPos)
                     viewModel.setPagePosition(pageIndex, firstPos, firstView?.top ?: 0)
                 }
@@ -357,13 +366,12 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.recyclerView.visibility = View.VISIBLE
                     binding.loadingView.hideAll()
+                    
+                    if (it.data.posts.isEmpty()) {
+                        binding.loadingView.showErrorText(R.string.no_posts)
+                    }
                 }
             }
-        }
-
-        viewModel.accountChanged.observe(viewLifecycleOwner) {
-            shouldScrollToTopAfterFresh = true
-            adapter?.reset()
         }
 
         if (adapter?.getItems().isNullOrEmpty()) {
@@ -400,7 +408,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
         val viewState = viewModel.createState()
         if (viewState != null) {
             historyManager.recordSubredditState(
-                tabId = MainFragment.getIdFromTag(parentFragment?.tag ?: ""),
+                tabId = 0,
                 saveReason = HistorySaveReason.LEAVE_SCREEN,
                 state = viewState,
                 shortDesc = viewState.getShortDesc(context)
@@ -458,9 +466,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
     private fun setupMainActivityButtons() {
         (activity as? MainActivity)?.apply {
-
-            val context = this
-
             getCustomAppBarController().setup(
                 communitySelectedListener = { controller, communityRef ->
                     val action = CommunityFragmentDirections.actionSubredditFragmentSwitchSubreddit(
@@ -471,105 +476,139 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     controller.hide()
                 },
                 abOverflowClickListener = {
-                    PopupMenu(context, it).apply {
-                        inflate(R.menu.menu_fragment_main)
-                        forceShowIcons()
-
-                        val selectedItem = when (PreferenceUtil.getSubredditLayout()) {
-                            CommunityLayout.LIST -> {
-                                menu.findItem(R.id.layoutList)
-                            }
-
-                            CommunityLayout.CARD -> {
-                                menu.findItem(R.id.layoutCard)
-                            }
-
-                            CommunityLayout.FULL -> {
-                                menu.findItem(R.id.layoutFull)
-                            }
-                        }
-
-                        menu.findItem(R.id.layoutCard).isVisible = false
-
-                        selectedItem.title = SpannableString(selectedItem.title).apply {
-                            setSpan(
-                                ForegroundColorSpan(context.getColorCompat(R.color.colorPrimary)),
-                                0,
-                                length,
-                                0
-                            )
-                            setSpan(StyleSpan(Typeface.BOLD), 0, length, 0)
-                        }
-
-                        val currentCommunityRef = viewModel.currentCommunityRef.value
-                        val currentDefaultPage = preferences.getDefaultPage()
-
-                        menu.findItem(R.id.set_as_default).isVisible =
-                            currentCommunityRef != null && currentCommunityRef != currentDefaultPage
-
-                        setOnMenuItemClickListener {
-                            when (it.itemId) {
-                                R.id.share -> {
-                                    val sendIntent: Intent = Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        putExtra(
-                                            Intent.EXTRA_TEXT,
-                                            viewModel.getSharedLinkForCurrentPage()
-                                        )
-                                        type = "text/plain"
-                                    }
-
-                                    val shareIntent = Intent.createChooser(sendIntent, null)
-                                    startActivity(shareIntent)
-                                    true
-                                }
-
-                                R.id.sort -> {
-                                    showBottomMenu(getSortByMenu())
-                                    true
-                                }
-
-                                R.id.layoutList -> {
-                                    PreferenceUtil.setSubredditLayout(CommunityLayout.LIST)
-                                    onSelectedLayoutChanged()
-                                    true
-                                }
-
-                                R.id.layoutCard -> {
-                                    PreferenceUtil.setSubredditLayout(CommunityLayout.CARD)
-                                    onSelectedLayoutChanged()
-                                    true
-                                }
-
-                                R.id.layoutFull -> {
-                                    PreferenceUtil.setSubredditLayout(CommunityLayout.FULL)
-                                    onSelectedLayoutChanged()
-                                    true
-                                }
-
-                                R.id.set_as_default -> {
-                                    if (currentCommunityRef != null) {
-                                        viewModel.setDefaultPage(currentCommunityRef)
-
-                                        Snackbar.make(
-                                            requireMainActivity().getSnackbarContainer(),
-                                            R.string.home_page_set,
-                                            Snackbar.LENGTH_LONG
-                                        ).show()
-                                    }
-                                    true
-                                }
-
-                                else -> false
-                            }
-                        }
-                    }.show()
+                    showOverflowMenu(it)
                 },
                 onAccountClick = {
                     AccountsAndSettingsDialogFragment.newInstance()
                         .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
                 })
         }
+    }
+
+    private fun showOverflowMenu(view: View) {
+        val context = context ?: return
+
+        PopupMenu(context, view).apply {
+            inflate(R.menu.menu_fragment_main)
+            forceShowIcons()
+
+            val selectedItem = when (PreferenceUtil.getSubredditLayout()) {
+                CommunityLayout.LIST -> {
+                    menu.findItem(R.id.layoutList)
+                }
+
+                CommunityLayout.CARD -> {
+                    menu.findItem(R.id.layoutCard)
+                }
+
+                CommunityLayout.FULL -> {
+                    menu.findItem(R.id.layoutFull)
+                }
+            }
+
+            menu.findItem(R.id.layoutCard).isVisible = false
+
+            selectedItem.title = SpannableString(selectedItem.title).apply {
+                setSpan(
+                    ForegroundColorSpan(context.getColorCompat(R.color.colorPrimary)),
+                    0,
+                    length,
+                    0
+                )
+                setSpan(StyleSpan(Typeface.BOLD), 0, length, 0)
+            }
+
+            val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value)
+            val currentDefaultPage = preferences.getDefaultPage()
+            val isBookmarked = userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
+            val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
+
+            if (isCurrentPageDefault) {
+                menu.findItem(R.id.set_as_default).isVisible = false
+                menu.findItem(R.id.toggle_bookmark).isVisible = false
+            } else {
+                menu.findItem(R.id.set_as_default).isVisible = true
+                menu.findItem(R.id.toggle_bookmark).isVisible = true
+
+                menu.findItem(R.id.toggle_bookmark).apply {
+                    if (isBookmarked) {
+                        this.setTitle(R.string.remove_bookmark)
+                        this.setIcon(R.drawable.baseline_bookmark_remove_24)
+                    } else {
+                        this.setTitle(R.string.bookmark_community)
+                        this.setIcon(R.drawable.baseline_bookmark_add_24)
+                    }
+                }
+            }
+
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.share -> {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                viewModel.getSharedLinkForCurrentPage()
+                            )
+                            type = "text/plain"
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        startActivity(shareIntent)
+                        true
+                    }
+
+                    R.id.sort -> {
+                        getMainActivity()?.showBottomMenu(getSortByMenu())
+                        true
+                    }
+
+                    R.id.layoutList -> {
+                        PreferenceUtil.setSubredditLayout(CommunityLayout.LIST)
+                        onSelectedLayoutChanged()
+                        true
+                    }
+
+                    R.id.layoutCard -> {
+                        PreferenceUtil.setSubredditLayout(CommunityLayout.CARD)
+                        onSelectedLayoutChanged()
+                        true
+                    }
+
+                    R.id.layoutFull -> {
+                        PreferenceUtil.setSubredditLayout(CommunityLayout.FULL)
+                        onSelectedLayoutChanged()
+                        true
+                    }
+
+                    R.id.set_as_default -> {
+                        viewModel.setDefaultPage(currentCommunityRef)
+
+                        Snackbar.make(
+                            requireMainActivity().getSnackbarContainer(),
+                            R.string.home_page_set,
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                        true
+                    }
+
+                    R.id.toggle_bookmark -> {
+                        if (isBookmarked) {
+                            userCommunitiesManager.removeCommunity(currentCommunityRef)
+                        } else {
+                            userCommunitiesManager.addUserCommunity(
+                                currentCommunityRef,
+                                viewModel.loadedPostsData.valueOrNull
+                                    ?.posts?.firstOrNull()?.community?.icon)
+                        }
+
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }.show()
     }
 
     override fun navigateToSignInScreen() {

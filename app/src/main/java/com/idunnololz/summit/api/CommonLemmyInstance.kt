@@ -1,7 +1,7 @@
 package com.idunnololz.summit.api
 
 enum class CommonLemmyInstance(
-    val site: String
+    val instance: String
 ) {
     LemmyMl("lemmy.ml"),
     LemmyWorld("lemmy.world"),

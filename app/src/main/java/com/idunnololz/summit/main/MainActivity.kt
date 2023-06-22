@@ -77,7 +77,8 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
 
     val headerOffset = MutableLiveData<Int>()
-    val bottomNavViewOffset = MutableLiveData<Int>()
+    val bottomNavViewOffset = MutableLiveData<Int>(0)
+    val bottomNavViewAnimationOffset = MutableLiveData<Float>(0f)
     val windowInsets = MutableLiveData<Rect>(Rect())
 
     private var animatingBottomNavView = false
@@ -121,10 +122,20 @@ class MainActivity : BaseActivity() {
         registerCurrentAccountListener()
         registerDefaultCommunityListener()
 
+        hideActionBar()
+
         lemmyAppBarController = LemmyAppBarController(this, binding.customAppBar)
 
+        fun updateBottomTranslationY() {
+            binding.bottomNavigationView.translationY =
+                bottomNavViewOffset.value!!.toFloat() + bottomNavViewAnimationOffset.value!!.toFloat()
+        }
+
         bottomNavViewOffset.observe(this) {
-            binding.bottomNavigationView.translationY = it.toFloat()
+            updateBottomTranslationY()
+        }
+        bottomNavViewAnimationOffset.observe(this) {
+            updateBottomTranslationY()
         }
 
         handleIntent(intent)
@@ -349,8 +360,8 @@ class MainActivity : BaseActivity() {
 
     fun setNavUiOpenness(progress: Float) {
         binding.customAppBar.translationY = -binding.customAppBar.height * progress
-        binding.bottomNavigationView.translationY =
-            binding.bottomNavigationView.height * progress
+        bottomNavViewAnimationOffset.value = binding.bottomNavigationView.height * progress
+
     }
 
     fun disableCustomAppBar() {

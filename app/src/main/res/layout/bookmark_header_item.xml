@@ -8,25 +8,14 @@
     <TextView
         android:id="@+id/bookmarks_title"
         android:text="@string/bookmarked_communities"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceTitleMedium"
         android:layout_marginStart="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/dialog_padding"
-        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <Button
-        style="?attr/materialIconButtonStyle"
-        android:id="@+id/add_community"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:padding="12dp"
-        android:layout_marginEnd="@dimen/padding_half"
-        app:icon="@drawable/baseline_add_24"
-        app:iconTint="?colorControlNormal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/bookmarks_title"
-        app:layout_constraintBottom_toBottomOf="@+id/bookmarks_title" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

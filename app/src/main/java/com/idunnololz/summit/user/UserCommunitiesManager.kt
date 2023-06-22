@@ -1,14 +1,17 @@
 package com.idunnololz.summit.user
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.toInstanceAgnosticCommunityRef
 import com.idunnololz.summit.preferences.Preferences
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,8 +27,11 @@ class UserCommunitiesManager @Inject constructor(
     private val moshi: Moshi,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val userCommunitiesDao: UserCommunitiesDao,
+    private val lemmyApiClient: LemmyApiClient,
 ) {
     companion object {
+        private const val TAG = "UserCommunitiesManager"
+
         const val FIRST_FRAGMENT_TAB_ID: Long = 1L
         const val FIRST_FRAGMENT_SORT_ID: Long = 1L
     }
@@ -42,8 +48,7 @@ class UserCommunitiesManager @Inject constructor(
 
     private var nextAvailableSortId: Long = 1
 
-    val userCommunitiesChangedLiveData = MutableLiveData(Unit)
-    val currentTabId = MutableLiveData(FIRST_FRAGMENT_TAB_ID)
+    val userCommunitiesChangedFlow = MutableSharedFlow<Unit>()
     val defaultCommunity = MutableStateFlow(preferences.getDefaultPage())
 
     init {
@@ -54,7 +59,7 @@ class UserCommunitiesManager @Inject constructor(
             withContext(dbContext) {
                 addCommunityOrUpdateInternal(makeHomeTab())
 
-                clearTabsInternal()
+                resetTabsDataInternal()
 
                 userCommunities.forEach {
                     addCommunityOrUpdateInternal(it)
@@ -65,7 +70,6 @@ class UserCommunitiesManager @Inject constructor(
                 ).sortOrder + 1
 
                 isLoading = false
-                userCommunitiesChangedLiveData.postValue(Unit)
             }
         }
     }
@@ -76,10 +80,29 @@ class UserCommunitiesManager @Inject constructor(
         idToUserCommunity[id]
     }
 
-    suspend fun addUserCommunity(communityRef: CommunityRef) = withContext(dbContext) {
-        val item = UserCommunityItem(communityRef = communityRef)
+    fun addUserCommunity(communityRef: CommunityRef, icon: String?) {
+        var icon = icon
+        var communityRef = communityRef
+        if (communityRef is CommunityRef.CommunityRefByObj) {
+            icon = communityRef.community.icon
+        }
+        communityRef = communityRef.toInstanceAgnosticCommunityRef()
+        val item = UserCommunityItem(communityRef = communityRef, iconUrl = icon)
 
-        addCommunityOrUpdateInternal(item)
+        coroutineScope.launch {
+            withContext(dbContext) {
+                addCommunityOrUpdateInternal(item)
+            }
+            userCommunitiesChangedFlow.emit(Unit)
+        }
+    }
+
+    fun removeCommunity(communityRef: CommunityRef) {
+        val item = userCommunityItems.firstOrNull { it.communityRef == communityRef } ?: return
+
+        coroutineScope.launch {
+            removeCommunityInternal(item)
+        }
     }
 
     suspend fun addUserCommunityItem(communityItem: UserCommunityItem) = withContext(dbContext) {
@@ -95,9 +118,13 @@ class UserCommunitiesManager @Inject constructor(
     fun getAllUserCommunities(): List<UserCommunityItem> = userCommunityItems
 
     suspend fun setDefaultPage(currentCommunityRef: CommunityRef) {
-        preferences.setDefaultPage(currentCommunityRef)
-        onDefaultPageChanged(currentCommunityRef)
+        val ref = currentCommunityRef.toInstanceAgnosticCommunityRef()
+        preferences.setDefaultPage(ref)
+        onDefaultPageChanged(ref)
     }
+
+    fun isCommunityBookmarked(communityRef: CommunityRef): Boolean =
+        userCommunityItems.any { it.communityRef == communityRef }
 
     private suspend fun addCommunityOrUpdateInternal(
         communityItem: UserCommunityItem
@@ -109,36 +136,42 @@ class UserCommunitiesManager @Inject constructor(
             nextAvailableSortId++
         }
 
-        val newId = userCommunitiesDao.insertCommunity(communityItem.toEntry())
+        val newId = userCommunitiesDao.insertCommunity(newCommunityItem.toEntry())
+
+        Log.d(TAG, "newId: $newId")
 
         if (newCommunityItem.id == 0L) {
             newCommunityItem = newCommunityItem.copy(id = newId)
         }
 
-        idToUserCommunity[communityItem.id] = communityItem
+        idToUserCommunity[newCommunityItem.id] = newCommunityItem
 
-        val oldTabIndex = userCommunityItems.indexOfFirst { it.id == communityItem.id }
+        val oldTabIndex = userCommunityItems.indexOfFirst { it.id == newCommunityItem.id }
         if (oldTabIndex == -1) {
-            userCommunityItems.add(communityItem)
+            userCommunityItems.add(newCommunityItem)
         } else {
-            userCommunityItems[oldTabIndex] = communityItem
+            userCommunityItems[oldTabIndex] = newCommunityItem
         }
 
         newCommunityItem
     }
 
-    private suspend fun removeCommunityInternal(community: UserCommunityItem) = withContext(dbContext) {
+    private suspend fun removeCommunityInternal(
+        community: UserCommunityItem
+    ) = withContext(dbContext) {
+        if (community.id == FIRST_FRAGMENT_TAB_ID) {
+            return@withContext
+        }
+
         idToUserCommunity.remove(community.id)
         userCommunityItems.remove(community)
 
-        if (currentTabId.value == community.id) {
-            currentTabId.value = FIRST_FRAGMENT_TAB_ID
-        }
-
         userCommunitiesDao.delete(community.id)
+
+        userCommunitiesChangedFlow.emit(Unit)
     }
 
-    private fun clearTabsInternal() {
+    private fun resetTabsDataInternal() {
         idToUserCommunity.clear()
         userCommunityItems.clear()
     }
@@ -154,5 +187,9 @@ class UserCommunitiesManager @Inject constructor(
         addCommunityOrUpdateInternal(makeHomeTab())
 
         defaultCommunity.emit(newValue)
+        userCommunitiesChangedFlow.emit(Unit)
     }
+
+    fun getHomeItem(): UserCommunityItem =
+        makeHomeTab()
 }

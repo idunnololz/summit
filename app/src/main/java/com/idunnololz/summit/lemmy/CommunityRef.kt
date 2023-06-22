@@ -1,9 +1,11 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
+import android.net.Uri
 import android.os.Parcelable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunitySafe
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import kotlinx.parcelize.Parcelize
@@ -23,26 +25,45 @@ sealed interface CommunityRef : Parcelable {
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class CommunityRefByObj(
-        val community: CommunitySafe
-    ) : CommunityRef
+        val community: CommunitySafe,
+        val instance: String?,
+    ) : CommunityRef {
+
+        fun getServerId(): String {
+            if (instance == null) {
+                return "${community.name}@"
+            }
+            return "${community.name}@${instance}"
+        }
+    }
 
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class Local(
-        val site: String?
+        val instance: String?
     ) : CommunityRef
 
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class All(
-        val site: String? = null
+        @Json(name = "site")
+        val instance: String? = null
     ) : CommunityRef
 
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class CommunityRefByName(
-        val name: String
-    ) : CommunityRef
+        val name: String,
+        val instance: String?,
+    ) : CommunityRef {
+
+        fun getServerId(): String {
+            if (instance == null) {
+                return "${name}@"
+            }
+            return "${name}@${instance}"
+        }
+    }
 
     fun getName(context: Context): String =
         when (this) {
@@ -55,12 +76,24 @@ sealed interface CommunityRef : Parcelable {
     fun getKey(): String =
         when (this) {
             is CommunityRefByObj -> this.community.actor_id
-            is Local -> this.site ?: "local@auto"
-            is All -> "all@${this.site}"
+            is Local -> this.instance ?: "local@auto"
+            is All -> "all@${this.instance}"
             is CommunityRefByName -> "cname@${this.name}".lowercase(Locale.US)
         }
 }
 
 fun CommunitySafe.toCommunityRef(): CommunityRef.CommunityRefByObj {
-    return CommunityRef.CommunityRefByObj(this)
+    val uri = Uri.parse(this.actor_id)
+    return CommunityRef.CommunityRefByObj(this, uri.host)
 }
+
+fun CommunityRef.toInstanceAgnosticCommunityRef(): CommunityRef =
+    when (this) {
+        is CommunityRef.All -> this
+        is CommunityRef.CommunityRefByName -> this
+        is CommunityRef.CommunityRefByObj -> CommunityRef.CommunityRefByName(
+            this.community.name,
+            this.instance,
+        )
+        is CommunityRef.Local -> this
+    }

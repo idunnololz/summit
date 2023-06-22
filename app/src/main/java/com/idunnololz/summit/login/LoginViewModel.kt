@@ -43,7 +43,7 @@ class LoginViewModel @Inject constructor(
             val siteResult = apiClient.fetchSiteWithRetry(jwt)
 
             if (siteResult.isFailure) {
-                accountLiveData.postError(requireNotNull(result.exceptionOrNull()))
+                accountLiveData.postError(result.exceptionOrNull() ?: RuntimeException())
                 return@launch
             }
 

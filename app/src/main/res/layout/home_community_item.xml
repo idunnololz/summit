@@ -6,12 +6,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?selectableItemBackground">
 
+    <View
+        android:id="@+id/selected_indicator"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorSelected"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <ImageView
         android:id="@+id/icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:padding="12dp"
         android:layout_marginStart="12dp"
+        android:src="@drawable/baseline_home_18"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

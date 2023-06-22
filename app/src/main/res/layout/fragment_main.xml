@@ -28,40 +28,11 @@
 
     </FrameLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/details_pane"
+
+    <include
+        android:id="@+id/end_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="@color/googleBackground"
-        android:padding="@dimen/dialog_padding">
-
-        <TextView
-            android:id="@+id/title2"
-            android:text="@string/coming_soon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?textAppearanceTitleMedium"
-            app:layout_constraintVertical_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/text2"/>
-
-        <TextView
-            android:id="@+id/text2"
-            android:text="@string/community_info_placeholder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?textAppearanceBodyMedium"
-            android:gravity="center"
-            android:layout_marginTop="@dimen/padding"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title2"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
+        layout="@layout/community_info_pane"/>
 </com.discord.panels.OverlappingPanelsLayout>
