@@ -1,5 +1,6 @@
 package com.idunnololz.summit.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
@@ -42,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 
 typealias CommunitySelectedListener =
         ((controller: CommunitySelectorController, communityRef: CommunityRef) -> Unit)
@@ -217,7 +219,8 @@ class CommunitySelectorController @AssistedInject constructor(
 
         class CommunityChildItem(
             val text: String,
-            val community: CommunityView
+            val community: CommunityView,
+            val monthlyActiveUsers: Int,
         ) : Item(community.community.name)
 
         class StaticChildItem(
@@ -239,6 +242,8 @@ class CommunitySelectorController @AssistedInject constructor(
         private var serverQueryResults: List<CommunityView> = listOf()
 
         private var query: String? = null
+
+        private val nf = NumberFormat.getNumberInstance()
 
         private val adapterHelper = AdapterHelper<Item> (
             areItemsTheSame = { old, new ->
@@ -279,7 +284,9 @@ class CommunitySelectorController @AssistedInject constructor(
                     b.icon.load(it)
                 }
 
-                b.textView.text = item.text
+                b.title.text = item.text
+                @Suppress("SetTextI18n")
+                b.monthlyActives.text = "(${context.getString(R.string.mau_format, nf.format(item.monthlyActiveUsers))})"
 
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
@@ -381,9 +388,13 @@ class CommunitySelectorController @AssistedInject constructor(
                     .plus(makeRecentItems(query))
                     .plus(Item.GroupHeaderItem(context.getString(R.string.communities)))
                     .plus(rawData
-                        .sortedBy { it.counts.users_active_month }
+                        .sortedByDescending { it.counts.users_active_month }
                         .map {
-                            Item.CommunityChildItem(it.community.name, it)
+                            Item.CommunityChildItem(
+                                text = it.community.name,
+                                community = it,
+                                monthlyActiveUsers = it.counts.users_active_month
+                            )
                                 .also { subredditIds.add(it.id) }
                         })
                     .let a@{ intermediateList ->
@@ -398,7 +409,11 @@ class CommunitySelectorController @AssistedInject constructor(
                         }
 
                         val serverQueryItems = serverQueryResults
-                            .map { Item.CommunityChildItem(it.community.name, it) }
+                            .map { Item.CommunityChildItem(
+                                text = it.community.name,
+                                community = it,
+                                monthlyActiveUsers = it.counts.users_active_month
+                            ) }
                             .filter {
                                 !subredditIds.contains(it.id) &&
                                         getText(it).contains(query, ignoreCase = true)
