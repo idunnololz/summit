@@ -33,8 +33,11 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
+import com.idunnololz.summit.lemmy.LinkResolver
+import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.offline.OfflineFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.preview.ImageViewerFragment
@@ -470,12 +473,22 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-//        intent ?: return
-//
-//        val data = intent.data ?: return
-//        if (data.authority == "auth") {
-//            RedditAuthManager.instance.handleAuthAttempt(data, supportFragmentManager)
-//        } else if (RedditUtils.isUriReddit(data)) {
+        intent ?: return
+
+        val data = intent.data ?: return
+        val page = LinkResolver.parseUrl(data.toString(), viewModel.currentInstance)
+
+        if (page == null) {
+            Log.d(TAG, "Unable to handle uri $data")
+
+            AlertDialogFragment.Builder()
+                .setMessage(getString(R.string.error_unable_to_handle_link, data.toString()))
+                .createAndShow(supportFragmentManager, "error")
+        } else {
+            launchPage(page)
+        }
+
+//        if (LinkResolver.isLemmyUrl(data)) {
 //            if (RedditUtils.isUriGallery(data) && data.pathSegments.size >= 2) {
 //                RedirectHandlerDialogFragment.newInstance(LinkUtils.getRedirectLink(data.pathSegments[1]))
 //                    .show(supportFragmentManager, "asd")
@@ -493,10 +506,23 @@ class MainActivity : BaseActivity() {
 //        }
     }
 
+    fun launchPage(page: PageRef) {
+        if (binding.bottomNavigationView.selectedItemId != R.id.mainFragment) {
+            binding.bottomNavigationView.selectedItemId = R.id.mainFragment
+        }
+
+        executeWhenMainFragmentAvailable { mainFragment ->
+            mainFragment.navigateToPage(page)
+        }
+    }
+
     private fun executeWhenMainFragmentAvailable(fn: (MainFragment) -> Unit) {
         val navigateToPageRunnable = object : Runnable {
             override fun run() {
-                val currentFragment = supportFragmentManager.getCurrentNavigationFragment()
+                val navHostFragment =
+                    supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                            as NavHostFragment
+                val currentFragment = navHostFragment.childFragmentManager.fragments.getOrNull(0)
                 if (currentFragment is MainFragment) {
                     fn(currentFragment)
                 } else {

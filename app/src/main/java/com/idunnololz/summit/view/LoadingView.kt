@@ -188,8 +188,12 @@ class LoadingView : ConstraintLayout {
                         if (t is ServerTimeoutException) {
                             showErrorWithRetry(R.string.error_server_timeout)
                         } else {
-                            showErrorWithRetry(R.string.error_unknown)
-                            FirebaseCrashlytics.getInstance().recordException(t)
+                            if (t.errorCode == 404) {
+                                showErrorWithRetry(R.string.error_page_not_found)
+                            } else {
+                                showErrorWithRetry(R.string.error_unknown)
+                                FirebaseCrashlytics.getInstance().recordException(t)
+                            }
                         }
                     }
                     is ServerApiException ->

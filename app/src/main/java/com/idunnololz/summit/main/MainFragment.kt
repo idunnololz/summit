@@ -29,8 +29,11 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMainBinding
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
+import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneViewModel
 import com.idunnololz.summit.main.community_info_pane.CommunityInfoController
@@ -176,22 +179,13 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             viewLifecycleOwner,
         )
 
-        val firstTab = checkNotNull(
-            userCommunitiesManager.getTab(UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID))
-        firstFragmentTag = getTagForTab(firstTab.id)
-        val navHostFragment = obtainNavHostFragment(
-            childFragmentManager,
-            firstFragmentTag,
-            R.navigation.community,
-            R.id.innerNavHostContainer,
-            firstTab.toCommunityFragmentArgs()
-        )
+        val firstTab = requireNotNull(tabsManager.currentTab.value)
+        firstFragmentTag = getTagForTab(firstTab.communityRef)
 
-        attachNavHostFragment(childFragmentManager, navHostFragment, true)
-
-        if (tabsManager.currentTab.value?.isHomeTab == true) {
-            setCurrentNavController(navHostFragment.navController)
-        }
+        changeCommunity(when (firstTab) {
+            is TabsManager.Tab.SubscribedCommunityTab -> Either.Right(firstTab.subscribedCommunity)
+            is TabsManager.Tab.UserCommunityTab -> Either.Left(firstTab.userCommunityItem)
+        })
 
         userCommunitiesManager.getAllUserCommunities().forEach { tab ->
             if (tabsManager.currentTab.value?.isHomeTab != true) {
@@ -208,13 +202,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             it.contentIfNotHandled ?: return@observe
 
             purgeUnusedFragments()
-        }
-
-        if (savedInstanceState == null) {
-            if (args.url != null) {
-                val uri = Uri.parse(args.url)
-                navigateToUri(uri)
-            }
         }
 
         ArrayList(deferredNavigationRequests).forEach {
@@ -239,6 +226,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         }
                         PanelState.Opened -> {
                             getMainActivity()?.setNavUiOpenness(100f)
+                            communitiesPaneController.onShown()
                         }
                         is PanelState.Opening -> {
                             getMainActivity()?.setNavUiOpenness(panelState.progress)
@@ -258,6 +246,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     }
                     PanelState.Opened -> {
                         getMainActivity()?.setNavUiOpenness(100f)
+                        communityInfoController.onShown()
                     }
                     is PanelState.Opening -> {
                         getMainActivity()?.setNavUiOpenness(panelState.progress)
@@ -285,57 +274,22 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         }
     }
 
-    fun navigateToUri(uri: Uri) {
-        if (currentNavController == null) {
-            deferredNavigationRequests.add {
-                navigateToUri(uri)
+    fun navigateToPage(page: PageRef) {
+        when (page) {
+            is CommunityRef -> {
+                currentNavController?.navigate(
+                    R.id.communityFragment,
+                    CommunityFragmentArgs(
+                        page
+                    ).toBundle()
+                )
             }
-            return
-        }
-
-        val pathSegments = uri.pathSegments
-        if (pathSegments.size >= 1) {
-            if (pathSegments[0].equals("r", ignoreCase = true)) {
-                if (pathSegments.size == 2) {
-//                    currentNavController?.navigate(
-//                        R.id.subredditFragment,
-//                        CommunityFragmentArgs(
-//                            url = RedditUtils.extractPrefixedSubreddit(uri.toString())
-//                        ).toBundle()
-//                    )
-                } else if (pathSegments.size > 2) {
-//                    currentNavController?.navigate(
-//                        R.id.postFragment,
-//                        PostFragmentArgs(url = uri.toString()).toBundle()
-//                    )
-
-                    TODO()
-                } else {
-                    Log.d(TAG, "Unable to handle uri $uri")
-
-                    AlertDialogFragment.Builder()
-                        .setMessage(getString(R.string.error_unable_to_handle_link, uri.toString()))
-                        .createAndShow(childFragmentManager, "error")
-                }
-            } else if (pathSegments[0].equals("comments", ignoreCase = true)) {
-//                currentNavController?.navigate(
-//                    R.id.postFragment,
-//                    PostFragmentArgs(url = uri.toString()).toBundle()
-//                )
-                TODO()
-            } else {
-                Log.d(TAG, "Unable to handle uri $uri")
-
-                AlertDialogFragment.Builder()
-                    .setMessage(getString(R.string.error_unable_to_handle_link, uri.toString()))
-                    .createAndShow(childFragmentManager, "error")
+            is PostRef -> {
+                currentNavController?.navigate(
+                    R.id.postFragment,
+                    PostFragmentArgs(page.instance, page.id, null).toBundle()
+                )
             }
-        } else {
-            Log.d(TAG, "Unable to handle uri $uri")
-
-            AlertDialogFragment.Builder()
-                .setMessage(getString(R.string.error_unable_to_handle_link, uri.toString()))
-                .createAndShow(childFragmentManager, "error")
         }
     }
 
@@ -359,6 +313,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         selectedNavHostFragment.navController.addOnDestinationChangedListener(
             onDestinationChangedListener
         )
+        attachNavHostFragment(childFragmentManager, selectedNavHostFragment, true)
         lastNavHostFragment = selectedNavHostFragment
 
         tabsManager.updateCurrentTab(community)
@@ -447,7 +402,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     // Detach all other Fragments
                     userCommunitiesManager.getAllUserCommunities().forEach { tab ->
                         if (getTagForTab(tab.id) != newlySelectedItemTag) {
-                            detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                            fragmentManager.findFragmentByTag(firstFragmentTag)?.let {
+                                detach(it)
+                            }
                         }
                     }
                 }

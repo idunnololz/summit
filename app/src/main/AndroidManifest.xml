@@ -44,37 +44,25 @@
                     android:host="auth" />
             </intent-filter>
 
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.VIEW" />-->
-<!--                <action android:name="android.intent.action.SEND" />-->
-
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.BROWSABLE" />-->
-
-<!--                <data-->
-<!--                    android:scheme="https"-->
-<!--                    android:host="www.reddit.com"-->
-<!--                    android:pathPrefix="/r" />-->
-<!--                <data-->
-<!--                    android:scheme="https"-->
-<!--                    android:host="reddit.com"-->
-<!--                    android:pathPrefix="/r" />-->
-<!--                <data-->
-<!--                    android:scheme="https"-->
-<!--                    android:host="amp.reddit.com"-->
-<!--                    android:pathPrefix="/r" />-->
-<!--            </intent-filter>-->
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- https://redd.it/iasjvt -->
-                <data
-                    android:scheme="https"
-                    android:host="redd.it" />
+                <data android:scheme="https"/>
+                <data android:host="beehaw.org"/>
+                <data android:host="feddit.de" />
+                <data android:host="feddit.it" />
+                <data android:host="lemmy.ca" />
+                <data android:host="lemmy.ml" />
+                <data android:host="lemmy.one" />
+                <data android:host="lemmy.world" />
+                <data android:host="lemmygrad.ml" />
+                <data android:host="midwest.social" />
+                <data android:host="mujico.org" />
+                <data android:host="sh.itjust.works" />
+                <data android:host="slrpnk.net" />
+                <data android:host="sopuli.xyz" />
+                <data android:host="szmer.info" />
             </intent-filter>
         </activity>
 

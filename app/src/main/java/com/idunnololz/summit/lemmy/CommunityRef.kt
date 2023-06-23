@@ -11,7 +11,7 @@ import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import kotlinx.parcelize.Parcelize
 import java.util.Locale
 
-sealed interface CommunityRef : Parcelable {
+sealed interface CommunityRef : PageRef, Parcelable {
 
     companion object {
         fun adapter(): PolymorphicJsonAdapterFactory<CommunityRef> =

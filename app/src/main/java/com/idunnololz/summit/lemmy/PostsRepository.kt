@@ -55,7 +55,7 @@ class PostsRepository @Inject constructor(
                 .minOrNull() ?: 1
 
             deleteFromPage(minPageInteral)
-
+            endReached = false
         }
 
         var hasMore = true

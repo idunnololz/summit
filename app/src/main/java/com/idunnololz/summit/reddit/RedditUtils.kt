@@ -6,11 +6,12 @@ import android.graphics.Point
 import android.icu.text.CompactDecimalFormat
 import android.net.Uri
 import android.os.Build
-import android.text.style.*
 import android.util.Log
 import android.view.View
 import android.widget.*
 import com.idunnololz.summit.R
+import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.spans.SpoilerSpan
 import com.idunnololz.summit.util.*
@@ -37,12 +38,13 @@ object RedditUtils {
     /**
      * Matches against subreddit names. (technically incomplete because it doesn't have the length limit)
      */
-    val SUBREDDIT_REGEX = Pattern.compile("/?\\br/([a-zA-Z0-9-][a-zA-Z0-9-_]*)\\b")
+    val SUBREDDIT_REGEX = Pattern.compile("""(^|\s)(\/?c\/([a-zA-Z0-9-][a-zA-Z0-9-_@]*))""")
 
     private val GIPHY_REGEX = Pattern.compile("\\(giphy\\|([^\\s]*)\\)")
 
-    private class RedditPlugin(
-        private val context: Context
+    private class LemmyPlugin(
+        private val context: Context,
+        private val instance: String,
     ) : AbstractMarkwonPlugin() {
 
         /**
@@ -64,7 +66,7 @@ object RedditUtils {
          * Matches against subreddit names. DOES NOT MATCH SUBREDDIT URLS. (technically incomplete because it doesn't have the length limit)
          */
         private val SUBREDDIT_REGEX =
-            Pattern.compile("(^|\\s)(/?\\br/([a-zA-Z0-9-][a-zA-Z0-9-_]*)\\b)")
+            Pattern.compile("(^|\\s)(/?\\bc/([a-zA-Z0-9-][a-zA-Z0-9-_]*)\\b)")
 
         private fun processSubTags(s: String): String {
             val matcher = SUB_REGEX.matcher(s)
@@ -109,16 +111,22 @@ object RedditUtils {
             return sb.toString()
         }
 
-        private fun processSubredditMentions(s: String): String {
+        private fun processSubredditMentions(s: String, instance: String): String {
             val matcher = SUBREDDIT_REGEX.matcher(s)
             val sb = StringBuffer()
             while (matcher.find()) {
-                val subredditName = matcher.group(3) ?: continue
+                val communityUrl = matcher.group(3) ?: continue
                 val spacer = matcher.group(1) ?: ""
-                if (subredditName.length > SUBREDDIT_NAME_MAX_LENGTH) continue
+
+                val pageRef = LinkResolver.parseUrl(communityUrl, instance)
+                    ?: continue
+
+                val communityRef = pageRef as? CommunityRef
+                    ?: continue
+
                 matcher.appendReplacement(
                     sb,
-                    "$spacer[${matcher.group(2)}](${LinkUtils.getLinkForSubreddit(subredditName)})"
+                    "$spacer[${matcher.group(2)}](${LinkUtils.getLinkForCommunity(communityRef)})"
                 )
             }
             matcher.appendTail(sb)
@@ -127,7 +135,8 @@ object RedditUtils {
 
         override fun processMarkdown(markdown: String): String =
             processSubredditMentions(
-                processSpoilerTags(processSubTags(processHeaderTags(markdown)))
+                s = processSpoilerTags(processSubTags(processHeaderTags(markdown))),
+                instance = instance
             )
 
         override fun configureTheme(builder: MarkwonTheme.Builder) {
@@ -137,12 +146,12 @@ object RedditUtils {
         }
     }
 
-    fun createMarkwon(context: Context): Markwon =
+    fun createMarkwon(context: Context, instance: String): Markwon =
         Markwon.builder(context)
             .usePlugin(CoilImagesPlugin.create(context))
             .usePlugin(LinkifyPlugin.create())
             .usePlugin(TablePlugin.create(context))
-            .usePlugin(RedditPlugin(context))
+            .usePlugin(LemmyPlugin(context, instance))
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(SimpleExtPlugin.create().apply {
                 addExtension(1, '^') { configuration, props ->
@@ -222,8 +231,8 @@ object RedditUtils {
     }
 
 
-    fun bindRedditText(textView: TextView, text: String) {
-        createMarkwon(textView.context).setMarkdown(textView, text)
+    fun bindLemmyText(textView: TextView, text: String, instance: String) {
+        createMarkwon(textView.context, instance).setMarkdown(textView, text)
     }
 
     fun needsWebView(html: String): Boolean = html.contains("&lt;table&gt;")

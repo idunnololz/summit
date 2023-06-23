@@ -11,6 +11,7 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
+    private val offlineManager: OfflineManager,
     val communitySelectorControllerFactory: CommunitySelectorController.Factory,
     val userCommunitiesManager: UserCommunitiesManager,
 ) : ViewModel() {
@@ -33,7 +35,6 @@ class MainActivityViewModel @Inject constructor(
     companion object {
         private val TAG = "MainActivityViewModel"
     }
-
     private val readyCount = MutableStateFlow<Int>(0)
 
     val communities = StatefulLiveData<List<CommunityView>>()
@@ -41,6 +42,9 @@ class MainActivityViewModel @Inject constructor(
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
 
     val isReady = MutableLiveData<Boolean>(false)
+
+    val currentInstance: String
+        get() = apiClient.instance
 
     fun Flow<Int>.completeWhenDone(): Flow<Int> =
         transformWhile { readyCount ->
@@ -104,6 +108,12 @@ class MainActivityViewModel @Inject constructor(
             launch {
                 accountManager.currentAccount.collect {
                     loadCommunities()
+                }
+            }
+
+            launch {
+                withContext(Dispatchers.IO) {
+                    offlineManager.cleanup()
                 }
             }
         }

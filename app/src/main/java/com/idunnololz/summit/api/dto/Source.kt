@@ -6,47 +6,50 @@ import com.google.gson.annotations.SerializedName
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 
-data class LocalUserSettings(
-    val id: Int,
-    val person_id: Int,
-    val email: String?,
+typealias LocalUserId = Int
+typealias PersonId = Int
+typealias InstanceId = Int
+
+data class LocalUser(
+    val id: LocalUserId,
+    val person_id: PersonId,
+    val email: String? = null,
     val show_nsfw: Boolean,
     val theme: String,
-    val default_sort_type: Int,
-    val default_listing_type: Int,
+    val default_sort_type: SortType? /* "Active" | "Hot" | "New" | "Old" | "TopDay" | "TopWeek" | "TopMonth" | "TopYear" | "TopAll" | "MostComments" | "NewComments" */,
+    val default_listing_type: ListingType? /* "All" | "Local" | "Subscribed" */,
     val interface_language: String,
     val show_avatars: Boolean,
     val send_notifications_to_email: Boolean,
     val validator_time: String,
-    val show_bot_accounts: Boolean,
     val show_scores: Boolean,
+    val show_bot_accounts: Boolean,
     val show_read_posts: Boolean,
     val show_new_post_notifs: Boolean,
     val email_verified: Boolean,
     val accepted_application: Boolean,
+    val totp_2fa_url: String? = null,
 )
 
 @Parcelize
-data class PersonSafe(
-    val id: Int,
+data class Person(
+    val id: PersonId,
     val name: String,
-    val display_name: String?,
-    val avatar: String?,
+    val display_name: String? = null,
+    val avatar: String? = null,
     val banned: Boolean,
     val published: String,
-    val updated: String?,
+    val updated: String? = null,
     val actor_id: String,
-    val bio: String?,
+    val bio: String? = null,
     val local: Boolean,
-    val banner: String?,
+    val banner: String? = null,
     val deleted: Boolean,
-    val inbox_url: String,
-    val shared_inbox_url: String?,
-    val matrix_user_id: String?,
+    val matrix_user_id: String? = null,
     val admin: Boolean,
     val bot_account: Boolean,
-    val ban_expires: String?,
-    val instance_id: Int,
+    val ban_expires: String? = null,
+    val instance_id: InstanceId,
 ) : Parcelable
 
 data class Site(

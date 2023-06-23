@@ -70,44 +70,43 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             lemmyApiClient.changeInstance(instance)
 
-            val post = if (fetchPostData) {
+            val postResult = if (fetchPostData) {
                 lemmyApiClient.fetchPostWithRetry(Either.Left(postId), force)
-                    .fold(
-                        onSuccess = { it },
-                        onFailure = {
-                            postData.postError(it)
-                            null
-                        },
-                    )
             } else {
-                this@PostViewModel.postView
+                Result.success(this@PostViewModel.postView)
             }
-            this@PostViewModel.postView = post
 
-            val comments = if (fetchCommentData) {
+            this@PostViewModel.postView = postResult.getOrNull()
+
+            val commentsResult = if (fetchCommentData) {
                 lemmyApiClient.fetchCommentsWithRetry(Either.Left(postId), sortOrder, force)
-                    .fold(
-                        onSuccess = { it },
-                        onFailure = {
-                            postData.postError(it)
-                            null
-                        },
-                    )
             } else {
-                this@PostViewModel.comments
+                Result.success(this@PostViewModel.comments)
             }
-            this@PostViewModel.comments = comments
+            this@PostViewModel.comments = commentsResult.getOrNull()
 
+            val post = postResult.getOrNull()
+            val comments = commentsResult.getOrNull()
             if (post == null || comments == null) {
-                return@launch
-            }
+                postResult
+                    .onFailure {
+                        postData.postError(it)
+                    }
+                    .onSuccess {}
 
-            postData.postValue(
-                PostData(
-                    ListView.PostListView(post),
-                    buildCommentsTreeListView(comments, parentComment = true)
+                commentsResult
+                    .onFailure {
+                        postData.postError(it)
+                    }
+                    .onSuccess {}
+            } else {
+                postData.postValue(
+                    PostData(
+                        ListView.PostListView(post),
+                        buildCommentsTreeListView(comments, parentComment = true)
+                    )
                 )
-            )
+            }
         }
     }
 

@@ -1,6 +1,5 @@
 package com.idunnololz.summit.main
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher

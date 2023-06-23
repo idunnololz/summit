@@ -1,7 +1,8 @@
 package com.idunnololz.summit.util
 
 import android.net.Uri
-import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.toUrl
 import okhttp3.CacheControl
 import okhttp3.Request
 import okhttp3.Response
@@ -39,7 +40,8 @@ object LinkUtils {
         return Client.get().newCall(request).execute()
     }
 
-    fun getLinkForSubreddit(subreddit: String): String = "https://www.reddit.com/r/${subreddit}"
+    fun getLinkForCommunity(communityRef: CommunityRef): String =
+        communityRef.toUrl()
 
     fun getLinkForMoreChildren(
         linkId: String,

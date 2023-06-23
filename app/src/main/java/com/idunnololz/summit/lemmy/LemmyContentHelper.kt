@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.text.method.LinkMovementMethod
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,19 +17,17 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import coil.load
+import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostType
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.ImageViewerFragmentArgs
 import com.idunnololz.summit.preview.VideoType
@@ -43,7 +40,6 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
-import com.idunnololz.summit.util.ext.addDefaultAnim
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -78,6 +74,7 @@ class LemmyContentHelper(
 
         fullImageViewTransitionName: String,
         postView: PostView,
+        instance: String,
 
         rootView: View,
         fullContentContainerView: ViewGroup,
@@ -183,24 +180,55 @@ class LemmyContentHelper(
             }
         }
 
-        if (postView.shouldHideItem() && !reveal) {
+        if (postView.shouldHideItem() && !reveal && !lazyUpdate) {
             val fullContentHiddenView = getView<View>(R.layout.full_content_hidden_view)
             val fullImageView = fullContentHiddenView.findViewById<ImageView>(R.id.fullImage)
             val textView = fullContentHiddenView.findViewById<TextView>(R.id.message)
             val button = fullContentHiddenView.findViewById<Button>(R.id.button)
 
-            val previewInfo: PreviewInfo? = postView.getLowestResHiddenPreviewInfo()
-            RedditUtils.setImageViewSizeBasedOnPreview(
-                context,
-                previewInfo,
-                rootView,
-                fullImageView
-            )
+            val imageUrl = postView.getThumbnailUrl(false)
 
-            if (!previewInfo?.getUrl().isNullOrBlank()) {
-                offlineManager.fetchImage(rootView, checkNotNull(previewInfo).getUrl()) {
-                    fullImageView.load(it)
+            if (imageUrl != null) {
+                fullImageView.setImageResource(0)
+
+                fun fetchFullImage() {
+                    offlineManager.fetchImage(rootView, imageUrl) b@{
+                        if (!fragment.isAdded || fragment.context == null) {
+                            return@b
+                        }
+
+                        offlineManager.calculateImageMaxSizeIfNeeded(it)
+                        offlineManager.getMaxImageSizeHint(it, tempSize)
+
+                        fullImageView.load(it) {
+
+                            this.transformations(BlurTransformation(context, sampling = 30f))
+
+                            listener { _, result ->
+                                val d = result.drawable
+                                if (d is BitmapDrawable) {
+                                    offlineManager.setImageSizeHint(
+                                        imageUrl,
+                                        d.bitmap.width,
+                                        d.bitmap.height
+                                    )
+                                    Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
+                                }
+                            }
+                        }
+                    }
                 }
+
+                offlineManager.getImageSizeHint(imageUrl, tempSize)
+                if (tempSize.width > 0 && tempSize.height > 0) {
+                    val thumbnailMaxHeight =
+                        (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+                    fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                        this.height = thumbnailMaxHeight
+                    }
+                }
+
+                fetchFullImage()
             } else {
                 fullImageView.visibility = View.GONE
             }
@@ -360,7 +388,7 @@ class LemmyContentHelper(
                             offlineManager.getMaxImageSizeHint(it, tempSize)
 
                             fullImageView.load(it) {
-                                listener { request, result ->
+                                listener { _, result ->
                                     val d = result.drawable
                                     if (d is BitmapDrawable) {
                                         offlineManager.setImageSizeHint(
@@ -592,7 +620,7 @@ class LemmyContentHelper(
                     val fullTextView = getView<View>(R.layout.full_content_text_view)
                     val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
                     bodyTextView.visibility = View.VISIBLE
-                    RedditUtils.bindRedditText(bodyTextView, content)
+                    RedditUtils.bindLemmyText(bodyTextView, content, instance)
                     bodyTextView.movementMethod = CustomLinkMovementMethod().apply {
                         onLinkLongClickListener = DefaultLinkLongClickListener(context)
                         this.onImageClickListener = onImageClickListener

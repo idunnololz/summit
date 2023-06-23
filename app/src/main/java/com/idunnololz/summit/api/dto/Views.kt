@@ -6,17 +6,17 @@ import com.idunnololz.summit.video.VideoSizeHint
 import kotlinx.parcelize.Parcelize
 
 data class PersonViewSafe(
-    val person: PersonSafe,
+    val person: Person,
     val counts: PersonAggregates,
 )
 
 data class PersonMentionView(
     val person_mention: PersonMention,
     val comment: Comment,
-    val creator: PersonSafe,
+    val creator: Person,
     val post: Post,
     val community: CommunitySafe,
-    val recipient: PersonSafe,
+    val recipient: Person,
     val counts: CommentAggregates,
     val creator_banned_from_community: Boolean,
     val subscribed: SubscribedType,
@@ -25,9 +25,9 @@ data class PersonMentionView(
     val my_vote: Int?,
 )
 
-data class LocalUserSettingsView(
-    val local_user: LocalUserSettings,
-    val person: PersonSafe,
+data class LocalUserView(
+    val local_user: LocalUser,
+    val person: Person,
     val counts: PersonAggregates,
 )
 
@@ -41,8 +41,8 @@ data class SiteView(
 
 data class PrivateMessageView(
     val private_message: PrivateMessage,
-    val creator: PersonSafe,
-    val recipient: PersonSafe,
+    val creator: Person,
+    val recipient: Person,
 )
 
 enum class PostType {
@@ -56,7 +56,7 @@ sealed interface LemmyListView
 @Parcelize
 data class PostView(
     val post: Post,
-    val creator: PersonSafe,
+    val creator: Person,
     val community: CommunitySafe,
     val creator_banned_from_community: Boolean,
     val counts: PostAggregates,
@@ -97,9 +97,8 @@ data class PostView(
         return null
     }
 
-    fun getUrl(): String? {
-        val domain = getDomain() ?: return null
-        return "https://${getDomain()}/post/${post.id}"
+    fun getUrl(instance: String): String {
+        return "https://${instance}/post/${post.id}"
     }
 
     fun getThumbnailPreviewInfo(): PreviewInfo? {
@@ -132,17 +131,17 @@ data class PostReportView(
     val post_report: PostReport,
     val post: Post,
     val community: CommunitySafe,
-    val creator: PersonSafe,
-    val post_creator: PersonSafe,
+    val creator: Person,
+    val post_creator: Person,
     val creator_banned_from_community: Boolean,
     val my_vote: Int?,
     val counts: PostAggregates,
-    val resolver: PersonSafe?,
+    val resolver: Person?,
 )
 
 data class CommentView(
     val comment: Comment,
-    val creator: PersonSafe,
+    val creator: Person,
     val post: Post,
     val community: CommunitySafe,
     val counts: CommentAggregates,
@@ -163,10 +162,10 @@ data class CommentView(
 data class CommentReplyView(
     val comment_reply: CommentReply,
     val comment: Comment,
-    val creator: PersonSafe,
+    val creator: Person,
     val post: Post,
     val community: CommunitySafe,
-    val recipient: PersonSafe,
+    val recipient: Person,
     val counts: CommentAggregates,
     val creator_banned_from_community: Boolean,
     val subscribed: SubscribedType,
@@ -180,106 +179,106 @@ data class CommentReportView(
     val comment: Comment,
     val post: Post,
     val community: CommunitySafe,
-    val creator: PersonSafe,
-    val comment_creator: PersonSafe,
+    val creator: Person,
+    val comment_creator: Person,
     val counts: CommentAggregates,
     val creator_banned_from_community: Boolean,
     val my_vote: Int?,
-    val resolver: PersonSafe?,
+    val resolver: Person?,
 )
 
 data class ModAddCommunityView(
     val mod_add_community: ModAddCommunity,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val community: CommunitySafe,
-    val modded_person: PersonSafe,
+    val modded_person: Person,
 )
 
 data class ModTransferCommunityView(
     val mod_transfer_community: ModTransferCommunity,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val community: CommunitySafe,
-    val modded_person: PersonSafe,
+    val modded_person: Person,
 )
 
 data class ModAddView(
     val mod_add: ModAdd,
-    val moderator: PersonSafe?,
-    val modded_person: PersonSafe,
+    val moderator: Person?,
+    val modded_person: Person,
 )
 
 data class ModBanFromCommunityView(
     val mod_ban_from_community: ModBanFromCommunity,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val community: CommunitySafe,
-    val banned_person: PersonSafe,
+    val banned_person: Person,
 )
 
 data class ModBanView(
     val mod_ban: ModBan,
-    val moderator: PersonSafe?,
-    val banned_person: PersonSafe,
+    val moderator: Person?,
+    val banned_person: Person,
 )
 
 data class ModLockPostView(
     val mod_lock_post: ModLockPost,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val post: Post,
     val community: CommunitySafe,
 )
 
 data class ModRemoveCommentView(
     val mod_remove_comment: ModRemoveComment,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val comment: Comment,
-    val commenter: PersonSafe,
+    val commenter: Person,
     val post: Post,
     val community: CommunitySafe,
 )
 
 data class ModRemoveCommunityView(
     val mod_remove_community: ModRemoveCommunity,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val community: CommunitySafe,
 )
 
 data class ModRemovePostView(
     val mod_remove_post: ModRemovePost,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val post: Post,
     val community: CommunitySafe,
 )
 
 data class ModFeaturePostView(
     val mod_feature_post: ModFeaturePost,
-    val moderator: PersonSafe?,
+    val moderator: Person?,
     val post: Post,
     val community: CommunitySafe,
 )
 
 data class CommunityFollowerView(
     val community: CommunitySafe,
-    val follower: PersonSafe,
+    val follower: Person,
 )
 
 data class CommunityBlockView(
-    val person: PersonSafe,
+    val person: Person,
     val community: CommunitySafe,
 )
 
 data class CommunityModeratorView(
     val community: CommunitySafe,
-    val moderator: PersonSafe,
+    val moderator: Person,
 )
 
 data class CommunityPersonBanView(
     val community: CommunitySafe,
-    val person: PersonSafe,
+    val person: Person,
 )
 
 data class PersonBlockView(
-    val person: PersonSafe,
-    val target: PersonSafe,
+    val person: Person,
+    val target: Person,
 )
 
 data class CommunityView(

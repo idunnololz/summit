@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <com.idunnololz.summit.view.RedditHeaderView
+        <com.idunnololz.summit.view.LemmyHeaderView
             android:id="@+id/headerContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -33,6 +33,7 @@
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
         android:layout_marginLeft="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_half"
+        android:scaleType="centerCrop"
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerView" />

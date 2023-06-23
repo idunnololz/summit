@@ -20,6 +20,7 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import org.apache.commons.io.FileUtils
+import org.threeten.bp.Duration
 import java.io.File
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -40,7 +41,7 @@ class OfflineManager @Inject constructor(
         private val TAG = OfflineManager::class.java.simpleName
     }
 
-    val downloadInProgressDir = File(context.filesDir, "dl")
+    private val downloadInProgressDir = File(context.filesDir, "dl")
     val imagesDir = File(context.filesDir, "imgs")
     val videosDir = File(context.filesDir, "videos")
     val videoCacheDir = File(context.cacheDir, "videos")
@@ -76,6 +77,26 @@ class OfflineManager @Inject constructor(
         fun cancel(offlineManager: OfflineManager) {
             offlineManager.cancelFetch(key, listener)
         }
+    }
+
+    fun cleanup() {
+        var purgedFiles = 0
+        val thresholdTime = System.currentTimeMillis() - Duration.ofDays(2).toMillis()
+
+        imagesDir.listFiles()?.forEach {
+            if (it.lastModified() < thresholdTime) {
+                it.delete()
+                purgedFiles++
+            }
+        }
+        videosDir.listFiles()?.forEach {
+            if (it.lastModified() < thresholdTime) {
+                it.delete()
+                purgedFiles++
+            }
+        }
+
+        Log.d(TAG, "Deleted $purgedFiles files.")
     }
 
     fun fetchImage(rootView: View, url: String?, listener: TaskListener) {

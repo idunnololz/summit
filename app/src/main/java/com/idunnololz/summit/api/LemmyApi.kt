@@ -3,6 +3,7 @@ package com.idunnololz.summit.api
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient.Companion.API_VERSION
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
 import com.idunnololz.summit.api.dto.BlockCommunity
@@ -69,8 +70,10 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.QueryMap
 import retrofit2.http.Url
+import java.io.File
 import java.util.concurrent.TimeUnit
 
+private const val TAG = "LemmyApi"
 
 interface LemmyApi {
     @GET("site")
@@ -338,11 +341,13 @@ interface LemmyApi {
                 return it
             }
 
-            val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BASIC
+            val loggingInterceptor = HttpLoggingInterceptor()
+            loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
 
-            val cacheSize = (10 * 1024 * 1024).toLong() // 10MB
-            val myCache = Cache(context.cacheDir, cacheSize)
+            val myCache = Cache(
+                directory = File(context.cacheDir, "okhttp_cache"),
+                maxSize = 20L * 1024L * 1024L // 20MB
+            )
             val okHttpClient = OkHttpClient.Builder()
                 // Specify the cache we created earlier.
                 .cache(myCache)
@@ -370,11 +375,9 @@ interface LemmyApi {
                         request.newBuilder()
                             .header(
                                 CACHE_CONTROL_HEADER,
-                                CacheControl.Builder()
-                                    .maxAge(10, TimeUnit.MINUTES)
-                                    .build()
-                                    .toString()
+                                "public, max-stale=600" // 600 = 10 minutes
                             )
+                            .removeHeader("Pragma")
                             .build()
                     else
                     /*
@@ -397,7 +400,20 @@ interface LemmyApi {
                     // End of if-else statement
 
                     // Add the modified request to the chain.
-                    chain.proceed(request)
+                    val response = chain.proceed(request)
+
+
+                    Log.d(TAG, "Response 1 response:          $response")
+                    Log.d(
+                        TAG,
+                        "Response 1 cache response:    ${response.cacheResponse}",
+                    )
+                    Log.d(
+                        TAG,
+                        "Response 1 network response:  ${response.networkResponse}",
+                    )
+
+                    response
                 }
                 .addInterceptor { chain ->
                     val requestBuilder = chain.request().newBuilder()
@@ -405,7 +421,7 @@ interface LemmyApi {
                     val newRequest = requestBuilder.build()
                     chain.proceed(newRequest)
                 }
-                .addInterceptor(interceptor)
+                .addInterceptor(loggingInterceptor)
                 .build()
                 .also {
                     okHttpClient = it

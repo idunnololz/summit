@@ -417,7 +417,7 @@ class LemmyApiClient @Inject constructor(
             } catch (e: Exception) {
                 errorBody
             }
-            Log.e("ApiError", "Error message: ${errMsg}", RuntimeException())
+            Log.e("ApiError", "Code: ${errorCode} Error message: ${errMsg}", RuntimeException())
 
             if (errMsg?.contains("timeout", ignoreCase = true) == true) {
                 return Result.failure(ServerTimeoutException(errorCode))

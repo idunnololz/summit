@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.load
-import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.SubscribedType
@@ -80,6 +79,10 @@ class CommunityInfoController @AssistedInject constructor(
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
         }
+    }
+
+    fun onShown() {
+        viewModel.refetchCommunityOrSite()
     }
 
     private class SiteAdapter : Adapter<ViewHolder>() {

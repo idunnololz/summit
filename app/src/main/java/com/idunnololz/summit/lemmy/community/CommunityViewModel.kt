@@ -20,6 +20,7 @@ import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.assertMainThread
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -72,6 +73,9 @@ class CommunityViewModel @Inject constructor(
 
     val voteUiHandler = accountActionsManager.voteUiHandler
 
+    val instance: String
+        get() = postsRepository.instance
+
     init {
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
@@ -84,7 +88,9 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             accountManager.currentAccountOnChange
                 .collect {
-                    reset()
+                    withContext(Dispatchers.Main) {
+                        reset()
+                    }
                 }
         }
     }
@@ -215,12 +221,6 @@ class CommunityViewModel @Inject constructor(
 
     fun getCurrentSortOrder(): CommunitySortOrder = postsRepository.sortOrder
 
-    override fun onCleared() {
-        super.onCleared()
-
-        currentCommunityRef.removeObserver(communityRefChangeObserver)
-    }
-
     fun setDefaultPage(currentCommunityRef: CommunityRef) {
         viewModelScope.launch {
             userCommunitiesManager.setDefaultPage(currentCommunityRef)
@@ -234,8 +234,15 @@ class CommunityViewModel @Inject constructor(
         reset()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+
+        currentCommunityRef.removeObserver(communityRefChangeObserver)
+    }
     private fun reset() {
-        loadedPostsData.postValue(LoadedPostsData(
+        assertMainThread()
+
+        loadedPostsData.setValue(LoadedPostsData(
             posts = listOf(),
             instance = postsRepository.instance,
             pageIndex = 0,
