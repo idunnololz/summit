@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <com.idunnololz.summit.view.RedditHeaderView
+        <com.idunnololz.summit.view.LemmyHeaderView
             android:id="@+id/headerContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

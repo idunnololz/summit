@@ -32,14 +32,14 @@ data class CommunityViewState(
     }
 }
 
-fun CommunityViewState.toUrl(): String {
-    val baseUrl = when (val community = this.communityState.communityRef) {
-        is CommunityRef.All -> "https://lemmy.world/home/data_type/Post/listing_type/All"
-        is CommunityRef.CommunityRefByObj -> "${community.community.communityUrl}/data_type/Post"
-        is CommunityRef.Local -> "${community.instance}/home/data_type/Post/listing_type/Local"
-        is CommunityRef.CommunityRefByName -> "https://${DEFAULT_INSTANCE}/c/${community.getServerId()}/data_type/Post"
-    }
-    return "${baseUrl}/sort/Active/page/${this.communityState.currentPageIndex}"
+fun CommunityViewState.toUrl(): String =
+    "${communityState.communityRef.toUrl()}/page/${this.communityState.currentPageIndex}"
+
+fun CommunityRef.toUrl(): String = when (val community = this) {
+    is CommunityRef.All -> "https://${community.instance ?: "lemmy.world"}/home/data_type/Post/listing_type/All"
+    is CommunityRef.CommunityRefByObj -> "${community.community.communityUrl}/data_type/Post"
+    is CommunityRef.Local -> "https://${community.instance}/home/data_type/Post/listing_type/Local"
+    is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}/data_type/Post"
 }
 
 @JsonClass(generateAdapter = true)

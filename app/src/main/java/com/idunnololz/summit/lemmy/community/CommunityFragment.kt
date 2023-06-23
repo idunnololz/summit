@@ -16,7 +16,6 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
@@ -29,6 +28,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
@@ -74,7 +74,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.video.ExoPlayerManager
-import com.idunnololz.summit.view.RedditHeaderView
+import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -177,6 +177,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
             adapter = ListingItemAdapter(
                 context,
                 offlineManager,
+                viewModel.instance,
                 onNextClick = {
                     viewModel.fetchNextPage(clearPagePosition = true)
                 },
@@ -642,7 +643,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
     private class ListingItemViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
-        val headerContainer: RedditHeaderView = itemView.findViewById(R.id.headerContainer)
+        val headerContainer: LemmyHeaderView = itemView.findViewById(R.id.headerContainer)
         val image: ImageView? = itemView.findViewById(R.id.image)
         val title: TextView = itemView.findViewById(R.id.title)
         val commentButton: MaterialButton = itemView.findViewById(R.id.commentButton)
@@ -657,6 +658,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
     private inner class ListingItemAdapter(
         private val context: Context,
         private val offlineManager: OfflineManager,
+        private val instance: String,
         private val onNextClick: () -> Unit,
         private val onPrevClick: () -> Unit,
         private val onSignInRequired: () -> Unit,
@@ -731,7 +733,14 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                         val h = holder as ListingItemViewHolder
                         val item = items[position] as Item.PostItem
 
-                        lemmyHeaderHelper.populateHeaderSpan(h.headerContainer, item.postView)
+                        lemmyHeaderHelper.populateHeaderSpan(
+                            headerContainer = h.headerContainer,
+                            postView = item.postView,
+                            instance = instance,
+                            onPageClick = {
+                                requireMainActivity().launchPage(it)
+                            },
+                        )
 
                         h.commentButton.text =
                             RedditUtils.abbrevNumber(item.postView.counts.comments.toLong())
@@ -766,12 +775,16 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     val item = items[position] as Item.PostItem
                     val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
 
-                    lemmyHeaderHelper.populateHeaderSpan(h.headerContainer, item.postView)
+                    lemmyHeaderHelper.populateHeaderSpan(
+                        headerContainer = h.headerContainer,
+                        postView = item.postView,
+                        instance = instance,
+                        onPageClick = {
+                            requireMainActivity().launchPage(it)
+                        },
+                    )
 
                     val thumbnailUrl = item.postView.post.thumbnail_url
-//                    val itemType = item.postView.post.
-
-                    ViewCompat.setTransitionName(h.title, "title:${item.postView.getUniqueKey()}")
 
                     fun showDefaultImage() {
                         h.image?.visibility = View.GONE
@@ -802,7 +815,11 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                         h.image.load(null)
 
                         offlineManager.fetchImage(h.itemView, thumbnailUrl) {
-                            h.image.load(it)
+                            h.image.load(it) {
+                                if (!isRevealed && item.postView.post.nsfw) {
+                                    transformations(BlurTransformation(context, sampling = 10f))
+                                }
+                            }
                         }
                     }
 
@@ -837,6 +854,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                             contentMaxWidth = contentMaxWidth,
                             fullImageViewTransitionName = "full_image_$position",
                             postView = item.postView,
+                            instance = instance,
                             rootView = h.itemView,
                             fullContentContainerView = h.fullContentContainerView,
                             onFullImageViewClickListener = { v, url ->

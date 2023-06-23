@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import android.graphics.RectF
+import android.text.Layout
 import android.text.Selection
 import android.text.Spannable
 import android.text.Spanned
@@ -9,13 +10,15 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.util.Log
-import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.TextView
 import com.idunnololz.summit.R
+import io.noties.markwon.core.spans.LinkSpan
+import io.noties.markwon.ext.tables.TableRowSpan
 import io.noties.markwon.image.AsyncDrawableSpan
+
 
 class CustomLinkMovementMethod : LinkMovementMethod() {
 
@@ -175,15 +178,20 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         if (clickableSpan is ClickableSpan) {
             val clickableSpanWithText =
                 ClickableSpanWithText.ofSpan(textView, clickableSpan)
-            val handled = onLinkClickListener?.onClick(
-                textView,
-                clickableSpanWithText.url,
-                clickableSpanWithText.text,
-                bounds
-            ) ?: false
-            if (!handled) {
-                // Let Android handle this click.
-                clickableSpanWithText.span.onClick(textView)
+
+            if (clickableSpanWithText != null) {
+                val handled = onLinkClickListener?.onClick(
+                    textView,
+                    clickableSpanWithText.url,
+                    clickableSpanWithText.text,
+                    bounds
+                ) ?: false
+                if (!handled) {
+                    // Let Android handle this click.
+                    clickableSpanWithText.span.onClick(textView)
+                }
+            } else {
+                clickableSpan.onClick(textView)
             }
         } else if (clickableSpan is AsyncDrawableSpan) {
             onImageClickListener?.invoke(clickableSpan.drawable.destination)
@@ -198,15 +206,32 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         if (clickableSpan is ClickableSpan) {
             val clickableSpanWithText =
                 ClickableSpanWithText.ofSpan(textView, clickableSpan)
-            val handled = onLinkLongClickListener?.onLongClick(
-                textView,
-                clickableSpanWithText.url,
-                clickableSpanWithText.text,
-                bounds
-            ) ?: false
-            if (!handled) {
-                // Let Android handle this long click as a short-click.
-                clickableSpanWithText.span.onClick(textView)
+            if (clickableSpanWithText != null) {
+                val handled = onLinkLongClickListener?.onLongClick(
+                    textView,
+                    clickableSpanWithText.url,
+                    clickableSpanWithText.text,
+                    bounds
+                ) ?: false
+                if (!handled) {
+                    // Let Android handle this long click as a short-click.
+                    clickableSpanWithText.span.onClick(textView)
+                }
+            } else {
+                val handled = if (clickableSpan is LinkSpan) {
+                    Log.d("HAHA", "onLongClick!")
+                    onLinkLongClickListener?.onLongClick(
+                        textView,
+                        clickableSpan.url,
+                        clickableSpan.link,
+                        bounds
+                    ) ?: false
+                } else {
+                    false
+                }
+                if (!handled) {
+                    clickableSpan.onClick(textView)
+                }
             }
         } else if (clickableSpan is AsyncDrawableSpan) {
             onImageClickListener?.invoke(clickableSpan.drawable.destination)
@@ -223,7 +248,9 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         isUrlHighlighted = false
         val text = textView.text as Spannable
         val highlightSpan =
-            textView.getTag(R.id.bettermovementmethod_highlight_background_span) as BackgroundColorSpan
+            textView.getTag(R.id.bettermovementmethod_highlight_background_span)
+                    as? BackgroundColorSpan
+                ?: return
         text.removeSpan(highlightSpan)
         Selection.removeSelection(text)
     }
@@ -243,6 +270,11 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         val spanStart = text.getSpanStart(clickableSpan)
         val spanEnd = text.getSpanEnd(clickableSpan)
         val highlightSpan = BackgroundColorSpan(textView.highlightColor)
+
+        if (spanStart < 0 || spanEnd < 0) {
+            return // tables dont really support highlighting
+        }
+
         text.setSpan(highlightSpan, spanStart, spanEnd, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
         textView.setTag(R.id.bettermovementmethod_highlight_background_span, highlightSpan)
         Selection.setSelection(text, spanStart, spanEnd)
@@ -273,11 +305,18 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         val layout = textView.layout
         val touchedLine = layout.getLineForVertical(touchY)
         val touchOffset = layout.getOffsetForHorizontal(touchedLine, touchX.toFloat())
+
         touchedLineBounds.left = layout.getLineLeft(touchedLine)
         touchedLineBounds.top = layout.getLineTop(touchedLine).toFloat()
         touchedLineBounds.right = layout.getLineWidth(touchedLine) + touchedLineBounds.left
         touchedLineBounds.bottom = layout.getLineBottom(touchedLine).toFloat()
+
         return if (touchedLineBounds.contains(touchX.toFloat(), touchY.toFloat())) {
+            val s = findClickableSpanInTable(textView, text, event)
+            if (s != null) {
+                return s
+            }
+
             // Find a ClickableSpan that lies under the touched area.
             val clickableSpans: Array<ClickableSpan> = text.getSpans(
                 touchOffset, touchOffset,
@@ -298,6 +337,56 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
             // Touch lies outside the line's horizontal bounds where no spans should exist.
             null
         }
+    }
+
+    private fun findClickableSpanInTable(
+        widget: TextView,
+        buffer: Spannable,
+        event: MotionEvent
+    ): Any? {
+//        // handle only action up (originally action down is used in order to handle selection,
+//        //  which tables do no have)
+//        if (event.action != MotionEvent.ACTION_UP) {
+//            return false
+//        }
+        var x = event.x.toInt()
+        var y = event.y.toInt()
+        x -= widget.totalPaddingLeft
+        y -= widget.totalPaddingTop
+        x += widget.scrollX
+        y += widget.scrollY
+        val layout: Layout = widget.layout
+        val line: Int = layout.getLineForVertical(y)
+        val off: Int = layout.getOffsetForHorizontal(line, x.toFloat())
+        val spans = buffer.getSpans(off, off, TableRowSpan::class.java)
+        if (spans.isEmpty()) {
+            return null
+        }
+        val span = spans[0]
+
+        // okay, we can calculate the x to obtain span, but what about y?
+        val rowLayout: Layout? = span.findLayoutForHorizontalOffset(x)
+        if (rowLayout != null) {
+            // line top as basis
+            val rowY: Int = layout.getLineTop(line)
+            val rowLine: Int = rowLayout.getLineForVertical(y - rowY)
+            val rowOffset: Int = rowLayout.getOffsetForHorizontal(rowLine,
+                (x % span.cellWidth()).toFloat()
+            )
+
+            val rowClickableTextSpans = (rowLayout.text as Spanned)
+                .getSpans(rowOffset, rowOffset, ClickableSpanWithText::class.java)
+            if (rowClickableTextSpans.isNotEmpty()) {
+                return rowClickableTextSpans[0]
+            }
+
+            val rowClickableSpans = (rowLayout.text as Spanned)
+                .getSpans(rowOffset, rowOffset, ClickableSpan::class.java)
+            if (rowClickableSpans.isNotEmpty()) {
+                return rowClickableSpans[0]
+            }
+        }
+        return null
     }
 
     class LongPressTimer : Runnable {
@@ -326,13 +415,16 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
     ) {
 
         companion object {
-            fun ofSpan(textView: TextView, span: ClickableSpan): ClickableSpanWithText {
+            fun ofSpan(textView: TextView, span: ClickableSpan): ClickableSpanWithText? {
                 val s = textView.text as Spanned
-                val text = run {
-                    val start = s.getSpanStart(span)
-                    val end = s.getSpanEnd(span)
-                    s.subSequence(start, end).toString()
+                val start = s.getSpanStart(span)
+                val end = s.getSpanEnd(span)
+
+                if (start < 0 || end < 0) {
+                    return null
                 }
+
+                val text = s.subSequence(start, end).toString()
                 return ClickableSpanWithText(
                     span = span,
                     text = text,

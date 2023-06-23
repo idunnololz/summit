@@ -25,7 +25,7 @@ import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.view.RedditHeaderView
+import com.idunnololz.summit.view.LemmyHeaderView
 import com.idunnololz.summit.view.RewardView
 
 class LemmyHeaderHelper(
@@ -49,9 +49,11 @@ class LemmyHeaderHelper(
     private val rewardViewRecycler = ViewRecycler<RewardView>()
 
     fun populateHeaderSpan(
-        headerContainer: RedditHeaderView,
+        headerContainer: LemmyHeaderView,
         postView: PostView,
-        listAuthor: Boolean = true
+        instance: String,
+        onPageClick: (PageRef) -> Unit,
+        listAuthor: Boolean = true,
     ) {
         val context = headerContainer.context
         val sb = SpannableStringBuilder()
@@ -98,9 +100,10 @@ class LemmyHeaderHelper(
             appendSeparator(sb)
         }
 
+
         sb.appendLink(
             postView.community.name,
-            LinkUtils.getLinkForSubreddit(postView.community.name)
+            LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
         )
         appendSeparator(sb)
         sb.append(
@@ -182,19 +185,22 @@ class LemmyHeaderHelper(
                     url: String,
                     text: String,
                     rect: RectF
-                ): Boolean =
-                    if (RedditUtils.isUrlReddit(url)) {
-                        RedditUtils.openRedditUrl(context, url)
+                ): Boolean {
+                    val pageRef = LinkResolver.parseUrl(url, instance)
+
+                    return if (pageRef != null) {
+                        onPageClick(pageRef)
                         true
                     } else {
                         false
                     }
+                }
             }
         }
     }
 
     fun populateHeaderSpan(
-        headerContainer: RedditHeaderView,
+        headerContainer: LemmyHeaderView,
         item: CommentView,
         detailed: Boolean = false,
         childrenCount: Int? = null,

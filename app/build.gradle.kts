@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 6
-        versionName = "0.1.5"
+        versionCode = 7
+        versionName = "0.1.6"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -130,6 +130,8 @@ dependencies {
 
     implementation("dev.zacsweers.moshix:moshi-sealed-runtime:0.22.1")
     ksp("dev.zacsweers.moshix:moshi-sealed-codegen:0.22.1")
+
+    implementation("com.github.Commit451.coil-transformations:transformations:2.0.2")
 
     // TODO: Remove the following deps
     implementation("org.apmem.tools:layouts:1.10@aar")

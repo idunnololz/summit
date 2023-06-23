@@ -82,6 +82,10 @@ class CommunitiesPaneController @AssistedInject constructor(
         }
     }
 
+    fun onShown() {
+
+    }
+
     private class UserCommunitiesAdapter(
         private val context: Context,
         private val offlineManager: OfflineManager,

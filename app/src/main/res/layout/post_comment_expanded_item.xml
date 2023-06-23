@@ -46,7 +46,7 @@
         app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
         app:layout_constraintEnd_toStartOf="@+id/collapseSectionButton">
 
-        <com.idunnololz.summit.view.RedditHeaderView
+        <com.idunnololz.summit.view.LemmyHeaderView
             android:id="@+id/headerContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

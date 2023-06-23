@@ -1,5 +1,6 @@
 package com.idunnololz.summit.api.dto
 
+typealias LocalSiteId = Int
 
 /**
  * Search lemmy for different types of data.
@@ -64,17 +65,18 @@ data class GetSiteResponse(
     val online: Int,
     val version: String,
     val my_user: MyUserInfo?,
-    val federated_instances: FederatedInstances?,
     val all_languages: List<Language>,
+    val federated_instances: FederatedInstances?,
     val discussion_languages: List<Int>,
     val taglines: List<Tagline>?,
+    val custom_emojis: List<CustomEmojiView>,
 )
 
 /**
  * Your user info, such as blocks, follows, etc.
  */
 data class MyUserInfo(
-    val local_user_view: LocalUserSettingsView,
+    val local_user_view: LocalUserView,
     val follows: List<CommunityFollowerView>,
     val moderates: List<CommunityModeratorView>,
     val community_blocks: List<CommunityBlockView>,

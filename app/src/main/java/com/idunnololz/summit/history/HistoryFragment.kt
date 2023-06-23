@@ -1,37 +1,33 @@
 package com.idunnololz.summit.history
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.ImageButton
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
-import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.databinding.HistoryEntryItemBinding
+import com.idunnololz.summit.databinding.HistoryHeaderItemBinding
+import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.reddit.RedditUtils
-import com.idunnololz.summit.reddit.getLocalizedName
-import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.moshi
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.RuntimeException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -61,7 +57,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setHasOptionsMenu(true)
+        super.onCreateView(inflater, container, savedInstanceState)
 
         requireMainActivity().apply {
             setupForFragment<HistoryFragment>()
@@ -78,7 +74,21 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
         val context = requireContext()
 
-        adapter = HistoryEntryAdapter(context)
+        adapter = HistoryEntryAdapter(
+            removeEntry = {
+                viewModel.removeEntry(it)
+            },
+            onEntryClick = {
+                val pageRef = LinkResolver.parseUrl(it.url, viewModel.instance)
+                if (pageRef == null) {
+                    AlertDialogFragment.Builder()
+                        .setMessage(R.string.error_history_entry_corrupt)
+                        .createAndShow(this@HistoryFragment, "asdf")
+                } else {
+                    requireMainActivity().launchPage(pageRef)
+                }
+            }
+        )
 
         requireMainActivity().apply {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
@@ -94,7 +104,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setTitle(getString(R.string.history))
+            supportActionBar?.title = getString(R.string.history)
         }
 
         historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)
@@ -128,42 +138,41 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.loadHistory()
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_fragment_history, menu)
 
-        inflater.inflate(R.menu.menu_fragment_history, menu)
+                val searchView: SearchView = menu.findItem(R.id.search).actionView as SearchView
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        return true
+                    }
 
-        val searchView: SearchView = menu.findItem(R.id.search).actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        if (newText != null) {
+                            adapter.setQuery(newText)
+                        }
+
+                        return true
+                    }
+                })
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null) {
-                    adapter.setQuery(newText)
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                when (menuItem.itemId) {
+                    R.id.search -> {
+                        true
+                    }
+                    R.id.clear_history -> {
+                        viewModel.clearHistory()
+                        true
+                    }
+                    else ->
+                        false
                 }
 
-                return true
-            }
-
         })
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.search -> {
-                return true
-            }
-            R.id.clear_history -> {
-                viewModel.clearHistory()
-                return true
-            }
-            else ->
-                return super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onDestroyView() {
@@ -172,122 +181,76 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         super.onDestroyView()
     }
 
-    private fun handleEntryClicked(data: LiteHistoryEntry) {
-        when (data.type) {
-            HistoryEntry.TYPE_PAGE_VISIT -> {
-                startActivity(
-                    Intent(context, MainActivity::class.java)
-                        .setData(Uri.parse(data.url))
-                )
-            }
-            HistoryEntry.TYPE_SUBREDDIT_STATE -> {
-                lifecycleScope.launch {
-                    val entry = try {
-                        withContext(Dispatchers.IO) {
-                            historyManager.getHistoryEntry(data.id)
-                        }
-                    } catch (e: Exception) {
-                        withContext(Dispatchers.Main) {
-                            AlertDialogFragment.Builder()
-                                .setMessage(R.string.error_history_entry_corrupt)
-                                .createAndShow(this@HistoryFragment, "asdf")
-                        }
-                        return@launch
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        if (entry == null) {
-                            AlertDialogFragment.Builder()
-                                .setMessage(R.string.error_history_entry_deleted)
-                                .createAndShow(this@HistoryFragment, "asdf")
-                        } else {
-                            val state = moshi.adapter(TabCommunityState::class.java).fromJson(entry.extras)
-                            requireMainActivity().restoreTabState(state)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private sealed class Item {
-        abstract val headerId: Int
-
-        data class HistoryItem(
-            val sharableUrl: String,
-            val data: LiteHistoryEntry,
-            override val headerId: Int
-        ) : Item()
-
-        data class HeaderItem(override val headerId: Int, val date: Date) : Item()
-    }
-
-    private class HistoryItemViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        val title: TextView = v.findViewById(R.id.title)
-        val body: TextView = v.findViewById(R.id.body)
-        val removeButton: ImageButton = v.findViewById(R.id.removeButton)
-    }
-
-    private class HeaderItemViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        val title: TextView = v.findViewById(R.id.title)
-    }
-
-    private inner class HistoryEntryAdapter(
-        context: Context
+    private class HistoryEntryAdapter(
+        private val removeEntry: (Long) -> Unit,
+        private val onEntryClick: (LiteHistoryEntry) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+        private sealed interface Item {
+            val headerId: Int
+
+            data class HistoryItem(
+                val sharableUrl: String,
+                val data: LiteHistoryEntry,
+                override val headerId: Int
+            ) : Item
+
+            data class HeaderItem(
+                override val headerId: Int,
+                val date: Date
+            ) : Item
+        }
 
         private var data: List<LiteHistoryEntry> = listOf()
 
-        private var items: List<Item> = listOf()
-
-        private val inflater = LayoutInflater.from(context)
+        private var query: String = ""
 
         private val dateFormatter = SimpleDateFormat.getDateInstance()
 
-        private var query: String = ""
-
-        override fun getItemViewType(position: Int): Int = when (items[position]) {
-            is Item.HistoryItem -> R.layout.history_entry_item
-            is Item.HeaderItem -> R.layout.history_header_item
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val v = inflater.inflate(viewType, parent, false)
-            return when (viewType) {
-                R.layout.history_entry_item -> {
-                    HistoryItemViewHolder(v)
+        private val adapterHelper = AdapterHelper<Item>(
+            areItemsTheSame = { old, new ->
+                if (old::class != new::class) {
+                    return@AdapterHelper false
                 }
-                R.layout.history_header_item -> {
-                    HeaderItemViewHolder(v)
+
+                when (old) {
+                    is Item.HistoryItem -> {
+                        old.data.id == (new as Item.HistoryItem).data.id
+                    }
+                    is Item.HeaderItem -> {
+                        old.date == (new as Item.HeaderItem).date
+                    }
                 }
-                else -> throw RuntimeException("Unknown view type $viewType")
+            }
+        ).apply {
+            addItemType(Item.HeaderItem::class, HistoryHeaderItemBinding::inflate) { item, b, _ ->
+                b.title.text = dateFormatter.format(item.date)
+            }
+            addItemType(Item.HistoryItem::class, HistoryEntryItemBinding::inflate) { item, b, h ->
+                b.title.text = item.data.shortDesc
+                b.body.text = item.sharableUrl
+
+                b.removeButton.setOnClickListener {
+                    removeEntry(item.data.id)
+                }
+
+                h.itemView.setOnClickListener {
+                    onEntryClick(item.data)
+                }
+
             }
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val item = items[position]
-            when (item) {
-                is Item.HistoryItem -> {
-                    val h = holder as HistoryItemViewHolder
-                    h.title.text = item.data.shortDesc
-                    h.body.text = item.sharableUrl
+        override fun getItemViewType(position: Int): Int =
+            adapterHelper.getItemViewType(position)
 
-                    h.removeButton.setOnClickListener {
-                        historyManager.removeEntry(item.data.id)
-                    }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+            adapterHelper.onCreateViewHolder(parent, viewType)
 
-                    h.itemView.setOnClickListener {
-                        handleEntryClicked(item.data)
-                    }
-                }
-                is Item.HeaderItem -> {
-                    val h = holder as HeaderItemViewHolder
-                    h.title.text = dateFormatter.format(item.date)
-                }
-            }
-        }
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+            adapterHelper.onBindViewHolder(holder, position)
 
-        override fun getItemCount(): Int = items.size
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         fun setItems(newData: List<LiteHistoryEntry>) {
             data = newData
@@ -302,7 +265,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         }
 
         private fun refreshItems() {
-            val oldItems = items
             val newItems = mutableListOf<Item>()
             val lastDate: Calendar = Calendar.getInstance()
             lastDate.timeInMillis = 0
@@ -341,41 +303,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                 )
             }
 
-            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    val oldItem = oldItems[oldItemPosition]
-                    val newItem = newItems[newItemPosition]
-                    if (oldItem::class != newItem::class) {
-                        return false
-                    }
-                    return when (oldItem) {
-                        is Item.HistoryItem -> {
-                            oldItem.data.id == (newItem as Item.HistoryItem).data.id
-                        }
-                        is Item.HeaderItem -> {
-                            oldItem.date == (newItem as Item.HeaderItem).date
-                        }
-                    }
-                }
-
-                override fun getOldListSize(): Int = oldItems.size
-
-                override fun getNewListSize(): Int = newItems.size
-
-                override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int
-                ): Boolean {
-                    val oldItem = oldItems[oldItemPosition]
-                    val newItem = newItems[newItemPosition]
-                    return true
-                }
-
-            })
-
-            this.items = newItems
-            diff.dispatchUpdatesTo(this)
-            notifyItemChanged(0, Unit)
+            adapterHelper.setItems(newItems, this)
         }
     }
 }

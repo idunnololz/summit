@@ -66,7 +66,7 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.LoadingView
-import com.idunnololz.summit.view.RedditHeaderView
+import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -213,7 +213,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
-                    adapter.setError(it.error)
+                    adapter.error = it.error
                 }
                 is StatefulData.Loading -> {
                     if (!adapter.hasStartingData()) {
@@ -231,7 +231,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         viewModel.fetchPostData(args.instance, args.id)
 
-        args.post?.getUrl()?.let { url ->
+        args.post?.getUrl(args.instance)?.let { url ->
             historyManager.recordVisit(
                 jsonUrl = url,
                 saveReason = HistorySaveReason.LOADING,
@@ -306,7 +306,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     }
 
     fun onMainListingItemRetrieved(post: PostView) {
-        post.getUrl()?.let { url ->
+        post.getUrl(args.instance).let { url ->
             historyManager.recordVisit(
                 jsonUrl = url,
                 saveReason = HistorySaveReason.LOADED,
@@ -491,7 +491,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     }
 
     class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val headerContainer: RedditHeaderView = view.findViewById(R.id.headerContainer)
+        val headerContainer: LemmyHeaderView = view.findViewById(R.id.headerContainer)
         val titleTextView: TextView = view.findViewById(R.id.title)
         val authorTextView: TextView = view.findViewById(R.id.author)
         val commentButton: MaterialButton = itemView.findViewById(R.id.commentButton)
@@ -506,7 +506,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     ) : RecyclerView.ViewHolder(binding.root)
 
     class CommentCollapsedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val headerView: RedditHeaderView = view.findViewById(R.id.headerContainer)
+        val headerView: LemmyHeaderView = view.findViewById(R.id.headerContainer)
         val threadLinesContainer: ViewGroup = view.findViewById(R.id.threadLinesContainer)
         val expandSectionButton: ImageButton = itemView.findViewById(R.id.expandSectionButton)
         val topHotspot: View = itemView.findViewById(R.id.topHotspot)
@@ -593,7 +593,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         var isFirstLoad: Boolean = true
         var isLoaded: Boolean = false
-        private var error: Throwable? = null
+        var error: Throwable? = null
+            set(value) {
+                field = value
+
+                refreshItems()
+            }
 
         var contentMaxWidth = 0
             set(value) {
@@ -686,7 +691,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         val postKey = post.getUniqueKey()
 
                         lemmyHeaderHelper.populateHeaderSpan(
-                            h.headerContainer, post, listAuthor = false
+                            headerContainer = h.headerContainer,
+                            postView = post,
+                            instance = instance,
+                            onPageClick = {
+                                requireMainActivity().launchPage(it)
+                            },
+                            listAuthor = false
                         )
 
                         h.titleTextView.text = post.getFormattedTitle()
@@ -706,6 +717,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             contentMaxWidth = contentMaxWidth,
                             fullImageViewTransitionName = "post_image",
                             postView = post,
+                            instance = instance,
                             rootView = h.itemView,
                             fullContentContainerView = h.fullContentContainerView,
                             onFullImageViewClickListener = { v, url ->
@@ -804,7 +816,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     ViewCompat.setTransitionName(h.titleTextView, "title")
 
                     lemmyHeaderHelper.populateHeaderSpan(
-                        h.headerContainer, item.postView, listAuthor = false
+                        headerContainer = h.headerContainer,
+                        postView = item.postView,
+                        instance = instance,
+                        onPageClick = {
+                            requireMainActivity().launchPage(it)
+                        },
+                        listAuthor = false
                     )
 
                     h.titleTextView.text = post.getFormattedTitle()
@@ -824,6 +842,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         contentMaxWidth = contentMaxWidth,
                         fullImageViewTransitionName = "post_image",
                         postView = post,
+                        instance = instance,
                         rootView = h.itemView,
                         fullContentContainerView = h.fullContentContainerView,
                         onFullImageViewClickListener = { v, url ->
@@ -905,7 +924,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
                         }
                     } else {
-                        RedditUtils.bindRedditText(b.text, body)
+                        RedditUtils.bindLemmyText(b.text, body, instance)
                     }
 
                     b.text.movementMethod = CustomLinkMovementMethod().apply {
@@ -1207,6 +1226,25 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
+        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+            super.onViewRecycled(holder)
+
+            val item = if (holder.absoluteAdapterPosition >= 0) {
+                items[holder.absoluteAdapterPosition]
+            } else {
+                null
+            }
+
+            if (holder is HeaderViewHolder) {
+                val state = lemmyContentHelper.recycleFullContent(holder.fullContentContainerView)
+
+                (item as? HeaderItem)?.videoState = state.videoState
+            } else if (holder is ComposeCommentViewHolder) {
+                holder.editText.removeTextChangedListener(holder.boundTextWatcher)
+                holder.boundTextWatcher = null
+            }
+        }
+
         private fun bindComposeCommentView(
             h: ComposeCommentViewHolder,
             item: ComposeCommentItem,
@@ -1321,25 +1359,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             refreshItems(refreshHeader = false)
         }
 
-        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-            super.onViewRecycled(holder)
-
-            val item = if (holder.absoluteAdapterPosition >= 0) {
-                items[holder.absoluteAdapterPosition]
-            } else {
-                null
-            }
-
-            if (holder is HeaderViewHolder) {
-                val state = lemmyContentHelper.recycleFullContent(holder.fullContentContainerView)
-
-                (item as? HeaderItem)?.videoState = state.videoState
-            } else if (holder is ComposeCommentViewHolder) {
-                holder.editText.removeTextChangedListener(holder.boundTextWatcher)
-                holder.boundTextWatcher = null
-            }
-        }
-
         override fun getItemCount(): Int = items.size
 
         private fun setupTransitionAnimation(titleTextView: TextView) {
@@ -1388,11 +1407,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
          * as refreshing them might cause a relayout causing janky animations
          */
         private fun refreshItems(refreshHeader: Boolean = true) {
-            val rawData = rawData ?: return
+            val rawData = rawData
             val oldItems = items
             var mainListingItemSeen = false
             val newItems =
                 if (error == null) {
+                    rawData ?: return
+
                     val finalItems = mutableListOf<Item>()
 
                     rawData.postView.let {
@@ -1544,12 +1565,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             commentItem.isCollapsed = false
 
             refreshItems(refreshHeader = false)
-        }
-
-        fun setError(error: Throwable) {
-            this.error = error
-
-            refreshItems()
         }
 
     }

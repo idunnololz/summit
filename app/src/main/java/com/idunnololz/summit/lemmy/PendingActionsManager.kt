@@ -238,19 +238,22 @@ class PendingActionsManager @Inject constructor(
         onActionChangedListeners.remove(l)
     }
 
-    private fun notifyActionComplete(action: LemmyAction) {
+    private suspend fun notifyActionComplete(action: LemmyAction) = withContext(Dispatchers.Main) {
         for (onActionCompleteListener in onActionChangedListeners) {
             onActionCompleteListener.onActionComplete(action)
         }
     }
 
-    private fun notifyActionAdded(action: LemmyAction) {
+    private suspend fun notifyActionAdded(action: LemmyAction) = withContext(Dispatchers.Main) {
         for (onActionCompleteListener in onActionChangedListeners) {
             onActionCompleteListener.onActionAdded(action)
         }
     }
 
-    private fun notifyActionFailed(action: LemmyAction, reason: Throwable) {
+    private suspend fun notifyActionFailed(
+        action: LemmyAction,
+        reason: Throwable
+    ) = withContext(Dispatchers.Main) {
         for (onActionCompleteListener in onActionChangedListeners) {
             onActionCompleteListener.onActionFailed(action, reason)
         }

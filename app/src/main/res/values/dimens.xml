@@ -27,4 +27,6 @@
     <dimen name="account_image_size">48dp</dimen>
 
     <dimen name="bottom_menu_width">-1px</dimen>
+
+    <dimen name="footer_height">96dp</dimen>
 </resources>
