@@ -92,6 +92,13 @@
         <action
             android:id="@+id/action_postFragment_to_login"
             app:destination="@id/login" />
+        <action
+            android:id="@+id/action_postFragment_to_addOrEditCommentFragment"
+            app:destination="@id/addOrEditCommentFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <fragment
         android:id="@+id/imageViewerFragment"
@@ -141,4 +148,38 @@
         android:id="@+id/commentFeatureDialogFragment"
         android:name="com.idunnololz.summit.comment.CommentFeatureDialogFragment"
         android:label="CommentFeatureDialogFragment" />
+    <fragment
+        android:id="@+id/addOrEditCommentFragment"
+        android:name="com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment"
+        android:label="AddOrEditCommentFragment" >
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="commentView"
+            app:argType="com.idunnololz.summit.api.dto.CommentView"
+            app:nullable="true" />
+        <argument
+            android:name="postView"
+            app:argType="com.idunnololz.summit.api.dto.PostView"
+            app:nullable="true" />
+        <argument
+            android:name="editCommentView"
+            app:argType="com.idunnololz.summit.api.dto.CommentView"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_addOrEditCommentFragment_to_previewCommentDialogFragment"
+            app:destination="@id/previewCommentDialogFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/previewCommentDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment"
+        android:label="PreviewCommentDialogFragment" >
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="content"
+            app:argType="string" />
+    </dialog>
 </navigation>

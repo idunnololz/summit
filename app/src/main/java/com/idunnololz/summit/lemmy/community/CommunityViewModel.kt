@@ -65,7 +65,7 @@ class CommunityViewModel @Inject constructor(
     private var pagePositions = arrayListOf<PageScrollState>()
 
     val currentCommunityRef = MutableLiveData<CommunityRef>(CommunityRef.All())
-    val currentPageIndex = MutableLiveData<Int>(0)
+    val currentPageIndex = MutableLiveData(0)
     private val communityRefChangeObserver = Observer<CommunityRef> {
         recentCommunityManager.addRecentCommunity(it)
     }
@@ -153,6 +153,10 @@ class CommunityViewModel @Inject constructor(
 
     fun changeCommunity(communityRef: CommunityRef?) {
         if (communityRef == null) {
+            return
+        }
+
+        if (communityRef is CommunityRef.Subscribed && accountManager.currentAccount.value == null) {
             return
         }
 

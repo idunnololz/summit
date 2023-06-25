@@ -1,9 +1,10 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
+import com.idunnololz.summit.api.utils.domain
 import com.idunnololz.summit.lemmy.community.CommunityViewModel
 import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.JsonClass
@@ -33,13 +34,25 @@ data class CommunityViewState(
 }
 
 fun CommunityViewState.toUrl(): String =
-    "${communityState.communityRef.toUrl()}/page/${this.communityState.currentPageIndex}"
+    communityState.communityRef.toUri()
+        .buildUpon()
+        .appendQueryParameter("page", this.communityState.currentPageIndex.toString())
+        .build()
+        .toString()
 
-fun CommunityRef.toUrl(): String = when (val community = this) {
-    is CommunityRef.All -> "https://${community.instance ?: "lemmy.world"}/home/data_type/Post/listing_type/All"
-    is CommunityRef.CommunityRefByObj -> "${community.community.communityUrl}/data_type/Post"
-    is CommunityRef.Local -> "https://${community.instance}/home/data_type/Post/listing_type/Local"
-    is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}/data_type/Post"
+fun CommunityRef.toUrl(): String = toUri().toString()
+
+fun CommunityRef.toUri(): Uri {
+    val url = when (val community = this) {
+        is CommunityRef.All ->
+            "https://${community.instance ?: "lemmy.world"}/?dataType=Post&listingType=All"
+        is CommunityRef.CommunityRefByObj -> "https://${community.community.domain}/c/${community.community.name}?dataType=Post"
+        is CommunityRef.Local -> "https://${community.instance}/?dataType=Post&listingType=Local"
+        is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
+        is CommunityRef.Subscribed -> "https://${community.instance}/?dataType=Post&listingType=Subscribed"
+    }
+
+    return Uri.parse(url)
 }
 
 @JsonClass(generateAdapter = true)

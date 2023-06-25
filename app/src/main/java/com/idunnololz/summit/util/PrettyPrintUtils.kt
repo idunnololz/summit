@@ -15,6 +15,9 @@ fun dateStringToPretty(dateStr: String, includeAgo: Boolean = false): CharSequen
     )
 }
 
+fun dateStringToTs(dateString: String): Long =
+    Instant.parse(dateString + "Z").toEpochMilli()
+
 fun abbrevNumber(number: Long): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         val formatter = CompactDecimalFormat.getInstance(

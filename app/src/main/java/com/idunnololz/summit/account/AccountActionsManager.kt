@@ -3,18 +3,26 @@ package com.idunnololz.summit.account
 import android.content.Context
 import android.util.Log
 import android.view.View
-import androidx.core.view.doOnDetach
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.PendingActionsManager
-import com.idunnololz.summit.lemmy.VotesManager
+import com.idunnololz.summit.actions.PendingActionsManager
+import com.idunnololz.summit.actions.PendingCommentView
+import com.idunnololz.summit.actions.PendingCommentsManager
+import com.idunnololz.summit.actions.VotesManager
+import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,6 +40,7 @@ class AccountActionsManager @Inject constructor(
     }
 
     private val votesManager = VotesManager(context)
+    private val pendingCommentsManager = PendingCommentsManager()
     private var nextId: Long = 1
 
     interface Registration {
@@ -50,8 +59,11 @@ class AccountActionsManager @Inject constructor(
     private val voteRefToRegistrations = mutableMapOf<VotableRef, MutableList<Registration>>()
     private val coroutineScope = coroutineScopeFactory.create()
 
+    val onCommentActionChanged = MutableSharedFlow<Unit>()
+
     val voteUiHandler = object : VoteUiHandler {
         override fun bindVoteUi(
+            lifecycleOwner: LifecycleOwner,
             currentScore: Int,
             instance: String,
             ref: VotableRef,
@@ -104,18 +116,121 @@ class AccountActionsManager @Inject constructor(
             registration.voteCurrent(votesManager.getVote(ref) ?: 0)
 
             Log.d(TAG, "Binding vote handler - ${ref}")
-            upVoteView.post {
-                upVoteView.doOnDetach {
-                    unbindVoteUi(it)
-                    Log.d(TAG, "Auto unbinding vote handler - ${ref}")
+
+            lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+                override fun onDestroy(owner: LifecycleOwner) {
+                    Log.d(TAG, "Lifecycle onDestroy. Unbinding - ${ref}")
+
+                    lifecycleOwner.lifecycle.removeObserver(this)
+
+                    unbindVoteUi(upVoteView)
+                    upVoteView.setOnClickListener(null)
+                    downVoteView.setOnClickListener(null)
                 }
-            }
+            })
         }
 
         override fun unbindVoteUi(upVoteView: View) {
             val existingRegId = upVoteView.getTag(R.id.account_actions_manager_reg_id)
             if (existingRegId != null) {
                 unregisterVoteHandler(existingRegId as Long)
+            }
+        }
+    }
+
+    private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {
+        override fun onActionAdded(action: LemmyAction) {
+            when (action.info) {
+                is ActionInfo.VoteActionInfo -> {
+                    votesManager.setPendingVote(action.info.ref, action.info.dir)
+                    voteRefToRegistrations[action.info.ref]?.forEach {
+                        it.votePending(action.info.dir)
+                    }
+                }
+                is ActionInfo.CommentActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onCommentActionAdded(action.id, action.info)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.DeleteCommentActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onDeleteCommentActionAdded(action.id, action.info)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.EditActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onEditCommentActionAdded(action.id, action.info)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                null -> {}
+            }
+        }
+
+        override fun onActionFailed(action: LemmyAction, reason: LemmyActionFailureReason) {
+            Log.d(TAG, "onActionComplete(): $action, reason: $reason")
+            when (action.info) {
+                is ActionInfo.VoteActionInfo -> {
+                    votesManager.clearPendingVotes(action.info.ref)
+                    voteRefToRegistrations[action.info.ref]?.forEach {
+                        it.voteFailed(
+                            score = votesManager.getVote(action.info.ref) ?: 0,
+                            e = LemmyActionFailureException(reason)
+                        )
+                    }
+                }
+                is ActionInfo.CommentActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onCommentActionFailed(action.id, action.info, reason)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.DeleteCommentActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onDeleteCommentActionFailed(action.id, action.info, reason)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.EditActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onEditCommentActionFailed(action.id, action.info, reason)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                null -> {}
+            }
+        }
+
+        override fun onActionComplete(action: LemmyAction) {
+            Log.d(TAG, "onActionComplete(): $action")
+            when (action.info) {
+                is ActionInfo.VoteActionInfo -> {
+                    votesManager.setVote(action.info.ref, action.info.dir)
+                    voteRefToRegistrations[action.info.ref]?.forEach {
+                        it.voteSuccess(action.info.dir)
+                    }
+                }
+                is ActionInfo.CommentActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onCommentActionComplete(action.id, action.info)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.DeleteCommentActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onDeleteCommentActionComplete(action.id, action.info)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.EditActionInfo -> {
+                    coroutineScope.launch {
+                        pendingCommentsManager.onEditCommentActionComplete(action.id, action.info)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                null -> {}
             }
         }
     }
@@ -127,59 +242,55 @@ class AccountActionsManager @Inject constructor(
             }
         })
 
-        pendingActionsManager.addActionCompleteListener(object :
-            PendingActionsManager.OnActionChangedListener {
-            override fun onActionAdded(action: LemmyAction) {
-                when (action.info) {
-                    is ActionInfo.VoteActionInfo -> {
-                        votesManager.setPendingVote(action.info.ref, action.info.dir)
-                        voteRefToRegistrations[action.info.ref]?.forEach {
-                            it.votePending(action.info.dir)
-                        }
-                    }
-                    is ActionInfo.CommentActionInfo -> {}
-                    is ActionInfo.DeleteCommentActionInfo -> {}
-                    is ActionInfo.EditActionInfo -> {}
-                    null -> {}
-                }
-            }
+        pendingActionsManager.addActionCompleteListener(onActionChangedListener)
+    }
 
-            override fun onActionFailed(action: LemmyAction, reason: Throwable) {
-                when (action.info) {
-                    is ActionInfo.VoteActionInfo -> {
-                        votesManager.clearPendingVotes(action.info.ref)
-                        voteRefToRegistrations[action.info.ref]?.forEach {
-                            it.voteFailed(votesManager.getVote(action.info.ref) ?: 0, reason)
-                        }
-                    }
-                    is ActionInfo.CommentActionInfo -> {}
-                    is ActionInfo.DeleteCommentActionInfo -> {}
-                    is ActionInfo.EditActionInfo -> {}
-                    null -> {}
-                }
-            }
+    suspend fun createComment(
+        postRef: PostRef,
+        parentId: CommentId?,
+        content: String,
+    ) {
+        val account = accountManager.currentAccount.value ?: return
+        pendingActionsManager.comment(
+            postRef,
+            parentId,
+            content,
+            account.id,
+        )
+    }
 
-            override fun onActionComplete(action: LemmyAction) {
-                when (action.info) {
-                    is ActionInfo.VoteActionInfo -> {
-                        votesManager.setVote(action.info.ref, action.info.dir)
-                        voteRefToRegistrations[action.info.ref]?.forEach {
-                            it.voteSuccess(action.info.dir)
-                        }
-                    }
-                    is ActionInfo.CommentActionInfo -> {}
-                    is ActionInfo.DeleteCommentActionInfo -> {}
-                    is ActionInfo.EditActionInfo -> {}
-                    null -> {}
-                }
-            }
-        })
+    suspend fun editComment(
+        postRef: PostRef,
+        commentId: CommentId,
+        content: String,
+    ) {
+        val account = accountManager.currentAccount.value ?: return
+        pendingActionsManager.editComment(
+            postRef,
+            commentId,
+            content,
+            account.id,
+        )
+    }
+
+    suspend fun deleteComment(
+        postRef: PostRef,
+        commentId: CommentId,
+    ) {
+        val account = accountManager.currentAccount.value ?: return
+        pendingActionsManager.deleteComment(
+            postRef,
+            commentId,
+            account.id,
+        )
     }
 
     private fun registerVoteHandler(existingRegId: Long, ref: VotableRef, registration: Registration) {
         regIdToRegistration[existingRegId] = VoteHandlerRegistration(ref, registration)
         val list = voteRefToRegistrations.getOrPut(ref) { mutableListOf() }
         list.add(registration)
+
+        Log.d(TAG, "Total registrations: ${regIdToRegistration.size}")
     }
 
     private fun unregisterVoteHandler(existingRegId: Long) {
@@ -204,5 +315,12 @@ class AccountActionsManager @Inject constructor(
         pendingActionsManager.voteOn(instance, ref, dir, account.id)
 
         return Result.success(Unit)
+    }
+
+    fun getPendingComments(postRef: PostRef) =
+        pendingCommentsManager.getPendingComments(postRef)
+
+    fun removePendingComment(pendingComment: PendingCommentView) {
+        pendingCommentsManager.removePendingComment(pendingComment)
     }
 }

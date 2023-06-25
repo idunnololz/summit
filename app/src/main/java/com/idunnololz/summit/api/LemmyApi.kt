@@ -78,6 +78,9 @@ private const val TAG = "LemmyApi"
 interface LemmyApi {
     @GET("site")
     fun getSite(@QueryMap form: Map<String, String>): Call<GetSiteResponse>
+    @GET("site")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getSiteNoCache(@QueryMap form: Map<String, String>): Call<GetSiteResponse>
 
     /**
      * Get / fetch posts, with various filters.
@@ -156,6 +159,9 @@ interface LemmyApi {
      */
     @GET("community")
     fun getCommunity(@QueryMap form: Map<String, String>): Call<GetCommunityResponse>
+    @GET("community")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getCommunityNoCache(@QueryMap form: Map<String, String>): Call<GetCommunityResponse>
 
     /**
      * Get / fetch a community.

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentPreAuthBinding
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -17,7 +18,7 @@ class PreAuthDialogFragment : BaseDialogFragment<DialogFragmentPreAuthBinding>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder: AlertDialog.Builder = MaterialAlertDialogBuilder(context)
 
         builder.setMessage(R.string.auth_required_title)
 

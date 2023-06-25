@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent">
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true">
+
+            <TextView
+                android:id="@+id/replying_to"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:padding="@dimen/padding"
+                android:textIsSelectable="true"
+                android:scrollbars="vertical"
+                android:textAppearance="?textAppearanceBodyMedium"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/comment_editor"
+                app:layout_constraintVertical_weight="1"/>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/replying_to"
+                app:layout_constraintBottom_toTopOf="@+id/comment_editor"/>
+
+            <EditText
+                android:id="@+id/comment_editor"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:autofillHints="no"
+                android:hint="@string/comment"
+                android:padding="@dimen/padding"
+                android:background="@null"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/replying_to"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_weight="1"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorSurface"
+        android:layout_gravity="bottom">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp">
+
+            <ImageView
+                android:id="@+id/preview"
+                android:src="@drawable/baseline_preview_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/preview"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/text_emojis"
+                android:src="@drawable/baseline_emoji_emotions_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/text_emojis"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/spoiler"
+                android:src="@drawable/baseline_spoiler_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/spoiler_text"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/bold"
+                android:src="@drawable/baseline_format_bold_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/bold"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/italic"
+                android:src="@drawable/baseline_format_italic_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/italic"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/strikethrough"
+                android:src="@drawable/baseline_format_strikethrough_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/strikethrough"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/quote"
+                android:src="@drawable/baseline_format_quote_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/quote"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/bulleted_list"
+                android:src="@drawable/baseline_format_list_bulleted_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/bulleted_list"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/numbered_list"
+                android:src="@drawable/baseline_format_list_numbered_24"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/numbered_list"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+            <ImageView
+                android:id="@+id/link_app"
+                android:src="@drawable/ic_app_link"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:contentDescription="@string/add_link_to_app"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
+                app:tint="?colorControlNormal"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

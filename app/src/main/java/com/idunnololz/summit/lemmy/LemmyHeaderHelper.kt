@@ -13,7 +13,8 @@ import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.api.utils.domain
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
@@ -146,11 +147,11 @@ class LemmyHeaderHelper(
 //                    )
 //                }
             } else {
-                sb.append(RedditUtils.formatAuthor(postView.creator.name))
+                sb.append(LemmyUtils.formatAuthor(postView.creator.name))
             }
         }
 
-        postView.community.domain?.let { domain ->
+        postView.domain.let { domain ->
             appendSeparator(sb)
             sb.append(domain)
         }
@@ -343,7 +344,7 @@ class LemmyHeaderHelper(
                 headerContainer.context.resources.getQuantityString(
                     R.plurals.point_count_format,
                     item.counts.score,
-                    RedditUtils.abbrevNumber(item.counts.score.toLong())
+                    LemmyUtils.abbrevNumber(item.counts.score.toLong())
                 )
             )
 //            }

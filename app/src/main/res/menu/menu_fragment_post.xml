@@ -13,4 +13,8 @@
         android:id="@+id/sort_comments_by"
         android:title="@string/sort_comments_by"
         android:orderInCategory="300"/>
+    <item
+        android:id="@+id/refresh"
+        android:title="@string/refresh"
+        android:orderInCategory="300"/>
 </menu>

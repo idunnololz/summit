@@ -8,18 +8,6 @@ import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 @JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface CommunitySortOrder {
 
-//    companion object {
-//        fun adapter(): PolymorphicJsonAdapterFactory<CommunitySortOrder> =
-//            PolymorphicJsonAdapterFactory.of(CommunitySortOrder::class.java, "t")
-//                .withSubtype(Hot::class.java, "1")
-//                .withSubtype(Active::class.java, "2")
-//                .withSubtype(New::class.java, "3")
-//                .withSubtype(Old::class.java, "4")
-//                .withSubtype(MostComments::class.java, "5")
-//                .withSubtype(NewComments::class.java, "6")
-//                .withSubtype(TopOrder::class.java, "7")
-//    }
-
     @TypeLabel("1")
     object Hot : CommunitySortOrder
     @TypeLabel("2")

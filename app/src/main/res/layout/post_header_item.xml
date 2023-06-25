@@ -78,6 +78,27 @@
         app:layout_constraintTop_toBottomOf="@+id/barrier" />
 
     <ImageButton
+        android:id="@+id/add_comment_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_add_comment_24"
+        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintEnd_toStartOf="@+id/controlsDivider" />
+
+    <View
+        android:id="@+id/controlsDivider"
+        android:layout_height="0dp"
+        android:layout_width="1dp"
+        android:background="@color/colorDivider"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintEnd_toStartOf="@+id/upvoteButton"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton" />
+
+    <ImageButton
         android:id="@+id/upvoteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

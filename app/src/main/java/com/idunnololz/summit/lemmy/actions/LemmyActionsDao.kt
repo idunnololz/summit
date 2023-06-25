@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.actions
 
+import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
@@ -11,11 +12,16 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -51,6 +57,11 @@ data class LemmyAction(
 
 @ProvidedTypeConverter
 class LemmyActionConverters(private val moshi: Moshi) {
+
+    companion object {
+        private val TAG = "LemmyActionConverters"
+    }
+
     @TypeConverter
     fun actionInfoToString(value: ActionInfo): String {
         return moshi.adapter(ActionInfo::class.java).toJson(value)
@@ -61,22 +72,29 @@ class LemmyActionConverters(private val moshi: Moshi) {
         try {
             moshi.adapter(ActionInfo::class.java).fromJson(value)
         } catch (e: Exception) {
+            Log.e(TAG, "", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+            null
+        }
+
+    @TypeConverter
+    fun lemmyActionFailureReasonToString(value: LemmyActionFailureReason): String {
+        return moshi.adapter(LemmyActionFailureReason::class.java).toJson(value)
+    }
+
+    @TypeConverter
+    fun stringToLemmyActionFailureReason(value: String): LemmyActionFailureReason? =
+        try {
+            moshi.adapter(LemmyActionFailureReason::class.java).fromJson(value)
+        } catch (e: Exception) {
+            Log.e(TAG, "", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             null
         }
 }
 
+@JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface ActionInfo {
-
-    companion object {
-        fun adapter(): PolymorphicJsonAdapterFactory<ActionInfo> =
-            PolymorphicJsonAdapterFactory.of(ActionInfo::class.java, "t")
-                .withSubtype(ActionInfo.VoteActionInfo::class.java, "1")
-                .withSubtype(ActionInfo.CommentActionInfo::class.java, "2")
-                .withSubtype(ActionInfo.DeleteCommentActionInfo::class.java, "3")
-                .withSubtype(ActionInfo.EditActionInfo::class.java, "4")
-                .withDefaultValue(null)
-
-    }
 
     val accountId: Int?
     val action: ActionType
@@ -84,6 +102,7 @@ sealed interface ActionInfo {
     val retries: Int
 
     @JsonClass(generateAdapter = true)
+    @TypeLabel("1")
     data class VoteActionInfo(
         /**
          * Instance where the object lives.
@@ -106,16 +125,15 @@ sealed interface ActionInfo {
     }
 
     @JsonClass(generateAdapter = true)
+    @TypeLabel("2")
     data class CommentActionInfo(
-        val instance: String,
-        /**
-         * Id of what to comment on
-         */
-        val parentId: String,
+        val postRef: PostRef,
+        val parentId: CommentId?,
         /**
          * The comment to post
          */
-        val text: String,
+        val content: String,
+
         override val accountId: Int,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,
@@ -124,12 +142,11 @@ sealed interface ActionInfo {
     }
 
     @JsonClass(generateAdapter = true)
+    @TypeLabel("3")
     data class DeleteCommentActionInfo(
-        val instance: String,
-        /**
-         * Full id of the comment to delete
-         */
-        val id: String,
+        val postRef: PostRef,
+        val commentId: CommentId,
+
         override val accountId: Int,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.DELETE_COMMENT,
@@ -138,16 +155,15 @@ sealed interface ActionInfo {
     }
 
     @JsonClass(generateAdapter = true)
+    @TypeLabel("4")
     data class EditActionInfo(
-        val instance: String,
+        val postRef: PostRef,
+        val commentId: CommentId,
         /**
-         * Id of what to edit
+         * The comment to post
          */
-        val thingId: String,
-        /**
-         * The new text
-         */
-        val text: String,
+        val content: String,
+
         override val accountId: Int,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,

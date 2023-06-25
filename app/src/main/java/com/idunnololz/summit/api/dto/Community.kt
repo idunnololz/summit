@@ -1,131 +1,26 @@
 package com.idunnololz.summit.api.dto
 
-/**
- * You can use either `id` or `name` as an id.
- *
-val * To get a federated community by name, use `name@instance.tld` .
- */
-data class GetCommunity(
-    val id: Int? = null,
-    val name: String? = null,
-    val auth: String?,
-)
+import android.os.Parcelable
+import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 
-data class GetCommunityResponse(
-    val community_view: CommunityView,
-    val site: Site?,
-    val moderators: List<CommunityModeratorView>,
-    val online: Int,
-    val discussion_languages: List<Int>,
-    val default_post_language: Int?,
-)
-
-data class CreateCommunity(
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class Community(
+    val id: CommunityId,
     val name: String,
     val title: String,
-    val description: String?,
-    val icon: String?,
-    val banner: String?,
-    val nsfw: Boolean?,
-    val posting_restricted_to_mods: Boolean?,
-    val discussion_languages: List<Int>?,
-    val auth: String,
-)
-
-data class CommunityResponse(
-    val community_view: CommunityView,
-    val discussion_languages: List<Int>?,
-)
-
-data class ListCommunities(
-    val type_: String,
-    val sort: String,
-    val page: Int?,
-    val limit: Int?,
-    val auth: String?,
-)
-
-data class ListCommunitiesResponse(
-    val communities: List<CommunityView>,
-)
-
-data class BanFromCommunity(
-    val community_id: Int,
-    val person_id: Int,
-    val ban: Boolean,
-    val remove_data: Boolean,
-    val reason: String?,
-    val expires: Int,
-    val auth: String?,
-)
-
-data class BanFromCommunityResponse(
-    val person_view: PersonViewSafe,
-    val banned: Boolean,
-)
-
-data class AddModToCommunity(
-    val community_id: Int,
-    val person_id: Int,
-    val added: Boolean,
-    val auth: String,
-)
-
-data class AddModToCommunityResponse(
-    val moderators: List<CommunityModeratorView>,
-)
-
-/**
- * Only mods can edit a community.
- */
-data class EditCommunity(
-    val community_id: Int,
-    val title: String,
-    val description: String?,
-    val icon: String?,
-    val banner: String?,
-    val nsfw: Boolean?,
-    val posting_restricted_to_mods: Boolean?,
-    val discussion_languages: List<Int>?,
-    val auth: String?,
-)
-
-data class DeleteCommunity(
-    val community_id: Int,
-    val deleted: Boolean,
-    val auth: String,
-)
-
-/**
- * Only admins can remove a community.
- */
-data class RemoveCommunity(
-    val community_id: Int,
+    val description: String? = null,
     val removed: Boolean,
-    val reason: String,
-    val expires: Int,
-    val auth: String?,
-)
-
-data class FollowCommunity(
-    val community_id: Int,
-    val follow: Boolean,
-    val auth: String,
-)
-
-data class TransferCommunity(
-    val community_id: Int,
-    val person_id: Int,
-    val auth: String,
-)
-
-data class BlockCommunity(
-    val community_id: Int,
-    val block: Boolean,
-    val auth: String,
-)
-
-data class BlockCommunityResponse(
-    val community_view: CommunityView,
-    val blocked: Boolean,
-)
+    val published: String,
+    val updated: String? = null,
+    val deleted: Boolean,
+    val nsfw: Boolean,
+    val actor_id: String,
+    val local: Boolean,
+    val icon: String? = null,
+    val banner: String? = null,
+    val hidden: Boolean,
+    val posting_restricted_to_mods: Boolean,
+    val instance_id: InstanceId,
+) : Parcelable

@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewTreeObserver
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -26,13 +27,19 @@ import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.PostType
+import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.getPreviewInfo
+import com.idunnololz.summit.api.utils.getThumbnailPreviewInfo
+import com.idunnololz.summit.api.utils.getThumbnailUrl
+import com.idunnololz.summit.api.utils.getType
+import com.idunnololz.summit.api.utils.getVideoInfo
+import com.idunnololz.summit.api.utils.shouldHideItem
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.ImageViewerFragmentArgs
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragmentArgs
-import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.PreviewInfo
@@ -258,7 +265,7 @@ class LemmyContentHelper(
         fun loadPreviewInfo(imageView: ImageView, attachClickHandler: Boolean = false) {
             val previewInfo: PreviewInfo? = postView.getPreviewInfo()
                 ?: postView.getThumbnailPreviewInfo()
-            RedditUtils.setImageViewSizeBasedOnPreview(context, previewInfo, rootView, imageView)
+            LemmyUtils.setImageViewSizeBasedOnPreview(context, previewInfo, rootView, imageView)
 
             imageView.load(null)
 
@@ -294,8 +301,8 @@ class LemmyContentHelper(
             externalContentTextView.text = Uri.parse(url).host ?: url
             externalContentView.setOnClickListener {
                 val uri = Uri.parse(url)
-                if (RedditUtils.isUriReddit(uri)) {
-                    RedditUtils.openRedditUrl(context, url)
+                if (LemmyUtils.isUriReddit(uri)) {
+                    LemmyUtils.openRedditUrl(context, url)
                 } else if (uri.path?.endsWith(".jpg") == true ||
                     uri.path?.endsWith(".jpeg") == true ||
                     uri.path?.endsWith(".png") == true) {
@@ -412,6 +419,10 @@ class LemmyContentHelper(
                         fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
                             this.height = thumbnailMaxHeight
                         }
+                    } else {
+                        fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                            this.height = WRAP_CONTENT
+                        }
                     }
 
                     // try to guess image size...
@@ -461,7 +472,7 @@ class LemmyContentHelper(
 
                     val videoInfo = targetPostView.getVideoInfo()
                     if (videoInfo != null) {
-                        val bestSize = RedditUtils.calculateBestVideoSize(
+                        val bestSize = LemmyUtils.calculateBestVideoSize(
                             context,
                             videoInfo,
                             availableH = videoViewMaxHeight
@@ -557,7 +568,7 @@ class LemmyContentHelper(
 
             if (!postView.post.body.isNullOrBlank()) {
                 val content = postView.post.body
-                if (RedditUtils.needsWebView(content)) {
+                if (LemmyUtils.needsWebView(content)) {
                     val fullTextView = getView<View>(R.layout.full_content_web_view)
                     val webView: WebView = fullTextView.findViewById(R.id.webView)
                     val textColorHex = String.format(
@@ -620,7 +631,7 @@ class LemmyContentHelper(
                     val fullTextView = getView<View>(R.layout.full_content_text_view)
                     val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
                     bodyTextView.visibility = View.VISIBLE
-                    RedditUtils.bindLemmyText(bodyTextView, content, instance)
+                    LemmyUtils.bindLemmyText(bodyTextView, content, instance)
                     bodyTextView.movementMethod = CustomLinkMovementMethod().apply {
                         onLinkLongClickListener = DefaultLinkLongClickListener(context)
                         this.onImageClickListener = onImageClickListener

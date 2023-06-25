@@ -16,6 +16,8 @@ import com.idunnololz.summit.history.HistoryEntry
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
+import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
+import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.user.UserCommunityEntry
 import com.idunnololz.summit.user.UserCommunitiesConverters
 import com.idunnololz.summit.user.UserCommunitiesDao
@@ -30,6 +32,7 @@ import com.idunnololz.summit.util.moshi
         HistoryEntry::class,
         Account::class,
         LemmyAction::class,
+        LemmyFailedAction::class,
     ],
     autoMigrations = [
         AutoMigration (
@@ -37,13 +40,14 @@ import com.idunnololz.summit.util.moshi
             to = 21
         ),
     ],
-    version = 21,
+    version = 22,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class)
 abstract class MainDatabase : RoomDatabase() {
 
     abstract fun lemmyActionsDao(): LemmyActionsDao
+    abstract fun lemmyFailedActionsDao(): LemmyFailedActionsDao
     abstract fun userCommunitiesDao(): UserCommunitiesDao
     abstract fun historyDao(): HistoryDao
     abstract fun accountDao(): AccountDao
@@ -70,6 +74,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .addTypeConverter(LemmyActionConverters(moshi))
                 .addTypeConverter(UserCommunitiesConverters(moshi))
                 .addMigrations(MIGRATION_19_20)
+                .addMigrations(MIGRATION_21_22)
                 .build()
         }
     }
@@ -79,5 +84,12 @@ val MIGRATION_19_20 = object : Migration(19, 20) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS tabs;")
         database.execSQL("CREATE TABLE IF NOT EXISTS `user_communities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sortOrder` INTEGER NOT NULL, `communitySortOrder` TEXT NOT NULL, `ref` TEXT)")
+    }
+}
+
+val MIGRATION_21_22 = object : Migration(21, 22) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS lemmy_failed_actions;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `lemmy_failed_actions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `cts` INTEGER NOT NULL, `fts` INTEGER NOT NULL, `error` TEXT NOT NULL, `info` TEXT)")
     }
 }

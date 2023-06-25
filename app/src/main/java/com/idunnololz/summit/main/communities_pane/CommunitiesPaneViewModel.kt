@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountInfoManager
-import com.idunnololz.summit.api.dto.CommunitySafe
+import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -22,7 +22,7 @@ class CommunitiesPaneViewModel @Inject constructor(
     private val userCommunitiesManager: UserCommunitiesManager,
 ) : ViewModel() {
 
-    private var subscriptionCommunities: List<CommunitySafe> = listOf()
+    private var subscriptionCommunities: List<Community> = listOf()
     private var userCommunities: List<UserCommunityItem> = listOf()
 
     val communities = MutableLiveData<CommunityData?>(null)
@@ -77,7 +77,7 @@ class CommunitiesPaneViewModel @Inject constructor(
     }
 
     class CommunityData(
-        val subscriptionCommunities: List<CommunitySafe>,
+        val subscriptionCommunities: List<Community>,
         val userCommunities: List<UserCommunityItem>,
     )
 }
