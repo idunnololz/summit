@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/highlight_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorHighlight"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
         android:id="@+id/threadLinesContainer"
@@ -32,6 +43,15 @@
         app:layout_constraintStart_toEndOf="@+id/headerView"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
+        app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        style="?android:attr/progressBarStyleSmall" />
+
     <HorizontalScrollView
         android:id="@+id/headerView"
         android:layout_width="wrap_content"
@@ -39,11 +59,13 @@
         android:fadingEdge="horizontal"
         android:requiresFadingEdge="horizontal"
         android:scrollbars="none"
+        android:layout_marginStart="@dimen/padding_half"
+        app:layout_goneMarginStart="0dp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
         app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintStart_toEndOf="@+id/progress_bar"
         app:layout_constraintEnd_toStartOf="@+id/collapseSectionButton">
 
         <com.idunnololz.summit.view.LemmyHeaderView
@@ -121,7 +143,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/baseline_comment_18"
+        android:src="@drawable/baseline_add_comment_24"
         app:layout_constraintTop_toBottomOf="@+id/barrier"
         app:layout_constraintEnd_toStartOf="@+id/controlsDivider" />
 

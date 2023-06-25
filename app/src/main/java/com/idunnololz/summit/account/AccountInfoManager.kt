@@ -1,11 +1,10 @@
 package com.idunnololz.summit.account
 
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.CommunitySafe
-import com.idunnololz.summit.api.dto.FederatedInstances
+import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.Language
 import com.idunnololz.summit.api.dto.MyUserInfo
-import com.idunnololz.summit.api.dto.PersonViewSafe
+import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.SiteView
 import com.idunnololz.summit.api.dto.Tagline
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -25,7 +24,7 @@ class AccountInfoManager @Inject constructor(
 
     private var currentAccountInfo: AccountInfo? = null
 
-    val subscribedCommunities = MutableStateFlow<List<CommunitySafe>>(listOf())
+    val subscribedCommunities = MutableStateFlow<List<Community>>(listOf())
 
     init {
         accountManager.addOnAccountChangedListener(
@@ -56,7 +55,7 @@ class AccountInfoManager @Inject constructor(
             return
         }
 
-        accountAwareLemmyClient.fetchSiteWithRetry(account.jwt)
+        accountAwareLemmyClient.fetchSiteWithRetry(force = true, account.jwt)
             .onSuccess { response ->
                 currentAccountInfo = AccountInfo(
                     response.site_view,
@@ -64,7 +63,6 @@ class AccountInfoManager @Inject constructor(
                     response.online,
                     response.version,
                     response.my_user,
-                    response.federated_instances,
                     response.all_languages,
                     response.discussion_languages,
                     response.taglines,
@@ -80,11 +78,10 @@ class AccountInfoManager @Inject constructor(
 
     private class AccountInfo(
         val siteView: SiteView,
-        val admins: List<PersonViewSafe>,
+        val admins: List<PersonView>,
         val online: Int,
         val version: String,
         val myUser: MyUserInfo?,
-        val federatedInstances: FederatedInstances?,
         val allLanguages: List<Language>,
         val discussionLanguages: List<Int>,
         val taglines: List<Tagline>?,

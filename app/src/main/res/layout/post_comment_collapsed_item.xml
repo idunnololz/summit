@@ -4,6 +4,16 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <View
+        android:id="@+id/highlight_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorHighlight"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <LinearLayout
         android:id="@+id/threadLinesContainer"
         android:layout_width="wrap_content"
@@ -24,6 +34,15 @@
         app:layout_constraintStart_toEndOf="@+id/headerView"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/expandSectionButton"
+        app:layout_constraintBottom_toBottomOf="@+id/expandSectionButton"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        style="?android:attr/progressBarStyleSmall" />
+
     <HorizontalScrollView
         android:id="@+id/headerView"
         android:layout_width="wrap_content"
@@ -31,11 +50,12 @@
         android:fadingEdge="horizontal"
         android:requiresFadingEdge="horizontal"
         android:scrollbars="none"
+        app:layout_goneMarginStart="0dp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toTopOf="@+id/expandSectionButton"
         app:layout_constraintBottom_toBottomOf="@+id/expandSectionButton"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintStart_toEndOf="@+id/progress_bar"
         app:layout_constraintEnd_toStartOf="@+id/expandSectionButton">
 
         <com.idunnololz.summit.view.LemmyHeaderView

@@ -6,6 +6,7 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
@@ -100,6 +101,13 @@ class PostsRepository @Inject constructor(
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.All,
                         )
+                    is CommunityRef.Subscribed ->
+                        fetchPage(
+                            pageIndex = currentPageInternal,
+                            communityIdOrName = null,
+                            sortType = sortOrder.toApiSortOrder(),
+                            listingType = ListingType.Subscribed,
+                        )
                 }
             }
 
@@ -134,17 +142,31 @@ class PostsRepository @Inject constructor(
     fun setCommunity(communityRef: CommunityRef?) {
         this.communityRef = communityRef ?: CommunityRef.All()
 
-        if (communityRef is CommunityRef.Local) {
-            if (communityRef.instance != null) {
-                apiClient.changeInstance(communityRef.instance)
-            } else {
+        when (communityRef) {
+            is CommunityRef.Local -> {
+                if (communityRef.instance != null) {
+                    apiClient.changeInstance(communityRef.instance)
+                } else {
+                    apiClient.defaultInstance()
+                }
+            }
+
+            is CommunityRef.All -> {
+                if (communityRef.instance != null) {
+                    apiClient.changeInstance(communityRef.instance)
+                } else {
+                    apiClient.defaultInstance()
+                }
+            }
+
+            is CommunityRef.Subscribed -> {
                 apiClient.defaultInstance()
             }
-        } else if (communityRef is CommunityRef.All) {
-            if (communityRef.instance != null) {
-                apiClient.changeInstance(communityRef.instance)
-            } else {
-                apiClient.defaultInstance()
+
+            is CommunityRef.CommunityRefByName,
+            is CommunityRef.CommunityRefByObj,
+            null -> {
+                // do nothing
             }
         }
 

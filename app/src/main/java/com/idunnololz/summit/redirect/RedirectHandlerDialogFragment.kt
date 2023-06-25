@@ -8,7 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentRedirectHandlerBinding
-import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.view.LoadingView
@@ -60,7 +60,7 @@ class RedirectHandlerDialogFragment : BaseDialogFragment<DialogFragmentRedirectH
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
-                    RedditUtils.openRedditUrl(requireContext(), it.data.finalUrl)
+                    LemmyUtils.openRedditUrl(requireContext(), it.data.finalUrl)
                     dismiss()
                 }
             }

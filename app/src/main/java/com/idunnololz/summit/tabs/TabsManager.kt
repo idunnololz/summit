@@ -15,7 +15,13 @@ class TabsManager @Inject constructor(
 
     val currentTab = MutableLiveData<Tab>(userCommunitiesManager.getHomeItem().toTab())
 
+    val previousTabs = linkedSetOf<Tab>()
+
     fun updateCurrentTab(tabObj: Either<UserCommunityItem, CommunityRef>) {
+        currentTab.value?.let {
+            previousTabs.add(it)
+        }
+
         currentTab.value = tabObj.fold(
             {
                 it.toTab()

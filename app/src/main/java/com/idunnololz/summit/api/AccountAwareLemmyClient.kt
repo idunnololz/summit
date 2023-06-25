@@ -3,11 +3,13 @@ package com.idunnololz.summit.api
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
@@ -87,8 +89,9 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun fetchCommunityWithRetry(
         idOrName: Either<Int, String>,
+        force: Boolean,
     ): Result<CommunityView> = retry {
-        apiClient.getCommunity(accountForInstance(), idOrName)
+        apiClient.getCommunity(accountForInstance(), idOrName, force)
     }
 
     suspend fun search(
@@ -142,9 +145,10 @@ class AccountAwareLemmyClient @Inject constructor(
         apiClient.login(instance, username, password)
 
     suspend fun fetchSiteWithRetry(
+        force: Boolean,
         auth: String? = currentAccount?.jwt,
     ): Result<GetSiteResponse> =
-        apiClient.fetchSiteWithRetry(auth)
+        apiClient.fetchSiteWithRetry(auth, force)
 
     fun changeInstance(site: String) =
         apiClient.changeInstance(site)

@@ -23,10 +23,8 @@ import org.apache.commons.io.FileUtils
 import org.threeten.bp.Duration
 import java.io.File
 import java.util.*
-import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.RuntimeException
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
@@ -362,7 +360,7 @@ class OfflineManager @Inject constructor(
         if (width > Utils.getScreenWidth(context)
             || height > Utils.getScreenHeight(context)) {
             val size =
-                RedditUtils.calculateMaxImagePreviewSize(
+                LemmyUtils.calculateMaxImagePreviewSize(
                     context,
                     width,
                     height

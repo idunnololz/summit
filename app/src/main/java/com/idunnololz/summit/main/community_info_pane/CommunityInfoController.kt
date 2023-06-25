@@ -49,7 +49,7 @@ class CommunityInfoController @AssistedInject constructor(
         )
 
         binding.loadingView.setOnRefreshClickListener {
-            viewModel.refetchCommunityOrSite()
+            viewModel.refetchCommunityOrSite(force = true)
         }
         viewModel.siteOrCommunity.observe(viewLifecycleOwner) {
             when (it) {
@@ -82,7 +82,7 @@ class CommunityInfoController @AssistedInject constructor(
     }
 
     fun onShown() {
-        viewModel.refetchCommunityOrSite()
+        viewModel.refetchCommunityOrSite(force = true)
     }
 
     private class SiteAdapter : Adapter<ViewHolder>() {

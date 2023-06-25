@@ -153,6 +153,25 @@
     <string name="remove">Remove</string>
     <string name="mau_format">%1$s MAU</string>
     <string name="error_page_not_found">Page not found.</string>
+    <string name="comment">Comment</string>
+    <string name="preview">Preview</string>
+    <string name="text_emojis">Text emojis</string>
+    <string name="send_comment">Send comment</string>
+    <string name="subscribed">Subscribed</string>
+    <string name="unknown">[unknown]</string>
+    <string name="refresh">Refresh</string>
+    <string name="update_comment">Update comment</string>
+    <string name="delete_comment_confirm">Delete comment?</string>
+    <string name="deleting">deleting</string>
+    <string name="spoiler_text">Spoiler text</string>
+    <string name="bold">Bold</string>
+    <string name="italic">Italic</string>
+    <string name="strikethrough">Strikethrough</string>
+    <string name="superscript">Superscript</string>
+    <string name="quote">Quote</string>
+    <string name="bulleted_list">Bulleted lsit</string>
+    <string name="numbered_list">Numbered list</string>
+    <string name="add_link_to_app">Add link to app</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>
@@ -160,6 +179,10 @@
     <plurals name="point_count_format">
         <item quantity="one">%1$s point</item>
         <item quantity="other">%1$s points</item>
+    </plurals>
+    <plurals name="replies_format">
+        <item quantity="one">%1$d more reply</item>
+        <item quantity="other">%1$d more replies</item>
     </plurals>
 
 

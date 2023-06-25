@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
@@ -14,11 +15,13 @@ import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 
 private val TAG = "VoteUiHandler"
 
 interface VoteUiHandler {
     fun bindVoteUi(
+        lifecycleOwner: LifecycleOwner,
         currentScore: Int,
         instance: String,
         ref: VotableRef,
@@ -30,6 +33,7 @@ interface VoteUiHandler {
 }
 
 fun VoteUiHandler.bind(
+    lifecycleOwner: LifecycleOwner,
     instance: String,
     commentView: CommentView,
     upVoteView: ImageView,
@@ -38,6 +42,7 @@ fun VoteUiHandler.bind(
     onInstanceMismatch: (String, String) -> Unit,
 ) {
     bind(
+        lifecycleOwner,
         instance,
         commentView.my_vote ?: 0,
         VotableRef.CommentRef(commentView.comment.id),
@@ -49,6 +54,7 @@ fun VoteUiHandler.bind(
 }
 
 fun VoteUiHandler.bind(
+    lifecycleOwner: LifecycleOwner,
     instance: String,
     postView: PostView,
     upVoteView: ImageView,
@@ -57,6 +63,7 @@ fun VoteUiHandler.bind(
     onInstanceMismatch: (String, String) -> Unit,
 ) {
     bind(
+        lifecycleOwner,
         instance,
         postView.my_vote ?: 0,
         VotableRef.PostRef(postView.post.id),
@@ -68,6 +75,7 @@ fun VoteUiHandler.bind(
 }
 
 fun VoteUiHandler.bind(
+    lifecycleOwner: LifecycleOwner,
     instance: String,
     currentScore: Int,
     ref: VotableRef,
@@ -93,6 +101,7 @@ fun VoteUiHandler.bind(
         downVoteView.invalidate()
     }
     bindVoteUi(
+        lifecycleOwner,
         currentScore,
         instance,
         ref,
@@ -129,21 +138,16 @@ fun VoteUiHandler.bind(
     )
 }
 
+@JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface VotableRef {
-    companion object {
-        fun adapter(): PolymorphicJsonAdapterFactory<VotableRef> =
-            PolymorphicJsonAdapterFactory.of(VotableRef::class.java, "t")
-                .withSubtype(PostRef::class.java, "1")
-                .withSubtype(CommentRef::class.java, "2")
-
-    }
-
     @JsonClass(generateAdapter = true)
+    @TypeLabel("1")
     data class PostRef(
         val postId: Int
     ) : VotableRef
 
     @JsonClass(generateAdapter = true)
+    @TypeLabel("2")
     data class CommentRef(
         val commentId: Int
     ) : VotableRef

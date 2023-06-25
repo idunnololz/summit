@@ -26,7 +26,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.*
@@ -93,7 +93,7 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
             setupForFragment<ImageViewerFragment>()
         }
 
-        if (!RedditUtils.isUrlAGif(args.url)) {
+        if (!LemmyUtils.isUrlAGif(args.url)) {
             sharedElementEnterTransition = SharedElementTransition()
             sharedElementReturnTransition = SharedElementTransition()
         }

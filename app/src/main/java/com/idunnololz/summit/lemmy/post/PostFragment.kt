@@ -6,8 +6,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,16 +14,19 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.*
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -34,46 +35,68 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.*
+import arrow.core.Either
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.drawable.ScalingUtils
 import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
-import com.google.android.material.button.MaterialButton
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.getDepth
+import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
+import com.idunnololz.summit.databinding.GenericFooterItemBinding
+import com.idunnololz.summit.databinding.GenericLoadingItemBinding
+import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
+import com.idunnololz.summit.databinding.PostHeaderItemBinding
+import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
+import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
+import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
+import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.utils.getFormattedAuthor
 import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.lemmy.utils.getUpvoteText
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.lemmy.post.PostFragment.Item.*
+import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.addDefaultAnim
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
+import com.idunnololz.summit.util.recyclerView.getBinding
+import com.idunnololz.summit.util.recyclerView.isBinding
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
-import com.idunnololz.summit.view.LoadingView
-import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostFragment : BaseFragment<FragmentPostBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener,
     SignInNavigator {
+
     companion object {
         private val TAG = PostFragment::class.java.canonicalName
 
@@ -94,6 +117,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var accountManager: AccountManager
+
+    private var mainListingItemSeen = false
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -147,10 +175,67 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
-        )
+            onAddCommentClick = { postOrComment ->
+                if (accountManager.currentAccount.value == null) {
+                    PreAuthDialogFragment.newInstance()
+                        .show(childFragmentManager, "asdf")
+                    return@PostsAdapter
+                }
+
+                val directions = postOrComment.fold({
+                    PostFragmentDirections
+                        .actionPostFragmentToAddOrEditCommentFragment(
+                            args.instance, null, it, null)
+                }, {
+                    PostFragmentDirections
+                        .actionPostFragmentToAddOrEditCommentFragment(
+                            args.instance, it, null, null)
+                })
+
+                findNavController().navigateSafe(directions)
+            },
+            onEditCommentClick = {
+                if (accountManager.currentAccount.value == null) {
+                    PreAuthDialogFragment.newInstance()
+                        .show(childFragmentManager, "asdf")
+                    return@PostsAdapter
+                }
+
+                val directions =
+                    PostFragmentDirections
+                        .actionPostFragmentToAddOrEditCommentFragment(
+                            args.instance, null, null, it)
+
+                findNavController().navigateSafe(directions)
+
+            },
+            onDeleteCommentClick = {
+                AlertDialogFragment.Builder()
+                    .setMessage(R.string.delete_comment_confirm)
+                    .setPositiveButton(android.R.string.ok)
+                    .setNegativeButton(android.R.string.cancel)
+                    .setExtra(EXTRA_COMMENT_ID, it.comment.id.toString())
+                    .createAndShow(
+                        childFragmentManager,
+                        CONFIRM_DELETE_COMMENT_TAG
+                    )
+
+            }
+        ).apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
+
+        setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, bundle ->
+            val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
+
+            if (result != null) {
+//                viewModel.fetchPostData(args.instance, args.id)
+            }
+        }
+
     }
 
     override fun onCreateView(
@@ -204,6 +289,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 PostViewModel.PostData(
                     PostViewModel.ListView.PostListView(post),
                     listOf(),
+                    null,
             ))
             onMainListingItemRetrieved(post)
         } ?: binding.loadingView.showProgressBar()
@@ -225,11 +311,44 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
                     adapter.setData(it.data)
+
+                    val newlyPostedCommentId = it.data.newlyPostedCommentId
+                    if (newlyPostedCommentId != null) {
+                        val pos = adapter.getPositionOfComment(newlyPostedCommentId)
+
+                        viewModel.resetNewlyPostedComment()
+
+                        binding.recyclerView.post {
+                            if (!isBindingAvailable()) {
+                                return@post
+                            }
+                            
+                            if (pos >= 0) {
+                                (binding.recyclerView.layoutManager as? LinearLayoutManager)
+                                    ?.scrollToPositionWithOffset(
+                                        pos, (requireMainActivity().lastInsets.topInset + Utils.convertDpToPixel(56f)).toInt()
+                                    )
+                                adapter.highlightComment(newlyPostedCommentId)
+
+                                lifecycleScope.launch {
+                                    withContext(Dispatchers.IO) {
+                                        delay(HIGHLIGHT_COMMENT_MS)
+                                    }
+
+                                    withContext(Dispatchers.Main) {
+                                        adapter.clearHighlightComment()
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        viewModel.fetchPostData(args.instance, args.id)
+        if (viewModel.postData.valueOrNull == null) {
+            viewModel.fetchPostData(args.instance, args.id)
+        }
 
         args.post?.getUrl(args.instance)?.let { url ->
             historyManager.recordVisit(
@@ -248,7 +367,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
             (binding.recyclerView.layoutManager as LinearLayoutManager)
-                .scrollToPositionWithOffset(1, 0)
+                .scrollToPositionWithOffset(1, (Utils.convertDpToPixel(48f)).toInt())
         }
 
         binding.recyclerView.post {
@@ -290,6 +409,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         getMainActivity()?.showBottomMenu(getSortByMenu())
                         true
                     }
+
+                    R.id.refresh -> {
+                        viewModel.fetchPostData(args.instance, args.id, force = true)
+                        true
+                    }
+
                     else -> false
                 }
 
@@ -332,7 +457,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             CONFIRM_DELETE_COMMENT_TAG -> {
                 val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
                 if (commentId != null) {
-                    viewModel.deleteComment(commentId)
+                    viewModel.deleteComment(PostRef(args.instance, args.id), commentId.toInt())
                 }
             }
         }
@@ -374,85 +499,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         }
     }
 
-    private class ThreadLinesDecoration(
-        private val context: Context
-    ) : RecyclerView.ItemDecoration() {
-
-        val distanceBetweenLines =
-            context.resources.getDimensionPixelSize(R.dimen.thread_line_total_size)
-        val startingPadding =
-            context.resources.getDimensionPixelSize(R.dimen.reddit_content_horizontal_padding)
-        val topOverdraw = context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw)
-
-        private val linePaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.colorThreadLines)
-            strokeWidth = Utils.convertDpToPixel(2f)
-        }
-
-        override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-            val childCount = parent.childCount
-
-            for (i in 0 until childCount) {
-                val view = parent.getChildAt(i)
-                val lastTag = if (i == 0) {
-                    null
-                } else {
-                    parent.getChildAt(i - 1).tag
-                }
-                val tag = view.tag
-                val translationX = view.translationX
-                val translationY = view.translationY
-                var topOverdraw = topOverdraw
-                val totalDepth = when (tag) {
-                    is CommentItem -> {
-                        tag.depth - tag.baseDepth
-                    }
-                    else -> {
-                        -1
-                    }
-                }
-
-                if (lastTag is ComposeCommentItem || lastTag is EditCommentItem) {
-                    topOverdraw = 0
-                }
-
-                if (totalDepth == -1) continue
-
-                for (lineIndex in 0 until totalDepth) {
-                    val x =
-                        view.left + (lineIndex.toFloat()) * distanceBetweenLines + startingPadding
-                    c.drawLine(
-                        x + translationX,
-                        view.top.toFloat() - topOverdraw + translationY,
-                        x + translationX,
-                        view.bottom.toFloat() + translationY,
-                        linePaint
-                    )
-                }
-            }
-        }
-    }
-
     sealed class Item(
-        val type: Int,
         open val id: String
     ) {
-        companion object {
-            const val TYPE_LISTING_ITEM = 1
-            const val TYPE_COMMENT_EXPANDED_ITEM = 2
-            const val TYPE_COMMENT_COLLAPSED_ITEM = 3
-            const val TYPE_MORE_COMMENTS_ITEM = 4
-            const val TYPE_PROGRESS = 5
-            const val TYPE_COMPOSE_COMMENT_ITEM = 6
-            const val TYPE_EDIT_COMMENT_ITEM = 7
-        }
 
         data class HeaderItem(
             val postView: PostView,
             var videoState: VideoState?
-        ) : Item(TYPE_LISTING_ITEM, postView.getUniqueKey())
+        ) : Item(postView.getUniqueKey())
 
         data class CommentItem(
+            val commentId: CommentId,
+            val content: String,
             val comment: CommentView,
             val depth: Int,
             val baseDepth: Int,
@@ -460,102 +518,41 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             val isPending: Boolean,
             val view: PostViewModel.ListView.CommentListView,
             val childrenCount: Int,
+            val isPostLocked: Boolean,
+            val isUpdating: Boolean,
+            val isDeleting: Boolean,
         ) : Item(
-            if (isExpanded) TYPE_COMMENT_EXPANDED_ITEM else TYPE_COMMENT_COLLAPSED_ITEM,
             "comment_${comment.comment.id}"
         )
 
-        data class ComposeCommentItem(
-            override val id: String,
-            val parentId: String,
+        data class PendingCommentItem(
+            val commentId: CommentId?,
+            val content: String,
+            val author: String?,
             val depth: Int,
             val baseDepth: Int,
-            var comment: CharSequence,
-            var isPosting: Boolean = false,
-            var error: Throwable? = null
-        ) : Item(TYPE_COMPOSE_COMMENT_ITEM, id)
+            val isExpanded: Boolean,
+            val isPending: Boolean,
+            val view: PostViewModel.ListView.PendingCommentListView,
+            val childrenCount: Int,
+        ) : Item(
+            "pending_comment_${view.pendingCommentView.id}"
+        )
 
-        data class EditCommentItem(
-            override val id: String,
-            val commentName: String,
+        data class MoreCommentsItem(
+            val parentId: CommentId,
+            val moreCount: Int,
             val depth: Int,
             val baseDepth: Int,
-            var comment: CharSequence,
-            var isPosting: Boolean = false,
-            var error: Throwable? = null
-        ) : Item(TYPE_EDIT_COMMENT_ITEM, id)
+        ) : Item(
+            "more_comments_${parentId}"
+        )
 
         class ProgressOrErrorItem(
             val error: Throwable? = null
-        ) : Item(TYPE_PROGRESS, "wew_pls_no_progress")
-    }
+        ) : Item("wew_pls_no_progress")
 
-    class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val headerContainer: LemmyHeaderView = view.findViewById(R.id.headerContainer)
-        val titleTextView: TextView = view.findViewById(R.id.title)
-        val authorTextView: TextView = view.findViewById(R.id.author)
-        val commentButton: MaterialButton = itemView.findViewById(R.id.commentButton)
-        val upvoteCount: TextView = itemView.findViewById(R.id.upvoteCount)
-        val fullContentContainerView: ViewGroup = itemView.findViewById(R.id.fullContent)
-        val upvoteButton: ImageView = itemView.findViewById(R.id.upvoteButton)
-        val downvoteButton: ImageView = itemView.findViewById(R.id.downvoteButton)
-    }
-
-    class CommentExpandedViewHolder(
-        val binding: PostCommentExpandedItemBinding
-    ) : RecyclerView.ViewHolder(binding.root)
-
-    class CommentCollapsedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val headerView: LemmyHeaderView = view.findViewById(R.id.headerContainer)
-        val threadLinesContainer: ViewGroup = view.findViewById(R.id.threadLinesContainer)
-        val expandSectionButton: ImageButton = itemView.findViewById(R.id.expandSectionButton)
-        val topHotspot: View = itemView.findViewById(R.id.topHotspot)
-        val overlay: View = itemView.findViewById(R.id.overlay)
-    }
-
-    class MoreCommentsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val threadLinesContainer: ViewGroup = view.findViewById(R.id.threadLinesContainer)
-        val moreButton: Button = itemView.findViewById(R.id.moreButton)
-    }
-
-    class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val loadingView: LoadingView = view.findViewById(R.id.loadingView)
-    }
-
-    class ComposeCommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val rootView: ConstraintLayout = view as ConstraintLayout
-        val editText: EditText = view.findViewById(R.id.editText)
-        val addComment: Button = view.findViewById(R.id.addComment)
-        val cancelButton: Button = view.findViewById(R.id.cancelButton)
-        val loadingView: LoadingView = view.findViewById(R.id.loadingView)
-
-        var boundTextWatcher: TextWatcher? = null
-
-        val postingConstraintSet: ConstraintSet = ConstraintSet()
-        val normalConstraintSet: ConstraintSet = ConstraintSet()
-
-        init {
-            normalConstraintSet.clone(rootView)
-            postingConstraintSet.clone(view.context, R.layout.compose_comment_item_posting)
-        }
-    }
-
-    class EditCommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val rootView: ConstraintLayout = view as ConstraintLayout
-        val editText: EditText = view.findViewById(R.id.editText)
-        val saveEditsButton: Button = view.findViewById(R.id.saveEditsButton)
-        val cancelButton: Button = view.findViewById(R.id.cancelButton)
-        val loadingView: LoadingView = view.findViewById(R.id.loadingView)
-
-        var boundTextWatcher: TextWatcher? = null
-
-        val postingConstraintSet: ConstraintSet = ConstraintSet()
-        val normalConstraintSet: ConstraintSet = ConstraintSet()
-
-        init {
-            normalConstraintSet.clone(rootView)
-            postingConstraintSet.clone(view.context, R.layout.edit_comment_item_posting)
-        }
+        object FooterItem : Item("footer")
     }
 
     private inner class PostsAdapter(
@@ -566,6 +563,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         private val onRefreshClickCb: () -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
+        private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
+        private val onEditCommentClick: (CommentView) -> Unit,
+        private val onDeleteCommentClick: (CommentView) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val inflater = LayoutInflater.from(context)
@@ -584,14 +584,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
          * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
          */
         private var revealedItems = mutableSetOf<String>()
-        private var composeCommentItems: HashMap<String, ComposeCommentItem> = hashMapOf()
-        private var editCommentItems: HashMap<String, EditCommentItem> = hashMapOf()
 
         private var rawData: PostViewModel.PostData? = null
 
         private var tempSize = Size()
 
-        var isFirstLoad: Boolean = true
+        private var highlightedComment: CommentId = -1
         var isLoaded: Boolean = false
         var error: Throwable? = null
             set(value) {
@@ -608,42 +606,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 field = value
 
                 for (i in 0.. items.lastIndex) {
-                    if (items[i] is Item.HeaderItem) {
+                    if (items[i] is HeaderItem) {
                         notifyItemChanged(i)
                     }
                 }
             }
-
-//        val onRedditActionChangedCallback: (StatefulData<RedditAction>) -> Unit = {
-//            if (it is StatefulData.Success) {
-//                val actionInfo = it.data.info
-//                if (actionInfo is ActionInfo.CommentActionInfo) {
-//                    removeComposeCommentItemFor(actionInfo.parentId)
-//                } else if (actionInfo is ActionInfo.EditActionInfo) {
-//                    removeEditCommentItemFor(actionInfo.thingId)
-//                }
-//            } else if (it is StatefulData.Error) {
-//                val error = it.error as PendingActionsManager.PendingActionsException
-//                val actionInfo = error
-//                if (actionInfo is ActionInfo.CommentActionInfo) {
-//                    setComposeCommentItemErrorFor(actionInfo.parentId, error = error.cause)
-//
-//                    Snackbar.make(
-//                        requireMainActivity().getSnackbarContainer(),
-//                        R.string.error_post_comment_failed,
-//                        Snackbar.LENGTH_LONG
-//                    ).show()
-//                } else if (actionInfo is ActionInfo.EditActionInfo) {
-//                    setEditCommentItemErrorFor(actionInfo.thingId, error = error.cause)
-//
-//                    Snackbar.make(
-//                        requireMainActivity().getSnackbarContainer(),
-//                        R.string.error_edit_comment_failed,
-//                        Snackbar.LENGTH_LONG
-//                    ).show()
-//                }
-//            }
-//        }
 
         override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
             is HeaderItem -> R.layout.post_header_item
@@ -652,9 +619,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     R.layout.post_comment_expanded_item
                 else
                     R.layout.post_comment_collapsed_item
+            is PendingCommentItem ->
+                if (item.isExpanded)
+                    R.layout.post_pending_comment_expanded_item
+                else
+                    R.layout.post_pending_comment_collapsed_item
             is ProgressOrErrorItem -> R.layout.generic_loading_item
-            is ComposeCommentItem -> R.layout.compose_comment_item
-            is EditCommentItem -> R.layout.edit_comment_item
+            is MoreCommentsItem -> R.layout.post_more_comments_item
+            is FooterItem -> R.layout.generic_footer_item
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -663,14 +635,21 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             parentHeight = parent.height
 
             return when (viewType) {
-                R.layout.post_header_item -> HeaderViewHolder(v)
+                R.layout.post_header_item -> ViewBindingViewHolder(PostHeaderItemBinding.bind(v))
                 R.layout.post_comment_expanded_item ->
-                    CommentExpandedViewHolder(PostCommentExpandedItemBinding.bind(v))
-                R.layout.post_comment_collapsed_item -> CommentCollapsedViewHolder(v)
-                R.layout.post_more_comments_item -> MoreCommentsViewHolder(v)
-                R.layout.generic_loading_item -> LoadingViewHolder(v)
-                R.layout.compose_comment_item -> ComposeCommentViewHolder(v)
-                R.layout.edit_comment_item -> EditCommentViewHolder(v)
+                    ViewBindingViewHolder(PostCommentExpandedItemBinding.bind(v))
+                R.layout.post_comment_collapsed_item ->
+                    ViewBindingViewHolder(PostCommentCollapsedItemBinding.bind(v))
+                R.layout.post_pending_comment_expanded_item ->
+                    ViewBindingViewHolder(PostPendingCommentExpandedItemBinding.bind(v))
+                R.layout.post_pending_comment_collapsed_item ->
+                    ViewBindingViewHolder(PostPendingCommentCollapsedItemBinding.bind(v))
+                R.layout.post_more_comments_item ->
+                    ViewBindingViewHolder(PostMoreCommentsItemBinding.bind(v))
+                R.layout.generic_loading_item ->
+                    ViewBindingViewHolder(GenericLoadingItemBinding.bind(v))
+                R.layout.generic_footer_item ->
+                    ViewBindingViewHolder(GenericFooterItemBinding.bind(v))
                 else -> throw RuntimeException("ViewType: $viewType")
             }
         }
@@ -686,12 +665,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         super.onBindViewHolder(holder, position, payloads)
                     } else {
                         // this is an incremental update... Only update the stats, do not update content...
-                        val h = holder as HeaderViewHolder
+                        val b = holder.getBinding<PostHeaderItemBinding>()
                         val post = item.postView
                         val postKey = post.getUniqueKey()
 
                         lemmyHeaderHelper.populateHeaderSpan(
-                            headerContainer = h.headerContainer,
+                            headerContainer = b.headerContainer,
                             postView = post,
                             instance = instance,
                             onPageClick = {
@@ -700,14 +679,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             listAuthor = false
                         )
 
-                        h.titleTextView.text = post.getFormattedTitle()
-                        h.authorTextView.text = post.getFormattedAuthor()
+                        b.title.text = post.getFormattedTitle()
+                        b.author.text = post.getFormattedAuthor()
 
-                        h.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
-                        h.upvoteCount.text = post.getUpvoteText()
-                        h.commentButton.isEnabled = !post.post.locked
-                        h.commentButton.setOnClickListener {
-                            handleCommentClick(postKey)
+                        b.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
+                        b.upvoteCount.text = post.getUpvoteText()
+                        b.commentButton.isEnabled = !post.post.locked
+                        b.commentButton.setOnClickListener {
+                            onAddCommentClick(Either.Left(item.postView))
+                        }
+                        b.addCommentButton.isEnabled = !post.post.locked
+                        b.addCommentButton.setOnClickListener {
+                            onAddCommentClick(Either.Left(item.postView))
                         }
 
                         lemmyContentHelper.setupFullContent(
@@ -718,8 +701,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             fullImageViewTransitionName = "post_image",
                             postView = post,
                             instance = instance,
-                            rootView = h.itemView,
-                            fullContentContainerView = h.fullContentContainerView,
+                            rootView = b.root,
+                            fullContentContainerView = b.fullContent,
                             onFullImageViewClickListener = { v, url ->
                                 val action =
                                     PostFragmentDirections.actionPostFragmentToImageViewerFragment(
@@ -757,7 +740,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             },
                             onRevealContentClickedFn = {
                                 revealedItems.add(postKey)
-                                notifyItemChanged(h.adapterPosition)
+                                notifyItemChanged(holder.absoluteAdapterPosition)
                             },
                             lazyUpdate = true,
                             onItemClickListener = {},
@@ -765,37 +748,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         )
 
                         voteUiHandler.bind(
+
+                            viewLifecycleOwner,
                             instance,
                             item.postView,
-                            h.upvoteButton,
-                            h.downvoteButton,
+                            b.upvoteButton,
+                            b.downvoteButton,
                             onSignInRequired,
                             onInstanceMismatch,
                         )
-                    }
-                }
-                is ComposeCommentItem -> {
-                    if (payloads.isEmpty()) {
-                        super.onBindViewHolder(holder, position, payloads)
-                    } else {
-                        val h = holder as ComposeCommentViewHolder
-
-                        if (!item.isPosting) {
-                            h.postingConstraintSet.applyTo(h.rootView)
-                        }
-                        h.itemView.tag = item
-                    }
-                }
-                is EditCommentItem -> {
-                    if (payloads.isEmpty()) {
-                        super.onBindViewHolder(holder, position, payloads)
-                    } else {
-                        val h = holder as EditCommentViewHolder
-
-                        if (!item.isPosting) {
-                            h.postingConstraintSet.applyTo(h.rootView)
-                        }
-                        h.itemView.tag = item
                     }
                 }
                 else -> super.onBindViewHolder(holder, position, payloads)
@@ -803,20 +764,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            when (getItemViewType(position)) {
-                R.layout.post_header_item -> {
-                    Log.d(TAG, "Post item is bound!")
-                    val h = holder as HeaderViewHolder
-                    val item = items[position] as HeaderItem
+            when (val item = items[position]) {
+                is HeaderItem -> {
+                    val b = holder.getBinding<PostHeaderItemBinding>()
                     val post = item.postView
                     val postKey = post.getUniqueKey()
 
-                    setupTransitionAnimation(h.titleTextView)
+                    setupTransitionAnimation(b.title)
 
-                    ViewCompat.setTransitionName(h.titleTextView, "title")
+                    ViewCompat.setTransitionName(b.title, "title")
 
                     lemmyHeaderHelper.populateHeaderSpan(
-                        headerContainer = h.headerContainer,
+                        headerContainer = b.headerContainer,
                         postView = item.postView,
                         instance = instance,
                         onPageClick = {
@@ -825,14 +784,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         listAuthor = false
                     )
 
-                    h.titleTextView.text = post.getFormattedTitle()
-                    h.authorTextView.text = post.getFormattedAuthor()
+                    b.title.text = post.getFormattedTitle()
+                    b.author.text = post.getFormattedAuthor()
 
-                    h.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
-                    h.upvoteCount.text = post.getUpvoteText()
-                    h.commentButton.isEnabled = !post.post.locked
-                    h.commentButton.setOnClickListener {
-                        handleCommentClick(postKey)
+                    b.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
+                    b.upvoteCount.text = post.getUpvoteText()
+                    b.commentButton.isEnabled = !post.post.locked
+                    b.commentButton.setOnClickListener {
+                        onAddCommentClick(Either.Left(item.postView))
+                    }
+                    b.addCommentButton.isEnabled = !post.post.locked
+                    b.addCommentButton.setOnClickListener {
+                        onAddCommentClick(Either.Left(item.postView))
                     }
 
                     lemmyContentHelper.setupFullContent(
@@ -843,8 +806,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         fullImageViewTransitionName = "post_image",
                         postView = post,
                         instance = instance,
-                        rootView = h.itemView,
-                        fullContentContainerView = h.fullContentContainerView,
+                        rootView = b.root,
+                        fullContentContainerView = b.fullContent,
                         onFullImageViewClickListener = { v, url ->
                             val action =
                                 PostFragmentDirections.actionPostFragmentToImageViewerFragment(
@@ -882,7 +845,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         },
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
-                            notifyItemChanged(h.absoluteAdapterPosition)
+                            notifyItemChanged(holder.absoluteAdapterPosition)
                         },
                         onItemClickListener = {},
                         videoState = item.videoState
@@ -891,102 +854,49 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     Log.d(TAG, "header vote state: ${item.postView.counts.upvotes}")
 
                     voteUiHandler.bind(
+                        viewLifecycleOwner,
                         instance,
                         item.postView,
-                        h.upvoteButton,
-                        h.downvoteButton,
+                        b.upvoteButton,
+                        b.downvoteButton,
                         onSignInRequired,
                         onInstanceMismatch,
                     )
 
-                    h.itemView.tag = item
+                    b.root.tag = item
                 }
-                R.layout.post_comment_expanded_item -> {
-                    val h = holder as CommentExpandedViewHolder
-                    val b = h.binding
-                    val item = items[position] as CommentItem
-                    val comment = item.comment
-                    val body = comment.comment.content
+                is CommentItem -> {
+                    if (item.isExpanded) {
+                        val b = holder.getBinding<PostCommentExpandedItemBinding>()
+                        val comment = item.comment
+                        val body = item.content
 
-                    threadLinesHelper.populateThreadLines(
-                        b.threadLinesContainer, item.depth, item.baseDepth
-                    )
-                    lemmyHeaderHelper.populateHeaderSpan(b.headerContainer, item.comment)
+                        threadLinesHelper.populateThreadLines(
+                            b.threadLinesContainer, item.depth, item.baseDepth
+                        )
+                        lemmyHeaderHelper.populateHeaderSpan(b.headerContainer, item.comment)
 
-                    if (comment.comment.deleted) {
-                        b.text.text = buildSpannedString {
-                            append(context.getString(R.string.deleted))
-                            setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
-                        }
-                    } else if (comment.comment.removed) {
-                        b.text.text = buildSpannedString {
-                            append(context.getString(R.string.removed))
-                            setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
-                        }
-                    } else {
-                        RedditUtils.bindLemmyText(b.text, body, instance)
-                    }
-
-                    b.text.movementMethod = CustomLinkMovementMethod().apply {
-                        onLinkLongClickListener = DefaultLinkLongClickListener(context)
-                        onImageClickListener = { url ->
-                            val action =
-                                PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                    title = null,
-                                    url = url,
-                                    mimeType = null
-                                )
-                            findNavController().navigate(
-                                action, NavOptions.Builder()
-                                    .addDefaultAnim()
-                                    .build()
-                            )
-                        }
-                    }
-
-                    val giphyLinks = RedditUtils.findGiphyLinks(body)
-                    if (giphyLinks.isNotEmpty()) {
-                        var lastViewId = 0
-                        giphyLinks.withIndex().forEach { (index, giphyKey) ->
-                            b.mediaContainer.visibility = View.VISIBLE
-                            val viewId = View.generateViewId()
-                            val imageView = SimpleDraweeView(context).apply {
-                                layoutParams = ConstraintLayout.LayoutParams(
-                                    ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                                    ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                                ).apply {
-                                    if (index == 0) {
-                                        this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                                    } else {
-                                        this.topToBottom = lastViewId
-                                    }
-                                    this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                                    this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                                    this.dimensionRatio = "H,16:9"
-                                }
-                                id = viewId
-                                hierarchy.actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER
+                        if (comment.comment.deleted || item.isDeleting) {
+                            b.text.text = buildSpannedString {
+                                append(context.getString(R.string.deleted))
+                                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
                             }
-                            b.mediaContainer.addView(imageView)
-
-                            val processedGiphyKey: String = if (giphyKey.contains('|')) {
-                                giphyKey.split('|')[0]
-                            } else {
-                                giphyKey
+                        } else if (comment.comment.removed) {
+                            b.text.text = buildSpannedString {
+                                append(context.getString(R.string.removed))
+                                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
                             }
+                        } else {
+                            LemmyUtils.bindLemmyText(b.text, body, instance)
+                        }
 
-                            val fullUrl = "https://i.giphy.com/media/${processedGiphyKey}/giphy.webp"
-                            val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-                                .setUri(fullUrl)
-                                .setAutoPlayAnimations(true)
-                                .build()
-                            imageView.controller = controller
-
-                            imageView.setOnClickListener {
+                        b.text.movementMethod = CustomLinkMovementMethod().apply {
+                            onLinkLongClickListener = DefaultLinkLongClickListener(context)
+                            onImageClickListener = { url ->
                                 val action =
                                     PostFragmentDirections.actionPostFragmentToImageViewerFragment(
                                         title = null,
-                                        url = fullUrl,
+                                        url = url,
                                         mimeType = null
                                     )
                                 findNavController().navigate(
@@ -995,234 +905,347 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                                         .build()
                                 )
                             }
-
-                            lastViewId = viewId
                         }
-                    } else {
-                        b.mediaContainer.removeAllViews()
-                        b.mediaContainer.visibility = View.GONE
-                    }
 
-                    b.upvoteCount.text = item.comment.getUpvoteText()
-
-                    b.collapseSectionButton.setOnClickListener {
-                        collapseSection(h.bindingAdapterPosition)
-                    }
-                    b.topHotspot.setOnClickListener {
-                        collapseSection(h.bindingAdapterPosition)
-                    }
-                    b.commentButton.setOnClickListener {
-
-
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.coming_soon)
-                            .setPositiveButton(android.R.string.ok)
-                            .createAndShow(
-                                childFragmentManager,
-                                CONFIRM_DELETE_COMMENT_TAG
-                            )
-//                        handleCommentClick(item.comment.getUniqueKey())
-                    }
-                    b.moreButton.setOnClickListener {
-
-                        PopupMenu(context, b.moreButton).apply {
-                            inflate(R.menu.menu_comment_item)
-
-                            if (BuildConfig.DEBUG) {
-                                menu.findItem(R.id.raw_comment).isVisible = true
-                            }
-
-//                            if (item.comment.creator.id) {
-//                                menu.setGroupVisible(R.id.mod_post_actions, false)
-//                                //menu.findItem(R.id.edit_comment).isVisible = false
-//                            }
-
-                            setOnMenuItemClickListener {
-                                when (it.itemId) {
-                                    R.id.raw_comment -> {
-                                        val action =
-                                            PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
-                                                commentItemStr = Utils.gson.toJson(item.comment)
-                                            )
-                                        findNavController().navigate(action)
+                        val giphyLinks = LemmyUtils.findGiphyLinks(body)
+                        if (giphyLinks.isNotEmpty()) {
+                            var lastViewId = 0
+                            giphyLinks.withIndex().forEach { (index, giphyKey) ->
+                                b.mediaContainer.visibility = View.VISIBLE
+                                val viewId = View.generateViewId()
+                                val imageView = SimpleDraweeView(context).apply {
+                                    layoutParams = ConstraintLayout.LayoutParams(
+                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
+                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
+                                    ).apply {
+                                        if (index == 0) {
+                                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                                        } else {
+                                            this.topToBottom = lastViewId
+                                        }
+                                        this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                                        this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                        this.dimensionRatio = "H,16:9"
                                     }
-                                    R.id.edit_comment -> {
-
-                                        AlertDialogFragment.Builder()
-                                            .setMessage(R.string.coming_soon)
-                                            .setPositiveButton(android.R.string.ok)
-                                            .createAndShow(
-                                                childFragmentManager,
-                                                CONFIRM_DELETE_COMMENT_TAG
-                                            )
-
-//                                        handleEditClick(item.comment)
-                                    }
-                                    R.id.delete_comment -> {
-//                                        AlertDialogFragment.Builder()
-//                                            .setMessage(R.string.delete_comment_confirm)
-//                                            .setPositiveButton(android.R.string.yes)
-//                                            .setNegativeButton(android.R.string.no)
-//                                            .setExtra(EXTRA_COMMENT_ID, item.comment.comment.id.toString())
-//                                            .createAndShow(
-//                                                childFragmentManager,
-//                                                CONFIRM_DELETE_COMMENT_TAG
-//                                            )
-
-
-                                        AlertDialogFragment.Builder()
-                                            .setMessage(R.string.coming_soon)
-                                            .setPositiveButton(android.R.string.ok)
-                                            .createAndShow(
-                                                childFragmentManager,
-                                                CONFIRM_DELETE_COMMENT_TAG
-                                            )
-                                    }
+                                    id = viewId
+                                    hierarchy.actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER
                                 }
-                                true
+                                b.mediaContainer.addView(imageView)
+
+                                val processedGiphyKey: String = if (giphyKey.contains('|')) {
+                                    giphyKey.split('|')[0]
+                                } else {
+                                    giphyKey
+                                }
+
+                                val fullUrl = "https://i.giphy.com/media/${processedGiphyKey}/giphy.webp"
+                                val controller: DraweeController = Fresco.newDraweeControllerBuilder()
+                                    .setUri(fullUrl)
+                                    .setAutoPlayAnimations(true)
+                                    .build()
+                                imageView.controller = controller
+
+                                imageView.setOnClickListener {
+                                    val action =
+                                        PostFragmentDirections.actionPostFragmentToImageViewerFragment(
+                                            title = null,
+                                            url = fullUrl,
+                                            mimeType = null
+                                        )
+                                    findNavController().navigate(
+                                        action, NavOptions.Builder()
+                                            .addDefaultAnim()
+                                            .build()
+                                    )
+                                }
+
+                                lastViewId = viewId
                             }
-                        }.show()
-                    }
-                    if (item.comment.comment.distinguished) {
-                        b.overlay.visibility = View.VISIBLE
-                        b.overlay.setBackgroundResource(R.drawable.locked_overlay)
+                        } else {
+                            b.mediaContainer.removeAllViews()
+                            b.mediaContainer.visibility = View.GONE
+                        }
+
+                        b.upvoteCount.text = item.comment.getUpvoteText()
+
+                        b.collapseSectionButton.setOnClickListener {
+                            collapseSection(holder.bindingAdapterPosition)
+                        }
+                        b.topHotspot.setOnClickListener {
+                            collapseSection(holder.bindingAdapterPosition)
+                        }
+
+                        b.commentButton.isEnabled = !item.isPostLocked
+                        b.commentButton.setOnClickListener {
+                            onAddCommentClick(Either.Right(item.comment))
+                        }
+                        b.moreButton.setOnClickListener {
+
+                            PopupMenu(context, b.moreButton).apply {
+                                inflate(R.menu.menu_comment_item)
+
+                                if (BuildConfig.DEBUG) {
+                                    menu.findItem(R.id.raw_comment).isVisible = true
+                                }
+
+                                if (item.comment.creator.id !=
+                                    accountManager.currentAccount.value?.id) {
+                                    menu.setGroupVisible(R.id.mod_post_actions, false)
+                                    //menu.findItem(R.id.edit_comment).isVisible = false
+                                }
+
+                                setOnMenuItemClickListener {
+                                    when (it.itemId) {
+                                        R.id.raw_comment -> {
+                                            val action =
+                                                PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
+                                                    commentItemStr = Utils.gson.toJson(item.comment)
+                                                )
+                                            findNavController().navigate(action)
+                                        }
+                                        R.id.edit_comment -> {
+                                            onEditCommentClick(item.comment)
+                                        }
+                                        R.id.delete_comment -> {
+                                            onDeleteCommentClick(item.comment)
+                                        }
+                                    }
+                                    true
+                                }
+                            }.show()
+                        }
+                        if (item.comment.comment.distinguished) {
+                            b.overlay.visibility = View.VISIBLE
+                            b.overlay.setBackgroundResource(R.drawable.locked_overlay)
+                        } else {
+                            b.overlay.visibility = View.GONE
+                        }
+
+                        voteUiHandler.bind(
+                            viewLifecycleOwner,
+                            instance,
+                            item.comment,
+                            b.upvoteButton,
+                            b.downvoteButton,
+                            onSignInRequired,
+                            onInstanceMismatch,
+                        )
+
+                        highlightComment(item.commentId, b.highlightBg)
+
+                        if (item.isUpdating) {
+                            b.progressBar.visibility = View.VISIBLE
+                        } else {
+                            b.progressBar.visibility = View.GONE
+                        }
+
+                        b.root.tag = item
                     } else {
+                        // collapsed
+                        val b = holder.getBinding<PostCommentCollapsedItemBinding>()
+                        threadLinesHelper.populateThreadLines(
+                            b.threadLinesContainer, item.depth, item.baseDepth
+                        )
+                        lemmyHeaderHelper.populateHeaderSpan(
+                            headerContainer = b.headerContainer,
+                            item = item.comment,
+                            detailed = true,
+                            childrenCount = item.childrenCount
+                        )
+
+                        b.expandSectionButton.setOnClickListener {
+                            expandSection(holder.absoluteAdapterPosition)
+                        }
+                        b.topHotspot.setOnClickListener {
+                            expandSection(holder.absoluteAdapterPosition)
+                        }
+                        if (item.comment.comment.distinguished) {
+                            b.overlay.visibility = View.VISIBLE
+                            b.overlay.setBackgroundResource(R.drawable.locked_overlay)
+                        } else {
+                            b.overlay.visibility = View.GONE
+                        }
+
+                        highlightComment(item.commentId, b.highlightBg)
+
+                        if (item.isUpdating) {
+                            b.progressBar.visibility = View.VISIBLE
+                        } else {
+                            b.progressBar.visibility = View.GONE
+                        }
+
+                        b.root.tag = item
+                    }
+                }
+                is PendingCommentItem -> {
+                    if (item.isExpanded) {
+                        val b = holder.getBinding<PostPendingCommentExpandedItemBinding>()
+                        val body = item.content
+
+                        threadLinesHelper.populateThreadLines(
+                            b.threadLinesContainer, item.depth, item.baseDepth
+                        )
+                        b.headerContainer.setTextFirstPart(item.author ?: getString(R.string.unknown))
+                        b.headerContainer.setTextSecondPart("")
+
+                        LemmyUtils.bindLemmyText(b.text, body, instance)
+
+                        b.text.movementMethod = CustomLinkMovementMethod().apply {
+                            onLinkLongClickListener = DefaultLinkLongClickListener(context)
+                            onImageClickListener = { url ->
+                                val action =
+                                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
+                                        title = null,
+                                        url = url,
+                                        mimeType = null
+                                    )
+                                findNavController().navigate(
+                                    action, NavOptions.Builder()
+                                        .addDefaultAnim()
+                                        .build()
+                                )
+                            }
+                        }
+
+                        val giphyLinks = LemmyUtils.findGiphyLinks(body)
+                        if (giphyLinks.isNotEmpty()) {
+                            var lastViewId = 0
+                            giphyLinks.withIndex().forEach { (index, giphyKey) ->
+                                b.mediaContainer.visibility = View.VISIBLE
+                                val viewId = View.generateViewId()
+                                val imageView = SimpleDraweeView(context).apply {
+                                    layoutParams = ConstraintLayout.LayoutParams(
+                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
+                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
+                                    ).apply {
+                                        if (index == 0) {
+                                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                                        } else {
+                                            this.topToBottom = lastViewId
+                                        }
+                                        this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                                        this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                        this.dimensionRatio = "H,16:9"
+                                    }
+                                    id = viewId
+                                    hierarchy.actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER
+                                }
+                                b.mediaContainer.addView(imageView)
+
+                                val processedGiphyKey: String = if (giphyKey.contains('|')) {
+                                    giphyKey.split('|')[0]
+                                } else {
+                                    giphyKey
+                                }
+
+                                val fullUrl = "https://i.giphy.com/media/${processedGiphyKey}/giphy.webp"
+                                val controller: DraweeController = Fresco.newDraweeControllerBuilder()
+                                    .setUri(fullUrl)
+                                    .setAutoPlayAnimations(true)
+                                    .build()
+                                imageView.controller = controller
+
+                                imageView.setOnClickListener {
+                                    val action =
+                                        PostFragmentDirections.actionPostFragmentToImageViewerFragment(
+                                            title = null,
+                                            url = fullUrl,
+                                            mimeType = null
+                                        )
+                                    findNavController().navigate(
+                                        action, NavOptions.Builder()
+                                            .addDefaultAnim()
+                                            .build()
+                                    )
+                                }
+
+                                lastViewId = viewId
+                            }
+                        } else {
+                            b.mediaContainer.removeAllViews()
+                            b.mediaContainer.visibility = View.GONE
+                        }
+
+                        b.collapseSectionButton.setOnClickListener {
+                            collapseSection(holder.bindingAdapterPosition)
+                        }
+                        b.topHotspot.setOnClickListener {
+                            collapseSection(holder.bindingAdapterPosition)
+                        }
+
+                        highlightComment(item.commentId, b.highlightBg)
+
+                        b.root.tag = item
+                    } else {
+                        // collapsed
+                        val b = holder.getBinding<PostPendingCommentCollapsedItemBinding>()
+                        threadLinesHelper.populateThreadLines(
+                            b.threadLinesContainer, item.depth, item.baseDepth
+                        )
+                        b.headerContainer.setTextFirstPart(item.author ?: getString(R.string.unknown))
+                        b.headerContainer.setTextSecondPart("")
+
+                        b.expandSectionButton.setOnClickListener {
+                            expandSection(holder.absoluteAdapterPosition)
+                        }
+                        b.topHotspot.setOnClickListener {
+                            expandSection(holder.absoluteAdapterPosition)
+                        }
                         b.overlay.visibility = View.GONE
+
+                        b.root.tag = item
+
+                        highlightComment(item.commentId, b.highlightBg)
                     }
-
-                    voteUiHandler.bind(
-                        instance,
-                        item.comment,
-                        b.upvoteButton,
-                        b.downvoteButton,
-                        onSignInRequired,
-                        onInstanceMismatch,
-                    )
-
-                    h.itemView.tag = item
                 }
-                R.layout.post_comment_collapsed_item -> {
-                    val h = holder as CommentCollapsedViewHolder
-                    val item = items[position] as CommentItem
-
-                    threadLinesHelper.populateThreadLines(
-                        h.threadLinesContainer, item.depth, item.baseDepth
-                    )
-                    lemmyHeaderHelper.populateHeaderSpan(
-                        headerContainer = h.headerView,
-                        item = item.comment,
-                        detailed = true,
-                        childrenCount = item.childrenCount
-                    )
-
-                    h.expandSectionButton.setOnClickListener {
-                        expandSection(h.absoluteAdapterPosition)
-                    }
-                    h.topHotspot.setOnClickListener {
-                        expandSection(h.absoluteAdapterPosition)
-                    }
-                    if (item.comment.comment.distinguished) {
-                        h.overlay.visibility = View.VISIBLE
-                        h.overlay.setBackgroundResource(R.drawable.locked_overlay)
-                    } else {
-                        h.overlay.visibility = View.GONE
-                    }
-
-                    h.itemView.tag = item
-                }
-                R.layout.generic_loading_item -> {
-                    val h = holder as LoadingViewHolder
-                    val item = items[position] as ProgressOrErrorItem
-
+                is ProgressOrErrorItem -> {
+                    val b = holder.getBinding<GenericLoadingItemBinding>()
                     if (item.error != null) {
-                        h.loadingView.showDefaultErrorMessageFor(item.error)
+                        b.loadingView.showDefaultErrorMessageFor(item.error)
                     } else if (!isLoaded) {
-                        h.loadingView.showProgressBar()
+                        b.loadingView.showProgressBar()
                     }
-                    h.loadingView.setOnRefreshClickListener {
+                    b.loadingView.setOnRefreshClickListener {
                         onRefreshClickCb()
                     }
                 }
-                R.layout.compose_comment_item -> {
-                    val h = holder as ComposeCommentViewHolder
-                    val item = items[position] as ComposeCommentItem
+                is MoreCommentsItem -> {
+                    val b = holder.getBinding<PostMoreCommentsItemBinding>()
 
-                    val constraintSet = if (item.isPosting) {
-                        h.postingConstraintSet
-                    } else {
-                        h.normalConstraintSet
+                    threadLinesHelper.populateThreadLines(
+                        b.threadLinesContainer, item.depth, item.baseDepth
+                    )
+                    b.moreButton.text = context.resources.getQuantityString(
+                        R.plurals.replies_format, item.moreCount, item.moreCount
+                    )
+
+                    b.moreButton.setOnClickListener {
+                        viewModel.fetchMoreComments(item.parentId)
                     }
-                    constraintSet.applyTo(h.rootView)
 
-                    bindComposeCommentView(h, item, item.isPosting)
-
-                    h.addComment.setOnClickListener a@{
-                        if (h.absoluteAdapterPosition < 0) return@a
-
-                        val autoTransition = AutoTransition()
-
-                        val item = items[h.absoluteAdapterPosition] as ComposeCommentItem
-                        if (item.isPosting) return@a
-
-                        item.isPosting = true
-
-                        autoTransition.ordering = AutoTransition.ORDERING_TOGETHER
-                        autoTransition.duration = 250
-                        TransitionManager.beginDelayedTransition(h.rootView, autoTransition)
-                        h.postingConstraintSet.applyTo(h.rootView)
-
-                        notifyItemChanged(h.adapterPosition, Unit)
-
-                        bindComposeCommentView(h, item, item.isPosting)
-
-//                        PendingActionsManager.instance.comment(
-//                            item.parentId,
-//                            item.comment.toString(),
-//                            this@PostFragment,
-//                            onRedditActionChangedCallback
-//                        )
-                    }
+                    b.root.tag = item
                 }
-                R.layout.edit_comment_item -> {
-                    val h = holder as EditCommentViewHolder
-                    val item = items[position] as EditCommentItem
 
-                    val constraintSet = if (item.isPosting) {
-                        h.postingConstraintSet
-                    } else {
-                        h.normalConstraintSet
-                    }
-                    constraintSet.applyTo(h.rootView)
+                FooterItem -> {}
+            }
+        }
 
-                    bindEditCommentView(h, item, item.isPosting)
+        private fun highlightComment(commentId: CommentId?, bg: View) {
+            commentId ?: return
 
-                    h.saveEditsButton.setOnClickListener a@{
-                        if (h.absoluteAdapterPosition < 0) return@a
+            if (highlightedComment == commentId) {
+                bg.visibility = View.VISIBLE
 
-                        val autoTransition = AutoTransition()
+                val animation = AlphaAnimation(0f, 0.9f)
+                animation.repeatCount = 5
+                animation.repeatMode = Animation.REVERSE
+                animation.duration = 300
+                animation.fillAfter = true
 
-                        val item = items[h.absoluteAdapterPosition] as EditCommentItem
-                        if (item.isPosting) return@a
-
-                        item.isPosting = true
-
-                        autoTransition.ordering = AutoTransition.ORDERING_TOGETHER
-                        autoTransition.duration = 250
-                        TransitionManager.beginDelayedTransition(h.rootView, autoTransition)
-                        h.postingConstraintSet.applyTo(h.rootView)
-
-                        notifyItemChanged(h.adapterPosition, Unit)
-
-                        bindEditCommentView(h, item, item.isPosting)
-
-//                        PendingActionsManager.instance.edit(
-//                            item.commentName,
-//                            item.comment.toString(),
-//                            this@PostFragment,
-//                            onRedditActionChangedCallback
-//                        )
-                    }
-                }
+                bg.startAnimation(animation)
+            } else {
+                bg.visibility = View.GONE
+                bg.clearAnimation()
             }
         }
 
@@ -1235,128 +1258,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 null
             }
 
-            if (holder is HeaderViewHolder) {
-                val state = lemmyContentHelper.recycleFullContent(holder.fullContentContainerView)
+            if (holder.isBinding<PostHeaderItemBinding>()) {
+                val b = holder.getBinding<PostHeaderItemBinding>()
+                val state = lemmyContentHelper.recycleFullContent(b.fullContent)
 
                 (item as? HeaderItem)?.videoState = state.videoState
-            } else if (holder is ComposeCommentViewHolder) {
-                holder.editText.removeTextChangedListener(holder.boundTextWatcher)
-                holder.boundTextWatcher = null
             }
-        }
-
-        private fun bindComposeCommentView(
-            h: ComposeCommentViewHolder,
-            item: ComposeCommentItem,
-            isPosting: Boolean
-        ) {
-            h.cancelButton.setOnClickListener {
-                removeComposeCommentItemFor(item.parentId)
-            }
-            h.editText.setText(item.comment)
-
-            if (h.boundTextWatcher != null) {
-                h.editText.removeTextChangedListener(h.boundTextWatcher)
-            }
-
-            val textWatcher = object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {}
-
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int
-                ) {
-                    item.comment = s ?: ""
-                }
-            }
-            h.boundTextWatcher = textWatcher
-            h.editText.addTextChangedListener(textWatcher)
-
-            val error = item.error
-            if (isPosting) {
-                h.loadingView.showProgressBarWithMessage(R.string.posting_comment)
-            }
-
-            h.itemView.tag = item
-        }
-
-        private fun removeComposeCommentItemFor(parentId: String) {
-            composeCommentItems.remove(parentId)
-            refreshItems(refreshHeader = false)
-        }
-
-        private fun setComposeCommentItemErrorFor(parentId: String, error: Throwable) {
-            composeCommentItems[parentId]?.let {
-                composeCommentItems[parentId] = it.copy(error = error, isPosting = false)
-            }
-            refreshItems(refreshHeader = false)
-        }
-
-        private fun bindEditCommentView(
-            h: EditCommentViewHolder,
-            item: EditCommentItem,
-            isPosting: Boolean
-        ) {
-            h.cancelButton.setOnClickListener {
-                removeEditCommentItemFor(item.commentName)
-            }
-            h.editText.setText(item.comment)
-
-            if (h.boundTextWatcher != null) {
-                h.editText.removeTextChangedListener(h.boundTextWatcher)
-            }
-
-            val textWatcher = object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {}
-
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int
-                ) {
-                    item.comment = s ?: ""
-                }
-            }
-            h.boundTextWatcher = textWatcher
-            h.editText.addTextChangedListener(textWatcher)
-
-            val error = item.error
-            if (isPosting) {
-                h.loadingView.showProgressBarWithMessage(R.string.posting_comment)
-            }
-
-            h.itemView.tag = item
-        }
-
-        private fun removeEditCommentItemFor(commentName: String) {
-            editCommentItems.remove(commentName)
-            refreshItems(refreshHeader = false)
-        }
-
-        private fun setEditCommentItemErrorFor(commentName: String, error: Throwable) {
-            editCommentItems[commentName]?.let {
-                editCommentItems[commentName] = it.copy(error = error, isPosting = false)
-            }
-            refreshItems(refreshHeader = false)
         }
 
         override fun getItemCount(): Int = items.size
@@ -1372,36 +1279,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             sharedElementReturnTransition = transitionSet
         }
 
-        private fun handleCommentClick(id: String) {
-//            val notSignedIn = RedditAuthManager.instance.showPreSignInIfNeeded(childFragmentManager)
-//
-//            if (notSignedIn) return
-//
-//            composeCommentItems[id] = ComposeCommentItem(
-//                id = "$id:comment",
-//                parentId = id,
-//                depth = 0,
-//                baseDepth = 0,
-//                comment = ""
-//            )
-//            refreshItems(refreshHeader = false)
-        }
-
-        private fun handleEditClick(commentItem: CommentView) {
-//            val notSignedIn = RedditAuthManager.instance.showPreSignInIfNeeded(childFragmentManager)
-//
-//            if (notSignedIn) return
-//
-//            editCommentItems[commentItem.getUniqueKey()] = EditCommentItem(
-//                id = commentItem.getUniqueKey(),
-//                commentName = commentItem.getUniqueKey(),
-//                depth = 0,
-//                baseDepth = 0,
-//                comment = commentItem.comment.content
-//            )
-//            refreshItems(refreshHeader = false)
-        }
-
         /**
          * @param refreshHeader Pass false to not always refresh header. Useful for web view headers
          * as refreshing them might cause a relayout causing janky animations
@@ -1409,7 +1286,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         private fun refreshItems(refreshHeader: Boolean = true) {
             val rawData = rawData
             val oldItems = items
-            var mainListingItemSeen = false
+
             val newItems =
                 if (error == null) {
                     rawData ?: return
@@ -1423,71 +1300,63 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         }
 
                         finalItems += HeaderItem(it.post, args.videoState)
-
-                        composeCommentItems[it.post.getUniqueKey()]?.let {
-                            finalItems += it
-                        }
                     }
 
                     rawData.commentTree.flatten().forEach {
-                        finalItems += CommentItem(
-                            it.commentView.comment,
-                            it.commentView.comment.getDepth(),
-                            0,
-                            !it.commentView.isCollapsed,
-                            false,
-                            view = it.commentView,
-                            it.children?.size ?: 0,
-                        )
+                        when (val commentView = it.commentView) {
+                            is PostViewModel.ListView.CommentListView -> {
+                                val isDeleting =
+                                    commentView.pendingCommentView?.isActionDelete == true
+                                finalItems += CommentItem(
+                                    commentId = commentView.comment.comment.id,
+                                    content =
+                                        commentView.pendingCommentView?.content
+                                            ?: commentView.comment.comment.content,
+                                    comment = commentView.comment,
+                                    depth = commentView.comment.getDepth(),
+                                    baseDepth = 0,
+                                    isExpanded = !commentView.isCollapsed,
+                                    isPending = false,
+                                    view = commentView,
+                                    childrenCount = it.children.size,
+                                    isPostLocked = commentView.comment.post.locked,
+                                    isUpdating = commentView.pendingCommentView != null,
+                                    isDeleting = isDeleting,
+                                )
+                            }
+                            is PostViewModel.ListView.PendingCommentListView -> {
+                                finalItems += PendingCommentItem(
+                                    commentId = commentView.pendingCommentView.commentId,
+                                    content = commentView.pendingCommentView.content,
+                                    author = commentView.author,
+                                    depth = it.depth,
+                                    baseDepth = 0,
+                                    isExpanded = !commentView.isCollapsed,
+                                    isPending = false,
+                                    view = commentView,
+                                    childrenCount = it.children.size,
+                                )
+                            }
+                            is PostViewModel.ListView.PostListView -> {
+                                // should never happen
+                            }
+
+                            is PostViewModel.ListView.MoreCommentsItem -> {
+                                finalItems += MoreCommentsItem(
+                                    parentId = commentView.parentId,
+                                    moreCount = commentView.moreCount,
+                                    depth = it.depth,
+                                    baseDepth = 0,
+                                )
+                            }
+                        }
                     }
-
-
-//
-//                    redditObjects.forEach { redditObject ->
-//                        when (redditObject) {
-//                            is PostItem.ContentItem -> {
-//                                if (!mainListingItemSeen) {
-//                                    mainListingItemSeen = true
-//                                    onMainListingItemRetreived(redditObject.listingItem)
-//                                }
-//
-//                                finalItems += HeaderItem(redditObject.listingItem, args.videoState)
-//
-//                                composeCommentItems[redditObject.listingItem.name]?.let {
-//                                    finalItems += it
-//                                }
-//                            }
-//                            is PostItem.CommentItem -> {
-//                                editCommentItems[redditObject.commentItem.name]?.let {
-//                                    finalItems += it
-//                                } ?: run {
-//                                    finalItems += CommentItem(
-//                                        redditObject.commentItem,
-//                                        redditObject.depth,
-//                                        0,
-//                                        !redditObject.commentItem.collapsed,
-//                                        redditObject.isPending
-//                                    )
-//                                }
-//
-//                                composeCommentItems[redditObject.commentItem.name]?.let {
-//                                    finalItems += it
-//                                }
-//                            }
-//                            is PostItem.MoreCommentsItem -> {
-//                                finalItems += MoreCommentsItem(
-//                                    redditObject.moreItem,
-//                                    redditObject.depth,
-//                                    0,
-//                                    redditObject.linkId
-//                                )
-//                            }
-//                        }
-//                    }
 
                     if (!isLoaded) {
                         finalItems += listOf(ProgressOrErrorItem())
                     }
+
+                    finalItems += FooterItem
 
                     finalItems
                 } else {
@@ -1510,13 +1379,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     val oldItem = oldItems[oldItemPosition]
                     val newItem = newItems[newItemPosition]
                     return when (oldItem) {
-                        is ComposeCommentItem -> {
-                            oldItem.isPosting == (newItem as ComposeCommentItem).isPosting
-                        }
-                        is EditCommentItem -> {
-                            oldItem.isPosting == (newItem as EditCommentItem).isPosting
-                        }
-
                         is HeaderItem -> true
                         else -> oldItem == newItem
                     }
@@ -1529,6 +1391,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 notifyItemChanged(0, Unit)
             }
         }
+
+        fun getPositionOfComment(commentId: CommentId): Int =
+            items.indexOfFirst {
+                when (it) {
+                    is CommentItem -> it.commentId == commentId
+                    is HeaderItem -> false
+                    is MoreCommentsItem -> false
+                    is PendingCommentItem -> it.commentId == commentId
+                    is ProgressOrErrorItem -> false
+                    FooterItem -> false
+                }
+            }
 
         fun setStartingData(data: PostViewModel.PostData) {
             rawData = data
@@ -1549,11 +1423,31 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             refreshItems()
         }
 
+        fun highlightComment(commentId: CommentId) {
+            val pos = getPositionOfComment(commentId)
+            if (pos == -1) {
+                return
+            }
+
+            highlightedComment = commentId
+            notifyItemChanged(getPositionOfComment(commentId), Unit)
+        }
+
+        fun clearHighlightComment() {
+            val pos = getPositionOfComment(highlightedComment)
+            if (pos == -1) {
+                return
+            }
+
+            highlightedComment = -1
+            notifyItemChanged(pos, Unit)
+        }
+
         private fun collapseSection(position: Int) {
             if (position < 0) return
 
-            val commentItem = (items[position] as CommentItem).view
-            commentItem.isCollapsed = true
+            (items[position] as? CommentItem)?.view?.isCollapsed = true
+            (items[position] as? PendingCommentItem)?.view?.isCollapsed = true
 
             refreshItems(refreshHeader = false)
         }
@@ -1561,8 +1455,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         private fun expandSection(position: Int) {
             if (position < 0) return
 
-            val commentItem = (items[position] as CommentItem).view
-            commentItem.isCollapsed = false
+            (items[position] as? CommentItem)?.view?.isCollapsed = false
+            (items[position] as? PendingCommentItem)?.view?.isCollapsed = false
 
             refreshItems(refreshHeader = false)
         }

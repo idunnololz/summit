@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 21,
-    "identityHash": "5d8a1b58ceb9a384849268336ecc5a63",
+    "identityHash": "b15c2ade5420f8621e669098f2b375d0",
     "entities": [
       {
         "tableName": "user_communities",
@@ -204,7 +204,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5d8a1b58ceb9a384849268336ecc5a63')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b15c2ade5420f8621e669098f2b375d0')"
     ]
   }
 }

@@ -19,7 +19,7 @@ import com.idunnololz.summit.databinding.FragmentHistoryBinding
 import com.idunnololz.summit.databinding.HistoryEntryItemBinding
 import com.idunnololz.summit.databinding.HistoryHeaderItemBinding
 import com.idunnololz.summit.lemmy.LinkResolver
-import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -292,7 +292,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                 }
                 newItems.add(
                     Item.HistoryItem(
-                        sharableUrl = RedditUtils.convertRedditUrl(
+                        sharableUrl = LemmyUtils.convertRedditUrl(
                             it.url,
                             desiredFormat = "",
                             sharable = true

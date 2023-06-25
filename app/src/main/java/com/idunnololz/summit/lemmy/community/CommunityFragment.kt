@@ -33,11 +33,13 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.api.dto.PostType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.utils.PostType
+import com.idunnololz.summit.api.utils.getType
+import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.FragmentSubredditBinding
 import com.idunnololz.summit.databinding.MainFooterItemBinding
 import com.idunnololz.summit.history.HistoryManager
@@ -56,7 +58,7 @@ import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -743,12 +745,13 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                         )
 
                         h.commentButton.text =
-                            RedditUtils.abbrevNumber(item.postView.counts.comments.toLong())
+                            LemmyUtils.abbrevNumber(item.postView.counts.comments.toLong())
                         h.upvoteCount.text = item.postView.getUpvoteText()
 
                         h.commentButton.isEnabled = !item.postView.post.locked
 
                         voteUiHandler.bind(
+                            viewLifecycleOwner,
                             item.instance,
                             item.postView,
                             h.upvoteButton,
@@ -955,17 +958,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                                 toggleItem(h.absoluteAdapterPosition, item)
                             }
                         }
-//                        ListingItemType.REDDIT_GALLERY -> {
-//                            loadAndShowImage()
-//
-//                            if (expandedItems.contains(item.listingItem.name)) {
-//                                showFullContent()
-//                            }
-//                            h.image?.setOnClickListener {
-//                                toggleItem(h.adapterPosition, item)
-//                                notifyItemChanged(h.adapterPosition)
-//                            }
-//                        }
                     }
 
                     h.image?.layoutParams = h.image?.layoutParams?.apply {
@@ -977,7 +969,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
                     h.title.text = item.postView.getFormattedTitle()
                     h.commentButton.text =
-                        RedditUtils.abbrevNumber(item.postView.counts.comments.toLong())
+                        LemmyUtils.abbrevNumber(item.postView.counts.comments.toLong())
                     h.upvoteCount.text = item.postView.getUpvoteText()
 
                     h.itemView.setOnClickListener {
@@ -997,6 +989,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     h.commentButton.isEnabled = !item.postView.post.locked
 
                     voteUiHandler.bind(
+                        viewLifecycleOwner,
                         item.instance,
                         item.postView,
                         h.upvoteButton,
@@ -1040,6 +1033,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                 lemmyContentHelper.recycleFullContent(
                     holder.fullContentContainerView
                 )
+                voteUiHandler.unbindVoteUi(holder.upvoteButton)
             }
         }
 

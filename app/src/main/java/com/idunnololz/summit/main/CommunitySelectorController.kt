@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommonLemmyInstance
 import com.idunnololz.summit.api.dto.CommunityView
@@ -50,6 +51,7 @@ typealias CommunitySelectedListener =
 class CommunitySelectorController @AssistedInject constructor(
     @Assisted private val context: Context,
     private val offlineManager: OfflineManager,
+    private val accountManager: AccountManager,
     private val lemmyApiClient: AccountAwareLemmyClient,
     private val recentCommunityManager: RecentCommunityManager,
 ) {
@@ -358,16 +360,27 @@ class CommunitySelectorController @AssistedInject constructor(
                     }
                 }
 
-            val subredditIds = hashSetOf<String>()
+            val communityIds = hashSetOf<String>()
             val query = query
-            val newItems =
+
+            val newItems = mutableListOf<Item>()
+            newItems.add(Item.GroupHeaderItem(context.getString(R.string.feeds)))
+            newItems.add(Item.StaticChildItem(
+                context.getString(R.string.all),
+                R.drawable.ic_subreddit_all,
+                CommunityRef.All(),
+            ))
+
+            val account = accountManager.currentAccount.value
+            if (account != null) {
+                newItems.add(Item.StaticChildItem(
+                    context.getString(R.string.subscribed),
+                    R.drawable.baseline_dynamic_feed_24,
+                    CommunityRef.Subscribed(account.instance),
+                ))
+            }
+            newItems.addAll(
                 listOf(
-                    Item.GroupHeaderItem(context.getString(R.string.feeds)),
-                    Item.StaticChildItem(
-                        context.getString(R.string.all),
-                        R.drawable.ic_subreddit_all,
-                        CommunityRef.All(),
-                    ),
                     Item.StaticChildItem(
                         CommonLemmyInstance.LemmyMl.instance,
                         R.drawable.ic_subreddit_home,
@@ -384,59 +397,57 @@ class CommunitySelectorController @AssistedInject constructor(
                         CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
                     ),
                 )
-                    .plus(makeRecentItems(query))
-                    .plus(Item.GroupHeaderItem(context.getString(R.string.communities)))
-                    .plus(rawData
-                        .sortedByDescending { it.counts.users_active_month }
-                        .map {
-                            Item.CommunityChildItem(
-                                text = it.community.name,
-                                community = it,
-                                monthlyActiveUsers = it.counts.users_active_month
-                            )
-                                .also { subredditIds.add(it.id) }
-                        })
-                    .let a@{ intermediateList ->
-                        if (query.isNullOrBlank()) {
-                            return@a intermediateList
-                        }
+            )
 
-                        fun getText(item: Item): String = when (item) {
-                            is Item.StaticChildItem -> item.text
-                            is Item.CommunityChildItem -> item.text
-                            else -> ""
-                        }
+            newItems.addAll(makeRecentItems(query))
+            newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))
 
-                        val serverQueryItems = serverQueryResults
-                            .map { Item.CommunityChildItem(
-                                text = it.community.name,
-                                community = it,
-                                monthlyActiveUsers = it.counts.users_active_month
-                            ) }
-                            .filter {
-                                !subredditIds.contains(it.id) &&
-                                        getText(it).contains(query, ignoreCase = true)
-                            }
+            rawData
+                .sortedByDescending { it.counts.users_active_month }
+                .mapTo(newItems) {
+                    Item.CommunityChildItem(
+                        text = it.community.name,
+                        community = it,
+                        monthlyActiveUsers = it.counts.users_active_month
+                    ).also { communityIds.add(it.id) }
+                }
 
-                        intermediateList.filter { getText(it).contains(query, ignoreCase = true) }
-                            .sortedByDescending { StringSearchUtils.similarity(query, getText(it)) }
-                            .let {
-                                if (it.isEmpty()) {
-                                    it.plus(Item.NoResultsItem(context.getString(R.string.no_results_found)))
-                                } else it
-                            }
-                            .let {
-                                if (serverQueryItems.isNotEmpty() || serverResultsInProgress) {
-                                    it.plus(
-                                        Item.GroupHeaderItem(
-                                            context.getString(R.string.server_results),
-                                            serverResultsInProgress
-                                        )
-                                    )
-                                        .plus(serverQueryItems)
-                                } else it
-                            }
+            if (!query.isNullOrBlank()) {
+                fun getText(item: Item): String = when (item) {
+                    is Item.StaticChildItem -> item.text
+                    is Item.CommunityChildItem -> item.text
+                    else -> ""
+                }
+
+                val serverQueryItems = serverQueryResults
+                    .map { Item.CommunityChildItem(
+                        text = it.community.name,
+                        community = it,
+                        monthlyActiveUsers = it.counts.users_active_month
+                    ) }
+                    .filter {
+                        !communityIds.contains(it.id) &&
+                                getText(it).contains(query, ignoreCase = true)
                     }
+
+                newItems.retainAll { getText(it).contains(query, ignoreCase = true) }
+
+                newItems.sortByDescending { StringSearchUtils.similarity(query, getText(it)) }
+
+                if (newItems.isEmpty()) {
+                    newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
+                }
+
+                if (serverQueryItems.isNotEmpty() || serverResultsInProgress) {
+                    newItems.add(
+                        Item.GroupHeaderItem(
+                            context.getString(R.string.server_results),
+                            serverResultsInProgress
+                        )
+                    )
+                    newItems.addAll(serverQueryItems)
+                }
+            }
 
             adapterHelper.setItems(newItems, this)
         }

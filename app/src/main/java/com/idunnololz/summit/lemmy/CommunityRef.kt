@@ -4,28 +4,22 @@ import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunitySafe
+import com.idunnololz.summit.api.dto.Community
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
 import java.util.Locale
 
+@JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface CommunityRef : PageRef, Parcelable {
-
-    companion object {
-        fun adapter(): PolymorphicJsonAdapterFactory<CommunityRef> =
-            PolymorphicJsonAdapterFactory.of(CommunityRef::class.java, "t")
-                .withSubtype(CommunityRefByObj::class.java, "1")
-                .withSubtype(Local::class.java, "2")
-                .withSubtype(All::class.java, "3")
-                .withSubtype(CommunityRefByName::class.java, "4")
-    }
 
     @Parcelize
     @JsonClass(generateAdapter = true)
+    @TypeLabel("1")
     data class CommunityRefByObj(
-        val community: CommunitySafe,
+        val community: Community,
         val instance: String?,
     ) : CommunityRef {
 
@@ -39,12 +33,14 @@ sealed interface CommunityRef : PageRef, Parcelable {
 
     @Parcelize
     @JsonClass(generateAdapter = true)
+    @TypeLabel("2")
     data class Local(
         val instance: String?
     ) : CommunityRef
 
     @Parcelize
     @JsonClass(generateAdapter = true)
+    @TypeLabel("3")
     data class All(
         @Json(name = "site")
         val instance: String? = null
@@ -52,6 +48,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
 
     @Parcelize
     @JsonClass(generateAdapter = true)
+    @TypeLabel("4")
     data class CommunityRefByName(
         val name: String,
         val instance: String?,
@@ -65,12 +62,20 @@ sealed interface CommunityRef : PageRef, Parcelable {
         }
     }
 
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("5")
+    data class Subscribed(
+        val instance: String?,
+    ) : CommunityRef
+
     fun getName(context: Context): String =
         when (this) {
             is CommunityRefByObj -> this.community.name
             is Local -> context.getString(R.string.local)
             is All -> context.getString(R.string.all)
             is CommunityRefByName -> this.name
+            is Subscribed -> context.getString(R.string.subscribed)
         }
 
     fun getKey(): String =
@@ -79,10 +84,11 @@ sealed interface CommunityRef : PageRef, Parcelable {
             is Local -> this.instance ?: "local@auto"
             is All -> "all@${this.instance}"
             is CommunityRefByName -> "cname@${this.name}".lowercase(Locale.US)
+            is Subscribed -> "subscribed@${this.instance}"
         }
 }
 
-fun CommunitySafe.toCommunityRef(): CommunityRef.CommunityRefByObj {
+fun Community.toCommunityRef(): CommunityRef.CommunityRefByObj {
     val uri = Uri.parse(this.actor_id)
     return CommunityRef.CommunityRefByObj(this, uri.host)
 }
@@ -96,4 +102,5 @@ fun CommunityRef.toInstanceAgnosticCommunityRef(): CommunityRef =
             this.instance,
         )
         is CommunityRef.Local -> this
+        is CommunityRef.Subscribed -> this
     }

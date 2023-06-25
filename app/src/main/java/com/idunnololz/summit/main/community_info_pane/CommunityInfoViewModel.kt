@@ -34,7 +34,7 @@ class CommunityInfoViewModel @Inject constructor(
     private var communityRef: CommunityRef? = null
 
     val siteOrCommunity = StatefulLiveData<Either<GetSiteResponse, CommunityView>>()
-    val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
+    private val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
 
     fun createController(
         binding: CommunityInfoPaneBinding,
@@ -46,21 +46,24 @@ class CommunityInfoViewModel @Inject constructor(
             viewLifecycleOwner,
         )
 
-    fun fetchCommunityOrSiteInfo(communityRef: CommunityRef) {
+    private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
         siteOrCommunity.setIsLoading()
         viewModelScope.launch {
             val result = when (communityRef) {
                 is CommunityRef.All -> {
-                    Either.Left(apiClient.fetchSiteWithRetry())
+                    Either.Left(apiClient.fetchSiteWithRetry(force))
                 }
                 is CommunityRef.CommunityRefByName -> {
-                    Either.Right(apiClient.fetchCommunityWithRetry(Either.Right(communityRef.getServerId())))
+                    Either.Right(apiClient.fetchCommunityWithRetry(Either.Right(communityRef.getServerId()), force))
                 }
                 is CommunityRef.CommunityRefByObj -> {
-                    Either.Right(apiClient.fetchCommunityWithRetry(Either.Right(communityRef.getServerId())))
+                    Either.Right(apiClient.fetchCommunityWithRetry(Either.Right(communityRef.getServerId()), force))
                 }
                 is CommunityRef.Local -> {
-                    Either.Left(apiClient.fetchSiteWithRetry())
+                    Either.Left(apiClient.fetchSiteWithRetry(force))
+                }
+                is CommunityRef.Subscribed -> {
+                    Either.Left(apiClient.fetchSiteWithRetry(force))
                 }
             }
 
@@ -100,7 +103,7 @@ class CommunityInfoViewModel @Inject constructor(
 
                     delay(1000)
 
-                    refetchCommunityOrSite()
+                    refetchCommunityOrSite(force = true)
                     accountInfoManager.fetchAccountInfo()
 
                     Log.d(TAG, "subscription status: " + it.subscribed)
@@ -114,8 +117,8 @@ class CommunityInfoViewModel @Inject constructor(
         fetchCommunityOrSiteInfo(communityRef)
     }
 
-    fun refetchCommunityOrSite() {
+    fun refetchCommunityOrSite(force: Boolean) {
         val communityRef = communityRef ?: return
-        fetchCommunityOrSiteInfo(communityRef)
+        fetchCommunityOrSiteInfo(communityRef, force)
     }
 }

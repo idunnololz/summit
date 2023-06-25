@@ -2,6 +2,8 @@ package com.idunnololz.summit.db
 
 import android.content.Context
 import com.idunnololz.summit.account.AccountDao
+import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
+import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.user.UserCommunitiesDao
 import dagger.Module
 import dagger.Provides
@@ -20,6 +22,14 @@ class DatabaseModule {
     @Provides
     fun provideUserCommunitiesDao(db: MainDatabase): UserCommunitiesDao =
         db.userCommunitiesDao()
+
+    @Provides
+    fun provideLemmyActionsDao(db: MainDatabase): LemmyActionsDao =
+        db.lemmyActionsDao()
+
+    @Provides
+    fun provideLemmyFailedActionsDao(db: MainDatabase): LemmyFailedActionsDao =
+        db.lemmyFailedActionsDao()
 
     @Provides
     @Singleton

@@ -6,7 +6,7 @@
     <color name="colorPrimaryDark">@color/orangeDarkTheme</color>
     <color name="colorSecondary">@color/orangeTheme</color>
     <color name="colorAccent">@color/orangeTheme</color>
-    <color name="colorOnPrimary">@color/white97</color>
+    <color name="colorOnPrimary">@color/black97</color>
     <color name="colorOnSecondary">@color/black97</color>
     <color name="colorOnBackground">@color/black97</color>
     <color name="colorOnSurface">@color/black97</color>
@@ -16,6 +16,7 @@
     <color name="colorTextFaint">@color/black50</color>
     <color name="colorSecondaryContainer">@color/white</color>
     <color name="colorSelected">@color/black10</color>
+    <color name="colorHighlight">@color/black10</color>
 
     <color name="colorBackground">#f6f6f6</color>
     <color name="colorWindowBackground">@color/colorSurface</color>

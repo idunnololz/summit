@@ -14,7 +14,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentGoToBinding
-import com.idunnololz.summit.reddit.RedditUtils
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.BaseDialogFragment
 
 class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
@@ -68,7 +68,7 @@ class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                     val url = textField.editText?.text.toString().trim()
                     if (Patterns.WEB_URL.matcher(url).matches()) {
-                        RedditUtils.openRedditUrl(requireContext(), url)
+                        LemmyUtils.openRedditUrl(requireContext(), url)
                         dismiss()
                     } else {
                         textField.error = getString(R.string.invalid_link)

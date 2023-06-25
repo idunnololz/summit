@@ -103,7 +103,7 @@ class MainActivity : BaseActivity() {
         mutableListOf<NavigationBarView.OnItemReselectedListener>()
 
     private var currentBottomMenu: BottomMenu? = null
-    private var lastInsets: MainActivityInsets = MainActivityInsets()
+    var lastInsets: MainActivityInsets = MainActivityInsets()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -757,13 +757,13 @@ class MainActivity : BaseActivity() {
 
     fun insetViewExceptTopAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = checkNotNull(windowInsets.value)
+            val insets = checkNotNull(lastInsets)
 
             rootView.setPadding(
-                insets.left,
+                insets.leftInset,
                 0,
-                insets.right,
-                insets.bottom
+                insets.rightInset,
+                insets.bottomInset,
             )
         }
     }

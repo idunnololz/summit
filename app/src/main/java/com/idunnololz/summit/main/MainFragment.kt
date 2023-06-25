@@ -407,6 +407,21 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                             }
                         }
                     }
+                    tabsManager.previousTabs.forEach { tab ->
+                        if (tab is TabsManager.Tab.SubscribedCommunityTab) {
+                            if (getTagForTab(tab.communityRef) != newlySelectedItemTag) {
+                                fragmentManager.findFragmentByTag(firstFragmentTag)?.let {
+                                    detach(it)
+                                }
+                            }
+                        }
+                    }
+
+//                    fragmentManager.fragments.forEach {
+//                        if (tag != newlySelectedItemTag) {
+//                            detach(it)
+//                        }
+//                    }
                 }
                 .addToBackStack(firstFragmentTag)
                 .setReorderingAllowed(true)
