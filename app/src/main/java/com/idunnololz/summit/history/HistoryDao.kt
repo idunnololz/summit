@@ -1,8 +1,14 @@
 package com.idunnololz.summit.history
 
+import android.util.Log
 import androidx.room.*
+import com.idunnololz.summit.user.TabCommunityState
+import com.idunnololz.summit.util.moshi
 import io.reactivex.Completable
 import io.reactivex.Single
+
+
+private const val TAG = "HistoryDao"
 
 /**
  * Data Access Object
@@ -36,4 +42,61 @@ interface HistoryDao {
 
     @Query("DELETE FROM history")
     suspend fun deleteAllHistoryEntries()
+
+
+    @Transaction
+    open suspend fun insertEntryMergeWithPreviousIfSame(newEntry: HistoryEntry) {
+        val lastEntry = getLastHistoryEntryWithType(newEntry.type)
+
+        Log.d(TAG, "Last entry: $lastEntry")
+
+        val entryToInsert = try {
+            if (lastEntry?.type != newEntry.type) {
+                newEntry
+            } else {
+                when (newEntry.type) {
+                    HistoryEntry.TYPE_PAGE_VISIT ->
+                        if (lastEntry.url == newEntry.url) {
+                            // just update the last entry
+                            Log.d(TAG, "Using copy of last entry...")
+                            lastEntry.copy(
+                                ts = newEntry.ts,
+                                shortDesc = newEntry.shortDesc
+                            )
+                        } else {
+                            newEntry
+                        }
+
+                    HistoryEntry.TYPE_COMMUNITY_STATE -> {
+                        // Url for subreddit state is actually the tab id...
+                        val adapter = moshi.adapter(TabCommunityState::class.java)
+                        val oldState = adapter.fromJson(lastEntry.extras)
+                        val newState = adapter.fromJson(newEntry.extras)
+                        if (oldState?.tabId == newState?.tabId &&
+                            oldState?.viewState?.communityState?.currentPageIndex ==
+                            newState?.viewState?.communityState?.currentPageIndex
+                        ) {
+                            // just update the last entry
+                            lastEntry.copy(
+                                ts = newEntry.ts,
+                                shortDesc = newEntry.shortDesc,
+                                extras = newEntry.extras
+                            )
+                        } else {
+                            newEntry
+                        }
+                    }
+
+                    else -> newEntry
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "", e)
+            newEntry
+        }
+
+        Log.d(TAG, "Inserting entry: $entryToInsert")
+
+        insertHistoryEntry(entryToInsert)
+    }
 }

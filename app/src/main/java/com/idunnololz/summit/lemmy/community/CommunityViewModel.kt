@@ -15,6 +15,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
 import com.idunnololz.summit.lemmy.CommunityViewState
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
@@ -75,6 +76,8 @@ class CommunityViewModel @Inject constructor(
 
     val instance: String
         get() = postsRepository.instance
+
+    var lastSelectedPost: PostRef? = null
 
     init {
         currentCommunityRef.observeForever(communityRefChangeObserver)

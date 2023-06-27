@@ -5,6 +5,10 @@
     android:id="@+id/main"
     app:startDestination="@id/mainFragment">
 
+    <include app:graph="@navigation/community" />
+
+    <action android:id="@+id/action_global_login" app:destination="@id/login"/>
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.idunnololz.summit.main.MainFragment"
@@ -14,6 +18,20 @@
             android:defaultValue="@null"
             app:nullable="true"
             app:argType="string" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_community"
+            app:destination="@+id/community">
+            <argument
+                android:name="communityRef"
+                android:defaultValue="@null"
+                app:nullable="true"
+                app:argType="com.idunnololz.summit.lemmy.CommunityRef" />
+            <argument
+                android:name="pageIndex"
+                android:defaultValue="0"
+                app:argType="integer" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/savedFragment"

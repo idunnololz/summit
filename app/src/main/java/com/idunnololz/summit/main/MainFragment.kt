@@ -9,12 +9,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
@@ -47,6 +49,9 @@ import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.getCurrentNavigationFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -90,6 +95,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     private val deferredNavigationRequests = mutableListOf<Runnable>()
 
+    private var doubleBackToExitPressedOnce = false
+
     private val onDestinationChangedListener =
         NavController.OnDestinationChangedListener { controller, destination, arguments ->
             Log.d(TAG, "onDestinationChangedListener(): ${destination.label}")
@@ -105,18 +112,39 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             }
         }
 
+    private val paneOnBackPressHandler = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!isBindingAvailable()) return
+
+            binding.rootView.closePanels()
+        }
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (!isBindingAvailable()) return
 
-            if (binding.rootView.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
-                binding.rootView.closePanels()
-                return
-            }
+            val context = requireContext()
 
             if (currentNavController?.navigateUp() == false) {
                 if (!findNavController().navigateUp()) {
-                    getMainActivity()?.finish()
+
+                    if (doubleBackToExitPressedOnce) {
+                        getMainActivity()?.finish()
+                        return
+                    }
+
+                    doubleBackToExitPressedOnce = true
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.press_back_again_to_exit),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        delay(2000)
+                        doubleBackToExitPressedOnce = false
+                    }
                 }
             }
         }
@@ -213,6 +241,16 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             startPostponedEnterTransition()
         }
 
+        fun updatePaneBackPressHandler() {
+            Log.d(TAG, "updatePaneBackPressHandler(): selected panel: ${binding.rootView.getSelectedPanel()}")
+            if (binding.rootView.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
+                paneOnBackPressHandler.remove()
+                requireMainActivity().onBackPressedDispatcher.addCallback(paneOnBackPressHandler)
+            } else {
+                paneOnBackPressHandler.remove()
+            }
+        }
+
         binding.rootView
             .registerStartPanelStateListeners(object : OverlappingPanelsLayout.PanelStateListener {
                 override fun onPanelStateChange(panelState: PanelState) {
@@ -220,6 +258,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     when (panelState) {
                         PanelState.Closed -> {
                             getMainActivity()?.setNavUiOpenness(0f)
+
+                            updatePaneBackPressHandler()
                         }
                         is PanelState.Closing -> {
                             getMainActivity()?.setNavUiOpenness(panelState.progress)
@@ -227,6 +267,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         PanelState.Opened -> {
                             getMainActivity()?.setNavUiOpenness(100f)
                             communitiesPaneController.onShown()
+
+                            updatePaneBackPressHandler()
                         }
                         is PanelState.Opening -> {
                             getMainActivity()?.setNavUiOpenness(panelState.progress)
@@ -240,6 +282,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 when (panelState) {
                     PanelState.Closed -> {
                         getMainActivity()?.setNavUiOpenness(0f)
+
+                        updatePaneBackPressHandler()
                     }
                     is PanelState.Closing -> {
                         getMainActivity()?.setNavUiOpenness(panelState.progress)
@@ -247,6 +291,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     PanelState.Opened -> {
                         getMainActivity()?.setNavUiOpenness(100f)
                         communityInfoController.onShown()
+
+                        updatePaneBackPressHandler()
                     }
                     is PanelState.Opening -> {
                         getMainActivity()?.setNavUiOpenness(panelState.progress)

@@ -91,6 +91,7 @@ class LemmyApiClient @Inject constructor(
         listingType: ListingType,
         page: Int,
         limit: Int? = null,
+        force: Boolean,
     ): Result<List<PostView>> {
         val communityId = communityIdOrName?.fold({ it }, { null })
         val communityName = communityIdOrName?.fold({ null }, { it })
@@ -111,7 +112,11 @@ class LemmyApiClient @Inject constructor(
         }
 
         return retrofitErrorHandler {
-            api.getPosts(form = form.serializeToMap())
+            if (force) {
+                api.getPostsNoCache(form = form.serializeToMap())
+            } else {
+                api.getPosts(form = form.serializeToMap())
+            }
         }.fold(
             onSuccess = {
                 Result.success(it.posts)

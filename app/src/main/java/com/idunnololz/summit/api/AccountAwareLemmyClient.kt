@@ -49,6 +49,7 @@ class AccountAwareLemmyClient @Inject constructor(
         listingType: ListingType? = null,
         page: Int,
         limit: Int? = null,
+        force: Boolean,
     ): Result<List<PostView>> {
         val currentAccount = accountForInstance()
 
@@ -68,7 +69,8 @@ class AccountAwareLemmyClient @Inject constructor(
                     ListingType.values()[currentAccount.defaultListingType]
                 },
             limit = limit,
-            page = page
+            page = page,
+            force = force,
         )
     }
 

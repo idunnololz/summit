@@ -17,7 +17,7 @@ data class HistoryEntry(
 ) {
     companion object {
         const val TYPE_PAGE_VISIT = 1
-        const val TYPE_SUBREDDIT_STATE = 2
+        const val TYPE_COMMUNITY_STATE = 2
     }
 }
 
