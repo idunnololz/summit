@@ -50,6 +50,7 @@
 
 
     <color name="white10">#1AFFFFFF</color>
+    <color name="white30">#4dFFFFFF</color>
     <color name="white50">#80FFFFFF</color>
     <color name="white66">#A8FFFFFF</color>
     <color name="white97">#F7FFFFFF</color>

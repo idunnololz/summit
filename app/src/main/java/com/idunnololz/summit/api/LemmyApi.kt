@@ -87,6 +87,9 @@ interface LemmyApi {
      */
     @GET("post/list")
     fun getPosts(@QueryMap form: Map<String, String>): Call<GetPostsResponse>
+    @GET("post/list")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getPostsNoCache(@QueryMap form: Map<String, String>): Call<GetPostsResponse>
 
     /**
      * Get / fetch a post.

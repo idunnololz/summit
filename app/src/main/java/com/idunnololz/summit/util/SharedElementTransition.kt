@@ -9,6 +9,7 @@ class SharedElementTransition : TransitionSet() {
             .addTransition(ChangeTransform())
             .addTransition(ChangeImageTransform())
             .addTransition(ChangeClipBounds())
-            .setDuration(250)
+            .addTransition(TextSizeTransition())
+            .setDuration(300)
     }
 }

@@ -36,146 +36,7 @@ object LemmyUtils {
 
     private val SUBREDDIT_NAME_MAX_LENGTH = 20
 
-    /**
-     * Matches against subreddit names. (technically incomplete because it doesn't have the length limit)
-     */
-    val SUBREDDIT_REGEX = Pattern.compile("""(^|\s)(\/?c\/([a-zA-Z0-9-][a-zA-Z0-9-_@]*))""")
-
     private val GIPHY_REGEX = Pattern.compile("\\(giphy\\|([^\\s]*)\\)")
-
-    private class LemmyPlugin(
-        private val context: Context,
-        private val instance: String,
-    ) : AbstractMarkwonPlugin() {
-
-        /**
-         * Matches against words where the first character is a caret. Eg. '^hello'
-         */
-        private val SUB_REGEX = Pattern.compile("\\^([^\\s]+)")
-
-        /**
-         * Matches against strings wrapped in '!>', '<!'. Eg. '!>this is a spoiler<!'
-         */
-        private val SPOILER_REGEX = Pattern.compile(""":::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\n|${'$'})\s*""")
-
-        /**
-         * Matches against poorly formated header tags. Eg. `##Asdf` (proper would be `## Asdf`)
-         */
-        val HEADER_TAG_REGEX = Pattern.compile("(?m)^([#]+)([^\\s]*.*)$")
-
-        /**
-         * Matches against subreddit names. DOES NOT MATCH SUBREDDIT URLS. (technically incomplete because it doesn't have the length limit)
-         */
-        private val SUBREDDIT_REGEX =
-            Pattern.compile("(^|\\s)(/?\\bc/([a-zA-Z0-9-][a-zA-Z0-9-_]*)\\b)")
-
-        private fun processSubTags(s: String): String {
-            val matcher = SUB_REGEX.matcher(s)
-            val sb = StringBuffer()
-            while (matcher.find()) {
-                val g1 = matcher.group(1)
-                if (!g1.endsWith("^")) {
-                    matcher.appendReplacement(sb, "^${matcher.group(1)}^")
-                }
-            }
-            matcher.appendTail(sb)
-            return sb.toString()
-        }
-
-        private fun processSpoilerTags(s: String): String {
-            val matcher = SPOILER_REGEX.matcher(s)
-            val sb = StringBuffer()
-            while (matcher.find()) {
-                val spoilerTitle: String? = matcher.group(1)?.trim()
-                val spoilerText: String? = matcher.group(2)?.trim()
-                if (!spoilerTitle.isNullOrBlank() && !spoilerText.isNullOrBlank()) {
-                    matcher.appendReplacement(sb, "<br>${spoilerTitle}<br>++${spoilerText}++<br>")
-                }
-            }
-            matcher.appendTail(sb)
-            return sb.toString()
-        }
-
-        private fun processHeaderTags(s: String): String {
-            val matcher = HEADER_TAG_REGEX.matcher(s)
-            val sb = StringBuffer()
-            while (matcher.find()) {
-                try {
-                    val formattingChar = requireNotNull(matcher.group(1)).trim()
-                    val rest = requireNotNull(matcher.group(2)).trim()
-                    matcher.appendReplacement(
-                        sb,
-                        Matcher.quoteReplacement("$formattingChar $rest")
-                    )
-                    Log.d(TAG, "Fixed ${"$formattingChar $rest"}")
-                } catch (e: Exception) {
-                    throw RuntimeException("Error parsing header tag: $s.", e)
-                }
-            }
-            matcher.appendTail(sb)
-            return sb.toString()
-        }
-
-        private fun processSubredditMentions(s: String, instance: String): String {
-            val matcher = SUBREDDIT_REGEX.matcher(s)
-            val sb = StringBuffer()
-            while (matcher.find()) {
-                val communityUrl = matcher.group(3) ?: continue
-                val spacer = matcher.group(1) ?: ""
-
-                val pageRef = LinkResolver.parseUrl(communityUrl, instance)
-                    ?: continue
-
-                val communityRef = pageRef as? CommunityRef
-                    ?: continue
-
-                matcher.appendReplacement(
-                    sb,
-                    "$spacer[${matcher.group(2)}](${LinkUtils.getLinkForCommunity(communityRef)})"
-                )
-            }
-            matcher.appendTail(sb)
-            return sb.toString()
-        }
-
-        override fun processMarkdown(markdown: String): String =
-            processSubredditMentions(
-                s = processSpoilerTags(processSubTags(processHeaderTags(markdown))),
-                instance = instance
-            )
-
-        override fun configureTheme(builder: MarkwonTheme.Builder) {
-            builder.blockQuoteColor(context.getColorCompat(R.color.colorQuoteLine))
-                .thematicBreakColor(context.getColorCompat(R.color.colorQuoteLine))
-                .headingBreakHeight(0)
-        }
-    }
-
-    fun createMarkwon(context: Context, instance: String): Markwon =
-        Markwon.builder(context)
-            .usePlugin(CoilImagesPlugin.create(context))
-            .usePlugin(LinkifyPlugin.create())
-            .usePlugin(TablePlugin.create(context))
-            .usePlugin(LemmyPlugin(context, instance))
-            .usePlugin(StrikethroughPlugin.create())
-            .usePlugin(HtmlPlugin.create())
-            .usePlugin(SimpleExtPlugin.create().apply {
-                addExtension(1, '^') { configuration, props ->
-                    SuperScriptSpan()
-                }
-                addExtension(2, '+') { configuration, props ->
-                    configuration.theme()
-
-                    val spoilerSpan = SpoilerSpan(
-                        context.getColorCompat(R.color.colorTextTitle),
-                        context.getColorCompat(R.color.colorSpoilerRevealed),
-                        context.getColorCompat(R.color.colorTextTitle)
-                    )
-
-                    spoilerSpan
-                }
-            })
-            .build()
 
     fun formatAuthor(author: String): String = "u/%s".format(author)
 
@@ -236,11 +97,6 @@ object LemmyUtils {
         }
     }
 
-
-    fun bindLemmyText(textView: TextView, text: String, instance: String) {
-        createMarkwon(textView.context, instance).setMarkdown(textView, text)
-    }
-
     fun needsWebView(html: String): Boolean = html.contains("&lt;table&gt;")
 
     fun isUrlAGif(url: String): Boolean = url.endsWith(".gif", ignoreCase = true)
@@ -289,24 +145,6 @@ object LemmyUtils {
                 authority("www.reddit.com")
             }
         }.build().toString()
-    }
-
-    fun toJsonUrl(url: String): String =
-        convertRedditUrl(url, desiredFormat = ".json", sharable = false)
-
-    fun toSharedLink(url: String): String =
-        convertRedditUrl(url, desiredFormat = "", sharable = true)
-
-    /**
-     * Extracts a prefixed subreddit. Eg. 'r/LeagueOfLegends'
-     */
-    fun extractPrefixedSubreddit(s: String): String? {
-        val matcher = SUBREDDIT_REGEX.matcher(s)
-        return if (matcher.find()) {
-            "r/${matcher.group(1)}"
-        } else {
-            null
-        }
     }
 
     fun openRedditUrl(context: Context, url: String) {

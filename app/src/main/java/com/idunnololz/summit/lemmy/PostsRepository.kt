@@ -79,6 +79,7 @@ class PostsRepository @Inject constructor(
                             communityIdOrName = null,
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.All,
+                            force = force,
                         )
                     is CommunityRef.CommunityRefByObj ->
                         fetchPage(
@@ -86,6 +87,7 @@ class PostsRepository @Inject constructor(
                             communityIdOrName = Either.Right(communityRef.getServerId()),
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.All,
+                            force = force,
                         )
                     is CommunityRef.Local ->
                         fetchPage(
@@ -93,6 +95,7 @@ class PostsRepository @Inject constructor(
                             communityIdOrName = null,
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.Local,
+                            force = force,
                         )
                     is CommunityRef.CommunityRefByName ->
                         fetchPage(
@@ -100,6 +103,7 @@ class PostsRepository @Inject constructor(
                             communityIdOrName = Either.Right(communityRef.getServerId()),
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.All,
+                            force = force,
                         )
                     is CommunityRef.Subscribed ->
                         fetchPage(
@@ -107,6 +111,7 @@ class PostsRepository @Inject constructor(
                             communityIdOrName = null,
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.Subscribed,
+                            force = force,
                         )
                 }
             }
@@ -188,6 +193,7 @@ class PostsRepository @Inject constructor(
         communityIdOrName: Either<Int, String>? = null,
         sortType: SortType,
         listingType: ListingType,
+        force: Boolean,
     ): Result<Boolean> {
         val newPosts =
             apiClient.fetchPosts(
@@ -196,6 +202,7 @@ class PostsRepository @Inject constructor(
                 listingType = listingType,
                 page = pageIndex,
                 limit = 20,
+                force = force,
             )
 
         return newPosts.fold(

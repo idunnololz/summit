@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.databinding.DialogFragmentPreviewCommentBinding
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.BaseDialogFragment
 
@@ -40,7 +41,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        LemmyUtils.bindLemmyText(binding.previewContent, args.content, args.instance)
+        LemmyTextHelper.bindText(binding.previewContent, args.content, args.instance, {}, {})
 
     }
 }

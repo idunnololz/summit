@@ -7,6 +7,8 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.style.StyleSpan
+import android.transition.Transition
+import android.transition.Transition.TransitionListener
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -19,6 +21,7 @@ import android.view.animation.Animation
 import android.widget.*
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.SharedElementCallback
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.MenuProvider
@@ -31,6 +34,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -65,6 +69,8 @@ import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
+import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.utils.getFormattedAuthor
@@ -151,8 +157,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         val context = requireContext()
 
-        postponeEnterTransition()
-
         adapter = PostsAdapter(
             context,
             args.instance,
@@ -220,6 +224,22 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         CONFIRM_DELETE_COMMENT_TAG
                     )
 
+            },
+            onImageClick = { url ->
+                val action =
+                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
+                        title = null,
+                        url = url,
+                        mimeType = null
+                    )
+                findNavController().navigate(
+                    action, NavOptions.Builder()
+                        .addDefaultAnim()
+                        .build()
+                )
+            },
+            onPageClick = {
+                getMainActivity()?.launchPage(it)
             }
         ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -227,6 +247,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
+//        enterTransition = TransitionInflater.from(requireContext())
+//            .inflateTransition(android.R.transition.fade)
 
         setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, bundle ->
             val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
@@ -366,12 +388,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
+            hasConsumedJumpToComments = true
             (binding.recyclerView.layoutManager as LinearLayoutManager)
                 .scrollToPositionWithOffset(1, (Utils.convertDpToPixel(48f)).toInt())
-        }
-
-        binding.recyclerView.post {
-            startPostponedEnterTransition()
         }
 
         viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {
@@ -566,6 +585,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         private val onEditCommentClick: (CommentView) -> Unit,
         private val onDeleteCommentClick: (CommentView) -> Unit,
+        private val onImageClick: (String) -> Unit,
+        private val onPageClick: (PageRef) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val inflater = LayoutInflater.from(context)
@@ -669,6 +690,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         val post = item.postView
                         val postKey = post.getUniqueKey()
 
+                        ViewCompat.setTransitionName(b.title, "title")
+
                         lemmyHeaderHelper.populateHeaderSpan(
                             headerContainer = b.headerContainer,
                             postView = post,
@@ -703,6 +726,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             instance = instance,
                             rootView = b.root,
                             fullContentContainerView = b.fullContent,
+                            lazyUpdate = true,
+                            videoState = item.videoState,
                             onFullImageViewClickListener = { v, url ->
                                 val action =
                                     PostFragmentDirections.actionPostFragmentToImageViewerFragment(
@@ -742,9 +767,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                                 revealedItems.add(postKey)
                                 notifyItemChanged(holder.absoluteAdapterPosition)
                             },
-                            lazyUpdate = true,
                             onItemClickListener = {},
-                            videoState = item.videoState
+                            onLemmyUrlClick = onPageClick
                         )
 
                         voteUiHandler.bind(
@@ -808,6 +832,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         instance = instance,
                         rootView = b.root,
                         fullContentContainerView = b.fullContent,
+                        videoState = item.videoState,
                         onFullImageViewClickListener = { v, url ->
                             val action =
                                 PostFragmentDirections.actionPostFragmentToImageViewerFragment(
@@ -830,25 +855,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                                 )
                             }
                         },
-                        onImageClickListener = { url ->
-                            val action =
-                                PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                    title = null,
-                                    url = url,
-                                    mimeType = null
-                                )
-                            findNavController().navigate(
-                                action, NavOptions.Builder()
-                                    .addDefaultAnim()
-                                    .build()
-                            )
-                        },
+                        onImageClickListener = onImageClick,
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
                             notifyItemChanged(holder.absoluteAdapterPosition)
                         },
                         onItemClickListener = {},
-                        videoState = item.videoState
+                        onLemmyUrlClick = onPageClick,
                     )
 
                     Log.d(TAG, "header vote state: ${item.postView.counts.upvotes}")
@@ -887,7 +900,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
                             }
                         } else {
-                            LemmyUtils.bindLemmyText(b.text, body, instance)
+                            LemmyTextHelper.bindText(
+                                textView = b.text,
+                                text = body,
+                                instance = instance,
+                                onImageClickListener = onImageClick,
+                                onPageClick = onPageClick,
+                            )
                         }
 
                         b.text.movementMethod = CustomLinkMovementMethod().apply {
@@ -1088,7 +1107,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         b.headerContainer.setTextFirstPart(item.author ?: getString(R.string.unknown))
                         b.headerContainer.setTextSecondPart("")
 
-                        LemmyUtils.bindLemmyText(b.text, body, instance)
+                        LemmyTextHelper.bindText(
+                            textView = b.text,
+                            text = body,
+                            instance = instance,
+                            onImageClickListener = onImageClick,
+                            onPageClick = onPageClick,
+                        )
 
                         b.text.movementMethod = CustomLinkMovementMethod().apply {
                             onLinkLongClickListener = DefaultLinkLongClickListener(context)

@@ -16,7 +16,7 @@
     <color name="colorTextFaint">@color/white50</color>
     <color name="colorSecondaryContainer">@color/colorBackground</color>
     <color name="colorSelected">@color/white10</color>
-    <color name="colorHighlight">@color/white10</color>
+    <color name="colorHighlight">@color/white30</color>
 
     <color name="colorBackground">@color/black</color>
     <color name="colorWindowBackground">@color/colorSurface</color>

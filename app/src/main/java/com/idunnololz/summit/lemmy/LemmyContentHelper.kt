@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
+import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Base64
@@ -85,14 +86,14 @@ class LemmyContentHelper(
 
         rootView: View,
         fullContentContainerView: ViewGroup,
+        lazyUpdate: Boolean = false,
+        videoState: VideoState? = null,
 
         onFullImageViewClickListener: (imageView: ImageView?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
-        lazyUpdate: Boolean = false,
-        videoState: VideoState? = null,
-
+        onLemmyUrlClick: (PageRef) -> Unit,
     ) {
         if (!lazyUpdate) {
             fullContentContainerView.removeAllViews()
@@ -279,7 +280,7 @@ class LemmyContentHelper(
                 }
 
                 if (attachClickHandler) {
-                    ViewCompat.setTransitionName(imageView, fullImageViewTransitionName)
+//                    ViewCompat.setTransitionName(imageView, fullImageViewTransitionName)
                     imageView.setOnClickListener {
                         onFullImageViewClickListener(null, previewInfo.getUrl())
                     }
@@ -631,11 +632,14 @@ class LemmyContentHelper(
                     val fullTextView = getView<View>(R.layout.full_content_text_view)
                     val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
                     bodyTextView.visibility = View.VISIBLE
-                    LemmyUtils.bindLemmyText(bodyTextView, content, instance)
-                    bodyTextView.movementMethod = CustomLinkMovementMethod().apply {
-                        onLinkLongClickListener = DefaultLinkLongClickListener(context)
-                        this.onImageClickListener = onImageClickListener
-                    }
+
+                    LemmyTextHelper.bindText(
+                        textView = bodyTextView,
+                        text = content,
+                        instance = instance,
+                        onImageClickListener = onImageClickListener,
+                        onPageClick = onLemmyUrlClick
+                    )
                     bodyTextView.setOnClickListener {
                         onItemClickListener()
                     }

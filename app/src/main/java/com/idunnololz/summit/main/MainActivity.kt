@@ -23,7 +23,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -38,20 +37,19 @@ import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.offline.OfflineFragment
+import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
+import com.idunnololz.summit.login.LoginFragment
+import com.idunnololz.summit.offline.OfflineFragment
 import com.idunnololz.summit.preview.ImageViewerFragment
 import com.idunnololz.summit.preview.VideoViewerFragment
+import com.idunnololz.summit.saved.SavedFragment
 import com.idunnololz.summit.settings.AccountSettingsFragment
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.lemmy.community.CommunityFragment
-import com.idunnololz.summit.login.LoginFragment
-import com.idunnololz.summit.saved.SavedFragment
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getCurrentNavigationFragment
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
@@ -201,25 +199,8 @@ class MainActivity : BaseActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
         val navController = navHostFragment.navController
-        val inflater = navController.navInflater
-        val graph = inflater.inflate(R.navigation.main)
-        navController.graph = graph
 
         binding.bottomNavigationView.setupWithNavController(navController)
-
-//        val navGraphIds = listOf(
-//            R.navigation.main,
-//            R.navigation.saved,
-//            R.navigation.history,
-//        )
-//
-//        // Setup the bottom navigation view with a list of navigation graphs
-//        val controller = binding.bottomNavigationView.setupWithNavController(
-//            navGraphIds = navGraphIds,
-//            fragmentManager = supportFragmentManager,
-//            containerId = R.id.navHostContainer,
-//            intent = intent
-//        )
 
         binding.bottomNavigationView.setOnItemReselectedListener { menuItem ->
             Log.d(TAG, "Reselected nav item: ${menuItem.itemId}")
@@ -663,8 +644,9 @@ class MainActivity : BaseActivity() {
     private fun createOrGetSubredditSelectorController(): CommunitySelectorController =
         communitySelectorController
             ?: viewModel.communitySelectorControllerFactory.create(this).also {
-                it.inflate(binding.overlayContainer)
+                it.inflate(this, binding.overlayContainer)
                 it.setCommunities(viewModel.communities.value)
+
                 communitySelectorController = it
             }
 
@@ -676,6 +658,7 @@ class MainActivity : BaseActivity() {
         }
 
         communitySelectorController.show(lastInsets)
+
         return communitySelectorController
     }
 
@@ -688,18 +671,6 @@ class MainActivity : BaseActivity() {
                 binding.toolbar.measure(0, 0)
                 toolbarHeight = binding.toolbar.measuredHeight
             }
-        }
-    }
-
-    override fun onBackPressed() {
-        onBackPressed(force = false)
-    }
-
-    fun onBackPressed(force: Boolean) {
-        if (!force && communitySelectorController?.isVisible == true) {
-            communitySelectorController?.onBackPressed()
-        } else {
-            super.onBackPressed()
         }
     }
 

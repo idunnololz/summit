@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.updateLayoutParams
@@ -75,11 +76,15 @@ class CommunitySelectorController @AssistedInject constructor(
     private var topInset = MutableLiveData(0)
     private var bottomInset = MutableLiveData(0)
 
-    var isVisible: Boolean = false
-
     var onCommunitySelectedListener: CommunitySelectedListener? = null
 
-    fun inflate(container: ViewGroup) {
+    private val onBackPressedHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            onBackPressed()
+        }
+    }
+
+    fun inflate(activity: MainActivity, container: ViewGroup) {
         rootView?.let {
             return
         }
@@ -131,11 +136,14 @@ class CommunitySelectorController @AssistedInject constructor(
 
             override fun onTransitionCompleted(moitonLayout: MotionLayout?, currentId: Int) {
                 if (currentId == R.id.collapsed) {
-                    isVisible = false
                     rootView.visibility = View.GONE
+
+                    onBackPressedHandler.isEnabled = false
                 }
             }
         })
+
+        activity.onBackPressedDispatcher.addCallback(onBackPressedHandler)
     }
 
     private fun doQueryAsync(query: CharSequence?) {
@@ -156,8 +164,6 @@ class CommunitySelectorController @AssistedInject constructor(
     }
 
     fun show(insets: MainActivityInsets) {
-
-        isVisible = true
         rootView?.visibility = View.VISIBLE
         motionLayout.transitionToState(R.id.expanded)
 
@@ -171,6 +177,8 @@ class CommunitySelectorController @AssistedInject constructor(
                 topMargin = it
             }
         }
+
+        onBackPressedHandler.isEnabled = true
     }
 
     fun onBackPressed() {
