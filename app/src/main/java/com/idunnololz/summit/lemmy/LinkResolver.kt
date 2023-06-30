@@ -6,10 +6,10 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object LinkResolver {
 
-    fun parseUrl(url: String, currentInstance: String): PageRef? {
+    fun parseUrl(url: String, currentInstance: String, mustHandle: Boolean = false): PageRef? {
         val normalizedUrl = normalizeUrl(url, currentInstance)
             ?: return null
-        return parseUrlInternal(normalizedUrl)
+        return parseUrlInternal(normalizedUrl, mustHandle)
     }
 
     private fun normalizeUrl(url: String, currentInstance: String): String? {
@@ -43,7 +43,7 @@ object LinkResolver {
         return null
     }
 
-    private fun parseUrlInternal(url: String): PageRef? {
+    private fun parseUrlInternal(url: String, mustHandle: Boolean): PageRef? {
         if (!url.startsWith("https://")) {
             return null
         }
@@ -56,11 +56,17 @@ object LinkResolver {
 
         when (uri.pathSegments.firstOrNull()) {
             null -> { // This is likely a link to the front page
-                return defaultResult
+                if (mustHandle) {
+                    return defaultResult
+                } else {
+                    return null
+                }
             }
             "c" -> { // link to a community
-                val communityName = uri.pathSegments.getOrNull(1)
+                var communityName = uri.pathSegments.getOrNull(1)
                     ?: return defaultResult
+
+                communityName = communityName.trimEnd { it == '.' }
 
                 return if (communityName.count { c -> c == '@' } == 1) {
                     val (community, instance) = url.substring(1).split("@", limit = 2)
@@ -79,10 +85,14 @@ object LinkResolver {
                 return PostRef(instance, postId.toIntOrNull() ?: return defaultResult)
             }
             else -> {
-                FirebaseCrashlytics.getInstance().recordException(
-                    RuntimeException("Unrecognized url format: $url")
-                )
-                return defaultResult
+                if (mustHandle) {
+                    FirebaseCrashlytics.getInstance().recordException(
+                        RuntimeException("Unrecognized url format: $url")
+                    )
+                    return defaultResult
+                } else {
+                    return null
+                }
             }
         }
     }

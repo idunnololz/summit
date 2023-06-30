@@ -70,9 +70,11 @@ class BottomMenu(private val context: Context) {
         menuItems.add(MenuItem(id, context.getString(title), checkIcon = icon))
     }
 
-    fun addItemWithIcon(@IdRes id: Int, title: String, iconUrl: String) {
-        menuItems.add(MenuItem(id, title, icon = MenuIcon.UrlIcon(iconUrl)))
+    fun addItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
+        menuItems.add(MenuItem(id, context.getString(title), icon = MenuIcon.ResourceIcon(icon)))
     }
+
+    fun itemsCount() = menuItems.size
 
     fun setChecked(@IdRes checked: Int) {
         this.checked = checked
@@ -250,9 +252,7 @@ class BottomMenu(private val context: Context) {
 
                         when (icon) {
                             is MenuIcon.ResourceIcon ->
-                                b.icon.load(icon.customIcon)
-                            is MenuIcon.UrlIcon ->
-                                b.icon.load(icon.url)
+                                b.icon.setImageResource(icon.customIcon)
                         }
                     } else {
                         b.icon.visibility = View.GONE
@@ -284,9 +284,6 @@ class BottomMenu(private val context: Context) {
     sealed interface MenuIcon {
         data class ResourceIcon(
             @DrawableRes val customIcon: Int = 0,
-        ) : MenuIcon
-        data class UrlIcon(
-            val url: String,
         ) : MenuIcon
     }
 }

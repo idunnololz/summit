@@ -7,6 +7,7 @@ import android.graphics.Rect
 import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
@@ -29,6 +30,13 @@ import kotlin.math.min
  * an exception.
  */
 open class OverlappingPanelsLayout : FrameLayout {
+
+  companion object {
+    private const val SIDE_PANEL_CLOSE_DURATION_MS = 200L
+    private const val SIDE_PANEL_OPEN_DURATION_MS = 250L
+
+    private const val TAG = "OverlappingPanelsLayout"
+  }
 
   interface PanelStateListener {
     fun onPanelStateChange(panelState: PanelState)
@@ -230,11 +238,19 @@ open class OverlappingPanelsLayout : FrameLayout {
           val isTouchingChildGestureRegion = isTouchingChildGestureRegion(event)
           val isFullyLocked = startPanelLockState != LockState.UNLOCKED &&
                   endPanelLockState != LockState.UNLOCKED
+          val isDirectionLocked = if (startPanelLockState != LockState.UNLOCKED && xDiff > 0) {
+            endPanelState != PanelState.Opened
+          } else if (endPanelLockState != LockState.UNLOCKED && xDiff < 0) {
+            startPanelState != PanelState.Opened
+          } else {
+            false
+          }
 
           if (abs(xDiff) > scrollingSlopPx &&
             abs(xDiff) > abs(yDiff) &&
             !isTouchingChildGestureRegion &&
-            !isFullyLocked
+            !isFullyLocked &&
+            !isDirectionLocked
           ) {
             isScrollingHorizontally = true
             this.parent?.requestDisallowInterceptTouchEvent(true)
@@ -931,10 +947,5 @@ open class OverlappingPanelsLayout : FrameLayout {
     ) {
       openEndPanel()
     }
-  }
-
-  companion object {
-    private const val SIDE_PANEL_CLOSE_DURATION_MS = 200L
-    private const val SIDE_PANEL_OPEN_DURATION_MS = 250L
   }
 }

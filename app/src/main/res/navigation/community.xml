@@ -39,9 +39,6 @@
             android:id="@+id/action_subredditFragment_switchSubreddit"
             app:destination="@id/communityFragment" />
         <action
-            android:id="@+id/action_subredditFragment_to_commentFeatureDialogFragment"
-            app:destination="@id/commentFeatureDialogFragment" />
-        <action
             android:id="@+id/action_communityFragment_to_login"
             app:destination="@id/login" />
     </fragment>
@@ -77,6 +74,10 @@
             android:defaultValue="@null"
             app:nullable="true"
             app:argType="com.idunnololz.summit.video.VideoState"/>
+        <argument
+            android:name="isSinglePage"
+            android:defaultValue="false"
+            app:argType="boolean"/>
         <action
             android:id="@+id/action_postFragment_to_imageViewerFragment"
             app:destination="@id/imageViewerFragment" />
@@ -87,9 +88,6 @@
             android:id="@+id/action_postFragment_to_commentRawDialogFragment"
             app:destination="@id/commentRawDialogFragment" />
         <action
-            android:id="@+id/action_postFragment_to_commentFeatureDialogFragment"
-            app:destination="@id/commentFeatureDialogFragment" />
-        <action
             android:id="@+id/action_postFragment_to_login"
             app:destination="@id/login" />
         <action
@@ -99,22 +97,6 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
-    </fragment>
-    <fragment
-        android:id="@+id/imageViewerFragment"
-        android:name="com.idunnololz.summit.preview.ImageViewerFragment"
-        android:label="ImageViewerFragment">
-        <argument
-            android:name="title"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="url"
-            app:argType="string" />
-        <argument
-            android:name="mimeType"
-            app:argType="string"
-            app:nullable="true" />
     </fragment>
     <dialog
         android:id="@+id/goToDialogFragment"
@@ -144,10 +126,6 @@
             android:name="commentItemStr"
             app:argType="string" />
     </dialog>
-    <dialog
-        android:id="@+id/commentFeatureDialogFragment"
-        android:name="com.idunnololz.summit.comment.CommentFeatureDialogFragment"
-        android:label="CommentFeatureDialogFragment" />
     <fragment
         android:id="@+id/addOrEditCommentFragment"
         android:name="com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment"
@@ -181,5 +159,26 @@
         <argument
             android:name="content"
             app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/createOrEditPostFragment"
+        android:name="com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment"
+        android:label="CreateOrEditPostFragment" >
+        <argument
+            android:name="communityId"
+            app:argType="integer"
+            android:defaultValue="-1"/>
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="communityName"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="post"
+            app:argType="com.idunnololz.summit.api.dto.Post"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </dialog>
 </navigation>

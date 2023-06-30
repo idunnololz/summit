@@ -10,12 +10,4 @@
         android:orderInCategory="100"
         app:showAsAction="always"
         app:iconTint="?attr/colorControlNormal" />
-
-    <item
-        android:id="@+id/save_hq"
-        android:title="@string/save_hq"
-        android:icon="@drawable/baseline_save_black_24"
-        android:orderInCategory="100"
-        app:showAsAction="always"
-        app:iconTint="?attr/colorControlNormal" />
 </menu>

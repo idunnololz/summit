@@ -2,15 +2,12 @@ package com.idunnololz.summit.lemmy.community
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -18,10 +15,11 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.marginBottom
+import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
@@ -41,9 +39,10 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getUniqueKey
-import com.idunnololz.summit.databinding.FragmentSubredditBinding
+import com.idunnololz.summit.databinding.FragmentCommunityBinding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemList2Binding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.MainFooterItemBinding
 import com.idunnololz.summit.history.HistoryManager
@@ -55,10 +54,13 @@ import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getKey
 import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.lemmy.getShortDesc
-import com.idunnololz.summit.lemmy.utils.getUpvoteText
+import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.bind
@@ -71,16 +73,15 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomDividerItemDecoration
-import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.addDefaultAnim
 import com.idunnololz.summit.util.ext.forceShowIcons
-import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -90,7 +91,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNavigator,
+class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNavigator,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -113,6 +114,10 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
+    private var viewPagerController: ViewPagerController? = null
+
+    private var isCustomAppBarExpanded = false
 
     private val onBackPressedHandler = object : OnBackPressedCallback(true /* enabled by default */) {
         override fun handleOnBackPressed() {
@@ -188,11 +193,41 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
         }
     }
 
+    private val _layoutSelectorMenu: BottomMenu by lazy {
+        BottomMenu(requireContext()).apply {
+            addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_list_24)
+            addItemWithIcon(R.id.layout_list2, R.string.list2, R.drawable.baseline_list_24)
+//            addItem(R.id.layoutCard, R.string.card, R.drawable.baseline_article_24)
+            addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
+            setTitle(R.string.layout)
+
+            setOnMenuItemClickListener { menuItem ->
+                when(menuItem.id) {
+                    R.id.layout_list ->
+                        preferences.setPostsLayout(CommunityLayout.List)
+                    R.id.layout_list2 ->
+                        preferences.setPostsLayout(CommunityLayout.List2)
+//                    R.id.layoutCard ->
+//                        preferences.setPostsLayout(CommunityLayout.CARD)
+                    R.id.layout_full ->
+                        preferences.setPostsLayout(CommunityLayout.Full)
+                }
+                onSelectedLayoutChanged()
+            }
+        }
+    }
+
     @Inject
     lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            requireMainActivity().apply {
+                setupForFragment<CommunityFragment>()
+            }
+        }
 
         val context = requireContext()
         if (adapter == null) {
@@ -223,19 +258,18 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                         .createAndShow(childFragmentManager, "onInstanceMismatch")
                 },
                 onImageClick = { url ->
-                    val action =
-                        CommunityFragmentDirections.actionMainFragmentToImageViewerFragment(
-                            title = null,
-                            url = url,
-                            mimeType = null
-                        )
-                    findNavController().navigateSafe(action)
+                    getMainActivity()?.openImage(null, url, null)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
                 onItemClick = { instance, id, currentCommunity, post, jumpToComments, reveal, videoState ->
-                    val action = CommunityFragmentDirections.actionMainFragmentToPostFragment(
+//                    val action = CommunityFragmentDirections.actionMainFragmentToPostFragment(
+
+//                    )
+//                    findNavController().navigateSafe(action)
+
+                    viewPagerController?.openPost(
                         instance = instance,
                         id =  id,
                         reveal = reveal,
@@ -244,8 +278,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                         currentCommunity = currentCommunity,
                         videoState = videoState,
                     )
-                    viewModel.lastSelectedPost = PostRef(instance, post.post.id)
-                    findNavController().navigateSafe(action)
                 }
             )
             onSelectedLayoutChanged()
@@ -259,6 +291,27 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
+
+        requireActivity().supportFragmentManager.setFragmentResultListener(
+            CreateOrEditPostFragment.REQUEST_KEY,
+            this
+        ) { _, bundle ->
+            val result = bundle.getParcelableCompat<PostView>(
+                CreateOrEditPostFragment.REQUEST_KEY_RESULT)
+
+            if (result != null) {
+                viewModel.fetchCurrentPage(force = true)
+                viewPagerController?.openPost(
+                    instance = viewModel.instance,
+                    id =  result.post.id,
+                    reveal = false,
+                    post = result,
+                    jumpToComments = false,
+                    currentCommunity = args.communityRef,
+                    videoState = null,
+                )
+            }
+        }
     }
 
     override fun onCreateView(
@@ -268,11 +321,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
     ): View {
         postponeEnterTransition()
 
-        requireMainActivity().apply {
-            setupForFragment<CommunityFragment>()
-        }
-
-        setBinding(FragmentSubredditBinding.inflate(inflater, container, false))
+        setBinding(FragmentCommunityBinding.inflate(inflater, container, false))
 
         return binding.root
     }
@@ -288,22 +337,85 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
             onReady()
         }
 
+        binding.fab.setOnClickListener a@{
+            val currentCommunity = viewModel.currentCommunityRef.value
+            var communityName: String? = null
+            var communityId: Int = -1
+            when (currentCommunity) {
+                is CommunityRef.All -> return@a
+                is CommunityRef.CommunityRefByName -> {
+                    communityName = currentCommunity.name
+                }
+                is CommunityRef.CommunityRefByObj -> {
+                    communityId = currentCommunity.community.id
+                }
+                is CommunityRef.Local -> return@a
+                is CommunityRef.Subscribed -> return@a
+                null -> return@a
+            }
+
+            CreateOrEditPostFragment()
+                .apply {
+                    arguments = CreateOrEditPostFragmentArgs(
+                        instance = viewModel.instance,
+                        communityName = communityName,
+                        communityId = communityId,
+                    ).toBundle()
+                }
+                .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedHandler)
+
+        viewPagerController = ViewPagerController(
+            this,
+            binding.viewPager,
+            childFragmentManager,
+            viewModel,
+        ) {
+            if (it == 0) {
+                val lastSelectedPost = viewModel.lastSelectedPost
+                if (lastSelectedPost != null) {
+                    // We came from a post...
+                    adapter?.highlightPost(lastSelectedPost)
+                    viewModel.lastSelectedPost = null
+                }
+            } else {
+                val lastSelectedPost = viewModel.lastSelectedPost
+                if (lastSelectedPost != null) {
+                    adapter?.highlightPostForever(lastSelectedPost)
+                }
+            }
+        }.apply {
+            init()
+        }
     }
 
     private fun onReady() {
         val view = binding.root
         checkNotNull(view.findNavController())
 
+        val mainView = binding.rootView
         val mainActivity = requireMainActivity()
         mainActivity.apply {
             headerOffset.observe(viewLifecycleOwner) {
                 if (it != null)
-                    getView()?.translationY = it.toFloat()
+                    mainView.translationY = it.toFloat()
+
+                isCustomAppBarExpanded = it == getCustomAppBarHeight()
+
+                updateFabState()
+            }
+
+            insetsChangedLiveData.observe(viewLifecycleOwner) {
+                binding.fab.updateLayoutParams<MarginLayoutParams> {
+                    this.bottomMargin = getBottomNavHeight() + getDimen(R.dimen.padding)
+                }
             }
         }
 
-        mainActivity.insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+        mainActivity.insetViewExceptTopAutomaticallyByPadding(
+            viewLifecycleOwner, binding.recyclerView)
 
         val context = requireContext()
 
@@ -415,12 +527,8 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
             viewModel.fetchCurrentPage()
         }
 
-        val lastSelectedPost = viewModel.lastSelectedPost
-        if (lastSelectedPost != null) {
-            // We came from a post...
-            adapter?.highlightPost(lastSelectedPost)
-            viewModel.lastSelectedPost = null
-        }
+        // try to restore state...
+        viewPagerController?.onPageSelected()
     }
 
     override fun onResume() {
@@ -432,6 +540,8 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
             viewModel.currentCommunityRef.observe(viewLifecycleOwner) {
                 val currentDefaultPage = preferences.getDefaultPage()
                 customAppBarController.setCommunity(it, it == currentDefaultPage)
+
+                updateFabState()
             }
             viewModel.currentPageIndex.observe(viewLifecycleOwner) { currentPageIndex ->
                 Log.d(TAG, "Current page: $currentPageIndex")
@@ -441,6 +551,20 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
                 onBackPressedHandler.isEnabled = currentPageIndex != 0
             }
+        }
+    }
+
+    private fun updateFabState() {
+        val communityRef = viewModel.currentCommunityRef.value
+
+        if (communityRef is CommunityRef.CommunityRefByName || communityRef is CommunityRef.CommunityRefByObj) {
+            if (isCustomAppBarExpanded) {
+                binding.fab.show()
+            } else {
+                binding.fab.hide()
+            }
+        } else {
+            binding.fab.hide()
         }
     }
 
@@ -509,6 +633,21 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
         return _sortByTopMenu
     }
+    private fun getLayoutMenu(): BottomMenu {
+        val postsLayout = preferences.getPostsLayout()
+        when (postsLayout) {
+            CommunityLayout.List ->
+                _layoutSelectorMenu.setChecked(R.id.layout_list)
+            CommunityLayout.List2 ->
+                _layoutSelectorMenu.setChecked(R.id.layout_list2)
+            CommunityLayout.Card ->
+                _layoutSelectorMenu.setChecked(R.id.layout_card)
+            CommunityLayout.Full ->
+                _layoutSelectorMenu.setChecked(R.id.layout_full)
+        }
+
+        return _layoutSelectorMenu
+    }
 
     private fun setupMainActivityButtons() {
         (activity as? MainActivity)?.apply {
@@ -537,32 +676,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
         PopupMenu(context, view).apply {
             inflate(R.menu.menu_fragment_main)
             forceShowIcons()
-
-            val selectedItem = when (PreferenceUtil.getSubredditLayout()) {
-                CommunityLayout.LIST -> {
-                    menu.findItem(R.id.layoutList)
-                }
-
-                CommunityLayout.CARD -> {
-                    menu.findItem(R.id.layoutCard)
-                }
-
-                CommunityLayout.FULL -> {
-                    menu.findItem(R.id.layoutFull)
-                }
-            }
-
-            menu.findItem(R.id.layoutCard).isVisible = false
-
-            selectedItem.title = SpannableString(selectedItem.title).apply {
-                setSpan(
-                    ForegroundColorSpan(context.getColorCompat(R.color.colorPrimary)),
-                    0,
-                    length,
-                    0
-                )
-                setSpan(StyleSpan(Typeface.BOLD), 0, length, 0)
-            }
 
             val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value)
             val currentDefaultPage = preferences.getDefaultPage()
@@ -609,24 +722,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                         true
                     }
 
-                    R.id.layoutList -> {
-                        PreferenceUtil.setSubredditLayout(CommunityLayout.LIST)
-                        onSelectedLayoutChanged()
-                        true
-                    }
-
-                    R.id.layoutCard -> {
-                        PreferenceUtil.setSubredditLayout(CommunityLayout.CARD)
-                        onSelectedLayoutChanged()
-                        true
-                    }
-
-                    R.id.layoutFull -> {
-                        PreferenceUtil.setSubredditLayout(CommunityLayout.FULL)
-                        onSelectedLayoutChanged()
-                        true
-                    }
-
                     R.id.set_as_default -> {
                         viewModel.setDefaultPage(currentCommunityRef)
 
@@ -635,6 +730,10 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                             R.string.home_page_set,
                             Snackbar.LENGTH_LONG
                         ).show()
+                        true
+                    }
+                    R.id.layout ->  {
+                        getMainActivity()?.showBottomMenu(getLayoutMenu())
                         true
                     }
 
@@ -673,7 +772,26 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
     }
 
     private fun onSelectedLayoutChanged() {
-        adapter?.setLayout(PreferenceUtil.getSubredditLayout())
+        adapter?.setLayout(preferences.getPostsLayout())
+    }
+
+    fun closePost(postFragment: PostFragment) {
+        viewPagerController?.closePost(postFragment)
+    }
+
+    fun isPristineFirstPage(): Boolean {
+        if (!isBindingAvailable()) {
+            return false
+        }
+
+        val position = (binding.recyclerView.layoutManager as? LinearLayoutManager)
+            ?.findFirstCompletelyVisibleItemPosition()
+
+        return position == 0 && viewModel.currentPageIndex.value == 0
+    }
+
+    fun onPostUpdated() {
+        viewModel.fetchCurrentPage(force = true)
     }
 
     private sealed class Item {
@@ -698,6 +816,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
         val iconImage: ImageView?,
         val fullContentContainerView: ViewGroup,
         val highlightBg: View,
+        val layoutShowsFullContent: Boolean,
     ) : RecyclerView.ViewHolder(root) {
 
         companion object {
@@ -715,6 +834,24 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     binding.iconImage,
                     binding.fullContent,
                     binding.highlightBg,
+                    layoutShowsFullContent = false,
+                )
+
+            fun fromBinding(binding: ListingItemList2Binding) =
+                ListingItemViewHolder(
+                    binding.root,
+                    binding.headerContainer,
+                    binding.image,
+                    binding.title,
+                    binding.commentButton,
+                    binding.upvoteCount,
+                    binding.upvoteButton,
+                    binding.downvoteButton,
+                    binding.linkTypeImage,
+                    binding.iconImage,
+                    binding.fullContent,
+                    binding.highlightBg,
+                    layoutShowsFullContent = false,
                 )
 
             fun fromBinding(binding: ListingItemCardBinding) =
@@ -731,6 +868,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     null,
                     binding.fullContent,
                     binding.highlightBg,
+                    layoutShowsFullContent = true,
                 )
 
             fun fromBinding(binding: ListingItemFullBinding) =
@@ -747,6 +885,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     null,
                     binding.fullContent,
                     binding.highlightBg,
+                    layoutShowsFullContent = true,
                 )
         }
     }
@@ -799,19 +938,21 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
         private val tempSize = Size()
 
-        private var layout: CommunityLayout = CommunityLayout.LIST
+        private var layout: CommunityLayout = CommunityLayout.List
 
         var curDataSource: String? = null
 
         var contentMaxWidth: Int = 0
 
+        private var postToHighlightForever: PostRef? = null
         private var postToHighlight: PostRef? = null
 
         override fun getItemViewType(position: Int): Int = when (items[position]) {
             is Item.PostItem -> when (layout) {
-                CommunityLayout.LIST -> R.layout.listing_item_list
-                CommunityLayout.CARD -> R.layout.listing_item_card
-                CommunityLayout.FULL -> R.layout.listing_item_full
+                CommunityLayout.List -> R.layout.listing_item_list
+                CommunityLayout.List2 -> R.layout.listing_item_list2
+                CommunityLayout.Card -> R.layout.listing_item_card
+                CommunityLayout.Full -> R.layout.listing_item_full
             }
             is Item.FooterItem -> R.layout.main_footer_item
         }
@@ -821,6 +962,8 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
             return when (viewType) {
                 R.layout.listing_item_list ->
                     ListingItemViewHolder.fromBinding(ListingItemListBinding.bind(v))
+                R.layout.listing_item_list2 ->
+                    ListingItemViewHolder.fromBinding(ListingItemList2Binding.bind(v))
                 R.layout.listing_item_card ->
                     ListingItemViewHolder.fromBinding(ListingItemCardBinding.bind(v))
                 R.layout.listing_item_full ->
@@ -835,16 +978,13 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
             position: Int,
             payloads: MutableList<Any>
         ) {
-            when (getItemViewType(position)) {
-                R.layout.listing_item_card,
-                R.layout.listing_item_list,
-                R.layout.listing_item_full -> {
+            when (val item = items[position]) {
+                is Item.PostItem -> {
                     if (payloads.isEmpty()) {
                         super.onBindViewHolder(holder, position, payloads)
                     } else {
                         // this is an incremental update... Only update the stats, do not update content...
                         val h = holder as ListingItemViewHolder
-                        val item = items[position] as Item.PostItem
 
                         lemmyHeaderHelper.populateHeaderSpan(
                             headerContainer = h.headerContainer,
@@ -857,7 +997,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
                         h.commentButton.text =
                             LemmyUtils.abbrevNumber(item.postView.counts.comments.toLong())
-                        h.upvoteCount.text = item.postView.getUpvoteText()
 
                         h.commentButton.isEnabled = !item.postView.post.locked
 
@@ -867,9 +1006,11 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                             item.postView,
                             h.upvoteButton,
                             h.downvoteButton,
+                            h.upvoteCount,
                             onSignInRequired = onSignInRequired,
                             onInstanceMismatch = onInstanceMismatch,
                         )
+                        highlightPostIfNeeded(h, item)
                     }
                 }
                 else -> {
@@ -879,18 +1020,29 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            when (val viewType = getItemViewType(position)) {
-                R.layout.listing_item_card,
-                R.layout.listing_item_list,
-                R.layout.listing_item_full -> {
-                    val isCard = viewType == R.layout.listing_item_card
-                    val isFullView = viewType == R.layout.listing_item_full
+            when (val item = items[position]) {
+                is Item.FooterItem -> {
+                    val b = holder.getBinding<MainFooterItemBinding>()
+                    if (item.hasMore) {
+                        b.nextButton.visibility = View.VISIBLE
+                        b.nextButton.setOnClickListener {
+                            onNextClick()
+                        }
+                    } else {
+                        b.nextButton.visibility = View.INVISIBLE
+                    }
+                    if (viewModel.currentPageIndex.value == 0) {
+                        b.prevButton.visibility = View.INVISIBLE
+                    } else {
+                        b.prevButton.visibility = View.VISIBLE
+                        b.prevButton.setOnClickListener {
+                            onPrevClick()
+                        }
+                    }
+                }
+                is Item.PostItem -> {
                     val h: ListingItemViewHolder = holder as ListingItemViewHolder
-                    val item = items[position] as Item.PostItem
                     val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
-                    val postRef = PostRef(instance, item.postView.post.id)
-
-                    ViewCompat.setTransitionName(h.title, "title:${postRef.getKey()}")
 
                     lemmyHeaderHelper.populateHeaderSpan(
                         headerContainer = h.headerContainer,
@@ -974,27 +1126,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                             rootView = h.itemView,
                             fullContentContainerView = h.fullContentContainerView,
                             onFullImageViewClickListener = { v, url ->
-
-                                val action =
-                                    CommunityFragmentDirections.actionMainFragmentToImageViewerFragment(
-                                        null,
-                                        url,
-                                        null
-                                    )
-
-                                if (v != null) {
-                                    val extras = FragmentNavigatorExtras(
-                                        v to "image_view"
-                                    )
-                                    findNavController().navigate(action, extras)
-                                } else {
-                                    findNavController().navigate(
-                                        action, NavOptions.Builder()
-                                            .addDefaultAnim()
-                                            .build()
-                                    )
-                                }
-
+                                onImageClick(url)
                             },
                             onImageClickListener = onImageClick,
                             onItemClickListener = {
@@ -1017,7 +1149,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                             }
                             h.image?.setOnClickListener {
                                 toggleItem(h.absoluteAdapterPosition, item)
-                                notifyItemChanged(h.absoluteAdapterPosition)
                             }
                         }
                         PostType.Video -> {
@@ -1047,7 +1178,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                                     showDefaultImage()
                                     h.iconImage?.setOnClickListener {
                                         toggleItem(h.absoluteAdapterPosition, item)
-                                        notifyItemChanged(h.absoluteAdapterPosition)
                                     }
                                 }
                             } else {
@@ -1058,7 +1188,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                                 showFullContent()
                             }
 
-                            h.linkTypeImage?.visibility = View.VISIBLE
+                            h.linkTypeImage?.visibility = View.GONE
                             h.linkTypeImage?.setImageResource(R.drawable.baseline_open_in_new_black_18)
                             h.image?.setOnClickListener {
                                 toggleItem(h.absoluteAdapterPosition, item)
@@ -1076,7 +1206,6 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                     h.title.text = item.postView.getFormattedTitle()
                     h.commentButton.text =
                         LemmyUtils.abbrevNumber(item.postView.counts.comments.toLong())
-                    h.upvoteCount.text = item.postView.getUpvoteText()
 
                     h.itemView.setOnClickListener {
                         onItemClick()
@@ -1100,48 +1229,40 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
                         item.postView,
                         h.upvoteButton,
                         h.downvoteButton,
+                        h.upvoteCount,
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch,
                     )
 
-                    if (isCard || isFullView) {
+                    if (h.layoutShowsFullContent) {
                         showFullContent()
                     }
 
-                    if (postToHighlight?.id == item.postView.post.id) {
-                        h.highlightBg.visibility = View.VISIBLE
-                        h.highlightBg.animate()
-                            .alpha(0f)
-                            .apply {
-                                duration = 1000
-                            }
-                            .withEndAction {
-                                h.highlightBg.visibility = View.GONE
-                            }
-                    } else {
+                    highlightPostIfNeeded(h, item)
+                }
+            }
+        }
+
+        private fun highlightPostIfNeeded(
+            h: ListingItemViewHolder,
+            item: Item.PostItem
+        ) {
+            if (postToHighlightForever?.id == item.postView.post.id) {
+                h.highlightBg.visibility = View.VISIBLE
+                h.highlightBg.alpha = 1f
+            } else if (postToHighlight?.id == item.postView.post.id) {
+                h.highlightBg.visibility = View.VISIBLE
+                h.highlightBg.animate()
+                    .alpha(0f)
+                    .apply {
+                        duration = 350
+                    }
+                    .withEndAction {
                         h.highlightBg.visibility = View.GONE
+                        postToHighlight = null
                     }
-                }
-                R.layout.main_footer_item -> {
-                    val b = holder.getBinding<MainFooterItemBinding>()
-                    val item = items[position] as Item.FooterItem
-                    if (item.hasMore) {
-                        b.nextButton.visibility = View.VISIBLE
-                        b.nextButton.setOnClickListener {
-                            onNextClick()
-                        }
-                    } else {
-                        b.nextButton.visibility = View.INVISIBLE
-                    }
-                    if (viewModel.currentPageIndex.value == 0) {
-                        b.prevButton.visibility = View.INVISIBLE
-                    } else {
-                        b.prevButton.visibility = View.VISIBLE
-                        b.prevButton.setOnClickListener {
-                            onPrevClick()
-                        }
-                    }
-                }
+            } else {
+                h.highlightBg.visibility = View.GONE
             }
         }
 
@@ -1177,6 +1298,7 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
 
         fun highlightPost(postToHighlight: PostRef) {
             this.postToHighlight = postToHighlight
+            this.postToHighlightForever = null
             val index = items.indexOfFirst {
                 when (it) {
                     is Item.FooterItem -> false
@@ -1186,7 +1308,23 @@ class CommunityFragment : BaseFragment<FragmentSubredditBinding>(), SignInNaviga
             }
 
             if (index >= 0) {
-                notifyItemChanged(index)
+                notifyItemChanged(index, Unit)
+            }
+        }
+
+        fun highlightPostForever(postToHighlight: PostRef) {
+            this.postToHighlightForever = postToHighlight
+            this.postToHighlight = null
+            val index = items.indexOfFirst {
+                when (it) {
+                    is Item.FooterItem -> false
+                    is Item.PostItem ->
+                        it.postView.post.id == postToHighlight.id
+                }
+            }
+
+            if (index >= 0) {
+                notifyItemChanged(index, Unit)
             }
         }
 

@@ -2,6 +2,7 @@ package com.idunnololz.summit.preferences
 
 import android.content.Context
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,6 +37,23 @@ class Preferences @Inject constructor(
             .putString(
                 PreferenceUtil.KEY_DEFAULT_PAGE,
                 moshi.adapter(CommunityRef::class.java).toJson(communityRef))
+            .apply()
+    }
+
+
+    fun getPostsLayout(): CommunityLayout =
+        try {
+            CommunityLayout.valueOf(
+                PreferenceUtil.preferences
+                    .getString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, null) ?: ""
+            )
+        } catch (e: IllegalArgumentException) {
+            CommunityLayout.List
+        }
+
+    fun setPostsLayout(layout: CommunityLayout) {
+        PreferenceUtil.preferences.edit()
+            .putString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, layout.name)
             .apply()
     }
 }

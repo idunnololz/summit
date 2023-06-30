@@ -25,6 +25,7 @@ import com.idunnololz.summit.tabs.hasTabId
 import com.idunnololz.summit.tabs.isSubscribedCommunity
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -106,7 +107,9 @@ class CommunitiesPaneController @AssistedInject constructor(
                 val userCommunityItem: UserCommunityItem,
                 val isSelected: Boolean,
             ) : Item
-            object SubscriptionHeaderItem : Item
+            data class SubscriptionHeaderItem(
+                val isRefreshing: Boolean,
+            ) : Item
             data class SubscribedCommunityItem(
                 val communityRef: CommunityRef,
                 val iconUrl: String?,
@@ -145,7 +148,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                     is Item.SubscribedCommunityItem ->
                         old.communityRef.getKey() ==
                                 (new as Item.SubscribedCommunityItem).communityRef.getKey()
-                    Item.SubscriptionHeaderItem -> true
+                    is Item.SubscriptionHeaderItem -> true
                     Item.NoSubscriptionsItem -> true
                 }
             }
@@ -210,6 +213,11 @@ class CommunitiesPaneController @AssistedInject constructor(
                 clazz = Item.SubscriptionHeaderItem::class,
                 inflateFn = BookmarkedCommunityHeaderItemBinding::inflate
             ) { item, b, h ->
+                if (item.isRefreshing) {
+                    b.progressBar.visibility = View.VISIBLE
+                } else {
+                    b.progressBar.visibility = View.GONE
+                }
             }
             addItemType(
                 clazz = Item.SubscribedCommunityItem::class,
@@ -269,7 +277,9 @@ class CommunitiesPaneController @AssistedInject constructor(
                 }
             }
 
-            newItems.add(Item.SubscriptionHeaderItem)
+            newItems.add(Item.SubscriptionHeaderItem(
+                data.accountInfoUpdateState is StatefulData.Loading
+            ))
             if (data.subscriptionCommunities.isNotEmpty()) {
                 data.subscriptionCommunities.mapTo(newItems) {
                     Item.SubscribedCommunityItem(

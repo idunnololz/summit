@@ -130,6 +130,22 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
 
+    <style name="Theme.App.Dialog.Fullscreen" parent="Theme.App.Dialog">
+<!--        <item name="android:windowFullscreen">false</item>-->
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@color/colorWindowBackground</item>
+        <item name="android:colorBackground">@color/colorWindowBackground</item>
+        <item name="android:windowAnimationStyle">@style/DialogAnimationStyle</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="DialogAnimationStyle">
+        <item name="android:windowEnterAnimation">@anim/slide_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_out</item>
+    </style>
+
     <style name="Theme.App.Dialog.Alert.Transparent">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2016 The Android Open Source Project
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and6
+     limitations under the License.
+-->
+<!-- Padding set programatically -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+    android:layout_gravity="bottom"
+    android:layoutDirection="ltr"
+    android:background="@color/colorOverlay"
+    android:id="@+id/controllerRootView">
+
+    <ImageButton
+        android:id="@+id/exo_more"
+        android:layout_width="40dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_more_vert_black_24"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/exo_volume_control"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_volume_up_black_24"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@+id/exo_more"
+        app:layout_constraintTop_toTopOf="@+id/exo_more"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_more" />
+
+    <ImageButton
+        android:id="@+id/exo_rotate_control"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@+id/exo_volume_control"
+        app:layout_constraintTop_toTopOf="@+id/exo_more"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_more" />
+
+    <ImageButton
+        android:id="@id/exo_prev"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/baseline_skip_previous_black_36"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/barrier"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="exo_play_pause"
+        app:barrierDirection="start" />
+
+    <ImageButton
+        android:id="@+id/exo_play_pause"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/baseline_play_arrow_black_48"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+
+    <FrameLayout android:id="@id/exo_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/exo_styled_bottom_bar_height"
+        android:layout_marginTop="@dimen/exo_styled_bottom_bar_margin_top"
+        android:layout_gravity="bottom"
+        android:background="@color/exo_bottom_bar_background"
+        android:layoutDirection="ltr"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout android:id="@id/exo_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/exo_styled_bottom_bar_time_padding"
+            android:paddingEnd="@dimen/exo_styled_bottom_bar_time_padding"
+            android:paddingLeft="@dimen/exo_styled_bottom_bar_time_padding"
+            android:paddingRight="@dimen/exo_styled_bottom_bar_time_padding"
+            android:layout_gravity="center_vertical|start"
+            android:layoutDirection="ltr">
+
+            <TextView android:id="@id/exo_position"
+                style="@style/ExoStyledControls.TimeText.Position"/>
+
+            <TextView
+                style="@style/ExoStyledControls.TimeText.Separator"/>
+
+            <TextView android:id="@id/exo_duration"
+                style="@style/ExoStyledControls.TimeText.Duration"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@id/exo_basic_controls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layoutDirection="ltr">
+
+            <ImageButton android:id="@id/exo_vr"
+                style="@style/ExoStyledControls.Button.Bottom.VR"/>
+
+            <ImageButton android:id="@id/exo_shuffle"
+                style="@style/ExoStyledControls.Button.Bottom.Shuffle"/>
+
+            <ImageButton android:id="@id/exo_repeat_toggle"
+                style="@style/ExoStyledControls.Button.Bottom.RepeatToggle"/>
+
+            <ImageButton android:id="@id/exo_subtitle"
+                style="@style/ExoStyledControls.Button.Bottom.CC"/>
+
+            <ImageButton android:id="@id/exo_settings"
+                style="@style/ExoStyledControls.Button.Bottom.Settings"/>
+
+            <ImageButton android:id="@id/exo_fullscreen"
+                style="@style/ExoStyledControls.Button.Bottom.FullScreen"/>
+
+            <ImageButton android:id="@id/exo_overflow_show"
+                style="@style/ExoStyledControls.Button.Bottom.OverflowShow"/>
+
+        </LinearLayout>
+
+        <HorizontalScrollView android:id="@id/exo_extra_controls_scroll_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:visibility="invisible">
+
+            <LinearLayout android:id="@id/exo_extra_controls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layoutDirection="ltr">
+
+                <ImageButton android:id="@id/exo_overflow_hide"
+                    style="@style/ExoStyledControls.Button.Bottom.OverflowHide"/>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
-import com.idunnololz.summit.account.AccountInfoManager
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetSiteResponse

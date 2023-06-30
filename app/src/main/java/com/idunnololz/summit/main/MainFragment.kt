@@ -1,6 +1,5 @@
 package com.idunnololz.summit.main
 
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,12 +22,10 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
-import arrow.core.left
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMainBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
@@ -43,15 +40,17 @@ import com.idunnololz.summit.main.community_info_pane.CommunityInfoViewModel
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef
 import com.idunnololz.summit.tabs.isHomeTab
-import com.idunnololz.summit.user.*
-import com.idunnololz.summit.util.*
+import com.idunnololz.summit.user.TabCommunityState
+import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.user.UserCommunityItem
+import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
-import com.idunnololz.summit.util.ext.getCurrentNavigationFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -155,12 +154,22 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             if (it.itemId == R.id.mainFragment) {
                 val tab = tabsManager.currentTab.value ?: return@a
 
-                currentNavController?.popBackStack(R.id.community, false)
+                val currentFragment = getCurrentFragment()
 
-                currentNavController?.navigate(
-                    R.id.communityFragment,
-                    CommunityFragmentArgs(communityRef = tab.communityRef).toBundle()
-                )
+                Log.d(TAG, "currentFragment: ${currentFragment}")
+
+                if (!tab.isHomeTab &&
+                    currentFragment is CommunityFragment && currentFragment.isPristineFirstPage()) {
+
+                    changeCommunity(tabsManager.getHomeTab().communityRef)
+                } else {
+                    currentNavController?.popBackStack(R.id.community, false)
+
+                    currentNavController?.navigate(
+                        R.id.communityFragment,
+                        CommunityFragmentArgs(communityRef = tab.communityRef).toBundle()
+                    )
+                }
             }
         }
 
@@ -318,9 +327,20 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             this.insetViewAutomaticallyByMargins(this, binding.startPanel.recyclerView)
             this.insetViewAutomaticallyByMargins(this, binding.endPanel.recyclerView)
         }
+
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.Default) {
+                userCommunitiesManager.defaultCommunity.collect {
+
+                }
+            }
+        }
     }
 
     fun navigateToPage(page: PageRef) {
+        if (!isBindingAvailable()) return
+
         when (page) {
             is CommunityRef -> {
                 currentNavController?.navigate(
@@ -333,9 +353,23 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             is PostRef -> {
                 currentNavController?.navigate(
                     R.id.postFragment,
-                    PostFragmentArgs(page.instance, page.id, null).toBundle()
+                    PostFragmentArgs(
+                        page.instance,
+                        page.id,
+                        null,
+                        isSinglePage = true
+                    ).toBundle()
                 )
             }
+        }
+    }
+
+    private fun getCurrentFragment(): Fragment? {
+        val currentFragment = binding.innerNavHostContainer.getFragment<Fragment>()
+        return if (currentFragment is NavHostFragment) {
+            currentFragment.childFragmentManager.fragments.getOrNull(0)
+        } else {
+            null
         }
     }
 
@@ -585,5 +619,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     fun updateCommunityInfoPane(communityRef: CommunityRef) {
         communityInfoViewModel.onCommunityChanged(communityRef)
+    }
+
+    fun setStartPanelLockState(lockState: OverlappingPanelsLayout.LockState) {
+        binding.rootView.setStartPanelLockState(lockState)
     }
 }

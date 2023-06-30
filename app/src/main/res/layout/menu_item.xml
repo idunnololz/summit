@@ -12,7 +12,8 @@
         android:id="@+id/icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginEnd="@dimen/padding_half"/>
+        android:layout_marginEnd="@dimen/dialog_padding"
+        app:tint="?colorControlNormal" />
 
     <TextView
         android:layout_gravity="center_vertical"

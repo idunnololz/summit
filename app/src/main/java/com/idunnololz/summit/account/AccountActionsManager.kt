@@ -3,6 +3,7 @@ package com.idunnololz.summit.account
 import android.content.Context
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.R
@@ -19,8 +20,10 @@ import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
+import com.idunnololz.summit.reddit.LemmyUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -44,10 +47,10 @@ class AccountActionsManager @Inject constructor(
     private var nextId: Long = 1
 
     interface Registration {
-        fun voteCurrent(score: Int)
-        fun voteSuccess(newScore: Int)
-        fun votePending(pendingScore: Int)
-        fun voteFailed(score: Int, e: Throwable)
+        fun voteCurrent(score: Int, totalScore: Int)
+        fun voteSuccess(newScore: Int, totalScore: Int)
+        fun votePending(pendingScore: Int, totalScore: Int)
+        fun voteFailed(score: Int, totalScore: Int, e: Throwable)
     }
 
     class VoteHandlerRegistration(
@@ -64,14 +67,17 @@ class AccountActionsManager @Inject constructor(
     val voteUiHandler = object : VoteUiHandler {
         override fun bindVoteUi(
             lifecycleOwner: LifecycleOwner,
+            currentVote: Int,
             currentScore: Int,
             instance: String,
             ref: VotableRef,
             upVoteView: View,
             downVoteView: View,
-            registration: Registration
+            scoreView: TextView,
+            registration: Registration,
         ) {
-            votesManager.setVoteIfNoneSet(ref, currentScore)
+            votesManager.setVoteIfNoneSet(ref, currentVote)
+            votesManager.setScoreIfNoneSet(ref, currentScore)
 
             val existingRegId = upVoteView.getTag(R.id.account_actions_manager_reg_id)
             if (existingRegId != null) {
@@ -82,6 +88,7 @@ class AccountActionsManager @Inject constructor(
 
             upVoteView.setOnClickListener {
                 val curVote = votesManager.getVote(ref) ?: 0
+                val curScore = votesManager.getScore(ref) ?: 0
                 val newScore = if (curVote == 1) {
                     0
                 } else {
@@ -90,11 +97,12 @@ class AccountActionsManager @Inject constructor(
 
                 voteOn(instance, ref, newScore, account)
                     .onFailure {
-                        registration.voteFailed(curVote, it)
+                        registration.voteFailed(curVote, curScore, it)
                     }
             }
             downVoteView.setOnClickListener {
                 val curVote = votesManager.getVote(ref) ?: 0
+                val curScore = votesManager.getScore(ref) ?: 0
                 val newScore = if (curVote == -1) {
                     0
                 } else {
@@ -103,7 +111,7 @@ class AccountActionsManager @Inject constructor(
 
                 voteOn(instance, ref, newScore, account)
                     .onFailure {
-                        registration.voteFailed(curVote, it)
+                        registration.voteFailed(curVote, curScore, it)
                     }
             }
 
@@ -113,9 +121,15 @@ class AccountActionsManager @Inject constructor(
 
             registerVoteHandler(regId, ref, registration)
 
-            registration.voteCurrent(votesManager.getVote(ref) ?: 0)
+            registration.voteCurrent(
+                score = votesManager.getVote(ref) ?: 0,
+                totalScore = votesManager.getScore(ref) ?: 0
+            )
 
             Log.d(TAG, "Binding vote handler - ${ref}")
+
+            scoreView.text = LemmyUtils.abbrevNumber(
+                votesManager.getScore(ref)?.toLong() ?: currentScore.toLong())
 
             lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
                 override fun onDestroy(owner: LifecycleOwner) {
@@ -144,7 +158,10 @@ class AccountActionsManager @Inject constructor(
                 is ActionInfo.VoteActionInfo -> {
                     votesManager.setPendingVote(action.info.ref, action.info.dir)
                     voteRefToRegistrations[action.info.ref]?.forEach {
-                        it.votePending(action.info.dir)
+                        it.votePending(
+                            pendingScore = action.info.dir,
+                            totalScore = votesManager.getScore(action.info.ref) ?: 0
+                        )
                     }
                 }
                 is ActionInfo.CommentActionInfo -> {
@@ -177,6 +194,7 @@ class AccountActionsManager @Inject constructor(
                     voteRefToRegistrations[action.info.ref]?.forEach {
                         it.voteFailed(
                             score = votesManager.getVote(action.info.ref) ?: 0,
+                            totalScore = votesManager.getScore(action.info.ref) ?: 0,
                             e = LemmyActionFailureException(reason)
                         )
                     }
@@ -203,13 +221,29 @@ class AccountActionsManager @Inject constructor(
             }
         }
 
-        override fun onActionComplete(action: LemmyAction) {
+        override fun onActionComplete(action: LemmyAction, result: LemmyActionResult<*, *>) {
             Log.d(TAG, "onActionComplete(): $action")
             when (action.info) {
                 is ActionInfo.VoteActionInfo -> {
+                    val score = (result as LemmyActionResult.VoteLemmyActionResult).result
+                        .fold(
+                            {
+                                val voteRef = VotableRef.PostRef(it.post.id)
+
+                                votesManager.setScore(voteRef, it.counts.score)
+                                it.counts.score
+                            },
+                            {
+                                val voteRef = VotableRef.CommentRef(it.comment.id)
+
+                                votesManager.setScore(voteRef, it.counts.score)
+                                it.counts.score
+                            }
+                        )
+
                     votesManager.setVote(action.info.ref, action.info.dir)
                     voteRefToRegistrations[action.info.ref]?.forEach {
-                        it.voteSuccess(action.info.dir)
+                        it.voteSuccess(action.info.dir, score)
                     }
                 }
                 is ActionInfo.CommentActionInfo -> {

@@ -2,13 +2,9 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.style.StyleSpan
-import android.transition.Transition
-import android.transition.Transition.TransitionListener
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -16,13 +12,13 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnPreDrawListener
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.SharedElementCallback
-import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
@@ -30,11 +26,8 @@ import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -73,19 +66,24 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.getFormattedAuthor
 import com.idunnololz.summit.lemmy.utils.getFormattedTitle
-import com.idunnololz.summit.lemmy.utils.getUpvoteText
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.lemmy.post.PostFragment.Item.*
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.addDefaultAnim
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
@@ -186,17 +184,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     return@PostsAdapter
                 }
 
-                val directions = postOrComment.fold({
-                    PostFragmentDirections
-                        .actionPostFragmentToAddOrEditCommentFragment(
+                AddOrEditCommentFragment().apply {
+                    arguments = postOrComment.fold({
+                        AddOrEditCommentFragmentArgs(
                             args.instance, null, it, null)
-                }, {
-                    PostFragmentDirections
-                        .actionPostFragmentToAddOrEditCommentFragment(
+                    }, {
+                        AddOrEditCommentFragmentArgs(
                             args.instance, it, null, null)
-                })
-
-                findNavController().navigateSafe(directions)
+                    }).toBundle()
+                }.show(childFragmentManager, "asdf")
             },
             onEditCommentClick = {
                 if (accountManager.currentAccount.value == null) {
@@ -226,21 +222,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
             },
             onImageClick = { url ->
-                val action =
-                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                        title = null,
-                        url = url,
-                        mimeType = null
-                    )
-                findNavController().navigate(
-                    action, NavOptions.Builder()
-                        .addDefaultAnim()
-                        .build()
-                )
+                getMainActivity()?.openImage(null, url, null)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
-            }
+            },
+            onPostMoreClick = {
+                getMainActivity()?.showBottomMenu(getPostMoreMenu(it))
+            },
         ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -258,6 +247,32 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
+        requireActivity().supportFragmentManager.setFragmentResultListener(
+            CreateOrEditPostFragment.REQUEST_KEY,
+            this
+        ) { _, bundle ->
+            val result = bundle.getParcelableCompat<PostView>(
+                CreateOrEditPostFragment.REQUEST_KEY_RESULT)
+
+            if (result != null) {
+                viewModel.fetchPostData(args.instance, args.id, force = true)
+                (parentFragment as? CommunityFragment)?.onPostUpdated()
+            }
+        }
+
+        if (!args.isSinglePage) {
+            requireMainActivity().onBackPressedDispatcher
+                .addCallback(this, object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        goBack()
+                    }
+                })
+        }
+    }
+
+    private fun goBack() {
+        (requireParentFragment() as CommunityFragment)
+            .closePost(this@PostFragment)
     }
 
     override fun onCreateView(
@@ -265,9 +280,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        requireMainActivity().apply {
-            setupForFragment<PostFragment>()
-        }
 
         setBinding(FragmentPostBinding.inflate(inflater, container, false))
 
@@ -276,6 +288,28 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.recyclerView.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                binding.recyclerView.viewTreeObserver.removeOnPreDrawListener(this)
+
+                adapter.contentMaxWidth = binding.recyclerView.width
+
+                setup()
+                return false
+            }
+
+        })
+
+//        view.doOnPreDraw {
+//        }
+
+    }
+
+    private fun setup() {
+        if (!isBindingAvailable()) {
+            return
+        }
 
         val context = requireContext()
 
@@ -312,7 +346,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     PostViewModel.ListView.PostListView(post),
                     listOf(),
                     null,
-            ))
+                ))
             onMainListingItemRetrieved(post)
         } ?: binding.loadingView.showProgressBar()
 
@@ -344,7 +378,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             if (!isBindingAvailable()) {
                                 return@post
                             }
-                            
+
                             if (pos >= 0) {
                                 (binding.recyclerView.layoutManager as? LinearLayoutManager)
                                     ?.scrollToPositionWithOffset(
@@ -368,8 +402,33 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
+        viewModel.deletePostResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    AlertDialogFragment.Builder()
+                        .setMessage(getString(
+                            R.string.error_unable_to_send_post,
+                            it.error::class.qualifiedName,
+                            it.error.message))
+                        .createAndShow(childFragmentManager, "ASDS")
+                }
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    viewModel.fetchPostData(args.instance, args.id, force = true)
+                    (parentFragment as? CommunityFragment)?.onPostUpdated()
+                }
+            }
+        }
+
         if (viewModel.postData.valueOrNull == null) {
-            viewModel.fetchPostData(args.instance, args.id)
+            lifecycleScope.launch(Dispatchers.Default) {
+                delay(400)
+
+                withContext(Dispatchers.Main) {
+                    viewModel.fetchPostData(args.instance, args.id)
+                }
+            }
         }
 
         args.post?.getUrl(args.instance)?.let { url ->
@@ -384,7 +443,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.addItemDecoration(ThreadLinesDecoration(context))
-        binding.recyclerView.addItemDecoration(PostDividerDecoration(context))
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
@@ -409,6 +467,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                 when (menuItem.itemId) {
+                    android.R.id.home -> {
+                        if (args.isSinglePage) {
+                            false
+                        } else {
+                            goBack()
+                            true
+                        }
+                    }
+
                     R.id.share -> {
                         val sendIntent: Intent = Intent().apply {
                             action = Intent.ACTION_SEND
@@ -438,6 +505,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 }
 
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (args.isSinglePage) {
+            requireMainActivity().apply {
+                setupForFragment<PostFragment>()
+                hideBottomNav()
+                disableCustomAppBar()
+                lockUiOpenness = true
+            }
+        }
     }
 
     override fun navigateToSignInScreen() {
@@ -471,6 +551,42 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         return _sortByMenu
     }
 
+    private fun getPostMoreMenu(postView: PostView): BottomMenu {
+        val bottomMenu = BottomMenu(requireContext()).apply {
+            if (postView.post.creator_id == accountManager.currentAccount.value?.id) {
+                addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
+                addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
+            }
+
+            if (this.itemsCount() == 0) {
+                addItem(io.noties.markwon.R.id.none, R.string.no_options)
+            }
+
+            setTitle(R.string.post_options)
+
+            setOnMenuItemClickListener {
+                when (it.id) {
+                    R.id.edit_post -> {
+                        CreateOrEditPostFragment()
+                            .apply {
+                                arguments = CreateOrEditPostFragmentArgs(
+                                    instance = viewModel.instance,
+                                    post = postView.post,
+                                    communityName = null,
+                                ).toBundle()
+                            }
+                            .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+                    }
+                    R.id.delete -> {
+                        viewModel.deletePost(postView.post)
+                    }
+                }
+            }
+        }
+
+        return bottomMenu
+    }
+
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
         when (tag) {
             CONFIRM_DELETE_COMMENT_TAG -> {
@@ -484,38 +600,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
         // do nothing
-    }
-
-    private class PostDividerDecoration(
-        private val context: Context
-    ) : RecyclerView.ItemDecoration() {
-
-        private val linePaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.colorDivider)
-            strokeWidth = Utils.convertDpToPixel(1f)
-        }
-
-        override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-            val childCount = parent.childCount
-
-            for (i in 1 until childCount) {
-                val previousView = parent.getChildAt(i - 1)
-                val view = parent.getChildAt(i)
-                val previousTag = previousView.tag
-
-                val drawDivider = previousTag is HeaderItem
-
-                if (drawDivider) {
-                    c.drawLine(
-                        view.left.toFloat(),
-                        view.top.toFloat(),
-                        view.right.toFloat(),
-                        view.top.toFloat(),
-                        linePaint
-                    )
-                }
-            }
-        }
     }
 
     sealed class Item(
@@ -559,7 +643,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         )
 
         data class MoreCommentsItem(
-            val parentId: CommentId,
+            val parentId: CommentId?,
             val moreCount: Int,
             val depth: Int,
             val baseDepth: Int,
@@ -587,6 +671,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         private val onDeleteCommentClick: (CommentView) -> Unit,
         private val onImageClick: (String) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
+        private val onPostMoreClick: (PostView) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val inflater = LayoutInflater.from(context)
@@ -706,7 +791,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         b.author.text = post.getFormattedAuthor()
 
                         b.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
-                        b.upvoteCount.text = post.getUpvoteText()
                         b.commentButton.isEnabled = !post.post.locked
                         b.commentButton.setOnClickListener {
                             onAddCommentClick(Either.Left(item.postView))
@@ -714,6 +798,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         b.addCommentButton.isEnabled = !post.post.locked
                         b.addCommentButton.setOnClickListener {
                             onAddCommentClick(Either.Left(item.postView))
+                        }
+
+                        b.moreButton.setOnClickListener {
+                            onPostMoreClick(item.postView)
                         }
 
                         lemmyContentHelper.setupFullContent(
@@ -729,39 +817,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             lazyUpdate = true,
                             videoState = item.videoState,
                             onFullImageViewClickListener = { v, url ->
-                                val action =
-                                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                        null,
-                                        url,
-                                        null
-                                    )
-
-                                if (v != null) {
-                                    val extras = FragmentNavigatorExtras(
-                                        v to "image_view"
-                                    )
-
-                                    findNavController().navigate(action, extras)
-                                } else {
-                                    findNavController().navigate(
-                                        action, NavOptions.Builder()
-                                            .addDefaultAnim()
-                                            .build()
-                                    )
-                                }
+                                onImageClick(url)
                             },
                             onImageClickListener = { url ->
-                                val action =
-                                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                        title = null,
-                                        url = url,
-                                        mimeType = null
-                                    )
-                                findNavController().navigate(
-                                    action, NavOptions.Builder()
-                                        .addDefaultAnim()
-                                        .build()
-                                )
+                                onImageClick(url)
                             },
                             onRevealContentClickedFn = {
                                 revealedItems.add(postKey)
@@ -772,12 +831,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         )
 
                         voteUiHandler.bind(
-
                             viewLifecycleOwner,
                             instance,
                             item.postView,
                             b.upvoteButton,
                             b.downvoteButton,
+                            b.upvoteCount,
                             onSignInRequired,
                             onInstanceMismatch,
                         )
@@ -812,7 +871,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     b.author.text = post.getFormattedAuthor()
 
                     b.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
-                    b.upvoteCount.text = post.getUpvoteText()
                     b.commentButton.isEnabled = !post.post.locked
                     b.commentButton.setOnClickListener {
                         onAddCommentClick(Either.Left(item.postView))
@@ -820,6 +878,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     b.addCommentButton.isEnabled = !post.post.locked
                     b.addCommentButton.setOnClickListener {
                         onAddCommentClick(Either.Left(item.postView))
+                    }
+
+                    b.moreButton.setOnClickListener {
+                        onPostMoreClick(item.postView)
                     }
 
                     lemmyContentHelper.setupFullContent(
@@ -834,26 +896,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         fullContentContainerView = b.fullContent,
                         videoState = item.videoState,
                         onFullImageViewClickListener = { v, url ->
-                            val action =
-                                PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                    null,
-                                    url,
-                                    null
-                                )
-
-                            if (v != null) {
-                                val extras = FragmentNavigatorExtras(
-                                    v to "image_view"
-                                )
-
-                                findNavController().navigate(action, extras)
-                            } else {
-                                findNavController().navigate(
-                                    action, NavOptions.Builder()
-                                        .addDefaultAnim()
-                                        .build()
-                                )
-                            }
+                            onImageClick(url)
                         },
                         onImageClickListener = onImageClick,
                         onRevealContentClickedFn = {
@@ -872,6 +915,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         item.postView,
                         b.upvoteButton,
                         b.downvoteButton,
+                        b.upvoteCount,
                         onSignInRequired,
                         onInstanceMismatch,
                     )
@@ -907,23 +951,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                                 onImageClickListener = onImageClick,
                                 onPageClick = onPageClick,
                             )
-                        }
-
-                        b.text.movementMethod = CustomLinkMovementMethod().apply {
-                            onLinkLongClickListener = DefaultLinkLongClickListener(context)
-                            onImageClickListener = { url ->
-                                val action =
-                                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                        title = null,
-                                        url = url,
-                                        mimeType = null
-                                    )
-                                findNavController().navigate(
-                                    action, NavOptions.Builder()
-                                        .addDefaultAnim()
-                                        .build()
-                                )
-                            }
                         }
 
                         val giphyLinks = LemmyUtils.findGiphyLinks(body)
@@ -965,17 +992,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                                 imageView.controller = controller
 
                                 imageView.setOnClickListener {
-                                    val action =
-                                        PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                            title = null,
-                                            url = fullUrl,
-                                            mimeType = null
-                                        )
-                                    findNavController().navigate(
-                                        action, NavOptions.Builder()
-                                            .addDefaultAnim()
-                                            .build()
-                                    )
+                                    onImageClick(fullUrl)
                                 }
 
                                 lastViewId = viewId
@@ -984,8 +1001,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             b.mediaContainer.removeAllViews()
                             b.mediaContainer.visibility = View.GONE
                         }
-
-                        b.upvoteCount.text = item.comment.getUpvoteText()
 
                         b.collapseSectionButton.setOnClickListener {
                             collapseSection(holder.bindingAdapterPosition)
@@ -1046,6 +1061,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             item.comment,
                             b.upvoteButton,
                             b.downvoteButton,
+                            b.upvoteCount,
                             onSignInRequired,
                             onInstanceMismatch,
                         )
@@ -1115,23 +1131,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             onPageClick = onPageClick,
                         )
 
-                        b.text.movementMethod = CustomLinkMovementMethod().apply {
-                            onLinkLongClickListener = DefaultLinkLongClickListener(context)
-                            onImageClickListener = { url ->
-                                val action =
-                                    PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                        title = null,
-                                        url = url,
-                                        mimeType = null
-                                    )
-                                findNavController().navigate(
-                                    action, NavOptions.Builder()
-                                        .addDefaultAnim()
-                                        .build()
-                                )
-                            }
-                        }
-
                         val giphyLinks = LemmyUtils.findGiphyLinks(body)
                         if (giphyLinks.isNotEmpty()) {
                             var lastViewId = 0
@@ -1171,17 +1170,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                                 imageView.controller = controller
 
                                 imageView.setOnClickListener {
-                                    val action =
-                                        PostFragmentDirections.actionPostFragmentToImageViewerFragment(
-                                            title = null,
-                                            url = fullUrl,
-                                            mimeType = null
-                                        )
-                                    findNavController().navigate(
-                                        action, NavOptions.Builder()
-                                            .addDefaultAnim()
-                                            .build()
-                                    )
+                                    onImageClick(fullUrl)
                                 }
 
                                 lastViewId = viewId
@@ -1245,7 +1234,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     )
 
                     b.moreButton.setOnClickListener {
-                        viewModel.fetchMoreComments(item.parentId)
+                        if (item.parentId != null) {
+                            viewModel.fetchMoreComments(item.parentId)
+                        }
                     }
 
                     b.root.tag = item
@@ -1367,12 +1358,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             }
 
                             is PostViewModel.ListView.MoreCommentsItem -> {
-                                finalItems += MoreCommentsItem(
-                                    parentId = commentView.parentId,
-                                    moreCount = commentView.moreCount,
-                                    depth = it.depth,
-                                    baseDepth = 0,
-                                )
+                                if (commentView.parentCommentId != null) {
+                                    finalItems += MoreCommentsItem(
+                                        parentId = commentView.parentCommentId,
+                                        moreCount = commentView.moreCount,
+                                        depth = it.depth,
+                                        baseDepth = 0,
+                                    )
+                                }
                             }
                         }
                     }
@@ -1404,7 +1397,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     val oldItem = oldItems[oldItemPosition]
                     val newItem = newItems[newItemPosition]
                     return when (oldItem) {
-                        is HeaderItem -> true
+                        is HeaderItem ->
+                            oldItem.postView.post == (newItem as HeaderItem).postView.post
                         else -> oldItem == newItem
                     }
                 }

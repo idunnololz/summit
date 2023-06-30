@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.api.dto.Community
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -104,3 +105,8 @@ fun CommunityRef.toInstanceAgnosticCommunityRef(): CommunityRef =
         is CommunityRef.Local -> this
         is CommunityRef.Subscribed -> this
     }
+
+fun AccountSubscription.toCommunityRef(): CommunityRef.CommunityRefByName {
+    val uri = Uri.parse(this.actorId)
+    return CommunityRef.CommunityRefByName(this.name, uri.host)
+}

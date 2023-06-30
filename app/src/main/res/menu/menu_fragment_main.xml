@@ -16,27 +16,6 @@
         android:orderInCategory="400"
         android:icon="@drawable/baseline_view_comfy_24"
         app:iconTint="?attr/colorControlNormal">
-
-        <menu>
-            <item
-                android:id="@+id/layoutList"
-                android:title="@string/list"
-                android:orderInCategory="100"
-                android:icon="@drawable/baseline_list_24"
-                app:iconTint="?attr/colorControlNormal" />
-            <item
-                android:id="@+id/layoutCard"
-                android:title="@string/card"
-                android:orderInCategory="200"
-                android:icon="@drawable/baseline_view_agenda_black_24"
-                app:iconTint="?attr/colorControlNormal" />
-            <item
-                android:id="@+id/layoutFull"
-                android:title="@string/full"
-                android:orderInCategory="200"
-                android:icon="@drawable/baseline_view_day_black_24"
-                app:iconTint="?attr/colorControlNormal" />
-        </menu>
     </item>
     <item
         android:id="@+id/set_as_default"

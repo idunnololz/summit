@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.utils
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.R
@@ -12,6 +13,7 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.actions.ActionInfo
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -22,12 +24,14 @@ private val TAG = "VoteUiHandler"
 interface VoteUiHandler {
     fun bindVoteUi(
         lifecycleOwner: LifecycleOwner,
+        currentVote: Int,
         currentScore: Int,
         instance: String,
         ref: VotableRef,
         upVoteView: View,
         downVoteView: View,
-        registration: AccountActionsManager.Registration
+        scoreView: TextView,
+        registration: AccountActionsManager.Registration,
     )
     fun unbindVoteUi(upVoteView: View)
 }
@@ -38,18 +42,21 @@ fun VoteUiHandler.bind(
     commentView: CommentView,
     upVoteView: ImageView,
     downVoteView: ImageView,
+    scoreView: TextView,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
     bind(
-        lifecycleOwner,
-        instance,
-        commentView.my_vote ?: 0,
-        VotableRef.CommentRef(commentView.comment.id),
-        upVoteView,
-        downVoteView,
-        onSignInRequired,
-        onInstanceMismatch,
+        lifecycleOwner = lifecycleOwner,
+        instance = instance,
+        currentVote = commentView.my_vote ?: 0,
+        currentScore = commentView.counts.score,
+        ref = VotableRef.CommentRef(commentView.comment.id),
+        upVoteView = upVoteView,
+        downVoteView = downVoteView,
+        scoreView = scoreView,
+        onSignInRequired = onSignInRequired,
+        onInstanceMismatch = onInstanceMismatch,
     )
 }
 
@@ -59,28 +66,33 @@ fun VoteUiHandler.bind(
     postView: PostView,
     upVoteView: ImageView,
     downVoteView: ImageView,
+    scoreView: TextView,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
     bind(
-        lifecycleOwner,
-        instance,
-        postView.my_vote ?: 0,
-        VotableRef.PostRef(postView.post.id),
-        upVoteView,
-        downVoteView,
-        onSignInRequired,
-        onInstanceMismatch,
+        lifecycleOwner = lifecycleOwner,
+        instance = instance,
+        currentVote = postView.my_vote ?: 0,
+        currentScore = postView.counts.score,
+        ref = VotableRef.PostRef(postView.post.id),
+        upVoteView = upVoteView,
+        downVoteView = downVoteView,
+        scoreView = scoreView,
+        onSignInRequired = onSignInRequired,
+        onInstanceMismatch = onInstanceMismatch,
     )
 }
 
 fun VoteUiHandler.bind(
     lifecycleOwner: LifecycleOwner,
     instance: String,
+    currentVote: Int,
     currentScore: Int,
     ref: VotableRef,
     upVoteView: ImageView,
     downVoteView: ImageView,
+    scoreView: TextView,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -102,26 +114,32 @@ fun VoteUiHandler.bind(
     }
     bindVoteUi(
         lifecycleOwner,
+        currentVote,
         currentScore,
         instance,
         ref,
         upVoteView,
         downVoteView,
+        scoreView,
         object : AccountActionsManager.Registration {
-            override fun voteCurrent(score: Int) {
+            override fun voteCurrent(score: Int, totalScore: Int) {
                 update(score)
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
             }
 
-            override fun voteSuccess(newScore: Int) {
+            override fun voteSuccess(newScore: Int, totalScore: Int) {
                 update(newScore)
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
             }
 
-            override fun votePending(pendingScore: Int) {
+            override fun votePending(pendingScore: Int, totalScore: Int) {
                 update(pendingScore)
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
             }
 
-            override fun voteFailed(score: Int, e: Throwable) {
+            override fun voteFailed(score: Int, totalScore: Int, e: Throwable) {
                 update(score)
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
 
                 if (e is NotAuthenticatedException) {
                     onSignInRequired()

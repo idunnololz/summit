@@ -17,6 +17,7 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.*
@@ -137,7 +138,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             }
         })
 
-        binding.playerView.findViewById<View>(R.id.exo_fullscreen).visibility = View.GONE
+        binding.playerView.findViewById<View>(androidx.media3.ui.R.id.exo_fullscreen).visibility = View.GONE
 
         binding.playerView.getRotateControl().apply {
             visibility = View.VISIBLE
@@ -246,72 +247,6 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     }
 
     private fun setupMoreButton(context: Context, url: String, videoType: VideoType) {
-//        fun getDownloadTask(quality: FileDownloadHelper.Quality): Single<FileDownloadHelper.DownloadResult> =
-//            when (videoType) {
-//                VideoType.UNKNOWN -> throw RuntimeException("Unknown video type")
-//                VideoType.DASH -> {
-//                    FileDownloadHelper
-//                        .downloadDashVideo(
-//                            context,
-//                            OfflineManager.instance,
-//                            url,
-//                            quality
-//                        )
-//                }
-//                VideoType.MP4 -> {
-//                    FileDownloadHelper
-//                        .downloadFile(
-//                            context,
-//                            FilenameUtils.getName(url),
-//                            url,
-//                            mimeType = "video/mp4"
-//                        )
-//                }
-//            }
-//
-//        fun downloadVideo(quality: FileDownloadHelper.Quality) {
-//            disposables.add(
-//                getDownloadTask(quality)
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe({ downloadResult ->
-//                        Log.d(TAG, "Download complete!")
-//
-//                        val snackbarMsg = getString(
-//                            R.string.video_saved_format,
-//                            downloadResult.uri
-//                        )
-//                        Snackbar.make(
-//                            requireMainActivity().getSnackbarContainer(),
-//                            snackbarMsg,
-//                            Snackbar.LENGTH_LONG
-//                        ).setAction(R.string.view) {
-//                            if (!isAdded) {
-//                                return@setAction
-//                            }
-//
-//                            Utils.safeLaunchExternalIntentWithErrorDialog(
-//                                context,
-//                                parentFragmentManager,
-//                                Intent(Intent.ACTION_VIEW).apply {
-//                                    flags =
-//                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-//                                    setDataAndType(
-//                                        downloadResult.uri,
-//                                        downloadResult.mimeType
-//                                    )
-//                                })
-//                        }.show()
-//                    }, {
-//                        Log.e(TAG, "", it)
-//                        Snackbar.make(
-//                            binding.rootView,
-//                            R.string.error_downloading_video,
-//                            Snackbar.LENGTH_LONG
-//                        ).show()
-//                    })
-//            )
-//        }
 
         binding.playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
             PopupMenu(context, it).apply {
@@ -320,11 +255,10 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.save -> {
-//                            downloadVideo(FileDownloadHelper.Quality.WORST)
-                            true
-                        }
-                        R.id.save_hq -> {
-//                            downloadVideo(FileDownloadHelper.Quality.BEST)
+
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.coming_soon)
+                                .createAndShow(childFragmentManager, "asdf")
                             true
                         }
                         else -> false
