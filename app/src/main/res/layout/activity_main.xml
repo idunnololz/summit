@@ -56,20 +56,13 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent">
 
-            <LinearLayout
-                android:id="@+id/toolbar_container"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent">
 
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent">
-
-                </com.google.android.material.appbar.MaterialToolbar>
-            </LinearLayout>
+            </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout

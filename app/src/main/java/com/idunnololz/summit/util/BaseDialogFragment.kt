@@ -6,9 +6,14 @@ import androidx.fragment.app.DialogFragment
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
+import com.idunnololz.summit.main.MainActivity
 
 open class BaseDialogFragment<T : ViewBinding> : DialogFragment() {
+    fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
+    fun getMainActivity(): MainActivity? = activity as? MainActivity
 
     private val logTag: String = javaClass.canonicalName ?: "UNKNOWN_CLASS"
 
@@ -89,5 +94,9 @@ open class BaseDialogFragment<T : ViewBinding> : DialogFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         MyLog.d(logTag, "Lifecycle: onSaveInstanceState()")
         super.onSaveInstanceState(outState)
+    }
+
+    fun addMenuProvider(menuProvider: MenuProvider) {
+        requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 }

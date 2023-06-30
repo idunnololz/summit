@@ -79,6 +79,8 @@ class CommunityViewModel @Inject constructor(
 
     var lastSelectedPost: PostRef? = null
 
+    val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
+
     init {
         currentCommunityRef.observeForever(communityRefChangeObserver)
 

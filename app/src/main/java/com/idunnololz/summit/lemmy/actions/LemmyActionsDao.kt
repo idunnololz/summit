@@ -12,18 +12,16 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import arrow.core.Either
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
-import io.reactivex.Completable
-import io.reactivex.Single
 
 @Dao
 interface LemmyActionsDao {
@@ -179,6 +177,30 @@ sealed interface ActionInfo {
             is VoteActionInfo -> this.copy(retries = this.retries + 1)
         }
 
+}
+
+interface LemmyActionResult<T: ActionInfo, R> {
+
+    val result: R
+
+    class VoteLemmyActionResult(
+        override val result: Either<PostView, CommentView>
+    ): LemmyActionResult<ActionInfo.VoteActionInfo, Either<PostView, CommentView>>
+
+    class CommentLemmyActionResult(
+    ): LemmyActionResult<ActionInfo.CommentActionInfo, Unit> {
+        override val result = Unit
+    }
+
+    class DeleteCommentLemmyActionResult(
+    ): LemmyActionResult<ActionInfo.DeleteCommentActionInfo, Unit> {
+        override val result = Unit
+    }
+
+    class EditLemmyActionResult(
+    ): LemmyActionResult<ActionInfo.EditActionInfo, Unit> {
+        override val result = Unit
+    }
 }
 
 /**

@@ -10,7 +10,9 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true">
+        app:elevation="0dp"
+        android:elevation="0dp"
+        app:liftOnScroll="false">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -18,7 +20,6 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
-
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

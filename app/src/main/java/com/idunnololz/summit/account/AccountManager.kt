@@ -28,6 +28,7 @@ class AccountManager @Inject constructor(
 ) {
 
     interface OnAccountChangedListener {
+        suspend fun onAccountSigningOut(account: Account) {}
         suspend fun onAccountChanged(newAccount: Account?)
     }
 
@@ -72,6 +73,8 @@ class AccountManager @Inject constructor(
 
     suspend fun signOut(account: Account) = withContext(Dispatchers.IO) {
         val deferred = coroutineScope.async {
+            doSignOutWork(account)
+
             accountDao.delete(account)
             if (accountDao.getCurrentAccount() == null) {
                 val firstAccount = accountDao.getFirstAccount()
@@ -127,6 +130,12 @@ class AccountManager @Inject constructor(
     private suspend fun doSwitchAccountWork(newAccount: Account?) {
         onAccountChangeListeners.forEach {
             it.onAccountChanged(newAccount)
+        }
+    }
+
+    private suspend fun doSignOutWork(account: Account) {
+        onAccountChangeListeners.forEach {
+            it.onAccountSigningOut(account)
         }
     }
 }

@@ -21,4 +21,12 @@
     <item name="sort_order_top_all_time" type="id"/>
 
     <item name="account_actions_manager_reg_id" type="id"/>
+
+    <item name="layout_list" type="id"/>
+    <item name="layout_list2" type="id"/>
+    <item name="layout_card" type="id"/>
+    <item name="layout_full" type="id"/>
+
+
+    <item name="edit_post" type="id"/>
 </resources>

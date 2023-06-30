@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
@@ -28,6 +29,7 @@ import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getPreviewInfo
@@ -197,7 +199,7 @@ class LemmyContentHelper(
             val imageUrl = postView.getThumbnailUrl(false)
 
             if (imageUrl != null) {
-                fullImageView.setImageResource(0)
+                fullImageView.load(0)
 
                 fun fetchFullImage() {
                     offlineManager.fetchImage(rootView, imageUrl) b@{
@@ -266,7 +268,6 @@ class LemmyContentHelper(
         fun loadPreviewInfo(imageView: ImageView, attachClickHandler: Boolean = false) {
             val previewInfo: PreviewInfo? = postView.getPreviewInfo()
                 ?: postView.getThumbnailPreviewInfo()
-            LemmyUtils.setImageViewSizeBasedOnPreview(context, previewInfo, rootView, imageView)
 
             imageView.load(null)
 
@@ -302,19 +303,16 @@ class LemmyContentHelper(
             externalContentTextView.text = Uri.parse(url).host ?: url
             externalContentView.setOnClickListener {
                 val uri = Uri.parse(url)
-                if (LemmyUtils.isUriReddit(uri)) {
-                    LemmyUtils.openRedditUrl(context, url)
+                val pageRef = LinkResolver.parseUrl(url, instance)
+                if (pageRef != null) {
+                    onLemmyUrlClick(pageRef)
                 } else if (uri.path?.endsWith(".jpg") == true ||
                     uri.path?.endsWith(".jpeg") == true ||
-                    uri.path?.endsWith(".png") == true) {
-                    val args = ImageViewerFragmentArgs(
-                        null,
-                        url,
-                        null
-                    )
-                    fragment.findNavController()
-                        .navigate(R.id.imageViewerFragment, args.toBundle())
-                } else if (uri.path?.endsWith(".gifv") == true) {
+                    uri.path?.endsWith(".png") == true ||
+                    uri.path?.endsWith(".webp") == true) {
+
+                    onImageClickListener(url)
+                } else if (uri.path?.endsWith(".gifv") == true || uri.path?.endsWith(".mp4") == true) {
                     val args = VideoViewerFragmentArgs(
                         url = url,
                         videoType = VideoType.UNKNOWN,
@@ -340,13 +338,7 @@ class LemmyContentHelper(
                         Utils.openExternalLink(context, url)
                     }
                 } else if (uri.host == "imgur.com") {
-                    val args = ImageViewerFragmentArgs(
-                        null,
-                        url,
-                        null
-                    )
-                    fragment.findNavController()
-                        .navigate(R.id.imageViewerFragment, args.toBundle())
+                    onImageClickListener(url)
                 } else {
                     Utils.openExternalLink(context, url)
                 }
@@ -382,7 +374,7 @@ class LemmyContentHelper(
 
                     val imageUrl = requireNotNull(targetPostView.post.thumbnail_url)
 
-                    fullImageView.setImageResource(0)
+                    fullImageView.load(0)
 
                     fun fetchFullImage() {
                         loadingView?.showProgressBar()
@@ -426,41 +418,11 @@ class LemmyContentHelper(
                         }
                     }
 
-                    // try to guess image size...
-//                    if (!offlineManager.hasImageSizeHint(imageUrl)) {
-//                        var width = 0
-//                        var height = 0
-//                        targetListingItem.preview?.images?.first()?.source?.let {
-//                            width = it.width
-//                            height = it.height
-//                        }
-//                        rootView.measure(
-//                            View.MeasureSpec.makeMeasureSpec(
-//                                Utils.getScreenWidth(context),
-//                                View.MeasureSpec.EXACTLY
-//                            ),
-//                            View.MeasureSpec.makeMeasureSpec(
-//                                Utils.getScreenHeight(context),
-//                                View.MeasureSpec.AT_MOST
-//                            )
-//                        )
-//                        if (width != 0 && height != 0) {
-//                            val thumbnailHeight =
-//                                (fullImageView.measuredWidth * (height.toDouble() / width)).toInt()
-//                            offlineManager.setImageSizeHint(
-//                                targetListingItem.url,
-//                                fullImageView.measuredWidth,
-//                                thumbnailHeight
-//                            )
-//                        }
-//                    }
-
                     loadingView?.setOnRefreshClickListener {
                         fetchFullImage()
                     }
                     fetchFullImage()
 
-                    //ViewCompat.setTransitionName(fullImageView, fullImageViewTransitionName)
                     fullImageView.setOnClickListener {
                         onFullImageViewClickListener(null, imageUrl)
                     }
@@ -496,39 +458,9 @@ class LemmyContentHelper(
                                 setOnMenuItemClickListener {
                                     when (it.itemId) {
                                         R.id.save -> {
-//                                            FileDownloadHelper
-//                                                .downloadDashVideo(
-//                                                    context = context,
-//                                                    offlineManager = offlineManager,
-//                                                    url = media.redditVideo.dashUrl,
-//                                                    quality = FileDownloadHelper.Quality.WORST
-//                                                )
-//                                                .subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .subscribe({
-//                                                    Log.d(TAG, "Download complete!")
-//                                                }, {
-//                                                    Log.e(TAG, "", it)
-//                                                })
-
-                                            true
-                                        }
-                                        R.id.save_hq -> {
-//                                            FileDownloadHelper
-//                                                .downloadDashVideo(
-//                                                    context = context,
-//                                                    offlineManager = offlineManager,
-//                                                    url = media.redditVideo.dashUrl,
-//                                                    quality = FileDownloadHelper.Quality.BEST
-//                                                )
-//                                                .subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .subscribe({
-//                                                    Log.d(TAG, "Download complete!")
-//                                                }, {
-//                                                    Log.e(TAG, "", it)
-//                                                })
-
+                                            AlertDialog.Builder(context)
+                                                .setMessage(R.string.coming_soon)
+                                                .show()
                                             true
                                         }
                                         else -> false
@@ -538,7 +470,7 @@ class LemmyContentHelper(
                                 show()
                             }
                         }
-                        playerView.findViewById<ImageButton>(R.id.exo_fullscreen)
+                        playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
                             .setOnClickListener {
                                 val args = VideoViewerFragmentArgs(
                                     url = videoInfo.dashUrl,

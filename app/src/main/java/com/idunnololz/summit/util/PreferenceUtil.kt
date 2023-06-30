@@ -70,7 +70,7 @@ object PreferenceUtil {
 
     const val KEY_LAST_SUCCESSFUL_OFFLINE_DOWNLOAD = "last_successful_offline_download"
 
-    private const val KEY_SUBREDDIT_LAYOUT = "KEY_SUBREDDIT_LAYOUT"
+    const val KEY_SUBREDDIT_LAYOUT = "KEY_SUBREDDIT_LAYOUT"
     private const val KEY_OFFLINE_STORAGE_CAP_BYTES = "KEY_OFFLINE_STORAGE_CAP_BYTES"
     private const val KEY_VIDEO_PLAYER_ROTATION_LOCKED = "KEY_VIDEO_PLAYER_ROTATION_LOCKED"
 
@@ -117,20 +117,6 @@ object PreferenceUtil {
             set.add(Integer.parseInt(st.nextToken()))
         }
         return set
-    }
-
-
-    fun getSubredditLayout(): CommunityLayout =
-        try {
-            CommunityLayout.valueOf(preferences.getString(KEY_SUBREDDIT_LAYOUT, null) ?: "")
-        } catch (e: IllegalArgumentException) {
-            CommunityLayout.LIST
-        }
-
-    fun setSubredditLayout(layout: CommunityLayout) {
-        preferences.edit()
-            .putString(KEY_SUBREDDIT_LAYOUT, layout.name)
-            .apply()
     }
 
     fun getOfflineStorageCap(): Long =

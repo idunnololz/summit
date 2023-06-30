@@ -22,6 +22,9 @@ interface HistoryDao {
     @Query("SELECT id, url, shortDesc, ts, type, reason FROM history ORDER BY ts DESC")
     suspend fun getAllLiteHistoryEntries(): List<LiteHistoryEntry>
 
+    @Query("SELECT id, url, shortDesc, ts, type, reason FROM history WHERE ts < :ts ORDER BY ts DESC LIMIT 1000")
+    suspend fun getLiteHistoryEntriesFrom(ts: Long): List<LiteHistoryEntry>
+
     @Query("SELECT * FROM history WHERE id = :entryId")
     suspend fun getHistoryEntry(entryId: Long): HistoryEntry?
 
@@ -42,6 +45,9 @@ interface HistoryDao {
 
     @Query("DELETE FROM history")
     suspend fun deleteAllHistoryEntries()
+
+    @Query("SELECT id, url, shortDesc, ts, type, reason FROM history WHERE shortDesc LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' ORDER BY ts DESC LIMIT 1000")
+    suspend fun query(query: String): List<LiteHistoryEntry>
 
 
     @Transaction
@@ -72,7 +78,7 @@ interface HistoryDao {
                         val adapter = moshi.adapter(TabCommunityState::class.java)
                         val oldState = adapter.fromJson(lastEntry.extras)
                         val newState = adapter.fromJson(newEntry.extras)
-                        if (oldState?.tabId == newState?.tabId &&
+                        if (oldState?.viewState?.communityState?.communityRef == newState?.viewState?.communityState?.communityRef &&
                             oldState?.viewState?.communityState?.currentPageIndex ==
                             newState?.viewState?.communityState?.currentPageIndex
                         ) {

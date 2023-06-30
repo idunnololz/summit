@@ -41,4 +41,20 @@
         android:id="@+id/historyFragment"
         android:name="com.idunnololz.summit.history.HistoryFragment"
         android:label="HistoryFragment" />
+    <fragment
+        android:id="@+id/imageViewerFragment"
+        android:name="com.idunnololz.summit.preview.ImageViewerFragment"
+        android:label="ImageViewerFragment">
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="url"
+            app:argType="string" />
+        <argument
+            android:name="mimeType"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment><action android:id="@+id/action_global_imageViewerFragment" app:destination="@id/imageViewerFragment"/>
 </navigation>

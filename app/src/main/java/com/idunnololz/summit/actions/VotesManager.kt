@@ -14,6 +14,8 @@ class VotesManager(
     private val votes = hashMapOf<VotableRef, Int>()
     private val pendingVotes = hashMapOf<VotableRef, Int>()
 
+    private val scores = mutableMapOf<VotableRef, Int>()
+
     fun setPendingVote(key: VotableRef, like: Int) {
         pendingVotes[key] = like
     }
@@ -32,6 +34,21 @@ class VotesManager(
 
     fun getVote(key: VotableRef): Int? =
         pendingVotes[key] ?: votes[key]
+
+    fun setScore(key: VotableRef, count: Int) {
+        scores[key] = count
+    }
+
+    fun getScore(key: VotableRef) =
+        scores[key]
+
+    fun setScoreIfNoneSet(key: VotableRef, score: Int) {
+        scores.getOrPut(key) { score }
+    }
+
+    fun deleteScore(ref: VotableRef) {
+        scores.remove(ref)
+    }
 
     fun reset() {
         votes.clear()

@@ -72,11 +72,31 @@
         style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/reddit_content_horizontal_padding"
-        android:paddingLeft="@dimen/reddit_content_horizontal_padding"
+        android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:icon="@drawable/baseline_comment_18"
         app:layout_constraintTop_toBottomOf="@+id/barrier" />
+
+
+    <ImageButton
+        android:id="@+id/moreButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_more_horiz_black_18"
+        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintEnd_toStartOf="@+id/controlsDivider2" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/controlsDivider2"
+        android:layout_height="0dp"
+        android:layout_width="1dp"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintEnd_toStartOf="@+id/add_comment_button"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton" />
 
     <ImageButton
         android:id="@+id/add_comment_button"
@@ -88,11 +108,10 @@
         app:layout_constraintTop_toBottomOf="@+id/barrier"
         app:layout_constraintEnd_toStartOf="@+id/controlsDivider" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/controlsDivider"
         android:layout_height="0dp"
         android:layout_width="1dp"
-        android:background="@color/colorDivider"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintEnd_toStartOf="@+id/upvoteButton"
@@ -125,9 +144,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_arrow_down_bold_black_24dp"
         android:paddingStart="@dimen/padding_half"
-        android:paddingLeft="@dimen/padding_half"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"
-        android:paddingRight="@dimen/reddit_content_horizontal_padding_for_downvote"
         android:paddingTop="@dimen/padding_half"
         android:paddingBottom="@dimen/padding_half"
         android:background="?selectableItemBackgroundBorderless"
@@ -135,4 +152,10 @@
         app:layout_constraintTop_toTopOf="@+id/commentButton"
         app:layout_constraintBottom_toBottomOf="@+id/commentButton"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

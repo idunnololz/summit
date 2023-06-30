@@ -10,6 +10,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
+import com.idunnololz.summit.account.info.AccountInfo
+import com.idunnololz.summit.account.info.AccountInfoConverters
+import com.idunnololz.summit.account.info.AccountInfoDao
 import com.idunnololz.summit.history.HistoryConverters
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.history.HistoryEntry
@@ -33,14 +36,12 @@ import com.idunnololz.summit.util.moshi
         Account::class,
         LemmyAction::class,
         LemmyFailedAction::class,
+        AccountInfo::class,
     ],
     autoMigrations = [
-        AutoMigration (
-            from = 20,
-            to = 21
-        ),
+        AutoMigration (from = 20, to = 21),
     ],
-    version = 22,
+    version = 24,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class)
@@ -51,6 +52,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun userCommunitiesDao(): UserCommunitiesDao
     abstract fun historyDao(): HistoryDao
     abstract fun accountDao(): AccountDao
+    abstract fun accountInfoDao(): AccountInfoDao
 
     companion object {
 
@@ -73,8 +75,11 @@ abstract class MainDatabase : RoomDatabase() {
                 .fallbackToDestructiveMigration()
                 .addTypeConverter(LemmyActionConverters(moshi))
                 .addTypeConverter(UserCommunitiesConverters(moshi))
+                .addTypeConverter(AccountInfoConverters(moshi))
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_21_22)
+                .addMigrations(MIGRATION_22_24)
+                .addMigrations(MIGRATION_23_24)
                 .build()
         }
     }
@@ -91,5 +96,19 @@ val MIGRATION_21_22 = object : Migration(21, 22) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS lemmy_failed_actions;")
         database.execSQL("CREATE TABLE IF NOT EXISTS `lemmy_failed_actions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `cts` INTEGER NOT NULL, `fts` INTEGER NOT NULL, `error` TEXT NOT NULL, `info` TEXT)")
+    }
+}
+
+val MIGRATION_22_24 = object : Migration(22, 24) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS account_info;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, PRIMARY KEY(`account_id`))")
+    }
+}
+
+val MIGRATION_23_24 = object : Migration(23, 24) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS account_info;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, PRIMARY KEY(`account_id`))")
     }
 }

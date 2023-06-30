@@ -2,6 +2,7 @@ package com.idunnololz.summit.db
 
 import android.content.Context
 import com.idunnololz.summit.account.AccountDao
+import com.idunnololz.summit.account.info.AccountInfoDao
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
@@ -35,6 +36,10 @@ class DatabaseModule {
     @Provides
     fun provideHistoryDao(db: MainDatabase): HistoryDao =
         db.historyDao()
+
+    @Provides
+    fun provideAccountInfoDao(db: MainDatabase): AccountInfoDao =
+        db.accountInfoDao()
 
     @Provides
     @Singleton

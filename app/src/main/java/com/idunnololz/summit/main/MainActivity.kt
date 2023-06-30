@@ -31,14 +31,17 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
+import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
+import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.offline.OfflineFragment
 import com.idunnololz.summit.preview.ImageViewerFragment
@@ -50,6 +53,7 @@ import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
@@ -59,7 +63,7 @@ import kotlin.math.max
 class MainActivity : BaseActivity() {
 
     companion object {
-        private val TAG = MainActivity::class.java.canonicalName
+        private val TAG = MainActivity::class.java.simpleName
     }
 
     private val sharedViewModel: SharedViewModel by viewModels()
@@ -95,13 +99,15 @@ class MainActivity : BaseActivity() {
 
     private lateinit var lemmyAppBarController: LemmyAppBarController
 
-    private val insetsChangedLiveData = MutableLiveData<Int>()
+    val insetsChangedLiveData = MutableLiveData<Int>()
 
     private val onNavigationItemReselectedListeners =
         mutableListOf<NavigationBarView.OnItemReselectedListener>()
 
     private var currentBottomMenu: BottomMenu? = null
     var lastInsets: MainActivityInsets = MainActivityInsets()
+
+    var lockUiOpenness = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -253,7 +259,7 @@ class MainActivity : BaseActivity() {
                 leftMargin = leftInset
                 rightMargin = rightInset
             }
-            binding.toolbarContainer.updatePadding(top = topInset)
+            binding.appBar.updatePadding(top = topInset)
 
             binding.customAppBar.layoutParams =
                 (binding.customAppBar.layoutParams as ViewGroup.MarginLayoutParams).apply {
@@ -342,19 +348,10 @@ class MainActivity : BaseActivity() {
         enableBottomNavViewScrolling = false
     }
 
-    fun setNavUiOpenness(progress: Float) {
-        binding.customAppBar.translationY = -binding.customAppBar.height * progress
-        bottomNavViewAnimationOffset.value = binding.bottomNavigationView.height * progress
-
-    }
-
     fun disableCustomAppBar() {
         binding.customAppBar.removeOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
         binding.customAppBar.animate()
             .translationY(-binding.customAppBar.height.toFloat())
-            .withEndAction {
-                binding.customAppBar.visibility = View.INVISIBLE
-            }
 
         communitySelectorController?.hide()
 
@@ -377,8 +374,19 @@ class MainActivity : BaseActivity() {
                     (percentShown * binding.bottomNavigationView.height).toInt()
         }
 
-    fun enableCustomAppBar() {
+    fun setNavUiOpenness(progress: Float) {
+        if (lockUiOpenness) return
+        binding.customAppBar.translationY = -binding.customAppBar.height * progress
+        bottomNavViewAnimationOffset.value = binding.bottomNavigationView.height * progress
+    }
+
+    fun enableCustomAppBarListener() {
+        binding.customAppBar.removeOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
         binding.customAppBar.addOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
+    }
+
+    fun enableCustomAppBar() {
+        enableCustomAppBarListener()
         val customAppBar = binding.customAppBar
         headerOffset.value = (customAppBar.height + lastCustomAppBarOffset).toInt()
         customAppBar.visibility = View.VISIBLE
@@ -398,20 +406,26 @@ class MainActivity : BaseActivity() {
                 }
             }
         }.start()
+        ValueAnimator.ofFloat(requireNotNull(bottomNavViewAnimationOffset.value), 0f).apply {
+            duration = 300
+            addUpdateListener {
+                bottomNavViewAnimationOffset.value = it.animatedValue as Float
+            }
+        }.start()
     }
 
     var lastScrollFlagsToolbar: Int = 0
     fun fixToolbar() {
-        binding.toolbarContainer.layoutParams =
-            (binding.toolbarContainer.layoutParams as AppBarLayout.LayoutParams).apply {
+        binding.toolbar.layoutParams =
+            (binding.toolbar.layoutParams as AppBarLayout.LayoutParams).apply {
                 lastScrollFlagsToolbar = scrollFlags
                 scrollFlags = 0
             }
     }
 
     fun unfixToolbar() {
-        binding.toolbarContainer.layoutParams =
-            (binding.toolbarContainer.layoutParams as AppBarLayout.LayoutParams).apply {
+        binding.toolbar.layoutParams =
+            (binding.toolbar.layoutParams as AppBarLayout.LayoutParams).apply {
                 scrollFlags = lastScrollFlagsToolbar
             }
     }
@@ -448,16 +462,13 @@ class MainActivity : BaseActivity() {
         binding.bottomNavigationView.animate()
             .translationY(binding.bottomNavigationView.height.toFloat())
             .setDuration(250)
-            .withEndAction {
-                binding.bottomNavigationView.visibility = View.INVISIBLE
-            }
     }
 
     private fun handleIntent(intent: Intent?) {
         intent ?: return
 
         val data = intent.data ?: return
-        val page = LinkResolver.parseUrl(data.toString(), viewModel.currentInstance)
+        val page = LinkResolver.parseUrl(data.toString(), viewModel.currentInstance, mustHandle = true)
 
         if (page == null) {
             Log.d(TAG, "Unable to handle uri $data")
@@ -601,7 +612,7 @@ class MainActivity : BaseActivity() {
         hideActionBar(false)
         unfixToolbar()
 
-        binding.toolbarContainer.updateLayoutParams<AppBarLayout.LayoutParams> {
+        binding.toolbar.updateLayoutParams<AppBarLayout.LayoutParams> {
             scrollFlags =
                 AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
                         AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
@@ -728,11 +739,25 @@ class MainActivity : BaseActivity() {
 
     fun insetViewExceptTopAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = checkNotNull(lastInsets)
+            val insets = lastInsets
 
             rootView.setPadding(
                 insets.leftInset,
                 0,
+                insets.rightInset,
+                insets.bottomInset,
+            )
+        }
+    }
+
+
+    fun insetViewAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = lastInsets
+
+            rootView.setPadding(
+                insets.leftInset,
+                insets.topInset,
                 insets.rightInset,
                 insets.bottomInset,
             )
@@ -750,6 +775,7 @@ class MainActivity : BaseActivity() {
     }
 
     inline fun <reified T> setupForFragment() {
+        Log.d("MainActivity", "setupForFragment(): ${T::class}")
         when (T::class) {
             CommunityFragment::class -> {
                 hideActionBar()
@@ -761,9 +787,10 @@ class MainActivity : BaseActivity() {
             PostFragment::class -> {
                 hideActionBar()
                 disableBottomNavViewScrolling()
-                hideBottomNav()
+//                hideBottomNav()
                 showNotificationBarBg()
-                disableCustomAppBar()
+                enableCustomAppBarListener()
+//                disableCustomAppBar()
             }
             VideoViewerFragment::class -> {
                 hideActionBar()
@@ -827,6 +854,8 @@ class MainActivity : BaseActivity() {
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
     fun getToolbarHeight() = binding.toolbar.layoutParams.height
+    fun getBottomNavHeight() = binding.bottomNavigationView.height
+    fun getCustomAppBarHeight() = binding.customAppBar.height
 
     private fun registerCurrentAccountListener() {
         viewModel.currentAccount.observe(this) {
@@ -847,5 +876,14 @@ class MainActivity : BaseActivity() {
         bottomMenu.setInsets(lastInsets.topInset, lastInsets.bottomInset)
         bottomMenu.show(binding.bottomSheetContainer)
         currentBottomMenu = bottomMenu
+    }
+
+    fun openImage(
+        title: String?,
+        url: String,
+        mimeType: String?,
+    ) {
+        val direction = MainDirections.actionGlobalImageViewerFragment(title, url, mimeType)
+        currentNavController?.navigateSafe(direction)
     }
 }

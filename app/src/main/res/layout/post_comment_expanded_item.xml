@@ -126,11 +126,10 @@
         app:layout_constraintTop_toBottomOf="@+id/barrier"
         app:layout_constraintEnd_toStartOf="@+id/controlsDivider2" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/controlsDivider2"
         android:layout_height="0dp"
         android:layout_width="1dp"
-        android:background="@color/colorDivider"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintEnd_toStartOf="@+id/commentButton"
@@ -147,11 +146,10 @@
         app:layout_constraintTop_toBottomOf="@+id/barrier"
         app:layout_constraintEnd_toStartOf="@+id/controlsDivider" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/controlsDivider"
         android:layout_height="0dp"
         android:layout_width="1dp"
-        android:background="@color/colorDivider"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintEnd_toStartOf="@+id/upvoteButton"

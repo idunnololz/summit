@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +32,8 @@ import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
+class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private const val TAG = "HistoryFragment"
@@ -79,7 +81,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                 viewModel.removeEntry(it)
             },
             onEntryClick = {
-                val pageRef = LinkResolver.parseUrl(it.url, viewModel.instance)
+                val pageRef = LinkResolver.parseUrl(it.url, viewModel.instance, mustHandle = true)
                 if (pageRef == null) {
                     AlertDialogFragment.Builder()
                         .setMessage(R.string.error_history_entry_corrupt)
@@ -105,12 +107,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = getString(R.string.history)
+
+            binding.contentContainer.updatePadding(bottom = getBottomNavHeight())
         }
 
         historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)
 
         viewModel.loadHistory()
-        viewModel.historyEntriesLiveData.observe(viewLifecycleOwner) {
+        viewModel.historyData.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
@@ -129,6 +133,17 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                 }
             }
         }
+        viewModel.historyQueryData.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {}
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    adapter.queryResults = it.data
+                }
+            }
+        }
+
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
@@ -136,7 +151,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.loadHistory()
+            viewModel.loadHistory(force = true)
         }
 
         addMenuProvider(object : MenuProvider {
@@ -152,6 +167,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                     override fun onQueryTextChange(newText: String?): Boolean {
                         if (newText != null) {
                             adapter.setQuery(newText)
+                            viewModel.query(newText)
                         }
 
                         return true
@@ -201,11 +217,18 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
             ) : Item
         }
 
-        private var data: List<LiteHistoryEntry> = listOf()
+        private var data: HistoryViewModel.HistoryEntryData? = null
 
         private var query: String = ""
 
         private val dateFormatter = SimpleDateFormat.getDateInstance()
+
+        var queryResults: HistoryViewModel.HistoryQueryResult? = null
+            set(value) {
+                field = value
+
+                refreshItems()
+            }
 
         private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
@@ -252,7 +275,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
         override fun getItemCount(): Int = adapterHelper.itemCount
 
-        fun setItems(newData: List<LiteHistoryEntry>) {
+        fun setItems(newData: HistoryViewModel.HistoryEntryData) {
             data = newData
 
             refreshItems()
@@ -265,20 +288,18 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         }
 
         private fun refreshItems() {
+            val data = data ?: return
             val newItems = mutableListOf<Item>()
             val lastDate: Calendar = Calendar.getInstance()
+            val query = query
+            val queryResults = queryResults
+
             lastDate.timeInMillis = 0
             var headerId = 0
 
             val calendar = Calendar.getInstance()
 
-            data.let {
-                if (query.isBlank()) {
-                    data
-                } else {
-                    data.filter { it.url.contains(query) || it.shortDesc.contains(query) }
-                }
-            }.forEach {
+            fun add(it: LiteHistoryEntry) {
                 calendar.timeInMillis = it.ts
                 if (calendar.get(Calendar.YEAR) != lastDate.get(Calendar.YEAR) ||
                     calendar.get(Calendar.DAY_OF_YEAR) != lastDate.get(Calendar.DAY_OF_YEAR)
@@ -303,7 +324,26 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
                 )
             }
 
+            if (query.isNotBlank()) {
+                if (query == queryResults?.query) {
+                    queryResults.sortedEntries.forEach {
+                        add(it)
+                    }
+                }
+            } else {
+                data.sortedEntries.forEach {
+                    add(it)
+                }
+            }
+
             adapterHelper.setItems(newItems, this)
         }
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 }

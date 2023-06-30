@@ -8,14 +8,29 @@
     <TextView
         android:id="@+id/bookmarks_title"
         android:text="@string/subscriptions"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceTitleMedium"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/dialog_padding"
         android:layout_marginBottom="@dimen/padding"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constrainedWidth="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_half"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@+id/bookmarks_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bookmarks_title"
+        app:layout_constraintBottom_toBottomOf="@+id/bookmarks_title"
+        style="?android:attr/progressBarStyleSmall" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,7 @@ import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.lemmy.PostRef
@@ -62,6 +63,8 @@ class PostViewModel @Inject constructor(
     val commentsSortOrderLiveData = MutableLiveData(CommentsSortOrder.Top)
 
     val postData = StatefulLiveData<PostData>()
+
+    val deletePostResult = StatefulLiveData<PostView>()
 
     init {
         commentsSortOrderLiveData.observeForever {
@@ -226,6 +229,7 @@ class PostViewModel @Inject constructor(
             PostData(
                 ListView.PostListView(post),
                 buildCommentsTreeListView(
+                    post,
                     comments,
                     parentComment = true,
                     pendingComments,
@@ -236,23 +240,16 @@ class PostViewModel @Inject constructor(
         )
     }
 
-    fun fetchMoreComments(parentId: CommentId, force: Boolean = false) {
+    fun fetchMoreComments(parentId: CommentId?, force: Boolean = false) {
+        val postRef = postRef ?: return
         val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
         viewModelScope.launch {
-            val result = lemmyApiClient.fetchCommentsWithRetry(
-                Either.Right(parentId),
-                sortOrder,
-                force,
-            )
-
-            result.onSuccess { comments ->
-                comments.forEach {
-                    supplementaryComments[it.comment.id] = it
-                }
+            if (parentId != null) {
+                fetchMoreCommentsInternal(parentId, sortOrder, force)
+            } else {
+                // TODO maybe?
             }
-
-            fetchMoreCommentsInternal(parentId, sortOrder, force)
 
             updateData()
         }
@@ -324,7 +321,7 @@ class PostViewModel @Inject constructor(
         ) : ListView
 
         data class MoreCommentsItem(
-            val parentId: CommentId,
+            val parentCommentId: CommentId?,
             val depth: Int,
             val moreCount: Int,
         ) : ListView
@@ -337,6 +334,7 @@ class PostViewModel @Inject constructor(
     )
 
     private suspend fun buildCommentsTreeListView(
+        post: PostView,
         comments: List<CommentView>?,
         parentComment: Boolean,
         pendingComments: List<PendingCommentView>?,
@@ -392,7 +390,7 @@ class PostViewModel @Inject constructor(
             }
         }
 
-        addMoreItems(topNodes)
+        addMoreItems(post, topNodes)
 
         pendingComments?.forEach { pendingComment ->
             if (pendingComment.commentId != null) {
@@ -441,7 +439,7 @@ class PostViewModel @Inject constructor(
         return topNodes
     }
 
-    private fun addMoreItems(topNodes: MutableList<CommentNodeData>) {
+    private fun addMoreItems(post: PostView, topNodes: MutableList<CommentNodeData>) {
         val toVisit = LinkedList<CommentNodeData>()
         toVisit.addAll(topNodes)
 
@@ -483,6 +481,35 @@ class PostViewModel @Inject constructor(
                 )
             }
         }
+
+        var childrenCount = 0
+        val expectedCount = post.counts.comments
+
+        topNodes.forEach {
+            when (val commentView = it.commentView) {
+                is ListView.CommentListView -> {
+                    childrenCount += commentView.comment.counts.child_count + 1 // + 1 for this comment
+                }
+                is ListView.MoreCommentsItem -> {}
+                is ListView.PendingCommentListView -> {
+                    childrenCount += 1 // + 1 for this comment
+                }
+                is ListView.PostListView -> {}
+            }
+        }
+
+        if (childrenCount < expectedCount) {
+            topNodes.add(
+                CommentNodeData(
+                    ListView.MoreCommentsItem(
+                        null,
+                        0,
+                        expectedCount - childrenCount
+                    ),
+                    0,
+                )
+            )
+        }
     }
 
     private fun getCommentParentId(comment: Comment?): Int? {
@@ -503,6 +530,18 @@ class PostViewModel @Inject constructor(
     fun deleteComment(postRef: PostRef, commentId: Int) {
         viewModelScope.launch {
             accountActionsManager.deleteComment(postRef, commentId)
+        }
+    }
+
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            lemmyApiClient.deletePost(post.id)
+                .onSuccess {
+                    deletePostResult.postValue(it)
+                }
+                .onFailure {
+                    deletePostResult.postError(it)
+                }
         }
     }
 }

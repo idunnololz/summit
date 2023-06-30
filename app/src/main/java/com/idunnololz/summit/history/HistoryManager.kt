@@ -45,6 +45,14 @@ class HistoryManager @Inject constructor(
             .getAllLiteHistoryEntries()
     }
 
+    suspend fun query(query: String): List<LiteHistoryEntry> = withContext(Dispatchers.IO) {
+        historyDao.query(query)
+    }
+
+    suspend fun getHistoryFrom(ts: Long): List<LiteHistoryEntry> = withContext(Dispatchers.IO) {
+        historyDao.getLiteHistoryEntriesFrom(ts)
+    }
+
     fun recordVisit(jsonUrl: String, saveReason: HistorySaveReason, post: PostView?) {
         coroutineScope.launch {
             withContext(dbContext) {
@@ -80,7 +88,8 @@ class HistoryManager @Inject constructor(
                     url = state.toUrl(),
                     shortDesc = shortDesc,
                     ts = ts,
-                    extras = Utils.gson.toJson(TabCommunityState(tabId = tabId, viewState = state))
+                    extras = moshi.adapter(TabCommunityState::class.java)
+                        .toJson(TabCommunityState(tabId = tabId, viewState = state))
                 )
                 recordHistoryEntry(historyEntry)
             }

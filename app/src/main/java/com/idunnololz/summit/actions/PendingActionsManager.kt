@@ -16,6 +16,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
@@ -52,7 +53,7 @@ class PendingActionsManager @Inject constructor(
     interface OnActionChangedListener {
         fun onActionAdded(action: LemmyAction)
         fun onActionFailed(action: LemmyAction, reason: LemmyActionFailureReason)
-        fun onActionComplete(action: LemmyAction)
+        fun onActionComplete(action: LemmyAction, result: LemmyActionResult<*, *>)
     }
 
     /**
@@ -79,8 +80,8 @@ class PendingActionsManager @Inject constructor(
         completeActionError = { action: LemmyAction, failureReason: LemmyActionFailureReason ->
             completeActionError(action, failureReason)
         },
-        completeActionSuccess = { action: LemmyAction ->
-            completeActionSuccess(action)
+        completeActionSuccess = { action: LemmyAction, result: LemmyActionResult<*, *> ->
+            completeActionSuccess(action, result)
         }
     )
 
@@ -212,9 +213,9 @@ class PendingActionsManager @Inject constructor(
         onActionChangedListeners.remove(l)
     }
 
-    private suspend fun notifyActionComplete(action: LemmyAction) = withContext(Dispatchers.Main) {
+    private suspend fun notifyActionComplete(action: LemmyAction, result: LemmyActionResult<*, *>) = withContext(Dispatchers.Main) {
         for (onActionCompleteListener in onActionChangedListeners) {
-            onActionCompleteListener.onActionComplete(action)
+            onActionCompleteListener.onActionComplete(action, result)
         }
     }
 
@@ -310,15 +311,15 @@ class PendingActionsManager @Inject constructor(
         notifyActionFailed(action, error)
     }
 
-    private suspend fun completeActionSuccess(action: LemmyAction) {
+    private suspend fun completeActionSuccess(action: LemmyAction, result: LemmyActionResult<*, *>) {
         withContext(actionsContext) {
             actionsDao.delete(action)
         }
-        notifyActionComplete(action)
+        notifyActionComplete(action, result)
     }
 
     sealed class ActionExecutionResult {
-        object Success : ActionExecutionResult()
+        class Success(val result: LemmyActionResult<*, *>) : ActionExecutionResult()
         data class Failure(
             val failureReason: LemmyActionFailureReason
         ) : ActionExecutionResult()

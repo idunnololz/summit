@@ -152,6 +152,17 @@ class AccountAwareLemmyClient @Inject constructor(
     ): Result<GetSiteResponse> =
         apiClient.fetchSiteWithRetry(auth, force)
 
+    suspend fun deletePost(
+        id: PostId,
+        auth: String? = currentAccount?.jwt,
+    ): Result<PostView> {
+        return if (auth == null) {
+            Result.failure(NotAuthenticatedException())
+        } else {
+            apiClient.deletePost(auth, id)
+        }
+    }
+
     fun changeInstance(site: String) =
         apiClient.changeInstance(site)
 

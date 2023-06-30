@@ -154,7 +154,7 @@ class OfflineManager @Inject constructor(
     fun hasImageSizeHint(url: String): Boolean = imageSizeHints.containsKey(url)
 
     fun getImageSizeHint(url: String, size: Size): Size = size.apply {
-        val size = imageSizeHints.get(url)
+        val size = imageSizeHints[url]
         if (size != null) {
             width = size.width
             height = size.height

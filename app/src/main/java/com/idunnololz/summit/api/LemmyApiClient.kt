@@ -7,12 +7,16 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.CreateComment
 import com.idunnololz.summit.api.dto.CreateCommentLike
+import com.idunnololz.summit.api.dto.CreatePost
 import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.DeleteComment
+import com.idunnololz.summit.api.dto.DeletePost
 import com.idunnololz.summit.api.dto.EditComment
+import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetComments
 import com.idunnololz.summit.api.dto.GetCommunity
@@ -293,7 +297,12 @@ class LemmyApiClient @Inject constructor(
         password: String,
     ): Result<String?> {
         val originalInstance = this.instance
-        changeInstance(instance)
+
+        try {
+            changeInstance(instance)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
 
         val form = Login(username, password)
 
@@ -464,6 +473,83 @@ class LemmyApiClient @Inject constructor(
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun createPost(
+        name: String,
+        body: String?,
+        url: String?,
+        isNsfw: Boolean,
+        account: Account,
+        communityId: CommunityId,
+    ): Result<PostView> {
+        val form = CreatePost(
+            name = name,
+            community_id = communityId,
+            url = url,
+            body = body,
+            nsfw = isNsfw,
+            auth = account.jwt
+        )
+
+        return retrofitErrorHandler {
+            api.createPost(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.post_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun editPost(
+        postId: PostId,
+        name: String,
+        body: String?,
+        url: String?,
+        isNsfw: Boolean,
+        account: Account,
+    ): Result<PostView> {
+        val form = EditPost(
+            post_id = postId,
+            name = name,
+            url = url,
+            body = body,
+            nsfw = isNsfw,
+            auth = account.jwt
+        )
+
+        return retrofitErrorHandler {
+            api.editPost(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.post_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun deletePost(auth: String, id: PostId): Result<PostView> {
+        val form = DeletePost(
+            post_id = id,
+            deleted = true,
+            auth = auth,
+        )
+
+        return retrofitErrorHandler {
+            api.deletePost(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.post_view)
             },
             onFailure = {
                 Result.failure(it)
