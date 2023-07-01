@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
@@ -47,8 +46,20 @@
                     android:inputType="textUri"
                     android:hint="@string/url_optional"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/upload_image"
                     app:layout_constraintTop_toTopOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/upload_image"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:src="@drawable/baseline_image_24"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:tint="?colorControlNormal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/url"
+                    app:layout_constraintBottom_toBottomOf="@+id/url"/>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider1"

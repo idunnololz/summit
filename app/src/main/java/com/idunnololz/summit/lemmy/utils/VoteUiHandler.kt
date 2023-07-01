@@ -28,8 +28,8 @@ interface VoteUiHandler {
         currentScore: Int,
         instance: String,
         ref: VotableRef,
-        upVoteView: View,
-        downVoteView: View,
+        upVoteView: View?,
+        downVoteView: View?,
         scoreView: TextView,
         registration: AccountActionsManager.Registration,
     )
@@ -64,8 +64,8 @@ fun VoteUiHandler.bind(
     lifecycleOwner: LifecycleOwner,
     instance: String,
     postView: PostView,
-    upVoteView: ImageView,
-    downVoteView: ImageView,
+    upVoteView: ImageView?,
+    downVoteView: ImageView?,
     scoreView: TextView,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
@@ -90,27 +90,27 @@ fun VoteUiHandler.bind(
     currentVote: Int,
     currentScore: Int,
     ref: VotableRef,
-    upVoteView: ImageView,
-    downVoteView: ImageView,
+    upVoteView: ImageView?,
+    downVoteView: ImageView?,
     scoreView: TextView,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
-    val context = upVoteView.context
+    val context = scoreView.context
     fun update(score: Int) {
         if (score < 0) {
-            upVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
-            downVoteView.setColorFilter(ContextCompat.getColor(context, R.color.downvoteColor))
+            upVoteView?.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+            downVoteView?.setColorFilter(ContextCompat.getColor(context, R.color.downvoteColor))
         } else if (score > 0) {
-            upVoteView.setColorFilter(ContextCompat.getColor(context, R.color.upvoteColor))
-            downVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+            upVoteView?.setColorFilter(ContextCompat.getColor(context, R.color.upvoteColor))
+            downVoteView?.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
         } else {
-            upVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
-            downVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+            upVoteView?.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+            downVoteView?.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
         }
 
-        upVoteView.invalidate()
-        downVoteView.invalidate()
+        upVoteView?.invalidate()
+        downVoteView?.invalidate()
     }
     bindVoteUi(
         lifecycleOwner,

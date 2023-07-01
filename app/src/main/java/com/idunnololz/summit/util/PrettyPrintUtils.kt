@@ -6,17 +6,28 @@ import android.text.format.DateUtils
 import org.threeten.bp.Instant
 import java.util.Locale
 
-fun dateStringToPretty(dateStr: String, includeAgo: Boolean = false): CharSequence? {
-    return DateUtils.getRelativeTimeSpanString(
-        Instant.parse(dateStr + "Z").toEpochMilli(),
-        System.currentTimeMillis(),
-        DateUtils.SECOND_IN_MILLIS,
-        DateUtils.FORMAT_ABBREV_RELATIVE
-    )
-}
+fun dateStringToPretty(dateStr: String, includeAgo: Boolean = false): CharSequence? =
+    try {
+        DateUtils.getRelativeTimeSpanString(
+            Instant.parse(if (dateStr.endsWith("Z")) {
+                dateStr
+            } else {
+                dateStr + "Z"
+            }).toEpochMilli(),
+            System.currentTimeMillis(),
+            DateUtils.SECOND_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+    } catch (e: Exception) {
+        null
+    }
 
 fun dateStringToTs(dateString: String): Long =
-    Instant.parse(dateString + "Z").toEpochMilli()
+    Instant.parse(if (dateString.endsWith("Z")) {
+        dateString
+    } else {
+        dateString + "Z"
+    }).toEpochMilli()
 
 fun abbrevNumber(number: Long): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

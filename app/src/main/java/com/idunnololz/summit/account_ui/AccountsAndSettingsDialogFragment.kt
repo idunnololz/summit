@@ -82,6 +82,10 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
 
+            settings.setOnClickListener {
+                requireMainActivity().openSettings()
+            }
+
             viewModel.accounts.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {}

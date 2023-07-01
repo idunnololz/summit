@@ -38,16 +38,15 @@ import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
-import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.offline.OfflineFragment
 import com.idunnololz.summit.preview.ImageViewerFragment
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedFragment
-import com.idunnololz.summit.settings.AccountSettingsFragment
+import com.idunnololz.summit.settings.OldSettingsFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
@@ -55,6 +54,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
+import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
 import kotlin.math.max
@@ -668,7 +668,7 @@ class MainActivity : BaseActivity() {
             communitySelectorController.setCommunities(it)
         }
 
-        communitySelectorController.show(lastInsets)
+        communitySelectorController.show(this, lastInsets)
 
         return communitySelectorController
     }
@@ -750,6 +750,19 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    fun insetViewExceptTopAutomaticallyByPaddingAndNavUi(lifecycleOwner: LifecycleOwner, rootView: View) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = lastInsets
+
+            rootView.setPadding(
+                insets.leftInset,
+                0,
+                insets.rightInset,
+                insets.bottomInset + getBottomNavHeight() + getCustomAppBarHeight(),
+            )
+        }
+    }
+
 
     fun insetViewAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
@@ -820,14 +833,7 @@ class MainActivity : BaseActivity() {
                 showNotificationBarBg()
                 disableCustomAppBar()
             }
-            SettingsFragment::class -> {
-                hideActionBar()
-                disableBottomNavViewScrolling()
-                showBottomNav()
-                disableCustomAppBar()
-                showNotificationBarBg()
-            }
-            AccountSettingsFragment::class -> {
+            OldSettingsFragment::class -> {
                 hideActionBar()
                 disableBottomNavViewScrolling()
                 showBottomNav()
@@ -847,6 +853,13 @@ class MainActivity : BaseActivity() {
                 showBottomNav()
                 disableCustomAppBar()
                 showNotificationBarBg()
+            }
+            SettingsFragment::class -> {
+                hideActionBar()
+                disableBottomNavViewScrolling()
+                hideBottomNav()
+                disableCustomAppBar()
+                hideNotificationBarBg()
             }
             else -> throw RuntimeException("No setup instructions for type: ${T::class.java.canonicalName}")
         }
@@ -874,7 +887,7 @@ class MainActivity : BaseActivity() {
     fun showBottomMenu(bottomMenu: BottomMenu) {
         currentBottomMenu?.close()
         bottomMenu.setInsets(lastInsets.topInset, lastInsets.bottomInset)
-        bottomMenu.show(binding.bottomSheetContainer)
+        bottomMenu.show(this, binding.bottomSheetContainer)
         currentBottomMenu = bottomMenu
     }
 
@@ -884,6 +897,20 @@ class MainActivity : BaseActivity() {
         mimeType: String?,
     ) {
         val direction = MainDirections.actionGlobalImageViewerFragment(title, url, mimeType)
+        currentNavController?.navigateSafe(direction)
+    }
+
+    fun openVideo(
+        url: String,
+        videoType: VideoType,
+        videoState: VideoState?,
+    ) {
+        val direction = MainDirections.actionGlobalVideoViewerFragment(url, videoType, videoState)
+        currentNavController?.navigateSafe(direction)
+    }
+
+    fun openSettings() {
+        val direction = MainDirections.actionGlobalSettingsFragment()
         currentNavController?.navigateSafe(direction)
     }
 }

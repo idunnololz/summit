@@ -115,6 +115,10 @@ class StatefulLiveData<T> {
         data.postValue(StatefulData.Error(error))
     }
 
+    fun clear() {
+        data.value = StatefulData.NotStarted()
+    }
+
     @MainThread
     fun observe(owner: LifecycleOwner, observer: Observer<StatefulData<T>>) {
         data.observe(owner, observer)

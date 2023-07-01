@@ -47,7 +47,7 @@ object Utils {
 
     const val ANIMATION_DURATION_MS: Long = 300
 
-    private val displayMetrics = Resources.getSystem().displayMetrics
+    val displayMetrics = Resources.getSystem().displayMetrics
 
     val gson: Gson by lazy {
         GsonBuilder()
@@ -74,10 +74,6 @@ object Utils {
      */
     fun convertPixelsToDp(px: Float): Float {
         return px / (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
-    }
-
-    fun convertSpToPixel(sp: Float): Float {
-        return sp * displayMetrics.scaledDensity
     }
 
     fun lightenColor(color: Int, amount: Float): Int {
@@ -897,4 +893,8 @@ object Utils {
  */
 fun assertMainThread() {
     require(Looper.myLooper() == Looper.getMainLooper()) { "You must call this method on the main thread" }
+}
+
+fun convertSpToPixel(sp: Float): Float {
+    return sp * Utils.displayMetrics.scaledDensity
 }

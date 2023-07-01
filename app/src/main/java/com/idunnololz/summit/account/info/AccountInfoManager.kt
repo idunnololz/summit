@@ -35,7 +35,8 @@ class AccountInfoManager @Inject constructor(
 
                 override suspend fun onAccountChanged(newAccount: Account?) {
                     currentAccountInfo = null
-                    updateAccountInfo(newAccount)
+                    subscribedCommunities.emit(listOf())
+                    accountInfoUpdateState.emit(StatefulData.NotStarted())
                 }
             }
         )

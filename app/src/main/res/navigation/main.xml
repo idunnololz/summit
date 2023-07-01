@@ -56,5 +56,44 @@
             android:name="mimeType"
             app:argType="string"
             app:nullable="true" />
-    </fragment><action android:id="@+id/action_global_imageViewerFragment" app:destination="@id/imageViewerFragment"/>
+    </fragment>
+    <action android:id="@+id/action_global_imageViewerFragment" app:destination="@id/imageViewerFragment"/>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.idunnololz.summit.settings.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_settingViewTypeFragment"
+            app:destination="@id/settingViewTypeFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+    </fragment>
+    <action android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settingsFragment"
+        app:enterAnim="@anim/slide_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out"  />
+    <fragment
+        android:id="@+id/videoViewerFragment"
+        android:name="com.idunnololz.summit.preview.VideoViewerFragment"
+        android:label="VideoViewerFragment">
+        <argument
+            android:name="url"
+            app:argType="string" />
+        <argument
+            android:name="videoType"
+            app:argType=".preview.VideoType" />
+        <argument
+            android:name="videoState"
+            android:defaultValue="@null"
+            app:nullable="true"
+            app:argType="com.idunnololz.summit.video.VideoState"/>
+    </fragment><action android:id="@+id/action_global_videoViewerFragment" app:destination="@id/videoViewerFragment"/>
+    <fragment
+        android:id="@+id/settingViewTypeFragment"
+        android:name="com.idunnololz.summit.settings.SettingViewTypeFragment"
+        android:label="SettingViewTypeFragment" />
 </navigation>

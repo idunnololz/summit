@@ -64,10 +64,13 @@ class AccountImageGenerator @Inject constructor(
 
             if (accountFirstCharacter != null) {
                 val inRect = Rect()
-                textPaint.getTextBounds(accountFirstCharacter.toString(), 0, 1, inRect)
+                val textToDraw = accountFirstCharacter.toString()
+
+                textPaint.getTextBounds(textToDraw, 0, textToDraw.length, inRect)
+                val width = textPaint.measureText(textToDraw)
                 drawText(
-                    accountFirstCharacter.toString(),
-                    (bitmap.width - inRect.width()) / 2f,
+                    textToDraw,
+                    (bitmap.width - width) / 2f,
                     (bitmap.height + inRect.height()) / 2f,
                     textPaint
                 )

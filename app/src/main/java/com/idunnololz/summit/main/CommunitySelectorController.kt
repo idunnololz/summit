@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitySelectorCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
@@ -33,6 +34,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -78,7 +80,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
     var onCommunitySelectedListener: CommunitySelectedListener? = null
 
-    private val onBackPressedHandler = object : OnBackPressedCallback(false) {
+    private val onBackPressedHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             onBackPressed()
         }
@@ -138,12 +140,10 @@ class CommunitySelectorController @AssistedInject constructor(
                 if (currentId == R.id.collapsed) {
                     rootView.visibility = View.GONE
 
-                    onBackPressedHandler.isEnabled = false
+                    onBackPressedHandler.remove()
                 }
             }
         })
-
-        activity.onBackPressedDispatcher.addCallback(onBackPressedHandler)
     }
 
     private fun doQueryAsync(query: CharSequence?) {
@@ -163,7 +163,7 @@ class CommunitySelectorController @AssistedInject constructor(
         }
     }
 
-    fun show(insets: MainActivityInsets) {
+    fun show(activity: MainActivity, insets: MainActivityInsets) {
         rootView?.visibility = View.VISIBLE
         motionLayout.transitionToState(R.id.expanded)
 
@@ -178,7 +178,7 @@ class CommunitySelectorController @AssistedInject constructor(
             }
         }
 
-        onBackPressedHandler.isEnabled = true
+        activity.onBackPressedDispatcher.addCallback(onBackPressedHandler)
     }
 
     fun onBackPressed() {
@@ -294,8 +294,11 @@ class CommunitySelectorController @AssistedInject constructor(
                 }
 
                 b.title.text = item.text
+                val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
+
                 @Suppress("SetTextI18n")
-                b.monthlyActives.text = "(${context.getString(R.string.mau_format, nf.format(item.monthlyActiveUsers))})"
+                b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
+                        "(${item.community.community.instance})"
 
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(

@@ -71,22 +71,22 @@ class AccountActionsManager @Inject constructor(
             currentScore: Int,
             instance: String,
             ref: VotableRef,
-            upVoteView: View,
-            downVoteView: View,
+            upVoteView: View?,
+            downVoteView: View?,
             scoreView: TextView,
             registration: Registration,
         ) {
             votesManager.setVoteIfNoneSet(ref, currentVote)
             votesManager.setScoreIfNoneSet(ref, currentScore)
 
-            val existingRegId = upVoteView.getTag(R.id.account_actions_manager_reg_id)
+            val existingRegId = scoreView.getTag(R.id.account_actions_manager_reg_id)
             if (existingRegId != null) {
                 unregisterVoteHandler(existingRegId as Long)
             }
 
             val account = accountManager.currentAccount.value
 
-            upVoteView.setOnClickListener {
+            upVoteView?.setOnClickListener {
                 val curVote = votesManager.getVote(ref) ?: 0
                 val curScore = votesManager.getScore(ref) ?: 0
                 val newScore = if (curVote == 1) {
@@ -100,7 +100,7 @@ class AccountActionsManager @Inject constructor(
                         registration.voteFailed(curVote, curScore, it)
                     }
             }
-            downVoteView.setOnClickListener {
+            downVoteView?.setOnClickListener {
                 val curVote = votesManager.getVote(ref) ?: 0
                 val curScore = votesManager.getScore(ref) ?: 0
                 val newScore = if (curVote == -1) {
@@ -116,7 +116,7 @@ class AccountActionsManager @Inject constructor(
             }
 
             val regId = nextId
-            upVoteView.setTag(R.id.account_actions_manager_reg_id, regId)
+            scoreView.setTag(R.id.account_actions_manager_reg_id, regId)
             nextId++
 
             registerVoteHandler(regId, ref, registration)
@@ -137,15 +137,15 @@ class AccountActionsManager @Inject constructor(
 
                     lifecycleOwner.lifecycle.removeObserver(this)
 
-                    unbindVoteUi(upVoteView)
-                    upVoteView.setOnClickListener(null)
-                    downVoteView.setOnClickListener(null)
+                    unbindVoteUi(scoreView)
+                    upVoteView?.setOnClickListener(null)
+                    downVoteView?.setOnClickListener(null)
                 }
             })
         }
 
-        override fun unbindVoteUi(upVoteView: View) {
-            val existingRegId = upVoteView.getTag(R.id.account_actions_manager_reg_id)
+        override fun unbindVoteUi(scoreView: View) {
+            val existingRegId = scoreView.getTag(R.id.account_actions_manager_reg_id)
             if (existingRegId != null) {
                 unregisterVoteHandler(existingRegId as Long)
             }

@@ -28,5 +28,5 @@
 
     <dimen name="bottom_menu_width">-1px</dimen>
 
-    <dimen name="footer_height">128dp</dimen>
+    <dimen name="footer_height">16dp</dimen>
 </resources>

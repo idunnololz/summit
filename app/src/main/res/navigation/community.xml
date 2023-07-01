@@ -90,34 +90,11 @@
         <action
             android:id="@+id/action_postFragment_to_login"
             app:destination="@id/login" />
-        <action
-            android:id="@+id/action_postFragment_to_addOrEditCommentFragment"
-            app:destination="@id/addOrEditCommentFragment"
-            app:enterAnim="@anim/slide_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <dialog
         android:id="@+id/goToDialogFragment"
         android:name="com.idunnololz.summit.go_to.GoToDialogFragment"
         android:label="GoToDialogFragment" />
-    <fragment
-        android:id="@+id/videoViewerFragment"
-        android:name="com.idunnololz.summit.preview.VideoViewerFragment"
-        android:label="VideoViewerFragment">
-        <argument
-            android:name="url"
-            app:argType="string" />
-        <argument
-            android:name="videoType"
-            app:argType=".preview.VideoType" />
-        <argument
-            android:name="videoState"
-            android:defaultValue="@null"
-            app:nullable="true"
-            app:argType="com.idunnololz.summit.video.VideoState"/>
-    </fragment>
     <dialog
         android:id="@+id/commentRawDialogFragment"
         android:name="com.idunnololz.summit.comment.CommentRawDialogFragment"

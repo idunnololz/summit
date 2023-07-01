@@ -1,31 +1,42 @@
 package com.idunnololz.summit.lemmy.utils
 
+import android.net.Uri
+import android.view.View
 import android.widget.EditText
 import android.widget.PopupMenu
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentDirections
 import com.idunnololz.summit.util.ext.navigateSafe
 
-object TextFormatterHelper {
+class TextFormatterHelper {
 
-    private val TEXT_EMOJIS = listOf(
-        "( ͡° ͜ʖ ͡° )",
-        "ಠ_ಠ",
-        "(╯°□°）╯︵ ┻━┻",
-        "┬─┬ノ( º _ ºノ)",
-        "¯\\_(ツ)_/¯",
-        "༼ つ ◕_◕ ༽つ",
-        "ᕕ( ᐛ )ᕗ",
-        "(•_•) ( •_•)>⌐■-■ (⌐■_■)"
-    )
+    companion object {
+        private val TEXT_EMOJIS = listOf(
+            "( ͡° ͜ʖ ͡° )",
+            "ಠ_ಠ",
+            "(╯°□°）╯︵ ┻━┻",
+            "┬─┬ノ( º _ ºノ)",
+            "¯\\_(ツ)_/¯",
+            "༼ つ ◕_◕ ༽つ",
+            "ᕕ( ᐛ )ᕗ",
+            "(•_•) ( •_•)>⌐■-■ (⌐■_■)"
+        )
+    }
+
+    private var editText: EditText? = null
 
     fun setupTextFormatterToolbar(
         textFormatToolbarBinding: TextFormatToolbarBinding,
         editText: EditText,
+        imagePickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>? = null,
         onPreviewClick: () -> Unit,
     ) {
+        this.editText = editText
         with(textFormatToolbarBinding) {
             preview.setOnClickListener {
                 onPreviewClick()
@@ -91,6 +102,15 @@ object TextFormatterHelper {
                 )
             }
 
+            if (imagePickerLauncher != null) {
+                image.visibility = View.VISIBLE
+                image.setOnClickListener {
+                    imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }
+            } else {
+                image.visibility = View.GONE
+            }
+
             linkApp.setOnClickListener {
                 editText.replaceTextAtCursor(
                     "Play store link: [Summit - Lemmy Reader](https://play.google.com/store/apps/details?id=com.idunnololz.summit)"
@@ -134,5 +154,9 @@ object TextFormatterHelper {
         }
 
         editText.setSelection(finalCursorPos)
+    }
+
+    fun onImageUploaded(url: String) {
+        editText?.replaceTextAtCursor("![]($url)")
     }
 }

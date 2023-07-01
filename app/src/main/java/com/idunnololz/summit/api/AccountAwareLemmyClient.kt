@@ -6,9 +6,11 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SearchResponse
@@ -17,12 +19,13 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.retry
 import kotlinx.coroutines.launch
+import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AccountAwareLemmyClient @Inject constructor(
-    private val apiClient: LemmyApiClient,
+    val apiClient: LemmyApiClient,
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
@@ -154,14 +157,48 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun deletePost(
         id: PostId,
-        auth: String? = currentAccount?.jwt,
+        account: Account? = currentAccount,
     ): Result<PostView> {
-        return if (auth == null) {
+        return if (account == null) {
             Result.failure(NotAuthenticatedException())
         } else {
-            apiClient.deletePost(auth, id)
+            apiClient.deletePost(account, id)
         }
     }
+
+    suspend fun uploadImage(
+        fileName: String,
+        imageIs: InputStream,
+        account: Account? = currentAccount,
+    ): Result<UploadImageResult> =
+        if (account == null) {
+            Result.failure(NotAuthenticatedException())
+        } else {
+            apiClient.uploadImage(account, fileName, imageIs)
+        }
+
+    suspend fun blockCommunity(
+        communityId: CommunityId,
+        block: Boolean,
+        account: Account? = currentAccount,
+    ) =
+        if (account == null) {
+            Result.failure(NotAuthenticatedException())
+        } else {
+            apiClient.blockCommunity(communityId, block, account)
+        }
+
+    suspend fun blockPerson(
+        personId: PersonId,
+        block: Boolean,
+        account: Account? = currentAccount,
+    ) =
+        if (account == null) {
+            Result.failure(NotAuthenticatedException())
+        } else {
+            apiClient.blockPerson(personId, block, account)
+        }
+
 
     fun changeInstance(site: String) =
         apiClient.changeInstance(site)
