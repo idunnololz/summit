@@ -63,11 +63,13 @@ import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.getFormattedAuthor
@@ -75,9 +77,11 @@ import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.lemmy.post.PostFragment.Item.*
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
+import com.idunnololz.summit.lemmy.post_view.PostViewBuilder
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.main.MainFragment
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.addDefaultAnim
@@ -126,6 +130,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     lateinit var accountManager: AccountManager
 
     private var mainListingItemSeen = false
+
+    private var actionsViewModel: MoreActionsViewModel? = null
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -201,12 +207,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     return@PostsAdapter
                 }
 
-                val directions =
-                    PostFragmentDirections
-                        .actionPostFragmentToAddOrEditCommentFragment(
-                            args.instance, null, null, it)
-
-                findNavController().navigateSafe(directions)
+                AddOrEditCommentFragment().apply {
+                    arguments =
+                        AddOrEditCommentFragmentArgs(
+                            args.instance,null, null, it).toBundle()
+                }.show(childFragmentManager, "asdf")
 
             },
             onDeleteCommentClick = {
@@ -223,6 +228,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             },
             onImageClick = { url ->
                 getMainActivity()?.openImage(null, url, null)
+            },
+            onVideoClick = { url, videoType, state ->
+                getMainActivity()?.openVideo(url, videoType, state)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -267,6 +275,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         goBack()
                     }
                 })
+            actionsViewModel = (parentFragment as? CommunityFragment)?.actionsViewModel
+        } else {
+            // do things if this is a single page
         }
     }
 
@@ -298,12 +309,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 setup()
                 return false
             }
-
         })
-
-//        view.doOnPreDraw {
-//        }
-
     }
 
     private fun setup() {
@@ -558,6 +564,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
             }
 
+            if (actionsViewModel != null) {
+                addItemWithIcon(
+                    R.id.block_community,
+                    getString(R.string.block_this_community_format, postView.community.name),
+                    R.drawable.baseline_block_24
+                )
+                addItemWithIcon(
+                    R.id.block_user,
+                    getString(R.string.block_this_user, postView.creator.name),
+                    R.drawable.baseline_person_off_24
+                )
+            }
+
             if (this.itemsCount() == 0) {
                 addItem(io.noties.markwon.R.id.none, R.string.no_options)
             }
@@ -579,6 +598,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     }
                     R.id.delete -> {
                         viewModel.deletePost(postView.post)
+                    }
+                    R.id.block_community -> {
+                        actionsViewModel?.blockCommunity(postView.community.id)
+                    }
+                    R.id.block_user -> {
+                        actionsViewModel?.blockPerson(postView.creator.id)
                     }
                 }
             }
@@ -670,6 +695,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         private val onEditCommentClick: (CommentView) -> Unit,
         private val onDeleteCommentClick: (CommentView) -> Unit,
         private val onImageClick: (String) -> Unit,
+        private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onPostMoreClick: (PostView) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -680,7 +706,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         private val lemmyHeaderHelper = LemmyHeaderHelper(context)
         private val lemmyContentHelper = LemmyContentHelper(
-            context, this@PostFragment, offlineManager, ExoPlayerManager.get(this@PostFragment)
+            context, offlineManager, ExoPlayerManager.get(this@PostFragment)
         )
         private val threadLinesHelper = ThreadLinesHelper(context)
 
@@ -822,6 +848,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             onImageClickListener = { url ->
                                 onImageClick(url)
                             },
+                            onVideoClickListener = onVideoClick,
                             onRevealContentClickedFn = {
                                 revealedItems.add(postKey)
                                 notifyItemChanged(holder.absoluteAdapterPosition)
@@ -899,6 +926,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             onImageClick(url)
                         },
                         onImageClickListener = onImageClick,
+                        onVideoClickListener = onVideoClick,
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
                             notifyItemChanged(holder.absoluteAdapterPosition)

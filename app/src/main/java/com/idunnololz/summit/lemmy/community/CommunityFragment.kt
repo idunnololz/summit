@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,16 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
-import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -26,9 +22,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import com.commit451.coiltransformations.BlurTransformation
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
@@ -36,47 +29,40 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.utils.PostType
-import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
+import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
-import com.idunnololz.summit.databinding.ListingItemList2Binding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.MainFooterItemBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
-import com.idunnololz.summit.lemmy.LemmyContentHelper
-import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.CommunityViewState
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.getKey
-import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.post.PostFragment
-import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.lemmy.utils.VoteUiHandler
-import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.post_view.ListingItemViewHolder
+import com.idunnololz.summit.lemmy.post_view.PostViewBuilder
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.reddit.LemmyUtils
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.SharedElementTransition
-import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.VerticalSpaceItemDecoration
 import com.idunnololz.summit.util.ext.forceShowIcons
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -84,9 +70,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
-import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
-import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -101,6 +85,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     private val args: CommunityFragmentArgs by navArgs()
 
     private val viewModel: CommunityViewModel by viewModels()
+    val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var adapter: ListingItemAdapter? = null
 
@@ -114,6 +99,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
+    @Inject
+    lateinit var postViewBuilder: PostViewBuilder
 
     private var viewPagerController: ViewPagerController? = null
 
@@ -196,19 +184,19 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     private val _layoutSelectorMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
             addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_list_24)
-            addItemWithIcon(R.id.layout_list2, R.string.list2, R.drawable.baseline_list_24)
-//            addItem(R.id.layoutCard, R.string.card, R.drawable.baseline_article_24)
+            addItemWithIcon(R.id.layout_compact, R.string.compact, R.drawable.baseline_list_24)
+            addItemWithIcon(R.id.layout_card, R.string.card, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
             setTitle(R.string.layout)
 
             setOnMenuItemClickListener { menuItem ->
                 when(menuItem.id) {
+                    R.id.layout_compact ->
+                        preferences.setPostsLayout(CommunityLayout.Compact)
                     R.id.layout_list ->
                         preferences.setPostsLayout(CommunityLayout.List)
-                    R.id.layout_list2 ->
-                        preferences.setPostsLayout(CommunityLayout.List2)
-//                    R.id.layoutCard ->
-//                        preferences.setPostsLayout(CommunityLayout.CARD)
+                    R.id.layout_card ->
+                        preferences.setPostsLayout(CommunityLayout.Card)
                     R.id.layout_full ->
                         preferences.setPostsLayout(CommunityLayout.Full)
                 }
@@ -232,10 +220,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         val context = requireContext()
         if (adapter == null) {
             adapter = ListingItemAdapter(
+                postViewBuilder = postViewBuilder,
                 context = context,
-                offlineManager = offlineManager,
-                instance = viewModel.instance,
-                voteUiHandler = viewModel.voteUiHandler,
                 onNextClick = {
                     viewModel.fetchNextPage(clearPagePosition = true)
                 },
@@ -260,6 +246,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 onImageClick = { url ->
                     getMainActivity()?.openImage(null, url, null)
                 },
+                onVideoClick = { url, videoType, state ->
+                    getMainActivity()?.openVideo(url, videoType, state)
+                },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
@@ -278,6 +267,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         currentCommunity = currentCommunity,
                         videoState = videoState,
                     )
+                },
+                onShowMoreActions = {
+                    showMoreOptionsFor(it)
                 }
             )
             onSelectedLayoutChanged()
@@ -391,6 +383,25 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
     }
 
+    fun closePost(postFragment: PostFragment) {
+        viewPagerController?.closePost(postFragment)
+    }
+
+    fun isPristineFirstPage(): Boolean {
+        if (!isBindingAvailable()) {
+            return false
+        }
+
+        val position = (binding.recyclerView.layoutManager as? LinearLayoutManager)
+            ?.findFirstCompletelyVisibleItemPosition()
+
+        return position == 0 && viewModel.currentPageIndex.value == 0
+    }
+
+    fun onPostUpdated() {
+        viewModel.fetchCurrentPage(force = true)
+    }
+
     private fun onReady() {
         val view = binding.root
         checkNotNull(view.findNavController())
@@ -414,7 +425,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
         }
 
-        mainActivity.insetViewExceptTopAutomaticallyByPadding(
+        mainActivity.insetViewExceptTopAutomaticallyByPaddingAndNavUi(
             viewLifecycleOwner, binding.recyclerView)
 
         val context = requireContext()
@@ -435,21 +446,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.addItemDecoration(
-            CustomDividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL
-            ).apply {
-                setDrawable(
-                    checkNotNull(
-                        ContextCompat.getDrawable(
-                            context,
-                            R.drawable.vertical_divider
-                        )
-                    )
-                )
-            }
-        )
+
+        updateDecorator(binding.recyclerView)
+
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -523,6 +522,19 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
         }
 
+        actionsViewModel.blockCommunityResult.observe(viewLifecycleOwner) {
+            if (it is StatefulData.Success) {
+                actionsViewModel.blockCommunityResult.setIdle()
+                viewModel.onBlockSettingsChanged()
+            }
+        }
+        actionsViewModel.blockPersonResult.observe(viewLifecycleOwner) {
+            if (it is StatefulData.Success) {
+                actionsViewModel.blockPersonResult.setIdle()
+                viewModel.onBlockSettingsChanged()
+            }
+        }
+
         if (adapter?.getItems().isNullOrEmpty()) {
             viewModel.fetchCurrentPage()
         }
@@ -551,6 +563,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
                 onBackPressedHandler.isEnabled = currentPageIndex != 0
             }
+
+            onSelectedLayoutChanged()
         }
     }
 
@@ -634,12 +648,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         return _sortByTopMenu
     }
     private fun getLayoutMenu(): BottomMenu {
-        val postsLayout = preferences.getPostsLayout()
-        when (postsLayout) {
+        when (preferences.getPostsLayout()) {
+            CommunityLayout.Compact ->
+                _layoutSelectorMenu.setChecked(R.id.layout_compact)
             CommunityLayout.List ->
                 _layoutSelectorMenu.setChecked(R.id.layout_list)
-            CommunityLayout.List2 ->
-                _layoutSelectorMenu.setChecked(R.id.layout_list2)
             CommunityLayout.Card ->
                 _layoutSelectorMenu.setChecked(R.id.layout_card)
             CommunityLayout.Full ->
@@ -737,6 +750,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         true
                     }
 
+                    R.id.community_info -> {
+                        (parentFragment?.parentFragment as? MainFragment)?.expandEndPane()
+                        true
+                    }
+
                     R.id.toggle_bookmark -> {
                         if (isBookmarked) {
                             userCommunitiesManager.removeCommunity(currentCommunityRef)
@@ -772,26 +790,90 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     }
 
     private fun onSelectedLayoutChanged() {
-        adapter?.setLayout(preferences.getPostsLayout())
-    }
+        val newPostUiConfig = preferences.getPostUiConfig()
+        val didUiConfigChange = postViewBuilder.postUiConfig != newPostUiConfig
+        val didLayoutChange = adapter?.layout != preferences.getPostsLayout()
 
-    fun closePost(postFragment: PostFragment) {
-        viewPagerController?.closePost(postFragment)
-    }
-
-    fun isPristineFirstPage(): Boolean {
-        if (!isBindingAvailable()) {
-            return false
+        if (didLayoutChange) {
+            if (isBindingAvailable()) {
+                updateDecorator(binding.recyclerView)
+            }
         }
 
-        val position = (binding.recyclerView.layoutManager as? LinearLayoutManager)
-            ?.findFirstCompletelyVisibleItemPosition()
+        if (didUiConfigChange) {
+            postViewBuilder.postUiConfig = newPostUiConfig
+        }
 
-        return position == 0 && viewModel.currentPageIndex.value == 0
+        if (didLayoutChange || didUiConfigChange) {
+            adapter?.layout = preferences.getPostsLayout()
+        }
     }
 
-    fun onPostUpdated() {
-        viewModel.fetchCurrentPage(force = true)
+    private fun updateDecorator(recyclerView: RecyclerView) {
+        while (binding.recyclerView.itemDecorationCount != 0) {
+            binding.recyclerView.removeItemDecorationAt(
+                binding.recyclerView.itemDecorationCount - 1)
+        }
+        if (preferences.getPostsLayout().usesDividers()) {
+            binding.recyclerView.addItemDecoration(
+                CustomDividerItemDecoration(
+                    recyclerView.context,
+                    DividerItemDecoration.VERTICAL
+                ).apply {
+                    setDrawable(
+                        checkNotNull(
+                            ContextCompat.getDrawable(
+                                context,
+                                R.drawable.vertical_divider
+                            )
+                        )
+                    )
+                }
+            )
+        } else {
+            binding.recyclerView.addItemDecoration(
+                VerticalSpaceItemDecoration(
+                    recyclerView.context.getDimen(R.dimen.padding_half),
+                    false
+                )
+            )
+        }
+    }
+
+    @SuppressLint("ResourceType")
+    private fun showMoreOptionsFor(postView: PostView) {
+        if (!isBindingAvailable()) {
+            return
+        }
+
+        val context = requireContext()
+
+        val bottomMenu = BottomMenu(context).apply {
+            setTitle(R.string.more_actions)
+            addItemWithIcon(
+                R.id.block_community,
+                getString(R.string.block_this_community_format, postView.community.name),
+                R.drawable.baseline_block_24
+            )
+            addItemWithIcon(
+                R.id.block_user,
+                getString(R.string.block_this_user, postView.creator.name),
+                R.drawable.baseline_person_off_24
+            )
+
+            setOnMenuItemClickListener {
+                when (it.id) {
+                    R.id.block_community -> {
+                        actionsViewModel.blockCommunity(postView.community.id)
+                    }
+                    R.id.block_user -> {
+                        actionsViewModel.blockPerson(postView.creator.id)
+                    }
+                }
+            }
+        }
+
+        getMainActivity()?.showBottomMenu(bottomMenu)
     }
 
     private sealed class Item {
@@ -803,104 +885,15 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         class FooterItem(val hasMore: Boolean) : Item()
     }
 
-    private class ListingItemViewHolder(
-        val root: View,
-        val headerContainer: LemmyHeaderView,
-        val image: ImageView?,
-        val title: TextView,
-        val commentButton: MaterialButton,
-        val upvoteCount: TextView,
-        val upvoteButton: ImageView,
-        val downvoteButton: ImageView,
-        val linkTypeImage: ImageView?,
-        val iconImage: ImageView?,
-        val fullContentContainerView: ViewGroup,
-        val highlightBg: View,
-        val layoutShowsFullContent: Boolean,
-    ) : RecyclerView.ViewHolder(root) {
-
-        companion object {
-            fun fromBinding(binding: ListingItemListBinding) =
-                ListingItemViewHolder(
-                    binding.root,
-                    binding.headerContainer,
-                    binding.image,
-                    binding.title,
-                    binding.commentButton,
-                    binding.upvoteCount,
-                    binding.upvoteButton,
-                    binding.downvoteButton,
-                    binding.linkTypeImage,
-                    binding.iconImage,
-                    binding.fullContent,
-                    binding.highlightBg,
-                    layoutShowsFullContent = false,
-                )
-
-            fun fromBinding(binding: ListingItemList2Binding) =
-                ListingItemViewHolder(
-                    binding.root,
-                    binding.headerContainer,
-                    binding.image,
-                    binding.title,
-                    binding.commentButton,
-                    binding.upvoteCount,
-                    binding.upvoteButton,
-                    binding.downvoteButton,
-                    binding.linkTypeImage,
-                    binding.iconImage,
-                    binding.fullContent,
-                    binding.highlightBg,
-                    layoutShowsFullContent = false,
-                )
-
-            fun fromBinding(binding: ListingItemCardBinding) =
-                ListingItemViewHolder(
-                    binding.root,
-                    binding.headerContainer,
-                    null,
-                    binding.title,
-                    binding.commentButton,
-                    binding.upvoteCount,
-                    binding.upvoteButton,
-                    binding.downvoteButton,
-                    null,
-                    null,
-                    binding.fullContent,
-                    binding.highlightBg,
-                    layoutShowsFullContent = true,
-                )
-
-            fun fromBinding(binding: ListingItemFullBinding) =
-                ListingItemViewHolder(
-                    binding.root,
-                    binding.headerContainer,
-                    null,
-                    binding.title,
-                    binding.commentButton,
-                    binding.upvoteCount,
-                    binding.upvoteButton,
-                    binding.downvoteButton,
-                    null,
-                    null,
-                    binding.fullContent,
-                    binding.highlightBg,
-                    layoutShowsFullContent = true,
-                )
-        }
-    }
-
-
     private inner class ListingItemAdapter(
+        private val postViewBuilder: PostViewBuilder,
         private val context: Context,
-        private val offlineManager: OfflineManager,
-        private val instance: String,
-        private val voteUiHandler: VoteUiHandler,
         private val onNextClick: () -> Unit,
         private val onPrevClick: () -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
         private val onImageClick: (String) -> Unit,
+        private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onItemClick: (
             instance: String,
@@ -911,6 +904,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             reveal: Boolean,
             videoState: VideoState?
         ) -> Unit,
+        private val onShowMoreActions: (PostView) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var pageIndex: Int? = null
@@ -920,25 +914,19 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         private var items: List<Item> = listOf()
 
         private var expandedItems = mutableSetOf<String>()
+        private var actionsExpandedItems = mutableSetOf<String>()
 
         /**
          * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
          */
         private var revealedItems = mutableSetOf<String>()
 
-        private val lemmyHeaderHelper = LemmyHeaderHelper(context)
-        private val lemmyContentHelper = LemmyContentHelper(
-            context,
-            this@CommunityFragment,
-            offlineManager,
-            ExoPlayerManager.get(this@CommunityFragment)
-        )
+        var layout: CommunityLayout = CommunityLayout.List
+            set(value) {
+                field = value
 
-        private val postImageWidth: Int = (Utils.getScreenWidth(context) * 0.2).toInt()
-
-        private val tempSize = Size()
-
-        private var layout: CommunityLayout = CommunityLayout.List
+                notifyDataSetChanged()
+            }
 
         var curDataSource: String? = null
 
@@ -949,8 +937,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
         override fun getItemViewType(position: Int): Int = when (items[position]) {
             is Item.PostItem -> when (layout) {
+                CommunityLayout.Compact -> R.layout.listing_item_compact
                 CommunityLayout.List -> R.layout.listing_item_list
-                CommunityLayout.List2 -> R.layout.listing_item_list2
                 CommunityLayout.Card -> R.layout.listing_item_card
                 CommunityLayout.Full -> R.layout.listing_item_full
             }
@@ -960,10 +948,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val v = inflater.inflate(viewType, parent, false)
             return when (viewType) {
+                R.layout.listing_item_compact ->
+                    ListingItemViewHolder.fromBinding(ListingItemCompactBinding.bind(v))
                 R.layout.listing_item_list ->
                     ListingItemViewHolder.fromBinding(ListingItemListBinding.bind(v))
-                R.layout.listing_item_list2 ->
-                    ListingItemViewHolder.fromBinding(ListingItemList2Binding.bind(v))
                 R.layout.listing_item_card ->
                     ListingItemViewHolder.fromBinding(ListingItemCardBinding.bind(v))
                 R.layout.listing_item_full ->
@@ -983,34 +971,42 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     if (payloads.isEmpty()) {
                         super.onBindViewHolder(holder, position, payloads)
                     } else {
-                        // this is an incremental update... Only update the stats, do not update content...
-                        val h = holder as ListingItemViewHolder
+                        val h: ListingItemViewHolder = holder as ListingItemViewHolder
+                        val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
+                        val isActionsExpanded = actionsExpandedItems
+                            .contains(item.postView.getUniqueKey())
+                        val isExpanded = expandedItems.contains(item.postView.getUniqueKey())
 
-                        lemmyHeaderHelper.populateHeaderSpan(
-                            headerContainer = h.headerContainer,
+                        postViewBuilder.bind(
+                            holder = h,
+                            container = binding.recyclerView,
                             postView = item.postView,
-                            instance = instance,
-                            onPageClick = {
-                                requireMainActivity().launchPage(it)
+                            instance = item.instance,
+                            isRevealed = isRevealed,
+                            contentMaxWidth = contentMaxWidth,
+                            viewLifecycleOwner = viewLifecycleOwner,
+                            isExpanded = isExpanded,
+                            isActionsExpanded = isActionsExpanded,
+                            updateContent = false,
+                            highlight = postToHighlight?.id == item.postView.post.id,
+                            highlightForever = postToHighlightForever?.id == item.postView.post.id,
+                            onRevealContentClickedFn = {
+                                revealedItems.add(item.postView.getUniqueKey())
+                                notifyItemChanged(h.absoluteAdapterPosition)
                             },
-                        )
-
-                        h.commentButton.text =
-                            LemmyUtils.abbrevNumber(item.postView.counts.comments.toLong())
-
-                        h.commentButton.isEnabled = !item.postView.post.locked
-
-                        voteUiHandler.bind(
-                            viewLifecycleOwner,
-                            item.instance,
-                            item.postView,
-                            h.upvoteButton,
-                            h.downvoteButton,
-                            h.upvoteCount,
+                            onImageClick = onImageClick,
+                            onVideoClick = onVideoClick,
+                            onPageClick = onPageClick,
+                            onItemClick = onItemClick,
+                            onShowMoreOptions = onShowMoreActions,
+                            toggleItem = this::toggleItem,
+                            toggleActions = this::toggleActions,
                             onSignInRequired = onSignInRequired,
                             onInstanceMismatch = onInstanceMismatch,
+                            onHighlightComplete = {
+                                postToHighlight = null
+                            },
                         )
-                        highlightPostIfNeeded(h, item)
                     }
                 }
                 else -> {
@@ -1043,246 +1039,69 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 is Item.PostItem -> {
                     val h: ListingItemViewHolder = holder as ListingItemViewHolder
                     val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
+                    val isActionsExpanded = actionsExpandedItems
+                        .contains(item.postView.getUniqueKey())
+                    val isExpanded = expandedItems.contains(item.postView.getUniqueKey())
 
-                    lemmyHeaderHelper.populateHeaderSpan(
-                        headerContainer = h.headerContainer,
+                    postViewBuilder.bind(
+                        holder = h,
+                        container = binding.recyclerView,
                         postView = item.postView,
-                        instance = instance,
+                        instance = item.instance,
+                        isRevealed = isRevealed,
+                        contentMaxWidth = contentMaxWidth,
+                        viewLifecycleOwner = viewLifecycleOwner,
+                        isExpanded = isExpanded,
+                        isActionsExpanded = isActionsExpanded,
+                        updateContent = true,
+                        highlight = postToHighlight?.id == item.postView.post.id,
+                        highlightForever = postToHighlightForever?.id == item.postView.post.id,
+                        onRevealContentClickedFn = {
+                            revealedItems.add(item.postView.getUniqueKey())
+                            notifyItemChanged(h.absoluteAdapterPosition)
+                        },
+                        onImageClick = onImageClick,
+                        onShowMoreOptions = onShowMoreActions,
+                        onVideoClick = onVideoClick,
                         onPageClick = onPageClick,
-                    )
-
-                    val thumbnailUrl = item.postView.post.thumbnail_url
-
-                    fun showDefaultImage() {
-                        h.image?.visibility = View.GONE
-                        h.iconImage?.visibility = View.VISIBLE
-                        h.iconImage?.setImageResource(R.drawable.ic_text_box_black_24dp)
-                    }
-
-                    fun loadAndShowImage() {
-                        if (activity == null) return
-
-                        h.image ?: return
-
-                        if (thumbnailUrl == "default") {
-                            showDefaultImage()
-                            return
-                        }
-
-                        if (thumbnailUrl.isNullOrBlank()) {
-                            h.image.visibility = View.GONE
-                            return
-                        }
-
-                        Log.d(TAG, "url: $thumbnailUrl")
-
-                        h.image.visibility = View.VISIBLE
-                        h.iconImage?.visibility = View.GONE
-
-                        h.image.load(null)
-
-                        offlineManager.fetchImage(h.itemView, thumbnailUrl) {
-                            h.image.load(it) {
-                                if (!isRevealed && item.postView.post.nsfw) {
-                                    transformations(BlurTransformation(context, sampling = 10f))
-                                }
-                            }
-                        }
-                    }
-
-                    h.linkTypeImage?.visibility = View.GONE
-                    h.iconImage?.visibility = View.GONE
-                    h.iconImage?.setOnClickListener(null)
-                    h.iconImage?.isClickable = false
-                    h.image?.setOnClickListener(null)
-                    h.image?.isClickable = false
-
-                    fun onItemClick() {
-                        this.onItemClick(
-                            item.instance,
-                            item.postView.post.id,
-                            item.postView.community.toCommunityRef(),
-                            item.postView,
-                            false,
-                            revealedItems.contains(item.postView.getUniqueKey()),
-                            lemmyContentHelper.getState(h.fullContentContainerView).videoState?.let {
-                                it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
-                            }
-                        )
-                    }
-
-                    fun showFullContent() {
-                        lemmyContentHelper.setupFullContent(
-                            reveal = isRevealed,
-                            tempSize = tempSize,
-                            videoViewMaxHeight = (binding.recyclerView.height
-                                    - Utils.convertDpToPixel(56f)
-                                    - Utils.convertDpToPixel(16f)
-                                    ).toInt(),
-                            contentMaxWidth = contentMaxWidth,
-                            fullImageViewTransitionName = "full_image_$position",
-                            postView = item.postView,
-                            instance = instance,
-                            rootView = h.itemView,
-                            fullContentContainerView = h.fullContentContainerView,
-                            onFullImageViewClickListener = { v, url ->
-                                onImageClick(url)
-                            },
-                            onImageClickListener = onImageClick,
-                            onItemClickListener = {
-                                onItemClick()
-                            },
-                            onRevealContentClickedFn = {
-                                revealedItems.add(item.postView.getUniqueKey())
-                                notifyItemChanged(h.absoluteAdapterPosition)
-                            },
-                            onLemmyUrlClick = onPageClick
-                        )
-                    }
-
-                    when (item.postView.getType()) {
-                        PostType.Image -> {
-                            loadAndShowImage()
-
-                            if (expandedItems.contains(item.postView.getUniqueKey())) {
-                                showFullContent()
-                            }
-                            h.image?.setOnClickListener {
-                                toggleItem(h.absoluteAdapterPosition, item)
-                            }
-                        }
-                        PostType.Video -> {
-                            loadAndShowImage()
-
-                            h.iconImage?.visibility = View.VISIBLE
-                            h.iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_black_24)
-
-                            if (expandedItems.contains(item.postView.getUniqueKey())) {
-                                showFullContent()
-                            }
-
-                            h.image?.setOnClickListener {
-                                toggleItem(h.absoluteAdapterPosition, item)
-                            }
-                        }
-                        PostType.Text -> {
-                            if (thumbnailUrl == null) {
-                                h.image?.visibility = View.GONE
-
-                                // see if this text post has additional content
-                                val hasAdditionalContent =
-                                    !item.postView.post.body.isNullOrBlank() ||
-                                            !item.postView.post.url.isNullOrBlank()
-
-                                if (hasAdditionalContent) {
-                                    showDefaultImage()
-                                    h.iconImage?.setOnClickListener {
-                                        toggleItem(h.absoluteAdapterPosition, item)
-                                    }
-                                }
-                            } else {
-                                loadAndShowImage()
-                            }
-
-                            if (expandedItems.contains(item.postView.getUniqueKey())) {
-                                showFullContent()
-                            }
-
-                            h.linkTypeImage?.visibility = View.GONE
-                            h.linkTypeImage?.setImageResource(R.drawable.baseline_open_in_new_black_18)
-                            h.image?.setOnClickListener {
-                                toggleItem(h.absoluteAdapterPosition, item)
-                            }
-                        }
-                    }
-
-                    h.image?.layoutParams = h.image?.layoutParams?.apply {
-                        width = postImageWidth
-                    }
-                    h.iconImage?.layoutParams = h.iconImage?.layoutParams?.apply {
-                        width = postImageWidth
-                    }
-
-                    h.title.text = item.postView.getFormattedTitle()
-                    h.commentButton.text =
-                        LemmyUtils.abbrevNumber(item.postView.counts.comments.toLong())
-
-                    h.itemView.setOnClickListener {
-                        onItemClick()
-                    }
-                    h.commentButton.setOnClickListener {
-                        this.onItemClick(
-                            item.instance,
-                            item.postView.post.id,
-                            item.postView.community.toCommunityRef(),
-                            item.postView,
-                            true,
-                            revealedItems.contains(item.postView.getUniqueKey()),
-                            null
-                        )
-                    }
-                    h.commentButton.isEnabled = !item.postView.post.locked
-
-                    voteUiHandler.bind(
-                        viewLifecycleOwner,
-                        item.instance,
-                        item.postView,
-                        h.upvoteButton,
-                        h.downvoteButton,
-                        h.upvoteCount,
+                        onItemClick = onItemClick,
+                        toggleItem = this::toggleItem,
+                        toggleActions = this::toggleActions,
                         onSignInRequired = onSignInRequired,
-                        onInstanceMismatch,
+                        onInstanceMismatch = onInstanceMismatch,
+                        onHighlightComplete = {
+                            postToHighlight = null
+                        }
                     )
-
-                    if (h.layoutShowsFullContent) {
-                        showFullContent()
-                    }
-
-                    highlightPostIfNeeded(h, item)
                 }
-            }
-        }
-
-        private fun highlightPostIfNeeded(
-            h: ListingItemViewHolder,
-            item: Item.PostItem
-        ) {
-            if (postToHighlightForever?.id == item.postView.post.id) {
-                h.highlightBg.visibility = View.VISIBLE
-                h.highlightBg.alpha = 1f
-            } else if (postToHighlight?.id == item.postView.post.id) {
-                h.highlightBg.visibility = View.VISIBLE
-                h.highlightBg.animate()
-                    .alpha(0f)
-                    .apply {
-                        duration = 350
-                    }
-                    .withEndAction {
-                        h.highlightBg.visibility = View.GONE
-                        postToHighlight = null
-                    }
-            } else {
-                h.highlightBg.visibility = View.GONE
             }
         }
 
         override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
             super.onViewRecycled(holder)
 
-            offlineManager.cancelFetch(holder.itemView)
             if (holder is ListingItemViewHolder) {
-                lemmyContentHelper.recycleFullContent(
-                    holder.fullContentContainerView
+                postViewBuilder.recycle(
+                    holder
                 )
-                voteUiHandler.unbindVoteUi(holder.upvoteButton)
             }
         }
 
-        private fun toggleItem(position: Int, item: Item.PostItem) {
-            if (expandedItems.contains(item.postView.getUniqueKey())) {
-                expandedItems.remove(item.postView.getUniqueKey())
+        private fun toggleItem(position: Int, postView: PostView) {
+            if (expandedItems.contains(postView.getUniqueKey())) {
+                expandedItems.remove(postView.getUniqueKey())
             } else {
-                expandedItems.add(item.postView.getUniqueKey())
+                expandedItems.add(postView.getUniqueKey())
+            }
+
+            notifyItemChanged(position)
+        }
+
+        private fun toggleActions(position: Int, postView: PostView) {
+            if (actionsExpandedItems.contains(postView.getUniqueKey())) {
+                actionsExpandedItems.remove(postView.getUniqueKey())
+            } else {
+                actionsExpandedItems.add(postView.getUniqueKey())
             }
 
             notifyItemChanged(position)
@@ -1370,15 +1189,5 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
 
         fun getItems() = items
-
-        fun setLayout(communityLayout: CommunityLayout) {
-            layout = communityLayout
-            notifyDataSetChanged()
-        }
-
-        fun reset() {
-            rawData = null
-            refreshItems()
-        }
     }
 }

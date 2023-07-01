@@ -10,6 +10,11 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.BlockCommunity
+import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -42,6 +47,7 @@ class CommunityViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val userCommunitiesManager: UserCommunitiesManager,
     private val accountActionsManager: AccountActionsManager,
+    private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
     companion object {
@@ -71,8 +77,6 @@ class CommunityViewModel @Inject constructor(
         recentCommunityManager.addRecentCommunity(it)
     }
     val loadedPostsData = StatefulLiveData<LoadedPostsData>()
-
-    val voteUiHandler = accountActionsManager.voteUiHandler
 
     val instance: String
         get() = postsRepository.instance
@@ -243,11 +247,19 @@ class CommunityViewModel @Inject constructor(
         reset()
     }
 
+    fun onBlockSettingsChanged() {
+        viewModelScope.launch {
+            postsRepository.resetCacheForCommunity()
+            fetchCurrentPage()
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
 
         currentCommunityRef.removeObserver(communityRefChangeObserver)
     }
+
     private fun reset() {
         assertMainThread()
 

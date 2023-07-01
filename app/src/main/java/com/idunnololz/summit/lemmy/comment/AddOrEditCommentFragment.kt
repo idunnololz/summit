@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.core.view.WindowCompat
@@ -19,11 +20,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -44,6 +47,16 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
     private val args by navArgs<AddOrEditCommentFragmentArgs>()
 
     private val viewModel: AddOrEditCommentViewModel by viewModels()
+
+    private val textFormatterHelper = TextFormatterHelper()
+
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            viewModel.uploadImage(args.instance, uri)
+        }
+    }
 
     @Parcelize
     enum class Result : Parcelable {
@@ -156,12 +169,10 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         val postView = args.postView
         val commentView = args.commentView
 
-        binding.replyingTo.movementMethod = ScrollingMovementMethod()
-
         val commentEditor = binding.commentEditor
         if (isEdit()) {
             val commentToEdit = requireNotNull(args.editCommentView)
-            binding.replyingTo.visibility = View.GONE
+            binding.scrollView.visibility = View.GONE
             binding.divider.visibility = View.GONE
 
             commentEditor.setText(commentToEdit.comment.content)
@@ -174,9 +185,10 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
             return
         }
 
-        TextFormatterHelper.setupTextFormatterToolbar(
+        textFormatterHelper.setupTextFormatterToolbar(
             binding.textFormatToolbar,
             commentEditor,
+            imagePickerLauncher,
             onPreviewClick = {
                 PreviewCommentDialogFragment()
                     .apply {
@@ -188,6 +200,29 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     .showAllowingStateLoss(childFragmentManager, "AA")
             }
         )
+        viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.hideAll()
+                    AlertDialogFragment.Builder()
+                        .setMessage(getString(
+                            R.string.error_unable_to_send_post,
+                            it.error::class.qualifiedName,
+                            it.error.message))
+                        .createAndShow(childFragmentManager, "ASDS")
+                }
+                is StatefulData.Loading -> {
+                    binding.loadingView.showProgressBar()
+                }
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+                    viewModel.uploadImageEvent.clear()
+
+                    textFormatterHelper.onImageUploaded(it.data.url)
+                }
+            }
+        }
     }
 
     private fun isEdit(): Boolean {

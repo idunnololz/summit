@@ -29,26 +29,35 @@
             android:animateLayoutChanges="true"
             android:background="@color/colorBackground">
 
-            <TextView
-                android:id="@+id/replying_to"
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scroll_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:padding="@dimen/padding"
-                android:textIsSelectable="true"
+                android:scrollbarStyle="outsideOverlay"
                 android:scrollbars="vertical"
-                android:textAppearance="?textAppearanceBodyMedium"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/comment_editor"
-                app:layout_constraintVertical_weight="1"/>
+                app:layout_constraintVertical_weight="1">
+
+                <TextView
+                    android:id="@+id/replying_to"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="true"
+                    android:scrollbars="vertical"
+                    android:textAppearance="?textAppearanceBodyMedium"/>
+
+            </androidx.core.widget.NestedScrollView>
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/replying_to"
+                app:layout_constraintTop_toBottomOf="@+id/scroll_view"
                 app:layout_constraintBottom_toTopOf="@+id/comment_editor"/>
 
             <EditText
@@ -63,11 +72,16 @@
                 android:inputType="textMultiLine|textCapSentences"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/replying_to"
+                app:layout_constraintTop_toBottomOf="@+id/scroll_view"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintVertical_weight="1"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.idunnololz.summit.view.LoadingView
+            android:id="@+id/loading_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     </FrameLayout>
 

@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy
 
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Base64
@@ -20,16 +19,12 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.core.view.ViewCompat
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getPreviewInfo
@@ -38,13 +33,12 @@ import com.idunnololz.summit.api.utils.getThumbnailUrl
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getVideoInfo
 import com.idunnololz.summit.api.utils.shouldHideItem
+import com.idunnololz.summit.lemmy.post_view.FullContentConfig
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.preview.ImageViewerFragmentArgs
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.preview.VideoViewerFragmentArgs
 import com.idunnololz.summit.reddit.LemmyUtils
-import com.idunnololz.summit.util.CustomLinkMovementMethod
-import com.idunnololz.summit.util.DefaultLinkLongClickListener
+import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
@@ -60,7 +54,6 @@ import com.idunnololz.summit.view.LoadingView
 
 class LemmyContentHelper(
     private val context: Context,
-    private val fragment: Fragment,
     private val offlineManager: OfflineManager,
     private val exoPlayerManager: ExoPlayerManager,
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
@@ -70,7 +63,16 @@ class LemmyContentHelper(
         private const val TAG = "LemmyContentHelper"
     }
 
+    var config: FullContentConfig = FullContentConfig()
+        set(value) {
+            field = value
+
+            textSizeMultiplier = config.textSizeMultiplier
+        }
+
     private val inflater = LayoutInflater.from(context)
+
+    private var textSizeMultiplier: Float = config.textSizeMultiplier
 
 
     /**
@@ -93,6 +95,7 @@ class LemmyContentHelper(
 
         onFullImageViewClickListener: (imageView: ImageView?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
+        onVideoClickListener: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
@@ -139,6 +142,8 @@ class LemmyContentHelper(
                 val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
+                textView.textSize = config.bodyTextSizeSp.toTextSize()
+
                 postRemovedView.layoutParams =
                     (postRemovedView.layoutParams as ViewGroup.MarginLayoutParams).apply {
                         topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
@@ -160,6 +165,8 @@ class LemmyContentHelper(
                 val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
+                textView.textSize = config.bodyTextSizeSp.toTextSize()
+
                 postRemovedView.layoutParams =
                     (postRemovedView.layoutParams as ViewGroup.MarginLayoutParams).apply {
                         topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
@@ -177,6 +184,8 @@ class LemmyContentHelper(
                 postRemovedView.setTag(R.id.is_footer, true)
                 val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
+
+                textView.textSize = config.bodyTextSizeSp.toTextSize()
 
                 postRemovedView.layoutParams =
                     (postRemovedView.layoutParams as ViewGroup.MarginLayoutParams).apply {
@@ -196,6 +205,8 @@ class LemmyContentHelper(
             val textView = fullContentHiddenView.findViewById<TextView>(R.id.message)
             val button = fullContentHiddenView.findViewById<Button>(R.id.button)
 
+            textView.textSize = config.bodyTextSizeSp.toTextSize()
+
             val imageUrl = postView.getThumbnailUrl(false)
 
             if (imageUrl != null) {
@@ -203,10 +214,6 @@ class LemmyContentHelper(
 
                 fun fetchFullImage() {
                     offlineManager.fetchImage(rootView, imageUrl) b@{
-                        if (!fragment.isAdded || fragment.context == null) {
-                            return@b
-                        }
-
                         offlineManager.calculateImageMaxSizeIfNeeded(it)
                         offlineManager.getMaxImageSizeHint(it, tempSize)
 
@@ -298,6 +305,8 @@ class LemmyContentHelper(
             val externalContentTextView =
                 externalContentView.findViewById<TextView>(R.id.externalContentText)
 
+            externalContentTextView.textSize = config.bodyTextSizeSp.toTextSize()
+
             loadPreviewInfo(thumbnailView)
 
             externalContentTextView.text = Uri.parse(url).host ?: url
@@ -306,20 +315,12 @@ class LemmyContentHelper(
                 val pageRef = LinkResolver.parseUrl(url, instance)
                 if (pageRef != null) {
                     onLemmyUrlClick(pageRef)
-                } else if (uri.path?.endsWith(".jpg") == true ||
-                    uri.path?.endsWith(".jpeg") == true ||
-                    uri.path?.endsWith(".png") == true ||
-                    uri.path?.endsWith(".webp") == true) {
-
+                } else if (ContentUtils.isUrlImage(url)) {
                     onImageClickListener(url)
-                } else if (uri.path?.endsWith(".gifv") == true || uri.path?.endsWith(".mp4") == true) {
-                    val args = VideoViewerFragmentArgs(
-                        url = url,
-                        videoType = VideoType.UNKNOWN,
-                        videoState = customPlayerView?.getVideoState()
-                    )
-                    fragment.findNavController()
-                        .navigate(R.id.videoViewerFragment, args.toBundle())
+                } else if (uri.path?.endsWith(".gifv") == true ||
+                    uri.path?.endsWith(".mp4") == true) {
+
+                    onVideoClickListener(url, VideoType.UNKNOWN, customPlayerView?.getVideoState())
                 } else if (uri.host == "gfycat.com") {
                     val keyLowerCase = uri.path?.substring(1)?.split("-")?.get(0) ?: ""
                     val url = requireNotNull(targetPostView.post.thumbnail_url)
@@ -327,13 +328,10 @@ class LemmyContentHelper(
                     if (startIndex > -1 && keyLowerCase.isNotBlank()) {
                         val key =
                             url.substring(startIndex, startIndex + keyLowerCase.length)
-                        val args = VideoViewerFragmentArgs(
-                            url = "https://thumbs.gfycat.com/${key}-mobile.mp4",
-                            videoType = VideoType.UNKNOWN,
-                            videoState = customPlayerView?.getVideoState()
-                        )
-                        fragment.findNavController()
-                            .navigate(R.id.videoViewerFragment, args.toBundle())
+                        onVideoClickListener(
+                            "https://thumbs.gfycat.com/${key}-mobile.mp4",
+                            VideoType.UNKNOWN,
+                            customPlayerView?.getVideoState())
                     } else {
                         Utils.openExternalLink(context, url)
                     }
@@ -365,24 +363,26 @@ class LemmyContentHelper(
         }
 
         if (!lazyUpdate) {
-            when (postView.getType()) {
+            when (val postType = postView.getType()) {
+                PostType.ImageUrl,
                 PostType.Image -> {
                     val fullContentImageView = getView<View>(R.layout.full_content_image_view)
                     val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.fullImage)
                     val loadingView =
                         fullContentImageView.findViewById<LoadingView>(R.id.loadingView)
 
-                    val imageUrl = requireNotNull(targetPostView.post.thumbnail_url)
+                    val imageUrl =
+                        if (postType == PostType.ImageUrl) {
+                            requireNotNull(targetPostView.post.url)
+                        } else {
+                            requireNotNull(targetPostView.post.thumbnail_url)
+                        }
 
                     fullImageView.load(0)
 
                     fun fetchFullImage() {
                         loadingView?.showProgressBar()
                         offlineManager.fetchImageWithError(rootView, imageUrl, b@{
-                            if (!fragment.isAdded || fragment.context == null) {
-                                return@b
-                            }
-
                             loadingView?.hideAll(animate = false)
                             offlineManager.calculateImageMaxSizeIfNeeded(it)
                             offlineManager.getMaxImageSizeHint(it, tempSize)
@@ -472,15 +472,13 @@ class LemmyContentHelper(
                         }
                         playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
                             .setOnClickListener {
-                                val args = VideoViewerFragmentArgs(
-                                    url = videoInfo.dashUrl,
-                                    videoType = VideoType.DASH,
-                                    videoState = customPlayerView?.getVideoState()?.let {
+                                onVideoClickListener(
+                                    videoInfo.dashUrl,
+                                    VideoType.DASH,
+                                    customPlayerView?.getVideoState()?.let {
                                         it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
                                     }
                                 )
-                                fragment.findNavController()
-                                    .navigate(R.id.videoViewerFragment, args.toBundle())
                             }
 
                         playerView.setup()
@@ -501,80 +499,21 @@ class LemmyContentHelper(
 
             if (!postView.post.body.isNullOrBlank()) {
                 val content = postView.post.body
-                if (LemmyUtils.needsWebView(content)) {
-                    val fullTextView = getView<View>(R.layout.full_content_web_view)
-                    val webView: WebView = fullTextView.findViewById(R.id.webView)
-                    val textColorHex = String.format(
-                        "#%06X",
-                        (0xFFFFFF and context.getColorCompat(R.color.colorText))
-                    )
-                    val bgColorHex = String.format(
-                        "#%06X",
-                        (0xFFFFFF and context.getColorCompat(R.color.colorBackground))
-                    )
-                    val aLinkColorHex = String.format(
-                        "#%06X",
-                        (0xFFFFFF and context.getColorCompat(R.color.colorLink))
-                    )
-                    val cssText = "<head><style type=\"text/css\">" +
-                            "body{margin:0;padding:0;color:${textColorHex};background-color:${bgColorHex};}" +
-                            "a{color:${aLinkColorHex}}" +
-                            "td{border-bottom:1px solid ${textColorHex};}" +
-                            "table{border-collapse:collapse;}" +
-                            "</style></head>"
+                val fullTextView = getView<View>(R.layout.full_content_text_view)
+                val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
+                bodyTextView.visibility = View.VISIBLE
 
-                    webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                bodyTextView.textSize = config.bodyTextSizeSp.toTextSize()
 
-                    webView.settings.apply {
-                        javaScriptEnabled = false
-                    }
-
-                    webView.setBackgroundColor(0) // transparent
-
-                    // Need to base 64 encode html due to stupid bug...
-                    val html =
-                        "<html>$cssText<body>${Utils.fromHtml(content)}</body></html>"
-                    val b64 = Base64.encodeToString(html.toByteArray(), Base64.DEFAULT)
-                    webView.loadData(
-                        b64,
-                        "text/html; charset=utf-8",
-                        "base64"
-                    )
-                    webView.isVerticalScrollBarEnabled = false
-                    webView.webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
-
-                            webView.viewTreeObserver.addOnPreDrawListener(object :
-                                ViewTreeObserver.OnPreDrawListener {
-                                override fun onPreDraw(): Boolean {
-                                    if (webView.measuredHeight != 0) {
-                                        webView.layoutParams = webView.layoutParams.apply {
-                                            width = webView.measuredWidth
-                                            height = webView.measuredHeight
-                                        }
-                                        webView.viewTreeObserver.removeOnPreDrawListener(this)
-                                    }
-                                    return true
-                                }
-                            })
-                        }
-                    }
-                } else {
-                    val fullTextView = getView<View>(R.layout.full_content_text_view)
-                    val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
-                    bodyTextView.visibility = View.VISIBLE
-
-                    LemmyTextHelper.bindText(
-                        textView = bodyTextView,
-                        text = content,
-                        instance = instance,
-                        onImageClickListener = onImageClickListener,
-                        onPageClick = onLemmyUrlClick
-                    )
-                    bodyTextView.setOnClickListener {
-                        onItemClickListener()
-                    }
+                LemmyTextHelper.bindText(
+                    textView = bodyTextView,
+                    text = content,
+                    instance = instance,
+                    onImageClickListener = onImageClickListener,
+                    onPageClick = onLemmyUrlClick
+                )
+                bodyTextView.setOnClickListener {
+                    onItemClickListener()
                 }
             }
 
@@ -663,4 +602,7 @@ class LemmyContentHelper(
 
         return stateBuilder.build()
     }
+
+    private fun Float.toTextSize(): Float =
+        this * textSizeMultiplier
 }

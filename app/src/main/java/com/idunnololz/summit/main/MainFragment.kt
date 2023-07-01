@@ -624,4 +624,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     fun setStartPanelLockState(lockState: OverlappingPanelsLayout.LockState) {
         binding.rootView.setStartPanelLockState(lockState)
     }
+
+    fun expandEndPane() {
+        binding.rootView.openEndPanel()
+    }
 }

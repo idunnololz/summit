@@ -2,11 +2,13 @@ package com.idunnololz.summit.api.utils
 
 import android.net.Uri
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.video.VideoSizeHint
 
 enum class PostType {
     Image,
+    ImageUrl,
     Video,
     Text,
 }
@@ -62,11 +64,14 @@ fun PostView.getType(): PostType {
     if (post.thumbnail_url != null) {
         return PostType.Image
     }
+    if (post.url != null && isUrlImage(post.url)) {
+        return PostType.ImageUrl
+    }
 //        if (post.embed_video_url != null) {
 //            return PostType.Video
 //        }
     return PostType.Text
 }
 
-val PostView.domain: String
-    get() = Uri.parse(this.post.ap_id).host ?: this.community.domain
+val PostView.instance: String
+    get() = Uri.parse(this.post.ap_id).host ?: this.community.instance

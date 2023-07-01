@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.api.dto.BlockCommunity
+import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -27,6 +29,8 @@ import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListCommunities
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.Login
+import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.Search
@@ -38,8 +42,11 @@ import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.Call
+import java.io.InputStream
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
@@ -74,7 +81,7 @@ class LemmyApiClient @Inject constructor(
     }
 
     private var api = LemmyApi.getInstance(context)
-    private val okHttpClient = LemmyApi.okHttpClient(context)
+    val okHttpClient = LemmyApi.okHttpClient(context)
 
     fun changeInstance(newInstance: String) {
         api = LemmyApi.getInstance(context, newInstance)
@@ -538,11 +545,11 @@ class LemmyApiClient @Inject constructor(
         )
     }
 
-    suspend fun deletePost(auth: String, id: PostId): Result<PostView> {
+    suspend fun deletePost(account: Account, id: PostId): Result<PostView> {
         val form = DeletePost(
             post_id = id,
             deleted = true,
-            auth = auth,
+            auth = account.jwt,
         )
 
         return retrofitErrorHandler {
@@ -550,6 +557,78 @@ class LemmyApiClient @Inject constructor(
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun uploadImage(
+        account: Account,
+        fileName: String,
+        imageIs: InputStream
+    ): Result<UploadImageResult> {
+        val part = MultipartBody.Part.createFormData(
+            "images[]",
+            fileName,
+            imageIs.readBytes().toRequestBody(),
+        )
+        val url = "https://${api.instance}/pictrs/image"
+        val cookie = "jwt=${account.jwt}"
+
+        return retrofitErrorHandler {
+            api.uploadImage(url, cookie, part)
+        }.fold(
+            onSuccess = {
+                val imageUrl = "$url/${it.files?.get(0)?.file}"
+                Result.success(UploadImageResult(imageUrl))
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun blockCommunity(
+        communityId: CommunityId,
+        block: Boolean,
+        account: Account,
+    ): Result<CommunityView> {
+        val form = BlockCommunity(
+            community_id = communityId,
+            block = block,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.blockCommunity(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.community_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun blockPerson(
+        personId: PersonId,
+        block: Boolean,
+        account: Account,
+    ): Result<PersonView> {
+        val form = BlockPerson(
+            person_id = personId,
+            block = block,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.blockPerson(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.person_view)
             },
             onFailure = {
                 Result.failure(it)
@@ -604,3 +683,7 @@ class LemmyApiClient @Inject constructor(
         }
     }
 }
+
+class UploadImageResult(
+    val url: String
+)

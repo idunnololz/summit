@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.utils.domain
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
@@ -107,9 +107,9 @@ class LemmyHeaderHelper(
             LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
         )
         appendSeparator(sb)
-        sb.append(
-            dateStringToPretty(postView.post.updated ?: postView.post.published)
-        )
+        dateStringToPretty(postView.post.updated ?: postView.post.published)?.let {
+            sb.append(it)
+        }
         if (listAuthor) {
             appendSeparator(sb)
             if (postView.creator.admin) {
@@ -151,7 +151,7 @@ class LemmyHeaderHelper(
             }
         }
 
-        postView.domain.let { domain ->
+        postView.instance.let { domain ->
             appendSeparator(sb)
             sb.append(domain)
         }

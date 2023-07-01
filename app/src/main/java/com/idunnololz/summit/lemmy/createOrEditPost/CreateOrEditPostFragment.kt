@@ -4,27 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.setFragmentResult
+import androidx.core.view.children
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
-import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentDirections
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,6 +37,24 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
     private val args by navArgs<CreateOrEditPostFragmentArgs>()
 
     private val viewModel: CreateOrEditPostViewModel by viewModels()
+
+    private val textFormatterHelper = TextFormatterHelper()
+
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            viewModel.uploadImage(args.instance, uri)
+        }
+    }
+
+    private val imagePickerLauncherForUrl = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            viewModel.uploadImageForUrl(args.instance, uri)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -125,9 +141,10 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
         }
 
         val postEditor = binding.postEditor
-        TextFormatterHelper.setupTextFormatterToolbar(
+        textFormatterHelper.setupTextFormatterToolbar(
             binding.textFormatToolbar,
             postEditor,
+            imagePickerLauncher,
             onPreviewClick = {
                 PreviewCommentDialogFragment()
                     .apply {
@@ -142,7 +159,12 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
 
         binding.loadingView.hideAll()
 
+        binding.uploadImage.setOnClickListener {
+            imagePickerLauncherForUrl.launch(PickVisualMediaRequest(ImageOnly))
+        }
         viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
+            updateEnableState()
+
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
@@ -171,6 +193,52 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                 }
             }
         }
+        viewModel.uploadImageResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.hideAll()
+                    AlertDialogFragment.Builder()
+                        .setMessage(getString(
+                            R.string.error_unable_to_send_post,
+                            it.error::class.qualifiedName,
+                            it.error.message))
+                        .createAndShow(childFragmentManager, "ASDS")
+                }
+                is StatefulData.Loading -> {
+                    binding.loadingView.showProgressBar()
+                }
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+                    viewModel.uploadImageResult.clear()
+
+                    textFormatterHelper.onImageUploaded(it.data.url)
+                }
+            }
+        }
+        viewModel.uploadImageForUrlResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.hideAll()
+                    AlertDialogFragment.Builder()
+                        .setMessage(getString(
+                            R.string.error_unable_to_send_post,
+                            it.error::class.qualifiedName,
+                            it.error.message))
+                        .createAndShow(childFragmentManager, "ASDS")
+                }
+                is StatefulData.Loading -> {
+                    binding.loadingView.showProgressBar()
+                }
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+                    viewModel.uploadImageResult.clear()
+
+                    binding.url.setText(it.data.url)
+                }
+            }
+        }
 
         if (savedInstanceState == null && !viewModel.postPrefilled) {
             viewModel.postPrefilled = true
@@ -182,6 +250,21 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                 binding.postEditor.setText(post.body)
                 binding.nsfwSwitch.isChecked = post.nsfw
             }
+        }
+        updateEnableState()
+    }
+
+    private fun updateEnableState() {
+        val isLoading = viewModel.createOrEditPostResult.isLoading
+
+        binding.url.isEnabled = !isLoading
+        binding.uploadImage.isEnabled = !isLoading
+        binding.title.isEnabled = !isLoading
+        binding.postEditor.isEnabled = !isLoading
+        binding.postBodyToolbar.isEnabled = !isLoading
+        binding.nsfwSwitch.isEnabled = !isLoading
+        binding.textFormatToolbar.root.children.forEach {
+            it.isEnabled = !isLoading
         }
     }
 

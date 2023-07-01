@@ -1,119 +1,115 @@
 package com.idunnololz.summit.settings
 
-import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.fragment.app.activityViewModels
-import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
-import com.idunnololz.summit.BuildConfig
+import androidx.core.view.updateLayoutParams
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.android.material.appbar.AppBarLayout
 import com.idunnololz.summit.R
-import com.idunnololz.summit.util.PreferenceUtil
-import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.databinding.BasicSettingItemBinding
+import com.idunnololz.summit.databinding.FragmentSettingsBinding
+import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class SettingsFragment : BasePreferenceFragment() {
+@AndroidEntryPoint
+class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
-    companion object {
-        private const val TAG = "SettingsFragment"
+    @Inject
+    lateinit var settingsManager: SettingsManager
 
-        private const val PREF_KEY_ADD_PREFERENCE = "PREF_KEY_ADD_PREFERENCE"
-        private const val PREF_KEY_ACCOUNT = "PREF_KEY_ACCOUNT"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        requireMainActivity().setupForFragment<SettingsFragment>()
     }
-
-    private val userInfoViewModel: UserInfoViewModel by activityViewModels()
-
-    private val onSharedPreferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener a@{ sharedPreferences, key ->
-            if (key == PreferenceUtil.KEY_OAUTH_TOKEN) {
-                loadUserInfo()
-            } else if (key == "pref_key_theme") {
-                val context = context ?: return@a
-                Handler().postDelayed({
-                    Utils.triggerRebirth(context)
-                }, 300)
-            }
-        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
 
-        PreferenceUtil.preferences.registerOnSharedPreferenceChangeListener(
-            onSharedPreferenceChangeListener
-        )
+        setBinding(FragmentSettingsBinding.inflate(inflater, container, false))
 
-        requireMainActivity().apply {
-            setupForFragment<SettingsFragment>()
-        }
-
-        return super.onCreateView(inflater, container, savedInstanceState)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated()")
         super.onViewCreated(view, savedInstanceState)
 
-        requireMainActivity().insetViewAutomaticallyByMargins(viewLifecycleOwner, view)
+        val context = requireContext()
+
+        requireMainActivity().apply {
+            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+
+            setSupportActionBar(binding.searchBar)
+
+            supportActionBar?.setDisplayShowHomeEnabled(true)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.title = context.getString(R.string.settings)
+            supportActionBar?.hide()
+
+            binding.searchBar.updateLayoutParams<AppBarLayout.LayoutParams> {
+                scrollFlags = 0
+            }
+        }
+
+        with(binding) {
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.setHasFixedSize(true)
+            recyclerView.adapter = SettingItemsAdapter(settingsManager.getSettingsForMainPage())
+        }
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.sharedPreferencesName = PreferenceUtil.DEFAULT_PREF
+    private inner class SettingItemsAdapter(
+        private val data: List<BasicSettingItem>
+    ) : Adapter<ViewHolder>() {
 
-        // Load the preferences from an XML resource
-        setPreferencesFromResource(R.xml.preferences, rootKey)
+        private val adapterHelper = AdapterHelper<SettingItem>(
+            areItemsTheSame = { old, new ->
+                old.id == new.id
+            }
+        ).apply {
+            addItemType(BasicSettingItem::class, BasicSettingItemBinding::inflate) { item, b, h ->
+                b.icon.setImageResource(item.icon)
+                b.title.text = item.title
+                b.desc.text = item.description
 
-        val sharedPref = PreferenceUtil.preferences
-
-        findPreference<Preference>("pref_key_theme")?.setOnPreferenceChangeListener { preference, newValue ->
-            sharedPref.edit().putInt(
-                PreferenceUtil.KEY_THEME, when (newValue as String) {
-                    "day" -> AppCompatDelegate.MODE_NIGHT_NO
-                    "night" -> AppCompatDelegate.MODE_NIGHT_YES
-                    else -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                    } else {
-                        AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-                    }
+                b.root.setOnClickListener {
+                    val directions = SettingsFragmentDirections
+                        .actionSettingsFragmentToSettingViewTypeFragment()
+                    findNavController().navigateSafe(directions)
                 }
-            ).apply()
-
-            true
+            }
         }
 
-        findPreference<Preference>(R.string.pref_key_build_version).apply {
-            summary = getString(R.string.build_version, BuildConfig.VERSION_NAME)
+        init {
+            refreshItems()
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+            adapterHelper.onCreateViewHolder(parent, viewType)
 
-        loadUserInfo()
-    }
+        override fun getItemCount(): Int =
+            adapterHelper.itemCount
 
-    override fun onDestroyView() {
-        PreferenceUtil.preferences.unregisterOnSharedPreferenceChangeListener(
-            onSharedPreferenceChangeListener
-        )
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+            adapterHelper.onBindViewHolder(holder, position)
 
-        super.onDestroyView()
-    }
-
-
-    fun loadUserInfo() {
-    }
-
-    private fun removePreference(key: String) {
-        findPreference<Preference>(key)?.let {
-            it.parent?.removePreference(it)
+        private fun refreshItems() {
+            adapterHelper.setItems(data, this)
         }
+
     }
 }

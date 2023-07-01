@@ -9,6 +9,8 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -176,6 +178,26 @@ class PostsRepository @Inject constructor(
         }
 
         reset()
+    }
+
+    suspend fun resetCacheForCommunity() {
+        reset()
+
+        val apiClient = apiClient
+
+        withContext(Dispatchers.Main) {
+            val urlIterator = apiClient.apiClient.okHttpClient.cache?.urls() ?: return@withContext
+            while (urlIterator.hasNext()) {
+
+                if (urlIterator.next().startsWith(
+                        "https://${apiClient.instance}/api/v3/post/list",
+                        ignoreCase = true
+                    )) {
+
+                    urlIterator.remove()
+                }
+            }
+        }
     }
 
     fun reset() {

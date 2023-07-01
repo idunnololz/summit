@@ -22,6 +22,7 @@
 
     <item name="account_actions_manager_reg_id" type="id"/>
 
+    <item name="layout_compact" type="id"/>
     <item name="layout_list" type="id"/>
     <item name="layout_list2" type="id"/>
     <item name="layout_card" type="id"/>
@@ -29,4 +30,11 @@
 
 
     <item name="edit_post" type="id"/>
+    <item name="block_user" type="id"/>
+    <item name="block_community" type="id"/>
+
+    <item name="setting_view_type" type="id"/>
+    <item name="setting_base_view_type" type="id"/>
+    <item name="setting_text_scaling" type="id"/>
+    <item name="setting_prefer_image_at_the_end" type="id"/>
 </resources>

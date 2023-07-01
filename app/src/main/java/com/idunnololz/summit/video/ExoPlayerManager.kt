@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -49,25 +50,22 @@ class ExoPlayerManager(
         }
 
         fun get(lifecycleOwner: LifecycleOwner): ExoPlayerManager {
-            return managersMap.get(lifecycleOwner) ?: ExoPlayerManager(context).also { manager ->
+            return managersMap[lifecycleOwner] ?: ExoPlayerManager(context).also { manager ->
                 Log.d(TAG, "No manager found for $lifecycleOwner. Creating one...")
                 managersMap[lifecycleOwner] = manager
-                lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+                lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
 
-                    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-                    fun onResume() {
+                    override fun onResume(owner: LifecycleOwner) {
                         Log.d(TAG, "Fragment resumed. Restoring players")
                         managersMap[lifecycleOwner]?.restorePlayers()
                     }
 
-                    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-                    fun onPause() {
+                    override fun onPause(owner: LifecycleOwner) {
                         Log.d(TAG, "Fragment paused. Stopping players")
                         managersMap[lifecycleOwner]?.stop()
                     }
 
-                    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                    fun onDestroy() {
+                    override fun onDestroy(owner: LifecycleOwner) {
                         Log.d(TAG, "Fragment destroyed. Cleaning up ExoPlayerManager instance")
                         //managersMap.remove(lifecycleOwner)?.destroy()
                         managersMap.remove(lifecycleOwner)?.viewDestroy()

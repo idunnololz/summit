@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
@@ -23,6 +24,7 @@ import com.idunnololz.summit.databinding.BottomMenuBinding
 import com.idunnololz.summit.databinding.MenuItemBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
+import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
@@ -54,8 +56,18 @@ class BottomMenu(private val context: Context) {
     )
     private val defaultTextColor = ContextCompat.getColor(context, R.color.colorTextTitle)
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            close()
+        }
+    }
+
     fun setTitle(@StringRes title: Int) {
         this.title = context.getString(title)
+    }
+
+    fun setTitle(title: String) {
+        this.title = title
     }
 
     fun addItem(@IdRes id: Int, @StringRes title: Int) {
@@ -66,12 +78,20 @@ class BottomMenu(private val context: Context) {
         menuItems.add(MenuItem(id, title))
     }
 
-    fun addItem(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
-        menuItems.add(MenuItem(id, context.getString(title), checkIcon = icon))
+    fun addItem(@IdRes id: Int, @StringRes title: Int, @DrawableRes checkIcon: Int) {
+        menuItems.add(MenuItem(id, context.getString(title), checkIcon = checkIcon))
+    }
+
+    fun addItem(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
+        menuItems.add(MenuItem(id, title, checkIcon = icon))
     }
 
     fun addItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
-        menuItems.add(MenuItem(id, context.getString(title), icon = MenuIcon.ResourceIcon(icon)))
+        addItemWithIcon(id, context.getString(title), icon)
+    }
+
+    fun addItemWithIcon(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
+        menuItems.add(MenuItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
     }
 
     fun itemsCount() = menuItems.size
@@ -84,7 +104,7 @@ class BottomMenu(private val context: Context) {
         this.onMenuItemClickListener = onMenuItemClickListener
     }
 
-    fun show(viewGroup: ViewGroup) {
+    fun show(mainActivity: MainActivity, viewGroup: ViewGroup) {
         parent = viewGroup
         adapter = BottomMenuAdapter()
 
@@ -142,6 +162,7 @@ class BottomMenu(private val context: Context) {
                     override fun onStateChanged(bottomSheet1: View, newState: Int) {
                         if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                             parent = null
+                            onBackPressedCallback.remove()
                             viewGroup.removeView(rootView)
                             viewGroup.removeView(overlay)
                         }
@@ -157,6 +178,8 @@ class BottomMenu(private val context: Context) {
                 },
             )
         }
+
+        mainActivity.onBackPressedDispatcher.addCallback(onBackPressedCallback)
     }
 
     fun close(): Boolean {

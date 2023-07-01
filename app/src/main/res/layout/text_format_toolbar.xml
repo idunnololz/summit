@@ -106,6 +106,17 @@
         app:tint="?colorControlNormal"/>
 
     <ImageView
+        android:id="@+id/image"
+        android:src="@drawable/baseline_image_24"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:contentDescription="@string/add_image"
+        android:background="?selectableItemBackgroundBorderless"
+        android:layout_gravity="center_vertical"
+        app:tint="?colorControlNormal"/>
+
+    <ImageView
         android:id="@+id/link_app"
         android:src="@drawable/ic_app_link"
         android:layout_width="48dp"

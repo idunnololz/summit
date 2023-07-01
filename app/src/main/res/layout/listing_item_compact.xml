@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="?selectableItemBackground">
+    android:background="?selectableItemBackground"
+    android:paddingBottom="@dimen/padding_half">
 
     <View
         android:id="@+id/highlight_bg"
@@ -16,26 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <HorizontalScrollView
-        android:id="@+id/headerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_half"
-        android:paddingStart="@dimen/reddit_content_horizontal_padding"
-        android:paddingEnd="@dimen/reddit_content_horizontal_padding"
-        android:fadingEdge="horizontal"
-        android:requiresFadingEdge="horizontal"
-        android:scrollbars="none"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.idunnololz.summit.view.LemmyHeaderView
-            android:id="@+id/headerContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </HorizontalScrollView>
-
     <!-- Width set programatically -->
     <com.idunnololz.summit.view.ReactiveImageView
         android:id="@+id/image"
@@ -43,11 +24,10 @@
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_half"
-        android:layout_marginEnd="@dimen/padding"
         android:scaleType="centerCrop"
-        app:layout_constraintDimensionRatio="H,16:9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerView" />
+        app:layout_constraintDimensionRatio="H,16:12"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Width set programatically -->
     <com.idunnololz.summit.view.ReactiveImageView
@@ -56,20 +36,19 @@
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_half"
-        android:layout_marginEnd="@dimen/padding"
         android:background="@drawable/border1"
-        android:padding="@dimen/padding_half"
+        android:padding="@dimen/padding"
+        app:layout_constraintDimensionRatio="H,16:12"
         app:tint="?attr/colorControlNormal"
-        app:layout_constraintDimensionRatio="H,16:9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerView" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <Space
         android:id="@+id/iconGoneSpacer"
         android:layout_width="@dimen/padding_half"
         android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerView" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/linkTypeImage"
@@ -82,31 +61,64 @@
         app:layout_constraintEnd_toEndOf="@+id/image" />
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/endBarrier"
+        android:id="@+id/leftBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="image,iconImage,iconGoneSpacer"
-        app:barrierDirection="start" />
+        app:barrierDirection="end" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceHeadline4"
-        android:layout_marginStart="@dimen/padding"
+        android:layout_marginStart="@dimen/padding_half"
         android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_quarter"
-        tools:text="Test!"
-        app:layout_constraintTop_toBottomOf="@+id/headerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/endBarrier"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/leftBarrier"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.idunnololz.summit.view.LemmyHeaderView
+        android:id="@+id/header_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintStart_toStartOf="@id/title"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/comment_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:drawablePadding="@dimen/padding_quarter"
+        android:layout_marginTop="@dimen/padding_quarter"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintEnd_toStartOf="@+id/score_text"
+        app:layout_constraintTop_toBottomOf="@+id/header_container"
+        app:drawableStartCompat="@drawable/outline_mode_comment_16"
+        app:drawableTint="?colorControlNormal" />
+
+    <TextView
+        android:id="@+id/score_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:layout_marginStart="@dimen/padding_half"
+        app:layout_constraintBaseline_toBaselineOf="@+id/comment_text"
+        app:layout_constraintStart_toEndOf="@+id/comment_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:drawableStartCompat="@drawable/baseline_arrow_upward_16"
+        app:drawableTint="?colorControlNormal" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="title,image,iconImage"
+        app:constraint_referenced_ids="comment_text,image,iconImage"
         app:barrierDirection="bottom" />
 
     <LinearLayout
@@ -116,25 +128,20 @@
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/barrier"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/bottomBarrier"
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/more_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="fullContent"
-        app:barrierDirection="bottom" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/commentButton"
-        style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingStart="@dimen/reddit_content_horizontal_padding"
-        android:paddingLeft="@dimen/reddit_content_horizontal_padding"
-        app:icon="@drawable/baseline_comment_18"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bottomBarrier" />
+        android:src="@drawable/baseline_more_horiz_black_24"
+        android:padding="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/downvoteButton"
+        app:layout_constraintBottom_toBottomOf="@+id/downvoteButton"
+        app:layout_constraintEnd_toStartOf="@+id/upvoteButton" />
 
     <ImageButton
         android:id="@+id/upvoteButton"
@@ -143,16 +150,8 @@
         android:src="@drawable/ic_arrow_up_bold_black_24dp"
         android:padding="@dimen/padding_half"
         android:background="?selectableItemBackgroundBorderless"
-        app:layout_constraintTop_toTopOf="@+id/commentButton"
-        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
-        app:layout_constraintEnd_toStartOf="@+id/upvoteCount" />
-
-    <TextView
-        android:id="@+id/upvoteCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@+id/commentButton"
-        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintTop_toTopOf="@+id/downvoteButton"
+        app:layout_constraintBottom_toBottomOf="@+id/downvoteButton"
         app:layout_constraintEnd_toStartOf="@+id/downvoteButton" />
 
     <ImageButton
@@ -160,13 +159,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_arrow_down_bold_black_24dp"
+        android:layout_marginTop="@dimen/padding_half"
         android:paddingStart="@dimen/padding_half"
-        android:paddingLeft="@dimen/padding_half"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"
-        android:paddingRight="@dimen/reddit_content_horizontal_padding_for_downvote"
         android:background="?selectableItemBackgroundBorderless"
-        app:layout_constraintTop_toTopOf="@+id/commentButton"
-        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+        app:layout_constraintTop_toBottomOf="@+id/fullContent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

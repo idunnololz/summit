@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.utils.domain
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.community.CommunityViewModel
 import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.JsonClass
@@ -46,7 +46,7 @@ fun CommunityRef.toUri(): Uri {
     val url = when (val community = this) {
         is CommunityRef.All ->
             "https://${community.instance ?: "lemmy.world"}/?dataType=Post&listingType=All"
-        is CommunityRef.CommunityRefByObj -> "https://${community.community.domain}/c/${community.community.name}?dataType=Post"
+        is CommunityRef.CommunityRefByObj -> "https://${community.community.instance}/c/${community.community.name}?dataType=Post"
         is CommunityRef.Local -> "https://${community.instance}/?dataType=Post&listingType=Local"
         is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
         is CommunityRef.Subscribed -> "https://${community.instance}/?dataType=Post&listingType=Subscribed"

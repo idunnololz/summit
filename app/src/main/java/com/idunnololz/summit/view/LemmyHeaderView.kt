@@ -49,5 +49,13 @@ class LemmyHeaderView : LinearLayout {
         textView2.text = text
     }
 
+    var textSize: Float = 0f
+        set(value) {
+            field = value
+
+            textView1.textSize = value
+            textView2.textSize = value
+        }
+
     fun getFlairView(): FlairView = flairView
 }

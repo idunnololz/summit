@@ -3,13 +3,22 @@ package com.idunnololz.summit.util
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.main.MainActivity
 
 abstract class BaseFragment<T : ViewBinding> : Fragment() {
+
+    private val logTag: String = if (BuildConfig.DEBUG) {
+        javaClass.simpleName ?: "UNKNOWN_CLASS"
+    } else {
+        javaClass.canonicalName ?: "UNKNOWN_CLASS"
+    }
+
     fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
     fun getMainActivity(): MainActivity? = activity as? MainActivity
 
@@ -45,14 +54,29 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
             })
     }
 
+    fun addMenuProvider(menuProvider: MenuProvider) {
+        requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    @CallSuper
+    override fun onStart() {
+        MyLog.d(logTag, "Lifecycle: onStart()")
+        super.onStart()
+    }
+
+    @CallSuper
     override fun onResume() {
         super.onResume()
 
         Log.d(this::class.simpleName, "onResume()")
     }
 
-    fun addMenuProvider(menuProvider: MenuProvider) {
-        requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    @CallSuper
+    override fun onDestroyView() {
+        MyLog.d(logTag, "Lifecycle: onDestroyView()")
+        super.onDestroyView()
+
+        _binding = null
     }
 
 }

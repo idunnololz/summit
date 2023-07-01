@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_quarter"
         android:layout_marginEnd="@dimen/padding"
-        android:textAppearance="?textAppearanceBodyMedium"
+        android:textAppearance="?textAppearanceBodySmall"
         android:textColor="@color/colorTextFaint"
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0"
