@@ -3,7 +3,7 @@ name: Build release APK
 on:
   push:
     branches:
-      - master
+      - release-*
     tags:
       - "v*.*.*"
   workflow_dispatch:
