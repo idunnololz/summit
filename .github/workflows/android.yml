@@ -26,7 +26,8 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleRelease --stacktrace
       - name: Sign APK
-        id: sign_aab
+        # ID used to access action output
+        id: sign_apk
         uses: r0adkll/sign-android-release@v1
         with:
           releaseDirectory: app/build/outputs/apk/release
@@ -34,12 +35,15 @@ jobs:
           alias: ${{ secrets.SIGNING_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.SIGNING_ALIAS_PASSWORD }}
+        env:
+          # override default build-tools version (29.0.3) -- optional
+          BUILD_TOOLS_VERSION: "34.0.0"
       - run: echo "Build status report=${{ job.status }}."
       - name: Upload App Bundle
         uses: actions/upload-artifact@v1
         with:
           name: release.apk
-          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          path: ${{steps.sign_apk.outputs.signedReleaseFile}}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
