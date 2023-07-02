@@ -24,12 +24,12 @@ jobs:
       - name: chmod gradlew
         run: chmod +x gradlew
       - name: Build APK
-        run: ./gradlew buildRelease --stacktrace
+        run: ./gradlew assembleRelease --stacktrace
       - name: Sign APK
         id: sign_aab
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: app/release
+          releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEYSTORE }}
           alias: ${{ secrets.SIGNING_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
@@ -38,13 +38,14 @@ jobs:
       - name: Upload App Bundle
         uses: actions/upload-artifact@v1
         with:
-          name: apk
-          path: ${{steps.sign_aab.outputs.signedReleaseFile}}
+          name: release.apk
+          path: ${{steps.sign_app.outputs.signedReleaseFile}}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           repository: idunnololz/summit-for-lemmy
           token: ${{ secrets.GH_TOKEN }}
+          files: release.apk
 #  release:
 #    name: Release APK
 #    needs: apk
