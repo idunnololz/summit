@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 jobs:
@@ -38,6 +40,15 @@ jobs:
         with:
           name: apk
           path: ${{steps.sign_aab.outputs.signedReleaseFile}}
+
+
+release:
+  steps:
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        repository: idunnololz/summit-for-lemmy
+        token: ${{ secrets.GH_TOKEN }}
 #  release:
 #    name: Release APK
 #    needs: apk
