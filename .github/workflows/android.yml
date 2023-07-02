@@ -1,11 +1,10 @@
-name: Minimal Android CI Workflow
+name: Build release APK
 
 on:
   push:
     branches:
       - master
-    tags:
-      - 'v*'
+  workflow_dispatch:
 
 jobs:
   apk:
