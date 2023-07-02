@@ -100,6 +100,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 .actionSettingsFragmentToSettingThemeFragment()
                             findNavController().navigateSafe(directions)
                         }
+                        R.id.setting_post_and_comments -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingPostAndCommentsFragment()
+                            findNavController().navigateSafe(directions)
+                        }
                     }
                 }
             }

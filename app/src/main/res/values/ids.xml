@@ -44,4 +44,5 @@
     <item name="setting_option_use_system" type="id" />
     <item name="setting_option_light_theme" type="id"/>
     <item name="setting_option_dark_theme" type="id" />
+    <item name="setting_post_and_comments" type="id" />
 </resources>

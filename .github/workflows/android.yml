@@ -38,12 +38,14 @@ jobs:
         env:
           # override default build-tools version (29.0.3) -- optional
           BUILD_TOOLS_VERSION: "34.0.0"
+      - name: Rename APK
+        run: mv ${{steps.sign_apk.outputs.signedReleaseFile}} release.apk
       - run: echo "Build status report=${{ job.status }}."
       - name: Upload App Bundle
         uses: actions/upload-artifact@v1
         with:
           name: release.apk
-          path: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          path: release.apk
       - name: Release
         uses: softprops/action-gh-release@v1
         with:

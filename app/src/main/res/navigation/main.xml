@@ -76,6 +76,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingPostAndCommentsFragment"
+            app:destination="@id/settingPostAndCommentsFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <action android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment"
@@ -107,4 +114,8 @@
         android:id="@+id/settingThemeFragment"
         android:name="com.idunnololz.summit.settings.theme.SettingThemeFragment"
         android:label="SettingThemeFragment" />
+    <fragment
+        android:id="@+id/settingPostAndCommentsFragment"
+        android:name="com.idunnololz.summit.settings.post_and_comments.SettingPostAndCommentsFragment"
+        android:label="SettingPostAndCommentsFragment" />
 </navigation>
