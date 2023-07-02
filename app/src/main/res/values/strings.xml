@@ -211,6 +211,8 @@
     <string name="personalized_theming_based_on_your_wallpaper">Personalized theming based on your wallpaper</string>
     <string name="theme_config">Theme configuration</string>
     <string name="error_dynamic_color_not_supported">Material You is not supported by your device.</string>
+    <string name="post_and_comments">Post and comments</string>
+    <string name="post_and_comments_settings_desc">Customize how post and comments look</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

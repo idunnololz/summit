@@ -33,7 +33,6 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.color.DynamicColorsOptions
 import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
@@ -51,7 +50,6 @@ import com.idunnololz.summit.preview.ImageViewerFragment
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedFragment
-import com.idunnololz.summit.settings.OldSettingsFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
@@ -913,13 +911,6 @@ class MainActivity : BaseActivity() {
                 showBottomNav()
                 showNotificationBarBg()
                 disableCustomAppBar(animate)
-            }
-            OldSettingsFragment::class -> {
-                hideActionBar(animate)
-                disableBottomNavViewScrolling()
-                showBottomNav()
-                disableCustomAppBar(animate)
-                showNotificationBarBg()
             }
             LoginFragment::class -> {
                 hideActionBar(animate)

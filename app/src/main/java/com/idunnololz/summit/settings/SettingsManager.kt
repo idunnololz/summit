@@ -33,6 +33,12 @@ class SettingsManager @Inject constructor(
             context.getString(R.string.view_type),
             context.getString(R.string.view_type_settings_desc)
         ),
+        BasicSettingItem(
+            R.id.setting_post_and_comments,
+            R.drawable.baseline_mode_comment_24,
+            context.getString(R.string.post_and_comments),
+            context.getString(R.string.post_and_comments_settings_desc)
+        ),
     )
 
     fun getSettingsForMainPage() =
