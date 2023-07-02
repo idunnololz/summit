@@ -37,4 +37,11 @@
     <item name="setting_base_view_type" type="id"/>
     <item name="setting_text_scaling" type="id"/>
     <item name="setting_prefer_image_at_the_end" type="id"/>
+
+
+    <item name="setting_theme" type="id"/>
+    <item name="setting_base_theme" type="id"/>
+    <item name="setting_option_use_system" type="id" />
+    <item name="setting_option_light_theme" type="id"/>
+    <item name="setting_option_dark_theme" type="id" />
 </resources>

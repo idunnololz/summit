@@ -14,7 +14,7 @@
     </style>
 
     <!-- Base application theme. -->
-    <style name="Theme.App" parent="Theme.Material3.Dark">
+    <style name="Theme.App" parent="Theme.Material3.DayNight">
         <item name="elevationOverlayEnabled">false</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
 
@@ -33,10 +33,13 @@
 
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorSecondary">@color/colorPrimary</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
+        <item name="colorTertiary">@color/colorTertiary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
@@ -66,17 +69,18 @@
 
         <item name="popupMenuStyle">@style/MyApp.Widget.MaterialComponents.PopupMenu</item>
 
-        <item name="android:dialogTheme">@style/Theme.App.Dialog</item>
-        <item name="android:alertDialogTheme">@style/Theme.App.Dialog</item>
+<!--        <item name="android:dialogTheme">@style/Theme.App.Dialog</item>-->
+<!--        <item name="android:alertDialogTheme">@style/Theme.App.Dialog</item>-->
 
         <item name="actionOverflowMenuStyle">@style/Widget.Material3.PopupMenu.Overflow</item>
 
         <item name="elevationOverlayColor">@color/white10</item>
 
         <item name="materialCardViewStyle">@style/MyApp.Widget.Material3.CardView</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>
     </style>
 
-    <style name="Theme.App.Dialog" parent="Theme.Material3.Dark.Dialog.Alert">
+    <style name="Theme.App.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">
         <item name="elevationOverlayEnabled">false</item>
         <item name="android:windowBackground">@drawable/dialog_background</item>
 
@@ -112,7 +116,7 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
 
-    <style name="Theme.App.Dialog.Alert" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+    <style name="Theme.App.Dialog.Alert" parent="Theme.Material3.DayNight.Dialog.Alert">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
@@ -130,7 +134,7 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
 
-    <style name="Theme.App.Dialog.Fullscreen" parent="Theme.App.Dialog">
+    <style name="Theme.App.Dialog.Fullscreen">
 <!--        <item name="android:windowFullscreen">false</item>-->
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@color/colorWindowBackground</item>

@@ -519,16 +519,20 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         if (args.isSinglePage) {
             requireMainActivity().apply {
                 setupForFragment<PostFragment>()
-                hideBottomNav()
-                disableCustomAppBar()
+                hideBottomNav(animate = true)
+                disableCustomAppBar(animate = true)
                 lockUiOpenness = true
             }
         }
     }
 
     override fun navigateToSignInScreen() {
-        val direction = PostFragmentDirections.actionPostFragmentToLogin()
-        findNavController().navigateSafe(direction)
+        if (args.isSinglePage) {
+            val direction = PostFragmentDirections.actionPostFragmentToLogin()
+            findNavController().navigateSafe(direction)
+        } else {
+            (parentFragment as? SignInNavigator)?.navigateToSignInScreen()
+        }
     }
 
     private fun forceRefresh() {

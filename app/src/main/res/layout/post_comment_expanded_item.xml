@@ -96,7 +96,7 @@
         app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
+    <com.idunnololz.summit.view.FixedTextView
         android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

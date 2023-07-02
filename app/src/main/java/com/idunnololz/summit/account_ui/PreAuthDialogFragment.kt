@@ -20,15 +20,9 @@ class PreAuthDialogFragment : BaseDialogFragment<DialogFragmentPreAuthBinding>()
         val context = requireContext()
         val builder: AlertDialog.Builder = MaterialAlertDialogBuilder(context)
 
-        builder.setMessage(R.string.auth_required_title)
+        builder.setTitle(R.string.auth_required_title)
 
-        val inflater = LayoutInflater.from(context)
-        val rootView = inflater.inflate(R.layout.dialog_fragment_pre_auth, null)
-        val textView = rootView.findViewById<TextView>(R.id.text)
-
-        textView.setText(R.string.auth_required_body)
-
-        builder.setView(rootView)
+        builder.setMessage(R.string.auth_required_body)
 
         builder.setPositiveButton(R.string.log_in) { _, _ ->
             dismiss()

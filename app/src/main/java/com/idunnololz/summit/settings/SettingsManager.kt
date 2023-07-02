@@ -22,11 +22,17 @@ class SettingsManager @Inject constructor(
 
     private val mainSettings = listOf(
         BasicSettingItem(
+            R.id.setting_theme,
+            R.drawable.baseline_palette_24,
+            context.getString(R.string.theme),
+            context.getString(R.string.theme_settings_desc)
+        ),
+        BasicSettingItem(
             R.id.setting_view_type,
             R.drawable.baseline_view_agenda_black_24,
             context.getString(R.string.view_type),
             context.getString(R.string.view_type_settings_desc)
-        )
+        ),
     )
 
     fun getSettingsForMainPage() =
@@ -65,76 +71,17 @@ data class OnOffSettingItem(
     val isOn: Boolean,
 ) : SettingItem
 
-fun OnOffSettingItem.bindTo(
-    b: OnOffSettingItemBinding,
-    getCurrentValue: () -> Boolean,
-    onValueChanged: (Boolean) -> Unit,
-) {
-    b.title.text = this.title
-    if (this.description != null) {
-        b.desc.visibility = View.VISIBLE
-        b.desc.text = this.description
-    } else {
-        b.desc.visibility = View.GONE
-    }
-    b.switchView.isChecked = getCurrentValue()
-
-    b.switchView.setOnCheckedChangeListener { compoundButton, b ->
-        onValueChanged(b)
-    }
-}
-
-fun SliderSettingItem.bindTo(
-    b: SliderSettingItemBinding,
-    getCurrentValue: () -> Float,
-    onValueChanged: (Float) -> Unit,
-) {
-    b.title.text = this.title
-    b.slider.valueFrom = this.minValue
-    b.slider.valueTo = this.maxValue
-
-    b.slider.value = getCurrentValue()
-
-    b.slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
-        override fun onStartTrackingTouch(slider: Slider) {}
-
-        override fun onStopTrackingTouch(slider: Slider) {
-            onValueChanged(slider.value)
-        }
-    })
-}
-
-fun <T> TextOnlySettingItem.bindTo(
-    activity: MainActivity,
-    b: TextOnlySettingItemBinding,
-    choices: Map<T, String>,
-    getCurrentChoice: () -> T,
-    onChoiceSelected: (T) -> Unit,
-) {
-    b.title.text = this.title
-    b.desc.text = choices[getCurrentChoice()]
-
-    b.root.setOnClickListener {
-        val curChoice = getCurrentChoice()
-        val bottomMenu = BottomMenu(b.root.context)
-            .apply {
-                val idToChoice = mutableMapOf<Int, T>()
-                choices.entries.withIndex().forEach { (index, entry) ->
-                    idToChoice[index] = entry.key
-                    addItem(index, entry.value)
-
-                    if (getCurrentChoice() == entry.key) {
-                        setChecked(index)
-                    }
-                }
-
-                setTitle(title)
-
-                setOnMenuItemClickListener {
-                    onChoiceSelected(requireNotNull(idToChoice[it.id]))
-                    b.desc.text = choices[getCurrentChoice()]
-                }
-            }
-        activity.showBottomMenu(bottomMenu)
-    }
+data class RadioGroupSettingItem(
+    @IdRes override val id: Int,
+    @DrawableRes val icon: Int,
+    override val title: String,
+    val description: String?,
+    val options: List<RadioGroupOption>,
+) : SettingItem {
+    data class RadioGroupOption(
+        @IdRes val id: Int,
+        val title: String,
+        val description: String?,
+        @DrawableRes val icon: Int,
+    )
 }

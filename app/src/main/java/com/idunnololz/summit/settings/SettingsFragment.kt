@@ -29,8 +29,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        requireMainActivity().setupForFragment<SettingsFragment>()
     }
 
     override fun onCreateView(
@@ -51,7 +49,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         val context = requireContext()
 
         requireMainActivity().apply {
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+            setupForFragment<SettingsFragment>()
+
+            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.collapsingToolbarLayout)
 
             setSupportActionBar(binding.searchBar)
 
@@ -87,9 +88,19 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 b.desc.text = item.description
 
                 b.root.setOnClickListener {
-                    val directions = SettingsFragmentDirections
-                        .actionSettingsFragmentToSettingViewTypeFragment()
-                    findNavController().navigateSafe(directions)
+
+                    when (item.id) {
+                        R.id.setting_view_type -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingViewTypeFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        R.id.setting_theme -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingThemeFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                    }
                 }
             }
         }

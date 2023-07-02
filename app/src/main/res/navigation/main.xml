@@ -69,6 +69,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingThemeFragment"
+            app:destination="@id/settingThemeFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <action android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment"
@@ -94,6 +101,10 @@
     </fragment><action android:id="@+id/action_global_videoViewerFragment" app:destination="@id/videoViewerFragment"/>
     <fragment
         android:id="@+id/settingViewTypeFragment"
-        android:name="com.idunnololz.summit.settings.SettingViewTypeFragment"
+        android:name="com.idunnololz.summit.settings.view_type.SettingViewTypeFragment"
         android:label="SettingViewTypeFragment" />
+    <fragment
+        android:id="@+id/settingThemeFragment"
+        android:name="com.idunnololz.summit.settings.theme.SettingThemeFragment"
+        android:label="SettingThemeFragment" />
 </navigation>

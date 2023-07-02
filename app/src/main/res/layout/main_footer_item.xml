@@ -7,7 +7,7 @@
 
     <Button
         android:id="@+id/prev_button"
-        style="@style/Widget.MaterialComponents.Button"
+        style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/prev"
@@ -22,7 +22,7 @@
 
     <Button
         android:id="@+id/next_button"
-        style="@style/Widget.MaterialComponents.Button"
+        style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/next"

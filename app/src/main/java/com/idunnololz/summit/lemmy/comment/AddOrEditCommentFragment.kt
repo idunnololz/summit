@@ -26,6 +26,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -37,7 +38,8 @@ import java.lang.Integer.min
 
 
 @AndroidEntryPoint
-class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBinding>() {
+class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
+    FullscreenDialogFragment {
 
     companion object {
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"

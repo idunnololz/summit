@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_half"
-        style="?attr/materialButtonOutlinedStyle"
+        style="@style/Widget.Material3.Button.TonalButton"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@+id/instance"

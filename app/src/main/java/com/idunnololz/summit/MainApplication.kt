@@ -13,12 +13,14 @@ import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
 import com.idunnololz.summit.video.ExoPlayerManager
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.plugins.RxJavaPlugins
 import java.util.*
@@ -190,6 +192,10 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                 }
                 .build(),
         )
+
+        val hiltEntryPoint =
+            EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
+        hiltEntryPoint.themeManager().applyThemeFromPreferences()
     }
 
     override fun getWorkManagerConfiguration(): androidx.work.Configuration {

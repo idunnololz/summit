@@ -21,13 +21,15 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBinding>() {
+class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
+    FullscreenDialogFragment {
 
     companion object {
         const val REQUEST_KEY = "CreateOrEditPostFragment_req_key"

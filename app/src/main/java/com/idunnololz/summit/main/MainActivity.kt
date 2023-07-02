@@ -11,6 +11,7 @@ import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -24,12 +25,15 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.color.DynamicColors
+import com.google.android.material.color.DynamicColorsOptions
 import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
@@ -42,6 +46,7 @@ import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.offline.OfflineFragment
+import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerFragment
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
@@ -56,8 +61,13 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.reflect.KClass
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -109,12 +119,29 @@ class MainActivity : BaseActivity() {
 
     var lockUiOpenness = false
 
+    @Inject
+    lateinit var themeManager: ThemeManager
+
+    private var isMaterialYou = false
+
+    private fun updateTheme() {
+        isMaterialYou = themeManager.useMaterialYou.value
+        if (isMaterialYou) {
+            Log.d("HAHA", "2Dynamic color applied!")
+            DynamicColors.applyToActivityIfAvailable(this@MainActivity)
+        } else {
+            // do nothing
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         super.onCreate(savedInstanceState)
+
+        updateTheme()
 
         viewModel.communities.observe(this) {
             communitySelectorController?.setCommunities(it)
@@ -129,7 +156,7 @@ class MainActivity : BaseActivity() {
         registerCurrentAccountListener()
         registerDefaultCommunityListener()
 
-        hideActionBar()
+        hideActionBar(animate = true)
 
         lemmyAppBarController = LemmyAppBarController(this, binding.customAppBar)
 
@@ -153,6 +180,18 @@ class MainActivity : BaseActivity() {
             if (savedInstanceState == null) {
                 setupBottomNavigationBar()
             } // Else, need to wait for onRestoreInstanceState
+
+            lifecycleScope.launch(Dispatchers.Default) {
+                themeManager.useMaterialYou.collect {
+                    withContext(Dispatchers.Main) {
+                        if (it != isMaterialYou) {
+                            updateTheme()
+
+                            recreate()
+                        }
+                    }
+                }
+            }
         }
 
         // Set up an OnPreDrawListener to the root view.
@@ -292,6 +331,10 @@ class MainActivity : BaseActivity() {
 
             onStatusBarHeightChanged(topInset)
 
+            binding.navBarBg.updateLayoutParams<LayoutParams> {
+                height = bottomInset
+            }
+
             insetsChangedLiveData.postValue(0)
 
             WindowInsetsCompat.CONSUMED
@@ -320,6 +363,9 @@ class MainActivity : BaseActivity() {
         binding.notificationBarBg.animate()
             .setDuration(250)
             .translationY((-binding.notificationBarBg.height).toFloat())
+        binding.navBarBg.animate()
+            .setDuration(250)
+            .translationY((binding.navBarBg.height).toFloat())
     }
 
     private fun showNotificationBarBgIfNeeded() {
@@ -327,6 +373,9 @@ class MainActivity : BaseActivity() {
         if (binding.notificationBarBg.translationY == 0f && binding.notificationBarBg.visibility == View.VISIBLE) return
         binding.notificationBarBg.visibility = View.VISIBLE
         binding.notificationBarBg.animate()
+            .setDuration(250)
+            .translationY(0f)
+        binding.navBarBg.animate()
             .setDuration(250)
             .translationY(0f)
     }
@@ -348,10 +397,15 @@ class MainActivity : BaseActivity() {
         enableBottomNavViewScrolling = false
     }
 
-    fun disableCustomAppBar() {
+    fun disableCustomAppBar(animate: Boolean) {
         binding.customAppBar.removeOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
-        binding.customAppBar.animate()
-            .translationY(-binding.customAppBar.height.toFloat())
+
+        if (animate) {
+            binding.customAppBar.animate()
+                .translationY(-binding.customAppBar.height.toFloat())
+        } else {
+            binding.customAppBar.translationY = -binding.customAppBar.height.toFloat()
+        }
 
         communitySelectorController?.hide()
 
@@ -457,11 +511,17 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun hideBottomNav() {
+    fun hideBottomNav(animate: Boolean) {
         Log.d(TAG, "bottomNavigationView.height: ${binding.bottomNavigationView.height}")
-        binding.bottomNavigationView.animate()
-            .translationY(binding.bottomNavigationView.height.toFloat())
-            .setDuration(250)
+
+        if (animate) {
+            binding.bottomNavigationView.animate()
+                .translationY(binding.bottomNavigationView.height.toFloat())
+                .setDuration(250)
+        } else {
+            binding.bottomNavigationView.translationY =
+                binding.bottomNavigationView.height.toFloat()
+        }
     }
 
     private fun handleIntent(intent: Intent?) {
@@ -609,7 +669,7 @@ class MainActivity : BaseActivity() {
     fun showActionBar() {
         setSupportActionBar(binding.toolbar)
 
-        hideActionBar(false)
+        hideActionBar(animate = true, false)
         unfixToolbar()
 
         binding.toolbar.updateLayoutParams<AppBarLayout.LayoutParams> {
@@ -633,7 +693,7 @@ class MainActivity : BaseActivity() {
         binding.appBar.addOnOffsetChangedListener(onOffsetChangedListener)
     }
 
-    fun hideActionBar(hideToolbar: Boolean = true) {
+    fun hideActionBar(animate: Boolean, hideToolbar: Boolean = true) {
         binding.appBar.removeOnOffsetChangedListener(onOffsetChangedListener)
         if (hideToolbar) {
             fixToolbar()
@@ -787,18 +847,39 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    inline fun <reified T> setupForFragment() {
-        Log.d("MainActivity", "setupForFragment(): ${T::class}")
-        when (T::class) {
+    inline fun <reified T> setupForFragment(animate: Boolean = true) {
+        setupForFragment(T::class, animate)
+    }
+
+    fun setupForFragment(t: KClass<*>, animate: Boolean) {
+        Log.d("MainActivity", "setupForFragment(): ${t}")
+
+        if (binding.root.height == 0) {
+            binding.root.viewTreeObserver.addOnPreDrawListener(
+                object : ViewTreeObserver.OnPreDrawListener {
+                    override fun onPreDraw(): Boolean {
+                        binding.root.viewTreeObserver.removeOnPreDrawListener(this)
+
+                        setupForFragment(t, animate)
+
+                        return false
+                    }
+                }
+            )
+
+            return
+        }
+
+        when (t) {
             CommunityFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 enableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
                 enableCustomAppBar()
             }
             PostFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
 //                hideBottomNav()
                 showNotificationBarBg()
@@ -806,62 +887,63 @@ class MainActivity : BaseActivity() {
 //                disableCustomAppBar()
             }
             VideoViewerFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
-                hideBottomNav()
-                disableCustomAppBar()
+                hideBottomNav(animate)
+                disableCustomAppBar(animate)
                 hideNotificationBarBg()
             }
             ImageViewerFragment::class -> {
                 showActionBar()
                 disableBottomNavViewScrolling()
-                hideBottomNav()
-                disableCustomAppBar()
+                hideBottomNav(animate)
+                disableCustomAppBar(animate)
                 hideNotificationBarBg()
             }
             OfflineFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar()
+                disableCustomAppBar(animate)
                 showNotificationBarBg()
             }
             HistoryFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
-                disableCustomAppBar()
+                disableCustomAppBar(animate)
             }
             OldSettingsFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar()
+                disableCustomAppBar(animate)
                 showNotificationBarBg()
             }
             LoginFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar()
+                disableCustomAppBar(animate)
                 showNotificationBarBg()
             }
             SavedFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar()
+                disableCustomAppBar(animate)
                 showNotificationBarBg()
             }
             SettingsFragment::class -> {
-                hideActionBar()
+                hideActionBar(animate)
                 disableBottomNavViewScrolling()
-                hideBottomNav()
-                disableCustomAppBar()
+                hideBottomNav(animate)
+                disableCustomAppBar(animate)
                 hideNotificationBarBg()
             }
-            else -> throw RuntimeException("No setup instructions for type: ${T::class.java.canonicalName}")
+            else ->
+                throw RuntimeException("No setup instructions for type: ${t.java.canonicalName}")
         }
     }
 
