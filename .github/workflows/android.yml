@@ -8,6 +8,9 @@ on:
       - "v*.*.*"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     name: Generate release APK
@@ -23,23 +26,24 @@ jobs:
           cache: gradle
       - name: chmod gradlew
         run: chmod +x gradlew
-      - name: Build APK
-        run: ./gradlew assembleRelease --stacktrace
-      - name: Sign APK
-        # ID used to access action output
-        id: sign_apk
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEYSTORE }}
-          alias: ${{ secrets.SIGNING_ALIAS }}
-          keyStorePassword: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.SIGNING_ALIAS_PASSWORD }}
-        env:
-          # override default build-tools version (29.0.3) -- optional
-          BUILD_TOOLS_VERSION: "34.0.0"
+#      - name: Build APK
+#        run: ./gradlew assembleRelease --stacktrace
+#      - name: Sign APK
+#        # ID used to access action output
+#        id: sign_apk
+#        uses: r0adkll/sign-android-release@v1
+#        with:
+#          releaseDirectory: app/build/outputs/apk/release
+#          signingKeyBase64: ${{ secrets.SIGNING_KEYSTORE }}
+#          alias: ${{ secrets.SIGNING_ALIAS }}
+#          keyStorePassword: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+#          keyPassword: ${{ secrets.SIGNING_ALIAS_PASSWORD }}
+#        env:
+#          # override default build-tools version (29.0.3) -- optional
+#          BUILD_TOOLS_VERSION: "34.0.0"
       - name: Rename APK
-        run: mv ${{steps.sign_apk.outputs.signedReleaseFile}} release.apk
+#        run: mv ${{steps.sign_apk.outputs.signedReleaseFile}} release.apk
+        run: mv app/release/app-release.apk release.apk
       - run: echo "Build status report=${{ job.status }}."
       - name: Upload App Bundle
         uses: actions/upload-artifact@v1
@@ -52,31 +56,3 @@ jobs:
           repository: idunnololz/summit-for-lemmy
           token: ${{ secrets.GH_TOKEN }}
           files: release.apk
-#  release:
-#    name: Release APK
-#    needs: apk
-#    if: startsWith(github.ref, 'refs/tags/v')
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download APK from build
-#        uses: actions/download-artifact@v1
-#        with:
-#          name: apk
-#      - name: Create Release
-#        id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: ${{ github.ref }}
-#          release_name: Release ${{ github.ref }}
-#      - name: Upload Release APK
-#        id: upload_release_asset
-#        uses: actions/upload-release-asset@v1.0.1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: apk/app-debug.apk
-#          asset_name: MensaApp.apk
-#          asset_content_type: application/zip
