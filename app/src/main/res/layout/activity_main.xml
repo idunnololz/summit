@@ -60,7 +60,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@android:color/transparent">
+                android:background="@color/transparent">
 
             </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
@@ -214,17 +214,26 @@
         android:fitsSystemWindows="false">
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/notificationBarBgContainer"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <!-- Height set programmatically -->
         <View
-            android:id="@+id/notificationBarBg"
+            android:id="@+id/notification_bar_bg"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@color/black33" />
-    </LinearLayout>
+            android:background="@color/colorSystemUiOverlay"
+            android:layout_gravity="top"/>
+
+        <!-- Height set programmatically -->
+        <View
+            android:id="@+id/nav_bar_bg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/colorSystemUiOverlay"
+            android:layout_gravity="bottom"
+            android:visibility="invisible"/>
+    </FrameLayout>
 </FrameLayout>

@@ -1,12 +1,15 @@
 package com.idunnololz.summit.preferences
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.post_view.PostUiConfig
 import com.idunnololz.summit.lemmy.post_view.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -16,6 +19,10 @@ import javax.inject.Singleton
 class Preferences @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
+
+    companion object {
+        private const val TAG = "Preferences"
+    }
 
     private val prefs = PreferenceUtil.preferences
 
@@ -61,22 +68,12 @@ class Preferences @Inject constructor(
     }
 
     fun getPostUiConfig(): PostUiConfig {
-        return try {
-            val json = prefs.getString(getPostUiConfigKey(), null)
-                ?: return getPostsLayout().getDefaultPostUiConfig()
-            moshi.adapter(PostUiConfig::class.java).fromJson(
-                json
-            ) ?: getPostsLayout().getDefaultPostUiConfig()
-        } catch (e: Exception) {
-            getPostsLayout().getDefaultPostUiConfig()
-        }
+        return prefs.getMoshiValue<PostUiConfig>(getPostUiConfigKey())
+            ?: getPostsLayout().getDefaultPostUiConfig()
     }
 
     fun setPostUiConfig(config: PostUiConfig) {
-        prefs.edit()
-            .putString(getPostUiConfigKey(),
-                moshi.adapter(PostUiConfig::class.java).toJson(config))
-            .apply()
+        prefs.putMoshiValue(getPostUiConfigKey(), config)
     }
 
     private fun getPostUiConfigKey() =
@@ -90,4 +87,40 @@ class Preferences @Inject constructor(
             CommunityLayout.Full ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_FULL
         }
+
+    fun getBaseTheme(): BaseTheme {
+        return prefs.getMoshiValue<BaseTheme>(KEY_BASE_THEME)
+            ?: BaseTheme.Dark
+    }
+
+    fun setBaseTheme(baseTheme: BaseTheme) {
+        prefs.putMoshiValue(KEY_BASE_THEME, baseTheme)
+    }
+
+    fun isUseMaterialYou(): Boolean {
+        return prefs.getBoolean(PreferenceUtil.KEY_USE_MATERIAL_YOU, false)
+    }
+
+    fun setUseMaterialYou(b: Boolean) {
+        prefs.edit().putBoolean(PreferenceUtil.KEY_USE_MATERIAL_YOU, b).apply()
+    }
+
+    private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
+        return try {
+            val json = this.getString(key, null)
+                ?: return null
+            moshi.adapter(T::class.java).fromJson(
+                json
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "", e)
+            null
+        }
+    }
+
+    private inline fun <reified T> SharedPreferences.putMoshiValue(key: String, value: T) {
+        this.edit()
+            .putString(key, moshi.adapter(T::class.java).toJson(value))
+            .apply()
+    }
 }

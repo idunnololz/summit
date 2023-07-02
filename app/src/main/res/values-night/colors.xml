@@ -3,8 +3,11 @@
 
     <!-- Important theme colors -->
     <color name="colorPrimary">@color/orangeTheme</color>
+    <color name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</color>
+    <color name="colorOnPrimaryContainer">@color/md_theme_dark_onPrimaryContainer</color>
     <color name="colorPrimaryDark">@color/orangeDarkTheme</color>
-    <color name="colorSecondary">@color/orangeTheme</color>
+    <color name="colorSecondary">@color/orangeThemeSecondary</color>
+    <color name="colorTertiary">@color/orangeThemeTertiary</color>
     <color name="colorAccent">@color/orangeTheme</color>
     <color name="colorOnPrimary">@color/black97</color>
     <color name="colorOnSecondary">@color/white97</color>
@@ -32,6 +35,8 @@
     <color name="colorDivider">#3b3b3d</color>
 
     <color name="colorQuoteLine">@color/white66</color>
+
+    <color name="colorSystemUiOverlay">@color/black33</color>
 
     <!-- This color MUST be a solid color to avoid UI issues -->
     <color name="colorThreadLines">#3b3b3d</color>

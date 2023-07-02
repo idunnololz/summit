@@ -9,9 +9,10 @@ import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
+import com.idunnololz.summit.R
 import com.idunnololz.summit.main.MainActivity
 
-open class BaseDialogFragment<T : ViewBinding> : DialogFragment() {
+open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
     fun getMainActivity(): MainActivity? = activity as? MainActivity
 
@@ -19,6 +20,8 @@ open class BaseDialogFragment<T : ViewBinding> : DialogFragment() {
 
     private var _binding: T? = null
     val binding get() = _binding!!
+
+    private val isFullscreen: Boolean = this is FullscreenDialogFragment
 
     fun isBindingAvailable(): Boolean = _binding != null
 
@@ -49,6 +52,16 @@ open class BaseDialogFragment<T : ViewBinding> : DialogFragment() {
     override fun onStart() {
         MyLog.d(logTag, "Lifecycle: onStart()")
         super.onStart()
+
+        if (isFullscreen) {
+
+        } else {
+            val dialog = dialog
+            if (dialog != null) {
+                val window = checkNotNull(dialog.window)
+                window.setBackgroundDrawableResource(R.drawable.dialog_background)
+            }
+        }
     }
 
     override fun onResume() {

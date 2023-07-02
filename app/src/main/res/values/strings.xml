@@ -202,6 +202,15 @@
     <string name="more_actions">More actions</string>
     <string name="block_this_community_format">Block this community (%1$s)</string>
     <string name="block_this_user">Block this user (%1$s)</string>
+    <string name="theme_settings_desc">Change and customize the app theme</string>
+    <string name="base_theme">Base theme</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="light_theme">Light theme</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="material_you">Material you</string>
+    <string name="personalized_theming_based_on_your_wallpaper">Personalized theming based on your wallpaper</string>
+    <string name="theme_config">Theme configuration</string>
+    <string name="error_dynamic_color_not_supported">Material You is not supported by your device.</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>
