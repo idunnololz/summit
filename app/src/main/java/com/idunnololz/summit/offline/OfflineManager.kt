@@ -31,7 +31,8 @@ import kotlin.collections.LinkedHashMap
 @SuppressLint("UnsafeOptInUsageError")
 @Singleton
 class OfflineManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+
 ) {
 
     companion object {

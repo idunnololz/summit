@@ -12,11 +12,11 @@ class ThreadLinesDecoration(
     private val context: Context
 ) : RecyclerView.ItemDecoration() {
 
-    val distanceBetweenLines =
+    private val distanceBetweenLines =
         context.resources.getDimensionPixelSize(R.dimen.thread_line_total_size)
-    val startingPadding =
+    private val startingPadding =
         context.resources.getDimensionPixelSize(R.dimen.reddit_content_horizontal_padding)
-    val topOverdraw = context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw)
+    private val topOverdraw = context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw)
 
     private val linePaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.colorThreadLines)
@@ -38,13 +38,7 @@ class ThreadLinesDecoration(
             val translationY = view.translationY
             val topOverdraw = topOverdraw
             val totalDepth = when (tag) {
-                is PostFragment.Item.CommentItem -> {
-                    tag.depth - tag.baseDepth
-                }
-                is PostFragment.Item.PendingCommentItem -> {
-                    tag.depth - tag.baseDepth
-                }
-                is PostFragment.Item.MoreCommentsItem -> {
+                is ThreadLinesData -> {
                     tag.depth - tag.baseDepth
                 }
                 else -> {
@@ -67,4 +61,9 @@ class ThreadLinesDecoration(
             }
         }
     }
+
+    data class ThreadLinesData(
+        val depth: Int,
+        val baseDepth: Int,
+    )
 }

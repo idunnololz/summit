@@ -2,10 +2,7 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.style.StyleSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -13,15 +10,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnPreDrawListener
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.widget.*
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.widget.PopupMenu
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.text.buildSpannedString
 import androidx.core.view.MenuProvider
-import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
@@ -31,13 +21,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.*
 import arrow.core.Either
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.drawable.ScalingUtils
-import com.facebook.drawee.interfaces.DraweeController
-import com.facebook.drawee.view.SimpleDraweeView
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
@@ -60,38 +44,38 @@ import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
-import com.idunnololz.summit.lemmy.LemmyContentHelper
-import com.idunnololz.summit.lemmy.LemmyHeaderHelper
-import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
-import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.utils.getFormattedAuthor
-import com.idunnololz.summit.lemmy.utils.getFormattedTitle
-import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.lemmy.post.PostFragment.Item.*
+import com.idunnololz.summit.lemmy.post.PostFragment.Item.CommentItem
+import com.idunnololz.summit.lemmy.post.PostFragment.Item.FooterItem
+import com.idunnololz.summit.lemmy.post.PostFragment.Item.HeaderItem
+import com.idunnololz.summit.lemmy.post.PostFragment.Item.MoreCommentsItem
+import com.idunnololz.summit.lemmy.post.PostFragment.Item.PendingCommentItem
+import com.idunnololz.summit.lemmy.post.PostFragment.Item.ProgressOrErrorItem
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
-import com.idunnololz.summit.lemmy.post_view.PostViewBuilder
-import com.idunnololz.summit.lemmy.utils.VoteUiHandler
-import com.idunnololz.summit.lemmy.utils.bind
-import com.idunnololz.summit.main.MainFragment
+import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.reddit.*
-import com.idunnololz.summit.util.*
-import com.idunnololz.summit.util.ext.addDefaultAnim
-import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.reddit.CommentsSortOrder
+import com.idunnololz.summit.reddit.getLocalizedName
+import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.SharedElementTransition
+import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
-import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -129,6 +113,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     @Inject
     lateinit var accountManager: AccountManager
 
+    @Inject
+    lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
     private var mainListingItemSeen = false
 
     private var actionsViewModel: MoreActionsViewModel? = null
@@ -162,10 +149,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         val context = requireContext()
 
         adapter = PostsAdapter(
+            postAndCommentViewBuilder = postAndCommentViewBuilder,
             context,
             args.instance,
             args.reveal,
-            viewModel.voteUiHandler,
             onRefreshClickCb = {
                 forceRefresh()
             },
@@ -244,15 +231,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
-//        enterTransition = TransitionInflater.from(requireContext())
-//            .inflateTransition(android.R.transition.fade)
 
         setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, bundle ->
-            val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
-
-            if (result != null) {
+//            val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
+//
+//            if (result != null) {
 //                viewModel.fetchPostData(args.instance, args.id)
-            }
+//            }
         }
 
         requireActivity().supportFragmentManager.setFragmentResultListener(
@@ -688,10 +673,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     }
 
     private inner class PostsAdapter(
+        private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
         private val context: Context,
         private val instance: String,
         private val revealAll: Boolean,
-        private val voteUiHandler: VoteUiHandler,
         private val onRefreshClickCb: () -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
@@ -708,12 +693,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         private var items: List<Item> = listOf()
 
-        private val lemmyHeaderHelper = LemmyHeaderHelper(context)
-        private val lemmyContentHelper = LemmyContentHelper(
-            context, offlineManager, ExoPlayerManager.get(this@PostFragment)
-        )
-        private val threadLinesHelper = ThreadLinesHelper(context)
-
         private var parentHeight: Int = 0
 
         /**
@@ -722,8 +701,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         private var revealedItems = mutableSetOf<String>()
 
         private var rawData: PostViewModel.PostData? = null
-
-        private var tempSize = Size()
 
         private var highlightedComment: CommentId = -1
         var isLoaded: Boolean = false
@@ -805,71 +782,29 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         val post = item.postView
                         val postKey = post.getUniqueKey()
 
-                        ViewCompat.setTransitionName(b.title, "title")
-
-                        lemmyHeaderHelper.populateHeaderSpan(
-                            headerContainer = b.headerContainer,
-                            postView = post,
+                        postAndCommentViewBuilder.bindPostView(
+                            binding = b,
+                            container = binding.recyclerView,
+                            postView = item.postView,
                             instance = instance,
-                            onPageClick = {
-                                requireMainActivity().launchPage(it)
-                            },
-                            listAuthor = false
-                        )
-
-                        b.title.text = post.getFormattedTitle()
-                        b.author.text = post.getFormattedAuthor()
-
-                        b.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
-                        b.commentButton.isEnabled = !post.post.locked
-                        b.commentButton.setOnClickListener {
-                            onAddCommentClick(Either.Left(item.postView))
-                        }
-                        b.addCommentButton.isEnabled = !post.post.locked
-                        b.addCommentButton.setOnClickListener {
-                            onAddCommentClick(Either.Left(item.postView))
-                        }
-
-                        b.moreButton.setOnClickListener {
-                            onPostMoreClick(item.postView)
-                        }
-
-                        lemmyContentHelper.setupFullContent(
-                            reveal = revealAll || revealedItems.contains(postKey),
-                            tempSize = tempSize,
-                            videoViewMaxHeight = (binding.recyclerView.height - Utils.convertDpToPixel(16f)).toInt(),
+                            isRevealed = revealAll || revealedItems.contains(postKey),
                             contentMaxWidth = contentMaxWidth,
-                            fullImageViewTransitionName = "post_image",
-                            postView = post,
-                            instance = instance,
-                            rootView = b.root,
-                            fullContentContainerView = b.fullContent,
-                            lazyUpdate = true,
+                            viewLifecycleOwner = viewLifecycleOwner,
                             videoState = item.videoState,
-                            onFullImageViewClickListener = { v, url ->
-                                onImageClick(url)
-                            },
-                            onImageClickListener = { url ->
-                                onImageClick(url)
-                            },
-                            onVideoClickListener = onVideoClick,
+                            updateContent = false,
                             onRevealContentClickedFn = {
                                 revealedItems.add(postKey)
                                 notifyItemChanged(holder.absoluteAdapterPosition)
                             },
-                            onItemClickListener = {},
-                            onLemmyUrlClick = onPageClick
-                        )
-
-                        voteUiHandler.bind(
-                            viewLifecycleOwner,
-                            instance,
-                            item.postView,
-                            b.upvoteButton,
-                            b.downvoteButton,
-                            b.upvoteCount,
-                            onSignInRequired,
-                            onInstanceMismatch,
+                            onImageClick = onImageClick,
+                            onVideoClick = onVideoClick,
+                            onPageClick = {
+                                requireMainActivity().launchPage(it)
+                            },
+                            onAddCommentClick = onAddCommentClick,
+                            onPostMoreClick = onPostMoreClick,
+                            onSignInRequired = onSignInRequired,
+                            onInstanceMismatch = onInstanceMismatch,
                         )
                     }
                 }
@@ -884,364 +819,111 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     val post = item.postView
                     val postKey = post.getUniqueKey()
 
-                    setupTransitionAnimation(b.title)
-
-                    ViewCompat.setTransitionName(b.title, "title")
-
-                    lemmyHeaderHelper.populateHeaderSpan(
-                        headerContainer = b.headerContainer,
+                    postAndCommentViewBuilder.bindPostView(
+                        binding = b,
+                        container = binding.recyclerView,
                         postView = item.postView,
                         instance = instance,
-                        onPageClick = {
-                            requireMainActivity().launchPage(it)
-                        },
-                        listAuthor = false
-                    )
-
-                    b.title.text = post.getFormattedTitle()
-                    b.author.text = post.getFormattedAuthor()
-
-                    b.commentButton.text = abbrevNumber(item.postView.counts.comments.toLong())
-                    b.commentButton.isEnabled = !post.post.locked
-                    b.commentButton.setOnClickListener {
-                        onAddCommentClick(Either.Left(item.postView))
-                    }
-                    b.addCommentButton.isEnabled = !post.post.locked
-                    b.addCommentButton.setOnClickListener {
-                        onAddCommentClick(Either.Left(item.postView))
-                    }
-
-                    b.moreButton.setOnClickListener {
-                        onPostMoreClick(item.postView)
-                    }
-
-                    lemmyContentHelper.setupFullContent(
-                        reveal = revealAll || revealedItems.contains(postKey),
-                        tempSize = tempSize,
-                        videoViewMaxHeight = (binding.recyclerView.height - Utils.convertDpToPixel(16f)).toInt(),
+                        isRevealed = revealAll || revealedItems.contains(postKey),
                         contentMaxWidth = contentMaxWidth,
-                        fullImageViewTransitionName = "post_image",
-                        postView = post,
-                        instance = instance,
-                        rootView = b.root,
-                        fullContentContainerView = b.fullContent,
+                        viewLifecycleOwner = viewLifecycleOwner,
                         videoState = item.videoState,
-                        onFullImageViewClickListener = { v, url ->
-                            onImageClick(url)
-                        },
-                        onImageClickListener = onImageClick,
-                        onVideoClickListener = onVideoClick,
+                        updateContent = true,
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
                             notifyItemChanged(holder.absoluteAdapterPosition)
                         },
-                        onItemClickListener = {},
-                        onLemmyUrlClick = onPageClick,
+                        onImageClick = onImageClick,
+                        onVideoClick = onVideoClick,
+                        onPageClick = {
+                            requireMainActivity().launchPage(it)
+                        },
+                        onAddCommentClick = onAddCommentClick,
+                        onPostMoreClick = onPostMoreClick,
+                        onSignInRequired = onSignInRequired,
+                        onInstanceMismatch = onInstanceMismatch,
                     )
-
-                    Log.d(TAG, "header vote state: ${item.postView.counts.upvotes}")
-
-                    voteUiHandler.bind(
-                        viewLifecycleOwner,
-                        instance,
-                        item.postView,
-                        b.upvoteButton,
-                        b.downvoteButton,
-                        b.upvoteCount,
-                        onSignInRequired,
-                        onInstanceMismatch,
-                    )
-
-                    b.root.tag = item
                 }
                 is CommentItem -> {
                     if (item.isExpanded) {
                         val b = holder.getBinding<PostCommentExpandedItemBinding>()
-                        val comment = item.comment
-                        val body = item.content
+                        val highlight = highlightedComment == item.commentId
 
-                        threadLinesHelper.populateThreadLines(
-                            b.threadLinesContainer, item.depth, item.baseDepth
-                        )
-                        lemmyHeaderHelper.populateHeaderSpan(b.headerContainer, item.comment)
-
-                        if (comment.comment.deleted || item.isDeleting) {
-                            b.text.text = buildSpannedString {
-                                append(context.getString(R.string.deleted))
-                                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
-                            }
-                        } else if (comment.comment.removed) {
-                            b.text.text = buildSpannedString {
-                                append(context.getString(R.string.removed))
-                                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
-                            }
-                        } else {
-                            LemmyTextHelper.bindText(
-                                textView = b.text,
-                                text = body,
-                                instance = instance,
-                                onImageClickListener = onImageClick,
-                                onPageClick = onPageClick,
-                            )
-                        }
-
-                        val giphyLinks = LemmyUtils.findGiphyLinks(body)
-                        if (giphyLinks.isNotEmpty()) {
-                            var lastViewId = 0
-                            giphyLinks.withIndex().forEach { (index, giphyKey) ->
-                                b.mediaContainer.visibility = View.VISIBLE
-                                val viewId = View.generateViewId()
-                                val imageView = SimpleDraweeView(context).apply {
-                                    layoutParams = ConstraintLayout.LayoutParams(
-                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                                    ).apply {
-                                        if (index == 0) {
-                                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                                        } else {
-                                            this.topToBottom = lastViewId
-                                        }
-                                        this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                                        this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                                        this.dimensionRatio = "H,16:9"
-                                    }
-                                    id = viewId
-                                    hierarchy.actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER
-                                }
-                                b.mediaContainer.addView(imageView)
-
-                                val processedGiphyKey: String = if (giphyKey.contains('|')) {
-                                    giphyKey.split('|')[0]
-                                } else {
-                                    giphyKey
-                                }
-
-                                val fullUrl = "https://i.giphy.com/media/${processedGiphyKey}/giphy.webp"
-                                val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-                                    .setUri(fullUrl)
-                                    .setAutoPlayAnimations(true)
-                                    .build()
-                                imageView.controller = controller
-
-                                imageView.setOnClickListener {
-                                    onImageClick(fullUrl)
-                                }
-
-                                lastViewId = viewId
-                            }
-                        } else {
-                            b.mediaContainer.removeAllViews()
-                            b.mediaContainer.visibility = View.GONE
-                        }
-
-                        b.collapseSectionButton.setOnClickListener {
-                            collapseSection(holder.bindingAdapterPosition)
-                        }
-                        b.topHotspot.setOnClickListener {
-                            collapseSection(holder.bindingAdapterPosition)
-                        }
-
-                        b.commentButton.isEnabled = !item.isPostLocked
-                        b.commentButton.setOnClickListener {
-                            onAddCommentClick(Either.Right(item.comment))
-                        }
-                        b.moreButton.setOnClickListener {
-
-                            PopupMenu(context, b.moreButton).apply {
-                                inflate(R.menu.menu_comment_item)
-
-                                if (BuildConfig.DEBUG) {
-                                    menu.findItem(R.id.raw_comment).isVisible = true
-                                }
-
-                                if (item.comment.creator.id !=
-                                    accountManager.currentAccount.value?.id) {
-                                    menu.setGroupVisible(R.id.mod_post_actions, false)
-                                    //menu.findItem(R.id.edit_comment).isVisible = false
-                                }
-
-                                setOnMenuItemClickListener {
-                                    when (it.itemId) {
-                                        R.id.raw_comment -> {
-                                            val action =
-                                                PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
-                                                    commentItemStr = Utils.gson.toJson(item.comment)
-                                                )
-                                            findNavController().navigate(action)
-                                        }
-                                        R.id.edit_comment -> {
-                                            onEditCommentClick(item.comment)
-                                        }
-                                        R.id.delete_comment -> {
-                                            onDeleteCommentClick(item.comment)
-                                        }
-                                    }
-                                    true
-                                }
-                            }.show()
-                        }
-                        if (item.comment.comment.distinguished) {
-                            b.overlay.visibility = View.VISIBLE
-                            b.overlay.setBackgroundResource(R.drawable.locked_overlay)
-                        } else {
-                            b.overlay.visibility = View.GONE
-                        }
-
-                        voteUiHandler.bind(
-                            viewLifecycleOwner,
-                            instance,
+                        postAndCommentViewBuilder.bindCommentViewExpanded(
+                            holder,
+                            b,
+                            item.baseDepth,
+                            item.depth,
                             item.comment,
-                            b.upvoteButton,
-                            b.downvoteButton,
-                            b.upvoteCount,
+                            item.isDeleting,
+                            item.content,
+                            instance,
+                            item.isPostLocked,
+                            item.isUpdating,
+                            highlight,
+                            viewLifecycleOwner,
+                            accountManager.currentAccount.value?.id,
+                            onImageClick,
+                            onPageClick,
+                            {
+                                collapseSection(holder.bindingAdapterPosition)
+                            },
+                            onAddCommentClick,
+                            onEditCommentClick,
+                            onDeleteCommentClick,
                             onSignInRequired,
                             onInstanceMismatch,
                         )
-
-                        highlightComment(item.commentId, b.highlightBg)
-
-                        if (item.isUpdating) {
-                            b.progressBar.visibility = View.VISIBLE
-                        } else {
-                            b.progressBar.visibility = View.GONE
-                        }
-
-                        b.root.tag = item
                     } else {
                         // collapsed
                         val b = holder.getBinding<PostCommentCollapsedItemBinding>()
-                        threadLinesHelper.populateThreadLines(
-                            b.threadLinesContainer, item.depth, item.baseDepth
+                        val highlight = highlightedComment == item.commentId
+
+                        postAndCommentViewBuilder.bindCommentViewCollapsed(
+                            holder,
+                            b,
+                            item.baseDepth,
+                            item.depth,
+                            item.childrenCount,
+                            highlight,
+                            item.isUpdating,
+                            item.comment,
+                            ::expandSection,
                         )
-                        lemmyHeaderHelper.populateHeaderSpan(
-                            headerContainer = b.headerContainer,
-                            item = item.comment,
-                            detailed = true,
-                            childrenCount = item.childrenCount
-                        )
-
-                        b.expandSectionButton.setOnClickListener {
-                            expandSection(holder.absoluteAdapterPosition)
-                        }
-                        b.topHotspot.setOnClickListener {
-                            expandSection(holder.absoluteAdapterPosition)
-                        }
-                        if (item.comment.comment.distinguished) {
-                            b.overlay.visibility = View.VISIBLE
-                            b.overlay.setBackgroundResource(R.drawable.locked_overlay)
-                        } else {
-                            b.overlay.visibility = View.GONE
-                        }
-
-                        highlightComment(item.commentId, b.highlightBg)
-
-                        if (item.isUpdating) {
-                            b.progressBar.visibility = View.VISIBLE
-                        } else {
-                            b.progressBar.visibility = View.GONE
-                        }
-
-                        b.root.tag = item
                     }
                 }
                 is PendingCommentItem -> {
                     if (item.isExpanded) {
                         val b = holder.getBinding<PostPendingCommentExpandedItemBinding>()
-                        val body = item.content
+                        val highlight = highlightedComment == item.commentId
 
-                        threadLinesHelper.populateThreadLines(
-                            b.threadLinesContainer, item.depth, item.baseDepth
+                        postAndCommentViewBuilder.bindPendingCommentViewExpanded(
+                            holder,
+                            b,
+                            item.baseDepth,
+                            item.depth,
+                            item.content,
+                            instance,
+                            item.author,
+                            highlight,
+                            onImageClick,
+                            onPageClick,
+                            ::collapseSection,
                         )
-                        b.headerContainer.setTextFirstPart(item.author ?: getString(R.string.unknown))
-                        b.headerContainer.setTextSecondPart("")
-
-                        LemmyTextHelper.bindText(
-                            textView = b.text,
-                            text = body,
-                            instance = instance,
-                            onImageClickListener = onImageClick,
-                            onPageClick = onPageClick,
-                        )
-
-                        val giphyLinks = LemmyUtils.findGiphyLinks(body)
-                        if (giphyLinks.isNotEmpty()) {
-                            var lastViewId = 0
-                            giphyLinks.withIndex().forEach { (index, giphyKey) ->
-                                b.mediaContainer.visibility = View.VISIBLE
-                                val viewId = View.generateViewId()
-                                val imageView = SimpleDraweeView(context).apply {
-                                    layoutParams = ConstraintLayout.LayoutParams(
-                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                                    ).apply {
-                                        if (index == 0) {
-                                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                                        } else {
-                                            this.topToBottom = lastViewId
-                                        }
-                                        this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                                        this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                                        this.dimensionRatio = "H,16:9"
-                                    }
-                                    id = viewId
-                                    hierarchy.actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER
-                                }
-                                b.mediaContainer.addView(imageView)
-
-                                val processedGiphyKey: String = if (giphyKey.contains('|')) {
-                                    giphyKey.split('|')[0]
-                                } else {
-                                    giphyKey
-                                }
-
-                                val fullUrl = "https://i.giphy.com/media/${processedGiphyKey}/giphy.webp"
-                                val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-                                    .setUri(fullUrl)
-                                    .setAutoPlayAnimations(true)
-                                    .build()
-                                imageView.controller = controller
-
-                                imageView.setOnClickListener {
-                                    onImageClick(fullUrl)
-                                }
-
-                                lastViewId = viewId
-                            }
-                        } else {
-                            b.mediaContainer.removeAllViews()
-                            b.mediaContainer.visibility = View.GONE
-                        }
-
-                        b.collapseSectionButton.setOnClickListener {
-                            collapseSection(holder.bindingAdapterPosition)
-                        }
-                        b.topHotspot.setOnClickListener {
-                            collapseSection(holder.bindingAdapterPosition)
-                        }
-
-                        highlightComment(item.commentId, b.highlightBg)
-
-                        b.root.tag = item
                     } else {
                         // collapsed
                         val b = holder.getBinding<PostPendingCommentCollapsedItemBinding>()
-                        threadLinesHelper.populateThreadLines(
-                            b.threadLinesContainer, item.depth, item.baseDepth
+                        val highlight = highlightedComment == item.commentId
+
+                        postAndCommentViewBuilder.bindPendingCommentViewCollapsed(
+                            holder,
+                            b,
+                            item.baseDepth,
+                            item.depth,
+                            item.author,
+                            highlight,
+                            ::collapseSection,
                         )
-                        b.headerContainer.setTextFirstPart(item.author ?: getString(R.string.unknown))
-                        b.headerContainer.setTextSecondPart("")
-
-                        b.expandSectionButton.setOnClickListener {
-                            expandSection(holder.absoluteAdapterPosition)
-                        }
-                        b.topHotspot.setOnClickListener {
-                            expandSection(holder.absoluteAdapterPosition)
-                        }
-                        b.overlay.visibility = View.GONE
-
-                        b.root.tag = item
-
-                        highlightComment(item.commentId, b.highlightBg)
                     }
                 }
                 is ProgressOrErrorItem -> {
@@ -1258,7 +940,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 is MoreCommentsItem -> {
                     val b = holder.getBinding<PostMoreCommentsItemBinding>()
 
-                    threadLinesHelper.populateThreadLines(
+                    postAndCommentViewBuilder.threadLinesHelper.populateThreadLines(
                         b.threadLinesContainer, item.depth, item.baseDepth
                     )
                     b.moreButton.text = context.resources.getQuantityString(
@@ -1278,25 +960,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
-        private fun highlightComment(commentId: CommentId?, bg: View) {
-            commentId ?: return
-
-            if (highlightedComment == commentId) {
-                bg.visibility = View.VISIBLE
-
-                val animation = AlphaAnimation(0f, 0.9f)
-                animation.repeatCount = 5
-                animation.repeatMode = Animation.REVERSE
-                animation.duration = 300
-                animation.fillAfter = true
-
-                bg.startAnimation(animation)
-            } else {
-                bg.visibility = View.GONE
-                bg.clearAnimation()
-            }
-        }
-
         override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
             super.onViewRecycled(holder)
 
@@ -1308,24 +971,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
             if (holder.isBinding<PostHeaderItemBinding>()) {
                 val b = holder.getBinding<PostHeaderItemBinding>()
-                val state = lemmyContentHelper.recycleFullContent(b.fullContent)
+                val state = postAndCommentViewBuilder.recycle(b)
 
                 (item as? HeaderItem)?.videoState = state.videoState
             }
         }
 
         override fun getItemCount(): Int = items.size
-
-        private fun setupTransitionAnimation(titleTextView: TextView) {
-            val transitionSet = TransitionSet()
-            transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
-            transitionSet.addTransition(ChangeBounds())
-            transitionSet.addTransition(ChangeTransform())
-            transitionSet.addTransition(TextResize().addTarget(titleTextView))
-
-            sharedElementEnterTransition = transitionSet
-            sharedElementReturnTransition = transitionSet
-        }
 
         /**
          * @param refreshHeader Pass false to not always refresh header. Useful for web view headers

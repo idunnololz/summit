@@ -48,8 +48,8 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.post.PostFragment
-import com.idunnololz.summit.lemmy.post_view.ListingItemViewHolder
-import com.idunnololz.summit.lemmy.post_view.PostViewBuilder
+import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
+import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
@@ -101,7 +101,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     lateinit var userCommunitiesManager: UserCommunitiesManager
 
     @Inject
-    lateinit var postViewBuilder: PostViewBuilder
+    lateinit var postListViewBuilder: PostListViewBuilder
 
     private var viewPagerController: ViewPagerController? = null
 
@@ -220,7 +220,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         val context = requireContext()
         if (adapter == null) {
             adapter = ListingItemAdapter(
-                postViewBuilder = postViewBuilder,
+                postListViewBuilder = postListViewBuilder,
                 context = context,
                 onNextClick = {
                     viewModel.fetchNextPage(clearPagePosition = true)
@@ -790,8 +790,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     }
 
     private fun onSelectedLayoutChanged() {
-        val newPostUiConfig = preferences.getPostUiConfig()
-        val didUiConfigChange = postViewBuilder.postUiConfig != newPostUiConfig
+        val newPostUiConfig = preferences.getPostInListUiConfig()
+        val didUiConfigChange = postListViewBuilder.postUiConfig != newPostUiConfig
         val didLayoutChange = adapter?.layout != preferences.getPostsLayout()
 
         if (didLayoutChange) {
@@ -801,7 +801,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
 
         if (didUiConfigChange) {
-            postViewBuilder.postUiConfig = newPostUiConfig
+            postListViewBuilder.postUiConfig = newPostUiConfig
         }
 
         if (didLayoutChange || didUiConfigChange) {
@@ -886,7 +886,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     }
 
     private inner class ListingItemAdapter(
-        private val postViewBuilder: PostViewBuilder,
+        private val postListViewBuilder: PostListViewBuilder,
         private val context: Context,
         private val onNextClick: () -> Unit,
         private val onPrevClick: () -> Unit,
@@ -977,7 +977,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                             .contains(item.postView.getUniqueKey())
                         val isExpanded = expandedItems.contains(item.postView.getUniqueKey())
 
-                        postViewBuilder.bind(
+                        postListViewBuilder.bind(
                             holder = h,
                             container = binding.recyclerView,
                             postView = item.postView,
@@ -1043,7 +1043,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         .contains(item.postView.getUniqueKey())
                     val isExpanded = expandedItems.contains(item.postView.getUniqueKey())
 
-                    postViewBuilder.bind(
+                    postListViewBuilder.bind(
                         holder = h,
                         container = binding.recyclerView,
                         postView = item.postView,
@@ -1081,7 +1081,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             super.onViewRecycled(holder)
 
             if (holder is ListingItemViewHolder) {
-                postViewBuilder.recycle(
+                postListViewBuilder.recycle(
                     holder
                 )
             }

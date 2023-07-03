@@ -3,8 +3,8 @@ package com.idunnololz.summit.settings.view_type
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.lemmy.post_view.PostUiConfig
-import com.idunnololz.summit.lemmy.post_view.getDefaultPostUiConfig
+import com.idunnololz.summit.lemmy.postListView.PostInListUiConfig
+import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.preferences.Preferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ class SettingViewTypeViewModel @Inject constructor(
     private val preferences: Preferences
 ) : ViewModel() {
 
-    var currentPostUiConfig: PostUiConfig = preferences.getPostUiConfig()
+    var currentPostUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
         set(value) {
             field = value
 
@@ -31,7 +31,7 @@ class SettingViewTypeViewModel @Inject constructor(
     }
 
     fun onLayoutChanged() {
-        currentPostUiConfig = preferences.getPostUiConfig()
+        currentPostUiConfig = preferences.getPostInListUiConfig()
         onPostUiChanged.value = Unit
     }
 
@@ -41,7 +41,7 @@ class SettingViewTypeViewModel @Inject constructor(
     }
 
     private fun applyConfig() {
-        preferences.setPostUiConfig(currentPostUiConfig)
+        preferences.setPostInListUiConfig(currentPostUiConfig)
     }
 
     override fun onCleared() {
