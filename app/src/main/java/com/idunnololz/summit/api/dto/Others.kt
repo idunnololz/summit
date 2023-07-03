@@ -79,6 +79,42 @@ enum class SortType {
      */
     @SerializedName("NewComments")
     NewComments,
+
+    /**
+     * Posts sorted by the top hour.
+     */
+    @SerializedName("TopHour")
+    TopHour,
+
+    /**
+     * Posts sorted by the top six hour.
+     */
+    @SerializedName("TopSixHour")
+    TopSixHour,
+
+    /**
+     * Posts sorted by the top twelve hour.
+     */
+    @SerializedName("TopTwelveHour")
+    TopTwelveHour,
+
+    /**
+     * Posts sorted by the top three months.
+     */
+    @SerializedName("TopThreeMonths")
+    TopThreeMonths,
+
+    /**
+     * Posts sorted by the top six months.
+     */
+    @SerializedName("TopSixMonths")
+    TopSixMonths,
+
+    /**
+     * Posts sorted by the top nine months.
+     */
+    @SerializedName("TopNineMonths")
+    TopNineMonths,
 }
 
 /**

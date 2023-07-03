@@ -288,7 +288,6 @@ class PostAndCommentViewBuilder @Inject constructor(
             onAddCommentClick(Either.Right(commentView))
         }
         moreButton.setOnClickListener {
-
             PopupMenu(context, moreButton).apply {
                 inflate(R.menu.menu_comment_item)
                 if (commentView.creator.id !=

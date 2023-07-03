@@ -152,15 +152,30 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
     private val _sortByTopMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
+            addItem(R.id.sort_order_top_last_hour, R.string.time_frame_last_hour)
+            addItem(R.id.sort_order_top_last_six_hour, getString(R.string.time_frame_last_hours_format, "6"))
+            addItem(R.id.sort_order_top_last_twelve_hour, getString(R.string.time_frame_last_hours_format, "12"))
             addItem(R.id.sort_order_top_day, R.string.time_frame_today)
             addItem(R.id.sort_order_top_week, R.string.time_frame_this_week)
             addItem(R.id.sort_order_top_month, R.string.time_frame_this_month)
+            addItem(R.id.sort_order_top_last_three_month, getString(R.string.time_frame_last_months_format, "3"))
+            addItem(R.id.sort_order_top_last_six_month, getString(R.string.time_frame_last_months_format, "6"))
+            addItem(R.id.sort_order_top_last_nine_month, getString(R.string.time_frame_last_months_format, "9"))
             addItem(R.id.sort_order_top_year, R.string.time_frame_this_year)
             addItem(R.id.sort_order_top_all_time, R.string.time_frame_all_time)
             setTitle(R.string.sort_by_top)
 
             setOnMenuItemClickListener { menuItem ->
                 when(menuItem.id) {
+                    R.id.sort_order_top_last_hour ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastHour))
+                    R.id.sort_order_top_last_six_hour ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastSixHour))
+                    R.id.sort_order_top_last_twelve_hour ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastTwelveHour))
                     R.id.sort_order_top_day ->
                         viewModel.setSortOrder(
                             CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.Today))
@@ -170,6 +185,15 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     R.id.sort_order_top_month ->
                         viewModel.setSortOrder(
                             CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisMonth))
+                    R.id.sort_order_top_last_three_month ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastThreeMonth))
+                    R.id.sort_order_top_last_six_month ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastSixMonth))
+                    R.id.sort_order_top_last_nine_month ->
+                        viewModel.setSortOrder(
+                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastNineMonth))
                     R.id.sort_order_top_year ->
                         viewModel.setSortOrder(
                             CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisYear))
@@ -640,6 +664,18 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         _sortByTopMenu.setChecked(R.id.sort_order_top_year)
                     CommunitySortOrder.TimeFrame.AllTime ->
                         _sortByTopMenu.setChecked(R.id.sort_order_top_all_time)
+                    CommunitySortOrder.TimeFrame.LastHour ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_hour)
+                    CommunitySortOrder.TimeFrame.LastSixHour ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_six_hour)
+                    CommunitySortOrder.TimeFrame.LastTwelveHour ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_twelve_hour)
+                    CommunitySortOrder.TimeFrame.LastThreeMonth ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_three_month)
+                    CommunitySortOrder.TimeFrame.LastSixMonth ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_six_month)
+                    CommunitySortOrder.TimeFrame.LastNineMonth ->
+                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_nine_month)
                 }
             }
             else -> {}
@@ -778,6 +814,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         val direction = CommunityFragmentDirections.actionCommunityFragmentToLogin()
         findNavController().navigateSafe(direction)
     }
+
+    override fun proceedAnyways(tag: Int) {}
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
     }
