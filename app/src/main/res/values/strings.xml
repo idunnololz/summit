@@ -217,6 +217,10 @@
     <string name="post_settings">Post settings</string>
     <string name="reset_post_styles">Reset post styles</string>
     <string name="reset_comment_styles">Reset comment styles</string>
+    <string name="proceed_anyways">Proceed anyways</string>
+    <string name="time_frame_last_hour">Last hour</string>
+    <string name="time_frame_last_hours_format">Last %1$s hours</string>
+    <string name="time_frame_last_months_format">Last %1$s months</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

@@ -47,4 +47,12 @@
     <item name="setting_post_and_comments" type="id" />
     <item name="setting_post_text_scaling" type="id" />
     <item name="setting_comment_text_scaling" type="id" />
+    <item name="action_add_comment" type="id" />
+    <item name="action_edit_comment" type="id" />
+    <item name="sort_order_top_last_hour" type="id" />
+    <item name="sort_order_top_last_six_hour" type="id" />
+    <item name="sort_order_top_last_twelve_hour" type="id" />
+    <item name="sort_order_top_last_three_month" type="id" />
+    <item name="sort_order_top_last_six_month" type="id" />
+    <item name="sort_order_top_last_nine_month" type="id" />
 </resources>

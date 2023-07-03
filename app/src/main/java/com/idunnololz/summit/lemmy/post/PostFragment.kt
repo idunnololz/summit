@@ -172,7 +172,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             },
             onAddCommentClick = { postOrComment ->
                 if (accountManager.currentAccount.value == null) {
-                    PreAuthDialogFragment.newInstance()
+                    PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                         .show(childFragmentManager, "asdf")
                     return@PostsAdapter
                 }
@@ -189,7 +189,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             },
             onEditCommentClick = {
                 if (accountManager.currentAccount.value == null) {
-                    PreAuthDialogFragment.newInstance()
+                    PreAuthDialogFragment.newInstance(R.id.action_edit_comment)
                         .show(childFragmentManager, "asdf")
                     return@PostsAdapter
                 }
@@ -517,6 +517,29 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             findNavController().navigateSafe(direction)
         } else {
             (parentFragment as? SignInNavigator)?.navigateToSignInScreen()
+        }
+    }
+
+    override fun proceedAnyways(tag: Int) {
+        when (tag) {
+            R.id.action_add_comment -> {
+                val postView = viewModel.postData.valueOrNull?.postView ?: return
+                AddOrEditCommentFragment().apply {
+                    arguments =
+                        AddOrEditCommentFragmentArgs(
+                            args.instance, null, postView.post, null)
+                            .toBundle()
+                }.show(childFragmentManager, "asdf")
+            }
+            R.id.action_edit_comment -> {
+                val postView = viewModel.postData.valueOrNull?.postView ?: return
+                AddOrEditCommentFragment().apply {
+                    arguments =
+                        AddOrEditCommentFragmentArgs(
+                            args.instance, null, postView.post, null)
+                            .toBundle()
+                }.show(childFragmentManager, "asdf")
+            }
         }
     }
 

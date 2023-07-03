@@ -13,7 +13,15 @@ import com.idunnololz.summit.util.BaseDialogFragment
 class PreAuthDialogFragment : BaseDialogFragment<DialogFragmentPreAuthBinding>() {
 
     companion object {
-        fun newInstance(): PreAuthDialogFragment = PreAuthDialogFragment()
+        private const val ARG_TAG = "ARG_TAG"
+
+        fun newInstance(tag: Int = 0): PreAuthDialogFragment =
+            PreAuthDialogFragment()
+                .apply {
+                    arguments = Bundle().apply {
+                        putInt(ARG_TAG, tag)
+                    }
+                }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -32,11 +40,19 @@ class PreAuthDialogFragment : BaseDialogFragment<DialogFragmentPreAuthBinding>()
             dismiss()
         }
 
-        return builder.create().also { dialog ->
+        val tag = arguments?.getInt(ARG_TAG) ?: 0
+        if (tag != 0) {
+            builder.setNeutralButton(R.string.proceed_anyways) { _, _ ->
+                dismiss()
+                (parentFragment as SignInNavigator).proceedAnyways(tag)
+            }
         }
+
+        return builder.create()
     }
 }
 
 interface SignInNavigator {
     fun navigateToSignInScreen()
+    fun proceedAnyways(tag: Int)
 }

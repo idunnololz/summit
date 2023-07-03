@@ -63,6 +63,7 @@ class AccountInfoManager @Inject constructor(
 
         if (account == null) {
             currentAccountInfo = null
+            accountInfoUpdateState.emit(StatefulData.Success(Unit))
             return
         }
 

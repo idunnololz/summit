@@ -28,9 +28,15 @@ sealed interface CommunitySortOrder {
     ) : CommunitySortOrder
 
     enum class TimeFrame {
+        LastHour,
+        LastSixHour,
+        LastTwelveHour,
         Today,
         ThisWeek,
         ThisMonth,
+        LastThreeMonth,
+        LastSixMonth,
+        LastNineMonth,
         ThisYear,
         AllTime
     }
@@ -46,9 +52,15 @@ fun CommunitySortOrder.toApiSortOrder(): SortType =
         CommunitySortOrder.Old -> SortType.Old
         is CommunitySortOrder.TopOrder -> {
             when (this.timeFrame) {
+                CommunitySortOrder.TimeFrame.LastHour -> SortType.TopHour
+                CommunitySortOrder.TimeFrame.LastSixHour -> SortType.TopSixHour
+                CommunitySortOrder.TimeFrame.LastTwelveHour -> SortType.TopTwelveHour
                 CommunitySortOrder.TimeFrame.Today -> SortType.TopDay
                 CommunitySortOrder.TimeFrame.ThisWeek -> SortType.TopWeek
                 CommunitySortOrder.TimeFrame.ThisMonth -> SortType.TopMonth
+                CommunitySortOrder.TimeFrame.LastThreeMonth -> SortType.TopThreeMonths
+                CommunitySortOrder.TimeFrame.LastSixMonth -> SortType.TopSixMonths
+                CommunitySortOrder.TimeFrame.LastNineMonth -> SortType.TopNineMonths
                 CommunitySortOrder.TimeFrame.ThisYear -> SortType.TopYear
                 CommunitySortOrder.TimeFrame.AllTime -> SortType.TopAll
             }

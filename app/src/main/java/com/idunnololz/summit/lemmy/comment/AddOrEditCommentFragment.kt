@@ -20,6 +20,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
 import com.idunnololz.summit.lemmy.PostRef
@@ -39,7 +41,7 @@ import java.lang.Integer.min
 
 @AndroidEntryPoint
 class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
-    FullscreenDialogFragment {
+    FullscreenDialogFragment, SignInNavigator {
 
     companion object {
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
@@ -135,6 +137,12 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.send_comment -> {
+                    if (viewModel.currentAccount.value == null) {
+                        PreAuthDialogFragment()
+                            .showAllowingStateLoss(childFragmentManager, "AS")
+                        return@setOnMenuItemClickListener true
+                    }
+
                     viewModel.sendComment(
                         PostRef(args.instance,
                             requireNotNull(args.postView?.post?.id ?: args.commentView?.post?.id) {
@@ -146,6 +154,12 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     true
                 }
                 R.id.update_comment -> {
+                    if (viewModel.currentAccount.value == null) {
+                        PreAuthDialogFragment()
+                            .showAllowingStateLoss(childFragmentManager, "DF")
+                        return@setOnMenuItemClickListener true
+                    }
+
                     viewModel.updateComment(
                         PostRef(args.instance,
                             requireNotNull(args.editCommentView?.post?.id) {
@@ -229,5 +243,13 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
 
     private fun isEdit(): Boolean {
         return args.editCommentView != null
+    }
+
+    override fun navigateToSignInScreen() {
+        (parentFragment as? SignInNavigator)?.navigateToSignInScreen()
+        dismiss()
+    }
+
+    override fun proceedAnyways(tag: Int) {
     }
 }
