@@ -56,7 +56,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?textAppearanceTitleMedium"/>
 
-                        <FrameLayout
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/demo_view_container"
                             android:layout_marginTop="@dimen/padding"
                             android:layout_width="match_parent"
@@ -65,57 +65,98 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <TextView
+                    android:id="@+id/section_title"
+                    android:text="@string/post_settings"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingBottom="@dimen/padding"
+                    android:paddingTop="@dimen/padding_two"
+                    style="@style/SettingHeaderStyle"
+                    app:layout_constraintTop_toBottomOf="@+id/demo_view_card"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
                 <include
-                    android:id="@+id/view_type_setting"
-                    layout="@layout/text_only_setting_item"
+                    android:id="@+id/text_scaling_setting1"
+                    layout="@layout/slider_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/padding"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/demo_view_card"/>
+                    app:layout_constraintTop_toBottomOf="@+id/section_title"/>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/view_type_setting"/>
+                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting1"/>
 
                 <TextView
-                    android:id="@+id/reset"
+                    android:id="@+id/reset_post_styles"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/padding"
                     android:background="?selectableItemBackground"
-                    android:text="@string/reset_view_styles"
+                    android:text="@string/reset_post_styles"
                     android:textAppearance="?textAppearanceTitleMedium"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/view_type_setting"
+                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting1"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/reset"/>
+                    app:layout_constraintTop_toBottomOf="@+id/reset_post_styles"/>
+
+                <TextView
+                    android:id="@+id/section_title2"
+                    android:text="@string/comment_settings"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingBottom="@dimen/padding"
+                    android:paddingTop="@dimen/padding_two"
+                    style="@style/SettingHeaderStyle"
+                    app:layout_constraintTop_toBottomOf="@+id/reset_post_styles"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
 
                 <include
-                    android:id="@+id/text_scaling_setting"
+                    android:id="@+id/text_scaling_setting2"
                     layout="@layout/slider_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/reset"/>
+                    app:layout_constraintTop_toBottomOf="@+id/section_title2"/>
 
-                <include
-                    android:id="@+id/prefer_image_at_the_end"
-                    layout="@layout/on_off_setting_item"
+
+                <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting"/>
+                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting2"/>
+
+                <TextView
+                    android:id="@+id/reset_comment_styles"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/padding"
+                    android:background="?selectableItemBackground"
+                    android:text="@string/reset_comment_styles"
+                    android:textAppearance="?textAppearanceTitleMedium"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting2"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/reset_comment_styles"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

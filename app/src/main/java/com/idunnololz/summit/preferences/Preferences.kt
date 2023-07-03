@@ -3,13 +3,15 @@ package com.idunnololz.summit.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.community.CommunityLayout
-import com.idunnololz.summit.lemmy.post_view.PostUiConfig
-import com.idunnololz.summit.lemmy.post_view.getDefaultPostUiConfig
+import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
+import com.idunnololz.summit.lemmy.postListView.PostInListUiConfig
+import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfig
+import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -50,7 +52,6 @@ class Preferences @Inject constructor(
             .apply()
     }
 
-
     fun getPostsLayout(): CommunityLayout =
         try {
             CommunityLayout.valueOf(
@@ -67,14 +68,25 @@ class Preferences @Inject constructor(
             .apply()
     }
 
-    fun getPostUiConfig(): PostUiConfig {
-        return prefs.getMoshiValue<PostUiConfig>(getPostUiConfigKey())
+    fun getPostInListUiConfig(): PostInListUiConfig {
+        return prefs.getMoshiValue<PostInListUiConfig>(getPostUiConfigKey())
             ?: getPostsLayout().getDefaultPostUiConfig()
     }
 
-    fun setPostUiConfig(config: PostUiConfig) {
+    fun setPostInListUiConfig(config: PostInListUiConfig) {
         prefs.putMoshiValue(getPostUiConfigKey(), config)
     }
+
+    fun getPostAndCommentsUiConfig(): PostAndCommentsUiConfig {
+        return prefs.getMoshiValue<PostAndCommentsUiConfig>(KEY_POST_AND_COMMENTS_UI_CONFIG)
+            ?: getDefaultPostAndCommentsUiConfig()
+    }
+
+    fun setPostAndCommentsUiConfig(config: PostAndCommentsUiConfig) {
+        prefs.putMoshiValue(KEY_POST_AND_COMMENTS_UI_CONFIG, config)
+    }
+
+
 
     private fun getPostUiConfigKey() =
         when (getPostsLayout()) {

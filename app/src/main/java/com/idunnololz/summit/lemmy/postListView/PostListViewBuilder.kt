@@ -1,4 +1,4 @@
-package com.idunnololz.summit.lemmy.post_view
+package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
 import android.view.View
@@ -37,7 +37,7 @@ import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 @ActivityScoped
-class PostViewBuilder @Inject constructor(
+class PostListViewBuilder @Inject constructor(
     private val activity: FragmentActivity,
     @ActivityContext private val context: Context,
     private val offlineManager: OfflineManager,
@@ -45,7 +45,7 @@ class PostViewBuilder @Inject constructor(
     private val preferences: Preferences,
 ) {
 
-    var postUiConfig: PostUiConfig = preferences.getPostUiConfig()
+    var postUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
         set(value) {
             field = value
 

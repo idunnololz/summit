@@ -18,21 +18,16 @@ import androidx.transition.TransitionSet
 import androidx.transition.TransitionSet.ORDERING_TOGETHER
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.dto.Community
-import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.dto.Post
-import com.idunnololz.summit.api.dto.PostAggregates
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.databinding.FragmentSettingViewTypeBinding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
-import com.idunnololz.summit.lemmy.post_view.ListingItemViewHolder
-import com.idunnololz.summit.lemmy.post_view.PostViewBuilder
+import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
+import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.SliderSettingItem
@@ -47,96 +42,13 @@ import javax.inject.Inject
 class SettingViewTypeFragment : BaseFragment<FragmentSettingViewTypeBinding>(),
 AlertDialogFragment.AlertDialogFragmentListener {
 
-    private val fakePostView = PostView(
-        post = Post(
-            id = 10,
-            name = "Example post",
-            url = "https://lol-catalyst-data.s3.amazonaws.com/manual_uploads/sencha.jpg",
-            body = "This is my cat Sencha. Isn't he cute? :D",
-            creator_id = 1,
-            community_id = 1,
-            removed = false,
-            locked = false,
-            published = "2023-06-30T07:11:18Z",
-            updated = null,
-            deleted = false,
-            nsfw = false,
-            embed_title = null,
-            embed_description = null,
-            thumbnail_url = null,
-            ap_id = "http://meme.idunnololz.com",
-            local = true,
-            embed_video_url = null,
-            language_id = 1,
-            featured_community = false,
-            featured_local = false,
-        ),
-        creator = Person(
-            id = 1,
-            name = "idunnololz",
-            display_name = "idunnololz",
-            avatar = "null",
-            banned = false,
-            published = "2023-06-30T07:11:18Z",
-            updated = null,
-            actor_id = "http://meme.idunnololz.com",
-            bio = null,
-            local = false,
-            banner = null,
-            deleted = false,
-            matrix_user_id = null,
-            admin = false,
-            bot_account = false,
-            ban_expires = null,
-            instance_id = 1
-        ),
-        community = Community(
-            id = 0,
-            name = "summit",
-            title = "summit",
-            description = null,
-            removed = false,
-            published = "2023-06-30T07:11:18Z",
-            updated = null,
-            deleted = false,
-            nsfw = false,
-            actor_id = "asdf",
-            local = true,
-            icon = null,
-            banner = null,
-            hidden = false,
-            posting_restricted_to_mods = false,
-            instance_id = 1,
-        ),
-        creator_banned_from_community = false,
-        counts = PostAggregates(
-            id = 1,
-            post_id = 1,
-            comments = 1,
-            score = 420,
-            upvotes = 489,
-            downvotes = 69,
-            published = "2023-06-30T07:11:18Z",
-            newest_comment_time_necro = "2023-06-30T07:11:18Z",
-            newest_comment_time = "2023-06-30T07:11:18Z",
-            featured_community = false,
-            featured_local = false,
-        ),
-        subscribed = SubscribedType.NotSubscribed,
-        saved = true,
-        read = true,
-        creator_blocked = false,
-        my_vote = null,
-        unread_comments = 0,
-    )
-
     private val viewModel: SettingViewTypeViewModel by viewModels()
 
     @Inject
     lateinit var preferences: Preferences
 
     @Inject
-    lateinit var postViewBuilder: PostViewBuilder
+    lateinit var postListViewBuilder: PostListViewBuilder
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -231,7 +143,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
     private fun bindPostUiSettings() {
         SliderSettingItem(
-            R.id.setting_text_scaling,
+            R.id.setting_post_in_list_text_scaling,
             getString(R.string.font_size),
             0.2f,
             3f,
@@ -275,7 +187,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             .setDuration(ANIMATION_DURATION_MS)
         TransitionManager.beginDelayedTransition(binding.demoViewContainer, set)
 
-        postViewBuilder.postUiConfig = viewModel.currentPostUiConfig
+        postListViewBuilder.postUiConfig = viewModel.currentPostUiConfig
 
         val context = requireContext()
         val inflater = LayoutInflater.from(context)
@@ -300,15 +212,15 @@ AlertDialogFragment.AlertDialogFragmentListener {
         }
 
         if (lastH != null) {
-            postViewBuilder.recycle(lastH)
+            postListViewBuilder.recycle(lastH)
         }
         binding.demoViewContainer.removeAllViews()
         binding.demoViewContainer.addView(h.root)
 
-        postViewBuilder.bind(
+        postListViewBuilder.bind(
             holder = h,
             container = binding.demoViewContainer,
-            postView = fakePostView,
+            postView = LemmyFakeModels.fakePostView,
             instance = "https://fake.instance",
             isRevealed = true,
             contentMaxWidth = binding.demoViewContainer.width,

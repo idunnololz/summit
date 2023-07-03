@@ -199,4 +199,8 @@
         <item name="cardBackgroundColor">?attr/colorSurface</item>
     </style>
 
+    <style name="SettingHeaderStyle">
+        <item name="android:textAppearance">?textAppearanceTitleLarge</item>
+    </style>
+
 </resources>

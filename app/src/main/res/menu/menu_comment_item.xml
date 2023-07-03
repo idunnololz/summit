@@ -10,10 +10,4 @@
             android:id="@+id/delete_comment"
             android:title="@string/delete_comment" />
     </group>
-
-    <item
-        android:id="@+id/raw_comment"
-        android:title="@string/raw_comment"
-        android:orderInCategory="100"
-        android:visible="false"/>
 </menu>

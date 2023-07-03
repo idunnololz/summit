@@ -1,7 +1,5 @@
 package com.idunnololz.summit.lemmy.community
 
-import com.idunnololz.summit.lemmy.post_view.PostUiConfig
-
 enum class CommunityLayout {
     Compact,
     List,

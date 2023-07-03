@@ -24,6 +24,16 @@ object Client {
             .connectTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
+                // shouldnt need this as okhttp uses
+//            .addNetworkInterceptor { chain ->
+//                val requestBuilder = chain.request().newBuilder()
+//                    .header(
+//                        "User-Agent",
+//                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+//                                "(KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+//                val newRequest = requestBuilder.build()
+//                chain.proceed(newRequest)
+//            }
             .cache(cache)
             .enableTls12()
             .build()

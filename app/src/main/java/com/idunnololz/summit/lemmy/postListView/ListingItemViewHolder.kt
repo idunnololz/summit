@@ -1,15 +1,12 @@
-package com.idunnololz.summit.lemmy.post_view
+package com.idunnololz.summit.lemmy.postListView
 
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
-import com.idunnololz.summit.databinding.DialogFragmentCommentRawBinding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
