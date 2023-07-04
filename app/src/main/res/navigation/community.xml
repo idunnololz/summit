@@ -158,4 +158,12 @@
             app:nullable="true"
             android:defaultValue="@null" />
     </dialog>
+    <fragment
+        android:id="@+id/personTabbedFragment"
+        android:name="com.idunnololz.summit.lemmy.person.PersonTabbedFragment"
+        android:label="PersonTabbedFragment" >
+        <argument
+            android:name="personRef"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef" />
+    </fragment>
 </navigation>

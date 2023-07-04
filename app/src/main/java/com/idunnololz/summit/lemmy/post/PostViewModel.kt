@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.post
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -345,8 +346,11 @@ class PostViewModel @Inject constructor(
         val idToPendingComments = pendingComments?.associateBy { it.commentId } ?: mapOf()
 
         val depthOffset = if (!parentComment) { 0 } else {
-            firstComment?.getDepth() ?: 0
+            comments?.minOfOrNull { it.getDepth() } ?: 0
         }
+
+        Log.d(TAG, "Score: ${comments?.firstOrNull()?.counts?.score} " +
+                "Depth: ${firstComment?.getDepth()} First comment: ${firstComment?.content}. ")
 
         val topNodes = mutableListOf<CommentNodeData>()
 
@@ -417,6 +421,9 @@ class PostViewModel @Inject constructor(
                 )
             } else {
                 val parent = map[pendingComment.parentId]
+
+                Log.d("HAHA", "depthOffset: ${depthOffset}")
+                Log.d("HAHA", "comments: $comments")
 
                 parent?.let {
                     it.children.add(

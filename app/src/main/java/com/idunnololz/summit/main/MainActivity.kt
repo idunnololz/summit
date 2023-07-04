@@ -42,6 +42,7 @@ import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.offline.OfflineFragment
@@ -932,6 +933,13 @@ class MainActivity : BaseActivity() {
                 hideBottomNav(animate)
                 disableCustomAppBar(animate)
                 hideNotificationBarBg()
+            }
+            PersonTabbedFragment::class -> {
+                hideActionBar(animate)
+                disableBottomNavViewScrolling()
+                showBottomNav()
+                disableCustomAppBar(animate)
+                showNotificationBarBg()
             }
             else ->
                 throw RuntimeException("No setup instructions for type: ${t.java.canonicalName}")

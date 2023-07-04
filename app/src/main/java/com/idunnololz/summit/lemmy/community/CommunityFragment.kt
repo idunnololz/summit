@@ -354,31 +354,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
 
         binding.fab.setOnClickListener a@{
-            val currentCommunity = viewModel.currentCommunityRef.value
-            var communityName: String? = null
-            var communityId: Int = -1
-            when (currentCommunity) {
-                is CommunityRef.All -> return@a
-                is CommunityRef.CommunityRefByName -> {
-                    communityName = currentCommunity.name
-                }
-                is CommunityRef.CommunityRefByObj -> {
-                    communityId = currentCommunity.community.id
-                }
-                is CommunityRef.Local -> return@a
-                is CommunityRef.Subscribed -> return@a
-                null -> return@a
-            }
-
-            CreateOrEditPostFragment()
-                .apply {
-                    arguments = CreateOrEditPostFragmentArgs(
-                        instance = viewModel.instance,
-                        communityName = communityName,
-                        communityId = communityId,
-                    ).toBundle()
-                }
-                .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+            showOverflowMenu()
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedHandler)
@@ -593,14 +569,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     }
 
     private fun updateFabState() {
-        val communityRef = viewModel.currentCommunityRef.value
-
-        if (communityRef is CommunityRef.CommunityRefByName || communityRef is CommunityRef.CommunityRefByObj) {
-            if (isCustomAppBarExpanded) {
-                binding.fab.show()
-            } else {
-                binding.fab.hide()
-            }
+        if (isCustomAppBarExpanded) {
+            binding.fab.show()
         } else {
             binding.fab.hide()
         }
@@ -709,9 +679,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     Utils.hideKeyboard(activity)
                     controller.hide()
                 },
-                abOverflowClickListener = {
-                    showOverflowMenu(it)
-                },
                 onAccountClick = {
                     AccountsAndSettingsDialogFragment.newInstance()
                         .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
@@ -719,38 +686,82 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
     }
 
-    private fun showOverflowMenu(view: View) {
+    private fun showOverflowMenu() {
         val context = context ?: return
 
-        PopupMenu(context, view).apply {
-            inflate(R.menu.menu_fragment_main)
-            forceShowIcons()
 
-            val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value)
-            val currentDefaultPage = preferences.getDefaultPage()
-            val isBookmarked = userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
-            val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
+        val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value)
+        val currentDefaultPage = preferences.getDefaultPage()
+        val isBookmarked = userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
+        val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
+
+        val bottomMenu = BottomMenu(context).apply {
+
+            val currentCommunity = viewModel.currentCommunityRef.value
+            var communityName: String? = null
+            var communityId: Int = -1
+            when (currentCommunity) {
+                is CommunityRef.All -> {}
+                is CommunityRef.CommunityRefByName -> {
+                    communityName = currentCommunity.name
+                    addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
+                }
+                is CommunityRef.CommunityRefByObj -> {
+                    communityId = currentCommunity.community.id
+                    addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
+                }
+                is CommunityRef.Local -> {}
+                is CommunityRef.Subscribed -> {}
+                null -> {}
+            }
+
+            addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
+            addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
+            addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
+            addItemWithIcon(
+                id = R.id.community_info,
+                title = R.string.community_info,
+                icon = R.drawable.ic_subreddit_default
+            )
+            addItemWithIcon(
+                id = R.id.my_communities,
+                title = R.string.my_communities,
+                icon = R.drawable.baseline_subscriptions_24
+            )
 
             if (isCurrentPageDefault) {
-                menu.findItem(R.id.set_as_default).isVisible = false
-                menu.findItem(R.id.toggle_bookmark).isVisible = false
-            } else {
-                menu.findItem(R.id.set_as_default).isVisible = true
-                menu.findItem(R.id.toggle_bookmark).isVisible = true
 
-                menu.findItem(R.id.toggle_bookmark).apply {
-                    if (isBookmarked) {
-                        this.setTitle(R.string.remove_bookmark)
-                        this.setIcon(R.drawable.baseline_bookmark_remove_24)
-                    } else {
-                        this.setTitle(R.string.bookmark_community)
-                        this.setIcon(R.drawable.baseline_bookmark_add_24)
-                    }
+            } else {
+                if (isBookmarked) {
+                    addItemWithIcon(
+                        id = R.id.toggle_bookmark,
+                        title = R.string.remove_bookmark,
+                        icon = R.drawable.baseline_bookmark_remove_24
+                    )
+                } else {
+                    addItemWithIcon(
+                        id = R.id.toggle_bookmark,
+                        title = R.string.bookmark_community,
+                        icon = R.drawable.baseline_bookmark_add_24
+                    )
                 }
+
+                addItemWithIcon(R.id.set_as_default, R.string.set_as_home_page, R.drawable.baseline_home_24)
             }
 
             setOnMenuItemClickListener {
-                when (it.itemId) {
+                when(it.id) {
+                    R.id.create_post -> {
+                        CreateOrEditPostFragment()
+                            .apply {
+                                arguments = CreateOrEditPostFragmentArgs(
+                                    instance = viewModel.instance,
+                                    communityName = communityName,
+                                    communityId = communityId,
+                                ).toBundle()
+                            }
+                            .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+                    }
                     R.id.share -> {
                         val sendIntent: Intent = Intent().apply {
                             action = Intent.ACTION_SEND
@@ -763,12 +774,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
                         val shareIntent = Intent.createChooser(sendIntent, null)
                         startActivity(shareIntent)
-                        true
                     }
 
                     R.id.sort -> {
                         getMainActivity()?.showBottomMenu(getSortByMenu())
-                        true
                     }
 
                     R.id.set_as_default -> {
@@ -779,16 +788,17 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                             R.string.home_page_set,
                             Snackbar.LENGTH_LONG
                         ).show()
-                        true
                     }
                     R.id.layout ->  {
                         getMainActivity()?.showBottomMenu(getLayoutMenu())
-                        true
                     }
 
                     R.id.community_info -> {
                         (parentFragment?.parentFragment as? MainFragment)?.expandEndPane()
-                        true
+                    }
+
+                    R.id.my_communities -> {
+                        (parentFragment?.parentFragment as? MainFragment)?.expandStartPane()
                     }
 
                     R.id.toggle_bookmark -> {
@@ -800,14 +810,12 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                                 viewModel.loadedPostsData.valueOrNull
                                     ?.posts?.firstOrNull()?.community?.icon)
                         }
-
-                        true
                     }
-
-                    else -> false
                 }
             }
-        }.show()
+        }
+
+        getMainActivity()?.showBottomMenu(bottomMenu)
     }
 
     override fun navigateToSignInScreen() {

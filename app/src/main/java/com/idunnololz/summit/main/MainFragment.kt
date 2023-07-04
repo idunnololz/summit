@@ -29,9 +29,11 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentMainBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
+import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneViewModel
@@ -361,6 +363,14 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     ).toBundle()
                 )
             }
+            is PersonRef -> {
+                currentNavController?.navigate(
+                    R.id.personTabbedFragment,
+                    PersonTabbedFragmentArgs(
+                        page
+                    ).toBundle()
+                )
+            }
         }
     }
 
@@ -623,6 +633,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     fun setStartPanelLockState(lockState: OverlappingPanelsLayout.LockState) {
         binding.rootView.setStartPanelLockState(lockState)
+    }
+
+    fun expandStartPane() {
+        binding.rootView.openStartPanel()
     }
 
     fun expandEndPane() {

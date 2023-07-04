@@ -4,19 +4,27 @@ import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.GetPersonMentions
+import com.idunnololz.summit.api.dto.GetPrivateMessages
+import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import kotlinx.coroutines.launch
 import java.io.InputStream
@@ -99,6 +107,20 @@ class AccountAwareLemmyClient @Inject constructor(
         apiClient.getCommunity(accountForInstance(), idOrName, force)
     }
 
+    suspend fun fetchPersonByIdWithRetry(
+        personId: PersonId,
+        account: Account? = accountForInstance(),
+    ): Result<GetPersonDetailsResponse> = retry {
+        apiClient.fetchPerson(personId = personId, name = null, account = account)
+    }
+
+    suspend fun fetchPersonByNameWithRetry(
+        name: String,
+        account: Account? = accountForInstance(),
+    ): Result<GetPersonDetailsResponse> = retry {
+        apiClient.fetchPerson(personId = null, name = name, account = account)
+    }
+
     suspend fun search(
         communityId: Int? = null,
         communityName: String? = null,
@@ -131,14 +153,13 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun followCommunityWithRetry(
         communityId: Int,
-        subscribe: Boolean
+        subscribe: Boolean,
+        account: Account? = accountForInstance(),
     ): Result<CommunityView> {
-        val account = accountForInstance()
-
         return if (account != null) {
             apiClient.followCommunityWithRetry(communityId, subscribe, account)
         } else {
-            Result.failure(NotAuthenticatedException())
+            createAccountErrorResult()
         }
     }
 
@@ -157,10 +178,10 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun deletePost(
         id: PostId,
-        account: Account? = currentAccount,
+        account: Account? = accountForInstance(),
     ): Result<PostView> {
         return if (account == null) {
-            Result.failure(NotAuthenticatedException())
+            createAccountErrorResult()
         } else {
             apiClient.deletePost(account, id)
         }
@@ -169,10 +190,10 @@ class AccountAwareLemmyClient @Inject constructor(
     suspend fun uploadImage(
         fileName: String,
         imageIs: InputStream,
-        account: Account? = currentAccount,
+        account: Account? = accountForInstance(),
     ): Result<UploadImageResult> =
         if (account == null) {
-            Result.failure(NotAuthenticatedException())
+            createAccountErrorResult()
         } else {
             apiClient.uploadImage(account, fileName, imageIs)
         }
@@ -180,10 +201,10 @@ class AccountAwareLemmyClient @Inject constructor(
     suspend fun blockCommunity(
         communityId: CommunityId,
         block: Boolean,
-        account: Account? = currentAccount,
+        account: Account? = accountForInstance(),
     ) =
         if (account == null) {
-            Result.failure(NotAuthenticatedException())
+            createAccountErrorResult()
         } else {
             apiClient.blockCommunity(communityId, block, account)
         }
@@ -191,12 +212,53 @@ class AccountAwareLemmyClient @Inject constructor(
     suspend fun blockPerson(
         personId: PersonId,
         block: Boolean,
-        account: Account? = currentAccount,
+        account: Account? = accountForInstance(),
     ) =
         if (account == null) {
-            Result.failure(NotAuthenticatedException())
+            createAccountErrorResult()
         } else {
             apiClient.blockPerson(personId, block, account)
+        }
+
+    suspend fun fetchReplies(
+        sort: CommentSortType? /* "Hot" | "Top" | "New" | "Old" */ = null,
+        page: Int? = 0,
+        limit: Int? = 20,
+        unreadOnly: Boolean? = null,
+        account: Account? = accountForInstance(),
+        force: Boolean,
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchReplies(sort, page, limit, unreadOnly, account, force)
+        }
+
+    suspend fun fetchMentions(
+        sort: CommentSortType? /* "Hot" | "Top" | "New" | "Old" */ = null,
+        page: Int? = 0,
+        limit: Int? = 20,
+        unreadOnly: Boolean? = null,
+        account: Account? = accountForInstance(),
+        force: Boolean,
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchMentions(sort, page, limit, unreadOnly, account, force)
+        }
+
+    suspend fun fetchPrivateMessages(
+        unreadOnly: Boolean? = null,
+        page: Int? = 0,
+        limit: Int? = 20,
+        account: Account? = accountForInstance(),
+        force: Boolean,
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchPrivateMessages(unreadOnly, page, limit, account, force)
         }
 
 
@@ -227,6 +289,16 @@ class AccountAwareLemmyClient @Inject constructor(
         } else {
             null
         }
+    }
+
+    private fun <T> createAccountErrorResult(): Result<T> {
+        val currentAccount = currentAccount
+        if (currentAccount != null) {
+            return Result.failure(
+                AccountInstanceMismatchException(currentAccount.instance, instance))
+        }
+
+        return Result.failure(NotAuthenticatedException())
     }
 
     private fun setAccount(account: Account?, accountChanged: Boolean) {

@@ -55,4 +55,5 @@
     <item name="sort_order_top_last_three_month" type="id" />
     <item name="sort_order_top_last_six_month" type="id" />
     <item name="sort_order_top_last_nine_month" type="id" />
+    <item name="my_communities" type="id" />
 </resources>

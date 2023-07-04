@@ -14,6 +14,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.NetworkException
+import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
@@ -205,6 +206,10 @@ class LoadingView : ConstraintLayout {
                     is SocketTimeoutException ->
                         showErrorWithRetry(
                             context.getString(R.string.error_socket_timeout))
+
+                    is NoInternetException ->
+                        showErrorWithRetry(
+                            context.getString(R.string.error_network))
                 }
             else -> {
                 Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
