@@ -7,6 +7,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
@@ -22,17 +23,24 @@ import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetComments
 import com.idunnololz.summit.api.dto.GetCommunity
+import com.idunnololz.summit.api.dto.GetPersonDetails
+import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.GetPersonMentions
 import com.idunnololz.summit.api.dto.GetPost
 import com.idunnololz.summit.api.dto.GetPosts
+import com.idunnololz.summit.api.dto.GetPrivateMessages
+import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetSite
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListCommunities
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.Login
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.dto.Search
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
@@ -48,6 +56,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import java.io.InputStream
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 const val COMMENTS_DEPTH_MAX = 6
@@ -636,6 +645,112 @@ class LemmyApiClient @Inject constructor(
         )
     }
 
+    suspend fun fetchPerson(
+        personId: PersonId?,
+        name: String?,
+        account: Account?
+    ): Result<GetPersonDetailsResponse> {
+        val form = GetPersonDetails(
+            person_id = personId,
+            username = name,
+            auth = account?.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.getPersonDetails(form.serializeToMap())
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun fetchReplies(
+        sort: CommentSortType? /* "Hot" | "Top" | "New" | "Old" */ = null,
+        page: Int? = null,
+        limit: Int? = null,
+        unreadOnly: Boolean? = null,
+        account: Account,
+        force: Boolean,
+    ): Result<List<CommentReplyView>> {
+        val form = GetReplies(
+            sort = sort, page = page, limit = limit, unread_only = unreadOnly, auth = account.jwt
+        )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getRepliesNoCache(form.serializeToMap())
+            } else {
+                api.getReplies(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it.replies)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun fetchMentions(
+        sort: CommentSortType? /* "Hot" | "Top" | "New" | "Old" */ = null,
+        page: Int? = null,
+        limit: Int? = null,
+        unreadOnly: Boolean? = null,
+        account: Account,
+        force: Boolean,
+    ): Result<List<PersonMentionView>> {
+        val form = GetPersonMentions(
+            sort, page, limit, unreadOnly, account.jwt
+        )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getPersonMentionsNoCache(form.serializeToMap())
+            } else {
+                api.getPersonMentions(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it.mentions)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun fetchPrivateMessages(
+        unreadOnly: Boolean? = null,
+        page: Int? = null,
+        limit: Int? = null,
+        account: Account,
+        force: Boolean,
+    ): Result<List<PrivateMessageView>> {
+        val form = GetPrivateMessages(
+            unreadOnly, page, limit, account.jwt
+        )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getPrivateMessagesNoCache(form.serializeToMap())
+            } else {
+                api.getPrivateMessages(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it.private_messages)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
     val instance: String
         get() = api.instance
 
@@ -650,6 +765,9 @@ class LemmyApiClient @Inject constructor(
             if (e is SocketTimeoutException) {
                 return Result.failure(com.idunnololz.summit.api.SocketTimeoutException())
             }
+            if (e is UnknownHostException) {
+                return Result.failure(NoInternetException())
+            }
             Log.e(TAG, "Exception fetching url", e)
             return Result.failure(e)
         }
@@ -659,6 +777,10 @@ class LemmyApiClient @Inject constructor(
             val errorCode = res.code()
 
             if (errorCode >= 500) {
+                if (res.message().contains("only-if-cached", ignoreCase = true)) {
+                    // for some reason okhttp returns a 504 if we force cache with no internet
+                    return Result.failure(NoInternetException())
+                }
                 return Result.failure(ServerApiException(errorCode))
             }
 

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.idunnololz.summit.view.LemmyHeaderView
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.idunnololz.summit.view.FixedTextView
+        android:id="@+id/content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header"/>
+
+    <ImageButton
+        android:id="@+id/mark_as_read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_check_24"
+        android:padding="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/more_button"
+        app:layout_constraintBottom_toBottomOf="@+id/more_button"
+        app:layout_constraintEnd_toStartOf="@+id/upvoteButton" />
+
+    <ImageButton
+        android:id="@+id/upvoteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_arrow_upward_24"
+        android:padding="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/more_button"
+        app:layout_constraintBottom_toBottomOf="@+id/more_button"
+        app:layout_constraintEnd_toStartOf="@+id/downvoteButton"/>
+
+    <ImageButton
+        android:id="@+id/downvoteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_arrow_downward_24"
+        android:padding="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/more_button"
+        app:layout_constraintBottom_toBottomOf="@+id/more_button"
+        app:layout_constraintEnd_toStartOf="@+id/reply"/>
+
+
+    <ImageButton
+        android:id="@+id/reply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_reply_24"
+        android:padding="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/more_button"
+        app:layout_constraintBottom_toBottomOf="@+id/more_button"
+        app:layout_constraintEnd_toStartOf="@+id/more_button"/>
+
+    <ImageButton
+        android:id="@+id/more_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_more_horiz_black_24"
+        android:layout_marginTop="@dimen/padding_half"
+        android:padding="@dimen/padding_half"
+        android:layout_marginEnd="@dimen/padding_half"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

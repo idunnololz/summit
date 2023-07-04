@@ -156,8 +156,13 @@ class AdapterHelper<T : Any>(
     val itemCount: Int
         get() = differ.currentList.size
 
-    fun setItems(newItems: List<T>, adapter: Adapter<ViewHolder>, cb: (() -> Unit)? = null) {
+    fun setItems(
+        newItems: List<T>,
+        adapter: Adapter<ViewHolder>,
+        cb: (() -> Unit)? = null
+    ) {
         this.adapter = adapter
+
         differ.submitList(newItems, cb)
     }
 }

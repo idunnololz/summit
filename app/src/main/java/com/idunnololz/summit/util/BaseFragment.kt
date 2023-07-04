@@ -1,5 +1,6 @@
 package com.idunnololz.summit.util
 
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
@@ -58,6 +59,11 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        MyLog.d(logTag, "Lifecycle: onCreate()")
+        super.onCreate(savedInstanceState)
+    }
+
     @CallSuper
     override fun onStart() {
         MyLog.d(logTag, "Lifecycle: onStart()")
@@ -79,4 +85,9 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         _binding = null
     }
 
+    @CallSuper
+    override fun onDestroy() {
+        MyLog.d(logTag, "Lifecycle: onDestroy()")
+        super.onDestroy()
+    }
 }

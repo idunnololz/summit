@@ -52,8 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
-            android:src="@drawable/baseline_add_24"
-            android:contentDescription="@string/new_post"
+            android:src="@drawable/baseline_more_horiz_black_24"
+            android:contentDescription="@string/more_actions"
             android:layout_margin="16dp"/>
     </FrameLayout>
 

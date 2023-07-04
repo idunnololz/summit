@@ -76,8 +76,17 @@ object LinkResolver {
                 }
             }
             "u" -> {
-                // TODO: Support user pages
-                return defaultResult
+                var personName = uri.pathSegments.getOrNull(1)
+                    ?: return defaultResult
+
+                personName = personName.trimEnd { it == '.' }
+
+                return if (personName.count { c -> c == '@' } == 1) {
+                    val (personName, instance) = url.substring(1).split("@", limit = 2)
+                    PersonRef.PersonRefByName(personName, instance)
+                } else {
+                    PersonRef.PersonRefByName(personName, instance)
+                }
             }
             "post" -> {
                 val postId = uri.pathSegments.getOrNull(1)

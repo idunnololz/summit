@@ -31,4 +31,7 @@ sealed class ApiException(msg: String) : RuntimeException(msg)
  */
 class SocketTimeoutException():
     NetworkException("Timed out waiting for server to respond")
+
+class NoInternetException() : NetworkException("No internet")
+
 sealed class NetworkException(msg: String) : RuntimeException(msg)

@@ -183,6 +183,9 @@ interface LemmyApi {
      */
     @GET("user/replies")
     fun getReplies(@QueryMap form: Map<String, String>): Call<GetRepliesResponse>
+    @GET("user/replies")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getRepliesNoCache(@QueryMap form: Map<String, String>): Call<GetRepliesResponse>
 
     /**
      * Mark a comment as read.
@@ -213,12 +216,18 @@ interface LemmyApi {
      */
     @GET("user/mention")
     fun getPersonMentions(@QueryMap form: Map<String, String>): Call<GetPersonMentionsResponse>
+    @GET("user/mention")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getPersonMentionsNoCache(@QueryMap form: Map<String, String>): Call<GetPersonMentionsResponse>
 
     /**
      * Get / fetch private messages.
      */
     @GET("private_message/list")
     fun getPrivateMessages(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
+    @GET("private_message/list")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getPrivateMessagesNoCache(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
 
     /**
      * Create a private message.

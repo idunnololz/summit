@@ -11,8 +11,11 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.spans.CenteredImageSpan
@@ -46,6 +49,7 @@ class LemmyHeaderHelper(
     private val criticalWarningColor: Int = ContextCompat.getColor(context, R.color.style_red)
     private val modColor: Int = context.getColorCompat(R.color.style_green)
     private val adminColor: Int = context.getColorCompat(R.color.style_red)
+    private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
 
     private val rewardViewRecycler = ViewRecycler<RewardView>()
 
@@ -101,7 +105,6 @@ class LemmyHeaderHelper(
             appendSeparator(sb)
         }
 
-
         sb.appendLink(
             postView.community.name,
             LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
@@ -114,7 +117,9 @@ class LemmyHeaderHelper(
             appendSeparator(sb)
             if (postView.creator.admin) {
                 val s = sb.length
-                sb.append(postView.creator.name)
+                sb.appendLink(
+                    postView.creator.name,
+                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name))
                 val e = sb.length
                 sb.setSpan(
                     ForegroundColorSpan(modColor),
@@ -147,7 +152,17 @@ class LemmyHeaderHelper(
 //                    )
 //                }
             } else {
-                sb.append(LemmyUtils.formatAuthor(postView.creator.name))
+                val s = sb.length
+                sb.appendLink(
+                    LemmyUtils.formatAuthor(postView.creator.name),
+                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name))
+                val e = sb.length
+                sb.setSpan(
+                    ForegroundColorSpan(emphasisColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
         }
 
@@ -360,6 +375,130 @@ class LemmyHeaderHelper(
         } else {
 //            appendAwards(headerContainer, item.allAwardings, sb)
         }
+        headerContainer.setTextSecondPart(sb)
+    }
+
+
+
+    fun populateHeaderSpan(
+        headerContainer: LemmyHeaderView,
+        item: PrivateMessageView,
+    ) {
+        var sb = SpannableStringBuilder()
+
+        if (item.creator.admin) {
+            run {
+                val s = sb.length
+                sb.append(item.creator.name)
+                val e = sb.length
+                sb.setSpan(
+                    ForegroundColorSpan(adminColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                sb.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        } else {
+            sb.append(item.creator.name)
+        }
+
+        appendSeparator(sb)
+        sb.append(
+            dateStringToPretty(item.private_message.updated ?: item.private_message.published)
+        )
+        headerContainer.getFlairView().visibility = View.GONE
+
+        headerContainer.setTextFirstPart(sb)
+        sb = SpannableStringBuilder()
+
+        headerContainer.setTextSecondPart(sb)
+    }
+
+
+    fun populateHeaderSpan(
+        headerContainer: LemmyHeaderView,
+        item: PersonMentionView,
+    ) {
+        var sb = SpannableStringBuilder()
+
+        if (item.creator.admin) {
+            run {
+                val s = sb.length
+                sb.append(item.creator.name)
+                val e = sb.length
+                sb.setSpan(
+                    ForegroundColorSpan(adminColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                sb.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        } else {
+            sb.append(item.creator.name)
+        }
+
+        appendSeparator(sb)
+        sb.append(
+            dateStringToPretty(item.comment.updated ?: item.comment.published)
+        )
+        headerContainer.getFlairView().visibility = View.GONE
+
+        headerContainer.setTextFirstPart(sb)
+        sb = SpannableStringBuilder()
+
+        headerContainer.setTextSecondPart(sb)
+    }
+
+
+    fun populateHeaderSpan(
+        headerContainer: LemmyHeaderView,
+        item: CommentReplyView,
+    ) {
+        var sb = SpannableStringBuilder()
+
+        if (item.creator.admin) {
+            run {
+                val s = sb.length
+                sb.append(item.creator.name)
+                val e = sb.length
+                sb.setSpan(
+                    ForegroundColorSpan(adminColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                sb.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        } else {
+            sb.append(item.creator.name)
+        }
+
+        appendSeparator(sb)
+        sb.append(
+            dateStringToPretty(item.comment.updated ?: item.comment.published)
+        )
+        headerContainer.getFlairView().visibility = View.GONE
+
+        headerContainer.setTextFirstPart(sb)
+        sb = SpannableStringBuilder()
+
         headerContainer.setTextSecondPart(sb)
     }
 

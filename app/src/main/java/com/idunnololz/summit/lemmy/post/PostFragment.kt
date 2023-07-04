@@ -346,6 +346,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
+
                     adapter.error = it.error
                 }
                 is StatefulData.Loading -> {
@@ -976,7 +977,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         }
                     }
 
-                    b.root.tag = item
+                    b.root.tag = ThreadLinesDecoration.ThreadLinesData(
+                        depth = item.depth,
+                        baseDepth = item.baseDepth
+                    )
                 }
 
                 FooterItem -> {}
@@ -1085,7 +1089,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
                     finalItems
                 } else {
-                    listOf(ProgressOrErrorItem(error))
+                    val finalItems = mutableListOf<Item>()
+                    rawData?.postView?.let {
+                        if (!mainListingItemSeen) {
+                            mainListingItemSeen = true
+                            onMainListingItemRetrieved(it.post)
+                        }
+
+                        finalItems += HeaderItem(it.post, args.videoState)
+                    }
+                    finalItems += ProgressOrErrorItem(error)
+
+                    finalItems
                 }
 
             val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {

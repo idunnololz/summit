@@ -26,6 +26,7 @@ import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 
@@ -106,7 +107,9 @@ class BottomMenu(private val context: Context) {
 
     fun show(mainActivity: MainActivity, viewGroup: ViewGroup) {
         parent = viewGroup
-        adapter = BottomMenuAdapter()
+        adapter = BottomMenuAdapter().apply {
+            refreshItems()
+        }
 
         val binding = BottomMenuBinding.inflate(inflater, viewGroup, false)
 
@@ -152,8 +155,6 @@ class BottomMenu(private val context: Context) {
             }
         }
 
-        rootView.requestLayout()
-
         rootView.post {
             bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
 
@@ -179,7 +180,7 @@ class BottomMenu(private val context: Context) {
             )
         }
 
-        mainActivity.onBackPressedDispatcher.addCallback(onBackPressedCallback)
+        mainActivity.onBackPressedDispatcher.addCallback(mainActivity, onBackPressedCallback)
     }
 
     fun close(): Boolean {
@@ -195,106 +196,114 @@ class BottomMenu(private val context: Context) {
         this.bottomInset.value = bottomInset
     }
 
+    private sealed interface Item {
+        data class TitleItem(
+            val title: String?
+        ): Item
+
+        data class MenuItemItem(
+            val menuItem: MenuItem
+        ): Item
+
+        object FooterItem : Item
+    }
+
     private inner class BottomMenuAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        override fun getItemViewType(position: Int): Int {
-            if (position == 0) {
-                return R.layout.menu_item_title
+        private val adapterHelper = AdapterHelper<Item> (
+            areItemsTheSame = { old, new ->
+                old::class == new::class && when (old) {
+                    Item.FooterItem -> true
+                    is Item.MenuItemItem ->
+                        old.menuItem.id == (new as Item.MenuItemItem).menuItem.id
+                    is Item.TitleItem -> true
+                }
             }
-            return if (position == itemCount - 1) {
-                R.layout.menu_item_footer
-            } else {
-                R.layout.menu_item
+        ).apply {
+            addItemType(Item.TitleItem::class, MenuItemTitleBinding::inflate) { item, b, h ->
+                b.title.text = item.title
+                if (item.title == null) {
+                    b.title.visibility = View.GONE
+                }
             }
+            addItemType(Item.MenuItemItem::class, MenuItemBinding::inflate) { item, b, h ->
+                val menuItem = item.menuItem
+                b.title.text = menuItem.title
+
+                when {
+                    menuItem.checkIcon != 0 -> {
+                        b.checkbox.setColorFilter(
+                            context.getColorFromAttribute(
+                                com.google.android.material.R.attr.colorControlNormal,
+                            ),
+                        )
+                        b.checkbox.setImageResource(menuItem.checkIcon)
+                        b.checkbox.visibility = View.VISIBLE
+                    }
+                    menuItem.id == checked -> {
+                        b.checkbox.setColorFilter(
+                            context.getColorFromAttribute(
+                                com.google.android.material.R.attr.colorPrimary,
+                            ),
+                        )
+                        b.checkbox.setImageResource(R.drawable.baseline_done_24)
+                        b.checkbox.visibility = View.VISIBLE
+                    }
+                    else -> b.checkbox.visibility = View.GONE
+                }
+
+                if (menuItem.id == checked) {
+                    b.title.setTextColor(checkedTextColor)
+                    b.title.setTypeface(null, Typeface.BOLD)
+                } else {
+                    b.title.setTextColor(defaultTextColor)
+                    b.title.setTypeface(null, Typeface.NORMAL)
+                }
+
+                val icon = menuItem.icon
+                if (icon != null) {
+                    b.icon.visibility = View.VISIBLE
+
+                    when (icon) {
+                        is MenuIcon.ResourceIcon ->
+                            b.icon.setImageResource(icon.customIcon)
+                    }
+                } else {
+                    b.icon.visibility = View.GONE
+                }
+
+                if (onMenuItemClickListener != null) {
+                    b.root.setOnClickListener {
+                        onMenuItemClickListener?.invoke(menuItem)
+                        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+                    }
+                }
+            }
+            addItemType(Item.FooterItem::class, MenuItemFooterBinding::inflate) { _, _, _ -> }
         }
+
+        fun refreshItems() {
+            val newItems = mutableListOf<Item>()
+
+            newItems.add(Item.TitleItem(title))
+            menuItems.forEach {
+                newItems.add(Item.MenuItemItem(it))
+            }
+            newItems.add(Item.FooterItem)
+
+            adapterHelper.setItems(newItems, this)
+        }
+
+        override fun getItemViewType(position: Int): Int =
+            adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            when (viewType) {
-                R.layout.menu_item_title -> {
-                    ViewBindingViewHolder(
-                        MenuItemTitleBinding.inflate(inflater, parent, false),
-                    )
-                }
-                R.layout.menu_item -> {
-                    ViewBindingViewHolder(
-                        MenuItemBinding.inflate(inflater, parent, false),
-                    )
-                }
-                R.layout.menu_item_footer -> {
-                    ViewBindingViewHolder(
-                        MenuItemFooterBinding.inflate(inflater, parent, false),
-                    )
-                }
-                else -> error("Unknown view type: $viewType")
-            }
+            adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            when (getItemViewType(position)) {
-                R.layout.menu_item_title -> {
-                    holder.getBinding<MenuItemTitleBinding>()
-                        .title.text = title
-                }
-                R.layout.menu_item -> {
-                    val b = holder.getBinding<MenuItemBinding>()
-                    val menuItem = menuItems[position - 1]
-                    b.title.text = menuItem.title
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+            adapterHelper.onBindViewHolder(holder, position)
 
-                    when {
-                        menuItem.checkIcon != 0 -> {
-                            b.checkbox.setColorFilter(
-                                context.getColorFromAttribute(
-                                    com.google.android.material.R.attr.colorControlNormal,
-                                ),
-                            )
-                            b.checkbox.setImageResource(menuItem.checkIcon)
-                            b.checkbox.visibility = View.VISIBLE
-                        }
-                        menuItem.id == checked -> {
-                            b.checkbox.setColorFilter(
-                                context.getColorFromAttribute(
-                                    com.google.android.material.R.attr.colorPrimary,
-                                ),
-                            )
-                            b.checkbox.setImageResource(R.drawable.baseline_done_24)
-                            b.checkbox.visibility = View.VISIBLE
-                        }
-                        else -> b.checkbox.visibility = View.GONE
-                    }
-
-                    if (menuItem.id == checked) {
-                        b.title.setTextColor(checkedTextColor)
-                        b.title.setTypeface(null, Typeface.BOLD)
-                    } else {
-                        b.title.setTextColor(defaultTextColor)
-                        b.title.setTypeface(null, Typeface.NORMAL)
-                    }
-
-                    val icon = menuItem.icon
-                    if (icon != null) {
-                        b.icon.visibility = View.VISIBLE
-
-                        when (icon) {
-                            is MenuIcon.ResourceIcon ->
-                                b.icon.setImageResource(icon.customIcon)
-                        }
-                    } else {
-                        b.icon.visibility = View.GONE
-                    }
-
-                    if (onMenuItemClickListener != null) {
-                        b.root.setOnClickListener {
-                            onMenuItemClickListener?.invoke(menuItem)
-                            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
-                        }
-                    }
-                }
-                R.layout.menu_item_footer -> { }
-            }
-        }
-
-        override fun getItemCount(): Int {
-            return menuItems.size + 2 // +2 for header and footer
-        }
+        override fun getItemCount(): Int = adapterHelper.itemCount
     }
 
     class MenuItem(

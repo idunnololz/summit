@@ -19,9 +19,13 @@ import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
+import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
@@ -51,6 +55,7 @@ import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ActivityScoped
@@ -524,6 +529,69 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         root.tag = ThreadLinesDecoration.ThreadLinesData(
             depth, baseDepth
+        )
+    }
+
+    fun bindMessage(
+        b: InboxListItemBinding,
+        instance: String,
+        message: PrivateMessageView,
+        onImageClick: (String) -> Unit,
+        onPageClick: (PageRef) -> Unit,
+    ) = with(b) {
+        lemmyHeaderHelper.populateHeaderSpan(
+            headerContainer = header,
+            item = message,
+        )
+
+        LemmyTextHelper.bindText(
+            textView = content,
+            text = message.private_message.content,
+            instance = instance,
+            onImageClickListener = onImageClick,
+            onPageClick = onPageClick,
+        )
+    }
+
+    fun bindMessage(
+        b: InboxListItemBinding,
+        instance: String,
+        message: PersonMentionView,
+        onImageClick: (String) -> Unit,
+        onPageClick: (PageRef) -> Unit,
+    ) = with(b) {
+        lemmyHeaderHelper.populateHeaderSpan(
+            headerContainer = header,
+            item = message,
+        )
+
+        LemmyTextHelper.bindText(
+            textView = content,
+            text = message.comment.content,
+            instance = instance,
+            onImageClickListener = onImageClick,
+            onPageClick = onPageClick,
+        )
+    }
+
+    fun bindMessage(
+        b: InboxListItemBinding,
+        instance: String,
+        message: CommentReplyView,
+        onImageClick: (String) -> Unit,
+        onPageClick: (PageRef) -> Unit,
+    ) = with(b) {
+        lemmyHeaderHelper.populateHeaderSpan(
+            headerContainer = header,
+            item = message,
+        )
+
+        LemmyTextHelper.bindText(
+            textView = content,
+            text = message.comment.content,
+            instance = instance,
+            onImageClickListener = onImageClick,
+            onPageClick = onPageClick,
         )
     }
 

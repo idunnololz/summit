@@ -103,4 +103,7 @@ object LinkUtils {
 
     fun postIdToLink(instance: String, postId: Int) =
         "https://${instance}/post/$postId"
+
+    fun getLinkForPerson(instance: String, name: String): String =
+        "https://${instance}/u/$name"
 }

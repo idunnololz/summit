@@ -221,6 +221,12 @@
     <string name="time_frame_last_hour">Last hour</string>
     <string name="time_frame_last_hours_format">Last %1$s hours</string>
     <string name="time_frame_last_months_format">Last %1$s months</string>
+    <string name="my_communities">My communities</string>
+    <string name="inbox">Inbox</string>
+    <string name="replies">Replies</string>
+    <string name="mentions">Mentions</string>
+    <string name="messages">Messages</string>
+    <string name="there_doesnt_seem_to_be_anything_here">There doesn\'t seem to be anything here</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>
