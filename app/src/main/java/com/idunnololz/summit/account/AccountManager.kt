@@ -1,6 +1,7 @@
 package com.idunnololz.summit.account
 
 import android.content.Context
+import android.net.Uri
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -21,18 +22,14 @@ import javax.inject.Singleton
 
 @Singleton
 class AccountManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val accountDao: AccountDao,
     private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val accountImageGenerator: AccountImageGenerator,
 ) {
 
     interface OnAccountChangedListener {
         suspend fun onAccountSigningOut(account: Account) {}
         suspend fun onAccountChanged(newAccount: Account?)
     }
-
-    val accountDir = File(context.filesDir, "account")
 
     private val coroutineScope = coroutineScopeFactory.create()
 
@@ -57,12 +54,6 @@ class AccountManager @Inject constructor(
         }
     }
 
-    fun getAccountViewForAccount(account: Account) =
-        AccountView(
-            account = account,
-            profileImage = getImageForAccount(account)
-        )
-
     suspend fun getAccounts(): List<Account> = withContext(Dispatchers.IO) {
         val deferred = coroutineScope.async {
             accountDao.getAll()
@@ -83,11 +74,6 @@ class AccountManager @Inject constructor(
                     accountDao.clearAndSetCurrent(firstAccount.id)
                 }
             }
-            accountImageGenerator.getImageForAccount(accountDir, account).let {
-                if (it.exists()) {
-                    it.delete()
-                }
-            }
 
             updateCurrentAccount()
         }
@@ -105,10 +91,6 @@ class AccountManager @Inject constructor(
         }
 
         deferred.await()
-    }
-
-    fun getImageForAccount(account: Account): File {
-        return accountImageGenerator.getOrGenerateImageForAccount(accountDir, account)
     }
 
     private suspend fun updateCurrentAccount() {

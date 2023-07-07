@@ -25,7 +25,6 @@ class LemmyAppBarController(
 
     private val context = mainActivity
 
-    private val rootView: View = v
     private val customActionBar: ViewGroup = v.findViewById(R.id.customActionBar)
     private val accountChip: Chip = v.findViewById(R.id.account_chip)
     private val accountImageView: ShapeableImageView = v.findViewById(R.id.account_image_view)

@@ -1,7 +1,10 @@
 package com.idunnololz.summit.lemmy.postAndCommentView
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Typeface
+import android.text.Spannable
+import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -19,12 +22,9 @@ import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
-import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
@@ -35,6 +35,8 @@ import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
+import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.post.ThreadLinesDecoration
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
@@ -46,16 +48,20 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.reddit.LemmyUtils
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.ThreadLinesHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.abbrevNumber
+import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ActivityScoped
@@ -66,6 +72,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val preferences: Preferences,
 ) {
+    private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
 
     var uiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()
         set(value) {
@@ -86,7 +93,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         offlineManager,
         ExoPlayerManager.get(activity),
     )
-    private val voteUiHandler = accountActionsManager.voteUiHandler
+    val voteUiHandler = accountActionsManager.voteUiHandler
     val threadLinesHelper = ThreadLinesHelper(context)
 
     private val tempSize = Size()
@@ -193,6 +200,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         isPostLocked: Boolean,
         isUpdating: Boolean,
         highlight: Boolean,
+        highlightForever: Boolean,
         viewLifecycleOwner: LifecycleOwner,
         currentAccountId: PersonId?,
         onImageClick: (String) -> Unit,
@@ -227,7 +235,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 textView = text,
                 text = content,
                 instance = instance,
-                onImageClickListener = onImageClick,
+                onImageClick = onImageClick,
                 onPageClick = onPageClick,
             )
         }
@@ -340,7 +348,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onInstanceMismatch,
         )
 
-        highlightComment(highlight, highlightBg)
+        highlightComment(highlight, highlightForever, highlightBg)
 
         if (isUpdating) {
             progressBar.visibility = View.VISIBLE
@@ -360,6 +368,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         depth: Int,
         childrenCount: Int,
         highlight: Boolean,
+        highlightForever: Boolean,
         isUpdating: Boolean,
         commentView: CommentView,
         expandSection: (position: Int) -> Unit,
@@ -390,7 +399,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             overlay.visibility = View.GONE
         }
 
-        highlightComment(highlight, highlightBg)
+        highlightComment(highlight, highlightForever, highlightBg)
 
         if (isUpdating) {
             progressBar.visibility = View.VISIBLE
@@ -412,6 +421,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         instance: String,
         author: String?,
         highlight: Boolean,
+        highlightForever: Boolean,
         onImageClick: (String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
@@ -431,7 +441,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             textView = text,
             text = content,
             instance = instance,
-            onImageClickListener = onImageClick,
+            onImageClick = onImageClick,
             onPageClick = onPageClick,
         )
 
@@ -491,7 +501,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             collapseSection(h.bindingAdapterPosition)
         }
 
-        highlightComment(highlight, highlightBg)
+        highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesDecoration.ThreadLinesData(
             depth, baseDepth
@@ -505,6 +515,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         depth: Int,
         author: String?,
         highlight: Boolean,
+        highlightForever: Boolean,
         expandSection: (position: Int) -> Unit,
     ) = with(binding) {
 
@@ -525,7 +536,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
         overlay.visibility = View.GONE
 
-        highlightComment(highlight, highlightBg)
+        highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesDecoration.ThreadLinesData(
             depth, baseDepth
@@ -533,66 +544,165 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     fun bindMessage(
+        viewLifecycleOwner: LifecycleOwner,
         b: InboxListItemBinding,
         instance: String,
-        message: PrivateMessageView,
+        accountId: PersonId?,
+        item: InboxItem,
         onImageClick: (String) -> Unit,
         onPageClick: (PageRef) -> Unit,
+        onMarkAsRead: (InboxItem, Boolean) -> Unit,
+        onMessageClick: (InboxItem) -> Unit,
+        onAddCommentClick: (InboxItem) -> Unit,
+        onOverflowMenuClick: (InboxItem) -> Unit,
+        onSignInRequired: () -> Unit,
+        onInstanceMismatch: (String, String) -> Unit,
     ) = with(b) {
-        lemmyHeaderHelper.populateHeaderSpan(
-            headerContainer = header,
-            item = message,
-        )
+        b.author.text = buildSpannedString {
+            val s = length
+            append(LemmyUtils.formatAuthor(item.authorName))
+            LinkUtils.getLinkForPerson(item.authorInstance, item.authorName)
+            val e = length
+            setSpan(
+                ForegroundColorSpan(emphasisColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
 
-        LemmyTextHelper.bindText(
-            textView = content,
-            text = message.private_message.content,
-            instance = instance,
-            onImageClickListener = onImageClick,
-            onPageClick = onPageClick,
-        )
-    }
+        if (item is CommentBackedItem) {
+            val scoreDrawable = context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)
+            scoreDrawable?.setBounds(
+                0,
+                0,
+                Utils.convertDpToPixel(16f).toInt(),
+                Utils.convertDpToPixel(16f).toInt()
+            )
+            b.score.setCompoundDrawablesRelative(
+                scoreDrawable,
+                null,
+                null,
+                null
+            )
+            b.score.text = LemmyUtils.abbrevNumber(item.score.toLong())
+            b.score.visibility = View.VISIBLE
 
-    fun bindMessage(
-        b: InboxListItemBinding,
-        instance: String,
-        message: PersonMentionView,
-        onImageClick: (String) -> Unit,
-        onPageClick: (PageRef) -> Unit,
-    ) = with(b) {
-        lemmyHeaderHelper.populateHeaderSpan(
-            headerContainer = header,
-            item = message,
-        )
+            voteUiHandler.bind(
+                viewLifecycleOwner,
+                instance,
+                item,
+                upvoteButton,
+                downvoteButton,
+                b.score,
+                onSignInRequired,
+                onInstanceMismatch,
+            )
+            upvoteButton.isEnabled = true
+            downvoteButton.isEnabled = true
+        } else {
+            voteUiHandler.unbindVoteUi(b.score)
+            b.score.visibility = View.GONE
 
-        LemmyTextHelper.bindText(
-            textView = content,
-            text = message.comment.content,
-            instance = instance,
-            onImageClickListener = onImageClick,
-            onPageClick = onPageClick,
-        )
-    }
+            upvoteButton.isEnabled = false
+            downvoteButton.isEnabled = false
+        }
 
-    fun bindMessage(
-        b: InboxListItemBinding,
-        instance: String,
-        message: CommentReplyView,
-        onImageClick: (String) -> Unit,
-        onPageClick: (PageRef) -> Unit,
-    ) = with(b) {
-        lemmyHeaderHelper.populateHeaderSpan(
-            headerContainer = header,
-            item = message,
+        val drawable = when (item) {
+            is InboxItem.MentionInboxItem ->
+                context.getDrawableCompat(R.drawable.baseline_at_24)
+            is InboxItem.MessageInboxItem ->
+                context.getDrawableCompat(R.drawable.baseline_email_24)
+            is InboxItem.ReplyInboxItem ->
+                context.getDrawableCompat(R.drawable.baseline_reply_24)
+        }
+        drawable?.setBounds(
+            0,
+            0,
+            Utils.convertDpToPixel(16f).toInt(),
+            Utils.convertDpToPixel(16f).toInt()
         )
+        val faintTextColor = context.getColorCompat(R.color.colorTextFaint)
 
-        LemmyTextHelper.bindText(
-            textView = content,
-            text = message.comment.content,
-            instance = instance,
-            onImageClickListener = onImageClick,
-            onPageClick = onPageClick,
+        b.author.setCompoundDrawablesRelative(
+            drawable,
+            null,
+            null,
+            null
         )
+        b.date.text = dateStringToPretty(item.lastUpdate)
+        b.title.text = item.title
+
+        b.content.text = if (item.isDeleted) {
+            buildSpannedString {
+                append(context.getString(R.string.deleted))
+                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+            }
+        } else if (item.isRemoved) {
+            buildSpannedString {
+                append(context.getString(R.string.removed))
+                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+            }
+        } else {
+            item.content
+        }
+
+        if (item.isRead) {
+            b.author.setTextColor(faintTextColor)
+            b.title.setTextColor(faintTextColor)
+            b.content.setTextColor(faintTextColor)
+
+            b.markAsRead.imageTintList =
+                ColorStateList.valueOf(context.getColorCompat(R.color.style_green))
+            b.markAsRead.setOnClickListener {
+                onMarkAsRead(item, false)
+            }
+            b.author.alpha = .5f
+        } else {
+            b.author.setTextColor(context.getColorCompat(R.color.colorText))
+            b.author.alpha = 1f
+            b.title.setTextColor(context.getColorCompat(R.color.colorTextTitle))
+            b.content.setTextColor(context.getColorCompat(R.color.colorText))
+            b.markAsRead.imageTintList =
+                ColorStateList.valueOf(
+                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+            b.markAsRead.setOnClickListener {
+                onMarkAsRead(item, true)
+            }
+        }
+
+        b.reply.setOnClickListener {
+            onAddCommentClick(item)
+        }
+        b.moreButton.setOnClickListener {
+            onOverflowMenuClick(item)
+        }
+
+        root.setOnClickListener {
+            onMessageClick(item)
+        }
+
+
+        if (item is InboxItem.MessageInboxItem &&
+            item.authorId == accountId) {
+            b.root.setTag(R.id.swipe_enabled, false)
+            b.markAsRead.isEnabled = false
+        } else {
+            b.root.setTag(R.id.swipe_enabled, true)
+            b.markAsRead.isEnabled = true
+        }
+
+        if (item.isRead) {
+            b.root.setTag(R.id.swipe_enabled, false)
+        }
+
+//        LemmyTextHelper.bindText(
+//            textView = content,
+//            text = message.content,
+//            instance = instance,
+//            onImageClickListener = onImageClick,
+//            onPageClick = onPageClick,
+//        )
     }
 
     fun recycle(b: PostHeaderItemBinding): RecycledState {
@@ -603,8 +713,11 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
 
-    private fun highlightComment(isCommentHighlighted: Boolean, bg: View) {
-        if (isCommentHighlighted) {
+    private fun highlightComment(isCommentHighlighted: Boolean, highlightForever: Boolean, bg: View) {
+        if (highlightForever) {
+            bg.visibility = View.VISIBLE
+            bg.clearAnimation()
+        } else if (isCommentHighlighted) {
             bg.visibility = View.VISIBLE
 
             val animation = AlphaAnimation(0f, 0.9f)

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
@@ -50,6 +51,7 @@ import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
@@ -106,6 +108,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     private var viewPagerController: ViewPagerController? = null
 
     private var isCustomAppBarExpanded = false
+
+    private lateinit var lemmyAppBarController: LemmyAppBarController
 
     private val onBackPressedHandler = object : OnBackPressedCallback(true /* enabled by default */) {
         override fun handleOnBackPressed() {
@@ -345,6 +349,44 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        lemmyAppBarController = LemmyAppBarController(requireMainActivity(), binding.customAppBar)
+
+        viewModel.defaultCommunity.observe(viewLifecycleOwner) {
+            lemmyAppBarController.setDefaultCommunity(it)
+        }
+        viewModel.currentAccount.observe(viewLifecycleOwner) {
+            lemmyAppBarController.onAccountChanged(it)
+        }
+
+        requireMainActivity().apply {
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.customActionBar)
+
+
+            binding.customAppBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+                val percentShown = -verticalOffset.toFloat() / binding.customAppBar.height
+
+                bottomNavViewOffset.value =
+                    (percentShown * getBottomNavHeight()).toInt()
+
+                isCustomAppBarExpanded = percentShown == 0f
+
+                updateFabState()
+            }
+            lemmyAppBarController.setup(
+                communitySelectedListener = { controller, communityRef ->
+                    val action = CommunityFragmentDirections.actionSubredditFragmentSwitchSubreddit(
+                        communityRef = communityRef
+                    )
+                    findNavController().navigate(action)
+                    Utils.hideKeyboard(activity)
+                    controller.hide()
+                },
+                onAccountClick = {
+                    AccountsAndSettingsDialogFragment.newInstance()
+                        .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+                })
+        }
+
         view.doOnPreDraw {
             adapter?.contentMaxWidth = binding.recyclerView.width
         }
@@ -406,18 +448,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         val view = binding.root
         checkNotNull(view.findNavController())
 
-        val mainView = binding.rootView
         val mainActivity = requireMainActivity()
         mainActivity.apply {
-            headerOffset.observe(viewLifecycleOwner) {
-                if (it != null)
-                    mainView.translationY = it.toFloat()
-
-                isCustomAppBarExpanded = it == getCustomAppBarHeight()
-
-                updateFabState()
-            }
-
             insetsChangedLiveData.observe(viewLifecycleOwner) {
                 binding.fab.updateLayoutParams<MarginLayoutParams> {
                     this.bottomMargin = getBottomNavHeight() + getDimen(R.dimen.padding)
@@ -470,7 +502,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
         })
 
-        setupMainActivityButtons()
         scheduleStartPostponedTransition(binding.rootView)
 
         viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
@@ -507,7 +538,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                                 )
                         } else {
                             binding.recyclerView.scrollToPosition(0)
-                            getMainActivity()?.showCustomAppBar()
+                            binding.customAppBar.setExpanded(true)
                         }
                     }
 
@@ -547,7 +578,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         super.onResume()
 
         runOnReady {
-            val customAppBarController = requireMainActivity().getCustomAppBarController()
+            val customAppBarController = lemmyAppBarController
 
             viewModel.currentCommunityRef.observe(viewLifecycleOwner) {
                 val currentDefaultPage = preferences.getDefaultPage()
@@ -666,24 +697,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
 
         return _layoutSelectorMenu
-    }
-
-    private fun setupMainActivityButtons() {
-        (activity as? MainActivity)?.apply {
-            getCustomAppBarController().setup(
-                communitySelectedListener = { controller, communityRef ->
-                    val action = CommunityFragmentDirections.actionSubredditFragmentSwitchSubreddit(
-                        communityRef = communityRef
-                    )
-                    findNavController().navigate(action)
-                    Utils.hideKeyboard(activity)
-                    controller.hide()
-                },
-                onAccountClick = {
-                    AccountsAndSettingsDialogFragment.newInstance()
-                        .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
-                })
-        }
     }
 
     private fun showOverflowMenu() {

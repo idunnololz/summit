@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import com.idunnololz.summit.R
 import kotlin.reflect.KClass
 
 class AdapterHelper<T : Any>(

@@ -186,6 +186,10 @@ open class OverlappingPanelsLayout : FrameLayout {
   override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
     super.onLayout(changed, left, top, right, bottom)
 
+
+//    setSystemGestureExclusionRects()
+
+
     // OverlappingPanelsLayout expects exactly three child views where each child view
     // is a panel. If there are not exactly three child views, OverlappingPanelsLayout
     // will throw an exception from the lateinit var panel views not getting initialized.
@@ -202,6 +206,10 @@ open class OverlappingPanelsLayout : FrameLayout {
    * https://developer.android.com/training/gestures/viewgroup.html
    */
   override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+    if (!isEnabled) {
+      return false
+    }
+
     return when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         isScrollingHorizontally = false
@@ -279,6 +287,8 @@ open class OverlappingPanelsLayout : FrameLayout {
       return false
     }
 
+    Log.d("HAHA", "event: " + event + " action: " + event.actionMasked)
+
     return when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         true
@@ -305,10 +315,15 @@ open class OverlappingPanelsLayout : FrameLayout {
         true
       }
       MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-        val isClosedCenterPanelClick =
+        val isClosedCenterPanelClick = if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
+          false
+        } else {
           wasActionDownOnClosedCenterPanel &&
                   abs(event.x - xFromInterceptActionDown) < scrollingSlopPx &&
                   !isScrollingHorizontally
+        }
+
+        Log.d("HAHA", "isClosedCenterPanelClick: " + isClosedCenterPanelClick)
 
         if (isClosedCenterPanelClick) {
           closePanels()
@@ -571,7 +586,12 @@ open class OverlappingPanelsLayout : FrameLayout {
 
     // Setting [units] to 1000 provides pixels per second.
     velocityTracker?.computeCurrentVelocity(1000 /* units */)
-    val pxPerSecond = velocityTracker?.xVelocity ?: Float.MIN_VALUE
+    val pxPerSecond =
+      if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
+        0f
+      } else {
+        velocityTracker?.xVelocity ?: Float.MIN_VALUE
+      }
     val isFling = abs(pxPerSecond) > minFlingPxPerSecond
     val isDirectionStartToEnd = if (isLeftToRight) pxPerSecond > 0 else pxPerSecond < 0
 

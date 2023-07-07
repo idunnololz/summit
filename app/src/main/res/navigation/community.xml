@@ -122,6 +122,11 @@
             android:name="editCommentView"
             app:argType="com.idunnololz.summit.api.dto.CommentView"
             app:nullable="true" />
+        <argument
+            android:name="inboxItem"
+            android:defaultValue="@null"
+            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem"
+            app:nullable="true" />
         <action
             android:id="@+id/action_addOrEditCommentFragment_to_previewCommentDialogFragment"
             app:destination="@id/previewCommentDialogFragment" />

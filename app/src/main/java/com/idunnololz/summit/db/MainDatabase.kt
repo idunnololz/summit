@@ -41,7 +41,7 @@ import com.idunnololz.summit.util.moshi
     autoMigrations = [
         AutoMigration (from = 20, to = 21),
     ],
-    version = 24,
+    version = 26,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class)
@@ -80,6 +80,8 @@ abstract class MainDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_24)
                 .addMigrations(MIGRATION_23_24)
+                .addMigrations(MIGRATION_24_26)
+                .addMigrations(MIGRATION_25_26)
                 .build()
         }
     }
@@ -110,5 +112,19 @@ val MIGRATION_23_24 = object : Migration(23, 24) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS account_info;")
         database.execSQL("CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, PRIMARY KEY(`account_id`))")
+    }
+}
+
+val MIGRATION_24_26 = object : Migration(24, 26) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS account_info;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, `misc_account_info` TEXT, PRIMARY KEY(`account_id`))")
+    }
+}
+
+val MIGRATION_25_26 = object : Migration(24, 26) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS account_info;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, `misc_account_info` TEXT, PRIMARY KEY(`account_id`))")
     }
 }

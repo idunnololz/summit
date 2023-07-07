@@ -24,12 +24,6 @@ class LinkifyTextView : AppCompatTextView {
         } else {
             false
         }
-        return if (handled) {
-            Log.d("HAHA", "Handled: $handled")
-            true
-        } else {
-            Log.d("HAHA", "NOT Handled: $handled")
-            false
-        }
+        return handled
     }
 }

@@ -26,6 +26,13 @@ data class AccountInfo(
     val accountId: Int,
     @ColumnInfo(name = "subscriptions")
     val subscriptions: List<AccountSubscription>?,
+    @ColumnInfo(name = "misc_account_info")
+    val miscAccountInfo: MiscAccountInfo?,
+)
+
+@JsonClass(generateAdapter = true)
+data class MiscAccountInfo(
+    val avatar: String? = null
 )
 
 @JsonClass(generateAdapter = true)
@@ -79,6 +86,23 @@ class AccountInfoConverters(private val moshi: Moshi) {
         try {
             moshi.adapter<List<AccountSubscription>>(
                 Types.newParameterizedType(List::class.java, AccountSubscription::class.java))
+                .fromJson(value)
+        } catch (e: Exception) {
+            Log.e(TAG, "", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
+            null
+        }
+
+    @TypeConverter
+    fun miscAccountInfoToString(miscAccountInfo: MiscAccountInfo): String {
+        return moshi.adapter<MiscAccountInfo>(MiscAccountInfo::class.java)
+            .toJson(miscAccountInfo)
+    }
+
+    @TypeConverter
+    fun stringToMiscAccountInfo(value: String): MiscAccountInfo? =
+        try {
+            moshi.adapter(MiscAccountInfo::class.java)
                 .fromJson(value)
         } catch (e: Exception) {
             Log.e(TAG, "", e)

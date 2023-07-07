@@ -13,6 +13,8 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.actions.ActionInfo
+import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
+import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.squareup.moshi.JsonClass
@@ -33,7 +35,7 @@ interface VoteUiHandler {
         scoreView: TextView,
         registration: AccountActionsManager.Registration,
     )
-    fun unbindVoteUi(upVoteView: View)
+    fun unbindVoteUi(scoreView: View)
 }
 
 fun VoteUiHandler.bind(
@@ -76,6 +78,30 @@ fun VoteUiHandler.bind(
         currentVote = postView.my_vote ?: 0,
         currentScore = postView.counts.score,
         ref = VotableRef.PostRef(postView.post.id),
+        upVoteView = upVoteView,
+        downVoteView = downVoteView,
+        scoreView = scoreView,
+        onSignInRequired = onSignInRequired,
+        onInstanceMismatch = onInstanceMismatch,
+    )
+}
+
+fun VoteUiHandler.bind(
+    lifecycleOwner: LifecycleOwner,
+    instance: String,
+    inboxItem: CommentBackedItem,
+    upVoteView: ImageView?,
+    downVoteView: ImageView?,
+    scoreView: TextView,
+    onSignInRequired: () -> Unit,
+    onInstanceMismatch: (String, String) -> Unit,
+) {
+    bind(
+        lifecycleOwner = lifecycleOwner,
+        instance = instance,
+        currentVote = inboxItem.myVote ?: 0,
+        currentScore = inboxItem.score,
+        ref = VotableRef.CommentRef(inboxItem.commentId),
         upVoteView = upVoteView,
         downVoteView = downVoteView,
         scoreView = scoreView,

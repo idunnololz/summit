@@ -240,6 +240,9 @@ interface LemmyApi {
      */
     @GET("user/unread_count")
     fun getUnreadCount(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
+    @GET("user/unread_count")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getUnreadCountNoCache(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
 
     /**
      * Follow / subscribe to a community.

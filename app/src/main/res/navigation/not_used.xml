@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/not_used.xml"
+    app:startDestination="@id/messageFragment">
+
+    <fragment
+        android:id="@+id/messageFragment"
+        android:name="com.idunnololz.summit.lemmy.inbox.MessageFragment"
+        android:label="MessageFragment" >
+        <argument
+            android:name="inboxItem"
+            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem" />
+        <argument
+            android:name="instance"
+            app:argType="string" />
+    </fragment>
+    <dialog
+        android:id="@+id/errorDialogFragment"
+        android:name="com.idunnololz.summit.error.ErrorDialogFragment"
+        android:label="ErrorDialogFragment" >
+        <argument
+            android:name="message"
+            app:argType="string" />
+        <argument
+            android:name="errorMessage"
+            app:argType="string" />
+        <argument
+            android:name="errorType"
+            app:argType="string" />
+    </dialog>
+</navigation>

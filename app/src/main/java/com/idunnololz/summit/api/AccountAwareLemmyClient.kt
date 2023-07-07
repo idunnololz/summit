@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentReplyId
 import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -14,11 +15,17 @@ import com.idunnololz.summit.api.dto.GetPersonMentions
 import com.idunnololz.summit.api.dto.GetPrivateMessages
 import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
+import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
+import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.PersonMentionId
 import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
@@ -176,6 +183,18 @@ class AccountAwareLemmyClient @Inject constructor(
     ): Result<GetSiteResponse> =
         apiClient.fetchSiteWithRetry(auth, force)
 
+    suspend fun fetchUnreadCountWithRetry(
+        force: Boolean,
+        account: Account? = currentAccount
+    ): Result<GetUnreadCountResponse> =
+        retry {
+            if (account == null) {
+                createAccountErrorResult()
+            } else {
+                apiClient.fetchUnreadCount(force, account)
+            }
+        }
+
     suspend fun deletePost(
         id: PostId,
         account: Account? = accountForInstance(),
@@ -259,6 +278,39 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.fetchPrivateMessages(unreadOnly, page, limit, account, force)
+        }
+
+    suspend fun markReplyAsRead(
+        id: CommentReplyId,
+        read: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<CommentView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.markReplyAsRead(id, read, account)
+        }
+
+    suspend fun markMentionAsRead(
+        id: PersonMentionId,
+        read: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<PersonMentionView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.markMentionAsRead(id, read, account)
+        }
+
+    suspend fun markPrivateMessageAsRead(
+        id: PrivateMessageId,
+        read: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<PrivateMessageView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.markPrivateMessageAsRead(id, read, account)
         }
 
 

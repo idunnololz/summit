@@ -7,6 +7,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentReplyId
 import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -16,6 +17,7 @@ import com.idunnololz.summit.api.dto.CreateComment
 import com.idunnololz.summit.api.dto.CreateCommentLike
 import com.idunnololz.summit.api.dto.CreatePost
 import com.idunnololz.summit.api.dto.CreatePostLike
+import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeletePost
 import com.idunnololz.summit.api.dto.EditComment
@@ -32,14 +34,21 @@ import com.idunnololz.summit.api.dto.GetPrivateMessages
 import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetSite
 import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.GetUnreadCount
+import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListCommunities
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.Login
+import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
+import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
+import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.PersonMentionId
 import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.dto.Search
 import com.idunnololz.summit.api.dto.SearchResponse
@@ -48,6 +57,7 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
@@ -355,6 +365,28 @@ class LemmyApiClient @Inject constructor(
                     Result.failure(it)
                 }
             )
+    }
+
+    suspend fun fetchUnreadCount(
+        force: Boolean,
+        account: Account
+    ): Result<GetUnreadCountResponse> {
+        val form = GetUnreadCount(account.jwt)
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getUnreadCountNoCache(form.serializeToMap())
+            } else {
+                api.getUnreadCount(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
     }
 
     suspend fun likePostWithRetry(
@@ -751,6 +783,94 @@ class LemmyApiClient @Inject constructor(
         )
     }
 
+    suspend fun markReplyAsRead(
+        id: CommentReplyId,
+        read: Boolean,
+        account: Account,
+    ): Result<CommentView> {
+        val form = MarkCommentReplyAsRead(
+            id,
+            read,
+            account.jwt
+        )
+        return retrofitErrorHandler {
+            api.markCommentReplyAsRead(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.comment_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun markMentionAsRead(
+        id: PersonMentionId,
+        read: Boolean,
+        account: Account,
+    ): Result<PersonMentionView> {
+        val form = MarkPersonMentionAsRead(
+            id,
+            read,
+            account.jwt
+        )
+        return retrofitErrorHandler {
+            api.markPersonMentionAsRead(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.person_mention_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun markPrivateMessageAsRead(
+        id: PrivateMessageId,
+        read: Boolean,
+        account: Account,
+    ): Result<PrivateMessageView> {
+        val form = MarkPrivateMessageAsRead(
+            id,
+            read,
+            account.jwt
+        )
+        return retrofitErrorHandler {
+            api.markPrivateMessageAsRead(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.private_message_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun createPrivateMessage(
+        content: String,
+        recipient: PersonId,
+        account: Account,
+    ): Result<PrivateMessageView> {
+        val form = CreatePrivateMessage(
+            content = content,
+            recipient_id = recipient,
+            auth = account.jwt,
+        )
+        return retrofitErrorHandler {
+            api.createPrivateMessage(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.private_message_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
     val instance: String
         get() = api.instance
 
@@ -767,6 +887,9 @@ class LemmyApiClient @Inject constructor(
             }
             if (e is UnknownHostException) {
                 return Result.failure(NoInternetException())
+            }
+            if (e is CancellationException) {
+                throw e
             }
             Log.e(TAG, "Exception fetching url", e)
             return Result.failure(e)

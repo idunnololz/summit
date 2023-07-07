@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.community
 
 import android.graphics.Bitmap
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.info.AccountInfo
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.CommunityId
@@ -24,6 +28,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.main.MainActivityViewModel
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
@@ -46,6 +51,7 @@ class CommunityViewModel @Inject constructor(
     private val recentCommunityManager: RecentCommunityManager,
     private val accountManager: AccountManager,
     private val userCommunitiesManager: UserCommunitiesManager,
+    private val accountInfoManager: AccountInfoManager,
     private val accountActionsManager: AccountActionsManager,
     private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
@@ -85,6 +91,9 @@ class CommunityViewModel @Inject constructor(
 
     val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
 
+    val defaultCommunity = MutableLiveData<CommunityRef>(null)
+    val currentAccount = MutableLiveData<AccountView?>(null)
+
     init {
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
@@ -101,6 +110,37 @@ class CommunityViewModel @Inject constructor(
                         reset()
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            userCommunitiesManager.defaultCommunity
+                .collect {
+                    defaultCommunity.postValue(it)
+                }
+        }
+
+        viewModelScope.launch {
+            accountManager.currentAccount.collect {
+                val accountView = if (it != null) {
+                    accountInfoManager.getAccountViewForAccount(it)
+                } else {
+                    null
+                }
+
+                currentAccount.postValue(accountView)
+            }
+        }
+
+        viewModelScope.launch {
+            accountInfoManager.accountInfoUpdateState.collect {
+                val account = accountManager.currentAccount.value
+
+                if (account != null) {
+                    val accountView = accountInfoManager.getAccountViewForAccount(account)
+
+                    currentAccount.postValue(accountView)
+                }
+            }
         }
     }
 

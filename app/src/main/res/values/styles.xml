@@ -77,7 +77,7 @@
 
         <item name="elevationOverlayColor">@color/white10</item>
 
-        <item name="materialCardViewStyle">@style/MyApp.Widget.Material3.CardView</item>
+<!--        <item name="materialCardViewStyle">@style/MyApp.Widget.Material3.CardView</item>-->
         <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>
     </style>
 

@@ -246,6 +246,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     false,
                     false,
                     false,
+                    false,
                     viewLifecycleOwner,
                     item.creator.id,
                     {},
@@ -274,7 +275,6 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
-
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

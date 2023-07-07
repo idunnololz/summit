@@ -227,6 +227,17 @@
     <string name="mentions">Mentions</string>
     <string name="messages">Messages</string>
     <string name="there_doesnt_seem_to_be_anything_here">There doesn\'t seem to be anything here</string>
+    <string name="unread">Unread</string>
+    <string name="no_more_items">No more items</string>
+    <string name="mark_as_unread">Mark as unread</string>
+    <string name="reply">Reply</string>
+    <string name="context">Context</string>
+    <string name="error_unable_to_send_message">Unable to send message. Got error %1$s. Details: %2$s.</string>
+    <string name="error_details">Error details</string>
+    <string name="caused_by_format">Caused by %1$s</string>
+    <string name="error_unable_to_mark_message_as_read">Unable to mark message as read.</string>
+    <string name="message_actions">Message actions</string>
+    <string name="from_format">From %1$s</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>
