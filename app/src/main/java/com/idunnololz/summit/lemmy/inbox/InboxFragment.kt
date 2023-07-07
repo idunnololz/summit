@@ -387,7 +387,6 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
     }
 
     private fun onUpdate() {
-        Log.d("HAHA", "Updated!", RuntimeException())
         when (val data = viewModel.inboxData.value) {
             is StatefulData.Error -> {
                 binding.swipeRefreshLayout.isRefreshing = false
@@ -410,6 +409,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                         getString(R.string.refresh)
                     )
                 } else {
+                    Log.d(TAG, "onUpdate. Got ${data.data.sumOf { it.items.size }} items!")
                     (binding.recyclerView.adapter as? InboxItemAdapter)?.setData(data.data)
                 }
             }

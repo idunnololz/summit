@@ -94,7 +94,7 @@ open class LemmyListSource<T, O>(
         }
 
     suspend fun getItem(index: Int, force: Boolean): Result<T?> {
-        if (index < allObjects.size) {
+        if (index < allObjects.size && !force) {
             return Result.success(allObjects[index].obj)
         }
         val result = getPage(index / PAGE_SIZE, force)
@@ -123,6 +123,8 @@ open class LemmyListSource<T, O>(
 
             deleteFromPage(minPageInteral)
             endReached = false
+
+            Log.d(TAG, "Force = true. Clearing data. Remaining: ${allObjects.size}")
         }
 
         var hasMore = true

@@ -128,4 +128,8 @@ class MainActivityViewModel @Inject constructor(
             }
         }
     }
+
+    fun updateUnreadCount() {
+        accountInfoManager.updateUnreadCount()
+    }
 }

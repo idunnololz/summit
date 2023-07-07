@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
@@ -17,6 +18,7 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 
 data class Item(
+    val id: Long,
     val clazz: Class<*>,
     val args: Bundle?,
     val title: String,
@@ -66,7 +68,7 @@ class ViewPagerAdapter(
         args: Bundle? = null,
         @DrawableRes drawableRes: Int? = null,
     ) {
-        items.add(Item(clazz, args, title, drawableRes))
+        items.add(Item(View.generateViewId().toLong(), clazz, args, title, drawableRes))
     }
 
     fun findIndexOfPage(className: String): Int =

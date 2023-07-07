@@ -31,6 +31,12 @@ class InboxRepository @Inject constructor(
         private const val PAGE_SIZE = 20
     }
 
+    /**
+     * Represents a change on the server. If a page is included in this set, it means we should
+     * fetch without a cache for the next fetch request.
+     */
+    private val serverInvalidated = mutableSetOf<InboxViewModel.PageType>()
+
     private val repliesStatelessSource: InboxSource<CommentSortType> =
         makeRepliesSource(unreadOnly = false)
     private val mentionsStatelessSource: InboxSource<CommentSortType> =
@@ -49,7 +55,8 @@ class InboxRepository @Inject constructor(
             }
 
             val result = inboxSource.getItem(itemIndex, force)
-            Log.d(TAG, "Setting next item to ${(result.getOrNull() ?: Unit)::class.java}. Index: $itemIndex")
+            Log.d(TAG, "Setting next item to ${(result.getOrNull() ?: Unit)}. " +
+                    "Index: $itemIndex. Force: $force")
 
             val nextItem = result.also {
                 nextItem = it
@@ -201,7 +208,15 @@ class InboxRepository @Inject constructor(
             InboxViewModel.PageType.Messages -> messagesSource
         }
 
-        return source.getPage(pageIndex, pageType, force)
+        val finalForce = serverInvalidated.contains(pageType) || force
+
+        val result = source.getPage(pageIndex, pageType, finalForce)
+
+        serverInvalidated.remove(pageType)
+
+        Log.d(TAG, "Got ${result.getOrNull()?.items?.size} items for page $pageType")
+
+        return result
     }
 
     suspend fun invalidate(pageType: InboxViewModel.PageType) {
@@ -313,6 +328,12 @@ class InboxRepository @Inject constructor(
                 Result.failure(it)
             }
         )
+    }
+
+    fun onServerChanged() {
+        InboxViewModel.PageType.values().forEach {
+            serverInvalidated.add(it)
+        }
     }
 }
 

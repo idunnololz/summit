@@ -18,6 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -86,6 +87,13 @@ class InboxViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            accountInfoManager.unreadCount.collect {
+                inboxRepository.onServerChanged()
+            }
+        }
+        inboxRepository.onServerChanged()
     }
 
     fun fetchInbox(
@@ -184,6 +192,8 @@ class InboxViewModel @Inject constructor(
         hasMore = data.hasMore
 
         allData.add(data)
+
+        Log.d(TAG, "Data updated! Total items: ${allData.sumOf { it.items.size }}")
     }
 
     private fun clearData() {
