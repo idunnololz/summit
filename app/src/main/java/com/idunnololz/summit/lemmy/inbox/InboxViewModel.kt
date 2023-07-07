@@ -59,6 +59,8 @@ class InboxViewModel @Inject constructor(
 
     var instance: String = apiClient.instance
 
+    var pauseUnreadUpdates = false
+
     private val allData: MutableList<LemmyListSource.PageResult<InboxItem>> = mutableListOf()
     private var hasMore = true
 
@@ -96,7 +98,9 @@ class InboxViewModel @Inject constructor(
 
         viewModelScope.launch {
             accountInfoManager.unreadCount.collect {
-                inboxRepository.onServerChanged()
+                if (!pauseUnreadUpdates) {
+                    inboxRepository.onServerChanged()
+                }
             }
         }
         inboxRepository.onServerChanged()

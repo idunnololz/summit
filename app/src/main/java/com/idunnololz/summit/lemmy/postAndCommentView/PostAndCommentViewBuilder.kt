@@ -685,8 +685,9 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         if (item is InboxItem.MessageInboxItem &&
             item.authorId == accountId) {
+
             b.root.setTag(R.id.swipe_enabled, false)
-            b.markAsRead.isEnabled = false
+//            b.markAsRead.isEnabled = false
         } else {
             b.root.setTag(R.id.swipe_enabled, true)
             b.markAsRead.isEnabled = true

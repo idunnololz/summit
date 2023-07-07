@@ -341,13 +341,13 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         with(binding) {
             val adapter = PostsAdapter(
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
-                context,
-                binding.recyclerView,
-                viewLifecycleOwner,
-                args.instance,
-                false,
-                viewModel.accountManager.currentAccount.value?.id,
-                null,
+                context = context,
+                containerView = binding.recyclerView,
+                lifecycleOwner = viewLifecycleOwner,
+                instance = args.instance,
+                revealAll = false,
+                currentAccountId = viewModel.accountManager.currentAccount.value?.id,
+                videoState = null,
                 onRefreshClickCb = {
                     loadContext(force = true)
                 },
@@ -435,6 +435,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
 
+            adapter.contentMaxWidth = recyclerView.width
+
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
             recyclerView.addItemDecoration(ThreadLinesDecoration(context))
@@ -444,7 +446,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 listOf(data.commentTree),
                 null,
             ))
-
 
             val commentId = args.inboxItem.commentId
             if (commentId != null) {

@@ -9,6 +9,7 @@ import androidx.annotation.DrawableRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -37,6 +38,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     private var adapter: InboxPagerAdapter? = null
 
     private val viewModel: InboxTabbedViewModel by viewModels()
+    private val inboxViewModel: InboxViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -110,6 +112,16 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         })
 
         viewModel.updateUnreadCount()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        inboxViewModel.pauseUnreadUpdates = true
+    }
+
+    override fun onPause() {
+        inboxViewModel.pauseUnreadUpdates = false
+        super.onPause()
     }
 
     override fun onDestroyView() {
