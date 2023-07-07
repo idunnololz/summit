@@ -7,6 +7,8 @@
 
     <include app:graph="@navigation/community" />
 
+    <include app:graph="@navigation/login" />
+
     <action android:id="@+id/action_global_login" app:destination="@id/login"/>
 
     <fragment

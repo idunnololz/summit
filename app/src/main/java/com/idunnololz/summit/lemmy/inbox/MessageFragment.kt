@@ -216,6 +216,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             .createAndShow(childFragmentManager, "aa")
                     },
                 )
+
+                binding.goToPost.setOnClickListener {
+                    getMainActivity()?.launchPage(
+                        PostRef(args.instance, inboxItem.postId)
+                    )
+                }
             }
             is InboxItem.MessageInboxItem -> {
                 binding.score.visibility = View.GONE
@@ -247,10 +253,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 indicator.setImageResource(R.drawable.baseline_expand_less_18)
                 contextContainer.visibility = View.VISIBLE
                 contextLoadingView.visibility = View.VISIBLE
+                goToPost.visibility = View.VISIBLE
             } else {
                 indicator.setImageResource(R.drawable.baseline_expand_more_18)
                 contextContainer.visibility = View.GONE
                 contextLoadingView.visibility = View.GONE
+                goToPost.visibility = View.GONE
             }
         }
     }

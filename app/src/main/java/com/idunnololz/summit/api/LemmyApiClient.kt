@@ -907,6 +907,10 @@ class LemmyApiClient @Inject constructor(
                 return Result.failure(ServerApiException(errorCode))
             }
 
+            if (errorCode == 401) {
+                return Result.failure(NotAuthenticatedException())
+            }
+
             val errorBody = res.errorBody()?.string()
             val errMsg = try {
                 errorBody?.let {

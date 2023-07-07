@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +27,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentInboxBinding
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.InboxListLoaderItemBinding
@@ -33,6 +35,7 @@ import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.util.BaseFragment
@@ -41,6 +44,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.VerticalSpaceItemDecoration
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -166,7 +170,11 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         }
 
         binding.loadingView.setOnRefreshClickListener {
-            refresh()
+            if (accountManager.currentAccount.value == null) {
+                (parentFragment as InboxTabbedFragment).showLogin()
+            } else {
+                refresh()
+            }
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -287,6 +295,8 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         lifecycleScope.launch(Dispatchers.IO) {
             accountManager.currentAccountOnChange.collect {
                 withContext(Dispatchers.Main) {
+                    if (!isBindingAvailable()) return@withContext
+
                     viewModel.currentAccountView?.let {
                         binding.accountImageView.load(it.profileImage)
                     }
@@ -390,12 +400,17 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         when (val data = viewModel.inboxData.value) {
             is StatefulData.Error -> {
                 binding.swipeRefreshLayout.isRefreshing = false
-                binding.loadingView.showDefaultErrorMessageFor(data.error)
+                if (data.error is NotAuthenticatedException) {
+                    binding.loadingView.showErrorWithRetry(
+                        getString(R.string.please_sign_in_to_view_your_inbox),
+                        getString(R.string.sign_in)
+                    )
+                } else {
+                    binding.loadingView.showDefaultErrorMessageFor(data.error)
+                }
             }
             is StatefulData.Loading -> {
-                if ((adapter?.itemCount ?: 0) == 0) {
-                    binding.loadingView.showProgressBar()
-                }
+                binding.loadingView.showProgressBar()
             }
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {

@@ -595,6 +595,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 onBackPressedHandler.isEnabled = currentPageIndex != 0
             }
 
+            if (binding.viewPager.currentItem == 0) {
+                getMainActivity()?.setNavUiOpenness(0f)
+            }
+
             onSelectedLayoutChanged()
         }
     }
