@@ -74,6 +74,9 @@ class InboxViewModel @Inject constructor(
                 delay(10) // just in case it takes a second for the api client to update...
                 pageIndex = 0
 
+                allData.clear()
+                inboxData.setValue(allData)
+
                 fetchInbox(pageIndex, requireNotNull(pageTypeFlow.value))
             }
         }
@@ -82,6 +85,9 @@ class InboxViewModel @Inject constructor(
             pageTypeFlow.collect {
                 withContext(Dispatchers.Main) {
                     pageIndex = 0
+
+                    allData.clear()
+                    inboxData.setValue(allData)
 
                     fetchInbox()
                 }

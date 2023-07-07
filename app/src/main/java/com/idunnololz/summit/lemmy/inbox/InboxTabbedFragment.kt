@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -20,11 +21,13 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentInboxBinding
+import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.DepthPageTransformer2
 import com.idunnololz.summit.util.Item
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -52,8 +55,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
         val context = requireContext()
 
-        val pagerAdapter =
-            adapter ?: InboxPagerAdapter(
+        val pagerAdapter = InboxPagerAdapter(
                 context,
                 this,
                 onPageCountChanged = { pageCount ->
@@ -136,6 +138,11 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
     fun closeMessage() {
         binding.viewPager.currentItem = 0
+    }
+
+    fun showLogin() {
+        val direction = InboxTabbedFragmentDirections.actionGlobalLogin()
+        findNavController().navigateSafe(direction)
     }
 
     class InboxPagerAdapter(

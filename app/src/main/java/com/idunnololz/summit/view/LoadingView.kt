@@ -15,6 +15,7 @@ import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NoInternetException
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
@@ -188,6 +189,8 @@ class LoadingView : ConstraintLayout {
                         Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
                         if (t is ServerTimeoutException) {
                             showErrorWithRetry(R.string.error_server_timeout)
+                        } else if (t is NotAuthenticatedException) {
+                            showErrorWithRetry(R.string.error_not_signed_in)
                         } else {
                             if (t.errorCode == 404) {
                                 showErrorWithRetry(R.string.error_page_not_found)
