@@ -410,7 +410,9 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 }
             }
             is StatefulData.Loading -> {
-                binding.loadingView.showProgressBar()
+                if (adapter?.isEmpty() == true) {
+                    binding.loadingView.showProgressBar()
+                }
             }
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {
@@ -546,6 +548,8 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         }
 
         fun hasMore(): Boolean = allData.lastOrNull()?.hasMore ?: true
+
+        fun isEmpty(): Boolean = allData.isEmpty() || allData.sumOf { it.items.size } == 0
 
         fun getItemAt(position: Int): InboxItem? =
             when (val item = adapterHelper.items.getOrNull(position)) {

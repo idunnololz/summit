@@ -361,7 +361,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.customActionBar)
 
-
             binding.customAppBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                 val percentShown = -verticalOffset.toFloat() / binding.customAppBar.height
 
@@ -458,7 +457,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
 
         mainActivity.insetViewExceptTopAutomaticallyByPaddingAndNavUi(
-            viewLifecycleOwner, binding.recyclerView)
+            viewLifecycleOwner, binding.recyclerView, binding.customActionBar.height)
 
         val context = requireContext()
 
@@ -706,7 +705,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     private fun showOverflowMenu() {
         val context = context ?: return
 
-
         val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value)
         val currentDefaultPage = preferences.getDefaultPage()
         val isBookmarked = userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
@@ -744,6 +742,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 id = R.id.my_communities,
                 title = R.string.my_communities,
                 icon = R.drawable.baseline_subscriptions_24
+            )
+            addItemWithIcon(
+                id = R.id.browse_communities,
+                title = R.string.browse_communities,
+                icon = R.drawable.baseline_dashboard_24,
             )
 
             if (isCurrentPageDefault) {
@@ -827,6 +830,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                                 viewModel.loadedPostsData.valueOrNull
                                     ?.posts?.firstOrNull()?.community?.icon)
                         }
+                    }
+                    R.id.browse_communities -> {
+                        lemmyAppBarController.showCommunitySelector()
                     }
                 }
             }

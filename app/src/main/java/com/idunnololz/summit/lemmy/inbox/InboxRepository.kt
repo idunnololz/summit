@@ -213,6 +213,14 @@ class InboxRepository @Inject constructor(
         val result = source.getPage(pageIndex, pageType, finalForce)
 
         serverInvalidated.remove(pageType)
+        if (pageType == InboxViewModel.PageType.All) {
+            serverInvalidated.remove(InboxViewModel.PageType.Replies)
+            serverInvalidated.remove(InboxViewModel.PageType.Messages)
+            serverInvalidated.remove(InboxViewModel.PageType.Mentions)
+            repliesSource.invalidate()
+            messagesSource.invalidate()
+            mentionsSource.invalidate()
+        }
 
         Log.d(TAG, "Got ${result.getOrNull()?.items?.size} items for page $pageType")
 

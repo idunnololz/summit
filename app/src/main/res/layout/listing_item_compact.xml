@@ -25,9 +25,11 @@
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_half"
         android:scaleType="centerCrop"
+        app:layout_constraintVertical_bias="0"
         app:layout_constraintDimensionRatio="H,16:12"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <!-- Width set programatically -->
     <com.idunnololz.summit.view.ReactiveImageView
@@ -38,10 +40,12 @@
         android:layout_marginTop="@dimen/padding_half"
         android:background="@drawable/border1"
         android:padding="@dimen/padding"
+        app:layout_constraintVertical_bias="0"
         app:layout_constraintDimensionRatio="H,16:12"
         app:tint="?attr/colorControlNormal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <Space
         android:id="@+id/iconGoneSpacer"
@@ -74,7 +78,7 @@
         android:textAppearance="?textAppearanceHeadline4"
         android:layout_marginStart="@dimen/padding_half"
         android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginTop="@dimen/padding_quarter"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@+id/leftBarrier"
         app:layout_constraintEnd_toEndOf="parent" />

@@ -55,6 +55,10 @@ class LemmyAppBarController(
         }
     }
 
+    fun showCommunitySelector() {
+        communityTextView.performClick()
+    }
+
     fun setCommunity(communityRef: CommunityRef?, isHome: Boolean) {
         currentCommunity = communityRef
 

@@ -25,6 +25,7 @@
         android:layout_marginTop="@dimen/dialog_padding"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginBottom="@dimen/padding"
+        app:strokeWidth="1dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/message"

@@ -57,4 +57,5 @@
     <item name="sort_order_top_last_nine_month" type="id" />
     <item name="my_communities" type="id" />
     <item name="swipe_enabled" type="id" />
+    <item name="browse_communities" type="id"/>
 </resources>

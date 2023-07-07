@@ -242,6 +242,7 @@
     <string name="error_not_signed_in">Error. Not signed in.</string>
     <string name="please_sign_in_to_view_your_inbox">Please sign in to view your inbox.</string>
     <string name="sign_in">Sign in</string>
+    <string name="browse_communities">Browse communities</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

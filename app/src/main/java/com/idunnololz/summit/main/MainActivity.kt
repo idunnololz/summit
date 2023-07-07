@@ -737,7 +737,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun insetViewExceptTopAutomaticallyByPaddingAndNavUi(lifecycleOwner: LifecycleOwner, rootView: View) {
+    fun insetViewExceptTopAutomaticallyByPaddingAndNavUi(
+        lifecycleOwner: LifecycleOwner,
+        rootView: View,
+        additionalPaddingBottom: Int = 0,
+    ) {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
 
@@ -745,7 +749,7 @@ class MainActivity : BaseActivity() {
                 insets.leftInset,
                 0,
                 insets.rightInset,
-                insets.bottomInset + getBottomNavHeight(),
+                insets.bottomInset + getBottomNavHeight() + additionalPaddingBottom,
             )
         }
     }
