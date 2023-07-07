@@ -216,6 +216,12 @@ class MainActivity : BaseActivity() {
         )
     }
 
+    override fun onResume() {
+        super.onStart()
+
+        viewModel.updateUnreadCount()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 

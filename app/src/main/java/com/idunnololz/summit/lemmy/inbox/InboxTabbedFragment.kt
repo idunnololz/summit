@@ -2,38 +2,27 @@ package com.idunnololz.summit.lemmy.inbox
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import coil.load
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentInboxBinding
-import com.idunnololz.summit.lemmy.community.ViewPagerController
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
-import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.DepthPageTransformer
 import com.idunnololz.summit.util.DepthPageTransformer2
 import com.idunnololz.summit.util.Item
-import com.idunnololz.summit.util.ViewPagerAdapter
-import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,8 +55,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         val pagerAdapter =
             adapter ?: InboxPagerAdapter(
                 context,
-                childFragmentManager,
-                viewLifecycleOwner.lifecycle,
+                this,
                 onPageCountChanged = { pageCount ->
                     binding.viewPager.isUserInputEnabled = pageCount > 1
                 }
@@ -84,7 +72,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             }
 
         binding.viewPager.offscreenPageLimit = 99
-        binding.viewPager.isSaveEnabled = false
+//        binding.viewPager.isSaveEnabled = false
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.setPageTransformer(DepthPageTransformer2())
         binding.viewPager.setCurrentItem(viewModel.pagePosition, false)
@@ -152,36 +140,26 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
     class InboxPagerAdapter(
         private val context: Context,
-        fragmentManager: FragmentManager,
-        lifecycle: Lifecycle,
+        fragment: Fragment,
         private val onPageCountChanged: (Int) -> Unit,
-    ) : FragmentStateAdapter(fragmentManager, lifecycle), TabLayoutMediator.TabConfigurationStrategy {
+    ) : FragmentStateAdapter(fragment), TabLayoutMediator.TabConfigurationStrategy {
 
-        private val fragmentFactory: FragmentFactory = fragmentManager.fragmentFactory
+
         private val items = ArrayList<Item>()
 
-        init {
-            lifecycle.addObserver(object : LifecycleEventObserver {
-                override fun onStateChanged(
-                    source: LifecycleOwner,
-                    event: Lifecycle.Event,
-                ) {
-                    if (event == Lifecycle.Event.ON_DESTROY) {
-                        source.lifecycle.removeObserver(this)
-                    }
-                }
-            })
+
+        override fun getItemId(position: Int): Long {
+            return items[position].id
         }
 
-        override fun createFragment(position: Int): Fragment {
-            val fragment = fragmentFactory.instantiate(
-                context::class.java.classLoader!!,
-                items[position].clazz.name,
-            )
-            fragment.arguments = items[position].args
+        override fun containsItem(itemId: Long): Boolean =
+            items.any { it.id == itemId }
 
-            // DO NOT DO THIS. New ViewPager2 made this method terribly inconsistent
-            // createdFragments.put(position, fragment)
+        override fun createFragment(position: Int): Fragment {
+            val fragment = items[position].clazz.newInstance() as Fragment
+            fragment.apply {
+                arguments = items[position].args
+            }
 
             return fragment
         }
@@ -194,7 +172,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             args: Bundle? = null,
             @DrawableRes drawableRes: Int? = null,
         ) {
-            items.add(Item(clazz, args, title, drawableRes))
+            items.add(Item(View.generateViewId().toLong(), clazz, args, title, drawableRes))
 
             onPageCountChanged(items.size)
 

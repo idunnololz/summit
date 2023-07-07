@@ -11,7 +11,10 @@ import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -31,6 +34,7 @@ class AccountInfoManager @Inject constructor(
 
     private var currentAccountInfo: AccountInfo? = null
 
+    private val unreadCountInvalidates = MutableSharedFlow<Unit>()
 
     val accountDir = File(context.filesDir, "account")
 
@@ -69,7 +73,16 @@ class AccountInfoManager @Inject constructor(
                 loadAccountInfo(it)
 
                 updateAccountInfo(it)
+                updateUnreadCount()
             }
+        }
+
+        coroutineScope.launch {
+            unreadCountInvalidates.debounce(1000)
+                .collect {
+                    val account = accountManager.currentAccount.value ?: return@collect
+                    updateUnreadCount(account)
+                }
         }
     }
 
@@ -80,9 +93,8 @@ class AccountInfoManager @Inject constructor(
     }
 
     fun updateUnreadCount() {
-        val account = accountManager.currentAccount.value ?: return
         coroutineScope.launch {
-            updateUnreadCount(account)
+            unreadCountInvalidates.emit(Unit)
         }
     }
 

@@ -70,6 +70,9 @@ sealed interface InboxItem : Parcelable {
             reply.comment.removed,
             reply.comment_reply.read,
         )
+
+        override fun toString(): String =
+            "ReplyInboxItem { content = ${content} }"
     }
 
     @Parcelize
@@ -110,6 +113,9 @@ sealed interface InboxItem : Parcelable {
             mention.comment.removed,
             mention.person_mention.read,
         )
+
+        override fun toString(): String =
+            "MentionInboxItem { content = ${content} }"
     }
 
     @Parcelize
@@ -143,6 +149,9 @@ sealed interface InboxItem : Parcelable {
             isRemoved = false,
             message.private_message.read,
         )
+
+        override fun toString(): String =
+            "MessageInboxItem { content = ${content} }"
     }
 
     val commentId: Int?
