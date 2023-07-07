@@ -12,6 +12,7 @@ import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -42,6 +43,7 @@ import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.login.LoginFragment
@@ -75,8 +77,6 @@ class MainActivity : BaseActivity() {
         private val TAG = MainActivity::class.java.simpleName
     }
 
-    private val sharedViewModel: SharedViewModel by viewModels()
-
     var toolbarTextView: TextView? = null
         private set
 
@@ -105,8 +105,6 @@ class MainActivity : BaseActivity() {
     private var currentNavController: NavController? = null
 
     private var showNotificationBarBg: Boolean = true
-
-    private lateinit var lemmyAppBarController: LemmyAppBarController
 
     val insetsChangedLiveData = MutableLiveData<Int>()
 
@@ -150,14 +148,9 @@ class MainActivity : BaseActivity() {
         setContentView(binding.root)
 
         setupActionBar()
-        setupCustomActionBar()
         registerInsetsHandler()
-        registerCurrentAccountListener()
-        registerDefaultCommunityListener()
 
         hideActionBar(animate = true)
-
-        lemmyAppBarController = LemmyAppBarController(this, binding.customAppBar)
 
         fun updateBottomTranslationY() {
             binding.bottomNavigationView.translationY =
@@ -169,6 +162,17 @@ class MainActivity : BaseActivity() {
         }
         bottomNavViewAnimationOffset.observe(this) {
             updateBottomTranslationY()
+        }
+
+        viewModel.unreadCount.observe(this) { unreadCount ->
+            binding.bottomNavigationView.getOrCreateBadge(R.id.inboxTabbedFragment).apply {
+                if (unreadCount.totalUnreadCount > 0) {
+                    isVisible = true
+                    number = unreadCount.totalUnreadCount
+                } else {
+                    isVisible = false
+                }
+            }
         }
 
         handleIntent(intent)
@@ -210,12 +214,6 @@ class MainActivity : BaseActivity() {
                 }
             }
         )
-    }
-
-    private fun registerDefaultCommunityListener() {
-        viewModel.defaultCommunity.observe(this) {
-            lemmyAppBarController.setDefaultCommunity(it)
-        }
     }
 
     override fun onDestroy() {
@@ -299,17 +297,11 @@ class MainActivity : BaseActivity() {
             }
             binding.appBar.updatePadding(top = topInset)
 
-            binding.customAppBar.layoutParams =
-                (binding.customAppBar.layoutParams as ViewGroup.MarginLayoutParams).apply {
-                    leftMargin = leftInset
-                    rightMargin = rightInset
-                }
             binding.bottomNavigationView.layoutParams =
                 (binding.bottomNavigationView.layoutParams as ViewGroup.MarginLayoutParams).apply {
                     leftMargin = leftInset
                     rightMargin = rightInset
                 }
-            binding.customActionBar.updatePadding(top = topInset)
 
             // Move our RecyclerView below toolbar + 10dp
             windowInsets.value = checkNotNull(windowInsets.value).apply {
@@ -396,75 +388,9 @@ class MainActivity : BaseActivity() {
         enableBottomNavViewScrolling = false
     }
 
-    fun disableCustomAppBar(animate: Boolean) {
-        binding.customAppBar.removeOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
-
-        if (animate) {
-            binding.customAppBar.animate()
-                .translationY(-binding.customAppBar.height.toFloat())
-        } else {
-            binding.customAppBar.translationY = -binding.customAppBar.height.toFloat()
-        }
-
-        communitySelectorController?.hide()
-
-        ValueAnimator.ofInt(headerOffset.value ?: 0, 0).apply {
-            duration = 300
-            addUpdateListener {
-                headerOffset.value = it.animatedValue as Int
-            }
-        }.start()
-    }
-
-    private val customAppBarOnOffsetChangedListener =
-        AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            lastCustomAppBarOffset = verticalOffset.toFloat()
-            headerOffset.value = verticalOffset + appBarLayout.height
-
-            val percentShown = abs(lastCustomAppBarOffset) / binding.customAppBar.height
-            if (!animatingBottomNavView)
-                bottomNavViewOffset.value =
-                    (percentShown * binding.bottomNavigationView.height).toInt()
-        }
-
     fun setNavUiOpenness(progress: Float) {
         if (lockUiOpenness) return
-        binding.customAppBar.translationY = -binding.customAppBar.height * progress
         bottomNavViewAnimationOffset.value = binding.bottomNavigationView.height * progress
-    }
-
-    fun enableCustomAppBarListener() {
-        binding.customAppBar.removeOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
-        binding.customAppBar.addOnOffsetChangedListener(customAppBarOnOffsetChangedListener)
-    }
-
-    fun enableCustomAppBar() {
-        enableCustomAppBarListener()
-        val customAppBar = binding.customAppBar
-        headerOffset.value = (customAppBar.height + lastCustomAppBarOffset).toInt()
-        customAppBar.visibility = View.VISIBLE
-        customAppBar.animate()
-            .translationY(0f)
-        val percentShown = abs(lastCustomAppBarOffset) / customAppBar.height
-        val endOff = percentShown * binding.bottomNavigationView.height
-
-        animatingBottomNavView = true
-        ValueAnimator.ofInt(binding.bottomNavigationView.translationY.toInt(), endOff.toInt()).apply {
-            duration = 300
-            addUpdateListener {
-                bottomNavViewOffset.value = it.animatedValue as Int
-
-                if (it.animatedFraction == 1.0f) {
-                    animatingBottomNavView = false
-                }
-            }
-        }.start()
-        ValueAnimator.ofFloat(requireNotNull(bottomNavViewAnimationOffset.value), 0f).apply {
-            duration = 300
-            addUpdateListener {
-                bottomNavViewAnimationOffset.value = it.animatedValue as Float
-            }
-        }.start()
     }
 
     var lastScrollFlagsToolbar: Int = 0
@@ -481,10 +407,6 @@ class MainActivity : BaseActivity() {
             (binding.toolbar.layoutParams as AppBarLayout.LayoutParams).apply {
                 scrollFlags = lastScrollFlagsToolbar
             }
-    }
-
-    fun showCustomAppBar() {
-        binding.customAppBar.setExpanded(true)
     }
 
     fun showBottomNav() {
@@ -609,16 +531,6 @@ class MainActivity : BaseActivity() {
         toolbarTextView = Utils.getToolbarTextView(binding.toolbar)
     }
 
-    private fun setupCustomActionBar() {
-        binding.customActionBar.layoutParams =
-            (binding.customActionBar.layoutParams as AppBarLayout.LayoutParams).apply {
-                scrollFlags =
-                    AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
-                            AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
-                            AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
-            }
-    }
-
     fun setupActionBar(@StringRes title: Int, showUp: Boolean) {
         setupActionBar(getString(title), showUp, showSpinner = false, animateActionBarIn = true)
     }
@@ -732,8 +644,6 @@ class MainActivity : BaseActivity() {
         return communitySelectorController
     }
 
-    fun getCustomAppBarController() = lemmyAppBarController
-
     private fun updateToolbarHeight() {
         if (toolbarHeight == 0) {
             toolbarHeight = binding.toolbar.height
@@ -809,6 +719,18 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    fun insetViewExceptTopAutomaticallyByMargin(lifecycleOwner: LifecycleOwner, rootView: View) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = lastInsets
+
+            rootView.updateLayoutParams<MarginLayoutParams> {
+                bottomMargin = insets.bottomInset
+                leftMargin = insets.leftInset
+                rightMargin = insets.rightInset
+            }
+        }
+    }
+
     fun insetViewExceptTopAutomaticallyByPaddingAndNavUi(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
@@ -817,7 +739,7 @@ class MainActivity : BaseActivity() {
                 insets.leftInset,
                 0,
                 insets.rightInset,
-                insets.bottomInset + getBottomNavHeight() + getCustomAppBarHeight(),
+                insets.bottomInset + getBottomNavHeight(),
             )
         }
     }
@@ -875,35 +797,28 @@ class MainActivity : BaseActivity() {
                 enableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
-                enableCustomAppBar()
             }
             PostFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
-//                hideBottomNav()
                 showNotificationBarBg()
-                enableCustomAppBarListener()
-//                disableCustomAppBar()
             }
             VideoViewerFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
-                disableCustomAppBar(animate)
                 hideNotificationBarBg()
             }
             ImageViewerFragment::class -> {
                 showActionBar()
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
-                disableCustomAppBar(animate)
                 hideNotificationBarBg()
             }
             OfflineFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar(animate)
                 showNotificationBarBg()
             }
             HistoryFragment::class -> {
@@ -911,34 +826,35 @@ class MainActivity : BaseActivity() {
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
-                disableCustomAppBar(animate)
             }
             LoginFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar(animate)
                 showNotificationBarBg()
             }
             SavedFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar(animate)
                 showNotificationBarBg()
             }
             SettingsFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
-                disableCustomAppBar(animate)
                 hideNotificationBarBg()
             }
             PersonTabbedFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
-                disableCustomAppBar(animate)
+                showNotificationBarBg()
+            }
+            InboxTabbedFragment::class -> {
+                hideActionBar(animate)
+                disableBottomNavViewScrolling()
+                showBottomNav()
                 showNotificationBarBg()
             }
             else ->
@@ -949,13 +865,6 @@ class MainActivity : BaseActivity() {
     fun getSnackbarContainer(): View = binding.snackbarContainer
     fun getToolbarHeight() = binding.toolbar.layoutParams.height
     fun getBottomNavHeight() = binding.bottomNavigationView.height
-    fun getCustomAppBarHeight() = binding.customAppBar.height
-
-    private fun registerCurrentAccountListener() {
-        viewModel.currentAccount.observe(this) {
-            lemmyAppBarController.onAccountChanged(it)
-        }
-    }
 
     fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {
         viewModel.isReady.observe(lifecycleOwner) {

@@ -389,6 +389,8 @@ class ImageViewerFragment : BaseFragment<FragmentImageViewerBinding>() {
         Log.d(TAG, "loadImageFromUrl: $url")
 
         offlineManager.fetchImageWithError(binding.rootView, url, {
+            if (!isBindingAvailable()) return@fetchImageWithError
+
             val tempSize = Size()
             offlineManager.calculateImageMaxSizeIfNeeded(it)
             offlineManager.getMaxImageSizeHint(it, tempSize)

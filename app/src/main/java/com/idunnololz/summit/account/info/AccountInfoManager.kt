@@ -1,42 +1,63 @@
 package com.idunnololz.summit.account.info
 
+import android.content.Context
+import android.net.Uri
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AccountInfoManager @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val accountManager: AccountManager,
     private val accountAwareLemmyClient: AccountAwareLemmyClient,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val accountInfoDao: AccountInfoDao,
+    private val accountImageGenerator: AccountImageGenerator,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
 
     private var currentAccountInfo: AccountInfo? = null
 
+
+    val accountDir = File(context.filesDir, "account")
+
     val subscribedCommunities = MutableStateFlow<List<AccountSubscription>>(listOf())
     val accountInfoUpdateState = MutableStateFlow<StatefulData<Unit>>(StatefulData.NotStarted())
+    val unreadCount = MutableStateFlow<UnreadCount>(UnreadCount(0))
 
     init {
         accountManager.addOnAccountChangedListener(
             onAccountChangeListener = object : AccountManager.OnAccountChangedListener {
                 override suspend fun onAccountSigningOut(account: Account) {
                     accountInfoDao.delete(account.id)
+
+                    accountImageGenerator.getImageForAccount(accountDir, account).let {
+                        if (it.exists()) {
+                            it.delete()
+                        }
+                    }
+
+                    unreadCount.emit(UnreadCount(0))
                 }
 
                 override suspend fun onAccountChanged(newAccount: Account?) {
                     currentAccountInfo = null
                     subscribedCommunities.emit(listOf())
                     accountInfoUpdateState.emit(StatefulData.NotStarted())
+                    unreadCount.emit(UnreadCount(0))
                 }
             }
         )
@@ -45,7 +66,7 @@ class AccountInfoManager @Inject constructor(
             accountManager.currentAccount.collect {
                 accountInfoUpdateState.emit(StatefulData.NotStarted())
 
-                loadSubscriptions(it)
+                loadAccountInfo(it)
 
                 updateAccountInfo(it)
             }
@@ -56,6 +77,36 @@ class AccountInfoManager @Inject constructor(
         coroutineScope.launch {
             updateAccountInfo(accountManager.currentAccount.value)
         }
+    }
+
+    fun updateUnreadCount() {
+        val account = accountManager.currentAccount.value ?: return
+        coroutineScope.launch {
+            updateUnreadCount(account)
+        }
+    }
+
+    fun getAccountViewForAccount(account: Account) =
+        AccountView(
+            account = account,
+            profileImage = currentAccountInfo?.miscAccountInfo?.avatar?.let {
+                try {
+                    Uri.parse(it)
+                } catch (e: Exception) {
+                    null
+                }
+            } ?: Uri.fromFile(getImageForAccount(account))
+        )
+
+    fun getImageForAccount(account: Account): File {
+        return accountImageGenerator.getOrGenerateImageForAccount(accountDir, account)
+    }
+
+    private suspend fun updateUnreadCount(account: Account) {
+        accountAwareLemmyClient.fetchUnreadCountWithRetry(force = true, account)
+            .onSuccess {
+                unreadCount.emit(UnreadCount(it.mentions + it.private_messages + it.replies))
+            }
     }
 
     private suspend fun updateAccountInfo(account: Account?) {
@@ -74,7 +125,10 @@ class AccountInfoManager @Inject constructor(
                     subscriptions = response.my_user
                         ?.follows
                         ?.map { it.community.toAccountSubscription() }
-                        ?: listOf()
+                        ?: listOf(),
+                    miscAccountInfo = MiscAccountInfo(
+                        response.my_user?.local_user_view?.person?.avatar
+                    )
                 )
                 currentAccountInfo = accountInfo
 
@@ -86,13 +140,19 @@ class AccountInfoManager @Inject constructor(
         accountInfoUpdateState.emit(StatefulData.Success(Unit))
     }
 
-    private suspend fun loadSubscriptions(account: Account?) {
+    private suspend fun loadAccountInfo(account: Account?) {
         account ?: return
 
-        val subscriptions = accountInfoDao.getAccountInfo(account.id)
+        val accountInfo = accountInfoDao.getAccountInfo(account.id)
 
-        subscribedCommunities.emit(subscriptions?.subscriptions ?: listOf())
+        currentAccountInfo = accountInfo
+
+        subscribedCommunities.emit(accountInfo?.subscriptions ?: listOf())
     }
+
+    data class UnreadCount(
+        val totalUnreadCount: Int
+    )
 
 //    private class AccountInfo(
 //        val siteView: SiteView,

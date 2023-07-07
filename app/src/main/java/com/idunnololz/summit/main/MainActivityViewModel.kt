@@ -3,9 +3,11 @@ package com.idunnololz.summit.main
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
@@ -28,6 +30,7 @@ class MainActivityViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val offlineManager: OfflineManager,
+    private val accountInfoManager: AccountInfoManager,
     val communitySelectorControllerFactory: CommunitySelectorController.Factory,
     val userCommunitiesManager: UserCommunitiesManager,
 ) : ViewModel() {
@@ -39,7 +42,7 @@ class MainActivityViewModel @Inject constructor(
 
     val communities = StatefulLiveData<List<CommunityView>>()
     val currentAccount = MutableLiveData<AccountView?>(null)
-    val defaultCommunity = MutableLiveData<CommunityRef>(null)
+    val unreadCount = accountInfoManager.unreadCount.asLiveData()
 
     val isReady = MutableLiveData<Boolean>(false)
 
@@ -67,7 +70,7 @@ class MainActivityViewModel @Inject constructor(
             launch {
                 accountManager.currentAccount.collect {
                     val accountView = if (it != null) {
-                        accountManager.getAccountViewForAccount(it)
+                        accountInfoManager.getAccountViewForAccount(it)
                     } else {
                         null
                     }
@@ -96,13 +99,6 @@ class MainActivityViewModel @Inject constructor(
                     Log.d(TAG, "'userCommunitiesManager' ready!")
                     readyCount.emit(readyCount.value + 1)
                 }
-            }
-
-            launch {
-                userCommunitiesManager.defaultCommunity
-                    .collect {
-                        defaultCommunity.postValue(it)
-                    }
             }
 
             launch {

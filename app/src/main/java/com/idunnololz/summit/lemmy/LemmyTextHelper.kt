@@ -32,7 +32,7 @@ object LemmyTextHelper {
         text: String,
         instance: String,
 
-        onImageClickListener: (url: String) -> Unit,
+        onImageClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
     ) {
         bindLemmyText(textView, text, instance)
@@ -53,7 +53,7 @@ object LemmyTextHelper {
                 }
             }
             onLinkLongClickListener = DefaultLinkLongClickListener(textView.context)
-            this.onImageClickListener = onImageClickListener
+            this.onImageClickListener = onImageClick
         }
     }
 

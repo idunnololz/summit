@@ -7,6 +7,8 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.Post
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,9 +18,11 @@ import javax.inject.Inject
 @HiltViewModel
 class MoreActionsViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
+    val accountManager: AccountManager,
 ) : ViewModel() {
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<Unit>()
+    val deletePostResult = StatefulLiveData<PostView>()
 
     fun blockCommunity(id: CommunityId) {
         blockCommunityResult.setIsLoading()
@@ -42,6 +46,18 @@ class MoreActionsViewModel @Inject constructor(
                 }
                 .onSuccess {
                     blockCommunityResult.postValue(Unit)
+                }
+        }
+    }
+
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            apiClient.deletePost(post.id)
+                .onSuccess {
+                    deletePostResult.postValue(it)
+                }
+                .onFailure {
+                    deletePostResult.postError(it)
                 }
         }
     }

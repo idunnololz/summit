@@ -16,6 +16,8 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getDepth
+import com.idunnololz.summit.lemmy.CommentNodeData
+import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
@@ -64,8 +66,6 @@ class PostViewModel @Inject constructor(
     val commentsSortOrderLiveData = MutableLiveData(CommentsSortOrder.Top)
 
     val postData = StatefulLiveData<PostData>()
-
-    val deletePostResult = StatefulLiveData<PostView>()
 
     init {
         commentsSortOrderLiveData.observeForever {
@@ -229,7 +229,7 @@ class PostViewModel @Inject constructor(
         postData.postValue(
             PostData(
                 ListView.PostListView(post),
-                buildCommentsTreeListView(
+                CommentTreeBuilder(accountManager).buildCommentsTreeListView(
                     post,
                     comments,
                     parentComment = true,
@@ -328,207 +328,6 @@ class PostViewModel @Inject constructor(
         ) : ListView
     }
 
-    data class CommentNodeData(
-        var commentView: ListView,
-        var depth: Int,
-        val children: MutableList<CommentNodeData> = mutableListOf(),
-    )
-
-    private suspend fun buildCommentsTreeListView(
-        post: PostView,
-        comments: List<CommentView>?,
-        parentComment: Boolean,
-        pendingComments: List<PendingCommentView>?,
-        supplementaryComments: Map<Int, CommentView>,
-    ): List<CommentNodeData> {
-        val map = LinkedHashMap<Number, CommentNodeData>()
-        val firstComment = comments?.firstOrNull()?.comment
-        val idToPendingComments = pendingComments?.associateBy { it.commentId } ?: mapOf()
-
-        val depthOffset = if (!parentComment) { 0 } else {
-            comments?.minOfOrNull { it.getDepth() } ?: 0
-        }
-
-        Log.d(TAG, "Score: ${comments?.firstOrNull()?.counts?.score} " +
-                "Depth: ${firstComment?.getDepth()} First comment: ${firstComment?.content}. ")
-
-        val topNodes = mutableListOf<CommentNodeData>()
-
-        supplementaryComments.values.forEach { comment ->
-            val depth = comment.comment.getDepth().minus(depthOffset)
-            val node = CommentNodeData(
-                commentView = ListView.CommentListView(
-                    comment,
-                    pendingCommentView = idToPendingComments[comment.comment.id]
-                ),
-                depth = depth,
-            )
-            map[comment.comment.id] = node
-        }
-        comments?.forEach { comment ->
-            val depth = comment.comment.getDepth().minus(depthOffset)
-            val node = CommentNodeData(
-                commentView = ListView.CommentListView(
-                    comment,
-                    pendingCommentView = idToPendingComments[comment.comment.id]
-                ),
-                depth = depth,
-            )
-            map[comment.comment.id] = node
-        }
-
-        map.values.forEach { node ->
-            val commentView = node.commentView
-            if (commentView !is ListView.CommentListView) {
-                return@forEach
-            }
-
-            val parentId = getCommentParentId(commentView.comment.comment)
-            parentId?.let { cParentId ->
-                val parent = map[cParentId]
-
-                // Necessary because blocked comment might not exist
-                parent?.children?.add(node)
-            } ?: run {
-                topNodes.add(node)
-            }
-        }
-
-        addMoreItems(post, topNodes)
-
-        pendingComments?.forEach { pendingComment ->
-            if (pendingComment.commentId != null) {
-                // this is an updated comment
-
-                val originalComment = map[pendingComment.commentId]
-                val commentView = originalComment?.commentView
-                if (originalComment != null && commentView is ListView.CommentListView) {
-                    originalComment.commentView = commentView.copy(
-                        pendingCommentView = pendingComment
-                    )
-                }
-            } else if (pendingComment.parentId == null) {
-                topNodes.add(
-                    0,
-                    CommentNodeData(
-                        commentView = ListView.PendingCommentListView(
-                            pendingComment,
-                            author = accountManager.getAccountById(pendingComment.accountId)?.name
-                        ),
-                        children = mutableListOf(),
-                        depth = 0,
-                    )
-                )
-            } else {
-                val parent = map[pendingComment.parentId]
-
-                Log.d("HAHA", "depthOffset: ${depthOffset}")
-                Log.d("HAHA", "comments: $comments")
-
-                parent?.let {
-                    it.children.add(
-                        0,
-                        CommentNodeData(
-                            commentView = ListView.PendingCommentListView(
-                                pendingComment,
-                                author = accountManager.getAccountById(pendingComment.accountId)?.name
-                            ),
-                            children = mutableListOf(),
-                            depth = it.depth + 1,
-                        )
-                    )
-                }
-
-            }
-
-        }
-
-        return topNodes
-    }
-
-    private fun addMoreItems(post: PostView, topNodes: MutableList<CommentNodeData>) {
-        val toVisit = LinkedList<CommentNodeData>()
-        toVisit.addAll(topNodes)
-
-        while (toVisit.isNotEmpty()) {
-            val node = toVisit.pollFirst() ?: continue
-
-            val cv = node.commentView
-            if (cv !is ListView.CommentListView) {
-                continue
-            }
-
-            var childrenCount = 0
-            val expectedCount = cv.comment.counts.child_count
-
-            node.children.forEach {
-                when (val commentView = it.commentView) {
-                    is ListView.CommentListView -> {
-                        childrenCount += commentView.comment.counts.child_count + 1 // + 1 for this comment
-                        toVisit.push(it)
-                    }
-                    is ListView.MoreCommentsItem -> {}
-                    is ListView.PendingCommentListView -> {
-                        childrenCount += 1 // + 1 for this comment
-                    }
-                    is ListView.PostListView -> {}
-                }
-            }
-
-            if (childrenCount < expectedCount) {
-                node.children.add(
-                    CommentNodeData(
-                        ListView.MoreCommentsItem(
-                            cv.comment.comment.id,
-                            node.depth + 1,
-                            expectedCount - childrenCount
-                        ),
-                        node.depth + 1,
-                    )
-                )
-            }
-        }
-
-        var childrenCount = 0
-        val expectedCount = post.counts.comments
-
-        topNodes.forEach {
-            when (val commentView = it.commentView) {
-                is ListView.CommentListView -> {
-                    childrenCount += commentView.comment.counts.child_count + 1 // + 1 for this comment
-                }
-                is ListView.MoreCommentsItem -> {}
-                is ListView.PendingCommentListView -> {
-                    childrenCount += 1 // + 1 for this comment
-                }
-                is ListView.PostListView -> {}
-            }
-        }
-
-        if (childrenCount < expectedCount) {
-            topNodes.add(
-                CommentNodeData(
-                    ListView.MoreCommentsItem(
-                        null,
-                        0,
-                        expectedCount - childrenCount
-                    ),
-                    0,
-                )
-            )
-        }
-    }
-
-    private fun getCommentParentId(comment: Comment?): Int? {
-        val split = comment?.path?.split(".")?.toMutableList()
-        // remove the 0
-        split?.removeFirst()
-        return if (split !== null && split.size > 1) {
-            split[split.size - 2].toInt()
-        } else {
-            null
-        }
-    }
 
     fun setCommentsSortOrder(sortOrder: CommentsSortOrder) {
         commentsSortOrderLiveData.value = sortOrder
@@ -539,54 +338,4 @@ class PostViewModel @Inject constructor(
             accountActionsManager.deleteComment(postRef, commentId)
         }
     }
-
-    fun deletePost(post: Post) {
-        viewModelScope.launch {
-            lemmyApiClient.deletePost(post.id)
-                .onSuccess {
-                    deletePostResult.postValue(it)
-                }
-                .onFailure {
-                    deletePostResult.postError(it)
-                }
-        }
-    }
-}
-
-fun List<PostViewModel.CommentNodeData>.flatten(): MutableList<PostViewModel.CommentNodeData> {
-    val result = mutableListOf<PostViewModel.CommentNodeData>()
-
-    fun PostViewModel.CommentNodeData.flattenRecursive() {
-
-        result.add(this)
-
-        when (val commentView = this.commentView) {
-            is PostViewModel.ListView.CommentListView -> {
-                if (commentView.isCollapsed) {
-                    return
-                }
-            }
-            is PostViewModel.ListView.PendingCommentListView -> {
-                if (commentView.isCollapsed) {
-                    return
-                }
-            }
-            is PostViewModel.ListView.PostListView -> {
-                // this should never happen
-            }
-
-            is PostViewModel.ListView.MoreCommentsItem -> {
-                // shouldnt happen
-            }
-        }
-
-        this.children.forEach {
-            it.flattenRecursive()
-        }
-    }
-    this.forEach {
-        it.flattenRecursive()
-    }
-
-    return result
 }

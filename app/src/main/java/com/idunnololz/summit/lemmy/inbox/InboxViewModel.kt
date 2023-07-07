@@ -2,43 +2,64 @@ package com.idunnololz.summit.lemmy.inbox
 
 import android.content.Context
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.CommentReplyView
-import com.idunnololz.summit.api.dto.PersonMentionView
-import com.idunnololz.summit.api.dto.PrivateMessageView
-import com.idunnololz.summit.lemmy.person.PersonTabbedViewModel
+import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
-import javax.inject.Qualifier
 
 @HiltViewModel
 class InboxViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
-    private val inboxRepository: InboxRepository,
+    private val accountInfoManager: AccountInfoManager,
+    private val inboxRepositoryFactory: InboxRepository.Factory,
 ): ViewModel() {
 
+    companion object {
+        private const val TAG = "InboxViewModel"
+    }
+
+    private var fetchInboxJob: Job? = null
+
+    var inboxRepository = inboxRepositoryFactory.create()
+
     val currentAccount
-        get() = accountManager.currentAccount.value
+        get() = accountManager.currentAccount.asLiveData()
     val currentAccountView
         get() =
-            currentAccount?.let {
-                accountManager.getAccountViewForAccount(it)
+            currentAccount.value?.let {
+                accountInfoManager.getAccountViewForAccount(it)
             }
-    val replies = StatefulLiveData<InboxResult.RepliesResult>()
-    val mentions = StatefulLiveData<InboxResult.MentionsResult>()
-    val messages = StatefulLiveData<InboxResult.MessagesResult>()
+    val markAsReadResult = StatefulLiveData<Unit>()
+
+    val inboxData = StatefulLiveData<List<LemmyListSource.PageResult<InboxItem>>>()
+
+    val pageTypeFlow = MutableStateFlow<PageType>(PageType.Unread)
+
+    val pageType = pageTypeFlow.asLiveData()
+
+    var pageIndex = 0
 
     var instance: String = apiClient.instance
+
+    private val allData: MutableList<LemmyListSource.PageResult<InboxItem>> = mutableListOf()
+    private var hasMore = true
 
     init {
         viewModelScope.launch {
@@ -47,91 +68,137 @@ class InboxViewModel @Inject constructor(
                     instance = it.instance
                 }
 
+                inboxRepository = inboxRepositoryFactory.create()
+
                 delay(10) // just in case it takes a second for the api client to update...
-                fetchInbox(false)
+                pageIndex = 0
+
+                fetchInbox(pageIndex, requireNotNull(pageTypeFlow.value))
+            }
+        }
+
+        viewModelScope.launch {
+            pageTypeFlow.collect {
+                withContext(Dispatchers.Main) {
+                    pageIndex = 0
+
+                    fetchInbox()
+                }
             }
         }
     }
 
-    fun fetchInboxIfNeeded() {
-        fetchInbox(false)
-    }
+    fun fetchInbox(
+        pageIndex: Int = this.pageIndex,
+        pageType: PageType = requireNotNull(this.pageTypeFlow.value),
+        force: Boolean = false
+    ) {
+        fetchInboxJob?.cancel()
+        Log.d(TAG, "Loading inbox page $pageIndex. PageType: $pageType")
 
-    fun fetchInbox(force: Boolean) {
-        viewModelScope.launch {
-            fetchReplies(force)
-            fetchMentions(force)
-            fetchMessages(force)
-        }
-    }
+        inboxData.setIsLoading()
+        fetchInboxJob = viewModelScope.launch {
+            val result = inboxRepository.getPage(pageIndex, pageType, force)
 
-    fun fetchReplies(force: Boolean) {
-        if (!force && replies.valueOrNull != null) return
+            ensureActive()
 
-        replies.setIsLoading()
-        viewModelScope.launch {
-            inboxRepository.repliesSource.getPage(0, force)
+            result
                 .onSuccess {
-                    replies.postValue(InboxResult.RepliesResult(it.items, it.hasMore))
+                    addData(it)
+                    inboxData.postValue(allData)
                 }
                 .onFailure {
-                    replies.postError(it)
+                    inboxData.postError(it)
                 }
         }
     }
 
-    fun fetchMentions(force: Boolean) {
-        if (!force && mentions.valueOrNull != null) return
-
-        mentions.setIsLoading()
+    fun markAsRead(inboxItem: InboxItem, read: Boolean, delete: Boolean = false) {
+        markAsReadResult.setIsLoading()
+        markAsReadInViewData(
+            inboxItem.id,
+            delete,//pageType.value == PageType.Unread,
+            read,
+        )
         viewModelScope.launch {
-            inboxRepository.mentionsSource.getPage(0, force)
+            inboxRepository.markAsRead(inboxItem, read)
                 .onSuccess {
-                    mentions.postValue(InboxResult.MentionsResult(it.items, it.hasMore))
+                    if (!read) {
+                        fetchInbox()
+                    }
+                    markAsReadResult.postValue(Unit)
                 }
                 .onFailure {
-                    mentions.postError(it)
+                    fetchInbox()
+                    markAsReadResult.postError(it)
                 }
         }
     }
 
-    fun fetchMessages(force: Boolean) {
-        if (!force && messages.valueOrNull != null) return
+    private fun markAsReadInViewData(id: Int, delete: Boolean = false, isRead: Boolean) {
+        for ((index, data) in allData.withIndex()) {
+            val position = data.items.indexOfFirst { it.id == id }
+            if (position == -1) {
+                Log.d(TAG, "Unable to find item to mark as read!")
+                continue
+            }
 
-        messages.setIsLoading()
-        viewModelScope.launch {
-            inboxRepository.messagesSource.getPage(0, force)
-                .onSuccess {
-                    messages.postValue(InboxResult.MessagesResult(it.items, it.hasMore))
+            val newItem = when (val item = data.items[position]) {
+                is InboxItem.MentionInboxItem ->
+                    item.copy(isRead = isRead)
+                is InboxItem.MessageInboxItem ->
+                    item.copy(isRead = isRead)
+                is InboxItem.ReplyInboxItem ->
+                    item.copy(isRead = isRead)
+            }
+
+            allData[index] = data.copy(
+                items = data.items.toMutableList().apply {
+                    if (isRead && delete) {
+                        removeAt(position)
+                    } else {
+                        this[position] = newItem
+                    }
                 }
-                .onFailure {
-                    messages.postError(it)
-                }
+            )
         }
+
+        inboxData.setValue(allData)
     }
 
-    sealed interface InboxResult {
+    private fun addData(data: LemmyListSource.PageResult<InboxItem>) {
+        if (data.pageIndex == 0) {
+            clearData()
+        }
 
-        val hasMore: Boolean
+        val currentPageIndex = allData.lastOrNull()?.pageIndex ?: -1
+        val nextPageIndex = currentPageIndex + 1
 
-        data class RepliesResult(
-            val replies: List<CommentReplyView>,
-            override val hasMore: Boolean,
-        ): InboxResult
-        data class MentionsResult(
-            val mentions: List<PersonMentionView>,
-            override val hasMore: Boolean,
-        ): InboxResult
-        data class MessagesResult(
-            val messages: List<PrivateMessageView>,
-            override val hasMore: Boolean,
-        ): InboxResult
+        if (data.pageIndex != nextPageIndex) {
+            Log.d(TAG, "addData(): Data with unexpected page index. " +
+                        "Expected $nextPageIndex. Got ${data.pageIndex}"
+            )
+            return
+        }
+
+        hasMore = data.hasMore
+
+        allData.add(data)
     }
 
+    private fun clearData() {
+        hasMore = true
+        allData.clear()
+    }
 
+    override fun onCleared() {
+        fetchInboxJob?.cancel()
+        super.onCleared()
+    }
 
     @Parcelize
     enum class PageType : Parcelable {
+        Unread,
         All,
         Replies,
         Mentions,
@@ -141,6 +208,7 @@ class InboxViewModel @Inject constructor(
 
 fun InboxViewModel.PageType.getName(context: Context) =
     when (this) {
+        InboxViewModel.PageType.Unread -> context.getString(R.string.unread)
         InboxViewModel.PageType.All -> context.getString(R.string.all)
         InboxViewModel.PageType.Replies -> context.getString(R.string.replies)
         InboxViewModel.PageType.Mentions -> context.getString(R.string.mentions)

@@ -503,7 +503,7 @@ class LemmyContentHelper(
                     textView = bodyTextView,
                     text = content,
                     instance = instance,
-                    onImageClickListener = onImageClickListener,
+                    onImageClick = onImageClickListener,
                     onPageClick = onLemmyUrlClick
                 )
                 bodyTextView.setOnClickListener {

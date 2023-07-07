@@ -50,7 +50,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
 
     private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
         override fun onHistoryChanged() {
-            viewModel.loadHistory()
+            viewModel.loadHistory(force = true)
         }
     }
 

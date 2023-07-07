@@ -207,7 +207,11 @@ class AccountActionsManager @Inject constructor(
                 }
                 is ActionInfo.DeleteCommentActionInfo -> {
                     coroutineScope.launch {
-                        pendingCommentsManager.onDeleteCommentActionFailed(action.id, action.info, reason)
+                        pendingCommentsManager.onDeleteCommentActionFailed(
+                            id = action.id,
+                            info = action.info,
+                            reason = reason
+                        )
                         onCommentActionChanged.emit(Unit)
                     }
                 }
@@ -317,6 +321,15 @@ class AccountActionsManager @Inject constructor(
             commentId,
             account.id,
         )
+    }
+
+    fun vote(
+        instance: String,
+        ref: VotableRef,
+        dir: Int,
+    ) {
+        val account = accountManager.currentAccount.value ?: return
+        voteOn(instance, ref, dir, account)
     }
 
     private fun registerVoteHandler(existingRegId: Long, ref: VotableRef, registration: Registration) {

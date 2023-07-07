@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/mark_as_unread"
+        android:title="@string/mark_as_unread"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_mark_as_unread_24"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
+
+    <item
+        android:id="@+id/upvote"
+        android:title="@string/mark_as_unread"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_arrow_upward_24"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
+
+    <item
+        android:id="@+id/downvote"
+        android:title="@string/mark_as_unread"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_arrow_downward_24"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
+</menu>

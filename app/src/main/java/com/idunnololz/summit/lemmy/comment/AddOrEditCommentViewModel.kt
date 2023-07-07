@@ -13,6 +13,8 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
+import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +31,7 @@ class AddOrEditCommentViewModel @Inject constructor(
 ) : ViewModel() {
     val currentAccount = accountManager.currentAccount.asLiveData()
 
-    val commentSentEvent = MutableLiveData<Event<Unit>>()
+    val commentSentEvent = MutableLiveData<Event<Result<Unit>>>()
     val uploadImageEvent = StatefulLiveData<UploadImageResult>()
 
     fun editComment() {
@@ -48,7 +50,45 @@ class AddOrEditCommentViewModel @Inject constructor(
                 content,
             )
 
-            commentSentEvent.postValue(Event(Unit))
+            commentSentEvent.postValue(Event(Result.success(Unit)))
+        }
+    }
+
+    fun sendComment(
+        instance: String,
+        inboxItem: InboxItem,
+        content: String,
+    ) {
+        viewModelScope.launch {
+            if (inboxItem is CommentBackedItem) {
+                accountActionsManager.createComment(
+                    PostRef(instance, inboxItem.postId),
+                    inboxItem.commentId,
+                    content,
+                )
+
+                commentSentEvent.postValue(Event(Result.success(Unit)))
+            } else {
+                when (inboxItem) {
+                    is InboxItem.MentionInboxItem,
+                    is InboxItem.ReplyInboxItem -> error("Should never happen!")
+                    is InboxItem.MessageInboxItem -> {
+                        apiClient.changeInstance(instance)
+                        apiClient
+                            .createPrivateMessage(
+                                content = content,
+                                recipient = inboxItem.authorId,
+                                account = requireNotNull(currentAccount.value)
+                            )
+                            .onFailure {
+                                commentSentEvent.postValue(Event(Result.failure(it)))
+                            }
+                            .onSuccess {
+                                commentSentEvent.postValue(Event(Result.success(Unit)))
+                            }
+                    }
+                }
+            }
         }
     }
 
@@ -60,7 +100,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                 content,
             )
 
-            commentSentEvent.postValue(Event(Unit))
+            commentSentEvent.postValue(Event(Result.success(Unit)))
         }
     }
 

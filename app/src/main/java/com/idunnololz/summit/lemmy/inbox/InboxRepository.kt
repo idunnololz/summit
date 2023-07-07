@@ -1,20 +1,11 @@
 package com.idunnololz.summit.lemmy.inbox
 
 import android.util.Log
-import arrow.core.Either
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.api.utils.getUniqueKey
-import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.CommunitySortOrder
-import com.idunnololz.summit.lemmy.PostsRepository
-import com.idunnololz.summit.lemmy.inbox.InboxSource.PageResult
-import com.idunnololz.summit.lemmy.toApiSortOrder
-import com.idunnololz.summit.util.retry
+import com.idunnololz.summit.lemmy.inbox.repository.InboxSource
+import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 import kotlin.math.min
@@ -22,157 +13,221 @@ import kotlin.math.min
 @ViewModelScoped
 class InboxRepository @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
+    private val accountInfoManager: AccountInfoManager,
 ) {
-    val repliesSource = InboxSource(
-        apiClient,
-        {
-            comment.id
-        },
-        CommentSortType.New,
-        { page: Int, sortOrder: CommentSortType, force: Boolean ->
-            fetchReplies(sort = sortOrder, page = page, force = force)
-        }
-    )
-    val mentionsSource = InboxSource(
-        apiClient,
-        {
-            comment.id
-        },
-        CommentSortType.New,
-        { page: Int, sortOrder: CommentSortType, force: Boolean ->
-            fetchMentions(sort = sortOrder, page = page, force = force)
-        }
-    )
-    val messagesSource = InboxSource(
-        apiClient,
-        {
-            private_message.id
-        },
-        Unit,
-        { page: Int, _: Unit, force: Boolean ->
-            fetchPrivateMessages(page = page, force = force)
-        }
-    )
-}
 
-
-
-class InboxSource<T, O>(
-    private val apiClient: AccountAwareLemmyClient,
-    private val id: T.() -> Int,
-    defaultSortOrder: O,
-    private val fetchObjects: suspend AccountAwareLemmyClient.(
-        pageIndex: Int, sortOrder: O, force: Boolean) -> Result<List<T>>
-) {
+    @ViewModelScoped
+    class Factory @Inject constructor(
+        private val apiClient: AccountAwareLemmyClient,
+        private val accountInfoManager: AccountInfoManager,
+    ) {
+        fun create() =
+            InboxRepository(apiClient, accountInfoManager)
+    }
 
     companion object {
-        private const val TAG = "InboxSource"
+        private const val TAG = "InboxRepository"
 
         private const val PAGE_SIZE = 20
     }
 
+    private val repliesStatelessSource: InboxSource<CommentSortType> =
+        makeRepliesSource(unreadOnly = false)
+    private val mentionsStatelessSource: InboxSource<CommentSortType> =
+        makeMentionsSource(unreadOnly = false)
+    private val messagesStatelessSource: InboxSource<Unit> =
+        makeMessagesSource(unreadOnly = false)
 
-    private data class ObjectData<T>(
-        val obj: T,
-        val pageIndexInternal: Int,
-    )
+    private class InboxSourceState<O>(
+        val inboxSource: InboxSource<O>,
+        var itemIndex: Int = 0,
+    ) {
+        private var nextItem: Result<InboxItem?>? = null
+        suspend fun getItem(force: Boolean): Result<InboxItem?> {
+            nextItem?.let {
+                return it
+            }
 
-    class PageResult<T>(
-        val items: List<T>,
-        val hasMore: Boolean,
-    )
+            val result = inboxSource.getItem(itemIndex, force)
+            Log.d(TAG, "Setting next item to ${(result.getOrNull() ?: Unit)::class.java}. Index: $itemIndex")
 
-    private val allObjects = mutableListOf<ObjectData<T>>()
-    private val seenObjects = mutableSetOf<Int>()
-
-    private var currentPageInternal = 1
-
-    private var endReached = false
-
-    var sortOrder: O = defaultSortOrder
-        set(value) {
-            field = value
-            reset()
+            val nextItem = result.also {
+                nextItem = it
+            }
+            return nextItem
         }
 
-    suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult<T>> {
-        val startIndex = pageIndex * PAGE_SIZE
-        val endIndex = startIndex + PAGE_SIZE
-
-        if (force) {
-            // delete all cached data for the given page
-            val minPageInteral = allObjects
-                .slice(startIndex until min(endIndex, allObjects.size))
-                .map { it.pageIndexInternal }
-                .minOrNull() ?: 1
-
-            deleteFromPage(minPageInteral)
-            endReached = false
-        }
-
-        var hasMore = true
-
-        while (true) {
-            if (allObjects.size >= endIndex) {
-                break
-            }
-
-            if (endReached) {
-                hasMore = false
-                break
-            }
-
-            val hasMoreResult = retry {
-                fetchPage(currentPageInternal, sortOrder, force)
-            }
-
-            if (hasMoreResult.isFailure) {
-                return Result.failure(requireNotNull(hasMoreResult.exceptionOrNull()))
-            } else {
-                hasMore = hasMoreResult.getOrThrow()
-                currentPageInternal++
-            }
-
-
-            if (!hasMore) {
-                endReached = true
-                break
+        suspend fun next() {
+            if (nextItem?.getOrNull() != null) {
+                itemIndex++
+                nextItem = null
             }
         }
 
-        return Result.success(
-            PageResult(
-                items = allObjects
-                    .slice(startIndex until min(endIndex, allObjects.size))
-                    .map { it.obj },
-                hasMore = hasMore
+        fun reset() {
+            nextItem = null
+            itemIndex = 0
+        }
+
+        fun markAsRead(id: Int, read: Boolean): InboxItem? {
+            return inboxSource.markAsRead(id, read)
+        }
+
+        fun removeItemWithId(id: Int) =
+            inboxSource.removeItemWithId(id)
+    }
+
+    private class InboxMultiDataSource(
+        private val sources: List<InboxSourceState<*>>
+    ) {
+
+        val allItems = mutableListOf<InboxItem>()
+
+        suspend fun getPage(
+            pageIndex: Int,
+            pageType: InboxViewModel.PageType,
+            force: Boolean,
+        ): Result<PageResult<InboxItem>> {
+
+            Log.d(TAG,
+                "Page type: $pageType. Index: $pageIndex. Sources: ${sources.size}. Force: $force")
+
+            if (force) {
+                allItems.clear()
+                sources.forEach { it.reset() }
+            }
+
+            val startIndex = pageIndex * PAGE_SIZE
+            val endIndex = (pageIndex + 1) * PAGE_SIZE
+            var hasMore = true
+
+            while (allItems.size < endIndex) {
+                val results = sources.map { it.getItem(force) }
+                val error = results.firstOrNull { it.isFailure }
+
+                if (error != null) {
+                    return Result.failure(requireNotNull(error.exceptionOrNull()))
+                }
+
+                val nextSource = sources.maxBy { it.getItem(force).getOrNull()?.lastUpdateTs ?: 0L }
+                val nextItem = nextSource.getItem(force).getOrNull()
+
+                if (nextItem == null) {
+                    // no more items!
+                    hasMore = false
+                    break
+                }
+
+                Log.d(TAG,
+                    "Adding item ${nextItem.id} from source ${nextItem::class.java}")
+
+                allItems.add(nextItem)
+
+                // increment the max item
+                nextSource.next()
+            }
+
+            return Result.success(
+                PageResult(
+                    pageIndex,
+                    allItems
+                        .slice(startIndex until min(endIndex, allItems.size)),
+                    hasMore = hasMore,
+                )
             )
+        }
+
+        fun markAsRead(id: Int, read: Boolean): InboxItem? {
+            sources.forEach {
+                val item = it.markAsRead(id, read)
+                if (item != null) {
+                    return item
+                }
+            }
+            return null
+        }
+
+        fun removeItemWithId(id: Int) {
+            sources.forEach {
+                it.removeItemWithId(id)
+            }
+        }
+
+        fun invalidate() {
+            allItems.clear()
+            sources.forEach {
+                it.reset()
+            }
+        }
+    }
+
+    private val repliesSource = InboxMultiDataSource(
+        listOf(InboxSourceState(repliesStatelessSource))
+    )
+    private val mentionsSource =
+        InboxMultiDataSource(
+            listOf(InboxSourceState(mentionsStatelessSource))
         )
-    }
+    private val messagesSource =
+        InboxMultiDataSource(
+            listOf(InboxSourceState(messagesStatelessSource))
+        )
+    private val allSources = InboxMultiDataSource(
+        listOf(
+            InboxSourceState(repliesStatelessSource),
+            InboxSourceState(mentionsStatelessSource),
+            InboxSourceState(messagesStatelessSource)
+        )
+    )
+    private val unreadSources = InboxMultiDataSource(
+        listOf(
+            InboxSourceState(makeRepliesSource(unreadOnly = true)),
+            InboxSourceState(makeMentionsSource(unreadOnly = true)),
+            InboxSourceState(makeMessagesSource(unreadOnly = true))
+        )
+    )
 
-    fun reset() {
-        currentPageInternal = 1
-
-        allObjects.clear()
-        seenObjects.clear()
-    }
-
-    /**
-     * @return true if there might be more posts to fetch
-     */
-    private suspend fun fetchPage(
+    suspend fun getPage(
         pageIndex: Int,
-        sortOrder: O,
+        pageType: InboxViewModel.PageType,
         force: Boolean,
-    ): Result<Boolean> {
-        val result =
-            apiClient.fetchObjects(pageIndex, sortOrder, force)
+    ): Result<PageResult<InboxItem>> {
 
-        return result.fold(
-            onSuccess = { newObjects ->
-                Log.d(TAG, "Fetched ${newObjects.size} posts.")
-                addObjects(newObjects, pageIndex)
-                Result.success(newObjects.isNotEmpty())
+        val source = when (pageType) {
+            InboxViewModel.PageType.Unread -> unreadSources
+            InboxViewModel.PageType.All -> allSources
+            InboxViewModel.PageType.Replies -> repliesSource
+            InboxViewModel.PageType.Mentions -> mentionsSource
+            InboxViewModel.PageType.Messages -> messagesSource
+        }
+
+        return source.getPage(pageIndex, pageType, force)
+    }
+
+    suspend fun invalidate(pageType: InboxViewModel.PageType) {
+        val source = when (pageType) {
+            InboxViewModel.PageType.Unread -> unreadSources
+            InboxViewModel.PageType.All -> allSources
+            InboxViewModel.PageType.Replies -> repliesSource
+            InboxViewModel.PageType.Mentions -> mentionsSource
+            InboxViewModel.PageType.Messages -> messagesSource
+        }
+        source.invalidate()
+    }
+
+    private fun makeRepliesSource(unreadOnly: Boolean) = InboxSource(
+        apiClient,
+        CommentSortType.New
+    ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
+        fetchReplies(
+            sort = sortOrder,
+            page = page,
+            limit = limit,
+            unreadOnly = unreadOnly,
+            force = force
+        ).fold(
+            onSuccess = {
+                Result.success(it.map { InboxItem.ReplyInboxItem(it) })
             },
             onFailure = {
                 Result.failure(it)
@@ -180,26 +235,84 @@ class InboxSource<T, O>(
         )
     }
 
-    private fun addObjects(newObjects: List<T>, pageIndex: Int,) {
-        newObjects.forEach {
-            val id = it.id()
-            if (seenObjects.add(id)) {
-                allObjects.add(ObjectData(it, pageIndex))
+    private fun makeMentionsSource(unreadOnly: Boolean) = InboxSource(
+        apiClient,
+        CommentSortType.New
+    ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
+        fetchMentions(
+            sort = sortOrder,
+            page = page,
+            limit = limit,
+            unreadOnly = unreadOnly,
+            force = force
+        ).fold(
+            onSuccess = {
+                Result.success(it.map { InboxItem.MentionInboxItem(it) })
+            },
+            onFailure = {
+                Result.failure(it)
             }
-        }
+        )
     }
 
-    private fun deleteFromPage(minPageInternal: Int) {
-        allObjects.retainAll {
-            val keep = it.pageIndexInternal < minPageInternal
-            if (!keep) {
-                seenObjects.remove(it.obj.id())
+    private fun makeMessagesSource(unreadOnly: Boolean) = InboxSource(
+        apiClient,
+        Unit
+    ) { page: Int, _: Unit, limit: Int, force: Boolean ->
+        fetchPrivateMessages(
+            page = page,
+            limit = limit,
+            unreadOnly = unreadOnly,
+            force = force
+        ).fold(
+            onSuccess = {
+                Result.success(it.map { InboxItem.MessageInboxItem(it) })
+            },
+            onFailure = {
+                Result.failure(it)
             }
-            keep
+        )
+    }
+
+    suspend fun markAsRead(inboxItem: InboxItem, read: Boolean): Result<Unit> {
+        val itemMarked = allSources.markAsRead(inboxItem.id, read)
+
+        if (read) {
+            unreadSources.removeItemWithId(inboxItem.id)
         }
 
-        currentPageInternal = minPageInternal
+        allSources.invalidate()
+        unreadSources.invalidate()
 
-        Log.d(TAG, "Deleted pages ${minPageInternal} and beyond. Posts left: ${allObjects.size}")
+        invalidate(InboxViewModel.PageType.Unread)
+        val result = when (inboxItem) {
+            is InboxItem.MentionInboxItem ->
+                apiClient.markMentionAsRead(inboxItem.id, read)
+            is InboxItem.MessageInboxItem ->
+                apiClient.markPrivateMessageAsRead(inboxItem.id, read)
+            is InboxItem.ReplyInboxItem ->
+                apiClient.markReplyAsRead(inboxItem.id, read)
+        }
+
+        return result.fold(
+            onSuccess = {
+                getPage(0, InboxViewModel.PageType.Unread, force = true)
+                invalidate(InboxViewModel.PageType.Unread)
+
+                accountInfoManager.updateUnreadCount()
+
+                Result.success(Unit)
+            },
+            onFailure = {
+                allSources.markAsRead(inboxItem.id, !read)
+
+                if (read) {
+                    getPage(0, InboxViewModel.PageType.Unread, force = true)
+                    invalidate(InboxViewModel.PageType.Unread)
+                }
+                Result.failure(it)
+            }
+        )
     }
 }
+

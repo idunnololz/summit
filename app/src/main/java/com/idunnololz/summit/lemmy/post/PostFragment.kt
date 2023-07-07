@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.post
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,50 +17,28 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.utils.getDepth
-import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
-import com.idunnololz.summit.databinding.GenericFooterItemBinding
-import com.idunnololz.summit.databinding.GenericLoadingItemBinding
-import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
-import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
-import com.idunnololz.summit.databinding.PostHeaderItemBinding
-import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
-import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
-import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.post.PostFragment.Item.CommentItem
-import com.idunnololz.summit.lemmy.post.PostFragment.Item.FooterItem
-import com.idunnololz.summit.lemmy.post.PostFragment.Item.HeaderItem
-import com.idunnololz.summit.lemmy.post.PostFragment.Item.MoreCommentsItem
-import com.idunnololz.summit.lemmy.post.PostFragment.Item.PendingCommentItem
-import com.idunnololz.summit.lemmy.post.PostFragment.Item.ProgressOrErrorItem
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.reddit.CommentsSortOrder
 import com.idunnololz.summit.reddit.getLocalizedName
 import com.idunnololz.summit.util.BaseFragment
@@ -73,10 +50,6 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
-import com.idunnololz.summit.util.recyclerView.getBinding
-import com.idunnololz.summit.util.recyclerView.isBinding
-import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -100,7 +73,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     private val viewModel: PostViewModel by viewModels()
 
-    private lateinit var adapter: PostsAdapter
+    private var adapter: PostsAdapter? = null
 
     private var hasConsumedJumpToComments: Boolean = false
 
@@ -115,8 +88,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
-
-    private var mainListingItemSeen = false
 
     private var actionsViewModel: MoreActionsViewModel? = null
 
@@ -147,87 +118,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         super.onCreate(savedInstanceState)
 
         val context = requireContext()
-
-        adapter = PostsAdapter(
-            postAndCommentViewBuilder = postAndCommentViewBuilder,
-            context,
-            args.instance,
-            args.reveal,
-            onRefreshClickCb = {
-                forceRefresh()
-            },
-            onSignInRequired = {
-                PreAuthDialogFragment.newInstance()
-                    .show(childFragmentManager, "asdf")
-            },
-            onInstanceMismatch = { accountInstance, apiInstance ->
-                AlertDialogFragment.Builder()
-                    .setTitle(R.string.error_account_instance_mismatch_title)
-                    .setMessage(
-                        getString(R.string.error_account_instance_mismatch,
-                            accountInstance,
-                            apiInstance)
-                    )
-                    .createAndShow(childFragmentManager, "aa")
-            },
-            onAddCommentClick = { postOrComment ->
-                if (accountManager.currentAccount.value == null) {
-                    PreAuthDialogFragment.newInstance(R.id.action_add_comment)
-                        .show(childFragmentManager, "asdf")
-                    return@PostsAdapter
-                }
-
-                AddOrEditCommentFragment().apply {
-                    arguments = postOrComment.fold({
-                        AddOrEditCommentFragmentArgs(
-                            args.instance, null, it, null)
-                    }, {
-                        AddOrEditCommentFragmentArgs(
-                            args.instance, it, null, null)
-                    }).toBundle()
-                }.show(childFragmentManager, "asdf")
-            },
-            onEditCommentClick = {
-                if (accountManager.currentAccount.value == null) {
-                    PreAuthDialogFragment.newInstance(R.id.action_edit_comment)
-                        .show(childFragmentManager, "asdf")
-                    return@PostsAdapter
-                }
-
-                AddOrEditCommentFragment().apply {
-                    arguments =
-                        AddOrEditCommentFragmentArgs(
-                            args.instance,null, null, it).toBundle()
-                }.show(childFragmentManager, "asdf")
-
-            },
-            onDeleteCommentClick = {
-                AlertDialogFragment.Builder()
-                    .setMessage(R.string.delete_comment_confirm)
-                    .setPositiveButton(android.R.string.ok)
-                    .setNegativeButton(android.R.string.cancel)
-                    .setExtra(EXTRA_COMMENT_ID, it.comment.id.toString())
-                    .createAndShow(
-                        childFragmentManager,
-                        CONFIRM_DELETE_COMMENT_TAG
-                    )
-
-            },
-            onImageClick = { url ->
-                getMainActivity()?.openImage(null, url, null)
-            },
-            onVideoClick = { url, videoType, state ->
-                getMainActivity()?.openVideo(url, videoType, state)
-            },
-            onPageClick = {
-                getMainActivity()?.launchPage(it)
-            },
-            onPostMoreClick = {
-                getMainActivity()?.showBottomMenu(getPostMoreMenu(it))
-            },
-        ).apply {
-            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        }
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
@@ -285,13 +175,113 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
+        if (adapter == null) {
+            adapter = PostsAdapter(
+                postAndCommentViewBuilder = postAndCommentViewBuilder,
+                context,
+                binding.recyclerView,
+                this,
+                args.instance,
+                args.reveal,
+                accountManager.currentAccount.value?.id,
+                args.videoState,
+                onRefreshClickCb = {
+                    forceRefresh()
+                },
+                onSignInRequired = {
+                    PreAuthDialogFragment.newInstance()
+                        .show(childFragmentManager, "asdf")
+                },
+                onInstanceMismatch = { accountInstance, apiInstance ->
+                    AlertDialogFragment.Builder()
+                        .setTitle(R.string.error_account_instance_mismatch_title)
+                        .setMessage(
+                            getString(
+                                R.string.error_account_instance_mismatch,
+                                accountInstance,
+                                apiInstance
+                            )
+                        )
+                        .createAndShow(childFragmentManager, "aa")
+                },
+                onAddCommentClick = { postOrComment ->
+                    if (accountManager.currentAccount.value == null) {
+                        PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                            .show(childFragmentManager, "asdf")
+                        return@PostsAdapter
+                    }
+
+                    AddOrEditCommentFragment().apply {
+                        arguments = postOrComment.fold({
+                            AddOrEditCommentFragmentArgs(
+                                args.instance, null, it, null
+                            )
+                        }, {
+                            AddOrEditCommentFragmentArgs(
+                                args.instance, it, null, null
+                            )
+                        }).toBundle()
+                    }.show(childFragmentManager, "asdf")
+                },
+                onEditCommentClick = {
+                    if (accountManager.currentAccount.value == null) {
+                        PreAuthDialogFragment.newInstance(R.id.action_edit_comment)
+                            .show(childFragmentManager, "asdf")
+                        return@PostsAdapter
+                    }
+
+                    AddOrEditCommentFragment().apply {
+                        arguments =
+                            AddOrEditCommentFragmentArgs(
+                                args.instance, null, null, it
+                            ).toBundle()
+                    }.show(childFragmentManager, "asdf")
+
+                },
+                onDeleteCommentClick = {
+                    AlertDialogFragment.Builder()
+                        .setMessage(R.string.delete_comment_confirm)
+                        .setPositiveButton(android.R.string.ok)
+                        .setNegativeButton(android.R.string.cancel)
+                        .setExtra(EXTRA_COMMENT_ID, it.comment.id.toString())
+                        .createAndShow(
+                            childFragmentManager,
+                            CONFIRM_DELETE_COMMENT_TAG
+                        )
+
+                },
+                onImageClick = { url ->
+                    getMainActivity()?.openImage(null, url, null)
+                },
+                onVideoClick = { url, videoType, state ->
+                    getMainActivity()?.openVideo(url, videoType, state)
+                },
+                onPageClick = {
+                    getMainActivity()?.launchPage(it)
+                },
+                onPostMoreClick = {
+                    getMainActivity()?.showBottomMenu(getPostMoreMenu(it))
+                },
+                onFetchComments = {
+                    viewModel.fetchMoreComments(it)
+                }
+            ).apply {
+                stateRestorationPolicy =
+                    RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
+        }
+
         binding.recyclerView.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 binding.recyclerView.viewTreeObserver.removeOnPreDrawListener(this)
 
-                adapter.contentMaxWidth = binding.recyclerView.width
+                if (isBindingAvailable()) {
+                    adapter?.contentMaxWidth = binding.recyclerView.width
 
-                setup()
+                    setup()
+                }
+
                 return false
             }
         })
@@ -301,6 +291,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         if (!isBindingAvailable()) {
             return
         }
+
+        val adapter = adapter ?: return
 
         val context = requireContext()
 
@@ -332,7 +324,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         }
 
         args.post?.let { post ->
-            adapter.setStartingData(
+            adapter?.setStartingData(
                 PostViewModel.PostData(
                     PostViewModel.ListView.PostListView(post),
                     listOf(),
@@ -359,6 +351,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
                     adapter.setData(it.data)
+                    onMainListingItemRetrieved(it.data.postView.post)
 
                     val newlyPostedCommentId = it.data.newlyPostedCommentId
                     if (newlyPostedCommentId != null) {
@@ -394,7 +387,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
-        viewModel.deletePostResult.observe(viewLifecycleOwner) {
+        actionsViewModel?.deletePostResult?.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     AlertDialogFragment.Builder()
@@ -402,7 +395,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             R.string.error_unable_to_send_post,
                             it.error::class.qualifiedName,
                             it.error.message))
-                        .createAndShow(childFragmentManager, "ASDS")
                 }
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
@@ -506,7 +498,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             requireMainActivity().apply {
                 setupForFragment<PostFragment>()
                 hideBottomNav(animate = true)
-                disableCustomAppBar(animate = true)
                 lockUiOpenness = true
             }
         }
@@ -548,7 +539,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         viewModel.fetchPostData(args.instance, args.id, force = true)
     }
 
-    fun onMainListingItemRetrieved(post: PostView) {
+    private fun onMainListingItemRetrieved(post: PostView) {
         post.getUrl(args.instance).let { url ->
             historyManager.recordVisit(
                 jsonUrl = url,
@@ -610,7 +601,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
                     }
                     R.id.delete -> {
-                        viewModel.deletePost(postView.post)
+                        actionsViewModel?.deletePost(postView.post)
                     }
                     R.id.block_community -> {
                         actionsViewModel?.blockCommunity(postView.community.id)
@@ -638,569 +629,5 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
         // do nothing
-    }
-
-    sealed class Item(
-        open val id: String
-    ) {
-
-        data class HeaderItem(
-            val postView: PostView,
-            var videoState: VideoState?
-        ) : Item(postView.getUniqueKey())
-
-        data class CommentItem(
-            val commentId: CommentId,
-            val content: String,
-            val comment: CommentView,
-            val depth: Int,
-            val baseDepth: Int,
-            val isExpanded: Boolean,
-            val isPending: Boolean,
-            val view: PostViewModel.ListView.CommentListView,
-            val childrenCount: Int,
-            val isPostLocked: Boolean,
-            val isUpdating: Boolean,
-            val isDeleting: Boolean,
-        ) : Item(
-            "comment_${comment.comment.id}"
-        )
-
-        data class PendingCommentItem(
-            val commentId: CommentId?,
-            val content: String,
-            val author: String?,
-            val depth: Int,
-            val baseDepth: Int,
-            val isExpanded: Boolean,
-            val isPending: Boolean,
-            val view: PostViewModel.ListView.PendingCommentListView,
-            val childrenCount: Int,
-        ) : Item(
-            "pending_comment_${view.pendingCommentView.id}"
-        )
-
-        data class MoreCommentsItem(
-            val parentId: CommentId?,
-            val moreCount: Int,
-            val depth: Int,
-            val baseDepth: Int,
-        ) : Item(
-            "more_comments_${parentId}"
-        )
-
-        class ProgressOrErrorItem(
-            val error: Throwable? = null
-        ) : Item("wew_pls_no_progress")
-
-        object FooterItem : Item("footer")
-    }
-
-    private inner class PostsAdapter(
-        private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
-        private val context: Context,
-        private val instance: String,
-        private val revealAll: Boolean,
-        private val onRefreshClickCb: () -> Unit,
-        private val onSignInRequired: () -> Unit,
-        private val onInstanceMismatch: (String, String) -> Unit,
-        private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-        private val onEditCommentClick: (CommentView) -> Unit,
-        private val onDeleteCommentClick: (CommentView) -> Unit,
-        private val onImageClick: (String) -> Unit,
-        private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
-        private val onPageClick: (PageRef) -> Unit,
-        private val onPostMoreClick: (PostView) -> Unit,
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        private val inflater = LayoutInflater.from(context)
-
-        private var items: List<Item> = listOf()
-
-        private var parentHeight: Int = 0
-
-        /**
-         * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
-         */
-        private var revealedItems = mutableSetOf<String>()
-
-        private var rawData: PostViewModel.PostData? = null
-
-        private var highlightedComment: CommentId = -1
-        var isLoaded: Boolean = false
-        var error: Throwable? = null
-            set(value) {
-                field = value
-
-                refreshItems()
-            }
-
-        var contentMaxWidth = 0
-            set(value) {
-                if (value == field) {
-                    return
-                }
-                field = value
-
-                for (i in 0.. items.lastIndex) {
-                    if (items[i] is HeaderItem) {
-                        notifyItemChanged(i)
-                    }
-                }
-            }
-
-        override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
-            is HeaderItem -> R.layout.post_header_item
-            is CommentItem ->
-                if (item.isExpanded)
-                    R.layout.post_comment_expanded_item
-                else
-                    R.layout.post_comment_collapsed_item
-            is PendingCommentItem ->
-                if (item.isExpanded)
-                    R.layout.post_pending_comment_expanded_item
-                else
-                    R.layout.post_pending_comment_collapsed_item
-            is ProgressOrErrorItem -> R.layout.generic_loading_item
-            is MoreCommentsItem -> R.layout.post_more_comments_item
-            is FooterItem -> R.layout.generic_footer_item
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val v = inflater.inflate(viewType, parent, false)
-
-            parentHeight = parent.height
-
-            return when (viewType) {
-                R.layout.post_header_item -> ViewBindingViewHolder(PostHeaderItemBinding.bind(v))
-                R.layout.post_comment_expanded_item ->
-                    ViewBindingViewHolder(PostCommentExpandedItemBinding.bind(v))
-                R.layout.post_comment_collapsed_item ->
-                    ViewBindingViewHolder(PostCommentCollapsedItemBinding.bind(v))
-                R.layout.post_pending_comment_expanded_item ->
-                    ViewBindingViewHolder(PostPendingCommentExpandedItemBinding.bind(v))
-                R.layout.post_pending_comment_collapsed_item ->
-                    ViewBindingViewHolder(PostPendingCommentCollapsedItemBinding.bind(v))
-                R.layout.post_more_comments_item ->
-                    ViewBindingViewHolder(PostMoreCommentsItemBinding.bind(v))
-                R.layout.generic_loading_item ->
-                    ViewBindingViewHolder(GenericLoadingItemBinding.bind(v))
-                R.layout.generic_footer_item ->
-                    ViewBindingViewHolder(GenericFooterItemBinding.bind(v))
-                else -> throw RuntimeException("ViewType: $viewType")
-            }
-        }
-
-        override fun onBindViewHolder(
-            holder: RecyclerView.ViewHolder,
-            position: Int,
-            payloads: MutableList<Any>
-        ) {
-            when (val item = items[position]) {
-                is HeaderItem -> {
-                    if (payloads.isEmpty()) {
-                        super.onBindViewHolder(holder, position, payloads)
-                    } else {
-                        // this is an incremental update... Only update the stats, do not update content...
-                        val b = holder.getBinding<PostHeaderItemBinding>()
-                        val post = item.postView
-                        val postKey = post.getUniqueKey()
-
-                        postAndCommentViewBuilder.bindPostView(
-                            binding = b,
-                            container = binding.recyclerView,
-                            postView = item.postView,
-                            instance = instance,
-                            isRevealed = revealAll || revealedItems.contains(postKey),
-                            contentMaxWidth = contentMaxWidth,
-                            viewLifecycleOwner = viewLifecycleOwner,
-                            videoState = item.videoState,
-                            updateContent = false,
-                            onRevealContentClickedFn = {
-                                revealedItems.add(postKey)
-                                notifyItemChanged(holder.absoluteAdapterPosition)
-                            },
-                            onImageClick = onImageClick,
-                            onVideoClick = onVideoClick,
-                            onPageClick = {
-                                requireMainActivity().launchPage(it)
-                            },
-                            onAddCommentClick = onAddCommentClick,
-                            onPostMoreClick = onPostMoreClick,
-                            onSignInRequired = onSignInRequired,
-                            onInstanceMismatch = onInstanceMismatch,
-                        )
-                    }
-                }
-                else -> super.onBindViewHolder(holder, position, payloads)
-            }
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            when (val item = items[position]) {
-                is HeaderItem -> {
-                    val b = holder.getBinding<PostHeaderItemBinding>()
-                    val post = item.postView
-                    val postKey = post.getUniqueKey()
-
-                    postAndCommentViewBuilder.bindPostView(
-                        binding = b,
-                        container = binding.recyclerView,
-                        postView = item.postView,
-                        instance = instance,
-                        isRevealed = revealAll || revealedItems.contains(postKey),
-                        contentMaxWidth = contentMaxWidth,
-                        viewLifecycleOwner = viewLifecycleOwner,
-                        videoState = item.videoState,
-                        updateContent = true,
-                        onRevealContentClickedFn = {
-                            revealedItems.add(postKey)
-                            notifyItemChanged(holder.absoluteAdapterPosition)
-                        },
-                        onImageClick = onImageClick,
-                        onVideoClick = onVideoClick,
-                        onPageClick = {
-                            requireMainActivity().launchPage(it)
-                        },
-                        onAddCommentClick = onAddCommentClick,
-                        onPostMoreClick = onPostMoreClick,
-                        onSignInRequired = onSignInRequired,
-                        onInstanceMismatch = onInstanceMismatch,
-                    )
-                }
-                is CommentItem -> {
-                    if (item.isExpanded) {
-                        val b = holder.getBinding<PostCommentExpandedItemBinding>()
-                        val highlight = highlightedComment == item.commentId
-
-                        postAndCommentViewBuilder.bindCommentViewExpanded(
-                            holder,
-                            b,
-                            item.baseDepth,
-                            item.depth,
-                            item.comment,
-                            item.isDeleting,
-                            item.content,
-                            instance,
-                            item.isPostLocked,
-                            item.isUpdating,
-                            highlight,
-                            viewLifecycleOwner,
-                            accountManager.currentAccount.value?.id,
-                            onImageClick,
-                            onPageClick,
-                            {
-                                collapseSection(holder.bindingAdapterPosition)
-                            },
-                            onAddCommentClick,
-                            onEditCommentClick,
-                            onDeleteCommentClick,
-                            onSignInRequired,
-                            onInstanceMismatch,
-                        )
-                    } else {
-                        // collapsed
-                        val b = holder.getBinding<PostCommentCollapsedItemBinding>()
-                        val highlight = highlightedComment == item.commentId
-
-                        postAndCommentViewBuilder.bindCommentViewCollapsed(
-                            holder,
-                            b,
-                            item.baseDepth,
-                            item.depth,
-                            item.childrenCount,
-                            highlight,
-                            item.isUpdating,
-                            item.comment,
-                            ::expandSection,
-                        )
-                    }
-                }
-                is PendingCommentItem -> {
-                    if (item.isExpanded) {
-                        val b = holder.getBinding<PostPendingCommentExpandedItemBinding>()
-                        val highlight = highlightedComment == item.commentId
-
-                        postAndCommentViewBuilder.bindPendingCommentViewExpanded(
-                            holder,
-                            b,
-                            item.baseDepth,
-                            item.depth,
-                            item.content,
-                            instance,
-                            item.author,
-                            highlight,
-                            onImageClick,
-                            onPageClick,
-                            ::collapseSection,
-                        )
-                    } else {
-                        // collapsed
-                        val b = holder.getBinding<PostPendingCommentCollapsedItemBinding>()
-                        val highlight = highlightedComment == item.commentId
-
-                        postAndCommentViewBuilder.bindPendingCommentViewCollapsed(
-                            holder,
-                            b,
-                            item.baseDepth,
-                            item.depth,
-                            item.author,
-                            highlight,
-                            ::collapseSection,
-                        )
-                    }
-                }
-                is ProgressOrErrorItem -> {
-                    val b = holder.getBinding<GenericLoadingItemBinding>()
-                    if (item.error != null) {
-                        b.loadingView.showDefaultErrorMessageFor(item.error)
-                    } else if (!isLoaded) {
-                        b.loadingView.showProgressBar()
-                    }
-                    b.loadingView.setOnRefreshClickListener {
-                        onRefreshClickCb()
-                    }
-                }
-                is MoreCommentsItem -> {
-                    val b = holder.getBinding<PostMoreCommentsItemBinding>()
-
-                    postAndCommentViewBuilder.threadLinesHelper.populateThreadLines(
-                        b.threadLinesContainer, item.depth, item.baseDepth
-                    )
-                    b.moreButton.text = context.resources.getQuantityString(
-                        R.plurals.replies_format, item.moreCount, item.moreCount
-                    )
-
-                    b.moreButton.setOnClickListener {
-                        if (item.parentId != null) {
-                            viewModel.fetchMoreComments(item.parentId)
-                        }
-                    }
-
-                    b.root.tag = ThreadLinesDecoration.ThreadLinesData(
-                        depth = item.depth,
-                        baseDepth = item.baseDepth
-                    )
-                }
-
-                FooterItem -> {}
-            }
-        }
-
-        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-            super.onViewRecycled(holder)
-
-            val item = if (holder.absoluteAdapterPosition >= 0) {
-                items[holder.absoluteAdapterPosition]
-            } else {
-                null
-            }
-
-            if (holder.isBinding<PostHeaderItemBinding>()) {
-                val b = holder.getBinding<PostHeaderItemBinding>()
-                val state = postAndCommentViewBuilder.recycle(b)
-
-                (item as? HeaderItem)?.videoState = state.videoState
-            }
-        }
-
-        override fun getItemCount(): Int = items.size
-
-        /**
-         * @param refreshHeader Pass false to not always refresh header. Useful for web view headers
-         * as refreshing them might cause a relayout causing janky animations
-         */
-        private fun refreshItems(refreshHeader: Boolean = true) {
-            val rawData = rawData
-            val oldItems = items
-
-            val newItems =
-                if (error == null) {
-                    rawData ?: return
-
-                    val finalItems = mutableListOf<Item>()
-
-                    rawData.postView.let {
-                        if (!mainListingItemSeen) {
-                            mainListingItemSeen = true
-                            onMainListingItemRetrieved(it.post)
-                        }
-
-                        finalItems += HeaderItem(it.post, args.videoState)
-                    }
-
-                    rawData.commentTree.flatten().forEach {
-                        when (val commentView = it.commentView) {
-                            is PostViewModel.ListView.CommentListView -> {
-                                val isDeleting =
-                                    commentView.pendingCommentView?.isActionDelete == true
-                                finalItems += CommentItem(
-                                    commentId = commentView.comment.comment.id,
-                                    content =
-                                        commentView.pendingCommentView?.content
-                                            ?: commentView.comment.comment.content,
-                                    comment = commentView.comment,
-                                    depth = commentView.comment.getDepth(),
-                                    baseDepth = 0,
-                                    isExpanded = !commentView.isCollapsed,
-                                    isPending = false,
-                                    view = commentView,
-                                    childrenCount = it.children.size,
-                                    isPostLocked = commentView.comment.post.locked,
-                                    isUpdating = commentView.pendingCommentView != null,
-                                    isDeleting = isDeleting,
-                                )
-                            }
-                            is PostViewModel.ListView.PendingCommentListView -> {
-                                finalItems += PendingCommentItem(
-                                    commentId = commentView.pendingCommentView.commentId,
-                                    content = commentView.pendingCommentView.content,
-                                    author = commentView.author,
-                                    depth = it.depth,
-                                    baseDepth = 0,
-                                    isExpanded = !commentView.isCollapsed,
-                                    isPending = false,
-                                    view = commentView,
-                                    childrenCount = it.children.size,
-                                )
-                            }
-                            is PostViewModel.ListView.PostListView -> {
-                                // should never happen
-                            }
-
-                            is PostViewModel.ListView.MoreCommentsItem -> {
-                                if (commentView.parentCommentId != null) {
-                                    finalItems += MoreCommentsItem(
-                                        parentId = commentView.parentCommentId,
-                                        moreCount = commentView.moreCount,
-                                        depth = it.depth,
-                                        baseDepth = 0,
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    if (!isLoaded) {
-                        finalItems += listOf(ProgressOrErrorItem())
-                    }
-
-                    finalItems += FooterItem
-
-                    finalItems
-                } else {
-                    val finalItems = mutableListOf<Item>()
-                    rawData?.postView?.let {
-                        if (!mainListingItemSeen) {
-                            mainListingItemSeen = true
-                            onMainListingItemRetrieved(it.post)
-                        }
-
-                        finalItems += HeaderItem(it.post, args.videoState)
-                    }
-                    finalItems += ProgressOrErrorItem(error)
-
-                    finalItems
-                }
-
-            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return oldItems[oldItemPosition].id == newItems[newItemPosition].id
-                }
-
-                override fun getOldListSize(): Int = oldItems.size
-
-                override fun getNewListSize(): Int = newItems.size
-
-                override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int
-                ): Boolean {
-                    val oldItem = oldItems[oldItemPosition]
-                    val newItem = newItems[newItemPosition]
-                    return when (oldItem) {
-                        is HeaderItem ->
-                            oldItem.postView.post == (newItem as HeaderItem).postView.post
-                        else -> oldItem == newItem
-                    }
-                }
-
-            })
-            this.items = newItems
-            diff.dispatchUpdatesTo(this)
-            if (refreshHeader) {
-                notifyItemChanged(0, Unit)
-            }
-        }
-
-        fun getPositionOfComment(commentId: CommentId): Int =
-            items.indexOfFirst {
-                when (it) {
-                    is CommentItem -> it.commentId == commentId
-                    is HeaderItem -> false
-                    is MoreCommentsItem -> false
-                    is PendingCommentItem -> it.commentId == commentId
-                    is ProgressOrErrorItem -> false
-                    FooterItem -> false
-                }
-            }
-
-        fun setStartingData(data: PostViewModel.PostData) {
-            rawData = data
-
-            refreshItems()
-        }
-
-        fun hasStartingData(): Boolean = rawData?.postView != null
-
-        fun setData(data: PostViewModel.PostData) {
-            if (!isLoaded) {
-                isLoaded = true
-            }
-
-            error = null
-            rawData = data
-
-            refreshItems()
-        }
-
-        fun highlightComment(commentId: CommentId) {
-            val pos = getPositionOfComment(commentId)
-            if (pos == -1) {
-                return
-            }
-
-            highlightedComment = commentId
-            notifyItemChanged(getPositionOfComment(commentId), Unit)
-        }
-
-        fun clearHighlightComment() {
-            val pos = getPositionOfComment(highlightedComment)
-            if (pos == -1) {
-                return
-            }
-
-            highlightedComment = -1
-            notifyItemChanged(pos, Unit)
-        }
-
-        private fun collapseSection(position: Int) {
-            if (position < 0) return
-
-            (items[position] as? CommentItem)?.view?.isCollapsed = true
-            (items[position] as? PendingCommentItem)?.view?.isCollapsed = true
-
-            refreshItems(refreshHeader = false)
-        }
-
-        private fun expandSection(position: Int) {
-            if (position < 0) return
-
-            (items[position] as? CommentItem)?.view?.isCollapsed = false
-            (items[position] as? PendingCommentItem)?.view?.isCollapsed = false
-
-            refreshItems(refreshHeader = false)
-        }
-
     }
 }

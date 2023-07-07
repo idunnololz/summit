@@ -116,11 +116,22 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         }
 
         viewModel.commentSentEvent.observe(viewLifecycleOwner) {
-            it.contentIfNotHandled ?: return@observe
+            val result = it.contentIfNotHandled ?: return@observe
 
-            setFragmentResult(REQUEST_KEY, bundleOf(REQUEST_KEY_RESULT to Result.CommentSent))
+            result
+                .onSuccess {
+                    setFragmentResult(REQUEST_KEY, bundleOf(REQUEST_KEY_RESULT to Result.CommentSent))
 
-            dismiss()
+                    dismiss()
+                }
+                .onFailure {
+                    AlertDialogFragment.Builder()
+                        .setMessage(context.getString(
+                            R.string.error_unable_to_send_message,
+                            it::class.qualifiedName,
+                            it.message))
+                        .createAndShow(childFragmentManager, "errr")
+                }
         }
 
         binding.toolbar.title = getString(R.string.comment)
@@ -143,14 +154,25 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                         return@setOnMenuItemClickListener true
                     }
 
-                    viewModel.sendComment(
-                        PostRef(args.instance,
-                            requireNotNull(args.postView?.post?.id ?: args.commentView?.post?.id) {
-                                "Both postView and commentView were null!"
-                            }),
-                        args.commentView?.comment?.id,
-                        binding.commentEditor.text.toString(),
-                    )
+                    val inboxItem = args.inboxItem
+                    if (inboxItem != null) {
+                        viewModel.sendComment(
+                            args.instance,
+                            inboxItem,
+                            binding.commentEditor.text.toString()
+                        )
+                    } else {
+                        viewModel.sendComment(
+                            PostRef(args.instance,
+                                requireNotNull(
+                                    args.postView?.post?.id ?: args.commentView?.post?.id
+                                ) {
+                                    "Both postView and commentView were null!"
+                                }),
+                            args.commentView?.comment?.id,
+                            binding.commentEditor.text.toString(),
+                        )
+                    }
                     true
                 }
                 R.id.update_comment -> {
@@ -184,6 +206,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
 
         val postView = args.postView
         val commentView = args.commentView
+        val inboxItem = args.inboxItem
 
         val commentEditor = binding.commentEditor
         if (isEdit()) {
@@ -196,8 +219,10 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
             binding.replyingTo.text = commentView.comment.content
         } else if (postView != null) {
             binding.replyingTo.text = postView.post.body
+        } else if (inboxItem != null) {
+            binding.replyingTo.text = inboxItem.content
         } else {
-            findNavController().navigateUp()
+            dismiss()
             return
         }
 

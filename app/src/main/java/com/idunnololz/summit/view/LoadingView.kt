@@ -152,10 +152,10 @@ class LoadingView : ConstraintLayout {
         showErrorWithRetry(context.getString(msg))
     }
 
-    fun showErrorWithRetry(msg: String) {
+    fun showErrorWithRetry(msg: String, retryText: String = context.getString(R.string.retry)) {
         show(errorText = true, positiveButton = true)
         bindErrorText(msg)
-        bindPositiveButton(context.getString(R.string.retry)) { v ->
+        bindPositiveButton(retryText) { v ->
             showProgressBar()
             onRefreshClickListener(v)
         }
