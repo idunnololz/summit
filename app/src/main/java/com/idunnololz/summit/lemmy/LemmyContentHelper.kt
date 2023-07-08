@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.core.view.ViewCompat
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import coil.load
@@ -87,7 +88,7 @@ class LemmyContentHelper(
         lazyUpdate: Boolean = false,
         videoState: VideoState? = null,
 
-        onFullImageViewClickListener: (imageView: ImageView?, url: String) -> Unit,
+        onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
         onVideoClickListener: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onItemClickListener: () -> Unit,
@@ -278,13 +279,15 @@ class LemmyContentHelper(
                     offlineManager.calculateImageMaxSizeIfNeeded(it)
                     offlineManager.getMaxImageSizeHint(it, tempSize)
 
-                    imageView.load(it)
+                    imageView.load(it) {
+                        allowHardware(false)
+                    }
                 }
 
                 if (attachClickHandler) {
-//                    ViewCompat.setTransitionName(imageView, fullImageViewTransitionName)
+                    imageView.transitionName = fullImageViewTransitionName
                     imageView.setOnClickListener {
-                        onFullImageViewClickListener(null, previewInfo.getUrl())
+                        onFullImageViewClickListener(it, previewInfo.getUrl())
                     }
                 }
             } else {
@@ -374,6 +377,21 @@ class LemmyContentHelper(
 
                     fullImageView.load(0)
 
+                    fun updateLayoutParams() {
+                        offlineManager.getImageSizeHint(imageUrl, tempSize)
+                        if (tempSize.width > 0 && tempSize.height > 0) {
+                            val thumbnailMaxHeight =
+                                (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+                            fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                                this.height = thumbnailMaxHeight
+                            }
+                        } else {
+                            fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                                this.height = WRAP_CONTENT
+                            }
+                        }
+                    }
+
                     fun fetchFullImage() {
                         loadingView?.showProgressBar()
                         offlineManager.fetchImageWithError(rootView, imageUrl, b@{
@@ -382,6 +400,8 @@ class LemmyContentHelper(
                             offlineManager.getMaxImageSizeHint(it, tempSize)
 
                             fullImageView.load(it) {
+                                allowHardware(false)
+
                                 listener { _, result ->
                                     val d = result.drawable
                                     if (d is BitmapDrawable) {
@@ -391,6 +411,8 @@ class LemmyContentHelper(
                                             d.bitmap.height
                                         )
                                         Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
+
+                                        updateLayoutParams()
                                     }
                                 }
                             }
@@ -399,26 +421,16 @@ class LemmyContentHelper(
                         })
                     }
 
-                    offlineManager.getImageSizeHint(imageUrl, tempSize)
-                    if (tempSize.width > 0 && tempSize.height > 0) {
-                        val thumbnailMaxHeight =
-                            (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-                        fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
-                            this.height = thumbnailMaxHeight
-                        }
-                    } else {
-                        fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
-                            this.height = WRAP_CONTENT
-                        }
-                    }
+                    updateLayoutParams()
 
                     loadingView?.setOnRefreshClickListener {
                         fetchFullImage()
                     }
                     fetchFullImage()
 
+                    fullImageView.transitionName = fullImageViewTransitionName
                     fullImageView.setOnClickListener {
-                        onFullImageViewClickListener(null, imageUrl)
+                        onFullImageViewClickListener(it, imageUrl)
                     }
                 }
                 PostType.Video -> {

@@ -231,7 +231,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             highlight = false,
             highlightForever = false,
             onRevealContentClickedFn = {},
-            onImageClick = {},
+            onImageClick = { _, _ -> },
             onVideoClick = { _, _, _ -> },
             onPageClick = {},
             onItemClick = { _, _, _, _, _, _, _ -> },

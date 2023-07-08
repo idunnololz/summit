@@ -898,3 +898,6 @@ fun assertMainThread() {
 fun convertSpToPixel(sp: Float): Float {
     return sp * Utils.displayMetrics.scaledDensity
 }
+
+fun Context.isLightTheme(): Boolean =
+    resources.getBoolean(R.bool.isLightTheme)

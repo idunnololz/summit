@@ -44,23 +44,6 @@
         android:name="com.idunnololz.summit.history.HistoryFragment"
         android:label="HistoryFragment" />
     <fragment
-        android:id="@+id/imageViewerFragment"
-        android:name="com.idunnololz.summit.preview.ImageViewerFragment"
-        android:label="ImageViewerFragment">
-        <argument
-            android:name="title"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="url"
-            app:argType="string" />
-        <argument
-            android:name="mimeType"
-            app:argType="string"
-            app:nullable="true" />
-    </fragment>
-    <action android:id="@+id/action_global_imageViewerFragment" app:destination="@id/imageViewerFragment"/>
-    <fragment
         android:id="@+id/settingsFragment"
         android:name="com.idunnololz.summit.settings.SettingsFragment"
         android:label="SettingsFragment" >
@@ -132,4 +115,24 @@
             android:name="pageType"
             app:argType="com.idunnololz.summit.lemmy.inbox.InboxViewModel$PageType" />
     </fragment>
+    <activity
+        android:id="@+id/imageViewerActivity"
+        android:name="com.idunnololz.summit.preview.ImageViewerActivity"
+        android:label="ImageViewerActivity" >
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="url"
+            app:argType="string" />
+        <argument
+            android:name="mimeType"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="transitionName"
+            app:argType="string"
+            app:nullable="true" />
+    </activity>
 </navigation>

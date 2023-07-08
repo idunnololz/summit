@@ -3,11 +3,13 @@ package com.idunnololz.summit.lemmy.inbox
 import android.content.Context
 import android.os.Parcelable
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
@@ -42,11 +44,7 @@ class InboxViewModel @Inject constructor(
 
     val currentAccount
         get() = accountManager.currentAccount.asLiveData()
-    val currentAccountView
-        get() =
-            currentAccount.value?.let {
-                accountInfoManager.getAccountViewForAccount(it)
-            }
+    val currentAccountView = MutableLiveData<AccountView?>()
     val markAsReadResult = StatefulLiveData<Unit>()
 
     val inboxData = StatefulLiveData<List<LemmyListSource.PageResult<InboxItem>>>()
@@ -80,6 +78,18 @@ class InboxViewModel @Inject constructor(
                 inboxData.setValue(allData)
 
                 fetchInbox(pageIndex, requireNotNull(pageTypeFlow.value))
+            }
+        }
+
+        viewModelScope.launch {
+            accountManager.currentAccount.collect {
+                withContext(Dispatchers.Main) {
+                    if (it != null) {
+                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(it)
+                    } else {
+                        currentAccountView.value = null
+                    }
+                }
             }
         }
 

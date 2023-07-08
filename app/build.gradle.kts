@@ -132,6 +132,7 @@ dependencies {
     ksp("dev.zacsweers.moshix:moshi-sealed-codegen:0.22.1")
 
     implementation("com.github.Commit451.coil-transformations:transformations:2.0.2")
+    implementation("com.otaliastudios:zoomlayout:1.9.0")
 
     // TODO: Remove the following deps
     implementation("org.apmem.tools:layouts:1.10@aar")

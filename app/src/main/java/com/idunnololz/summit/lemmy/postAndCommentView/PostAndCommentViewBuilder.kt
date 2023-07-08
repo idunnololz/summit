@@ -113,7 +113,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         videoState: VideoState?,
         updateContent: Boolean,
         onRevealContentClickedFn: () -> Unit,
-        onImageClick: (String) -> Unit,
+        onImageClick: (View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
@@ -164,11 +164,11 @@ class PostAndCommentViewBuilder @Inject constructor(
             fullContentContainerView = fullContent,
             lazyUpdate = !updateContent,
             videoState = videoState,
-            onFullImageViewClickListener = { _, url ->
-                onImageClick(url)
+            onFullImageViewClickListener = { view, url ->
+                onImageClick(view, url)
             },
             onImageClickListener = { url ->
-                onImageClick(url)
+                onImageClick(null, url)
             },
             onVideoClickListener = onVideoClick,
             onRevealContentClickedFn = onRevealContentClickedFn,
@@ -203,7 +203,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightForever: Boolean,
         viewLifecycleOwner: LifecycleOwner,
         currentAccountId: PersonId?,
-        onImageClick: (String) -> Unit,
+        onImageClick: (View?, String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
@@ -235,7 +235,9 @@ class PostAndCommentViewBuilder @Inject constructor(
                 textView = text,
                 text = content,
                 instance = instance,
-                onImageClick = onImageClick,
+                onImageClick = {
+                    onImageClick(null, it)
+                },
                 onPageClick = onPageClick,
             )
         }
@@ -279,7 +281,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 imageView.controller = controller
 
                 imageView.setOnClickListener {
-                    onImageClick(fullUrl)
+                    onImageClick(null, fullUrl)
                 }
 
                 lastViewId = viewId
@@ -422,7 +424,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         author: String?,
         highlight: Boolean,
         highlightForever: Boolean,
-        onImageClick: (String) -> Unit,
+        onImageClick: (View?, String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
     ) = with(binding) {
@@ -441,7 +443,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             textView = text,
             text = content,
             instance = instance,
-            onImageClick = onImageClick,
+            onImageClick = {
+                onImageClick(null, it)
+            },
             onPageClick = onPageClick,
         )
 
@@ -484,7 +488,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 imageView.controller = controller
 
                 imageView.setOnClickListener {
-                    onImageClick(fullUrl)
+                    onImageClick(null, fullUrl)
                 }
 
                 lastViewId = viewId

@@ -58,6 +58,7 @@ class GalleryImageView : AppCompatImageView {
     private var offX = 0f
     private var offY = 0f
 
+    private var overScrollX = 0f
     private var overScrollY = 0f
 
     private var imageW = 0f
@@ -91,7 +92,7 @@ class GalleryImageView : AppCompatImageView {
                 }
 
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    detector?.let {
+                    detector.let {
                         zoomInToAbs(
                             detector.focusX / curZoom - offX,
                             detector.focusY / curZoom - offY,
@@ -133,7 +134,7 @@ class GalleryImageView : AppCompatImageView {
                 if (scrollByAndCommit(distanceX, distanceY)) {
                     return true
                 } else if (curZoom > minZoom - 0.01 && curZoom <= minZoom + 0.01) {
-                    updateOverScrollBy(distanceY)
+                    updateOverScrollBy(distanceX, distanceY)
                     return false
                 } else {
                     return false
@@ -146,7 +147,7 @@ class GalleryImageView : AppCompatImageView {
 
         detector.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
             override fun onDoubleTap(e: MotionEvent): Boolean {
-                e?.let {
+                e.let {
                     zoomInToAnimated(it.x, it.y)
                 }
                 return true
@@ -166,15 +167,17 @@ class GalleryImageView : AppCompatImageView {
         scaleType = ScaleType.MATRIX
     }
 
-    private fun updateOverScrollBy(offY: Float) {
+    private fun updateOverScrollBy(offX: Float, offY: Float) {
+        overScrollX -= offX / curZoom
         overScrollY -= offY / curZoom
-        callback?.overScroll(0f, overScrollY)
+        callback?.overScroll(overScrollX, overScrollY)
         updateMatrix()
     }
 
-    private fun updateOverScroll(newOverScrollY: Float) {
+    private fun updateOverScroll(newOverScrollX: Float, newOverScrollY: Float) {
+        overScrollX = newOverScrollX
         overScrollY = newOverScrollY
-        callback?.overScroll(0f, overScrollY)
+        callback?.overScroll(overScrollX, overScrollY)
         updateMatrix()
     }
 
@@ -188,10 +191,13 @@ class GalleryImageView : AppCompatImageView {
         if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
             val keepOverscroll = callback?.overScrollEnd()
             if (keepOverscroll != true) {
-                ValueAnimator.ofFloat(overScrollY, 0f).apply {
+                ValueAnimator.ofFloat(1f, 0f).apply {
                     duration = ANIMATION_DURATION
                     addUpdateListener {
-                        updateOverScroll(it.animatedValue as Float)
+                        val newX = overScrollX - overScrollX * it.animatedFraction
+                        val newY = overScrollY - overScrollY * it.animatedFraction
+
+                        updateOverScroll(newX, newY)
                     }
                 }.also {
                     it.start()
@@ -207,9 +213,9 @@ class GalleryImageView : AppCompatImageView {
     }
 
     override fun setScaleType(scaleType: ScaleType?) {
-        if (scaleType != ScaleType.MATRIX) {
-            throw UnsupportedOperationException("GalleryImageView only supports Matrix scale type.")
-        }
+//        if (scaleType != ScaleType.MATRIX) {
+//            throw UnsupportedOperationException("GalleryImageView only supports Matrix scale type.")
+//        }
         super.setScaleType(scaleType)
     }
 
@@ -358,7 +364,7 @@ class GalleryImageView : AppCompatImageView {
 
     private fun updateMatrix() {
         _matrix.reset()
-        _matrix.postTranslate(offX, offY + overScrollY)
+        _matrix.postTranslate(offX + overScrollX, offY + overScrollY)
         _matrix.postScale(curZoom, curZoom)
         imageMatrix = _matrix
     }

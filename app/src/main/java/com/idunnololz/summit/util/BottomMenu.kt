@@ -17,7 +17,6 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BottomMenuBinding
@@ -27,8 +26,6 @@ import com.idunnololz.summit.databinding.MenuItemTitleBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
-import com.idunnololz.summit.util.recyclerView.getBinding
 
 class BottomMenu(private val context: Context) {
 
@@ -139,11 +136,13 @@ class BottomMenu(private val context: Context) {
         ViewCompat.setElevation(rootView, Utils.convertDpToPixel(17f))
         viewGroup.addView(rootView)
 
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
             peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
             isHideable = true
             state = BottomSheetBehavior.STATE_HIDDEN
             skipCollapsed = true
+        }.also {
+            bottomSheetBehavior = it
         }
 
         bottomInset.observeForever {
@@ -155,10 +154,10 @@ class BottomMenu(private val context: Context) {
             }
         }
 
-        rootView.post {
-            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
+        rootView.postDelayed({
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-            bottomSheetBehavior!!.addBottomSheetCallback(
+            bottomSheetBehavior.addBottomSheetCallback(
                 object : BottomSheetBehavior.BottomSheetCallback() {
                     override fun onStateChanged(bottomSheet1: View, newState: Int) {
                         if (newState == BottomSheetBehavior.STATE_HIDDEN) {
@@ -178,7 +177,7 @@ class BottomMenu(private val context: Context) {
                     }
                 },
             )
-        }
+        }, 100)
 
         mainActivity.onBackPressedDispatcher.addCallback(mainActivity, onBackPressedCallback)
     }
@@ -220,13 +219,13 @@ class BottomMenu(private val context: Context) {
                 }
             }
         ).apply {
-            addItemType(Item.TitleItem::class, MenuItemTitleBinding::inflate) { item, b, h ->
+            addItemType(Item.TitleItem::class, MenuItemTitleBinding::inflate) { item, b, _ ->
                 b.title.text = item.title
                 if (item.title == null) {
                     b.title.visibility = View.GONE
                 }
             }
-            addItemType(Item.MenuItemItem::class, MenuItemBinding::inflate) { item, b, h ->
+            addItemType(Item.MenuItemItem::class, MenuItemBinding::inflate) { item, b, _ ->
                 val menuItem = item.menuItem
                 b.title.text = menuItem.title
 

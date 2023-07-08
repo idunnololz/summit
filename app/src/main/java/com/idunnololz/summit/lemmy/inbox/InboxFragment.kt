@@ -297,20 +297,15 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 withContext(Dispatchers.Main) {
                     if (!isBindingAvailable()) return@withContext
 
-                    viewModel.currentAccountView?.let {
-                        binding.accountImageView.load(it.profileImage)
-                    }
-
                     viewModel.pageIndex = 0
                     viewModel.fetchInbox()
                 }
             }
         }
 
-        viewModel.currentAccountView?.let {
-            binding.accountImageView.load(it.profileImage)
+        viewModel.currentAccountView.observe(viewLifecycleOwner) {
+            binding.accountImageView.load(it?.profileImage)
         }
-
         viewModel.currentAccount.observe(viewLifecycleOwner) {
             adapter.accountId = it?.id
         }
@@ -343,7 +338,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
             viewModel.instance,
             viewLifecycleOwner,
             onImageClick = { url ->
-                getMainActivity()?.openImage(null, url, null)
+                getMainActivity()?.openImage(null, null, url, null)
             },
             onMarkAsRead = { inboxItem, read ->
                 markAsRead(inboxItem, read)

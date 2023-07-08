@@ -1,7 +1,7 @@
 package com.idunnololz.summit.main
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.ActivityOptions.makeSceneTransitionAnimation
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -14,10 +14,12 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
+import android.view.Window
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -49,7 +51,8 @@ import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.offline.OfflineFragment
 import com.idunnololz.summit.preferences.ThemeManager
-import com.idunnololz.summit.preview.ImageViewerFragment
+import com.idunnololz.summit.preview.ImageViewerActivity
+import com.idunnololz.summit.preview.ImageViewerActivityArgs
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedFragment
@@ -217,7 +220,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onResume() {
-        super.onStart()
+        super.onResume()
 
         viewModel.updateUnreadCount()
     }
@@ -321,10 +324,10 @@ class MainActivity : BaseActivity() {
                     leftMargin = leftInset
                     rightMargin = rightInset
                 }
+            binding.bottomNavigationView.updatePadding(bottom = bottomInset)
             binding.snackbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = binding.bottomNavigationView.height
             }
-            binding.bottomNavigationView.updatePadding(bottom = bottomInset)
 
             onStatusBarHeightChanged(topInset)
 
@@ -737,6 +740,23 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    fun insetViewAutomaticallyByPaddingAndNavUi(
+        lifecycleOwner: LifecycleOwner,
+        rootView: View,
+        additionalPaddingBottom: Int = 0,
+    ) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = lastInsets
+
+            rootView.setPadding(
+                insets.leftInset,
+                insets.topInset,
+                insets.rightInset,
+                getBottomNavHeight() + additionalPaddingBottom,
+            )
+        }
+    }
+
     fun insetViewExceptTopAutomaticallyByPaddingAndNavUi(
         lifecycleOwner: LifecycleOwner,
         rootView: View,
@@ -749,7 +769,7 @@ class MainActivity : BaseActivity() {
                 insets.leftInset,
                 0,
                 insets.rightInset,
-                insets.bottomInset + getBottomNavHeight() + additionalPaddingBottom,
+                getBottomNavHeight() + additionalPaddingBottom,
             )
         }
     }
@@ -819,7 +839,7 @@ class MainActivity : BaseActivity() {
                 hideBottomNav(animate)
                 hideNotificationBarBg()
             }
-            ImageViewerFragment::class -> {
+            ImageViewerActivity::class -> {
                 showActionBar()
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
@@ -892,12 +912,32 @@ class MainActivity : BaseActivity() {
     }
 
     fun openImage(
+        sharedElement: View?,
         title: String?,
         url: String,
         mimeType: String?,
     ) {
-        val direction = MainDirections.actionGlobalImageViewerFragment(title, url, mimeType)
-        currentNavController?.navigateSafe(direction)
+//        val direction = MainDirections.actionGlobalImageViewerFragment(title, url, mimeType)
+//        currentNavController?.navigateSafe(direction)
+//
+
+        val transitionName = sharedElement?.transitionName
+
+        val intent = Intent(this, ImageViewerActivity::class.java).apply {
+            putExtras(ImageViewerActivityArgs(title, url, mimeType, transitionName).toBundle())
+        }
+
+        if (transitionName != null) {
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this,
+                androidx.core.util.Pair.create(sharedElement, transitionName),
+                androidx.core.util.Pair.create(binding.bottomNavigationView, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME),
+            )
+            startActivity(intent, options.toBundle())
+//            startActivity(intent)
+        } else {
+            startActivity(intent)
+        }
     }
 
     fun openVideo(

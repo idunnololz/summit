@@ -17,6 +17,7 @@ import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.OfflineScheduleManager
+import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -32,6 +33,9 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var themeManager: ThemeManager
 
     companion object {
         private val TAG = MainApplication::class.java.simpleName

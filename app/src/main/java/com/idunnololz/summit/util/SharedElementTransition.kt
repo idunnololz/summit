@@ -1,6 +1,11 @@
 package com.idunnololz.summit.util
 
-import androidx.transition.*
+import android.transition.ChangeBounds
+import android.transition.ChangeClipBounds
+import android.transition.ChangeImageTransform
+import android.transition.ChangeTransform
+import android.transition.TransitionSet
+
 
 class SharedElementTransition : TransitionSet() {
     init {
@@ -9,7 +14,7 @@ class SharedElementTransition : TransitionSet() {
             .addTransition(ChangeTransform())
             .addTransition(ChangeImageTransform())
             .addTransition(ChangeClipBounds())
-            .addTransition(TextSizeTransition())
-            .setDuration(300)
+//            .addTransition(TextSizeTransition())
+            .setDuration(250)
     }
 }
