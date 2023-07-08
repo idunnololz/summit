@@ -15,7 +15,6 @@
             android:id="@+id/motion_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipChildren="false"
             android:clipToPadding="false"
             android:background="@android:color/transparent">
 
@@ -58,6 +57,15 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"/>
         </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="bottom"
+            android:background="?colorSurface"
+            app:menu="@menu/bottom_navigation_menu"
+            app:labelVisibilityMode="labeled" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

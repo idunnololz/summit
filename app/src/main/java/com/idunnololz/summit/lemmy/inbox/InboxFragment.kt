@@ -338,7 +338,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
             viewModel.instance,
             viewLifecycleOwner,
             onImageClick = { url ->
-                getMainActivity()?.openImage(null, null, url, null)
+                getMainActivity()?.openImage(null, binding.appBar, null, url, null)
             },
             onMarkAsRead = { inboxItem, read ->
                 markAsRead(inboxItem, read)

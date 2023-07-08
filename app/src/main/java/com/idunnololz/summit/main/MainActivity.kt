@@ -198,6 +198,14 @@ class MainActivity : BaseActivity() {
                     }
                 }
             }
+
+            lifecycleScope.launch(Dispatchers.Default) {
+                themeManager.themeOverlayChanged.collect {
+                    withContext(Dispatchers.Main) {
+                        recreate()
+                    }
+                }
+            }
         }
 
         // Set up an OnPreDrawListener to the root view.
@@ -913,14 +921,11 @@ class MainActivity : BaseActivity() {
 
     fun openImage(
         sharedElement: View?,
+        appBar: View?,
         title: String?,
         url: String,
         mimeType: String?,
     ) {
-//        val direction = MainDirections.actionGlobalImageViewerFragment(title, url, mimeType)
-//        currentNavController?.navigateSafe(direction)
-//
-
         val transitionName = sharedElement?.transitionName
 
         val intent = Intent(this, ImageViewerActivity::class.java).apply {
@@ -931,6 +936,7 @@ class MainActivity : BaseActivity() {
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this,
                 androidx.core.util.Pair.create(sharedElement, transitionName),
+                androidx.core.util.Pair.create(appBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME),
                 androidx.core.util.Pair.create(binding.bottomNavigationView, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME),
             )
             startActivity(intent, options.toBundle())

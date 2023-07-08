@@ -272,7 +272,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         .createAndShow(childFragmentManager, "onInstanceMismatch")
                 },
                 onImageClick = { sharedElementView, url ->
-                    getMainActivity()?.openImage(sharedElementView, null, url, null)
+                    getMainActivity()?.openImage(sharedElementView, binding.customAppBar, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
@@ -904,7 +904,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         } else {
             binding.recyclerView.addItemDecoration(
                 VerticalSpaceItemDecoration(
-                    recyclerView.context.getDimen(R.dimen.padding_half),
+                    recyclerView.context.getDimen(R.dimen.padding),
                     false
                 )
             )

@@ -15,6 +15,6 @@ class SharedElementTransition : TransitionSet() {
             .addTransition(ChangeImageTransform())
             .addTransition(ChangeClipBounds())
 //            .addTransition(TextSizeTransition())
-            .setDuration(250)
+            .setDuration(220)
     }
 }

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             app:scrimVisibleHeightTrigger="0dp"
             app:titleEnabled="false"
-            app:contentScrim="?attr/colorToolbar"
+            app:contentScrim="?android:colorBackground"
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,8 +46,7 @@
         <com.google.android.material.search.SearchBar
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorToolbar"/>
+            android:layout_height="wrap_content"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout

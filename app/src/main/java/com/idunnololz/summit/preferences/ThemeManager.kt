@@ -9,6 +9,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.isLightTheme
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,6 +24,7 @@ class ThemeManager @Inject constructor(
     private val coroutineScope = coroutineScopeFactory.create()
 
     val useMaterialYou = MutableStateFlow<Boolean>(preferences.isUseMaterialYou())
+    val themeOverlayChanged = MutableSharedFlow<Unit>()
 
     fun applyThemeFromPreferences() {
         val themeValue = when (preferences.getBaseTheme()) {
@@ -40,12 +42,18 @@ class ThemeManager @Inject constructor(
         }
     }
 
+    fun onThemeOverlayChanged() {
+        coroutineScope.launch {
+            themeOverlayChanged.emit(Unit)
+        }
+    }
+
     fun applyThemeForActivity(activity: BaseActivity) {
         if (preferences.isBlackTheme()) {
             if (activity.isLightTheme()) {
                 activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
             }
-        } else if (activity.isLightTheme()) {
+        } else {
             activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
         }
 

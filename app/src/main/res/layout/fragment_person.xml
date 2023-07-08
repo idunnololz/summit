@@ -18,7 +18,6 @@
             android:layout_height="wrap_content"
             app:scrimVisibleHeightTrigger="0dp"
             app:titleEnabled="false"
-            app:contentScrim="?attr/colorToolbar"
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -83,7 +82,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorToolbar"
                 app:contentInsetStart="0dp"
                 app:contentInsetStartWithNavigation="0dp"
                 app:layout_collapseMode="pin"/>
@@ -94,7 +92,6 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorToolbar"
             app:tabMode="scrollable"/>
     </com.google.android.material.appbar.AppBarLayout>
 

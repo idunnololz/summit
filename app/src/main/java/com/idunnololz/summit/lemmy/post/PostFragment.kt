@@ -252,7 +252,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
                 },
                 onImageClick = { view, url ->
-                    getMainActivity()?.openImage(view, null, url, null)
+                    getMainActivity()?.openImage(view, binding.appBar, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
