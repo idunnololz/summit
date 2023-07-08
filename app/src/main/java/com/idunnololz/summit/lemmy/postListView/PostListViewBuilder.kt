@@ -241,11 +241,12 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                 }
+                image.transitionName = "image_$absoluteAdapterPosition"
                 image.setOnClickListener {
                     if (fullContentContainerView != null) {
                         toggleItem(absoluteAdapterPosition, postView)
                     } else {
-                        onImageClick(null, url)
+                        onImageClick(image, url)
                     }
                 }
             }

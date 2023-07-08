@@ -125,6 +125,7 @@ class LemmyAppBarController(
 
             accountImageView.tag = it.account
             accountImageView.load(it.profileImage) {
+                allowHardware(false)
                 placeholder(R.drawable.baseline_person_24)
             }
         }

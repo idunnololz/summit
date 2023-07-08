@@ -111,6 +111,9 @@ class ImageViewerActivity : BaseActivity() {
 
         setupActionBar("", true)
 
+        binding.appBar.transitionName = Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME
+        binding.bottomNavigationView.transitionName = Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { _, insets ->
             val insetsCompat = WindowInsetsCompat(insets)
             val insetsSystemBars = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -144,13 +147,13 @@ class ImageViewerActivity : BaseActivity() {
 
 
         window.enterTransition = Fade(Fade.IN).apply {
-            duration = 250
+            duration = 220
         }
         window.exitTransition = Fade(Fade.OUT).apply {
-            duration = 250
+            duration = 220
         }
         window.returnTransition = Fade(Fade.OUT).apply {
-            duration = 250
+            duration = 220
         }
         window.sharedElementEnterTransition = SharedElementTransition()
         window.sharedElementReturnTransition = SharedElementTransition()
@@ -182,6 +185,16 @@ class ImageViewerActivity : BaseActivity() {
             }
         })
 
+        if (args.transitionName == null) {
+            binding.dummyImageView.post {
+                binding.dummyImageView.transitionName = null
+                binding.imageView.transitionName = args.transitionName
+
+                binding.dummyImageView.visibility = View.GONE
+                binding.imageView.visibility = View.VISIBLE
+            }
+        }
+
         binding.toolbar.setNavigationOnClickListener {
             supportFinishAfterTransition()
         }
@@ -201,9 +214,9 @@ class ImageViewerActivity : BaseActivity() {
 
         loadImage(args.url)
 
-        binding.imageView.post {
+        binding.imageView.postDelayed( {
             startPostponedEnterTransition()
-        }
+        }, 50)
 
         viewModel.downloadResult.observe(this) {
             when (it) {
@@ -461,6 +474,7 @@ class ImageViewerActivity : BaseActivity() {
 
             val request = ImageRequest.Builder(binding.imageView.context)
                 .data(it)
+                .allowHardware(false)
                 .target(object : Target {
                     override fun onError(error: Drawable?) {
                         super.onError(error)
@@ -474,6 +488,8 @@ class ImageViewerActivity : BaseActivity() {
                     override fun onSuccess(result: Drawable) {
                         super.onSuccess(result)
 
+
+                        startPostponedEnterTransition()
                         binding.loadingView.hideAll()
 
                         binding.imageView.setImageDrawable(result)

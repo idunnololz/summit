@@ -140,6 +140,20 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     }
                 }
             )
+
+            OnOffSettingItem(
+                R.id.use_black_theme,
+                getString(R.string.black_theme),
+                getString(R.string.black_theme_desc),
+                false,
+            ).bindTo(
+                binding.useBlackTheme,
+                { preferences.isBlackTheme() },
+                {
+                    preferences.setUseBlackTheme(it)
+                    themeManager.onThemeOverlayChanged()
+                }
+            )
         }
     }
 }
