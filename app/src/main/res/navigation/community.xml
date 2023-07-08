@@ -29,9 +29,6 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
         <action
-            android:id="@+id/action_mainFragment_to_imageViewerFragment"
-            app:destination="@id/imageViewerFragment" />
-        <action
             android:id="@+id/action_subredditFragment_self"
             app:destination="@id/communityFragment"
             app:launchSingleTop="true" />
@@ -79,9 +76,6 @@
             android:defaultValue="false"
             app:argType="boolean"/>
         <action
-            android:id="@+id/action_postFragment_to_imageViewerFragment"
-            app:destination="@id/imageViewerFragment" />
-        <action
             android:id="@+id/action_postFragment_to_subredditFragment"
             app:destination="@id/communityFragment" />
         <action
@@ -91,10 +85,6 @@
             android:id="@+id/action_postFragment_to_login"
             app:destination="@id/login" />
     </fragment>
-    <dialog
-        android:id="@+id/goToDialogFragment"
-        android:name="com.idunnololz.summit.go_to.GoToDialogFragment"
-        android:label="GoToDialogFragment" />
     <dialog
         android:id="@+id/commentRawDialogFragment"
         android:name="com.idunnololz.summit.comment.CommentRawDialogFragment"

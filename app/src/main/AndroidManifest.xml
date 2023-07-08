@@ -25,7 +25,7 @@
             android:name=".main.MainActivity"
             android:theme="@style/Theme.App.Splash"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustNothing">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,6 +54,12 @@
                 <data android:host="szmer.info" />
             </intent-filter>
         </activity>
+        <activity
+            android:configChanges="layoutDirection|locale"
+            android:name=".preview.ImageViewerActivity"
+            android:theme="@style/Theme.App.Transparent"
+            android:parentActivityName=".main.MainActivity"
+            android:exported="false"/>
 
         <service
             android:name=".offline.OfflineService"

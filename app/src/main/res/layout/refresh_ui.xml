@@ -36,7 +36,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/padding_half"
-        android:layout_marginRight="@dimen/padding_half"
         android:visibility="gone"
         app:layout_constraintVertical_bias="0"
         app:layout_constraintTop_toTopOf="@+id/_positive_button"
@@ -47,7 +46,6 @@
 
     <Button
         android:id="@+id/_positive_button"
-        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"

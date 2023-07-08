@@ -174,8 +174,9 @@ class AccountAwareLemmyClient @Inject constructor(
         instance: String,
         username: String,
         password: String,
+        twoFactorCode: String?,
     ): Result<String?> =
-        apiClient.login(instance, username, password)
+        apiClient.login(instance, username, password, twoFactorCode)
 
     suspend fun fetchSiteWithRetry(
         force: Boolean,

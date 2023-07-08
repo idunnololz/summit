@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -15,14 +14,14 @@
             android:id="@+id/custom_app_bar"
             android:animateLayoutChanges="true"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent">
+            android:layout_width="match_parent"
+            android:background="?backgroundColor">
 
             <!-- Scrollflags set programatically -->
             <FrameLayout
                 android:id="@+id/customActionBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/appBarBackground"
                 app:layout_scrollFlags="scroll|enterAlways">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -178,7 +177,7 @@
         android:id="@+id/post_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorBackground">
+        android:background="?backgroundColor">
     </androidx.fragment.app.FragmentContainerView>
 
 </com.idunnololz.summit.util.CustomScrollViewPager>

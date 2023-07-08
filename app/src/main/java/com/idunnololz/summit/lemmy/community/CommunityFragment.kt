@@ -271,8 +271,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         .setNegativeButton(R.string.go_to_account_instance)
                         .createAndShow(childFragmentManager, "onInstanceMismatch")
                 },
-                onImageClick = { url ->
-                    getMainActivity()?.openImage(null, url, null)
+                onImageClick = { sharedElementView, url ->
+                    getMainActivity()?.openImage(sharedElementView, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
@@ -387,7 +387,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
 
         view.doOnPreDraw {
-            adapter?.contentMaxWidth = binding.recyclerView.width
+            adapter?.contentMaxWidth = binding.recyclerView.measuredWidth
         }
 
         runOnReady {
@@ -501,7 +501,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
         })
 
-        scheduleStartPostponedTransition(binding.rootView)
+        binding.rootView.post {
+            scheduleStartPostponedTransition(binding.rootView)
+        }
 
         viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
             when (it) {
@@ -961,7 +963,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         private val onPrevClick: () -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
-        private val onImageClick: (String) -> Unit,
+        private val onImageClick: (View?, String) -> Unit,
         private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onItemClick: (

@@ -321,6 +321,7 @@ class LemmyApiClient @Inject constructor(
         instance: String,
         username: String,
         password: String,
+        twoFactorCode: String?,
     ): Result<String?> {
         val originalInstance = this.instance
 
@@ -330,7 +331,7 @@ class LemmyApiClient @Inject constructor(
             return Result.failure(e)
         }
 
-        val form = Login(username, password)
+        val form = Login(username, password, twoFactorCode)
 
         return retrofitErrorHandler { api.login(form = form) }
             .fold(

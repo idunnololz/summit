@@ -88,7 +88,7 @@ class PostListViewBuilder @Inject constructor(
         highlight: Boolean,
         highlightForever: Boolean,
         onRevealContentClickedFn: () -> Unit,
-        onImageClick: (String) -> Unit,
+        onImageClick: (sharedElementView: View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onItemClick: (
@@ -245,7 +245,7 @@ class PostListViewBuilder @Inject constructor(
                     if (fullContentContainerView != null) {
                         toggleItem(absoluteAdapterPosition, postView)
                     } else {
-                        onImageClick(url)
+                        onImageClick(null, url)
                     }
                 }
             }
@@ -268,15 +268,17 @@ class PostListViewBuilder @Inject constructor(
                             - Utils.convertDpToPixel(16f)
                             ).toInt(),
                     contentMaxWidth = contentMaxWidth,
-                    fullImageViewTransitionName = "full_image_$position",
+                    fullImageViewTransitionName = "full_image_$absoluteAdapterPosition",
                     postView = postView,
                     instance = instance,
                     rootView = itemView,
                     fullContentContainerView = fullContentContainerView,
                     onFullImageViewClickListener = { v, url ->
-                        onImageClick(url)
+                        onImageClick(v, url)
                     },
-                    onImageClickListener = onImageClick,
+                    onImageClickListener = {
+                        onImageClick(null, it)
+                    },
                     onVideoClickListener = onVideoClick,
                     onItemClickListener = {
                         onItemClick()

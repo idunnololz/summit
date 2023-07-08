@@ -117,6 +117,14 @@ class Preferences @Inject constructor(
         prefs.edit().putBoolean(PreferenceUtil.KEY_USE_MATERIAL_YOU, b).apply()
     }
 
+    fun isBlackTheme(): Boolean {
+        return prefs.getBoolean(PreferenceUtil.KEY_USE_BLACK_THEME, false)
+    }
+
+    fun setUseBlackTheme(b: Boolean) {
+        prefs.edit().putBoolean(PreferenceUtil.KEY_USE_BLACK_THEME, b).apply()
+    }
+
     private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
         return try {
             val json = this.getString(key, null)

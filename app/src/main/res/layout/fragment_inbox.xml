@@ -118,7 +118,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorBackground">
+        android:background="?backgroundColor">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"
@@ -130,7 +130,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorToolbar"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:contentInsetStart="0dp"
                 app:contentInsetStartWithNavigation="0dp"

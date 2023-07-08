@@ -118,7 +118,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             inboxItem.title,
             args.instance,
             onImageClick = { url ->
-                getMainActivity()?.openImage(null, url, null)
+                getMainActivity()?.openImage(null, null, url, null)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -129,7 +129,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             inboxItem.content,
             args.instance,
             onImageClick = { url ->
-                getMainActivity()?.openImage(null, url, null)
+                getMainActivity()?.openImage(null, null, url, null)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -408,8 +408,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         )
 
                 },
-                onImageClick = { url ->
-                    getMainActivity()?.openImage(null, url, null)
+                onImageClick = { view, url ->
+                    getMainActivity()?.openImage(view, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)

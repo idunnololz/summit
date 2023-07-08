@@ -11,11 +11,13 @@ import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -98,10 +100,24 @@ class AccountInfoManager @Inject constructor(
         }
     }
 
-    fun getAccountViewForAccount(account: Account) =
-        AccountView(
+    fun getCurrentAccountView(): AccountView? =
+        accountManager.currentAccount.value?.let {
+            currentAccountInfo?.toAccountView(it)
+        }
+
+    suspend fun getAccountViewForAccount(account: Account): AccountView {
+        val accountInfo =
+            if (currentAccountInfo?.accountId == account.id) {
+                currentAccountInfo
+            } else {
+                withContext(Dispatchers.IO) {
+                    accountInfoDao.getAccountInfo(account.id)
+                }
+            }
+
+        return AccountView(
             account = account,
-            profileImage = currentAccountInfo?.miscAccountInfo?.avatar?.let {
+            profileImage = accountInfo?.miscAccountInfo?.avatar?.let {
                 try {
                     Uri.parse(it)
                 } catch (e: Exception) {
@@ -109,6 +125,7 @@ class AccountInfoManager @Inject constructor(
                 }
             } ?: Uri.fromFile(getImageForAccount(account))
         )
+    }
 
     fun getImageForAccount(account: Account): File {
         return accountImageGenerator.getOrGenerateImageForAccount(accountDir, account)
@@ -160,6 +177,23 @@ class AccountInfoManager @Inject constructor(
         currentAccountInfo = accountInfo
 
         subscribedCommunities.emit(accountInfo?.subscriptions ?: listOf())
+    }
+
+    private fun AccountInfo.toAccountView(account: Account): AccountView? {
+        if (this.accountId != account.id) {
+            return null
+        }
+
+        return AccountView(
+            account = account,
+            profileImage = this.miscAccountInfo?.avatar?.let {
+                try {
+                    Uri.parse(it)
+                } catch (e: Exception) {
+                    null
+                }
+            } ?: Uri.fromFile(getImageForAccount(account))
+        )
     }
 
     data class UnreadCount(

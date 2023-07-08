@@ -8,7 +8,11 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
+import com.idunnololz.summit.preferences.ThemeManager
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -61,6 +65,8 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as MainApplication).themeManager.applyThemeForActivity(this)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val key = getString(R.string.pref_key_navigation_bar_color)
             if (PreferenceUtil.preferences.contains(key)) {

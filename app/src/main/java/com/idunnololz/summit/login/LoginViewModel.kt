@@ -1,6 +1,7 @@
 package com.idunnololz.summit.login
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
@@ -25,16 +26,26 @@ class LoginViewModel @Inject constructor(
     }
 
     val accountLiveData = StatefulLiveData<Account>()
+    val state = MutableLiveData<State>(State.Login)
 
-    fun login(instance: String, username: String, password: String) {
+    fun login(instance: String, username: String, password: String, twoFactorCode: String?) {
         accountLiveData.setIsLoading()
 
         viewModelScope.launch {
             val result = apiClient.login(
                 instance,
                 username,
-                password
+                password,
+                twoFactorCode,
             )
+
+            if (result.exceptionOrNull()?.message?.contains("totp", ignoreCase = true) ==
+                true) {
+
+                // user has 2fa enabled
+                state.postValue(State.TwoFactorAuth(instance, username, password))
+                return@launch
+            }
 
             if (result.isFailure) {
                 Log.e(TAG, "", result.exceptionOrNull())
@@ -81,5 +92,39 @@ class LoginViewModel @Inject constructor(
             accountLiveData.postValue(account)
 
         }
+    }
+
+    fun login2fa(twoFactorCode: String) {
+        val currentState = state.value
+        if (currentState is State.TwoFactorAuth) {
+            login(
+                currentState.instance,
+                currentState.username,
+                currentState.password,
+                twoFactorCode
+            )
+        }
+    }
+
+    fun onBackPress() {
+        when (state.value) {
+            State.Login -> {
+                // shouldnt happen
+            }
+            is State.TwoFactorAuth -> {
+                state.value = State.Login
+            }
+            null -> {}
+        }
+    }
+
+    sealed interface State {
+        object Login : State
+
+        data class TwoFactorAuth(
+            val instance: String,
+            val username: String,
+            val password: String,
+        ) : State
     }
 }

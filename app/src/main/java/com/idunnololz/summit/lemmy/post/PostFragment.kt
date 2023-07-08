@@ -251,8 +251,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         )
 
                 },
-                onImageClick = { url ->
-                    getMainActivity()?.openImage(null, url, null)
+                onImageClick = { view, url ->
+                    getMainActivity()?.openImage(view, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
@@ -274,9 +274,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         binding.recyclerView.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
             override fun onPreDraw(): Boolean {
-                binding.recyclerView.viewTreeObserver.removeOnPreDrawListener(this)
-
                 if (isBindingAvailable()) {
+                    binding.recyclerView.viewTreeObserver.removeOnPreDrawListener(this)
+
                     adapter?.contentMaxWidth = binding.recyclerView.width
 
                     setup()

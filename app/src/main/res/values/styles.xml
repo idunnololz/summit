@@ -6,6 +6,7 @@
         <item name="windowSplashScreenAnimationDuration">300</item>
         <item name="postSplashScreenTheme">@style/Theme.App</item>
 
+        <item name="backgroundColor">@color/colorBackground</item>
         <item name="android:statusBarColor">@color/googleBackground</item>
         <item name="android:navigationBarColor">@color/googleBackground</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
@@ -32,6 +33,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <!-- Customize your theme here. -->
+        <item name="backgroundColor">@color/colorBackground</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
@@ -79,6 +81,42 @@
 
         <item name="materialCardViewStyle">@style/MyApp.Widget.Material3.CardView</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+
+    <style name="OverlayThemeRegular">
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="backgroundColor">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
+        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+    </style>
+
+    <style name="Theme.App.Transparent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
     <style name="Theme.App.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">
@@ -161,7 +199,7 @@
     </style>
 
     <style name="MyApp.Widget.MaterialComponents.AppBarLayout.Primary" parent="Widget.MaterialComponents.AppBarLayout.Primary">
-        <item name="android:background">@color/appBarBackground</item>
+        <item name="android:background">?backgroundColor</item>
     </style>
 
     <style name="MyApp.Widget.MaterialComponents.Button.TextButton.Icon" parent="Widget.MaterialComponents.Button.TextButton.Icon">

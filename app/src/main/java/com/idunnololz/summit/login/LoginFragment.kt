@@ -1,11 +1,13 @@
 package com.idunnololz.summit.login
 
 import android.os.Bundle
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -23,6 +25,12 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
     private val viewModel: LoginViewModel by viewModels()
 
+    private val onBackPressedHandler = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            viewModel.onBackPress()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,8 +47,44 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         requireMainActivity().apply {
-            insetViewAutomaticallyByMargins(viewLifecycleOwner, view)
+            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, view)
             setupForFragment<LoginFragment>()
+        }
+
+        viewModel.state.observe(viewLifecycleOwner) {
+            TransitionManager.beginDelayedTransition(binding.root)
+            when (it) {
+                LoginViewModel.State.Login -> {
+                    binding.title.visibility = View.VISIBLE
+                    binding.instance.visibility = View.VISIBLE
+                    binding.username.visibility = View.VISIBLE
+                    binding.password.visibility = View.VISIBLE
+
+                    binding.title2fa.visibility = View.GONE
+                    binding.body2fa.visibility = View.GONE
+                    binding.twoFactorInput.visibility = View.GONE
+
+                    onBackPressedHandler.remove()
+                    updateLoginButtonState()
+                }
+                is LoginViewModel.State.TwoFactorAuth -> {
+                    binding.title.visibility = View.GONE
+                    binding.instance.visibility = View.GONE
+                    binding.username.visibility = View.GONE
+                    binding.password.visibility = View.GONE
+
+                    binding.title2fa.visibility = View.VISIBLE
+                    binding.body2fa.visibility = View.VISIBLE
+                    binding.twoFactorInput.visibility = View.VISIBLE
+
+                    hideProgressBar()
+                    enableAllFields()
+
+                    updateLoginButtonState()
+                    requireActivity().onBackPressedDispatcher.addCallback(
+                        viewLifecycleOwner, onBackPressedHandler)
+                }
+            }
         }
 
         viewModel.accountLiveData.observe(viewLifecycleOwner) {
@@ -97,16 +141,33 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
             password.editText?.doOnTextChanged { text, start, before, count ->
                 updateLoginButtonState()
             }
+            twoFactorInput.editText?.doOnTextChanged { text, start, before, count ->
+                updateLoginButtonState()
+            }
             login.setOnClickListener {
-                val instance = instance.editText?.text?.toString() ?: return@setOnClickListener
-                val username = username.editText?.text?.toString() ?: return@setOnClickListener
-                val password = password.editText?.text?.toString() ?: return@setOnClickListener
+                when (viewModel.state.value) {
+                    LoginViewModel.State.Login -> {
+                        val instance = instance.editText?.text?.toString()
+                            ?: return@setOnClickListener
+                        val username = username.editText?.text?.toString()
+                            ?: return@setOnClickListener
+                        val password = password.editText?.text?.toString()
+                            ?: return@setOnClickListener
 
-                viewModel.login(
-                    instance = instance,
-                    username = username,
-                    password = password,
-                )
+                        viewModel.login(
+                            instance = instance,
+                            username = username,
+                            password = password,
+                            twoFactorCode = null,
+                        )
+                    }
+                    is LoginViewModel.State.TwoFactorAuth -> {
+                        val twoFactorCode = twoFactorInput.editText?.text?.toString()
+                            ?: return@setOnClickListener
+                        viewModel.login2fa(twoFactorCode)
+                    }
+                    null -> {}
+                }
             }
             updateLoginButtonState()
         }
@@ -120,6 +181,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
             username.isEnabled = false
             password.isEnabled = false
             login.isEnabled = false
+
+            twoFactorInput.isEnabled = false
         }
     }
     private fun enableAllFields() {
@@ -127,16 +190,28 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
             instance.isEnabled = true
             username.isEnabled = true
             password.isEnabled = true
+
+            twoFactorInput.isEnabled = true
+
             updateLoginButtonState()
         }
     }
 
     private fun updateLoginButtonState() {
         with(binding) {
-            login.isEnabled =
-                !instance.editText?.text.isNullOrBlank() &&
-                        !username.editText?.text.isNullOrBlank() &&
-                        !password.editText?.text.isNullOrBlank()
+            when (viewModel.state.value) {
+                LoginViewModel.State.Login -> {
+                    login.isEnabled =
+                        !instance.editText?.text.isNullOrBlank() &&
+                                !username.editText?.text.isNullOrBlank() &&
+                                !password.editText?.text.isNullOrBlank()
+                }
+                is LoginViewModel.State.TwoFactorAuth -> {
+                    login.isEnabled =
+                        !twoFactorInput.editText?.text.isNullOrBlank()
+                }
+                null -> {}
+            }
         }
     }
 

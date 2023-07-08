@@ -4,7 +4,7 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground">
+    android:background="?backgroundColor">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/contentView"
@@ -31,21 +31,6 @@
 
                     app:defaultNavHost="true"
                     app:navGraph="@navigation/main"/>
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fab"
-                    android:layout_gravity="bottom|end"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:visibility="gone"
-                    android:layout_marginBottom="@dimen/action_button_margin"
-                    android:layout_marginRight="@dimen/action_button_margin"
-                    android:layout_marginEnd="@dimen/action_button_margin"
-                    app:elevation="6dp"
-                    app:backgroundTint="?attr/colorPrimary"
-                    app:rippleColor="@color/colorOnPrimary"
-                    app:fabSize="normal"
-                    app:tint="?attr/colorOnPrimary" />
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </LinearLayout>
 
@@ -75,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="@color/colorSurface"
+            android:background="?colorSurface"
             app:menu="@menu/bottom_navigation_menu"
             app:labelVisibilityMode="labeled" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
