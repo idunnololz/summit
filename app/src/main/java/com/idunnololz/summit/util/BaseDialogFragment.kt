@@ -84,7 +84,11 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         if (dialog != null) {
             val window = checkNotNull(dialog.window)
 
-            window.requestFeature(Window.FEATURE_NO_TITLE)
+            try {
+                window.requestFeature(Window.FEATURE_NO_TITLE)
+            } catch (e: Exception) {
+                // do nothing
+            }
         }
 
         return super.onCreateView(inflater, container, savedInstanceState)

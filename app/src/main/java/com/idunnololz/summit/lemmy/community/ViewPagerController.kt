@@ -111,7 +111,7 @@ class ViewPagerController(
                 ).toBundle()
             }
 
-        childFragmentManager.commitNow {
+        childFragmentManager.commitNow(allowStateLoss = true) {
             replace(R.id.post_fragment_container, fragment)
         }
 

@@ -99,6 +99,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             findNavController().navigateSafe(directions)
                             true
                         }
+                        mainSettings.settingHistory.id -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingHistoryFragment()
+                            findNavController().navigateSafe(directions)
+                            true
+                        }
                         mainSettings.settingCache.id -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingCacheFragment()

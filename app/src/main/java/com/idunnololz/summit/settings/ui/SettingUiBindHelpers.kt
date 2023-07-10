@@ -127,9 +127,8 @@ fun RadioGroupSettingItem.bindTo(
             b.desc.visibility = View.GONE
         }
 
-        b.radioButton.setOnCheckedChangeListener { compoundButton, b ->
-            Log.d("HAHA", "getCurrentValue(): ${getCurrentValue()}, id: ${option.id}")
-            if (b && getCurrentValue() != option.id) {
+        b.radioButton.setOnCheckedChangeListener { _, value ->
+            if (value && getCurrentValue() != option.id) {
                 onValueChanged(option.id)
             }
             updateChecked()

@@ -12,6 +12,7 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -85,6 +86,8 @@ class CommunityViewModel @Inject constructor(
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
     val currentAccount = MutableLiveData<AccountView?>(null)
 
+    var isHideReadEnabled = false
+
     init {
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
@@ -126,6 +129,8 @@ class CommunityViewModel @Inject constructor(
             accountInfoManager.currentFullAccount.collect {
                 if (it != null) {
                     val accountView = accountInfoManager.getAccountViewForAccount(it.account)
+
+                    isHideReadEnabled = !(it.accountInfo.miscAccountInfo?.showReadPosts ?: true)
 
                     currentAccount.postValue(accountView)
                 }
@@ -321,8 +326,33 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun onPostRead(postView: PostView) {
+        if (postView.read) {
+            return
+        }
+
         viewModelScope.launch {
             accountActionsManager.markPostAsRead(instance, postView.post.id, read = true)
+        }
+    }
+
+    fun onHideRead() {
+        val loadedPostData = loadedPostsData.valueOrNull
+        loadedPostsData.setIsLoading()
+
+        viewModelScope.launch {
+            val anchorPosts = mutableListOf<PostId>()
+            loadedPostData?.posts
+                ?.filter { !it.read }
+                ?.mapTo(anchorPosts) { it.post.id }
+
+            postsRepository.hideReadPosts(anchorPosts, currentPageIndex.value ?: 0)
+                .onSuccess {
+                    fetchPage(it.pageIndex)
+//                    setPagePositionAtTop(it.pageIndex)
+                }
+                .onFailure {
+                    loadedPostsData.postError(it)
+                }
         }
     }
 }

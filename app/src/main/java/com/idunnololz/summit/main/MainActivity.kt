@@ -926,10 +926,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun showBottomMenu(bottomMenu: BottomMenu) {
+    fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean = true) {
         currentBottomMenu?.close()
         bottomMenu.setInsets(lastInsets.topInset, lastInsets.bottomInset)
-        bottomMenu.show(this, binding.bottomSheetContainer)
+        bottomMenu.show(this, binding.bottomSheetContainer, expandFully)
         currentBottomMenu = bottomMenu
     }
 

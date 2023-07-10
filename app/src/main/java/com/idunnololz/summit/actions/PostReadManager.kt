@@ -1,5 +1,7 @@
 package com.idunnololz.summit.actions
 
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -11,7 +13,8 @@ import javax.inject.Singleton
 
 @Singleton
 class PostReadManager @Inject constructor(
-    private val coroutineScopeFactory: CoroutineScopeFactory
+    private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val accountManager: AccountManager,
 ) {
 
     companion object {
@@ -25,6 +28,15 @@ class PostReadManager @Inject constructor(
     private val readPosts = object : LinkedHashMap<String, Boolean>() {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Boolean>?): Boolean {
             return size > MAX_READ_POST_LIMIT
+        }
+    }
+
+    init {
+        coroutineScope.launch {
+            accountManager.currentAccountOnChange.collect {
+                readPosts.clear()
+                postReadChanged.emit(Unit)
+            }
         }
     }
 
