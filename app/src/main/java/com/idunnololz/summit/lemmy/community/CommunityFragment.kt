@@ -784,7 +784,15 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         startActivity(shareIntent)
                     }
                     R.id.clear_read -> {
-                        viewModel.onHideRead()
+                        val anchors = mutableSetOf<Int>()
+                        val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+                            it.findFirstCompletelyVisibleItemPosition()..
+                            it.findLastCompletelyVisibleItemPosition()
+                        }
+                        range?.mapNotNullTo(anchors) {
+                            (adapter?.getItems()?.getOrNull(it) as? Item.PostItem)?.postView?.post?.id
+                        }
+                        viewModel.onHideRead(anchors)
                     }
 
                     R.id.sort -> {
