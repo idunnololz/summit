@@ -24,6 +24,7 @@ import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -69,7 +70,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
     @Inject
-    lateinit var accountManager: AccountManager
+    lateinit var accountInfoManager: AccountInfoManager
 
     private var adapter: InboxItemAdapter? = null
 
@@ -170,8 +171,8 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         }
 
         binding.loadingView.setOnRefreshClickListener {
-            if (accountManager.currentAccount.value == null) {
-                (parentFragment as InboxTabbedFragment).showLogin()
+            if (accountInfoManager.currentFullAccount.value == null) {
+                parentFragment.showLogin()
             } else {
                 refresh()
             }
@@ -293,7 +294,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            accountManager.currentAccountOnChange.collect {
+            accountInfoManager.currentFullAccountOnChange.collect {
                 withContext(Dispatchers.Main) {
                     if (!isBindingAvailable()) return@withContext
 
@@ -353,7 +354,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 (parentFragment as? InboxTabbedFragment)?.openMessage(it, viewModel.instance)
             },
             onAddCommentClick = { inboxItem ->
-                if (accountManager.currentAccount.value == null) {
+                if (accountInfoManager.currentFullAccount.value == null) {
                     PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                         .show(childFragmentManager, "asdf")
                     return@InboxItemAdapter

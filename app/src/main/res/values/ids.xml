@@ -33,11 +33,6 @@
     <item name="block_user" type="id"/>
     <item name="block_community" type="id"/>
 
-    <item name="setting_view_type" type="id"/>
-    <item name="setting_base_view_type" type="id"/>
-    <item name="setting_post_in_list_text_scaling" type="id"/>
-    <item name="setting_prefer_image_at_the_end" type="id"/>
-
 
     <item name="setting_theme" type="id"/>
     <item name="setting_base_theme" type="id"/>

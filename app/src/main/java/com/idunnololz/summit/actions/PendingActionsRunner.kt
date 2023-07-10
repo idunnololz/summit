@@ -13,6 +13,7 @@ import com.idunnololz.summit.actions.PendingActionsManager.ActionExecutionResult
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.api.dto.CommentView
@@ -195,6 +196,9 @@ class PendingActionsRunner @AssistedInject constructor(
                 is ApiException -> {
                     when (error) {
                         is ClientApiException -> {
+                            if (error is NotAuthenticatedException) {
+                                Failure(AccountNotFoundError(action.info?.accountId ?: 0))
+                            }
                             if (error.errorCode == 429) {
                                 if (RateLimitManager.isRateLimitHit()) {
                                     shouldDeleteAction = false
@@ -340,7 +344,27 @@ class PendingActionsRunner @AssistedInject constructor(
                     }
                 )
             }
-            else -> throw RuntimeException("Unknown action type ${action.info}")
+            is ActionInfo.MarkPostAsReadActionInfo -> {
+                if (account == null) {
+                    return Failure(AccountNotFoundError(actionInfo.accountId))
+                }
+
+                val result = apiClient.markPostAsRead(
+                    actionInfo.postRef.id,
+                    actionInfo.read,
+                    account,
+                )
+
+                return result.fold(
+                    onSuccess = {
+                        PendingActionsManager.ActionExecutionResult.Success(
+                            LemmyActionResult.MarkPostAsReadActionResult())
+                    },
+                    onFailure = {
+                        getResultForError(it)
+                    }
+                )
+            }
         }
     }
 

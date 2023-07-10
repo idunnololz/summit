@@ -13,8 +13,10 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PendingCommentsManager
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.actions.VotesManager
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
@@ -36,6 +38,7 @@ class AccountActionsManager @Inject constructor(
     private val accountManager: AccountManager,
     private val pendingActionsManager: PendingActionsManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val postReadManager: PostReadManager,
 ) {
 
     companion object {
@@ -182,6 +185,16 @@ class AccountActionsManager @Inject constructor(
                         onCommentActionChanged.emit(Unit)
                     }
                 }
+                is ActionInfo.MarkPostAsReadActionInfo -> {
+                    coroutineScope.launch {
+                        postReadManager.markPostAsReadLocal(
+                            action.info.postRef.instance,
+                            action.info.postRef.id,
+                            action.info.read,
+                        )
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
                 null -> {}
             }
         }
@@ -218,6 +231,15 @@ class AccountActionsManager @Inject constructor(
                 is ActionInfo.EditActionInfo -> {
                     coroutineScope.launch {
                         pendingCommentsManager.onEditCommentActionFailed(action.id, action.info, reason)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.MarkPostAsReadActionInfo -> {
+                    coroutineScope.launch {
+                        postReadManager.delete(
+                            action.info.postRef.instance,
+                            action.info.postRef.id,
+                        )
                         onCommentActionChanged.emit(Unit)
                     }
                 }
@@ -265,6 +287,16 @@ class AccountActionsManager @Inject constructor(
                 is ActionInfo.EditActionInfo -> {
                     coroutineScope.launch {
                         pendingCommentsManager.onEditCommentActionComplete(action.id, action.info)
+                        onCommentActionChanged.emit(Unit)
+                    }
+                }
+                is ActionInfo.MarkPostAsReadActionInfo -> {
+                    coroutineScope.launch {
+                        postReadManager.markPostAsReadLocal(
+                            action.info.postRef.instance,
+                            action.info.postRef.id,
+                            action.info.read,
+                        )
                         onCommentActionChanged.emit(Unit)
                     }
                 }
@@ -330,6 +362,15 @@ class AccountActionsManager @Inject constructor(
     ) {
         val account = accountManager.currentAccount.value ?: return
         voteOn(instance, ref, dir, account)
+    }
+
+    suspend fun markPostAsRead(instance: String, id: PostId, read: Boolean) {
+        val account = accountManager.currentAccount.value ?: return
+        pendingActionsManager.markPostAsRead(
+            PostRef(instance, id),
+            read,
+            account.id,
+        )
     }
 
     private fun registerVoteHandler(existingRegId: Long, ref: VotableRef, registration: Registration) {

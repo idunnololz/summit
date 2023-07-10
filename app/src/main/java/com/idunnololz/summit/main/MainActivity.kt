@@ -1,7 +1,6 @@
 package com.idunnololz.summit.main
 
 import android.annotation.SuppressLint
-import android.app.ActivityOptions.makeSceneTransitionAnimation
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -10,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
@@ -49,7 +47,7 @@ import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.login.LoginFragment
-import com.idunnololz.summit.offline.OfflineFragment
+import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
@@ -307,7 +305,7 @@ class MainActivity : BaseActivity() {
             Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
 
             // Move toolbar below status bar
-            binding.appBar.layoutParams = (binding.appBar.layoutParams as ViewGroup.MarginLayoutParams).apply {
+            binding.appBar.layoutParams = (binding.appBar.layoutParams as MarginLayoutParams).apply {
                 //topMargin = insets.systemWindowInsetTop
                 leftMargin = leftInset
                 rightMargin = rightInset
@@ -315,7 +313,7 @@ class MainActivity : BaseActivity() {
             binding.appBar.updatePadding(top = topInset)
 
             binding.bottomNavigationView.layoutParams =
-                (binding.bottomNavigationView.layoutParams as ViewGroup.MarginLayoutParams).apply {
+                (binding.bottomNavigationView.layoutParams as MarginLayoutParams).apply {
                     leftMargin = leftInset
                     rightMargin = rightInset
                 }
@@ -328,12 +326,12 @@ class MainActivity : BaseActivity() {
                 bottom = bottomInset
             }
             binding.bottomNavigationView.layoutParams =
-                (binding.bottomNavigationView.layoutParams as ViewGroup.MarginLayoutParams).apply {
+                (binding.bottomNavigationView.layoutParams as MarginLayoutParams).apply {
                     leftMargin = leftInset
                     rightMargin = rightInset
                 }
             binding.bottomNavigationView.updatePadding(bottom = bottomInset)
-            binding.snackbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            binding.snackbarContainer.updateLayoutParams<MarginLayoutParams> {
                 bottomMargin = binding.bottomNavigationView.height
             }
 
@@ -511,8 +509,11 @@ class MainActivity : BaseActivity() {
             override fun run() {
                 val navHostFragment =
                     supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-                            as NavHostFragment
-                val currentFragment = navHostFragment.childFragmentManager.fragments.getOrNull(0)
+                            as? NavHostFragment
+                val currentFragment = navHostFragment
+                    ?.childFragmentManager
+                    ?.fragments
+                    ?.getOrNull(0)
                 if (currentFragment is MainFragment) {
                     fn(currentFragment)
                 } else {
@@ -643,7 +644,7 @@ class MainActivity : BaseActivity() {
     private fun createOrGetSubredditSelectorController(): CommunitySelectorController =
         communitySelectorController
             ?: viewModel.communitySelectorControllerFactory.create(this).also {
-                it.inflate(this, binding.overlayContainer)
+                it.inflate(binding.overlayContainer)
                 it.setCommunities(viewModel.communities.value)
 
                 communitySelectorController = it
@@ -656,7 +657,7 @@ class MainActivity : BaseActivity() {
             communitySelectorController.setCommunities(it)
         }
 
-        communitySelectorController.show(this, lastInsets)
+        communitySelectorController.show(this, this)
 
         return communitySelectorController
     }
@@ -699,7 +700,7 @@ class MainActivity : BaseActivity() {
 
     fun insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
-            val lp = rootView.layoutParams as ViewGroup.MarginLayoutParams
+            val lp = rootView.layoutParams as MarginLayoutParams
             val insets = checkNotNull(windowInsets.value)
 
             lp.topMargin = insets.top
@@ -710,15 +711,15 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun insetViewExceptBottomAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
+    fun insetViewExceptBottomAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, view: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
-            val lp = rootView.layoutParams as ViewGroup.MarginLayoutParams
             val insets = checkNotNull(windowInsets.value)
 
-            lp.topMargin = insets.top
-            lp.leftMargin = insets.left
-            lp.rightMargin = insets.right
-            rootView.requestLayout()
+            view.updateLayoutParams<MarginLayoutParams> {
+                topMargin = insets.top
+                leftMargin = insets.left
+                rightMargin = insets.right
+            }
         }
     }
 
@@ -732,6 +733,19 @@ class MainActivity : BaseActivity() {
                 0,
                 insets.rightInset,
                 insets.bottomInset,
+            )
+        }
+    }
+
+    fun insetViewExceptBottomAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = lastInsets
+
+            rootView.setPadding(
+                insets.leftInset,
+                insets.topInset,
+                insets.rightInset,
+                0,
             )
         }
     }
@@ -853,7 +867,7 @@ class MainActivity : BaseActivity() {
                 hideBottomNav(animate)
                 hideNotificationBarBg()
             }
-            OfflineFragment::class -> {
+            SettingCacheFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
@@ -957,6 +971,11 @@ class MainActivity : BaseActivity() {
 
     fun openSettings() {
         val direction = MainDirections.actionGlobalSettingsFragment()
+        currentNavController?.navigateSafe(direction)
+    }
+
+    fun openAccountSettings() {
+        val direction = MainDirections.actionGlobalSettingWebFragment()
         currentNavController?.navigateSafe(direction)
     }
 }

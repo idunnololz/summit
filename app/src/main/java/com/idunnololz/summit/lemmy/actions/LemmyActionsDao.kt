@@ -169,12 +169,26 @@ sealed interface ActionInfo {
         override val isAffectedByRateLimit: Boolean = true
     }
 
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("5")
+    data class MarkPostAsReadActionInfo(
+        val postRef: PostRef,
+        val read: Boolean,
+
+        override val accountId: Int,
+        override val retries: Int = 0,
+        override val action: ActionType = ActionType.COMMENT,
+    ) : ActionInfo {
+        override val isAffectedByRateLimit: Boolean = true
+    }
+
     fun incRetries() =
         when (this) {
             is CommentActionInfo -> this.copy(retries = this.retries + 1)
             is DeleteCommentActionInfo -> this.copy(retries = this.retries + 1)
             is EditActionInfo -> this.copy(retries = this.retries + 1)
             is VoteActionInfo -> this.copy(retries = this.retries + 1)
+            is MarkPostAsReadActionInfo -> this.copy(retries = this.retries + 1)
         }
 
 }
@@ -199,6 +213,10 @@ interface LemmyActionResult<T: ActionInfo, R> {
 
     class EditLemmyActionResult(
     ): LemmyActionResult<ActionInfo.EditActionInfo, Unit> {
+        override val result = Unit
+    }
+    class MarkPostAsReadActionResult(
+    ): LemmyActionResult<ActionInfo.MarkPostAsReadActionInfo, Unit> {
         override val result = Unit
     }
 }

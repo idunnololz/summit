@@ -76,6 +76,9 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                     val direction = CommunityDirections.actionGlobalLogin()
                     findNavController().navigateSafe(direction)
                 },
+                onSettingClick = {
+                    requireMainActivity().openAccountSettings()
+                },
             )
 
             recyclerView.setHasFixedSize(false)
@@ -125,6 +128,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
         private val signOut: (AccountView) -> Unit,
         private val onAccountClick: (AccountView) -> Unit,
         private val onAddAccountClick: () -> Unit,
+        private val onSettingClick: () -> Unit,
     ) : RecyclerView.Adapter<ViewHolder>() {
 
         private sealed interface Item {
@@ -155,6 +159,9 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                 b.image.load(item.accountView.profileImage)
                 b.name.text = item.accountView.account.name
                 b.instance.text = item.accountView.account.instance
+                b.settings.setOnClickListener {
+                    onSettingClick()
+                }
 
                 b.signOut.setOnClickListener {
                     signOut(item.accountView)

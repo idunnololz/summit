@@ -80,7 +80,7 @@ class OfflineManager @Inject constructor(
 
     fun cleanup() {
         var purgedFiles = 0
-        val thresholdTime = System.currentTimeMillis() - Duration.ofDays(2).toMillis()
+        val thresholdTime = System.currentTimeMillis() - Duration.ofDays(1).toMillis()
 
         imagesDir.listFiles()?.forEach {
             if (it.lastModified() < thresholdTime) {

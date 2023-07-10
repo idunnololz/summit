@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -53,15 +54,19 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         MyLog.d(logTag, "Lifecycle: onStart()")
         super.onStart()
 
+        val dialog = dialog ?: return
+        val window = checkNotNull(dialog.window)
+
         if (isFullscreen) {
 
         } else {
-            val dialog = dialog
-            if (dialog != null) {
-                val window = checkNotNull(dialog.window)
-                window.setBackgroundDrawableResource(R.drawable.dialog_background)
-            }
+            window.setBackgroundDrawableResource(R.drawable.dialog_background)
         }
+    }
+
+    @CallSuper
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
     override fun onResume() {
@@ -74,6 +79,14 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         MyLog.d(logTag, "Lifecycle: onCreateView()")
+
+        val dialog = dialog
+        if (dialog != null) {
+            val window = checkNotNull(dialog.window)
+
+            window.requestFeature(Window.FEATURE_NO_TITLE)
+        }
+
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 

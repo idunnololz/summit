@@ -1,24 +1,17 @@
 package com.idunnololz.summit.lemmy.community
 
-import android.graphics.Bitmap
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
-import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.BlockCommunity
-import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -28,20 +21,16 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
-import com.idunnololz.summit.main.MainActivityViewModel
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
-import okhttp3.Dispatcher
 import java.lang.RuntimeException
 import javax.inject.Inject
 
@@ -54,17 +43,19 @@ class CommunityViewModel @Inject constructor(
     private val accountInfoManager: AccountInfoManager,
     private val accountActionsManager: AccountActionsManager,
     private val apiClient: AccountAwareLemmyClient,
+    private val postReadManager: PostReadManager,
 ) : ViewModel() {
 
     companion object {
         private val TAG = CommunityViewModel::class.java.canonicalName
     }
 
-    class LoadedPostsData(
+    data class LoadedPostsData(
         val posts: List<PostView>,
         val instance: String,
         val pageIndex: Int,
         val hasMore: Boolean,
+        val isReadPostUpdate: Boolean = true,
     )
 
     @Parcelize
@@ -104,7 +95,7 @@ class CommunityViewModel @Inject constructor(
         })
 
         viewModelScope.launch {
-            accountManager.currentAccountOnChange
+            accountInfoManager.currentFullAccountOnChange
                 .collect {
                     withContext(Dispatchers.Main) {
                         reset()
@@ -132,13 +123,28 @@ class CommunityViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            accountInfoManager.accountInfoUpdateState.collect {
-                val account = accountManager.currentAccount.value
-
-                if (account != null) {
-                    val accountView = accountInfoManager.getAccountViewForAccount(account)
+            accountInfoManager.currentFullAccount.collect {
+                if (it != null) {
+                    val accountView = accountInfoManager.getAccountViewForAccount(it.account)
 
                     currentAccount.postValue(accountView)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            postReadManager.postReadChanged.collect {
+                val postData = loadedPostsData.valueOrNull ?: return@collect
+
+                val updatedPostData = withContext(Dispatchers.Default) {
+                    postData.copy(
+                        posts = postsRepository.update(postData.posts),
+                        isReadPostUpdate = false,
+                    )
+                }
+
+                withContext(Dispatchers.Main) {
+                    loadedPostsData.setValue(updatedPostData)
                 }
             }
         }
@@ -314,7 +320,9 @@ class CommunityViewModel @Inject constructor(
         fetchCurrentPage()
     }
 
-    data class CurrentCommunity(
-        private val communityRef: CommunityRef,
-    )
+    fun onPostRead(postView: PostView) {
+        viewModelScope.launch {
+            accountActionsManager.markPostAsRead(instance, postView.post.id, read = true)
+        }
+    }
 }

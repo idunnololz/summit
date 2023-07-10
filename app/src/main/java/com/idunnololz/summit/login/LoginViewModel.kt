@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.ListingType
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
+    private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
     companion object {
@@ -88,6 +90,7 @@ class LoginViewModel @Inject constructor(
             )
 
             accountManager.addAccountAndSetCurrent(account)
+            accountInfoManager.updateAccountInfoWith(account, site)
 
             accountLiveData.postValue(account)
 

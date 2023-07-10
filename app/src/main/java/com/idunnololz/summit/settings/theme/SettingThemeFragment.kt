@@ -67,7 +67,6 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
         with(binding) {
             RadioGroupSettingItem(
-                R.id.setting_base_theme,
                 0,
                 getString(R.string.base_theme),
                 null,
@@ -90,7 +89,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                         null,
                         R.drawable.baseline_dark_mode_24,
                     )
-                )
+                ),
             ).bindTo(
                 baseThemeSetting,
                 listOf(this.option1, this.option2, this.option3),
@@ -119,10 +118,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
 
             OnOffSettingItem(
-                R.id.use_material_you,
                 getString(R.string.material_you),
                 getString(R.string.personalized_theming_based_on_your_wallpaper),
-                false,
             ).bindTo(
                 binding.useMaterialYou,
                 { preferences.isUseMaterialYou() },
@@ -142,10 +139,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
             )
 
             OnOffSettingItem(
-                R.id.use_black_theme,
                 getString(R.string.black_theme),
                 getString(R.string.black_theme_desc),
-                false,
             ).bindTo(
                 binding.useBlackTheme,
                 { preferences.isBlackTheme() },

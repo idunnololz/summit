@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content" />
         </HorizontalScrollView>
 
-        <TextView
+        <com.idunnololz.summit.view.LinkifyTextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

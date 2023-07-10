@@ -104,7 +104,7 @@ class CommunityInfoViewModel @Inject constructor(
                     delay(1000)
 
                     refetchCommunityOrSite(force = true)
-                    accountInfoManager.fetchAccountInfo()
+                    accountInfoManager.refreshAccountInfo()
 
                     Log.d(TAG, "subscription status: " + it.subscribed)
                 }

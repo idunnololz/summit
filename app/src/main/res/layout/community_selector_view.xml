@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.motion.widget.MotionLayout
-    android:id="@+id/motionLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/motionLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layoutDescription="@xml/scene_01">
 
     <View
@@ -25,7 +25,7 @@
         android:layout_height="0dp"
         android:background="@color/colorSurface"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/subredditsRecyclerView"
+        app:layout_constraintBottom_toBottomOf="@+id/recycler_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -37,16 +37,17 @@
         android:padding="@dimen/padding_half"
         android:layout_marginStart="@dimen/padding_half"
         android:layout_marginEnd="@dimen/padding_half"
+        android:layout_marginTop="@dimen/padding_half"
         android:maxLines="1"
         android:inputType="text"
-        android:textAppearance="?textAppearanceBody1"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:prefix="c/"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/subredditsRecyclerView"
+        android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/padding_half"

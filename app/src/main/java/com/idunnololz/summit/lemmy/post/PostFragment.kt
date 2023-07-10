@@ -324,7 +324,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         }
 
         args.post?.let { post ->
-            adapter?.setStartingData(
+            adapter.setStartingData(
                 PostViewModel.PostData(
                     PostViewModel.ListView.PostListView(post),
                     listOf(),

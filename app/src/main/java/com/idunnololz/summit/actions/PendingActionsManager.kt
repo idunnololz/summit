@@ -205,6 +205,23 @@ class PendingActionsManager @Inject constructor(
         return lemmyAction.await()
     }
 
+    suspend fun markPostAsRead(
+        postRef: PostRef,
+        read: Boolean,
+        accountId: Int,
+    ): LemmyAction {
+        val lemmyAction = coroutineScope.async {
+            val action = ActionInfo.MarkPostAsReadActionInfo(
+                postRef = postRef,
+                read = read,
+                accountId = accountId,
+            )
+            action.insert()
+        }
+
+        return lemmyAction.await()
+    }
+
     fun addActionCompleteListener(l: OnActionChangedListener) {
         onActionChangedListeners.add(l)
     }

@@ -13,7 +13,7 @@
         android:layout_marginTop="@dimen/padding"
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
-        android:text="@string/offline_files"
+        android:text="@string/media_cache"
         android:textAppearance="?textAppearanceBody1"
         android:textColor="@color/colorTextTitle"
         app:layout_constraintTop_toTopOf="parent"

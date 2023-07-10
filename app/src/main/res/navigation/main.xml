@@ -68,6 +68,20 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingWebFragment"
+            app:destination="@id/settingWebFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingCacheFragment"
+            app:destination="@id/settingCacheFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <action android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment"
@@ -135,4 +149,12 @@
             app:argType="string"
             app:nullable="true" />
     </activity>
+    <fragment
+        android:id="@+id/settingWebFragment"
+        android:name="com.idunnololz.summit.settings.web_settings.SettingWebFragment"
+        android:label="SettingWebFragment" />
+    <fragment
+        android:id="@+id/settingCacheFragment"
+        android:name="com.idunnololz.summit.settings.cache.SettingCacheFragment"
+        android:label="SettingCacheFragment" /><action android:id="@+id/action_global_settingWebFragment" app:destination="@id/settingWebFragment"/>
 </navigation>

@@ -147,13 +147,13 @@ class ImageViewerActivity : BaseActivity() {
 
 
         window.enterTransition = Fade(Fade.IN).apply {
-            duration = 220
+            duration = 200
         }
         window.exitTransition = Fade(Fade.OUT).apply {
-            duration = 220
+            duration = 200
         }
         window.returnTransition = Fade(Fade.OUT).apply {
-            duration = 220
+            duration = 200
         }
         window.sharedElementEnterTransition = SharedElementTransition()
         window.sharedElementReturnTransition = SharedElementTransition()

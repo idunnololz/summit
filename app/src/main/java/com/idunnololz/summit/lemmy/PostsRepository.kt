@@ -2,14 +2,20 @@ package com.idunnololz.summit.lemmy
 
 import android.util.Log
 import arrow.core.Either
+import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.min
@@ -17,6 +23,10 @@ import kotlin.math.min
 @ViewModelScoped
 class PostsRepository @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val postReadManager: PostReadManager,
+    private val accountManager: AccountManager,
+    private val accountInfoManager: AccountInfoManager,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -28,6 +38,8 @@ class PostsRepository @Inject constructor(
         val post: PostView,
         val postPageIndexInternal: Int,
     )
+
+    private val coroutineScope = coroutineScopeFactory.create()
 
     private val allPosts = mutableListOf<PostData>()
     private val seenPosts = mutableSetOf<String>()
@@ -44,7 +56,23 @@ class PostsRepository @Inject constructor(
             reset()
         }
 
+    init {
+        coroutineScope.launch {
+            accountInfoManager.currentFullAccount.collect {
+                if (it != null) {
+                    sortOrder = it
+                        .accountInfo
+                        .miscAccountInfo
+                        ?.defaultCommunitySortType
+                        ?.toSortOrder()
+                        ?: return@collect
+                }
+            }
+        }
+    }
+
     suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
+        val instance = instance // snapshot instance
         val startIndex = pageIndex * POSTS_PER_PAGE
         val endIndex = startIndex + POSTS_PER_PAGE
 
@@ -52,12 +80,12 @@ class PostsRepository @Inject constructor(
 
         if (force) {
             // delete all cached data for the given page
-            val minPageInteral = allPosts
+            val minPageInternal = allPosts
                 .slice(startIndex until min(endIndex, allPosts.size))
                 .map { it.postPageIndexInternal }
                 .minOrNull() ?: 1
 
-            deleteFromPage(minPageInteral)
+            deleteFromPage(minPageInternal)
             endReached = false
         }
 
@@ -136,7 +164,9 @@ class PostsRepository @Inject constructor(
             PageResult(
                 posts = allPosts
                     .slice(startIndex until min(endIndex, allPosts.size))
-                    .map { it.post },
+                    .map {
+                        transformPostWithLocalData(instance, it.post)
+                    },
                 instance = apiClient.instance,
                 hasMore = hasMore
             )
@@ -202,9 +232,18 @@ class PostsRepository @Inject constructor(
 
     fun reset() {
         currentPageInternal = 1
+        endReached = false
 
         allPosts.clear()
         seenPosts.clear()
+    }
+
+    private fun transformPostWithLocalData(instance: String, postView: PostView): PostView {
+        val localRead = postReadManager.isPostRead(instance, postView.post.id)
+        if (localRead && !postView.read) {
+            return postView.copy(read = true)
+        }
+        return postView
     }
 
     /**
@@ -260,6 +299,13 @@ class PostsRepository @Inject constructor(
         currentPageInternal = minPageInternal
 
         Log.d(TAG, "Deleted pages ${minPageInternal} and beyond. Posts left: ${allPosts.size}")
+    }
+
+    fun update(posts: List<PostView>): List<PostView> {
+        val instance = instance
+        return posts.map {
+            transformPostWithLocalData(instance, it)
+        }
     }
 
     interface Factory {
