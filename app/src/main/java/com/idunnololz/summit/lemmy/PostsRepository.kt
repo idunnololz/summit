@@ -7,6 +7,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.getUniqueKey
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.max
 import kotlin.math.min
 
 @ViewModelScoped
@@ -69,6 +71,40 @@ class PostsRepository @Inject constructor(
                 }
             }
         }
+    }
+
+    suspend fun hideReadPosts(anchors: List<PostId>, maxPage: Int): Result<PageResult> {
+        reset()
+        resetCacheForCommunity()
+
+        val anchorsSet = anchors.toSet()
+
+        var curPage = 0
+        while (true) {
+            if (curPage > maxPage) {
+                break
+            }
+
+            val result = getPage(curPage, force = true)
+            if (result.isFailure) {
+                return result
+            }
+
+            val pageResult = result.getOrNull() ?: break
+            if (pageResult.posts.isEmpty() || anchorsSet.isEmpty()) {
+                break
+            }
+
+            // try to find our anchors
+            val anchorsMatched = pageResult.posts.count { anchorsSet.contains(it.post.id) }
+            if (anchorsMatched > 0) {
+                return result
+            }
+
+            curPage++
+        }
+
+        return getPage(0)
     }
 
     suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
@@ -167,6 +203,7 @@ class PostsRepository @Inject constructor(
                     .map {
                         transformPostWithLocalData(instance, it.post)
                     },
+                pageIndex = pageIndex,
                 instance = apiClient.instance,
                 hasMore = hasMore
             )
@@ -314,6 +351,7 @@ class PostsRepository @Inject constructor(
 
     class PageResult(
         val posts: List<PostView>,
+        val pageIndex: Int,
         val instance: String,
         val hasMore: Boolean,
     )

@@ -95,6 +95,6 @@ class MultipleChoiceDialogFragment : BaseDialogFragment<DialogFragmentBottomMenu
                     dismiss()
                 }
             }
-            .show(requireMainActivity(), binding.root, handleBackPress = false)
+            .show(requireMainActivity(), binding.root, handleBackPress = false, expandFully = true)
     }
 }

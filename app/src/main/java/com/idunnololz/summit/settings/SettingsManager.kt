@@ -29,6 +29,7 @@ class SettingsManager @Inject constructor(
             context.getString(R.string.content),
             listOf(
                 mainSettings.settingLemmyWeb,
+                mainSettings.settingHistory,
             )
         ),
         SubgroupItem(

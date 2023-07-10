@@ -35,6 +35,7 @@ data class AccountInfo(
 data class MiscAccountInfo(
     val avatar: String? = null,
     val defaultCommunitySortType: SortType? = null,
+    val showReadPosts: Boolean? = null,
 )
 
 @JsonClass(generateAdapter = true)

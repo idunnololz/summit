@@ -121,6 +121,9 @@
 
     <style name="Theme.App.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">
         <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="windowActionBar">false</item>
         <item name="elevationOverlayEnabled">false</item>
         <item name="android:windowBackground">@drawable/dialog_background</item>
 
@@ -157,6 +160,10 @@
     </style>
 
     <style name="Theme.App.Dialog.Alert" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="windowActionBar">false</item>
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>

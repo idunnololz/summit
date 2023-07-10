@@ -11,6 +11,7 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -124,6 +125,13 @@ class Preferences @Inject constructor(
     fun setUseBlackTheme(b: Boolean) {
         prefs.edit().putBoolean(PreferenceUtil.KEY_USE_BLACK_THEME, b).apply()
     }
+
+    var markPostsAsReadOnScroll: Boolean
+        get() = prefs.getBoolean(KEY_MARK_POSTS_AS_READ_ON_SCROLL, false)
+        set(value) {
+            prefs.edit().putBoolean(KEY_MARK_POSTS_AS_READ_ON_SCROLL, value).apply()
+        }
+
 
     private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
         return try {

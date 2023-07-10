@@ -434,9 +434,24 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             viewModel.fetchCurrentPage(true)
         }
 
+        val layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.layoutManager = layoutManager
+
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (preferences.markPostsAsReadOnScroll) {
+                    val range = layoutManager.findFirstCompletelyVisibleItemPosition()..layoutManager.findLastCompletelyVisibleItemPosition()
+
+                    range.forEach {
+                        adapter?.seenItemPositions?.add(it)
+                    }
+                }
+            }
+        })
 
         updateDecorator(binding.recyclerView)
 
@@ -482,6 +497,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     if (!it.data.isReadPostUpdate) {
                         adapter.setItems(it.data.pageIndex, it.data, animate = false)
                     } else {
+                        adapter.seenItemPositions.clear()
+
                         adapter.setItems(it.data.pageIndex, it.data)
 
                         adapter.curDataSource = it.data.instance
@@ -697,6 +714,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
 
             addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
+
+            if (viewModel.isHideReadEnabled) {
+                addItemWithIcon(R.id.clear_read, R.string.hide_read, R.drawable.baseline_clear_all_24)
+            }
+
             addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
             addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
             addItemWithIcon(
@@ -761,6 +783,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         val shareIntent = Intent.createChooser(sendIntent, null)
                         startActivity(shareIntent)
                     }
+                    R.id.clear_read -> {
+                        viewModel.onHideRead()
+                    }
 
                     R.id.sort -> {
                         getMainActivity()?.showBottomMenu(getSortByMenu())
@@ -804,7 +829,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
         }
 
-        getMainActivity()?.showBottomMenu(bottomMenu)
+        getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
     }
 
     override fun navigateToSignInScreen() {
@@ -975,6 +1000,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         private var postToHighlightForever: PostRef? = null
         private var postToHighlight: PostRef? = null
 
+        var seenItemPositions = mutableSetOf<Int>()
+
         override fun getItemViewType(position: Int): Int = when (items[position]) {
             is Item.PostItem -> when (layout) {
                 CommunityLayout.Compact -> R.layout.listing_item_compact
@@ -1061,6 +1088,13 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     if (item.hasMore) {
                         b.nextButton.visibility = View.VISIBLE
                         b.nextButton.setOnClickListener {
+                            if (preferences.markPostsAsReadOnScroll) {
+                                seenItemPositions.forEach {
+                                    (items[it] as? Item.PostItem)?.let {
+                                        onPostRead(it.postView)
+                                    }
+                                }
+                            }
                             onNextClick()
                         }
                     } else {
@@ -1080,6 +1114,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
                     val isActionsExpanded = item.isActionExpanded
                     val isExpanded = item.isExpanded
+
+                    h.root.setTag(R.id.post_view, item.postView)
 
                     postListViewBuilder.bind(
                         holder = h,
@@ -1116,12 +1152,23 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
 
         override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+            val position = holder.absoluteAdapterPosition
             super.onViewRecycled(holder)
 
             if (holder is ListingItemViewHolder) {
                 postListViewBuilder.recycle(
                     holder
                 )
+
+                if (preferences.markPostsAsReadOnScroll) {
+                    val postView = holder.root.getTag(R.id.post_view) as? PostView
+                    if (postView != null && seenItemPositions.contains(position)) {
+                        Log.d("HAHA", "Marking post ${position} - ${postView.post.name} as read")
+                        onPostRead(postView)
+                    } else {
+                        Log.d("HAHA", "${position} recycled but not read")
+                    }
+                }
             }
         }
 

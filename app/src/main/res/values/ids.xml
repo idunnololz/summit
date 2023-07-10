@@ -53,4 +53,6 @@
     <item name="my_communities" type="id" />
     <item name="swipe_enabled" type="id" />
     <item name="browse_communities" type="id"/>
+    <item name="clear_read" type="id" />
+    <item name="post_view" type="id" />
 </resources>

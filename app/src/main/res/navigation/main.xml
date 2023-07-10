@@ -82,6 +82,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingHistoryFragment"
+            app:destination="@id/settingHistoryFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <action android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment"
@@ -157,4 +164,8 @@
         android:id="@+id/settingCacheFragment"
         android:name="com.idunnololz.summit.settings.cache.SettingCacheFragment"
         android:label="SettingCacheFragment" /><action android:id="@+id/action_global_settingWebFragment" app:destination="@id/settingWebFragment"/>
+    <fragment
+        android:id="@+id/settingHistoryFragment"
+        android:name="com.idunnololz.summit.settings.history.SettingHistoryFragment"
+        android:label="SettingHistoryFragment" />
 </navigation>

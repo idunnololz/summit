@@ -152,6 +152,7 @@ class AccountInfoManager @Inject constructor(
             miscAccountInfo = MiscAccountInfo(
                 response.my_user?.local_user_view?.person?.avatar,
                 response.my_user?.local_user_view?.local_user?.default_sort_type,
+                response.my_user?.local_user_view?.local_user?.show_read_posts,
             )
         )
         currentFullAccount.emit(

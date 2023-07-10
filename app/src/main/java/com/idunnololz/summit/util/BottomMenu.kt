@@ -104,7 +104,12 @@ class BottomMenu(private val context: Context) {
         this.onMenuItemClickListener = onMenuItemClickListener
     }
 
-    fun show(mainActivity: MainActivity, viewGroup: ViewGroup, handleBackPress: Boolean = true) {
+    fun show(
+        mainActivity: MainActivity,
+        viewGroup: ViewGroup,
+        expandFully: Boolean,
+        handleBackPress: Boolean = true,
+    ) {
         parent = viewGroup
         adapter = BottomMenuAdapter().apply {
             refreshItems()
@@ -142,7 +147,11 @@ class BottomMenu(private val context: Context) {
             peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
             isHideable = true
             state = BottomSheetBehavior.STATE_HIDDEN
-            skipCollapsed = true
+
+            if (expandFully) {
+                skipCollapsed = true
+            }
+                
         }.also {
             bottomSheetBehavior = it
         }
@@ -157,7 +166,11 @@ class BottomMenu(private val context: Context) {
         }
 
         rootView.postDelayed({
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            if (expandFully) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
 
             bottomSheetBehavior.addBottomSheetCallback(
                 object : BottomSheetBehavior.BottomSheetCallback() {

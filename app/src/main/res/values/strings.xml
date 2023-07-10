@@ -271,6 +271,10 @@
     <string name="error_unsaved_changes_desc">You have unsaved changes. Web preferences must be saved to the server in order for them to take effect.</string>
     <string name="discard_saves">Discard changes</string>
     <string name="send_notifications_to_email">Send notifications to email</string>
+    <string name="hide_read">Hide read</string>
+    <string name="mark_posts_as_read_on_scroll">Mark posts as read on scroll</string>
+    <string name="mark_posts_as_read_on_scroll_desc">If enabled, posts you scroll past will automatically be marked as read</string>
+    <string name="history_setting_desc">Change preferences related to browse history</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>
