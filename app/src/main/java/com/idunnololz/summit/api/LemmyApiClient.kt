@@ -41,6 +41,7 @@ import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.Login
 import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
+import com.idunnololz.summit.api.dto.MarkPostAsRead
 import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionId
@@ -50,6 +51,7 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.Search
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
@@ -184,6 +186,29 @@ class LemmyApiClient @Inject constructor(
         )
     }
 
+    suspend fun markPostAsRead(
+        postId: PostId,
+        read: Boolean,
+        account: Account,
+    ): Result<PostView> {
+        val form = MarkPostAsRead(
+            post_id = postId,
+            read = read,
+            auth = account.jwt
+        )
+
+        return retrofitErrorHandler {
+            api.markPostAsRead(form = form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.post_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
     suspend fun fetchComments(
         account: Account?,
         id: Either<PostId, CommentId>,
@@ -267,6 +292,7 @@ class LemmyApiClient @Inject constructor(
         searchType: SearchType,
         page: Int? = null,
         query: String,
+        limit: Int? = null,
         creatorId: Int? = null,
     ): Result<SearchResponse> {
         val form = Search(
@@ -278,6 +304,7 @@ class LemmyApiClient @Inject constructor(
             sort = sortType,
             listing_type = listingType,
             page = page,
+            limit = limit,
             auth = account?.jwt,
         )
 
@@ -872,6 +899,19 @@ class LemmyApiClient @Inject constructor(
         )
     }
 
+    suspend fun saveUserSettings(settings: SaveUserSettings): Result<Unit> {
+        return retrofitErrorHandler {
+            api.saveUserSettings(settings)
+        }.fold(
+            onSuccess = {
+                Result.success(Unit)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
     val instance: String
         get() = api.instance
 
@@ -923,6 +963,11 @@ class LemmyApiClient @Inject constructor(
                 Log.e(TAG, "Exception parsing body", e)
                 errorBody
             }
+
+            if (errMsg?.contains("not_logged_in", ignoreCase = true) == true) {
+                return Result.failure(NotAuthenticatedException())
+            }
+
             Log.e("ApiError", "Code: ${errorCode} Error message: ${errMsg}", RuntimeException())
 
             if (errMsg?.contains("timeout", ignoreCase = true) == true) {

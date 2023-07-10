@@ -14,6 +14,7 @@ import androidx.room.TypeConverters
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.InstanceId
+import com.idunnololz.summit.api.dto.SortType
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -32,7 +33,8 @@ data class AccountInfo(
 
 @JsonClass(generateAdapter = true)
 data class MiscAccountInfo(
-    val avatar: String? = null
+    val avatar: String? = null,
+    val defaultCommunitySortType: SortType? = null,
 )
 
 @JsonClass(generateAdapter = true)

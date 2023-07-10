@@ -19,6 +19,7 @@ import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
@@ -356,7 +357,22 @@ class PostListViewBuilder @Inject constructor(
             }
         }
 
-        title.text = postView.getFormattedTitle()
+        LemmyTextHelper.bindText(
+            title,
+            postView.post.name,
+            instance,
+            onImageClick = {
+                onImageClick(null, it)
+            },
+            onPageClick = onPageClick
+        )
+
+        if (postView.read) {
+            title.alpha = 0.66f
+        } else {
+            title.alpha = 1f
+        }
+
         commentText.text =
             LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
 

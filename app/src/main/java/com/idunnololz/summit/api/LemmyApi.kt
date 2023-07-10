@@ -41,6 +41,7 @@ import com.idunnololz.summit.api.dto.LoginResponse
 import com.idunnololz.summit.api.dto.MarkAllAsRead
 import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
+import com.idunnololz.summit.api.dto.MarkPostAsRead
 import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.PersonMentionResponse
 import com.idunnololz.summit.api.dto.PictrsImages
@@ -141,6 +142,9 @@ interface LemmyApi {
      */
     @PUT("post/save")
     fun savePost(@Body form: SavePost): Call<PostResponse>
+
+    @POST("post/mark_as_read")
+    fun markPostAsRead(@Body form: MarkPostAsRead): Call<PostResponse>
 
     /**
      * Save a comment.

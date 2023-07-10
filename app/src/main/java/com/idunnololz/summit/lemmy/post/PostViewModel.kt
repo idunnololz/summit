@@ -8,6 +8,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentId
@@ -37,6 +38,7 @@ class PostViewModel @Inject constructor(
     private val lemmyApiClient: AccountAwareLemmyClient,
     private val accountActionsManager: AccountActionsManager,
     private val accountManager: AccountManager,
+    private val postReadManager: PostReadManager,
 ) : ViewModel() {
 
     companion object {
@@ -47,7 +49,6 @@ class PostViewModel @Inject constructor(
 
     private var postRef: PostRef? = null
 
-    val voteUiHandler: VoteUiHandler = accountActionsManager.voteUiHandler
     private var loader: WebsiteAdapterLoader? = null
 
     private var commentLoaders = ArrayList<WebsiteAdapterLoader>()
@@ -130,6 +131,11 @@ class PostViewModel @Inject constructor(
 
             val post = postResult.getOrNull()
             val comments = commentsResult.getOrNull()
+
+            if (post != null) {
+                postReadManager.markPostAsReadLocal(instance, post.post.id, read = true)
+            }
+
             if (post == null || comments == null) {
                 postResult
                     .onFailure {

@@ -60,6 +60,8 @@ class BottomMenu(private val context: Context) {
         }
     }
 
+    var onClose: (() -> Unit)? = null
+
     fun setTitle(@StringRes title: Int) {
         this.title = context.getString(title)
     }
@@ -102,7 +104,7 @@ class BottomMenu(private val context: Context) {
         this.onMenuItemClickListener = onMenuItemClickListener
     }
 
-    fun show(mainActivity: MainActivity, viewGroup: ViewGroup) {
+    fun show(mainActivity: MainActivity, viewGroup: ViewGroup, handleBackPress: Boolean = true) {
         parent = viewGroup
         adapter = BottomMenuAdapter().apply {
             refreshItems()
@@ -165,6 +167,8 @@ class BottomMenu(private val context: Context) {
                             onBackPressedCallback.remove()
                             viewGroup.removeView(rootView)
                             viewGroup.removeView(overlay)
+
+                            onClose?.invoke()
                         }
                     }
 
@@ -179,7 +183,9 @@ class BottomMenu(private val context: Context) {
             )
         }, 100)
 
-        mainActivity.onBackPressedDispatcher.addCallback(mainActivity, onBackPressedCallback)
+        if (handleBackPress) {
+            mainActivity.onBackPressedDispatcher.addCallback(mainActivity, onBackPressedCallback)
+        }
     }
 
     fun close(): Boolean {

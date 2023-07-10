@@ -128,7 +128,6 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
 
     private fun bindPostUiSettings(adapter: FakePostAndCommentsAdapter) {
         SliderSettingItem(
-            R.id.setting_post_text_scaling,
             getString(R.string.font_size),
             0.2f,
             3f,
@@ -147,7 +146,6 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
             }
         )
         SliderSettingItem(
-            R.id.setting_comment_text_scaling,
             getString(R.string.font_size),
             0.2f,
             3f,

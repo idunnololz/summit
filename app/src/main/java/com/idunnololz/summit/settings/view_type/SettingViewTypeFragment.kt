@@ -110,7 +110,6 @@ AlertDialogFragment.AlertDialogFragmentListener {
         }
 
         TextOnlySettingItem(
-            R.id.setting_base_view_type,
             getString(R.string.base_view_type),
             ""
         ).bindTo(activity = parentActivity,
@@ -143,7 +142,6 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
     private fun bindPostUiSettings() {
         SliderSettingItem(
-            R.id.setting_post_in_list_text_scaling,
             getString(R.string.font_size),
             0.2f,
             3f,
@@ -158,10 +156,8 @@ AlertDialogFragment.AlertDialogFragmentListener {
             }
         )
         OnOffSettingItem(
-            R.id.setting_prefer_image_at_the_end,
             getString(R.string.prefer_image_at_the_end),
             null,
-            false,
         ).bindTo(
             binding.preferImageAtTheEnd,
             { viewModel.currentPostUiConfig.preferImagesAtEnd },

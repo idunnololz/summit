@@ -7,15 +7,18 @@ import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.Community
+import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -34,15 +37,15 @@ class AccountInfoManager @Inject constructor(
 
     private val coroutineScope = coroutineScopeFactory.create()
 
-    private var currentAccountInfo: AccountInfo? = null
-
     private val unreadCountInvalidates = MutableSharedFlow<Unit>()
 
     val accountDir = File(context.filesDir, "account")
 
     val subscribedCommunities = MutableStateFlow<List<AccountSubscription>>(listOf())
-    val accountInfoUpdateState = MutableStateFlow<StatefulData<Unit>>(StatefulData.NotStarted())
+    val accountInfoUpdateState = MutableStateFlow<StatefulData<Account?>>(StatefulData.NotStarted())
     val unreadCount = MutableStateFlow<UnreadCount>(UnreadCount(0))
+    val currentFullAccount = MutableStateFlow<FullAccount?>(null)
+    val currentFullAccountOnChange = currentFullAccount.asSharedFlow().drop(1)
 
     init {
         accountManager.addOnAccountChangedListener(
@@ -60,7 +63,8 @@ class AccountInfoManager @Inject constructor(
                 }
 
                 override suspend fun onAccountChanged(newAccount: Account?) {
-                    currentAccountInfo = null
+                    // Don't emit null as it will trigger multiple updates
+//                    currentFullAccount.emit(null)
                     subscribedCommunities.emit(listOf())
                     accountInfoUpdateState.emit(StatefulData.NotStarted())
                     unreadCount.emit(UnreadCount(0))
@@ -74,7 +78,7 @@ class AccountInfoManager @Inject constructor(
 
                 loadAccountInfo(it)
 
-                updateAccountInfo(it)
+                refreshAccountInfo(it)
                 updateUnreadCount()
             }
         }
@@ -88,11 +92,14 @@ class AccountInfoManager @Inject constructor(
         }
     }
 
-    fun fetchAccountInfo() {
+    fun refreshAccountInfo() {
         coroutineScope.launch {
-            updateAccountInfo(accountManager.currentAccount.value)
+            refreshAccountInfo(accountManager.currentAccount.value)
         }
     }
+
+    suspend fun fetchAccountInfo(): Result<GetSiteResponse> =
+        refreshAccountInfo(accountManager.currentAccount.value)
 
     fun updateUnreadCount() {
         coroutineScope.launch {
@@ -100,24 +107,11 @@ class AccountInfoManager @Inject constructor(
         }
     }
 
-    fun getCurrentAccountView(): AccountView? =
-        accountManager.currentAccount.value?.let {
-            currentAccountInfo?.toAccountView(it)
-        }
-
     suspend fun getAccountViewForAccount(account: Account): AccountView {
-        val accountInfo =
-            if (currentAccountInfo?.accountId == account.id) {
-                currentAccountInfo
-            } else {
-                withContext(Dispatchers.IO) {
-                    accountInfoDao.getAccountInfo(account.id)
-                }
-            }
-
+        val fullAccount = getFullAccount(account)
         return AccountView(
             account = account,
-            profileImage = accountInfo?.miscAccountInfo?.avatar?.let {
+            profileImage = fullAccount?.accountInfo?.miscAccountInfo?.avatar?.let {
                 try {
                     Uri.parse(it)
                 } catch (e: Exception) {
@@ -127,8 +121,49 @@ class AccountInfoManager @Inject constructor(
         )
     }
 
-    fun getImageForAccount(account: Account): File {
+    private fun getImageForAccount(account: Account): File {
         return accountImageGenerator.getOrGenerateImageForAccount(accountDir, account)
+    }
+
+    private suspend fun getFullAccount(account: Account): FullAccount? {
+        val fullAccount = currentFullAccount.value
+        return if (fullAccount?.accountId == account.id) {
+            fullAccount
+        } else {
+            withContext(Dispatchers.IO) {
+                val accountInfo = accountInfoDao.getAccountInfo(account.id)
+                    ?: return@withContext null
+
+                FullAccount(
+                    account,
+                    accountInfo,
+                )
+            }
+        }
+    }
+
+    suspend fun updateAccountInfoWith(account: Account, response: GetSiteResponse) {
+        val accountInfo = AccountInfo(
+            accountId = account.id,
+            subscriptions = response.my_user
+                ?.follows
+                ?.map { it.community.toAccountSubscription() }
+                ?: listOf(),
+            miscAccountInfo = MiscAccountInfo(
+                response.my_user?.local_user_view?.person?.avatar,
+                response.my_user?.local_user_view?.local_user?.default_sort_type,
+            )
+        )
+        currentFullAccount.emit(
+            FullAccount(
+                account,
+                accountInfo,
+            )
+        )
+
+        accountInfoDao.insert(accountInfo)
+
+        subscribedCommunities.emit(accountInfo.subscriptions ?: listOf())
     }
 
     private suspend fun updateUnreadCount(account: Account) {
@@ -138,62 +173,44 @@ class AccountInfoManager @Inject constructor(
             }
     }
 
-    private suspend fun updateAccountInfo(account: Account?) {
+    private suspend fun refreshAccountInfo(account: Account?): Result<GetSiteResponse> {
         accountInfoUpdateState.emit(StatefulData.Loading())
 
         if (account == null) {
-            currentAccountInfo = null
-            accountInfoUpdateState.emit(StatefulData.Success(Unit))
-            return
+            currentFullAccount.emit(null)
+            accountInfoUpdateState.emit(StatefulData.Success(null))
+            return Result.failure(NotAuthenticatedException())
         }
 
-        accountAwareLemmyClient.fetchSiteWithRetry(force = true, account.jwt)
+        val result = withContext(Dispatchers.IO) {
+            accountAwareLemmyClient.fetchSiteWithRetry(force = true, account.jwt)
+        }
+
+        result
             .onSuccess { response ->
-                val accountInfo = AccountInfo(
-                    accountId = account.id,
-                    subscriptions = response.my_user
-                        ?.follows
-                        ?.map { it.community.toAccountSubscription() }
-                        ?: listOf(),
-                    miscAccountInfo = MiscAccountInfo(
-                        response.my_user?.local_user_view?.person?.avatar
-                    )
-                )
-                currentAccountInfo = accountInfo
-
-                accountInfoDao.insert(accountInfo)
-
-                subscribedCommunities.emit(accountInfo.subscriptions ?: listOf())
+                updateAccountInfoWith(account, response)
             }
 
-        accountInfoUpdateState.emit(StatefulData.Success(Unit))
+        accountInfoUpdateState.emit(StatefulData.Success(account))
+
+        return result
     }
 
     private suspend fun loadAccountInfo(account: Account?) {
         account ?: return
 
         val accountInfo = accountInfoDao.getAccountInfo(account.id)
+            ?: return
 
-        currentAccountInfo = accountInfo
 
-        subscribedCommunities.emit(accountInfo?.subscriptions ?: listOf())
-    }
-
-    private fun AccountInfo.toAccountView(account: Account): AccountView? {
-        if (this.accountId != account.id) {
-            return null
-        }
-
-        return AccountView(
-            account = account,
-            profileImage = this.miscAccountInfo?.avatar?.let {
-                try {
-                    Uri.parse(it)
-                } catch (e: Exception) {
-                    null
-                }
-            } ?: Uri.fromFile(getImageForAccount(account))
+        currentFullAccount.emit(
+            FullAccount(
+                account,
+                accountInfo,
+            )
         )
+
+        subscribedCommunities.emit(accountInfo.subscriptions ?: listOf())
     }
 
     data class UnreadCount(

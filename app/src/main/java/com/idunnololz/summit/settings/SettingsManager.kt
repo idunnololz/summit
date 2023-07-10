@@ -1,93 +1,107 @@
 package com.idunnololz.summit.settings
 
 import android.content.Context
-import android.view.View
+import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
-import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.OnOffSettingItemBinding
-import com.idunnololz.summit.databinding.SliderSettingItemBinding
-import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
-import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.util.BottomMenu
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SettingsManager @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val mainSettings: MainSettings,
 ) {
 
-    private val mainSettings = listOf(
-        BasicSettingItem(
-            R.id.setting_theme,
-            R.drawable.baseline_palette_24,
-            context.getString(R.string.theme),
-            context.getString(R.string.theme_settings_desc)
+    private val mainSettingItems = listOf(
+        SubgroupItem(
+            context.getString(R.string.appearance),
+            listOf(
+                mainSettings.settingTheme,
+                mainSettings.settingViewType,
+                mainSettings.settingPostAndComment,
+            )
         ),
-        BasicSettingItem(
-            R.id.setting_view_type,
-            R.drawable.baseline_view_agenda_black_24,
-            context.getString(R.string.view_type),
-            context.getString(R.string.view_type_settings_desc)
+        SubgroupItem(
+            context.getString(R.string.content),
+            listOf(
+                mainSettings.settingLemmyWeb,
+            )
         ),
-        BasicSettingItem(
-            R.id.setting_post_and_comments,
-            R.drawable.baseline_mode_comment_24,
-            context.getString(R.string.post_and_comments),
-            context.getString(R.string.post_and_comments_settings_desc)
-        ),
+        SubgroupItem(
+            context.getString(R.string.systems),
+            listOf(
+                mainSettings.settingCache,
+            )
+        )
     )
 
     fun getSettingsForMainPage() =
-        mainSettings
+        mainSettingItems
 }
 
+var nextId = 1
 
-sealed interface SettingItem {
-    val id: Int
-    val title: String
+sealed class SettingItem : Parcelable {
+    val id: Int = nextId++
+    abstract val title: String
+    open val isEnabled: Boolean = true
 }
+
+@Parcelize
+data class SubgroupItem(
+    override val title: String,
+    val settings: List<SettingItem>,
+) : SettingItem()
+
+@Parcelize
 data class BasicSettingItem(
-    @IdRes override val id: Int,
     @DrawableRes val icon: Int,
     override val title: String,
     val description: String?,
-) : SettingItem
+) : SettingItem()
 
+@Parcelize
 data class TextOnlySettingItem(
-    @IdRes override val id: Int,
     override val title: String,
     val description: String?,
-) : SettingItem
+) : SettingItem()
 
+@Parcelize
+data class TextValueSettingItem(
+    override val title: String,
+    val supportsRichText: Boolean,
+    override val isEnabled: Boolean = true
+) : SettingItem()
+
+@Parcelize
 data class SliderSettingItem(
-    @IdRes override val id: Int,
     override val title: String,
     val minValue: Float,
     val maxValue: Float,
-) : SettingItem
+) : SettingItem()
 
+@Parcelize
 data class OnOffSettingItem(
-    @IdRes override val id: Int,
     override val title: String,
     val description: String?,
-    val isOn: Boolean,
-) : SettingItem
+) : SettingItem()
 
+@Parcelize
 data class RadioGroupSettingItem(
-    @IdRes override val id: Int,
-    @DrawableRes val icon: Int,
+    @DrawableRes val icon: Int?,
     override val title: String,
     val description: String?,
     val options: List<RadioGroupOption>,
-) : SettingItem {
+) : SettingItem() {
+    @Parcelize
     data class RadioGroupOption(
         @IdRes val id: Int,
         val title: String,
         val description: String?,
-        @DrawableRes val icon: Int,
-    )
+        @DrawableRes val icon: Int?,
+    ) : Parcelable
 }

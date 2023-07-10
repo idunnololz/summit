@@ -120,6 +120,7 @@
     </style>
 
     <style name="Theme.App.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="android:windowNoTitle">true</item>
         <item name="elevationOverlayEnabled">false</item>
         <item name="android:windowBackground">@drawable/dialog_background</item>
 

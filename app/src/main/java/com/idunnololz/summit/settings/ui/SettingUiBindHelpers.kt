@@ -114,7 +114,11 @@ fun RadioGroupSettingItem.bindTo(
 
     zipped.forEach { (option, b) ->
         b.title.text = option.title
-        b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(option.icon, 0, 0, 0)
+        if (option.icon != null) {
+            b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(option.icon, 0, 0, 0)
+        } else {
+            b.title.setCompoundDrawables(null, null, null, null)
+        }
 
         if (option.description != null) {
             b.desc.visibility = View.VISIBLE

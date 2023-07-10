@@ -11,9 +11,7 @@ import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -30,6 +28,7 @@ import com.idunnololz.summit.databinding.CommunitySelectorCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
+import com.idunnololz.summit.databinding.CommunitySelectorViewBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -67,6 +66,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
     private var rootView: View? = null
 
+    private lateinit var binding: CommunitySelectorViewBinding
     private lateinit var motionLayout: MotionLayout
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: EditText
@@ -74,9 +74,6 @@ class CommunitySelectorController @AssistedInject constructor(
     private var coroutineScope = createCoroutineScope()
 
     private val adapter = SubredditsAdapter()
-
-    private var topInset = MutableLiveData(0)
-    private var bottomInset = MutableLiveData(0)
 
     var onCommunitySelectedListener: CommunitySelectedListener? = null
 
@@ -86,18 +83,20 @@ class CommunitySelectorController @AssistedInject constructor(
         }
     }
 
-    fun inflate(activity: MainActivity, container: ViewGroup) {
+    fun inflate(container: ViewGroup) {
         rootView?.let {
             return
         }
 
-        val rootView = inflater.inflate(R.layout.subreddit_selector_view, container, false)
-        this.rootView = rootView
+        val binding = CommunitySelectorViewBinding.inflate(inflater, container, false)
+        this.binding = binding
+        this.rootView = binding.root
+        val rootView = binding.root
         rootView.visibility = View.GONE
 
-        motionLayout = rootView.findViewById(R.id.motionLayout)
-        recyclerView = rootView.findViewById(R.id.subredditsRecyclerView)
-        searchView = rootView.findViewById(R.id.searchView)
+        motionLayout = binding.motionLayout
+        recyclerView = binding.recyclerView
+        searchView = binding.searchView
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -153,30 +152,23 @@ class CommunitySelectorController @AssistedInject constructor(
 
         coroutineScope.launch {
             lemmyApiClient.search(
-                sortType = SortType.Active,
+                sortType = SortType.TopMonth,
                 listingType = ListingType.All,
                 searchType = SearchType.Communities,
                 query = query.toString(),
+                limit = 20,
             ).onSuccess {
                 adapter.setQueryServerResults(it.communities)
             }
         }
     }
 
-    fun show(activity: MainActivity, insets: MainActivityInsets) {
+    fun show(activity: MainActivity, lifecycleOwner: LifecycleOwner) {
         rootView?.visibility = View.VISIBLE
         motionLayout.transitionToState(R.id.expanded)
 
-        setInsets(insets.topInset, insets.bottomInset)
-
-        bottomInset.observeForever {
-            recyclerView.updatePadding(bottom = it)
-        }
-        topInset.observeForever {
-            rootView?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = it
-            }
-        }
+        activity.insetViewExceptTopAutomaticallyByPadding(lifecycleOwner, recyclerView)
+        activity.insetViewExceptBottomAutomaticallyByPadding(lifecycleOwner, binding.motionLayout)
 
         activity.onBackPressedDispatcher.addCallback(onBackPressedHandler)
     }
@@ -204,11 +196,6 @@ class CommunitySelectorController @AssistedInject constructor(
                 adapter.setData(it.data)
             }
         }
-    }
-
-    private fun setInsets(topInset: Int, bottomInset: Int) {
-        this.topInset.value = topInset
-        this.bottomInset.value = bottomInset
     }
 
     private fun createCoroutineScope() =
@@ -371,56 +358,75 @@ class CommunitySelectorController @AssistedInject constructor(
                     }
                 }
 
-            val communityIds = hashSetOf<String>()
+            val communityRefs = hashSetOf<CommunityRef>()
             val query = query
+            val isQueryActive = !query.isNullOrBlank()
 
             val newItems = mutableListOf<Item>()
-            newItems.add(Item.GroupHeaderItem(context.getString(R.string.feeds)))
-            newItems.add(Item.StaticChildItem(
-                context.getString(R.string.all),
-                R.drawable.ic_subreddit_all,
-                CommunityRef.All(),
-            ))
 
-            val account = accountManager.currentAccount.value
-            if (account != null) {
-                newItems.add(Item.StaticChildItem(
-                    context.getString(R.string.subscribed),
-                    R.drawable.baseline_dynamic_feed_24,
-                    CommunityRef.Subscribed(account.instance),
-                ))
-            }
-            newItems.addAll(
-                listOf(
+            if (!isQueryActive) {
+                newItems.add(Item.GroupHeaderItem(context.getString(R.string.feeds)))
+                newItems.add(
                     Item.StaticChildItem(
-                        CommonLemmyInstance.LemmyMl.instance,
-                        R.drawable.ic_subreddit_home,
-                        CommunityRef.Local(CommonLemmyInstance.LemmyMl.instance),
-                    ),
-                    Item.StaticChildItem(
-                        CommonLemmyInstance.LemmyWorld.instance,
-                        R.drawable.ic_subreddit_home,
-                        CommunityRef.Local(CommonLemmyInstance.LemmyWorld.instance),
-                    ),
-                    Item.StaticChildItem(
-                        CommonLemmyInstance.Beehaw.instance,
-                        R.drawable.ic_subreddit_home,
-                        CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
-                    ),
+                        context.getString(R.string.all),
+                        R.drawable.ic_subreddit_all,
+                        CommunityRef.All(),
+                    )
                 )
-            )
 
-            newItems.addAll(makeRecentItems(query))
-            newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))
+                val account = accountManager.currentAccount.value
+                if (account != null) {
+                    newItems.add(
+                        Item.StaticChildItem(
+                            context.getString(R.string.subscribed),
+                            R.drawable.baseline_dynamic_feed_24,
+                            CommunityRef.Subscribed(account.instance),
+                        )
+                    )
+                }
+                newItems.addAll(
+                    listOf(
+                        Item.StaticChildItem(
+                            CommonLemmyInstance.LemmyMl.instance,
+                            R.drawable.ic_subreddit_home,
+                            CommunityRef.Local(CommonLemmyInstance.LemmyMl.instance),
+                        ),
+                        Item.StaticChildItem(
+                            CommonLemmyInstance.LemmyWorld.instance,
+                            R.drawable.ic_subreddit_home,
+                            CommunityRef.Local(CommonLemmyInstance.LemmyWorld.instance),
+                        ),
+                        Item.StaticChildItem(
+                            CommonLemmyInstance.Beehaw.instance,
+                            R.drawable.ic_subreddit_home,
+                            CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
+                        ),
+                    )
+                )
 
-            rawData
+                newItems.addAll(makeRecentItems(query))
+                newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))
+            }
+
+            val filteredPopularCommunities = rawData.filter {
+                query.isNullOrBlank() || it.community.name.contains(query, ignoreCase = true)
+            }
+
+            filteredPopularCommunities
                 .sortedByDescending { it.counts.users_active_month }
                 .mapTo(newItems) {
                     Item.CommunityChildItem(
                         text = it.community.name,
                         community = it,
                         monthlyActiveUsers = it.counts.users_active_month
-                    ).also { communityIds.add(it.id) }
+                    ).also {
+                        communityRefs.add(
+                            CommunityRef.CommunityRefByName(
+                                name = it.community.community.name,
+                                instance = it.community.community.instance
+                            )
+                        )
+                    }
                 }
 
             if (!query.isNullOrBlank()) {
@@ -437,11 +443,13 @@ class CommunitySelectorController @AssistedInject constructor(
                         monthlyActiveUsers = it.counts.users_active_month
                     ) }
                     .filter {
-                        !communityIds.contains(it.id) &&
-                                getText(it).contains(query, ignoreCase = true)
+                        !communityRefs.contains(
+                            CommunityRef.CommunityRefByName(
+                                it.community.community.name,
+                                it.community.community.instance,
+                            )
+                        ) && it.community.community.name.contains(query, ignoreCase = true)
                     }
-
-                newItems.retainAll { getText(it).contains(query, ignoreCase = true) }
 
                 newItems.sortByDescending { StringSearchUtils.similarity(query, getText(it)) }
 

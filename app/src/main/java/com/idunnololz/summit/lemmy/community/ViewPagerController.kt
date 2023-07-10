@@ -68,7 +68,7 @@ class ViewPagerController(
                         val postFragment = childFragmentManager
                             .findFragmentById(R.id.post_fragment_container)
                         if (postFragment != null) {
-                            childFragmentManager.commit {
+                            childFragmentManager.commit(allowStateLoss = true) {
                                 remove(postFragment)
                             }
                         }

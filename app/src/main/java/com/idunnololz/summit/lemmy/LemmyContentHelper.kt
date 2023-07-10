@@ -205,7 +205,7 @@ class LemmyContentHelper(
             val imageUrl = postView.getThumbnailUrl(false)
 
             if (imageUrl != null) {
-                fullImageView.load(0)
+                fullImageView.load(null)
 
                 fun fetchFullImage() {
                     offlineManager.fetchImage(rootView, imageUrl) b@{
@@ -375,7 +375,7 @@ class LemmyContentHelper(
                             requireNotNull(targetPostView.post.thumbnail_url)
                         }
 
-                    fullImageView.load(0)
+                    fullImageView.load(null)
 
                     fun updateLayoutParams() {
                         offlineManager.getImageSizeHint(imageUrl, tempSize)

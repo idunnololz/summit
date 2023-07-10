@@ -1,5 +1,6 @@
 package com.idunnololz.summit.api
 
+import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
@@ -45,6 +46,10 @@ class AccountAwareLemmyClient @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
+    companion object {
+        private const val TAG = "AccountAwareLemmyClient"
+    }
+
     private val coroutineScope = coroutineScopeFactory.create()
     private var currentAccount: Account? = null
 
@@ -68,28 +73,27 @@ class AccountAwareLemmyClient @Inject constructor(
         page: Int,
         limit: Int? = null,
         force: Boolean,
+        account: Account? = accountForInstance(),
     ): Result<List<PostView>> {
-        val currentAccount = accountForInstance()
-
         return apiClient.fetchPosts(
-            account = currentAccount,
+            account = account,
             communityIdOrName = communityIdOrName,
             sortType = sortType
-                ?: if (currentAccount == null) {
+                ?: if (account == null) {
                     SortType.Active
                 } else {
-                    SortType.values()[currentAccount.defaultSortType]
+                    SortType.values()[account.defaultSortType]
                 },
             listingType = listingType
-                ?: if (currentAccount == null) {
+                ?: if (account == null) {
                     ListingType.All
                 } else {
-                    ListingType.values()[currentAccount.defaultListingType]
+                    ListingType.values()[account.defaultListingType]
                 },
             limit = limit,
             page = page,
             force = force,
-        )
+        ).autoSignOut(account)
     }
 
     suspend fun fetchPostWithRetry(
@@ -99,19 +103,36 @@ class AccountAwareLemmyClient @Inject constructor(
         apiClient.fetchPost(accountForInstance(), id, force)
     }
 
+    suspend fun markPostAsRead(
+        postId: PostId,
+        read: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<PostView> {
+        return if (account != null) {
+            apiClient.markPostAsRead(postId, read, account)
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+    }
+
     suspend fun fetchCommentsWithRetry(
         id: Either<PostId, CommentId>,
         sort: CommentSortType,
         force: Boolean,
+        account: Account? = accountForInstance(),
     ): Result<List<CommentView>> = retry {
-        apiClient.fetchComments(accountForInstance(), id, sort, force)
+        apiClient.fetchComments(account, id, sort, force)
+            .autoSignOut(account)
     }
 
     suspend fun fetchCommunityWithRetry(
         idOrName: Either<Int, String>,
         force: Boolean,
+        account: Account? = accountForInstance(),
     ): Result<CommunityView> = retry {
-        apiClient.getCommunity(accountForInstance(), idOrName, force)
+        apiClient.getCommunity(account, idOrName, force)
+            .autoSignOut(account)
     }
 
     suspend fun fetchPersonByIdWithRetry(
@@ -119,6 +140,7 @@ class AccountAwareLemmyClient @Inject constructor(
         account: Account? = accountForInstance(),
     ): Result<GetPersonDetailsResponse> = retry {
         apiClient.fetchPerson(personId = personId, name = null, account = account)
+            .autoSignOut(account)
     }
 
     suspend fun fetchPersonByNameWithRetry(
@@ -126,6 +148,7 @@ class AccountAwareLemmyClient @Inject constructor(
         account: Account? = accountForInstance(),
     ): Result<GetPersonDetailsResponse> = retry {
         apiClient.fetchPerson(personId = null, name = name, account = account)
+            .autoSignOut(account)
     }
 
     suspend fun search(
@@ -136,26 +159,32 @@ class AccountAwareLemmyClient @Inject constructor(
         searchType: SearchType,
         page: Int? = null,
         query: String,
+        limit: Int? = null,
         creatorId: Int? = null,
+        account: Account? = accountForInstance(),
     ): Result<SearchResponse> =
         apiClient.search(
-            account = accountForInstance(),
+            account = account,
             communityId = communityId,
             communityName = communityName,
             sortType = sortType,
             listingType = listingType,
             searchType = searchType,
             page = page,
+            limit = limit,
             query = query
         )
+            .autoSignOut(account)
 
     suspend fun fetchCommunitiesWithRetry(
         sortType: SortType,
         listingType: ListingType,
         page: Int = 1,
         limit: Int = 50,
+        account: Account? = accountForInstance(),
     ): Result<List<CommunityView>> = retry {
-        apiClient.fetchCommunities(accountForInstance(), sortType, listingType, page, limit)
+        apiClient.fetchCommunities(account, sortType, listingType, page, limit)
+            .autoSignOut(account)
     }
 
     suspend fun followCommunityWithRetry(
@@ -165,6 +194,7 @@ class AccountAwareLemmyClient @Inject constructor(
     ): Result<CommunityView> {
         return if (account != null) {
             apiClient.followCommunityWithRetry(communityId, subscribe, account)
+                .autoSignOut(account)
         } else {
             createAccountErrorResult()
         }
@@ -193,6 +223,7 @@ class AccountAwareLemmyClient @Inject constructor(
                 createAccountErrorResult()
             } else {
                 apiClient.fetchUnreadCount(force, account)
+                    .autoSignOut(account)
             }
         }
 
@@ -204,6 +235,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.deletePost(account, id)
+                .autoSignOut(account)
         }
     }
 
@@ -216,6 +248,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.uploadImage(account, fileName, imageIs)
+                .autoSignOut(account)
         }
 
     suspend fun blockCommunity(
@@ -227,6 +260,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.blockCommunity(communityId, block, account)
+                .autoSignOut(account)
         }
 
     suspend fun blockPerson(
@@ -238,6 +272,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.blockPerson(personId, block, account)
+                .autoSignOut(account)
         }
 
     suspend fun fetchReplies(
@@ -252,6 +287,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.fetchReplies(sort, page, limit, unreadOnly, account, force)
+                .autoSignOut(account)
         }
 
     suspend fun fetchMentions(
@@ -266,6 +302,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.fetchMentions(sort, page, limit, unreadOnly, account, force)
+                .autoSignOut(account)
         }
 
     suspend fun fetchPrivateMessages(
@@ -279,6 +316,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.fetchPrivateMessages(unreadOnly, page, limit, account, force)
+                .autoSignOut(account)
         }
 
     suspend fun markReplyAsRead(
@@ -290,6 +328,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.markReplyAsRead(id, read, account)
+                .autoSignOut(account)
         }
 
     suspend fun markMentionAsRead(
@@ -301,6 +340,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.markMentionAsRead(id, read, account)
+                .autoSignOut(account)
         }
 
     suspend fun markPrivateMessageAsRead(
@@ -312,6 +352,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.markPrivateMessageAsRead(id, read, account)
+                .autoSignOut(account)
         }
 
 
@@ -370,5 +411,28 @@ class AccountAwareLemmyClient @Inject constructor(
             apiClient.changeInstance(account.instance)
         }
         currentAccount = account
+    }
+
+    private fun <T> Result<T>.autoSignOut(account: Account?): Result<T> {
+        if (account == null) {
+            return this
+        }
+
+        if (this.isSuccess) {
+            return this
+        }
+
+        val error = requireNotNull(this.exceptionOrNull())
+        if (error is NotAuthenticatedException) {
+            if (account.instance == apiClient.instance) {
+                Log.d(TAG, "Account token expired. Signing user '${account.name}' out.")
+                // sign this account out
+                coroutineScope.launch {
+                    accountManager.signOut(account)
+                }
+            }
+        }
+
+        return this
     }
 }

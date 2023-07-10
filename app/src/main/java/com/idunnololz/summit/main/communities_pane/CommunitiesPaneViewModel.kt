@@ -4,6 +4,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
@@ -23,7 +25,7 @@ class CommunitiesPaneViewModel @Inject constructor(
 
     private var subscriptionCommunities: List<AccountSubscription> = listOf()
     private var userCommunities: List<UserCommunityItem> = listOf()
-    private var accountInfoUpdateState: StatefulData<Unit> = StatefulData.NotStarted()
+    private var accountInfoUpdateState: StatefulData<Account?> = StatefulData.NotStarted()
 
     val communities = MutableLiveData<CommunityData?>(null)
 
@@ -67,7 +69,7 @@ class CommunitiesPaneViewModel @Inject constructor(
 
     fun loadCommunities() {
         userCommunities = userCommunitiesManager.getAllUserCommunities()
-        accountInfoManager.fetchAccountInfo()
+        accountInfoManager.refreshAccountInfo()
         updateCommunities()
     }
 
@@ -88,6 +90,6 @@ class CommunitiesPaneViewModel @Inject constructor(
     class CommunityData(
         val subscriptionCommunities: List<AccountSubscription>,
         val userCommunities: List<UserCommunityItem>,
-        val accountInfoUpdateState: StatefulData<Unit>,
+        val accountInfoUpdateState: StatefulData<Account?>,
     )
 }

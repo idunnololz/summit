@@ -31,7 +31,7 @@
         android:layout_marginEnd="@dimen/padding"
         android:layout_marginTop="@dimen/padding_quarter"
         app:layout_constraintStart_toEndOf="@+id/image"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/settings"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
@@ -45,8 +45,20 @@
         android:ellipsize="end"
         android:layout_marginEnd="@dimen/padding"
         app:layout_constraintStart_toStartOf="@+id/name"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/settings"
         app:layout_constraintTop_toBottomOf="@+id/name"/>
+
+    <ImageView
+        android:id="@+id/settings"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:src="@drawable/baseline_settings_24"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/image"
+        app:layout_constraintBottom_toBottomOf="@+id/image"
+        app:tint="?colorControlNormal" />
 
     <Button
         android:id="@+id/sign_out"

@@ -86,7 +86,7 @@
         app:constraint_referenced_ids="image,iconImage,iconGoneSpacer"
         app:barrierDirection="end" />
 
-    <TextView
+    <com.idunnololz.summit.view.LinkifyTextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

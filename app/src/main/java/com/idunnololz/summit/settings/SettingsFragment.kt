@@ -1,7 +1,6 @@
 package com.idunnololz.summit.settings
 
 import android.os.Bundle
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
+import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -25,6 +25,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
     @Inject
     lateinit var settingsManager: SettingsManager
+
+    @Inject
+    lateinit var mainSettings: MainSettings
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,63 +72,47 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         with(binding) {
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
-            recyclerView.adapter = SettingItemsAdapter(settingsManager.getSettingsForMainPage())
-        }
-    }
-
-    private inner class SettingItemsAdapter(
-        private val data: List<BasicSettingItem>
-    ) : Adapter<ViewHolder>() {
-
-        private val adapterHelper = AdapterHelper<SettingItem>(
-            areItemsTheSame = { old, new ->
-                old.id == new.id
-            }
-        ).apply {
-            addItemType(BasicSettingItem::class, BasicSettingItemBinding::inflate) { item, b, h ->
-                b.icon.setImageResource(item.icon)
-                b.title.text = item.title
-                b.desc.text = item.description
-
-                b.root.setOnClickListener {
-
-                    when (item.id) {
-                        R.id.setting_view_type -> {
+            recyclerView.adapter = SettingItemsAdapter(
+                onSettingClick = {
+                    when (it) {
+                        mainSettings.settingViewType.id -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingViewTypeFragment()
                             findNavController().navigateSafe(directions)
+                            true
                         }
-                        R.id.setting_theme -> {
+                        mainSettings.settingTheme.id -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingThemeFragment()
                             findNavController().navigateSafe(directions)
+                            true
                         }
-                        R.id.setting_post_and_comments -> {
+                        mainSettings.settingPostAndComment.id -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingPostAndCommentsFragment()
                             findNavController().navigateSafe(directions)
+                            true
                         }
+                        mainSettings.settingLemmyWeb.id -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingWebFragment()
+                            findNavController().navigateSafe(directions)
+                            true
+                        }
+                        mainSettings.settingCache.id -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingCacheFragment()
+                            findNavController().navigateSafe(directions)
+                            true
+                        }
+                        else -> false
                     }
-                }
+                },
+                childFragmentManager,
+            ).apply {
+                this.data = settingsManager.getSettingsForMainPage()
             }
         }
-
-        init {
-            refreshItems()
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        private fun refreshItems() {
-            adapterHelper.setItems(data, this)
-        }
-
     }
+
 }

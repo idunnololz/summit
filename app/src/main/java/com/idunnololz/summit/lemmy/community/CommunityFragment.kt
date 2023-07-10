@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
@@ -22,7 +21,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
@@ -48,11 +46,11 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getShortDesc
+import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.main.LemmyAppBarController
-import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
@@ -65,7 +63,6 @@ import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.VerticalSpaceItemDecoration
-import com.idunnololz.summit.util.ext.forceShowIcons
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -135,20 +132,12 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
             setOnMenuItemClickListener { menuItem ->
                 when(menuItem.id) {
-                    R.id.sort_order_active ->
-                        viewModel.setSortOrder(CommunitySortOrder.Active)
-                    R.id.sort_order_hot ->
-                        viewModel.setSortOrder(CommunitySortOrder.Hot)
                     R.id.sort_order_top ->
                         getMainActivity()?.showBottomMenu(getSortByTopMenu())
-                    R.id.sort_order_new ->
-                        viewModel.setSortOrder(CommunitySortOrder.New)
-                    R.id.sort_order_old ->
-                        viewModel.setSortOrder(CommunitySortOrder.Old)
-                    R.id.sort_order_most_comments ->
-                        viewModel.setSortOrder(CommunitySortOrder.MostComments)
-                    R.id.sort_order_new_comments ->
-                        viewModel.setSortOrder(CommunitySortOrder.NewComments)
+                    else ->
+                        idToSortOrder(menuItem.id)?.let {
+                            viewModel.setSortOrder(it)
+                        }
                 }
             }
         }
@@ -170,40 +159,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             setTitle(R.string.sort_by_top)
 
             setOnMenuItemClickListener { menuItem ->
-                when(menuItem.id) {
-                    R.id.sort_order_top_last_hour ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastHour))
-                    R.id.sort_order_top_last_six_hour ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastSixHour))
-                    R.id.sort_order_top_last_twelve_hour ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastTwelveHour))
-                    R.id.sort_order_top_day ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.Today))
-                    R.id.sort_order_top_week ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisWeek))
-                    R.id.sort_order_top_month ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisMonth))
-                    R.id.sort_order_top_last_three_month ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastThreeMonth))
-                    R.id.sort_order_top_last_six_month ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastSixMonth))
-                    R.id.sort_order_top_last_nine_month ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastNineMonth))
-                    R.id.sort_order_top_year ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisYear))
-                    R.id.sort_order_top_all_time ->
-                        viewModel.setSortOrder(
-                            CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.AllTime))
+                idToSortOrder(menuItem.id)?.let {
+                    viewModel.setSortOrder(it)
                 }
             }
         }
@@ -298,6 +255,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 },
                 onShowMoreActions = {
                     showMoreOptionsFor(it)
+                },
+                onPostRead = { postView ->
+                    viewModel.onPostRead(postView)
                 }
             )
             onSelectedLayoutChanged()
@@ -519,36 +479,40 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 is StatefulData.Success -> {
                     val adapter = adapter ?: return@a
 
-                    adapter.setItems(it.data.pageIndex, it.data)
-
-                    adapter.curDataSource = it.data.instance
-
-                    if (shouldScrollToTopAfterFresh) {
-                        shouldScrollToTopAfterFresh = false
-                        binding.recyclerView.scrollToPosition(0)
+                    if (!it.data.isReadPostUpdate) {
+                        adapter.setItems(it.data.pageIndex, it.data, animate = false)
                     } else {
-                        val pagePosition = viewModel.getPagePosition(it.data.pageIndex)
-                        if (pagePosition.isAtBottom) {
-                            (binding.recyclerView.layoutManager as LinearLayoutManager)
-                                .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
-                        } else if (pagePosition.itemIndex != 0 || pagePosition.offset != 0) {
-                            (binding.recyclerView.layoutManager as LinearLayoutManager)
-                                .scrollToPositionWithOffset(
-                                    pagePosition.itemIndex,
-                                    pagePosition.offset
-                                )
-                        } else {
-                            binding.recyclerView.scrollToPosition(0)
-                            binding.customAppBar.setExpanded(true)
-                        }
-                    }
+                        adapter.setItems(it.data.pageIndex, it.data)
 
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    binding.recyclerView.visibility = View.VISIBLE
-                    binding.loadingView.hideAll()
-                    
-                    if (it.data.posts.isEmpty()) {
-                        binding.loadingView.showErrorText(R.string.no_posts)
+                        adapter.curDataSource = it.data.instance
+
+                        if (shouldScrollToTopAfterFresh) {
+                            shouldScrollToTopAfterFresh = false
+                            binding.recyclerView.scrollToPosition(0)
+                        } else {
+                            val pagePosition = viewModel.getPagePosition(it.data.pageIndex)
+                            if (pagePosition.isAtBottom) {
+                                (binding.recyclerView.layoutManager as LinearLayoutManager)
+                                    .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
+                            } else if (pagePosition.itemIndex != 0 || pagePosition.offset != 0) {
+                                (binding.recyclerView.layoutManager as LinearLayoutManager)
+                                    .scrollToPositionWithOffset(
+                                        pagePosition.itemIndex,
+                                        pagePosition.offset
+                                    )
+                            } else {
+                                binding.recyclerView.scrollToPosition(0)
+                                binding.customAppBar.setExpanded(true)
+                            }
+                        }
+
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        binding.recyclerView.visibility = View.VISIBLE
+                        binding.loadingView.hideAll()
+
+                        if (it.data.posts.isEmpty()) {
+                            binding.loadingView.showErrorText(R.string.no_posts)
+                        }
                     }
                 }
             }
@@ -951,9 +915,13 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         data class PostItem(
             val postView: PostView,
             val instance: String,
+            val isExpanded: Boolean,
+            val isActionExpanded: Boolean,
+            val highlight: Boolean,
+            val highlightForever: Boolean,
         ) : Item()
 
-        class FooterItem(val hasMore: Boolean) : Item()
+        data class FooterItem(val hasMore: Boolean) : Item()
     }
 
     private inner class ListingItemAdapter(
@@ -976,6 +944,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             videoState: VideoState?
         ) -> Unit,
         private val onShowMoreActions: (PostView) -> Unit,
+        private val onPostRead: (PostView) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var pageIndex: Int? = null
@@ -1044,9 +1013,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     } else {
                         val h: ListingItemViewHolder = holder as ListingItemViewHolder
                         val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
-                        val isActionsExpanded = actionsExpandedItems
-                            .contains(item.postView.getUniqueKey())
-                        val isExpanded = expandedItems.contains(item.postView.getUniqueKey())
+                        val isActionsExpanded = item.isActionExpanded
+                        val isExpanded = item.isExpanded
 
                         postListViewBuilder.bind(
                             holder = h,
@@ -1059,8 +1027,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                             isExpanded = isExpanded,
                             isActionsExpanded = isActionsExpanded,
                             updateContent = false,
-                            highlight = postToHighlight?.id == item.postView.post.id,
-                            highlightForever = postToHighlightForever?.id == item.postView.post.id,
+                            highlight = item.highlight,
+                            highlightForever = item.highlightForever,
                             onRevealContentClickedFn = {
                                 revealedItems.add(item.postView.getUniqueKey())
                                 notifyItemChanged(h.absoluteAdapterPosition)
@@ -1110,9 +1078,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 is Item.PostItem -> {
                     val h: ListingItemViewHolder = holder as ListingItemViewHolder
                     val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
-                    val isActionsExpanded = actionsExpandedItems
-                        .contains(item.postView.getUniqueKey())
-                    val isExpanded = expandedItems.contains(item.postView.getUniqueKey())
+                    val isActionsExpanded = item.isActionExpanded
+                    val isExpanded = item.isExpanded
 
                     postListViewBuilder.bind(
                         holder = h,
@@ -1125,8 +1092,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         isExpanded = isExpanded,
                         isActionsExpanded = isActionsExpanded,
                         updateContent = true,
-                        highlight = postToHighlight?.id == item.postView.post.id,
-                        highlightForever = postToHighlightForever?.id == item.postView.post.id,
+                        highlight = item.highlight,
+                        highlightForever = item.highlightForever,
                         onRevealContentClickedFn = {
                             revealedItems.add(item.postView.getUniqueKey())
                             notifyItemChanged(h.absoluteAdapterPosition)
@@ -1163,9 +1130,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 expandedItems.remove(postView.getUniqueKey())
             } else {
                 expandedItems.add(postView.getUniqueKey())
+
+                onPostRead(postView)
             }
 
-            notifyItemChanged(position)
+            refreshItems(animate = true)
         }
 
         private fun toggleActions(position: Int, postView: PostView) {
@@ -1175,15 +1144,20 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 actionsExpandedItems.add(postView.getUniqueKey())
             }
 
-            notifyItemChanged(position)
+            refreshItems(animate = true)
         }
 
         override fun getItemCount(): Int = items.size
 
-        fun setItems(pageIndex: Int, data: CommunityViewModel.LoadedPostsData) {
+        fun setItems(
+            pageIndex: Int,
+            data: CommunityViewModel.LoadedPostsData,
+            animate: Boolean = true
+        ) {
             rawData = data
             this.pageIndex = pageIndex
-            refreshItems()
+
+            refreshItems(animate)
         }
 
         fun highlightPost(postToHighlight: PostRef) {
@@ -1198,7 +1172,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
 
             if (index >= 0) {
-                notifyItemChanged(index, Unit)
+                refreshItems(animate = false)
             }
         }
 
@@ -1214,15 +1188,30 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
 
             if (index >= 0) {
-                notifyItemChanged(index, Unit)
+                refreshItems(animate = false)
             }
         }
 
-        fun refreshItems() {
-            val newItems = rawData?.let { data ->
+        fun refreshItems(animate: Boolean) {
+            val newItems = mutableListOf<Item>()
+            rawData?.let { data ->
                 data.posts
-                    .map { Item.PostItem(it, data.instance) } + Item.FooterItem(data.hasMore)
-            } ?: listOf()
+                    .mapTo(newItems) {
+                        val key = it.getUniqueKey()
+                        val isActionsExpanded = actionsExpandedItems.contains(key)
+                        val isExpanded = expandedItems.contains(key)
+
+                        Item.PostItem(
+                            postView = it,
+                            instance = data.instance,
+                            isExpanded = isExpanded,
+                            isActionExpanded = isActionsExpanded,
+                            highlight = postToHighlight?.id == it.post.id,
+                            highlightForever = postToHighlightForever?.id == it.post.id,
+                        )
+                    }
+                newItems.add(Item.FooterItem(data.hasMore))
+            }
             val oldItems = items
 
             val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
@@ -1230,14 +1219,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     val oldItem = oldItems[oldItemPosition]
                     val newItem = newItems[newItemPosition]
 
-                    return if (oldItem::class.java == newItem::class.java) {
-                        if (oldItem is Item.PostItem && newItem is Item.PostItem) {
-                            oldItem.postView.getUniqueKey() == newItem.postView.getUniqueKey()
-                        } else {
-                            false
-                        }
-                    } else {
-                        false
+                    return oldItem::class == newItem::class && when (oldItem) {
+                        is Item.FooterItem -> true
+                        is Item.PostItem ->
+                            oldItem.postView.getUniqueKey() ==
+                                    (newItem as Item.PostItem).postView.getUniqueKey()
                     }
                 }
 
@@ -1251,9 +1237,17 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 ): Boolean {
                     val oldItem = oldItems[oldItemPosition]
                     val newItem = newItems[newItemPosition]
+
                     return oldItem == newItem
                 }
 
+                override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+                    return if (animate) {
+                        null
+                    } else {
+                        Unit
+                    }
+                }
             })
             this.items = newItems
             diff.dispatchUpdatesTo(this)
