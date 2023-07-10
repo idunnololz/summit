@@ -335,20 +335,30 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun onHideRead() {
+    fun onHideRead(anchors: Set<Int>) {
         val loadedPostData = loadedPostsData.valueOrNull
         loadedPostsData.setIsLoading()
 
         viewModelScope.launch {
-            val anchorPosts = mutableListOf<PostId>()
-            loadedPostData?.posts
-                ?.filter { !it.read }
-                ?.mapTo(anchorPosts) { it.post.id }
+            val anchorPosts = if (anchors.isEmpty()) {
+                loadedPostData?.posts
+                    ?.filter { !it.read }
+                    ?.mapTo(mutableSetOf<Int>()) { it.post.id }
+            } else {
+                anchors
+            } ?: setOf()
 
             postsRepository.hideReadPosts(anchorPosts, currentPageIndex.value ?: 0)
                 .onSuccess {
+                    val position = it.posts.indexOfFirst { anchorPosts.contains(it.post.id) }
+
+                    if (position != -1) {
+                        setPagePosition(it.pageIndex, position, 0)
+                    } else {
+                        setPagePositionAtTop(it.pageIndex)
+                    }
+
                     fetchPage(it.pageIndex)
-//                    setPagePositionAtTop(it.pageIndex)
                 }
                 .onFailure {
                     loadedPostsData.postError(it)

@@ -73,11 +73,11 @@ class PostsRepository @Inject constructor(
         }
     }
 
-    suspend fun hideReadPosts(anchors: List<PostId>, maxPage: Int): Result<PageResult> {
+    suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> {
         reset()
         resetCacheForCommunity()
 
-        val anchorsSet = anchors.toSet()
+        val anchorsSet = anchors
 
         var curPage = 0
         while (true) {
