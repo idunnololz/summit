@@ -166,7 +166,7 @@ class LemmyHeaderHelper(
             }
         }
 
-        postView.instance.let { domain ->
+        postView.community.instance.let { domain ->
             appendSeparator(sb)
             sb.append(domain)
         }

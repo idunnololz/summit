@@ -432,7 +432,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             shouldScrollToTopAfterFresh = true
-            viewModel.fetchCurrentPage(true)
+            viewModel.fetchCurrentPage(true, resetHideRead = true)
             binding.recyclerView.scrollToPosition(0)
         }
         binding.loadingView.setOnRefreshClickListener {
@@ -757,10 +757,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
 
             addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
-
-            if (viewModel.isHideReadEnabled) {
-                addItemWithIcon(R.id.clear_read, R.string.hide_read, R.drawable.baseline_clear_all_24)
-            }
+            addItemWithIcon(R.id.hide_read, R.string.hide_read, R.drawable.baseline_clear_all_24)
 
             addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
             addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
@@ -825,7 +822,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         val shareIntent = Intent.createChooser(sendIntent, null)
                         startActivity(shareIntent)
                     }
-                    R.id.clear_read -> {
+                    R.id.hide_read -> {
                         val anchors = mutableSetOf<Int>()
                         val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
                             it.findFirstCompletelyVisibleItemPosition()..
@@ -1142,7 +1139,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         b.nextButton.setOnClickListener {
                             if (preferences.markPostsAsReadOnScroll) {
                                 seenItemPositions.forEach {
-                                    (items[it] as? Item.PostItem)?.let {
+                                    (items.getOrNull(it) as? Item.PostItem)?.let {
                                         onPostRead(it.postView)
                                     }
                                 }
