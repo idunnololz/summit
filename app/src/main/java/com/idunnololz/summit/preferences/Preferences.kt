@@ -13,6 +13,7 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -132,6 +133,11 @@ class Preferences @Inject constructor(
             prefs.edit().putBoolean(KEY_MARK_POSTS_AS_READ_ON_SCROLL, value).apply()
         }
 
+    var useGestureActions: Boolean
+        get() = prefs.getBoolean(KEY_USE_GESTURE_ACTIONS, false)
+        set(value) {
+            prefs.edit().putBoolean(KEY_USE_GESTURE_ACTIONS, value).apply()
+        }
 
     private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
         return try {

@@ -104,9 +104,14 @@ class CommunitySelectorController @AssistedInject constructor(
 
         searchView.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                val tokens = searchView.text.toString().split("@")
+                val communityName = tokens.getOrNull(0) ?: return@OnKeyListener true
+                val instance = tokens.getOrNull(1)
+                    ?: lemmyApiClient.instance
+
                 onCommunitySelectedListener?.invoke(
                     this@CommunitySelectorController,
-                    CommunityRef.CommunityRefByName(searchView.text.toString(), null)
+                    CommunityRef.CommunityRefByName(communityName, instance)
                 )
                 searchView.setText("")
                 return@OnKeyListener true

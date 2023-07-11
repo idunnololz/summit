@@ -5,7 +5,6 @@ import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.toInstanceAgnosticCommunityRef
 import com.idunnololz.summit.preferences.Preferences
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -81,12 +80,6 @@ class UserCommunitiesManager @Inject constructor(
     }
 
     fun addUserCommunity(communityRef: CommunityRef, icon: String?) {
-        var icon = icon
-        var communityRef = communityRef
-        if (communityRef is CommunityRef.CommunityRefByObj) {
-            icon = communityRef.community.icon
-        }
-        communityRef = communityRef.toInstanceAgnosticCommunityRef()
         val item = UserCommunityItem(communityRef = communityRef, iconUrl = icon)
 
         coroutineScope.launch {
@@ -118,9 +111,8 @@ class UserCommunitiesManager @Inject constructor(
     fun getAllUserCommunities(): List<UserCommunityItem> = userCommunityItems
 
     suspend fun setDefaultPage(currentCommunityRef: CommunityRef) {
-        val ref = currentCommunityRef.toInstanceAgnosticCommunityRef()
-        preferences.setDefaultPage(ref)
-        onDefaultPageChanged(ref)
+        preferences.setDefaultPage(currentCommunityRef)
+        onDefaultPageChanged(currentCommunityRef)
     }
 
     fun isCommunityBookmarked(communityRef: CommunityRef): Boolean =

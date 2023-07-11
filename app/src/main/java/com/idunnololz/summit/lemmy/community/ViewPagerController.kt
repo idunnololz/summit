@@ -147,6 +147,7 @@ class ViewPagerController(
         mainFragment.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
 
         viewPagerAdapter.onPostOpen()
+        viewPager.setPagingEnabled(true)
     }
 
     private fun onPostClosed() {
@@ -154,6 +155,7 @@ class ViewPagerController(
         mainFragment.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
 
         viewPagerAdapter.onPostClosed()
+        viewPager.setPagingEnabled(false)
     }
 
     class ViewPagerAdapter() : PagerAdapter() {

@@ -239,6 +239,36 @@ class AccountAwareLemmyClient @Inject constructor(
         }
     }
 
+    suspend fun createPost(
+        name: String,
+        body: String?,
+        url: String?,
+        isNsfw: Boolean,
+        account: Account? = accountForInstance(),
+        communityId: CommunityId,
+    ): Result<PostView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.createPost(name, body, url, isNsfw, account, communityId)
+                .autoSignOut(account)
+        }
+
+    suspend fun editPost(
+        postId: PostId,
+        name: String,
+        body: String?,
+        url: String?,
+        isNsfw: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<PostView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.editPost(postId, name, body, url, isNsfw, account)
+                .autoSignOut(account)
+        }
+
     suspend fun uploadImage(
         fileName: String,
         imageIs: InputStream,

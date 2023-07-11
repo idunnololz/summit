@@ -56,9 +56,6 @@ class CommunityInfoViewModel @Inject constructor(
                 is CommunityRef.CommunityRefByName -> {
                     Either.Right(apiClient.fetchCommunityWithRetry(Either.Right(communityRef.getServerId()), force))
                 }
-                is CommunityRef.CommunityRefByObj -> {
-                    Either.Right(apiClient.fetchCommunityWithRetry(Either.Right(communityRef.getServerId()), force))
-                }
                 is CommunityRef.Local -> {
                     Either.Left(apiClient.fetchSiteWithRetry(force))
                 }

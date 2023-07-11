@@ -30,6 +30,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.lemmy_web_preferences),
         context.getString(R.string.lemmy_web_preferences_desc)
     )
+    val settingGestures = BasicSettingItem(
+        R.drawable.baseline_gesture_24,
+        context.getString(R.string.gestures),
+        context.getString(R.string.gestures_desc)
+    )
     val settingHistory = BasicSettingItem(
         R.drawable.baseline_history_24,
         context.getString(R.string.history),

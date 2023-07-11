@@ -35,6 +35,7 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -977,5 +978,10 @@ class MainActivity : BaseActivity() {
     fun openAccountSettings() {
         val direction = MainDirections.actionGlobalSettingWebFragment()
         currentNavController?.navigateSafe(direction)
+    }
+
+    fun showSnackbar(message: Int) {
+        Snackbar.make(getSnackbarContainer(), message, Snackbar.LENGTH_LONG)
+            .show()
     }
 }

@@ -39,6 +39,7 @@ import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneViewModel
 import com.idunnololz.summit.main.community_info_pane.CommunityInfoController
 import com.idunnololz.summit.main.community_info_pane.CommunityInfoViewModel
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef
 import com.idunnololz.summit.tabs.isHomeTab
@@ -86,6 +87,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     lateinit var userCommunitiesManager: UserCommunitiesManager
     @Inject
     lateinit var tabsManager: TabsManager
+    @Inject
+    lateinit var preferences: Preferences
 
     lateinit var communitiesPaneController: CommunitiesPaneController
     lateinit var communityInfoController: CommunityInfoController
@@ -106,7 +109,12 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
             if (destination.id == R.id.postFragment || destination.id == R.id.communityFragment) {
                 binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
-                binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+
+                if (preferences.useGestureActions) {
+                    binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
+                } else {
+                    binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+                }
             } else {
                 binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
                 binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
@@ -294,6 +302,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     PanelState.Closed -> {
                         getMainActivity()?.setNavUiOpenness(0f)
 
+                        if (preferences.useGestureActions) {
+                            binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
+                        }
+
                         updatePaneBackPressHandler()
                     }
                     is PanelState.Closing -> {
@@ -337,6 +349,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
                 }
             }
+        }
+
+        if (preferences.useGestureActions) {
+            binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
         }
     }
 
@@ -640,6 +656,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     }
 
     fun expandEndPane() {
+        binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
         binding.rootView.openEndPanel()
     }
 }

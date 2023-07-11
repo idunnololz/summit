@@ -258,6 +258,36 @@ class LemmyApiClient @Inject constructor(
 
     suspend fun getCommunity(
         account: Account?,
+        name: String,
+        instance: String,
+        force: Boolean,
+    ): Result<CommunityView> {
+        val finalName = if (instance == this.instance) {
+            name
+        } else {
+            "$name@$instance"
+        }
+
+        val form = GetCommunity(name = finalName, auth = account?.jwt)
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getCommunityNoCache(form = form.serializeToMap())
+            } else {
+                api.getCommunity(form = form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it.community_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun getCommunity(
+        account: Account?,
         idOrName: Either<Int, String>,
         force: Boolean,
     ): Result<CommunityView> {

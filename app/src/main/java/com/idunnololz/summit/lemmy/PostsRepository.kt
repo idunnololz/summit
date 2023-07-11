@@ -12,14 +12,12 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.max
 import kotlin.math.min
 
 @ViewModelScoped
@@ -43,8 +41,8 @@ class PostsRepository @Inject constructor(
 
     private val coroutineScope = coroutineScopeFactory.create()
 
-    private val allPosts = mutableListOf<PostData>()
-    private val seenPosts = mutableSetOf<String>()
+    private var allPosts = mutableListOf<PostData>()
+    private var seenPosts = mutableSetOf<String>()
 
     private var communityRef: CommunityRef = CommunityRef.All()
 
@@ -108,7 +106,7 @@ class PostsRepository @Inject constructor(
     }
 
     suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
-        val instance = instance // snapshot instance
+        val instance = communityInstance // snapshot instance
         val startIndex = pageIndex * POSTS_PER_PAGE
         val endIndex = startIndex + POSTS_PER_PAGE
 
@@ -143,14 +141,6 @@ class PostsRepository @Inject constructor(
                         fetchPage(
                             pageIndex = currentPageInternal,
                             communityIdOrName = null,
-                            sortType = sortOrder.toApiSortOrder(),
-                            listingType = ListingType.All,
-                            force = force,
-                        )
-                    is CommunityRef.CommunityRefByObj ->
-                        fetchPage(
-                            pageIndex = currentPageInternal,
-                            communityIdOrName = Either.Right(communityRef.getServerId()),
                             sortType = sortOrder.toApiSortOrder(),
                             listingType = ListingType.All,
                             force = force,
@@ -210,7 +200,16 @@ class PostsRepository @Inject constructor(
         )
     }
 
-    val instance: String
+    val communityInstance: String
+        get() =
+            when (val communityRef = communityRef) {
+                is CommunityRef.All -> apiClient.instance
+                is CommunityRef.CommunityRefByName -> communityRef.instance ?: apiClient.instance
+                is CommunityRef.Local -> apiClient.instance
+                is CommunityRef.Subscribed -> communityRef.instance ?: apiClient.instance
+            }
+
+    val accountInstance: String
         get() = apiClient.instance
 
     fun setCommunity(communityRef: CommunityRef?) {
@@ -238,7 +237,6 @@ class PostsRepository @Inject constructor(
             }
 
             is CommunityRef.CommunityRefByName,
-            is CommunityRef.CommunityRefByObj,
             null -> {
                 // do nothing
             }
@@ -271,8 +269,8 @@ class PostsRepository @Inject constructor(
         currentPageInternal = 1
         endReached = false
 
-        allPosts.clear()
-        seenPosts.clear()
+        allPosts = mutableListOf()
+        seenPosts = mutableSetOf()
     }
 
     private fun transformPostWithLocalData(instance: String, postView: PostView): PostView {
@@ -339,7 +337,7 @@ class PostsRepository @Inject constructor(
     }
 
     fun update(posts: List<PostView>): List<PostView> {
-        val instance = instance
+        val instance = communityInstance
         return posts.map {
             transformPostWithLocalData(instance, it)
         }

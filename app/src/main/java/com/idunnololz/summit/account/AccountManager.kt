@@ -110,13 +110,19 @@ class AccountManager @Inject constructor(
     }
 
     private suspend fun doSwitchAccountWork(newAccount: Account?) {
-        onAccountChangeListeners.forEach {
+        val listeners = withContext(Dispatchers.Main) {
+            onAccountChangeListeners.toList()
+        }
+        listeners.forEach {
             it.onAccountChanged(newAccount)
         }
     }
 
     private suspend fun doSignOutWork(account: Account) {
-        onAccountChangeListeners.forEach {
+        val listeners = withContext(Dispatchers.Main) {
+            onAccountChangeListeners.toList()
+        }
+        listeners.forEach {
             it.onAccountSigningOut(account)
         }
     }

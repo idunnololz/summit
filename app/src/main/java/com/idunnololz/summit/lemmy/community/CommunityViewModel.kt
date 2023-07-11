@@ -12,7 +12,6 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -28,7 +27,6 @@ import com.idunnololz.summit.util.assertMainThread
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -76,8 +74,10 @@ class CommunityViewModel @Inject constructor(
     }
     val loadedPostsData = StatefulLiveData<LoadedPostsData>()
 
-    val instance: String
-        get() = postsRepository.instance
+    val communityInstance: String
+        get() = postsRepository.communityInstance
+    val accountInstance: String
+        get() = postsRepository.accountInstance
 
     var lastSelectedPost: PostRef? = null
 
@@ -316,7 +316,7 @@ class CommunityViewModel @Inject constructor(
 
         loadedPostsData.setValue(LoadedPostsData(
             posts = listOf(),
-            instance = postsRepository.instance,
+            instance = postsRepository.communityInstance,
             pageIndex = 0,
             hasMore = false
         ))
@@ -331,7 +331,7 @@ class CommunityViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            accountActionsManager.markPostAsRead(instance, postView.post.id, read = true)
+            accountActionsManager.markPostAsRead(accountInstance, postView.post.id, read = true)
         }
     }
 
