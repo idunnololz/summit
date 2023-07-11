@@ -9,6 +9,7 @@ import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class MoreActionsViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     val accountManager: AccountManager,
+    val actionsManager: AccountActionsManager,
 ) : ViewModel() {
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<Unit>()
@@ -60,5 +62,9 @@ class MoreActionsViewModel @Inject constructor(
                     deletePostResult.postError(it)
                 }
         }
+    }
+
+    fun upvote(postView: PostView) {
+        actionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), 1)
     }
 }

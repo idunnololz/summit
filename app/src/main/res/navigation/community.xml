@@ -137,10 +137,6 @@
         android:name="com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment"
         android:label="CreateOrEditPostFragment" >
         <argument
-            android:name="communityId"
-            app:argType="integer"
-            android:defaultValue="-1"/>
-        <argument
             android:name="instance"
             app:argType="string" />
         <argument

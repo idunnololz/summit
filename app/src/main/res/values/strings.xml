@@ -275,6 +275,10 @@
     <string name="mark_posts_as_read_on_scroll">Mark posts as read on scroll</string>
     <string name="mark_posts_as_read_on_scroll_desc">If enabled, posts you scroll past will automatically be marked as read</string>
     <string name="history_setting_desc">Change preferences related to browse history</string>
+    <string name="gestures">Gestures</string>
+    <string name="gestures_desc">Change which gestures to use</string>
+    <string name="use_gesture_actions">Use gesture actions</string>
+    <string name="use_gesture_actions_desc">Use gestures for actions instead of buttons</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

@@ -46,7 +46,6 @@ fun CommunityRef.toUri(): Uri {
     val url = when (val community = this) {
         is CommunityRef.All ->
             "https://${community.instance ?: "lemmy.world"}/?dataType=Post&listingType=All"
-        is CommunityRef.CommunityRefByObj -> "https://${community.community.instance}/c/${community.community.name}?dataType=Post"
         is CommunityRef.Local -> "https://${community.instance}/?dataType=Post&listingType=Local"
         is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
         is CommunityRef.Subscribed -> "https://${community.instance}/?dataType=Post&listingType=Subscribed"

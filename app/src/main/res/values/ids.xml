@@ -55,4 +55,8 @@
     <item name="browse_communities" type="id"/>
     <item name="clear_read" type="id" />
     <item name="post_view" type="id" />
+    <item name="swipe_action_upvote" type="id" />
+    <item name="swipe_action_bookmark" type="id" />
+    <item name="swipe_action_reply" type="id" />
+    <item name="swipeable" type="id" />
 </resources>

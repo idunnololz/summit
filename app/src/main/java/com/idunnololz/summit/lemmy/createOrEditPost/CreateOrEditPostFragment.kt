@@ -12,11 +12,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.children
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
@@ -114,16 +113,14 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
             when (it.itemId) {
                 R.id.create_post -> {
                     viewModel.createPost(
-                        instance = args.instance,
+                        communityRef = CommunityRef.CommunityRefByName(
+                            name = requireNotNull(args.communityName),
+                            instance = args.instance
+                        ),
                         name = binding.title.text.toString(),
                         body = binding.postEditor.text.toString(),
                         url = binding.url.text.toString(),
                         isNsfw = binding.nsfwSwitch.isChecked,
-                        communityNameOrId = if (args.communityName != null) {
-                            Either.Left(requireNotNull(args.communityName))
-                        } else {
-                            Either.Right(args.communityId as CommunityId)
-                        },
                     )
                     true
                 }

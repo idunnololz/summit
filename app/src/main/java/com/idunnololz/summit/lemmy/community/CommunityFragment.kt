@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +30,7 @@ import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
@@ -43,6 +45,9 @@ import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getShortDesc
@@ -104,7 +109,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
     private var viewPagerController: ViewPagerController? = null
 
-    private var isCustomAppBarExpanded = false
+    private var isCustomAppBarExpandedPercent = 0f
 
     private lateinit var lemmyAppBarController: LemmyAppBarController
 
@@ -282,7 +287,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             if (result != null) {
                 viewModel.fetchCurrentPage(force = true)
                 viewPagerController?.openPost(
-                    instance = viewModel.instance,
+                    instance = result.instance,
                     id =  result.post.id,
                     reveal = false,
                     post = result,
@@ -327,7 +332,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 bottomNavViewOffset.value =
                     (percentShown * getBottomNavHeight()).toInt()
 
-                isCustomAppBarExpanded = percentShown == 0f
+                isCustomAppBarExpandedPercent = 1f - percentShown
 
                 updateFabState()
             }
@@ -480,6 +485,42 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             scheduleStartPostponedTransition(binding.rootView)
         }
 
+        ItemTouchHelper(LemmySwipeActionCallback(
+            context,
+            binding.recyclerView,
+            onActionSelected = { action, vh ->
+                val postView = vh.itemView.getTag(R.id.post_view) as? PostView
+                    ?: return@LemmySwipeActionCallback
+
+                when (action.id) {
+                    R.id.swipe_action_upvote -> {
+                        actionsViewModel.upvote(postView)
+                    }
+                    R.id.swipe_action_bookmark -> {
+                        getMainActivity()?.showSnackbar(R.string.coming_soon)
+                    }
+                    R.id.swipe_action_reply -> {
+
+                        viewPagerController?.openPost(
+                            instance = viewModel.accountInstance,
+                            id =  postView.post.id,
+                            reveal = false,
+                            post = postView,
+                            jumpToComments = false,
+                            currentCommunity = viewModel.currentCommunityRef.value,
+                            videoState = null,
+                        )
+
+                        AddOrEditCommentFragment().apply {
+                            arguments = AddOrEditCommentFragmentArgs(
+                                viewModel.accountInstance, null, postView, null,
+                            ).toBundle()
+                        }.show(childFragmentManager, "asdf")
+                    }
+                }
+            }
+        )).attachToRecyclerView(binding.recyclerView)
+
         viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
             when (it) {
                 is StatefulData.Error -> {
@@ -586,7 +627,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     }
 
     private fun updateFabState() {
-        if (isCustomAppBarExpanded) {
+        if (isCustomAppBarExpandedPercent > 0.8f) {
             binding.fab.show()
         } else {
             binding.fab.hide()
@@ -599,7 +640,16 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     }
 
     override fun onPause() {
+        updateHistory()
+
+        super.onPause()
+    }
+
+    private fun updateHistory() {
+        if (!isBindingAvailable()) return
+
         val context = requireContext()
+
         val viewState = viewModel.createState()
         if (viewState != null) {
             historyManager.recordCommunityState(
@@ -609,8 +659,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 shortDesc = viewState.getShortDesc(context)
             )
         }
-
-        super.onPause()
     }
 
     override fun onDestroyView() {
@@ -697,15 +745,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
             val currentCommunity = viewModel.currentCommunityRef.value
             var communityName: String? = null
-            var communityId: Int = -1
             when (currentCommunity) {
                 is CommunityRef.All -> {}
                 is CommunityRef.CommunityRefByName -> {
                     communityName = currentCommunity.name
-                    addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
-                }
-                is CommunityRef.CommunityRefByObj -> {
-                    communityId = currentCommunity.community.id
                     addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
                 }
                 is CommunityRef.Local -> {}
@@ -763,9 +806,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         CreateOrEditPostFragment()
                             .apply {
                                 arguments = CreateOrEditPostFragmentArgs(
-                                    instance = viewModel.instance,
+                                    instance = viewModel.communityInstance,
                                     communityName = communityName,
-                                    communityId = communityId,
                                 ).toBundle()
                             }
                             .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
@@ -1051,6 +1093,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         val isActionsExpanded = item.isActionExpanded
                         val isExpanded = item.isExpanded
 
+                        h.root.setTag(R.id.post_view, item.postView)
+
                         postListViewBuilder.bind(
                             holder = h,
                             container = binding.recyclerView,
@@ -1124,6 +1168,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     val isExpanded = item.isExpanded
 
                     h.root.setTag(R.id.post_view, item.postView)
+                    h.root.setTag(R.id.swipeable, true)
 
                     postListViewBuilder.bind(
                         holder = h,

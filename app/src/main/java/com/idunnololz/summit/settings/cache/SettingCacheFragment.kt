@@ -29,6 +29,8 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
+
         requireMainActivity().apply {
             setupForFragment<SettingCacheFragment>()
         }
