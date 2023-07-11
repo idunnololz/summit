@@ -49,6 +49,7 @@ class PostsRepository @Inject constructor(
     private var endReached = false
 
     private var currentPageInternal = 1
+    private var hideRead = false
 
     var sortOrder: CommunitySortOrder = CommunitySortOrder.Active
         set(value) {
@@ -73,7 +74,7 @@ class PostsRepository @Inject constructor(
 
     suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> {
         reset()
-        resetCacheForCommunity()
+        hideRead = true
 
         val anchorsSet = anchors
 
@@ -106,7 +107,6 @@ class PostsRepository @Inject constructor(
     }
 
     suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
-        val instance = communityInstance // snapshot instance
         val startIndex = pageIndex * POSTS_PER_PAGE
         val endIndex = startIndex + POSTS_PER_PAGE
 
@@ -191,7 +191,7 @@ class PostsRepository @Inject constructor(
                 posts = allPosts
                     .slice(startIndex until min(endIndex, allPosts.size))
                     .map {
-                        transformPostWithLocalData(instance, it.post)
+                        transformPostWithLocalData(it.post)
                     },
                 pageIndex = pageIndex,
                 instance = apiClient.instance,
@@ -273,8 +273,9 @@ class PostsRepository @Inject constructor(
         seenPosts = mutableSetOf()
     }
 
-    private fun transformPostWithLocalData(instance: String, postView: PostView): PostView {
-        val localRead = postReadManager.isPostRead(instance, postView.post.id)
+    private fun transformPostWithLocalData(postView: PostView): PostView {
+        val accountInstance = accountInstance
+        val localRead = postReadManager.isPostRead(accountInstance, postView.post.id)
         if (localRead && !postView.read) {
             return postView.copy(read = true)
         }
@@ -314,10 +315,14 @@ class PostsRepository @Inject constructor(
     }
 
     private fun addPosts(newPosts: List<PostView>, pageIndex: Int,) {
-        newPosts.forEach {
-            val uniquePostKey = it.getUniqueKey()
+        for (post in newPosts) {
+            val uniquePostKey = post.getUniqueKey()
+            if (hideRead && (post.read || postReadManager.isPostRead(accountInstance, post.post.id))) {
+                continue
+            }
+
             if (seenPosts.add(uniquePostKey)) {
-                allPosts.add(PostData(it, pageIndex))
+                allPosts.add(PostData(post, pageIndex))
             }
         }
     }
@@ -337,10 +342,13 @@ class PostsRepository @Inject constructor(
     }
 
     fun update(posts: List<PostView>): List<PostView> {
-        val instance = communityInstance
         return posts.map {
-            transformPostWithLocalData(instance, it)
+            transformPostWithLocalData(it)
         }
+    }
+
+    fun clearHideRead() {
+        hideRead = false
     }
 
     interface Factory {

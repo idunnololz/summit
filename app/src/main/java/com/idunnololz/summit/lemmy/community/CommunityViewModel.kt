@@ -182,7 +182,10 @@ class CommunityViewModel @Inject constructor(
         fetchCurrentPageInternal(force = false)
     }
 
-    fun fetchCurrentPage(force: Boolean = false) {
+    fun fetchCurrentPage(force: Boolean = false, resetHideRead: Boolean = false) {
+        if (resetHideRead) {
+            postsRepository.clearHideRead()
+        }
         fetchCurrentPageInternal(force)
     }
 

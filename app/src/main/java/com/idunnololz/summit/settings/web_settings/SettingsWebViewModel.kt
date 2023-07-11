@@ -165,7 +165,7 @@ class SettingsWebViewModel @Inject constructor(
                 mapOf(
                     lemmyWebSettings.instanceSetting.id to account.instance,
                     lemmyWebSettings.displayNameSetting.id to person.name,
-                    lemmyWebSettings.defaultSortType.id to localUser.default_sort_type.toId(),
+                    lemmyWebSettings.defaultSortType.id to localUser.default_sort_type?.toId(),
                     lemmyWebSettings.showNsfwSetting.id to localUser.show_nsfw,
                     lemmyWebSettings.showReadPostsSetting.id to localUser.show_read_posts,
                     lemmyWebSettings.botAccountSetting.id to person.bot_account,
