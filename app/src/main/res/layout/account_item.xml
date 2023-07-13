@@ -15,6 +15,7 @@
         android:gravity="start|center_vertical"
         android:padding="@dimen/padding_half"
         android:foreground="@drawable/account_ripple"
+        android:scaleType="centerCrop"
         style="@style/CircleImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

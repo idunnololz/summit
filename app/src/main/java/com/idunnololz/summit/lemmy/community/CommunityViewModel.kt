@@ -156,6 +156,9 @@ class CommunityViewModel @Inject constructor(
                 withContext(Dispatchers.Main) {
                     postListEngine.clearPages()
                     postListEngine.createItems()
+                    pagePositions.clear()
+
+                    loadedPostsData.setValue(PostUpdateInfo())
                 }
                 fetchInitialPage()
             }
@@ -163,8 +166,12 @@ class CommunityViewModel @Inject constructor(
 
         viewModelScope.launch {
             postReadManager.postReadChanged.collect {
+                val pagesCopy = withContext(Dispatchers.Main) {
+                    ArrayList(postListEngine.pages)
+                }
+
                 val updatedPages = withContext(Dispatchers.Default) {
-                    postListEngine.pages.map {
+                    pagesCopy.map {
                         it.copy(
                             posts = postsRepository.update(it.posts),
                             isReadPostUpdate = false,
@@ -408,7 +415,7 @@ class CommunityViewModel @Inject constructor(
         postListEngine.clearPages()
         postListEngine.addPage(LoadedPostsData(
             posts = listOf(),
-            instance = postsRepository.communityInstance,
+            instance = postsRepository.accountInstance,
             pageIndex = 0,
             hasMore = false
         ))
