@@ -853,6 +853,7 @@ class MainActivity : BaseActivity() {
             PostFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
+                hideBottomNav(animate)
                 showNotificationBarBg()
             }
             VideoViewerFragment::class -> {

@@ -158,7 +158,7 @@ class ViewPagerController(
         viewPager.setPagingEnabled(false)
     }
 
-    class ViewPagerAdapter() : PagerAdapter() {
+    class ViewPagerAdapter : PagerAdapter() {
 
         private var count = 1
 
