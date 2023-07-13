@@ -96,6 +96,9 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsContentFragment"
+            app:destination="@id/settingsContentFragment" />
     </fragment>
     <action android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment"
@@ -179,4 +182,8 @@
         android:id="@+id/settingGesturesFragment"
         android:name="com.idunnololz.summit.settings.gestures.SettingGesturesFragment"
         android:label="SettingGesturesFragment" />
+    <fragment
+        android:id="@+id/settingsContentFragment"
+        android:name="com.idunnololz.summit.settings.content.SettingsContentFragment"
+        android:label="SettingsContentFragment" />
 </navigation>

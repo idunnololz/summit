@@ -21,15 +21,16 @@ class SettingsManager @Inject constructor(
             context.getString(R.string.appearance),
             listOf(
                 mainSettings.settingTheme,
+                mainSettings.settingContent,
                 mainSettings.settingViewType,
                 mainSettings.settingPostAndComment,
             )
         ),
         SubgroupItem(
-            context.getString(R.string.content),
+            context.getString(R.string.behavior),
             listOf(
                 mainSettings.settingLemmyWeb,
-//                mainSettings.settingGestures,
+                mainSettings.settingGestures,
                 mainSettings.settingHistory,
             )
         ),

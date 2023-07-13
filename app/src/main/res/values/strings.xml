@@ -33,7 +33,7 @@
     <string name="normal_channel_description">General channel for most notifications</string>
     <string name="offline_notification_message">Downloading offline data…</string>
     <string name="offline_ticker_text">Downloading offline data</string>
-    <string name="page_format">Page %1$d</string>
+    <string name="page_format">Page %1$s</string>
     <string name="nsfw">NSFW</string>
     <string name="all">All</string>
     <string name="feeds">Feeds</string>
@@ -114,7 +114,7 @@
     <string name="save_hq">Save highest quality</string>
     <string name="local">Local</string>
     <string name="deleted">[deleted]</string>
-    <string name="removed">removed</string>
+    <string name="removed">[removed]</string>
     <string name="error_server">Server error. Code: %1$s.</string>
     <string name="login">Login</string>
     <string name="instance">Instance</string>
@@ -279,6 +279,11 @@
     <string name="gestures_desc">Change which gestures to use</string>
     <string name="use_gesture_actions">Use gesture actions</string>
     <string name="use_gesture_actions_desc">Use gestures for actions instead of buttons</string>
+    <string name="setting_content_desc">Change how content is displayed</string>
+    <string name="behavior">Behavior</string>
+    <string name="infinity">Infinity</string>
+    <string name="no_your_limits">No your limits.</string>
+    <string name="view_all_comments">View all comments</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

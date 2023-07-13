@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentCacheBinding
 import com.idunnololz.summit.databinding.FragmentSettingGesturesBinding
+import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
@@ -22,6 +23,8 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>() {
 
     @Inject
     lateinit var preferences: Preferences
+    @Inject
+    lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,7 +56,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>() {
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.history)
+            supportActionBar?.title = context.getString(R.string.gestures)
         }
 
         updateRendering()
@@ -68,6 +71,9 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>() {
             { preferences.useGestureActions },
             {
                 preferences.useGestureActions = it
+                preferences.hideCommentActions = preferences.useGestureActions
+
+                postAndCommentViewBuilder.onPreferencesChanged()
 
                 updateRendering()
             }

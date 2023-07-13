@@ -102,8 +102,8 @@ class PostListViewBuilder @Inject constructor(
             videoState: VideoState?
         ) -> Unit,
         onShowMoreOptions: (PostView) -> Unit,
-        toggleItem: (position: Int, postView: PostView) -> Unit,
-        toggleActions: (position: Int, postView: PostView) -> Unit,
+        toggleItem: (postView: PostView) -> Unit,
+        toggleActions: (postView: PostView) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
@@ -233,10 +233,12 @@ class PostListViewBuilder @Inject constructor(
                 image.visibility = View.VISIBLE
                 iconImage?.visibility = View.GONE
 
-                image.load(null)
+                image.load(R.drawable.thumbnail_placeholder)
 
                 offlineManager.fetchImage(itemView, url) {
                     image.load(it) {
+                        placeholder(R.drawable.thumbnail_placeholder)
+
                         if (!isRevealed && postView.post.nsfw) {
                             transformations(BlurTransformation(context, sampling = 10f))
                         }
@@ -245,7 +247,7 @@ class PostListViewBuilder @Inject constructor(
                 image.transitionName = "image_$absoluteAdapterPosition"
                 image.setOnClickListener {
                     if (fullContentContainerView != null) {
-                        toggleItem(absoluteAdapterPosition, postView)
+                        toggleItem(postView)
                     } else {
                         onImageClick(image, url)
                     }
@@ -326,7 +328,7 @@ class PostListViewBuilder @Inject constructor(
                             showDefaultImage()
                             iconImage?.setOnClickListener {
                                 if (fullContentContainerView != null) {
-                                    toggleItem(absoluteAdapterPosition, postView)
+                                    toggleItem(postView)
                                 } else {
                                     onItemClick()
                                 }
@@ -399,6 +401,7 @@ class PostListViewBuilder @Inject constructor(
             upvoteButton,
             downvoteButton,
             upvoteCount,
+            null,
             onSignInRequired = onSignInRequired,
             onInstanceMismatch,
         )
@@ -441,7 +444,7 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 rb.root.setOnLongClickListener {
-                    toggleActions(absoluteAdapterPosition, postView)
+                    toggleActions(postView)
                     true
                 }
             }

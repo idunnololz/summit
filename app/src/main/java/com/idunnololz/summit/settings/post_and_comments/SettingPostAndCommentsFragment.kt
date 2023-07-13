@@ -25,6 +25,7 @@ import com.idunnololz.summit.databinding.FragmentSettingPostAndCommentsBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.lemmy.post.ThreadLinesDecoration
+import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.SettingsFragment
@@ -116,7 +117,8 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
         binding.demoViewContainer.adapter = adapter
         binding.demoViewContainer.setHasFixedSize(true)
         binding.demoViewContainer.layoutManager = LinearLayoutManager(context)
-        binding.demoViewContainer.addItemDecoration(ThreadLinesDecoration(context))
+        binding.demoViewContainer.addItemDecoration(ThreadLinesDecoration(
+            context, postAndCommentViewBuilder.hideCommentActions))
 
         viewModel.onPostUiChanged.observe(viewLifecycleOwner) {
             updateRendering(adapter)
@@ -230,7 +232,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
             addItemType(CommentView::class, PostCommentExpandedItemBinding::inflate) { item, b, h ->
                 postAndCommentViewBuilder.bindCommentViewExpanded(
                     h,
-                    b,
+                    CommentExpandedViewHolder.fromBinding(b),
                     0,
                     if (item.comment.id == LemmyFakeModels.fakeCommentView1.comment.id) {
                         0
@@ -247,7 +249,9 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     false,
                     viewLifecycleOwner,
                     item.creator.id,
+                    false,
                     onImageClick = { _, _ -> },
+                    {},
                     {},
                     {},
                     {},

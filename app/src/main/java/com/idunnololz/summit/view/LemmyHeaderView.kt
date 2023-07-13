@@ -17,7 +17,7 @@ class LemmyHeaderView : LinearLayout {
     }
 
     private val textView1: TextView
-    private val textView2: TextView
+    val textView2: TextView
     private val flairView: FlairView
 
     constructor(context: Context?) : super(context)

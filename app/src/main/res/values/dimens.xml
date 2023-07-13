@@ -19,6 +19,7 @@
     <dimen name="thread_line_total_size">16dp</dimen>
     <dimen name="reward_icon_size">16dp</dimen>
     <dimen name="comment_top_overdraw">24dp</dimen>
+    <dimen name="comment_top_overdraw_compact">4dp</dimen>
 
     <dimen name="tabs_text_size">12sp</dimen>
 

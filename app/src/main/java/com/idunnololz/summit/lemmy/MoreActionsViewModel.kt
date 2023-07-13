@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.Post
@@ -66,5 +67,9 @@ class MoreActionsViewModel @Inject constructor(
 
     fun upvote(postView: PostView) {
         actionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), 1)
+    }
+
+    fun upvote(commentView: CommentView) {
+        actionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), 1)
     }
 }

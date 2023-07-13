@@ -6,12 +6,18 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import android.widget.FrameLayout
+import androidx.annotation.LayoutRes
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -25,8 +31,10 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.databinding.CommentActionsViewBinding
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
+import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
@@ -53,6 +61,7 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.ThreadLinesHelper
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.abbrevNumber
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -84,6 +93,11 @@ class PostAndCommentViewBuilder @Inject constructor(
             commentUiConfig = uiConfig.commentUiConfig
         }
 
+    var hideCommentActions = preferences.hideCommentActions
+        private set
+
+    private val inflater = LayoutInflater.from(activity)
+
     private var postUiConfig: PostUiConfig = uiConfig.postUiConfig
     private var commentUiConfig: CommentUiConfig = uiConfig.commentUiConfig
 
@@ -96,10 +110,21 @@ class PostAndCommentViewBuilder @Inject constructor(
     val voteUiHandler = accountActionsManager.voteUiHandler
     val threadLinesHelper = ThreadLinesHelper(context)
 
+    private val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
+    private val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
+    private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
+
+    private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
+
     private val tempSize = Size()
 
     init {
         lemmyContentHelper.config = uiConfig.postUiConfig.fullContentConfig
+    }
+
+    fun onPreferencesChanged() {
+        uiConfig = preferences.getPostAndCommentsUiConfig()
+        hideCommentActions = preferences.hideCommentActions
     }
 
     fun bindPostView(
@@ -183,6 +208,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             upvoteButton,
             downvoteButton,
             upvoteCount,
+            null,
             onSignInRequired,
             onInstanceMismatch,
         )
@@ -190,7 +216,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     fun bindCommentViewExpanded(
         h: ViewHolder,
-        binding: PostCommentExpandedItemBinding,
+        binding: CommentExpandedViewHolder,
         baseDepth: Int,
         depth: Int,
         commentView: CommentView,
@@ -203,9 +229,11 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightForever: Boolean,
         viewLifecycleOwner: LifecycleOwner,
         currentAccountId: PersonId?,
+        isActionsExpanded: Boolean,
         onImageClick: (View?, String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
+        toggleActionsExpanded: () -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onEditCommentClick: (CommentView) -> Unit,
         onDeleteCommentClick: (CommentView) -> Unit,
@@ -215,10 +243,41 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         scaleTextSizes()
 
+        val isCompactView = this.rawBinding is PostCommentExpandedCompactItemBinding
+
+        fun getActionsView(): CommentActionsViewBinding =
+            (viewRecycler.getRecycledView(R.layout.comment_actions_view)
+                ?.let { CommentActionsViewBinding.bind(it) }
+                ?: CommentActionsViewBinding.inflate(
+                    inflater,
+                    binding.actionsContainer,
+                    false
+                ))
+                .also {
+                    it.root.updateLayoutParams<FrameLayout.LayoutParams> {
+                        gravity = Gravity.END
+                    }
+                    binding.actionsContainer?.addView(it.root)
+                }
+
+        var upvoteButton = upvoteButton
+        var downvoteButton = downvoteButton
+        var commentButton = commentButton
+        var moreButton = moreButton
+
+        if (isActionsExpanded) {
+            getActionsView().apply {
+                upvoteButton = this.upvoteButton
+                downvoteButton = this.downvoteButton
+                commentButton = this.commentButton
+                moreButton = this.moreButton
+            }
+        }
+
         threadLinesHelper.populateThreadLines(
             threadLinesContainer, depth, baseDepth
         )
-        lemmyHeaderHelper.populateHeaderSpan(headerContainer, commentView)
+        lemmyHeaderHelper.populateHeaderSpan(headerView, commentView)
 
         if (commentView.comment.deleted || isDeleting) {
             text.text = buildSpannedString {
@@ -298,12 +357,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             collapseSection(h.bindingAdapterPosition)
         }
 
-        commentButton.isEnabled = !isPostLocked
-        commentButton.setOnClickListener {
+        commentButton?.isEnabled = !isPostLocked
+        commentButton?.setOnClickListener {
             onAddCommentClick(Either.Right(commentView))
         }
-        moreButton.setOnClickListener {
-            PopupMenu(context, moreButton).apply {
+        moreButton?.setOnClickListener {
+            PopupMenu(context, it).apply {
                 inflate(R.menu.menu_comment_item)
                 if (commentView.creator.id !=
                     currentAccountId) {
@@ -346,11 +405,28 @@ class PostAndCommentViewBuilder @Inject constructor(
             upvoteButton,
             downvoteButton,
             upvoteCount,
+            {
+              if (isCompactView) {
+                  if (it > 0) {
+                      upvoteCount.setTextColor(upvoteColor)
+                  } else if (it == 0) {
+                      upvoteCount.setTextColor(normalTextColor)
+                  } else {
+                      upvoteCount.setTextColor(downvoteColor)
+                  }
+              }
+            },
             onSignInRequired,
             onInstanceMismatch,
         )
 
         highlightComment(highlight, highlightForever, highlightBg)
+
+        if (isCompactView) {
+            binding.root.setOnClickListener {
+                toggleActionsExpanded()
+            }
+        }
 
         if (isUpdating) {
             progressBar.visibility = View.VISIBLE
@@ -599,6 +675,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 upvoteButton,
                 downvoteButton,
                 b.score,
+                null,
                 onSignInRequired,
                 onInstanceMismatch,
             )
@@ -717,6 +794,17 @@ class PostAndCommentViewBuilder @Inject constructor(
         return recycledState
     }
 
+    fun recycle(b: CommentExpandedViewHolder) {
+        voteUiHandler.unbindVoteUi(b.upvoteCount)
+        b.actionsContainer?.let {
+            if (it.childCount > 0) {
+                val actionsView = it.getChildAt(0)
+                it.removeAllViews()
+                viewRecycler.addRecycledView(actionsView,R.layout.comment_actions_view)
+            }
+        }
+    }
+
 
     private fun highlightComment(isCommentHighlighted: Boolean, highlightForever: Boolean, bg: View) {
         if (highlightForever) {
@@ -746,8 +834,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         author.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
 
-    private fun PostCommentExpandedItemBinding.scaleTextSizes() {
-        headerContainer.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
+    private fun CommentExpandedViewHolder.scaleTextSizes() {
+        headerView.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
         text.textSize = commentUiConfig.contentTextSizeSp.toCommentTextSize()
         upvoteCount.textSize = postUiConfig.footerTextSizeSp.toCommentTextSize()
     }

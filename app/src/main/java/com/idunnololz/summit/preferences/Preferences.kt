@@ -11,6 +11,8 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
@@ -137,6 +139,18 @@ class Preferences @Inject constructor(
         get() = prefs.getBoolean(KEY_USE_GESTURE_ACTIONS, false)
         set(value) {
             prefs.edit().putBoolean(KEY_USE_GESTURE_ACTIONS, value).apply()
+        }
+
+    var hideCommentActions: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_COMMENT_ACTIONS, false)
+        set(value) {
+            prefs.edit().putBoolean(KEY_HIDE_COMMENT_ACTIONS, value).apply()
+        }
+
+    var infinity: Boolean
+        get() = prefs.getBoolean(KEY_INFINITY, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_INFINITY, value).apply()
         }
 
     private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {

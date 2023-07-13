@@ -8,6 +8,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -16,11 +17,11 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
-import com.idunnololz.summit.util.ext.getDrawableCompat
 
 class LemmySwipeActionCallback(
     private val context: Context,
     val recyclerView: RecyclerView,
+    private val actions: List<SwipeAction>,
     val onActionSelected: (SwipeAction, ViewHolder) -> Unit,
 ) : ItemTouchHelper.Callback() {
 
@@ -34,6 +35,7 @@ class LemmySwipeActionCallback(
         @ColorInt val color: Int
     )
 
+    private val noActionColor = context.getColorCompat(R.color.gray)
     private val clearPaint: Paint = Paint()
     private val background: ColorDrawable = ColorDrawable()
     private val marginEnd = context.getDimen(R.dimen.padding)
@@ -44,32 +46,14 @@ class LemmySwipeActionCallback(
 
     private var currentSwipeAction: SwipeAction? = null
 
-    private val actions = listOf(
-        SwipeAction(
-            R.id.swipe_action_upvote,
-            context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)!!.mutate(),
-            context.getColorCompat(R.color.style_red)
-        ),
-        SwipeAction(
-            R.id.swipe_action_bookmark,
-            context.getDrawableCompat(R.drawable.baseline_bookmark_add_24)!!.mutate(),
-            context.getColorCompat(R.color.style_amber)
-        ),
-        SwipeAction(
-            R.id.swipe_action_reply,
-            context.getDrawableCompat(R.drawable.baseline_reply_24)!!.mutate(),
-            context.getColorCompat(R.color.style_blue)
-        )
-    )
-
     init {
         clearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
     }
 
-    fun ViewHolder.isSwipeEnabled() =
+    private fun ViewHolder.isSwipeEnabled() =
         this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
 
-    fun ViewHolder.isSwipeable() =
+    private fun ViewHolder.isSwipeable() =
         this.itemView.getTag(R.id.swipeable) as? Boolean == true
 
 
@@ -161,7 +145,7 @@ class LemmySwipeActionCallback(
         }
 
         val maxActionW = itemView.width / 2
-        val deadSpace = Utils.convertDpToPixel(48f)
+        val deadSpace = Utils.convertDpToPixel(24f)
         val usableSpace = maxActionW - deadSpace
         val actionSpace = usableSpace / actions.size
 
@@ -171,17 +155,15 @@ class LemmySwipeActionCallback(
         val currentSwipeAction = currentSwipeAction
         if (isCurrentlyActive || currentSwipeAction == null) {
             if (negDx < deadSpace) {
-                val alpha = ((1f - (deadSpace - negDx) / (deadSpace)) * 255).toInt()
-                background.alpha = alpha
-                background.color = actions.first().color
-                drawable = actions.first().icon.apply {
-                    val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
-                    val iconLeft = itemView.right - marginEnd - intrinsicWidth
-                    val iconRight = itemView.right - marginEnd
-                    val iconBottom = iconTop + intrinsicHeight
-                    this.alpha = alpha
-                    setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                }
+                background.color = noActionColor
+//                drawable = actions.first().icon.apply {
+//                    val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
+//                    val iconLeft = itemView.right - marginEnd - intrinsicWidth
+//                    val iconRight = itemView.right - marginEnd
+//                    val iconBottom = iconTop + intrinsicHeight
+//                    this.alpha = alpha
+//                    setBounds(iconLeft, iconTop, iconRight, iconBottom)
+//                }
                 this.currentSwipeAction = null
             } else {
                 var thresholdX = deadSpace + actionSpace
@@ -190,7 +172,12 @@ class LemmySwipeActionCallback(
                     if (negDx < thresholdX || index == actions.lastIndex) {
                         val swipeAction = actions[index]
                         background.color = swipeAction.color
-                        this.currentSwipeAction = swipeAction
+                        if (currentSwipeAction != swipeAction) {
+
+                            viewHolder.itemView.performHapticFeedback(
+                                HapticFeedbackConstants.VIRTUAL_KEY)
+                            this.currentSwipeAction = swipeAction
+                        }
 
                         drawable = swipeAction.icon.apply {
                             val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2

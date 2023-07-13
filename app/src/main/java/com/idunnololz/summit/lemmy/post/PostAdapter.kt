@@ -4,6 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
+import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -11,17 +13,20 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.GenericFooterItemBinding
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
+import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
+import com.idunnololz.summit.databinding.ViewAllCommentsBinding
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
@@ -32,8 +37,10 @@ import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.HeaderItem
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.MoreCommentsItem
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.PendingCommentItem
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.ProgressOrErrorItem
+import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
@@ -59,6 +66,7 @@ class PostsAdapter(
     private val onPageClick: (PageRef) -> Unit,
     private val onPostMoreClick: (PostView) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
+    private val onLoadPost: (PostId) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -84,6 +92,8 @@ class PostsAdapter(
             val isPostLocked: Boolean,
             val isUpdating: Boolean,
             val isDeleting: Boolean,
+            val isActionsExpanded: Boolean,
+            val isHighlighted: Boolean,
         ) : Item(
             "comment_${comment.comment.id}"
         )
@@ -115,6 +125,10 @@ class PostsAdapter(
             val error: Throwable? = null
         ) : Item("wew_pls_no_progress")
 
+        data class ViewAllComments(
+            val postId: PostId
+        ): Item("view_all_yo")
+
         object FooterItem : Item("footer")
     }
 
@@ -128,6 +142,8 @@ class PostsAdapter(
      * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
      */
     private var revealedItems = mutableSetOf<String>()
+
+    private var actionExpandedComments = mutableSetOf<CommentId>()
 
     private var rawData: PostViewModel.PostData? = null
 
@@ -160,7 +176,11 @@ class PostsAdapter(
         is HeaderItem -> R.layout.post_header_item
         is CommentItem ->
             if (item.isExpanded)
-                R.layout.post_comment_expanded_item
+                if (postAndCommentViewBuilder.hideCommentActions) {
+                    R.layout.post_comment_expanded_compact_item
+                } else {
+                    R.layout.post_comment_expanded_item
+                }
             else
                 R.layout.post_comment_collapsed_item
         is PendingCommentItem ->
@@ -171,6 +191,7 @@ class PostsAdapter(
         is ProgressOrErrorItem -> R.layout.generic_loading_item
         is MoreCommentsItem -> R.layout.post_more_comments_item
         is FooterItem -> R.layout.generic_footer_item
+        is Item.ViewAllComments -> R.layout.view_all_comments
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -181,7 +202,17 @@ class PostsAdapter(
         return when (viewType) {
             R.layout.post_header_item -> ViewBindingViewHolder(PostHeaderItemBinding.bind(v))
             R.layout.post_comment_expanded_item ->
-                ViewBindingViewHolder(PostCommentExpandedItemBinding.bind(v))
+                CommentExpandedViewHolder.fromBinding(PostCommentExpandedItemBinding.bind(v))
+            R.layout.post_comment_expanded_compact_item ->
+                CommentExpandedViewHolder.fromBinding(PostCommentExpandedCompactItemBinding.bind(v))
+                    .apply {
+                        headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                            R.drawable.baseline_arrow_upward_16, 0, 0, 0)
+                        headerView.textView2.compoundDrawablePadding =
+                            Utils.convertDpToPixel(4f).toInt()
+                        headerView.textView2.updatePaddingRelative(
+                            start = Utils.convertDpToPixel(8f).toInt())
+                    }
             R.layout.post_comment_collapsed_item ->
                 ViewBindingViewHolder(PostCommentCollapsedItemBinding.bind(v))
             R.layout.post_pending_comment_expanded_item ->
@@ -194,6 +225,8 @@ class PostsAdapter(
                 ViewBindingViewHolder(GenericLoadingItemBinding.bind(v))
             R.layout.generic_footer_item ->
                 ViewBindingViewHolder(GenericFooterItemBinding.bind(v))
+            R.layout.view_all_comments ->
+                ViewBindingViewHolder(ViewAllCommentsBinding.bind(v))
             else -> throw RuntimeException("ViewType: $viewType")
         }
     }
@@ -273,7 +306,7 @@ class PostsAdapter(
             }
             is CommentItem -> {
                 if (item.isExpanded) {
-                    val b = holder.getBinding<PostCommentExpandedItemBinding>()
+                    val b = holder as CommentExpandedViewHolder
                     val highlight = highlightedComment == item.commentId
                     val highlightForever = highlightedCommentForever == item.commentId
 
@@ -292,10 +325,14 @@ class PostsAdapter(
                         highlightForever,
                         lifecycleOwner,
                         currentAccountId,
+                        item.isActionsExpanded,
                         onImageClick,
                         onPageClick,
                         {
                             collapseSection(holder.bindingAdapterPosition)
+                        },
+                        {
+                            toggleActions(item.comment.comment.id)
                         },
                         onAddCommentClick,
                         onEditCommentClick,
@@ -322,6 +359,9 @@ class PostsAdapter(
                         ::expandSection,
                     )
                 }
+
+                holder.itemView.setTag(R.id.swipeable, true)
+                holder.itemView.setTag(R.id.comment_view, item.comment)
             }
             is PendingCommentItem -> {
                 if (item.isExpanded) {
@@ -395,6 +435,12 @@ class PostsAdapter(
             }
 
             FooterItem -> {}
+            is Item.ViewAllComments -> {
+                val b = holder.getBinding<ViewAllCommentsBinding>()
+                b.button.setOnClickListener { 
+                    onLoadPost(item.postId)
+                }
+            }
         }
     }
 
@@ -412,6 +458,8 @@ class PostsAdapter(
             val state = postAndCommentViewBuilder.recycle(b)
 
             (item as? HeaderItem)?.videoState = state.videoState
+        } else if (holder is CommentExpandedViewHolder) {
+            postAndCommentViewBuilder.recycle(holder)
         }
     }
 
@@ -435,13 +483,18 @@ class PostsAdapter(
                     finalItems += HeaderItem(it.post, videoState)
                 }
 
+                if (rawData.isSingleComment) {
+                    finalItems += Item.ViewAllComments(rawData.postView.post.post.id)
+                }
+
                 rawData.commentTree.flatten().forEach {
                     when (val commentView = it.commentView) {
                         is PostViewModel.ListView.CommentListView -> {
+                            val commentId = commentView.comment.comment.id
                             val isDeleting =
                                 commentView.pendingCommentView?.isActionDelete == true
                             finalItems += CommentItem(
-                                commentId = commentView.comment.comment.id,
+                                commentId = commentId,
                                 content =
                                 commentView.pendingCommentView?.content
                                     ?: commentView.comment.comment.content,
@@ -455,6 +508,10 @@ class PostsAdapter(
                                 isPostLocked = commentView.comment.post.locked,
                                 isUpdating = commentView.pendingCommentView != null,
                                 isDeleting = isDeleting,
+                                isActionsExpanded = actionExpandedComments.contains(
+                                    commentId
+                                ),
+                                isHighlighted = rawData.selectedCommentId == commentId
                             )
                         }
                         is PostViewModel.ListView.PendingCommentListView -> {
@@ -543,6 +600,7 @@ class PostsAdapter(
                 is PendingCommentItem -> it.commentId == commentId
                 is ProgressOrErrorItem -> false
                 FooterItem -> false
+                is Item.ViewAllComments -> false
             }
         }
 
@@ -613,6 +671,16 @@ class PostsAdapter(
 
         (items[position] as? CommentItem)?.view?.isCollapsed = false
         (items[position] as? PendingCommentItem)?.view?.isCollapsed = false
+
+        refreshItems(refreshHeader = false)
+    }
+
+    private fun toggleActions(id: CommentId) {
+        if (actionExpandedComments.contains(id)) {
+            actionExpandedComments.remove(id)
+        } else {
+            actionExpandedComments.add(id)
+        }
 
         refreshItems(refreshHeader = false)
     }

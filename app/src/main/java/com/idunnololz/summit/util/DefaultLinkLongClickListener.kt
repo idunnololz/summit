@@ -2,8 +2,8 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.graphics.RectF
-import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import com.idunnololz.summit.R
 
 class DefaultLinkLongClickListener(

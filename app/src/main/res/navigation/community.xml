@@ -50,6 +50,10 @@
             android:name="id"
             app:argType="integer" />
         <argument
+            android:name="commentId"
+            android:defaultValue="0"
+            app:argType="integer"/>
+        <argument
             android:name="currentCommunity"
             app:argType="com.idunnololz.summit.lemmy.CommunityRef"
             app:nullable="true" />

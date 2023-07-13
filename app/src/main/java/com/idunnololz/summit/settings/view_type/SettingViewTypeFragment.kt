@@ -232,8 +232,8 @@ AlertDialogFragment.AlertDialogFragmentListener {
             onPageClick = {},
             onItemClick = { _, _, _, _, _, _, _ -> },
             onShowMoreOptions = {},
-            toggleItem = { _, _ -> },
-            toggleActions = { _, _ -> },
+            toggleItem = {},
+            toggleActions = {},
             onSignInRequired = {},
             onInstanceMismatch = { _, _ -> },
             onHighlightComplete = {}
