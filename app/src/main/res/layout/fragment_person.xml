@@ -25,57 +25,66 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="?attr/actionBarSize"
+                android:paddingBottom="@dimen/padding_half"
                 app:layout_collapseMode="pin">
 
-                <ImageView
-                    android:id="@+id/crystal_icon"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <TextView
-                    android:id="@+id/challenge_total_score"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceTitleMedium"
-                    app:layout_constraintVertical_chainStyle="packed"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/crystal_icon"
-                    app:layout_constraintBottom_toTopOf="@id/challenge_summary" />
-
-                <TextView
-                    android:id="@+id/challenge_next_rank_score"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceTitleSmall"
-                    android:textColor="@color/colorTextFaint"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/challenge_total_score"
-                    app:layout_constraintStart_toEndOf="@+id/challenge_total_score"
-                    app:layout_constraintEnd_toStartOf="@+id/challenge_summary_button"/>
-
-                <TextView
-                    android:id="@+id/challenge_summary"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="@dimen/padding_quarter"
-                    android:textAppearance="?textAppearanceBodyMedium"
-                    app:layout_constraintTop_toBottomOf="@+id/challenge_total_score"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/challenge_total_score"
-                    app:layout_constraintEnd_toStartOf="@+id/challenge_summary_button"/>
-
-                <Button
-                    android:id="@+id/challenge_summary_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/profile_icon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
                     android:layout_margin="@dimen/padding"
+                    android:foreground="@drawable/account_ripple"
+                    android:scaleType="centerCrop"
+                    style="@style/CircleImageView"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceTitleLarge"
+                    android:layout_marginTop="@dimen/padding"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/profile_icon"/>
+
+                <TextView
+                    android:id="@+id/subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceBodyMedium"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:layout_marginTop="@dimen/padding_half"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/name"/>
+
+                <TextView
+                    android:id="@+id/cake_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceBodyMedium"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:layout_marginTop="@dimen/padding_half"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:gravity="center"
+                    android:drawablePadding="@dimen/padding_half"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/subtitle"
+                    app:drawableStartCompat="@drawable/baseline_cake_24"
+                    app:drawableTint="?colorControlNormal" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
@@ -90,8 +99,10 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:colorBackground"
+            android:layout_gravity="center_horizontal"
             app:tabMode="scrollable"/>
     </com.google.android.material.appbar.AppBarLayout>
 

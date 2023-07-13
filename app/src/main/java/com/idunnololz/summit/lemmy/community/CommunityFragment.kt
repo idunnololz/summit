@@ -596,9 +596,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     }
                 }
                 is StatefulData.Loading -> {
-                    if (!viewModel.infinity) {
-                        binding.loadingView.showProgressBar()
-                    }
+                    binding.loadingView.showProgressBar()
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
@@ -852,6 +850,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 title = R.string.browse_communities,
                 icon = R.drawable.baseline_dashboard_24,
             )
+            addItemWithIcon(
+                id = R.id.settings,
+                title = R.string.settings,
+                icon = R.drawable.baseline_settings_24,
+            )
 
             if (isCurrentPageDefault) {
 
@@ -946,6 +949,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     }
                     R.id.browse_communities -> {
                         lemmyAppBarController.showCommunitySelector()
+                    }
+                    R.id.settings -> {
+                        requireMainActivity().openSettings()
                     }
                 }
             }

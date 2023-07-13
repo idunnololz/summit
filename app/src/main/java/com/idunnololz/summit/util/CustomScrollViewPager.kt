@@ -44,11 +44,8 @@ class CustomScrollViewPager : ViewPager {
                     val xDiff = x - lastMotionX
                     val xDiffAbs = abs(xDiff)
 
-                    Log.d("HAHA", "xDiff: $xDiff")
-
                     if (xDiffAbs >= touchSlop) {
                         if (xDiff < 0 && disableLeftSwipe) {
-                            Log.d("HAHA", "Not allowing intercept!")
                             return false
                         }
                     }
@@ -88,11 +85,8 @@ class CustomScrollViewPager : ViewPager {
                     val xDiff = x - lastMotionX
                     val xDiffAbs = abs(xDiff)
 
-                    Log.d("HAHA2", "xDiff: $xDiff")
-
                     if (xDiffAbs >= touchSlop) {
                         if (xDiff < 0 && disableLeftSwipe) {
-                            Log.d("HAHA2", "Not allowing intercept!")
                             return false
                         }
                     }

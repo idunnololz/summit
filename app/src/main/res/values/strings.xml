@@ -284,6 +284,11 @@
     <string name="infinity">Infinity</string>
     <string name="no_your_limits">No your limits.</string>
     <string name="view_all_comments">View all comments</string>
+    <string name="posts_format">%1$s posts</string>
+    <string name="comments_format">%1$s comments</string>
+    <string name="cake_day_on_format">Cake day on %1$s</string>
+    <string name="posts">Posts</string>
+    <string name="comments">Comments</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

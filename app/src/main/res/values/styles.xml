@@ -53,20 +53,9 @@
         </item>
 
         <!--Material type attributes-->
-        <item name="textAppearanceHeadline1">@style/TextAppearance.MyTheme.Headline1</item>
-        <item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>
-        <item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>
-        <item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>
-        <item name="textAppearanceHeadline5">@style/TextAppearance.MyTheme.Headline5</item>
-        <!-- Don't change 6 since it's used for toolbar -->
-        <!-- <item name="textAppearanceHeadline6">@style/TextAppearance.MyTheme.Headline6</item> -->
-        <item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>
-        <item name="textAppearanceSubtitle2">@style/TextAppearance.MyTheme.Subtitle2</item>
-        <item name="textAppearanceBody1">@style/TextAppearance.MyTheme.Body1</item>
-        <item name="textAppearanceBody2">@style/TextAppearance.MyTheme.Body2</item>
-        <item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>
-        <item name="textAppearanceCaption">@style/TextAppearance.MyTheme.Caption</item>
-        <item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.BodySmall</item>
 
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
 
@@ -141,20 +130,9 @@
         <item name="colorOnSurface">@color/colorOnSurface</item>
 
         <!--Material type attributes-->
-        <item name="textAppearanceHeadline1">@style/TextAppearance.MyTheme.Headline1</item>
-        <item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>
-        <item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>
-        <item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>
-        <item name="textAppearanceHeadline5">@style/TextAppearance.MyTheme.Headline5</item>
-        <!-- Don't change 6 since it's used for toolbar -->
-        <!-- <item name="textAppearanceHeadline6">@style/TextAppearance.MyTheme.Headline6</item> -->
-        <item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>
-        <item name="textAppearanceSubtitle2">@style/TextAppearance.MyTheme.Subtitle2</item>
-        <item name="textAppearanceBody1">@style/TextAppearance.MyTheme.Body1</item>
-        <item name="textAppearanceBody2">@style/TextAppearance.MyTheme.Body2</item>
-        <item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>
-        <item name="textAppearanceCaption">@style/TextAppearance.MyTheme.Caption</item>
-        <item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.BodySmall</item>
 
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
@@ -227,7 +205,7 @@
     </style>
 
     <style name="DayPickerDayStyle">
-        <item name="android:textAppearance">?textAppearanceBody1</item>
+        <item name="android:textAppearance">?textAppearanceBodyMedium</item>
         <item name="android:textColor">@color/colorTextTitle</item>
     </style>
 

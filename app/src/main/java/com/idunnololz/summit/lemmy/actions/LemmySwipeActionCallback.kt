@@ -219,7 +219,6 @@ class LemmySwipeActionCallback(
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        Log.d("HAHA", "clearView")
     }
 
     private fun clearCanvas(c: Canvas, left: Float, top: Float, right: Float, bottom: Float) {
@@ -232,10 +231,8 @@ class LemmySwipeActionCallback(
 
     override fun getSwipeVelocityThreshold(defaultValue: Float): Float {
         return if (lastVhSwiped?.isSwipeEnabled() == false) {
-            Log.d("HAHA", "getSwipeVelocityThreshold() 0f")
             0f
         } else {
-            Log.d("HAHA", "getSwipeVelocityThreshold() $defaultValue")
             5000f
         }
     }

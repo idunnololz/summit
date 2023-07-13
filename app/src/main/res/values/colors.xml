@@ -63,7 +63,10 @@
     <color name="white10">#1AFFFFFF</color>
     <color name="white30">#4dFFFFFF</color>
     <color name="white50">#80FFFFFF</color>
+    <color name="white60">#99FFFFFF</color>
     <color name="white66">#A8FFFFFF</color>
+    <color name="white75">#BFFFFFFF</color>
+    <color name="white80">#CCFFFFFF</color>
     <color name="white97">#F7FFFFFF</color>
     <color name="white">#FFFFFFFF</color>
 

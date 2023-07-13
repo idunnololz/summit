@@ -9,9 +9,9 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorText"
+        android:textColor="@color/colorTextFaint"
         android:gravity="start"
-        android:textAppearance="?textAppearanceHeadline4"
+        android:textAppearance="?textAppearanceBodySmall"
         tools:text="Hello" />
 
     <com.idunnololz.summit.view.FlairView
@@ -23,9 +23,9 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorText"
+        android:textColor="@color/colorTextFaint"
         android:gravity="start"
-        android:textAppearance="?textAppearanceHeadline4"
+        android:textAppearance="?textAppearanceBodySmall"
         app:drawableTint="?colorControlNormal"
         tools:text="Hello" />
 </merge>

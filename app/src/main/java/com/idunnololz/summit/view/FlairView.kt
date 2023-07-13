@@ -49,10 +49,10 @@ class FlairView : LinearLayout {
                         view.load(url)
                     } else {
                         val view = MaterialTextView(context)
-                        TextViewCompat.setTextAppearance(
-                            view,
-                            R.style.TextAppearance_MyTheme_Headline4
-                        )
+//                        TextViewCompat.setTextAppearance(
+//                            view,
+//                            R.style.TextAppearance_MyTheme_Headline4
+//                        )
                         view.text = it["t"] as String
                         view.setPadding(
                             Utils.convertDpToPixel(4f).toInt(),

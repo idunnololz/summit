@@ -4,7 +4,25 @@ import android.icu.text.CompactDecimalFormat
 import android.os.Build
 import android.text.format.DateUtils
 import org.threeten.bp.Instant
+import java.text.NumberFormat
 import java.util.Locale
+
+
+object PrettyPrintUtils {
+
+    private val df = NumberFormat.getNumberInstance().apply {
+        this.maximumFractionDigits = 1
+    }
+    private val pf = NumberFormat.getPercentInstance().apply {
+        maximumFractionDigits = 2
+    }
+
+    val defaultDecimalFormat: NumberFormat
+        get() = df
+
+    val defaultPercentFormat: NumberFormat
+        get() = pf
+}
 
 fun dateStringToPretty(dateStr: String, includeAgo: Boolean = false): CharSequence? =
     try {
