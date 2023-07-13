@@ -48,8 +48,6 @@ object LinkResolver {
             return null
         }
 
-//        Log.d("HAHA", "First seg: " + )
-
         val uri = Uri.parse(url)
         val instance = uri.host ?: return null
         val defaultResult = CommunityRef.Local(instance)

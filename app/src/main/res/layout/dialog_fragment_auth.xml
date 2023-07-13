@@ -34,7 +34,7 @@
         android:paddingStart="@dimen/padding"
         android:paddingEnd="@dimen/padding"
         android:visibility="gone"
-        android:textAppearance="?textAppearanceBody1"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

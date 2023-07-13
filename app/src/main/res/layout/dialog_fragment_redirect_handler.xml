@@ -9,7 +9,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/processing_link"
-        android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+        android:textAppearance="?textAppearanceBodyMedium"
         android:paddingStart="?dialogPreferredPadding"
         android:paddingEnd="?dialogPreferredPadding"
         android:paddingTop="?dialogPreferredPadding"

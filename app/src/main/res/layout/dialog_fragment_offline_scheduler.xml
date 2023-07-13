@@ -24,7 +24,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/enable"
-            android:textAppearance="?textAppearanceBody1"
+            android:textAppearance="?textAppearanceBodyMedium"
             android:gravity="start"
             android:layout_marginStart="@dimen/padding"
             android:layout_marginEnd="@dimen/padding"

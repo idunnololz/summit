@@ -219,7 +219,6 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                 }
             } else {
                 val handled = if (clickableSpan is LinkSpan) {
-                    Log.d("HAHA", "onLongClick!")
                     onLinkLongClickListener?.onLongClick(
                         textView,
                         clickableSpan.url,

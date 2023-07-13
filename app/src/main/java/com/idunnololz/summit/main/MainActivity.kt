@@ -126,7 +126,6 @@ class MainActivity : BaseActivity() {
     private fun updateTheme() {
         isMaterialYou = themeManager.useMaterialYou.value
         if (isMaterialYou) {
-            Log.d("HAHA", "2Dynamic color applied!")
             DynamicColors.applyToActivityIfAvailable(this@MainActivity)
         } else {
             // do nothing

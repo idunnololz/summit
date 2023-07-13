@@ -200,7 +200,7 @@ class PostListEngine(
         var lastPost: Item.PostItem? = null
         var i = displayFirstItemsIndex
         while (i < _items.size) {
-            val item = _items[i]
+            val item = _items.getOrNull(i)
             if (item is Item.PostItem) {
                 firstPost = item
                 break
@@ -210,7 +210,7 @@ class PostListEngine(
 
         i = displayLastItemsIndex
         while (i > displayFirstItemsIndex) {
-            val item = _items[i]
+            val item = _items.getOrNull(i)
             if (item is Item.PostItem) {
                 lastPost = item
                 break

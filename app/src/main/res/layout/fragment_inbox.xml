@@ -139,7 +139,6 @@
                     android:id="@+id/account_image_view"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:textAppearance="?textAppearanceHeadline4"
                     android:foreground="@drawable/account_ripple"
                     android:layout_marginStart="@dimen/padding_half"
                     android:layout_marginEnd="@dimen/padding_quarter"

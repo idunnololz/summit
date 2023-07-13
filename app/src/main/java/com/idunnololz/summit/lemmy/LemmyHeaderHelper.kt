@@ -39,7 +39,7 @@ class LemmyHeaderHelper(
     companion object {
         private val TAG = "LemmyHeaderHelper"
 
-        private const val SEPARATOR = " ● "
+        const val SEPARATOR = " ● "
     }
 
     private val unimportantColor: Int = ContextCompat.getColor(context, R.color.colorText)
@@ -73,7 +73,7 @@ class LemmyHeaderHelper(
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-            appendSeparator(sb)
+            sb.appendSeparator()
         }
 
 //        if (postView.post.spoiler) {
@@ -102,19 +102,19 @@ class LemmyHeaderHelper(
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-            appendSeparator(sb)
+            sb.appendSeparator()
         }
 
         sb.appendLink(
             postView.community.name,
             LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
         )
-        appendSeparator(sb)
+        sb.appendSeparator()
         dateStringToPretty(postView.post.updated ?: postView.post.published)?.let {
             sb.append(it)
         }
         if (listAuthor) {
-            appendSeparator(sb)
+            sb.appendSeparator()
             if (postView.creator.admin) {
                 val s = sb.length
                 sb.appendLink(
@@ -167,7 +167,7 @@ class LemmyHeaderHelper(
         }
 
         postView.community.instance.let { domain ->
-            appendSeparator(sb)
+            sb.appendSeparator()
             sb.append(domain)
         }
 //        if (listingItem.linkFlairText != null) {
@@ -281,7 +281,7 @@ class LemmyHeaderHelper(
             }
         }
 
-        appendSeparator(sb)
+        sb.appendSeparator()
         sb.append(
             dateStringToPretty(item.comment.updated ?: item.comment.published)
         )
@@ -350,7 +350,7 @@ class LemmyHeaderHelper(
         sb = SpannableStringBuilder()
 
         if (detailed) {
-            appendSeparator(sb)
+            sb.appendSeparator()
 
 //            if (item.scoreHidden) {
 //                sb.append(headerContainer.context.getString(R.string.score_hidden))
@@ -365,7 +365,7 @@ class LemmyHeaderHelper(
 //            }
 
             if (childrenCount != null) {
-                appendSeparator(sb)
+                sb.appendSeparator()
                 sb.append(
                     headerContainer.context.resources.getQuantityString(
                         R.plurals.children_count_format, childrenCount, childrenCount
@@ -408,7 +408,7 @@ class LemmyHeaderHelper(
             sb.append(item.creator.name)
         }
 
-        appendSeparator(sb)
+        sb.appendSeparator()
         sb.append(
             dateStringToPretty(item.private_message.updated ?: item.private_message.published)
         )
@@ -449,7 +449,7 @@ class LemmyHeaderHelper(
             sb.append(item.creator.name)
         }
 
-        appendSeparator(sb)
+        sb.appendSeparator()
         sb.append(
             dateStringToPretty(item.comment.updated ?: item.comment.published)
         )
@@ -490,7 +490,7 @@ class LemmyHeaderHelper(
             sb.append(item.creator.name)
         }
 
-        appendSeparator(sb)
+        sb.appendSeparator()
         sb.append(
             dateStringToPretty(item.comment.updated ?: item.comment.published)
         )
@@ -501,16 +501,16 @@ class LemmyHeaderHelper(
 
         headerContainer.setTextSecondPart(sb)
     }
+}
 
-    private inline fun appendSeparator(sb: SpannableStringBuilder) {
-        val s = sb.length
-        sb.append(SEPARATOR)
-        val e = sb.length
-        sb.setSpan(
-            HorizontalDividerSpan(),
-            s + 1,
-            e - 1,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-    }
+inline fun SpannableStringBuilder.appendSeparator() {
+    val s = length
+    append(LemmyHeaderHelper.SEPARATOR)
+    val e = length
+    setSpan(
+        HorizontalDividerSpan(),
+        s + 1,
+        e - 1,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
 }

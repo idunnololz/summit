@@ -152,6 +152,16 @@ class CommunityViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            accountInfoManager.currentFullAccountOnChange.collect {
+                withContext(Dispatchers.Main) {
+                    postListEngine.clearPages()
+                    postListEngine.createItems()
+                }
+                fetchInitialPage()
+            }
+        }
+
+        viewModelScope.launch {
             postReadManager.postReadChanged.collect {
                 val updatedPages = withContext(Dispatchers.Default) {
                     postListEngine.pages.map {

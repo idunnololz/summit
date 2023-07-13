@@ -99,7 +99,7 @@
         android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceBody1"
+        android:textAppearance="?textAppearanceBodyMedium"
         android:layout_marginTop="@dimen/padding_quarter"
         android:textColor="@color/colorTextTitle"
         android:textIsSelectable="true"

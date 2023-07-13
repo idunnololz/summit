@@ -9,7 +9,7 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"

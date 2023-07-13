@@ -287,8 +287,6 @@ open class OverlappingPanelsLayout : FrameLayout {
       return false
     }
 
-    Log.d("HAHA", "event: " + event + " action: " + event.actionMasked)
-
     return when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         true
