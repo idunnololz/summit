@@ -2,28 +2,118 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.view.animation.DecelerateInterpolator
 import android.widget.Scroller
 import androidx.viewpager.widget.ViewPager
 import java.lang.reflect.Field
+import kotlin.math.abs
 
 
 class CustomScrollViewPager : ViewPager {
 
     private var enabled = true
 
+    var disableLeftSwipe = false
+    var disableRightSwipe = false
+
+    private var lastMotionX = 0f
+    private var activePointerId = 0
+    private var touchSlop = 0
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    init {
+        val configuration = ViewConfiguration.get(context)
+        touchSlop = configuration.scaledPagingTouchSlop
+    }
     
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return if (enabled) {
+
+            val action: Int = event.action
+            when (action and MotionEvent.ACTION_MASK) {
+
+                MotionEvent.ACTION_MOVE -> {
+
+                    val pointerIndex: Int = event.findPointerIndex(activePointerId)
+                    val x: Float = event.getX(pointerIndex)
+                    val xDiff = x - lastMotionX
+                    val xDiffAbs = abs(xDiff)
+
+                    Log.d("HAHA", "xDiff: $xDiff")
+
+                    if (xDiffAbs >= touchSlop) {
+                        if (xDiff < 0 && disableLeftSwipe) {
+                            Log.d("HAHA", "Not allowing intercept!")
+                            return false
+                        }
+                    }
+                }
+
+                MotionEvent.ACTION_UP -> {}
+
+                MotionEvent.ACTION_CANCEL -> {}
+
+                MotionEvent.ACTION_DOWN -> {
+                    val index: Int = event.actionIndex
+                    activePointerId = event.getPointerId(0)
+                    val x: Float = event.getX(index)
+                    lastMotionX = x
+                }
+                MotionEvent.ACTION_POINTER_DOWN -> {
+                }
+
+                MotionEvent.ACTION_POINTER_UP -> {
+                }
+            }
+
             super.onTouchEvent(event)
+            false
         } else false
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
         return if (enabled) {
+            val action: Int = event.action
+            when (action and MotionEvent.ACTION_MASK) {
+
+                MotionEvent.ACTION_MOVE -> {
+
+                    val pointerIndex: Int = event.findPointerIndex(activePointerId)
+                    val x: Float = event.getX(pointerIndex)
+                    val xDiff = x - lastMotionX
+                    val xDiffAbs = abs(xDiff)
+
+                    Log.d("HAHA2", "xDiff: $xDiff")
+
+                    if (xDiffAbs >= touchSlop) {
+                        if (xDiff < 0 && disableLeftSwipe) {
+                            Log.d("HAHA2", "Not allowing intercept!")
+                            return false
+                        }
+                    }
+                }
+
+                MotionEvent.ACTION_UP -> {}
+
+                MotionEvent.ACTION_CANCEL -> {}
+
+                MotionEvent.ACTION_DOWN -> {
+                    val index: Int = event.actionIndex
+                    activePointerId = event.getPointerId(0)
+                    val x: Float = event.getX(index)
+                    lastMotionX = x
+                }
+                MotionEvent.ACTION_POINTER_DOWN -> {
+                }
+
+                MotionEvent.ACTION_POINTER_UP -> {
+                }
+            }
             super.onInterceptTouchEvent(event)
         } else false
     }

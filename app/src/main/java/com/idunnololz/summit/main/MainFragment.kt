@@ -27,6 +27,7 @@ import com.discord.panels.PanelState
 import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentMainBinding
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
@@ -375,6 +376,18 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         page.instance,
                         page.id,
                         null,
+                        isSinglePage = true
+                    ).toBundle()
+                )
+            }
+            is CommentRef -> {
+                currentNavController?.navigate(
+                    R.id.postFragment,
+                    PostFragmentArgs(
+                        instance = page.instance,
+                        id = 0,
+                        commentId = page.id,
+                        currentCommunity = null,
                         isSinglePage = true
                     ).toBundle()
                 )

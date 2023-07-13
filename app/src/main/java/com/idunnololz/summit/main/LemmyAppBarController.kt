@@ -87,13 +87,13 @@ class LemmyAppBarController(
         pageIndex: Int,
         onPageSelectedListener: (pageIndex: Int) -> Unit
     ) {
-        pageTextView.text = context.getString(R.string.page_format, pageIndex + 1)
+        pageTextView.text = context.getString(R.string.page_format, (pageIndex + 1).toString())
 
         pageTextView.setOnClickListener {
             PopupMenu(context, it).apply {
                 menu.apply {
                     for (i in 0..pageIndex) {
-                        add(0, i, 0, context.getString(R.string.page_format, i + 1))
+                        add(0, i, 0, context.getString(R.string.page_format, (i + 1).toString()))
                     }
                 }
                 setOnMenuItemClickListener {
@@ -103,6 +103,12 @@ class LemmyAppBarController(
                 }
             }.show()
         }
+    }
+
+    fun setPageIndexInfinity() {
+        pageTextView.text = "∞"
+
+        pageTextView.setOnClickListener {}
     }
 
     fun clearPageIndex() {

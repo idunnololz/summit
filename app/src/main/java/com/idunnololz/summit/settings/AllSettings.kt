@@ -45,6 +45,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.cache),
         context.getString(R.string.cache_info_and_preferences)
     )
+    val settingContent = BasicSettingItem(
+        R.drawable.baseline_pages_24,
+        context.getString(R.string.content),
+        context.getString(R.string.setting_content_desc)
+    )
 }
 
 @Singleton

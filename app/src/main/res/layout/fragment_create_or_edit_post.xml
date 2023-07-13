@@ -78,7 +78,7 @@
                     android:textIsSelectable="true"
                     android:scrollbars="vertical"
                     android:textAppearance="?textAppearanceBodyMedium"
-                    android:inputType="text|textCapSentences"
+                    android:inputType="textMultiLine|textCapSentences"
                     android:hint="@string/title"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

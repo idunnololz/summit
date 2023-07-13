@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -192,6 +193,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }.show(childFragmentManager, "asdf")
         }
 
+        val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
+        val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
+        val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
         when (inboxItem) {
             is CommentBackedItem -> {
                 postAndCommentViewBuilder.voteUiHandler.bind(
@@ -201,6 +205,15 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     null,
                     null,
                     binding.score,
+                    {
+                        if (it > 0) {
+                            binding.score.setTextColor(upvoteColor)
+                        } else if (it == 0) {
+                            binding.score.setTextColor(normalTextColor)
+                        } else {
+                            binding.score.setTextColor(downvoteColor)
+                        }
+                    },
                     onSignInRequired = {
                         PreAuthDialogFragment.newInstance()
                             .show(childFragmentManager, "asdf")
@@ -430,7 +443,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     getMainActivity()?.launchPage(
                         PostRef(args.instance, postId)
                     )
-                }
+                },
+                onLoadPost = {}
             ).apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
@@ -439,12 +453,15 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
-            recyclerView.addItemDecoration(ThreadLinesDecoration(context))
+            recyclerView.addItemDecoration(ThreadLinesDecoration(
+                context, postAndCommentViewBuilder.hideCommentActions))
 
             adapter.setData(PostViewModel.PostData(
                 PostViewModel.ListView.PostListView(data.post),
                 listOf(data.commentTree),
                 null,
+                null,
+                false,
             ))
 
             val commentId = args.inboxItem.commentId

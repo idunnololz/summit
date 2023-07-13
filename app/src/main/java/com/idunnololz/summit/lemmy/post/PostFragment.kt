@@ -17,20 +17,25 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
@@ -39,6 +44,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.reddit.CommentsSortOrder
 import com.idunnololz.summit.reddit.getLocalizedName
 import com.idunnololz.summit.util.BaseFragment
@@ -47,6 +53,8 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -88,6 +96,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
+    @Inject
+    lateinit var preferences: Preferences
 
     private var actionsViewModel: MoreActionsViewModel? = null
 
@@ -138,7 +149,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 CreateOrEditPostFragment.REQUEST_KEY_RESULT)
 
             if (result != null) {
-                viewModel.fetchPostData(args.instance, args.id, force = true)
+                viewModel.fetchPostData(args.postOrCommentRef(), force = true)
                 (parentFragment as? CommunityFragment)?.onPostUpdated()
             }
         }
@@ -265,6 +276,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 },
                 onFetchComments = {
                     viewModel.fetchMoreComments(it)
+                },
+                onLoadPost = {
+                    viewModel.fetchPostData(Either.Left(PostRef(args.instance, it)))
                 }
             ).apply {
                 stateRestorationPolicy =
@@ -329,6 +343,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     PostViewModel.ListView.PostListView(post),
                     listOf(),
                     null,
+                    null,
+                    false,
                 ))
             onMainListingItemRetrieved(post)
         } ?: binding.loadingView.showProgressBar()
@@ -399,7 +415,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
-                    viewModel.fetchPostData(args.instance, args.id, force = true)
+                    viewModel.fetchPostData(args.postOrCommentRef(), force = true)
                     (parentFragment as? CommunityFragment)?.onPostUpdated()
                 }
             }
@@ -410,7 +426,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 delay(400)
 
                 withContext(Dispatchers.Main) {
-                    viewModel.fetchPostData(args.instance, args.id)
+                    viewModel.fetchPostData(args.postOrCommentRef())
                 }
             }
         }
@@ -426,8 +442,56 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.addItemDecoration(ThreadLinesDecoration(context))
+        binding.recyclerView.addItemDecoration(
+            ThreadLinesDecoration(context, postAndCommentViewBuilder.hideCommentActions))
         binding.fastScroller.setRecyclerView(binding.recyclerView)
+
+
+        if (preferences.useGestureActions) {
+            ItemTouchHelper(LemmySwipeActionCallback(
+                context,
+                binding.recyclerView,
+                listOf(
+                    LemmySwipeActionCallback.SwipeAction(
+                        R.id.swipe_action_upvote,
+                        context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)!!.mutate(),
+                        context.getColorCompat(R.color.style_red)
+                    ),
+                    LemmySwipeActionCallback.SwipeAction(
+                        R.id.swipe_action_bookmark,
+                        context.getDrawableCompat(R.drawable.baseline_bookmark_add_24)!!.mutate(),
+                        context.getColorCompat(R.color.style_amber)
+                    ),
+                    LemmySwipeActionCallback.SwipeAction(
+                        R.id.swipe_action_reply,
+                        context.getDrawableCompat(R.drawable.baseline_reply_24)!!.mutate(),
+                        context.getColorCompat(R.color.style_blue)
+                    )
+                ),
+                onActionSelected = { action, vh ->
+                    val commentView = vh.itemView.getTag(R.id.comment_view) as? CommentView
+                        ?: return@LemmySwipeActionCallback
+
+                    when (action.id) {
+                        R.id.swipe_action_upvote -> {
+                            actionsViewModel?.upvote(commentView)
+                        }
+
+                        R.id.swipe_action_bookmark -> {
+                            getMainActivity()?.showSnackbar(R.string.coming_soon)
+                        }
+
+                        R.id.swipe_action_reply -> {
+                            AddOrEditCommentFragment().apply {
+                                arguments = AddOrEditCommentFragmentArgs(
+                                    args.instance, commentView, null, null
+                                ).toBundle()
+                            }.show(childFragmentManager, "asdf")
+                        }
+                    }
+                }
+            )).attachToRecyclerView(binding.recyclerView)
+        }
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
             hasConsumedJumpToComments = true
@@ -481,7 +545,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     }
 
                     R.id.refresh -> {
-                        viewModel.fetchPostData(args.instance, args.id, force = true)
+                        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
                         true
                     }
 
@@ -536,7 +600,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     }
 
     private fun forceRefresh() {
-        viewModel.fetchPostData(args.instance, args.id, force = true)
+        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
     }
 
     private fun onMainListingItemRetrieved(post: PostView) {
@@ -630,4 +694,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
         // do nothing
     }
+
+    private fun PostFragmentArgs.postOrCommentRef() =
+        if (this.id > 0) {
+            Either.Left(PostRef(this.instance, this.id))
+        } else {
+            Either.Right(CommentRef(this.instance, this.commentId))
+        }
 }

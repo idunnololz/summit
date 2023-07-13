@@ -42,9 +42,10 @@ fun VoteUiHandler.bind(
     lifecycleOwner: LifecycleOwner,
     instance: String,
     commentView: CommentView,
-    upVoteView: ImageView,
-    downVoteView: ImageView,
+    upVoteView: ImageView?,
+    downVoteView: ImageView?,
     scoreView: TextView,
+    onUpdate: ((score: Int) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -57,6 +58,7 @@ fun VoteUiHandler.bind(
         upVoteView = upVoteView,
         downVoteView = downVoteView,
         scoreView = scoreView,
+        onUpdate = onUpdate,
         onSignInRequired = onSignInRequired,
         onInstanceMismatch = onInstanceMismatch,
     )
@@ -69,6 +71,7 @@ fun VoteUiHandler.bind(
     upVoteView: ImageView?,
     downVoteView: ImageView?,
     scoreView: TextView,
+    onUpdate: ((score: Int) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -81,6 +84,7 @@ fun VoteUiHandler.bind(
         upVoteView = upVoteView,
         downVoteView = downVoteView,
         scoreView = scoreView,
+        onUpdate = onUpdate,
         onSignInRequired = onSignInRequired,
         onInstanceMismatch = onInstanceMismatch,
     )
@@ -93,6 +97,7 @@ fun VoteUiHandler.bind(
     upVoteView: ImageView?,
     downVoteView: ImageView?,
     scoreView: TextView,
+    onUpdate: ((score: Int) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -105,6 +110,7 @@ fun VoteUiHandler.bind(
         upVoteView = upVoteView,
         downVoteView = downVoteView,
         scoreView = scoreView,
+        onUpdate = onUpdate,
         onSignInRequired = onSignInRequired,
         onInstanceMismatch = onInstanceMismatch,
     )
@@ -119,6 +125,7 @@ fun VoteUiHandler.bind(
     upVoteView: ImageView?,
     downVoteView: ImageView?,
     scoreView: TextView,
+    onUpdate: ((score: Int) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -137,6 +144,8 @@ fun VoteUiHandler.bind(
 
         upVoteView?.invalidate()
         downVoteView?.invalidate()
+
+        onUpdate?.invoke(score)
     }
     bindVoteUi(
         lifecycleOwner,

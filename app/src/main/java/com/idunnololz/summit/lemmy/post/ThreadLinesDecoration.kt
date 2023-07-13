@@ -9,14 +9,20 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 
 class ThreadLinesDecoration(
-    private val context: Context
+    private val context: Context,
+    private val isCompactView: Boolean,
 ) : RecyclerView.ItemDecoration() {
 
     private val distanceBetweenLines =
         context.resources.getDimensionPixelSize(R.dimen.thread_line_total_size)
     private val startingPadding =
         context.resources.getDimensionPixelSize(R.dimen.reddit_content_horizontal_padding)
-    private val topOverdraw = context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw)
+    private val topOverdraw =
+        if (isCompactView) {
+            context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw_compact)
+        } else {
+            context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw)
+        }
 
     private val linePaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.colorThreadLines)

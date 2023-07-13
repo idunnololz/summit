@@ -7,6 +7,3 @@ data class PostRef(
     val instance: String,
     val id: Int,
 ) : PageRef
-
-fun PostRef.getKey() =
-    "$instance#$id"

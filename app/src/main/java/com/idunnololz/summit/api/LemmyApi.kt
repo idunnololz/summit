@@ -105,6 +105,7 @@ interface LemmyApi {
      * Log into lemmy.
      */
     @POST("user/login")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun login(@Body form: Login): Call<LoginResponse>
 
     /**

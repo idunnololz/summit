@@ -56,6 +56,15 @@ object LinkResolver {
 
         when (uri.pathSegments.firstOrNull()) {
             null -> { // This is likely a link to the front page
+                val listingType = uri.getQueryParameter("listingType")
+                if (listingType != null) {
+                    if (listingType.equals("all", ignoreCase = true)) {
+                        return CommunityRef.All(instance)
+                    } else if (listingType.equals("local", ignoreCase = true)) {
+                        return CommunityRef.Local(instance)
+                    }
+                }
+
                 if (mustHandle) {
                     return defaultResult
                 } else {
@@ -92,6 +101,11 @@ object LinkResolver {
                 val postId = uri.pathSegments.getOrNull(1)
                     ?: return defaultResult
                 return PostRef(instance, postId.toIntOrNull() ?: return defaultResult)
+            }
+            "comment" -> {
+                val commentId = uri.pathSegments.getOrNull(1)
+                    ?: return defaultResult
+                return CommentRef(instance, commentId.toIntOrNull() ?: return defaultResult)
             }
             else -> {
                 if (mustHandle) {

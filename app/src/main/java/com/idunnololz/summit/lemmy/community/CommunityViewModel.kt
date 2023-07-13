@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
@@ -43,6 +44,7 @@ class CommunityViewModel @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val apiClient: AccountAwareLemmyClient,
     private val postReadManager: PostReadManager,
+    private val preferences: Preferences,
 ) : ViewModel() {
 
     companion object {
@@ -55,6 +57,7 @@ class CommunityViewModel @Inject constructor(
         val pageIndex: Int,
         val hasMore: Boolean,
         val isReadPostUpdate: Boolean = true,
+        val error: Throwable? = null,
     )
 
     @Parcelize
@@ -65,6 +68,11 @@ class CommunityViewModel @Inject constructor(
         var offset: Int = 0
     ) : Parcelable
 
+    // Dont use data class so every change triggers the observers
+    class PostUpdateInfo(
+        val isReadPostUpdate: Boolean = false,
+    )
+
     private var pagePositions = arrayListOf<PageScrollState>()
 
     val currentCommunityRef = MutableLiveData<CommunityRef>(CommunityRef.All())
@@ -72,7 +80,7 @@ class CommunityViewModel @Inject constructor(
     private val communityRefChangeObserver = Observer<CommunityRef> {
         recentCommunityManager.addRecentCommunity(it)
     }
-    val loadedPostsData = StatefulLiveData<LoadedPostsData>()
+    val loadedPostsData = StatefulLiveData<PostUpdateInfo>()
 
     val communityInstance: String
         get() = postsRepository.communityInstance
@@ -87,6 +95,12 @@ class CommunityViewModel @Inject constructor(
     val currentAccount = MutableLiveData<AccountView?>(null)
 
     var isHideReadEnabled = false
+
+    private var fetchingPages = mutableSetOf<Int>()
+    var postListEngine = PostListEngine(preferences.infinity)
+
+    val infinity: Boolean
+        get() = postListEngine.infinity
 
     init {
         currentCommunityRef.observeForever(communityRefChangeObserver)
@@ -139,19 +153,31 @@ class CommunityViewModel @Inject constructor(
 
         viewModelScope.launch {
             postReadManager.postReadChanged.collect {
-                val postData = loadedPostsData.valueOrNull ?: return@collect
-
-                val updatedPostData = withContext(Dispatchers.Default) {
-                    postData.copy(
-                        posts = postsRepository.update(postData.posts),
-                        isReadPostUpdate = false,
-                    )
+                val updatedPages = withContext(Dispatchers.Default) {
+                    postListEngine.pages.map {
+                        it.copy(
+                            posts = postsRepository.update(it.posts),
+                            isReadPostUpdate = false,
+                        )
+                    }
                 }
+
+                updatedPages.forEach {
+                    postListEngine.addPage(it)
+                }
+                postListEngine.createItems()
 
                 withContext(Dispatchers.Main) {
-                    loadedPostsData.setValue(updatedPostData)
+                    loadedPostsData.setValue(PostUpdateInfo(isReadPostUpdate = true))
                 }
             }
+        }
+    }
+
+    fun updateInfinity() {
+        // check for inconsistency
+        if (postListEngine.infinity != preferences.infinity) {
+            postListEngine.infinity = preferences.infinity
         }
     }
 
@@ -161,8 +187,10 @@ class CommunityViewModel @Inject constructor(
             return
         }
 
-        currentPageIndex.value = pageIndex - 1
-        fetchCurrentPageInternal(force)
+        if (!postListEngine.infinity) {
+            currentPageIndex.value = pageIndex - 1
+        }
+        fetchPageInternal(pageIndex - 1, force)
     }
 
     fun fetchNextPage(force: Boolean = false, clearPagePosition: Boolean) {
@@ -172,44 +200,90 @@ class CommunityViewModel @Inject constructor(
             pagePositions = ArrayList(pagePositions.take(pageIndex + 1))
         }
 
-        currentPageIndex.value = pageIndex + 1
+        if (!postListEngine.infinity) {
+            currentPageIndex.value = pageIndex + 1
+        }
 
-        fetchCurrentPageInternal(force)
+        fetchPageInternal(pageIndex + 1, force)
     }
 
     fun fetchPage(pageIndex: Int) {
-        currentPageIndex.value = pageIndex
-        fetchCurrentPageInternal(force = false)
+        if (!postListEngine.infinity) {
+            currentPageIndex.value = pageIndex
+        }
+        fetchPageInternal(pageIndex, force = false)
+    }
+
+    fun fetchInitialPage() {
+        if (postListEngine.infinity) {
+            fetchPage(0)
+        } else {
+            fetchCurrentPage()
+        }
     }
 
     fun fetchCurrentPage(force: Boolean = false, resetHideRead: Boolean = false) {
         if (resetHideRead) {
             postsRepository.clearHideRead()
         }
-        fetchCurrentPageInternal(force)
+
+        val pages = if (postListEngine.infinity) {
+            postListEngine.getCurrentPages()
+        } else {
+            listOf(requireNotNull(currentPageIndex.value))
+        }
+        pages.forEach {
+            fetchPageInternal(it, force)
+        }
     }
 
-    private fun fetchCurrentPageInternal(force: Boolean) {
+    private fun fetchPageInternal(pageToFetch: Int, force: Boolean) {
+        if (fetchingPages.contains(pageToFetch)) {
+            return
+        }
+
+        fetchingPages.add(pageToFetch)
+
         loadedPostsData.setIsLoading()
 
-        val currentPage = requireNotNull(currentPageIndex.value)
         viewModelScope.launch {
             val result = postsRepository.getPage(
-                currentPage, force)
+                pageToFetch, force)
 
             result
                 .onSuccess {
-                    loadedPostsData.postValue(
+                    val pageData =
                         LoadedPostsData(
                             posts = it.posts,
                             instance = it.instance,
-                            pageIndex = currentPage,
+                            pageIndex = pageToFetch,
                             hasMore = it.hasMore,
                         )
-                    )
+                    postListEngine.addPage(pageData)
+                    postListEngine.createItems()
+
+                    loadedPostsData.postValue(PostUpdateInfo())
+
+                    withContext(Dispatchers.Main) {
+                        fetchingPages.remove(pageToFetch)
+                    }
                 }
                 .onFailure {
+                    postListEngine.addPage(
+                        LoadedPostsData(
+                            posts = listOf(),
+                            instance = postsRepository.accountInstance,
+                            pageIndex = pageToFetch,
+                            hasMore = true,
+                            error = it,
+                        )
+                    )
+                    postListEngine.createItems()
                     loadedPostsData.postError(it)
+
+                    withContext(Dispatchers.Main) {
+                        fetchingPages.remove(pageToFetch)
+                    }
                 }
         }
     }
@@ -234,7 +308,11 @@ class CommunityViewModel @Inject constructor(
             CommunityState(
                 communityRef = currentCommunityRef.value ?: return null,
                 pages = listOf(),
-                currentPageIndex = currentPageIndex.value ?: return null,
+                currentPageIndex = if (infinity) {
+                    postListEngine.biggestPageIndex
+                } else {
+                    currentPageIndex.value
+                } ?: return null,
             ),
             pagePositions
         )
@@ -317,12 +395,14 @@ class CommunityViewModel @Inject constructor(
     private fun reset() {
         assertMainThread()
 
-        loadedPostsData.setValue(LoadedPostsData(
+        postListEngine.clearPages()
+        postListEngine.addPage(LoadedPostsData(
             posts = listOf(),
             instance = postsRepository.communityInstance,
             pageIndex = 0,
             hasMore = false
         ))
+        loadedPostsData.setValue(PostUpdateInfo())
         currentPageIndex.value = 0
         setPagePositionAtTop(0)
         fetchCurrentPage()
@@ -342,16 +422,15 @@ class CommunityViewModel @Inject constructor(
         val loadedPostData = loadedPostsData.valueOrNull
         loadedPostsData.setIsLoading()
 
-        viewModelScope.launch {
-            val anchorPosts = if (anchors.isEmpty()) {
-                loadedPostData?.posts
-                    ?.filter { !it.read }
-                    ?.mapTo(mutableSetOf<Int>()) { it.post.id }
-            } else {
-                anchors
-            } ?: setOf()
+        val anchorPosts = if (anchors.isEmpty()) {
+            postListEngine.getPostsCloseBy()
+                .mapTo(mutableSetOf<Int>()) { it.post.id }
+        } else {
+            anchors
+        } ?: setOf()
 
-            postsRepository.hideReadPosts(anchorPosts, currentPageIndex.value ?: 0)
+        viewModelScope.launch {
+            postsRepository.hideReadPosts(anchorPosts, postListEngine.biggestPageIndex ?: 0)
                 .onSuccess {
                     val position = it.posts.indexOfFirst { anchorPosts.contains(it.post.id) }
 
@@ -361,7 +440,14 @@ class CommunityViewModel @Inject constructor(
                         setPagePositionAtTop(it.pageIndex)
                     }
 
-                    fetchPage(it.pageIndex)
+                    if (infinity) {
+                        postListEngine.clearPages()
+                        for (index in 0..it.pageIndex) {
+                            fetchPageInternal(index, force = false)
+                        }
+                    } else {
+                        fetchPageInternal(it.pageIndex, force = false)
+                    }
                 }
                 .onFailure {
                     loadedPostsData.postError(it)
