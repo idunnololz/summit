@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.community
 import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
@@ -45,12 +46,14 @@ class CommunityViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val postReadManager: PostReadManager,
     private val preferences: Preferences,
+    private val state: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
         private val TAG = CommunityViewModel::class.java.canonicalName
     }
 
+    @Parcelize
     data class LoadedPostsData(
         val posts: List<PostView>,
         val instance: String,
@@ -58,7 +61,7 @@ class CommunityViewModel @Inject constructor(
         val hasMore: Boolean,
         val isReadPostUpdate: Boolean = true,
         val error: Throwable? = null,
-    )
+    ): Parcelable
 
     @Parcelize
     @JsonClass(generateAdapter = true)
@@ -97,7 +100,7 @@ class CommunityViewModel @Inject constructor(
     var isHideReadEnabled = false
 
     private var fetchingPages = mutableSetOf<Int>()
-    var postListEngine = PostListEngine(preferences.infinity)
+    var postListEngine = PostListEngine(preferences.infinity, state)
 
     val infinity: Boolean
         get() = postListEngine.infinity

@@ -446,7 +446,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             ThreadLinesDecoration(context, postAndCommentViewBuilder.hideCommentActions))
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
-
         if (preferences.useGestureActions) {
             ItemTouchHelper(LemmySwipeActionCallback(
                 context,

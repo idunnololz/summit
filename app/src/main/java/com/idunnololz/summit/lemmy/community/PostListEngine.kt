@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.community
 
+import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.lemmy.PostRef
@@ -26,7 +27,8 @@ sealed class Item {
 }
 
 class PostListEngine(
-    infinity: Boolean
+    infinity: Boolean,
+    private val state: SavedStateHandle,
 ) {
 
     var infinity: Boolean = infinity
@@ -35,18 +37,20 @@ class PostListEngine(
 
             field = value
 
-            if (!value && pages.size > 0) {
+            if (!value && pages.isNotEmpty()) {
                 val firstPage = pages.first()
-                pages.clear()
-                pages.add(firstPage)
+                _pages.value = listOf(firstPage)
             }
             createItems()
         }
 
+    private val _pages = state.getLiveData<List<CommunityViewModel.LoadedPostsData>>("pages")
+
     /**
      * Sorted pages in ascending order.
      */
-    val pages = mutableListOf<CommunityViewModel.LoadedPostsData>()
+    val pages: List<CommunityViewModel.LoadedPostsData>
+        get() = _pages.value ?: listOf()
 
     private var expandedItems = mutableSetOf<String>()
     private var actionsExpandedItems = mutableSetOf<String>()
@@ -63,6 +67,7 @@ class PostListEngine(
 
     fun addPage(data: CommunityViewModel.LoadedPostsData) {
         if (infinity) {
+            val pages = pages.toMutableList()
             val pageIndexInPages = pages.indexOfFirst { it.pageIndex == data.pageIndex }
             if (pageIndexInPages != -1) {
                 // replace!
@@ -71,9 +76,9 @@ class PostListEngine(
                 pages.add(data)
                 pages.sortBy { it.pageIndex }
             }
+            _pages.value = pages
         } else {
-            pages.clear()
-            pages.add(data)
+            _pages.value = listOf(data)
         }
     }
 
@@ -229,7 +234,7 @@ class PostListEngine(
         pages.map { it.pageIndex }
 
     fun clearPages() {
-        pages.clear()
+        _pages.value = listOf()
     }
 
     fun getPostsCloseBy(): MutableList<PostView> {
