@@ -15,6 +15,13 @@ fun Context.getColorFromAttribute(attribute: Int): Int {
     return color
 }
 
+fun Context.getDimenFromAttribute(attribute: Int): Float {
+    val attributes = obtainStyledAttributes(intArrayOf(attribute))
+    val dimen = attributes.getDimension(0, 0f)
+    attributes.recycle()
+    return dimen
+}
+
 fun Context.getDimen(@DimenRes dimen: Int): Int {
     return resources.getDimension(dimen).toInt()
 }

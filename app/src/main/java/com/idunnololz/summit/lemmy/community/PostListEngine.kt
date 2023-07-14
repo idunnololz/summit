@@ -17,7 +17,10 @@ sealed class Item {
         val pageIndex: Int,
     ) : Item()
 
-    data class FooterItem(val hasMore: Boolean) : Item()
+    data class FooterItem(
+        val hasMore: Boolean,
+        val hasLess: Boolean,
+    ) : Item()
 
     data class AutoLoadItem(val pageToLoad: Int) : Item()
 
@@ -44,12 +47,12 @@ class PostListEngine(
             createItems()
         }
 
-    private val _pages = state.getLiveData<List<CommunityViewModel.LoadedPostsData>>("pages")
+    private val _pages = state.getLiveData<List<LoadedPostsData>>("pages")
 
     /**
      * Sorted pages in ascending order.
      */
-    val pages: List<CommunityViewModel.LoadedPostsData>
+    val pages: List<LoadedPostsData>
         get() = _pages.value ?: listOf()
 
     private var expandedItems = mutableSetOf<String>()
@@ -65,7 +68,7 @@ class PostListEngine(
     val biggestPageIndex: Int?
         get() = pages.lastOrNull()?.pageIndex
 
-    fun addPage(data: CommunityViewModel.LoadedPostsData) {
+    fun addPage(data: LoadedPostsData) {
         if (infinity) {
             val pages = pages.toMutableList()
             val pageIndexInPages = pages.indexOfFirst { it.pageIndex == data.pageIndex }
@@ -127,7 +130,10 @@ class PostListEngine(
                 items.add(Item.EndItem)
             }
         } else {
-            items.add(Item.FooterItem(lastPage.hasMore))
+            items.add(Item.FooterItem(
+                hasMore = lastPage.hasMore,
+                hasLess = lastPage.pageIndex != 0,
+            ))
         }
 
         _items = items
@@ -229,9 +235,6 @@ class PostListEngine(
 
         return (firstPost.pageIndex..lastPost.pageIndex).toList()
     }
-
-    fun getAllPageIndices(): List<Int> =
-        pages.map { it.pageIndex }
 
     fun clearPages() {
         _pages.value = listOf()

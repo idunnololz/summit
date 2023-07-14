@@ -24,10 +24,12 @@
 
         <com.idunnololz.summit.view.ReactiveImageView
             android:id="@+id/image"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="H,16:9"
+            android:adjustViewBounds="true"
+            app:layout_constraintHeight_min="200dp"
+            app:layout_constraintHeight_max="1000dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -74,6 +76,17 @@
             app:icon="@drawable/baseline_comment_18"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title"/>
+
+        <ImageButton
+            android:id="@+id/open_link_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_open_in_new_black_24"
+            android:padding="@dimen/padding_half"
+            android:background="?selectableItemBackgroundBorderless"
+            app:layout_constraintTop_toTopOf="@+id/commentButton"
+            app:layout_constraintBottom_toBottomOf="@+id/commentButton"
+            app:layout_constraintEnd_toStartOf="@+id/upvoteButton" />
 
         <ImageButton
             android:id="@+id/upvoteButton"

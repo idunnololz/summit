@@ -428,6 +428,8 @@ class MainActivity : BaseActivity() {
         if (enableBottomNavViewScrolling && binding.bottomNavigationView.visibility == View.VISIBLE) {
             return
         }
+
+        bottomNavViewOffset.value = 0
         if (binding.bottomNavigationView.visibility != View.VISIBLE) {
             binding.bottomNavigationView.visibility = View.VISIBLE
             binding.bottomNavigationView.translationY =

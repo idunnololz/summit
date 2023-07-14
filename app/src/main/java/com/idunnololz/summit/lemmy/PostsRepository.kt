@@ -49,7 +49,7 @@ class PostsRepository @Inject constructor(
     private var endReached = false
 
     private var currentPageInternal = 1
-    private var hideRead = false
+    var hideRead = false
 
     var sortOrder: CommunitySortOrder = CommunitySortOrder.Active
         set(value) {
@@ -238,7 +238,7 @@ class PostsRepository @Inject constructor(
 
             is CommunityRef.CommunityRefByName,
             null -> {
-                // do nothing
+                apiClient.defaultInstance()
             }
         }
 

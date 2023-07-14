@@ -55,6 +55,29 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
             })
     }
 
+    fun runAfterLayout(
+        callback: () -> Unit
+    ) {
+        if (!isBindingAvailable()) return
+
+        if (binding.root.isLaidOut) {
+            callback()
+
+            return
+        }
+
+        val view = binding.root
+        view.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    view.viewTreeObserver.removeOnPreDrawListener(this)
+                    callback()
+                    return true
+                }
+            }
+        )
+    }
+
     fun addMenuProvider(menuProvider: MenuProvider) {
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }

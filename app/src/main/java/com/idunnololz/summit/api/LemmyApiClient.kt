@@ -738,12 +738,16 @@ class LemmyApiClient @Inject constructor(
     suspend fun fetchPerson(
         personId: PersonId?,
         name: String?,
+        page: Int? = null,
+        limit: Int? = null,
         account: Account?
     ): Result<GetPersonDetailsResponse> {
         val form = GetPersonDetails(
             person_id = personId,
             username = name,
             auth = account?.jwt,
+            page = page,
+            limit = limit,
         )
 
         return retrofitErrorHandler {

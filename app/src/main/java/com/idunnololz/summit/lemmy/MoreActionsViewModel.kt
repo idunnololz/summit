@@ -11,7 +11,6 @@ import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.utils.VotableRef
-import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,7 +20,7 @@ import javax.inject.Inject
 class MoreActionsViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     val accountManager: AccountManager,
-    val actionsManager: AccountActionsManager,
+    val accountActionsManager: AccountActionsManager,
 ) : ViewModel() {
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<Unit>()
@@ -65,11 +64,17 @@ class MoreActionsViewModel @Inject constructor(
         }
     }
 
+    fun deleteComment(postRef: PostRef, commentId: Int) {
+        viewModelScope.launch {
+            accountActionsManager.deleteComment(postRef, commentId)
+        }
+    }
+
     fun upvote(postView: PostView) {
-        actionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), 1)
+        accountActionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), 1)
     }
 
     fun upvote(commentView: CommentView) {
-        actionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), 1)
+        accountActionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), 1)
     }
 }

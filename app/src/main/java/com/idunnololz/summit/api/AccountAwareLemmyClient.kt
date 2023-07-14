@@ -145,9 +145,11 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun fetchPersonByNameWithRetry(
         name: String,
+        page: Int,
+        limit: Int,
         account: Account? = accountForInstance(),
     ): Result<GetPersonDetailsResponse> = retry {
-        apiClient.fetchPerson(personId = null, name = name, account = account)
+        apiClient.fetchPerson(personId = null, name = name, account = account, page = page, limit = limit)
             .autoSignOut(account)
     }
 

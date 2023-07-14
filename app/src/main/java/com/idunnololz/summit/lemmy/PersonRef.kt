@@ -17,4 +17,10 @@ sealed interface PersonRef : Parcelable, PageRef {
         val name: String,
         override val instance: String,
     ): PersonRef
+
+    val fullName: String
+        get() =
+            when (this) {
+                is PersonRefByName -> "$name@$instance"
+            }
 }

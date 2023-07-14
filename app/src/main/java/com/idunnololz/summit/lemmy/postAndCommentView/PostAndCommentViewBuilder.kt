@@ -101,7 +101,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var postUiConfig: PostUiConfig = uiConfig.postUiConfig
     private var commentUiConfig: CommentUiConfig = uiConfig.commentUiConfig
 
-    private val lemmyHeaderHelper = LemmyHeaderHelper(context)
+    val lemmyHeaderHelper = LemmyHeaderHelper(context)
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,
