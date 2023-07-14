@@ -4,11 +4,110 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
+import com.idunnololz.summit.lemmy.community.Item
+import com.idunnololz.summit.lemmy.community.ListingItemAdapter
+import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.StatefulData
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
+
+    private var adapter: ListingItemAdapter? = null
+
+    @Inject
+    lateinit var postListViewBuilder: PostListViewBuilder
+    @Inject
+    lateinit var preferences: Preferences
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val parentFragment = parentFragment as PersonTabbedFragment
+        val viewModel = parentFragment.viewModel
+
+        adapter = ListingItemAdapter(
+            postListViewBuilder,
+            requireContext(),
+            viewModel.postListEngine,
+            onNextClick = {
+//                viewModel.fetchNextPage(clearPagePosition = true)
+            },
+            onPrevClick = {
+//                viewModel.fetchPrevPage()
+            },
+            onSignInRequired = {
+                PreAuthDialogFragment.newInstance()
+                    .show(childFragmentManager, "asdf")
+            },
+            onInstanceMismatch = { accountInstance, apiInstance ->
+                AlertDialogFragment.Builder()
+                    .setTitle(R.string.error_account_instance_mismatch_title)
+                    .setMessage(
+                        getString(R.string.error_account_instance_mismatch,
+                            accountInstance,
+                            apiInstance)
+                    )
+                    .setNegativeButton(R.string.go_to_account_instance)
+                    .createAndShow(childFragmentManager, "onInstanceMismatch")
+            },
+            onImageClick = { sharedElementView, url ->
+                getMainActivity()?.openImage(
+                    sharedElement = sharedElementView,
+                    appBar = parentFragment.binding.appBar,
+                    title = null,
+                    url = url,
+                    mimeType = null
+                )
+            },
+            onVideoClick = { url, videoType, state ->
+                getMainActivity()?.openVideo(url, videoType, state)
+            },
+            onPageClick = {
+                getMainActivity()?.launchPage(it)
+            },
+            onItemClick = {
+                    instance,
+                    id,
+                    currentCommunity,
+                    post,
+                    jumpToComments,
+                    reveal,
+                    videoState ->
+
+                parentFragment.viewPagerController?.openPost(
+                    instance = instance,
+                    id =  id,
+                    reveal = reveal,
+                    post = post,
+                    jumpToComments = jumpToComments,
+                    currentCommunity = currentCommunity,
+                    videoState = videoState,
+                )
+            },
+            onShowMoreActions = {
+//                showMoreOptionsFor(it)
+            },
+            onPostRead = { postView ->
+//                viewModel.onPostRead(postView)
+            },
+            onLoadPage = {
+                viewModel.fetchPage(it)
+            }
+        )
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -20,5 +119,75 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
         setBinding(FragmentPersonPostsBinding.inflate(inflater, container, false))
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val parentFragment = parentFragment as PersonTabbedFragment
+
+        parentFragment.viewModel.postsState.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.showDefaultErrorMessageFor(it.error)
+                }
+                is StatefulData.Loading ->
+                    binding.loadingView.showProgressBar()
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+
+                    adapter?.onItemsChanged()
+                }
+            }
+        }
+
+        with(binding) {
+            val layoutManager = LinearLayoutManager(context)
+            recyclerView.layoutManager = layoutManager
+
+            fun fetchPageIfLoadItem(position: Int) {
+                (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
+                    ?.pageToLoad
+                    ?.let {
+                        parentFragment.viewModel.fetchPage(it)
+                    }
+            }
+
+
+            binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val firstPos = layoutManager.findFirstVisibleItemPosition()
+                    val lastPos = layoutManager.findLastVisibleItemPosition()
+
+                    fetchPageIfLoadItem(firstPos)
+                    fetchPageIfLoadItem(firstPos - 1)
+                    fetchPageIfLoadItem(lastPos)
+                    fetchPageIfLoadItem(lastPos + 1)
+                }
+            })
+        }
+
+        runAfterLayout {
+            setupView()
+        }
+    }
+
+    private fun setupView() {
+        if (!isBindingAvailable()) return
+
+        with(binding) {
+            adapter?.apply {
+                contentMaxWidth = recyclerView.width
+                contentPreferredHeight = recyclerView.height
+                viewLifecycleOwner = this@PersonPostsFragment.viewLifecycleOwner
+            }
+
+            recyclerView.adapter = adapter
+            recyclerView.setHasFixedSize(true)
+            recyclerView.setupDecoratorsForPostList(preferences)
+        }
     }
 }

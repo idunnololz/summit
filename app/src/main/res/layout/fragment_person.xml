@@ -1,130 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<com.idunnololz.summit.util.CustomScrollViewPager
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/coordinator_layout"
+    android:id="@+id/top_view_pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:animateLayoutChanges="true">
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:scrimVisibleHeightTrigger="0dp"
-            app:titleEnabled="false"
-            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/collapsing_toolbar_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="?attr/actionBarSize"
-                android:paddingBottom="@dimen/padding_half"
-                app:layout_collapseMode="pin">
-
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/profile_icon"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_margin="@dimen/padding"
-                    android:foreground="@drawable/account_ripple"
-                    android:scaleType="centerCrop"
-                    style="@style/CircleImageView"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceTitleLarge"
-                    android:layout_marginTop="@dimen/padding"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:gravity="center"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/profile_icon"/>
-
-                <TextView
-                    android:id="@+id/subtitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceBodyMedium"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:layout_marginTop="@dimen/padding_half"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    android:gravity="center"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/name"/>
-
-                <TextView
-                    android:id="@+id/cake_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceBodyMedium"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:layout_marginTop="@dimen/padding_half"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    android:gravity="center"
-                    android:drawablePadding="@dimen/padding_half"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/subtitle"
-                    app:drawableStartCompat="@drawable/baseline_cake_24"
-                    app:drawableTint="?colorControlNormal" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:contentInsetStart="0dp"
-                app:contentInsetStartWithNavigation="0dp"
-                app:layout_collapseMode="pin"/>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
-            android:layout_gravity="center_horizontal"
-            app:tabMode="scrollable"/>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </FrameLayout>
-
-    <FrameLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.idunnololz.summit.view.LoadingView
-            android:id="@+id/loading_view"
-            android:layout_width="wrap_content"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-    </FrameLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            android:animateLayoutChanges="true">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:statusBarScrim="?backgroundColor"
+                app:contentScrim="?backgroundColor"
+                app:titleEnabled="false"
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/collapsing_toolbar_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="?attr/actionBarSize"
+                    android:paddingBottom="@dimen/padding_half"
+                    app:layout_collapseMode="pin">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/profile_icon"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_margin="@dimen/padding"
+                        android:foreground="@drawable/account_ripple"
+                        android:scaleType="centerCrop"
+                        style="@style/CircleImageView"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?textAppearanceTitleLarge"
+                        android:layout_marginTop="@dimen/padding"
+                        android:layout_marginHorizontal="@dimen/padding"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/profile_icon"/>
+
+                    <TextView
+                        android:id="@+id/subtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?textAppearanceBodyMedium"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:layout_marginTop="@dimen/padding_half"
+                        android:layout_marginHorizontal="@dimen/padding"
+                        android:gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/name"/>
+
+                    <TextView
+                        android:id="@+id/cake_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?textAppearanceBodyMedium"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:layout_marginTop="@dimen/padding_half"
+                        android:layout_marginHorizontal="@dimen/padding"
+                        android:gravity="center"
+                        android:drawablePadding="@dimen/padding_half"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/subtitle"
+                        app:drawableStartCompat="@drawable/baseline_cake_24"
+                        app:drawableTint="?colorControlNormal" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceTitleLarge"/>
+                </androidx.appcompat.widget.Toolbar>
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?backgroundColor"
+                android:layout_gravity="center_horizontal"
+                app:tabMode="scrollable"/>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.idunnololz.summit.view.LoadingView
+                android:id="@+id/loading_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/post_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?backgroundColor">
+    </androidx.fragment.app.FragmentContainerView>
+</com.idunnololz.summit.util.CustomScrollViewPager>

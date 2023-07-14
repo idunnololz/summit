@@ -18,6 +18,7 @@ import com.idunnololz.summit.databinding.AccountItemBinding
 import com.idunnololz.summit.databinding.AddAccountItemBinding
 import com.idunnololz.summit.databinding.CurrentAccountItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentAccountsBinding
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -79,6 +80,10 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                 onSettingClick = {
                     requireMainActivity().openAccountSettings()
                 },
+                onPersonClick = {
+                    requireMainActivity().launchPage(
+                        PersonRef.PersonRefByName(it.account.name, it.account.instance))
+                }
             )
 
             recyclerView.setHasFixedSize(false)
@@ -129,6 +134,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
         private val onAccountClick: (AccountView) -> Unit,
         private val onAddAccountClick: () -> Unit,
         private val onSettingClick: () -> Unit,
+        private val onPersonClick: (AccountView) -> Unit,
     ) : RecyclerView.Adapter<ViewHolder>() {
 
         private sealed interface Item {
@@ -165,6 +171,9 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
 
                 b.signOut.setOnClickListener {
                     signOut(item.accountView)
+                }
+                b.root.setOnClickListener {
+                    onPersonClick(item.accountView)
                 }
             }
             addItemType(Item.AccountItem::class, AccountItemBinding::inflate) { item, b, _ ->

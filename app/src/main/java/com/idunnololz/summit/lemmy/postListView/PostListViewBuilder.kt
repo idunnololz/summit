@@ -8,12 +8,15 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import coil.load
+import coil.size.OriginalSize
+import coil.size.Scale
 import com.commit451.coiltransformations.BlurTransformation
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
+import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -77,11 +80,11 @@ class PostListViewBuilder @Inject constructor(
      */
     fun bind(
         holder: ListingItemViewHolder,
-        container: View,
         postView: PostView,
         instance: String,
         isRevealed: Boolean,
         contentMaxWidth: Int,
+        contentPreferredHeight: Int,
         viewLifecycleOwner: LifecycleOwner,
         isExpanded: Boolean,
         isActionsExpanded: Boolean,
@@ -235,15 +238,21 @@ class PostListViewBuilder @Inject constructor(
 
                 image.load(R.drawable.thumbnail_placeholder)
 
-                offlineManager.fetchImage(itemView, url) {
+                offlineManager.fetchImageWithError(itemView, url, {
+                    offlineManager.calculateImageMaxSizeIfNeeded(it)
+                    offlineManager.getMaxImageSizeHint(it, tempSize)
+
                     image.load(it) {
-                        placeholder(R.drawable.thumbnail_placeholder)
+                        size(coil.size.Size.ORIGINAL)
+//                        placeholder(R.drawable.thumbnail_placeholder)
 
                         if (!isRevealed && postView.post.nsfw) {
                             transformations(BlurTransformation(context, sampling = 10f))
                         }
                     }
-                }
+                }, {
+                    image.visibility = View.GONE
+                })
                 image.transitionName = "image_$absoluteAdapterPosition"
                 image.setOnClickListener {
                     if (fullContentContainerView != null) {
@@ -267,10 +276,7 @@ class PostListViewBuilder @Inject constructor(
                 lemmyContentHelper.setupFullContent(
                     reveal = isRevealed,
                     tempSize = tempSize,
-                    videoViewMaxHeight = (container.height
-                            - Utils.convertDpToPixel(56f)
-                            - Utils.convertDpToPixel(16f)
-                            ).toInt(),
+                    videoViewMaxHeight = contentPreferredHeight,
                     contentMaxWidth = contentMaxWidth,
                     fullImageViewTransitionName = "full_image_$absoluteAdapterPosition",
                     postView = postView,
@@ -350,9 +356,6 @@ class PostListViewBuilder @Inject constructor(
             image?.layoutParams = image?.layoutParams?.apply {
                 width = postImageWidth
             }
-            iconImage?.layoutParams = iconImage?.layoutParams?.apply {
-                width = postImageWidth
-            }
 
             if (layoutShowsFullContent) {
                 showFullContent()
@@ -429,6 +432,17 @@ class PostListViewBuilder @Inject constructor(
             onShowMoreOptions(postView)
         }
 
+
+        if (rawBinding is ListingItemCardBinding) {
+            postView.post.url?.let { url ->
+                openLinkButton?.visibility = View.VISIBLE
+                openLinkButton?.setOnClickListener {
+                    Utils.openExternalLink(context, url)
+                }
+            }
+        } else {
+            openLinkButton?.visibility = View.GONE
+        }
         when (val rb = rawBinding) {
             is ListingItemCompactBinding -> {
                 if (isActionsExpanded) {

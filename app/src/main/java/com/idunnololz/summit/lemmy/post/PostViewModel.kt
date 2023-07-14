@@ -103,8 +103,6 @@ class PostViewModel @Inject constructor(
         val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
         viewModelScope.launch {
-            lemmyApiClient.changeInstance(instance)
-
             val postResult = if (fetchPostData) {
                 postOrCommentRef
                     .fold(

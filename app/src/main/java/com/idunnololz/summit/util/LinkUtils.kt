@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import android.net.Uri
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toUrl
 import okhttp3.CacheControl
@@ -106,4 +107,7 @@ object LinkUtils {
 
     fun getLinkForPerson(instance: String, name: String): String =
         "https://${instance}/u/$name"
+
+    fun getLinkForPost(instance: String, id: PostId): String =
+        "https://${instance}/post/$id"
 }

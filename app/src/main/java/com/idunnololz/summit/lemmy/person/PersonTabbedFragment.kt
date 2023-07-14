@@ -14,6 +14,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.appendSeparator
+import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.lemmy.inbox.InboxFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -23,6 +24,8 @@ import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -35,7 +38,11 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
 
     private val args by navArgs<PersonTabbedFragmentArgs>()
 
-    private val viewModel: PersonTabbedViewModel by viewModels()
+    val viewModel: PersonTabbedViewModel by viewModels()
+    var viewPagerController: ViewPagerController? = null
+
+    private var isAnimatingTitleIn: Boolean = false
+    private var isAnimatingTitleOut: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,7 +70,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = ""
 
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.appBar)
+            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
         }
 
         viewModel.fetchPersonIfNotDone(args.personRef)
@@ -85,6 +92,70 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
                     }
                 }
             }
+
+            viewPagerController = ViewPagerController(
+                this@PersonTabbedFragment,
+                topViewPager,
+                childFragmentManager,
+                viewModel,
+                true,
+            ) {
+                if (it == 0) {
+                    val lastSelectedPost = viewModel.lastSelectedPost
+                    if (lastSelectedPost != null) {
+                        // We came from a post...
+//                        adapter?.highlightPost(lastSelectedPost)
+                        viewModel.lastSelectedPost = null
+                    }
+                } else {
+                    val lastSelectedPost = viewModel.lastSelectedPost
+                    if (lastSelectedPost != null) {
+//                        adapter?.highlightPostForever(lastSelectedPost)
+                    }
+                }
+            }.apply {
+                init()
+            }
+            topViewPager.disableLeftSwipe = true
+
+            binding.title.alpha = 0f
+            isAnimatingTitleIn = false
+            isAnimatingTitleOut = false
+
+            binding.cakeDate.visibility = View.GONE
+
+            val actionBarHeight = context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize)
+            binding.appBar.addOnOffsetChangedListener { _, verticalOffset ->
+                if (!isBindingAvailable()) {
+                    return@addOnOffsetChangedListener
+                }
+
+                val percentCollapsed =
+                    -verticalOffset / binding.collapsingToolbarLayout.height.toDouble()
+                val absPixelsShowing = binding.collapsingToolbarLayout.height + verticalOffset
+
+                if (absPixelsShowing <= actionBarHeight) {
+                    if (!isAnimatingTitleIn) {
+                        isAnimatingTitleIn = true
+                        isAnimatingTitleOut = false
+                        binding.title.animate().alpha(1f)
+                    }
+                } else if (percentCollapsed < 0.66) {
+                    if (!isAnimatingTitleOut) {
+                        isAnimatingTitleOut = true
+                        isAnimatingTitleIn = false
+                        binding.title.animate().alpha(0f)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (binding.viewPager.currentItem == 0) {
+            getMainActivity()?.setNavUiOpenness(0f)
         }
     }
 
@@ -94,14 +165,17 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
         val data = viewModel.personData.valueOrNull ?: return
         val context = requireContext()
 
-        requireMainActivity().apply {
-            supportActionBar?.title = data.personView.person.display_name
-        }
-
         with(binding) {
-            profileIcon.load(data.personView.person.avatar)
-            name.text = data.personView.person.display_name
+            val displayName = data.personView.person.display_name
                 ?: data.personView.person.name
+
+            binding.title.text = displayName
+
+            profileIcon.load(data.personView.person.avatar) {
+                fallback(R.drawable.thumbnail_placeholder)
+                allowHardware(false)
+            }
+            name.text = displayName
             subtitle.text = buildSpannedString {
                 append("@")
                 append(data.personView.person.name)
@@ -123,6 +197,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
                 ZoneOffset.UTC)
             val dateStr = dateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
             cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
+            binding.cakeDate.visibility = View.VISIBLE
 
             viewPager.offscreenPageLimit = 5
             val adapter = ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)

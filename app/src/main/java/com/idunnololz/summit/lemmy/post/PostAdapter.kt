@@ -69,7 +69,6 @@ class PostsAdapter(
     private val onLoadPost: (PostId) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-
     private sealed class Item(
         open val id: String
     ) {
@@ -479,12 +478,13 @@ class PostsAdapter(
 
                 val finalItems = mutableListOf<Item>()
 
-                rawData.postView.let {
-                    finalItems += HeaderItem(it.post, videoState)
-                }
+                val postView = rawData.postView
+                if (postView != null) {
+                    finalItems += HeaderItem(postView.post, videoState)
 
-                if (rawData.isSingleComment) {
-                    finalItems += Item.ViewAllComments(rawData.postView.post.post.id)
+                    if (rawData.isSingleComment) {
+                        finalItems += Item.ViewAllComments(postView.post.post.id)
+                    }
                 }
 
                 rawData.commentTree.flatten().forEach {

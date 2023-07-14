@@ -215,11 +215,11 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
         postListViewBuilder.bind(
             holder = h,
-            container = binding.demoViewContainer,
             postView = LemmyFakeModels.fakePostView,
             instance = "https://fake.instance",
             isRevealed = true,
             contentMaxWidth = binding.demoViewContainer.width,
+            contentPreferredHeight = binding.demoViewContainer.height,
             viewLifecycleOwner = viewLifecycleOwner,
             isExpanded = false,
             isActionsExpanded = false,

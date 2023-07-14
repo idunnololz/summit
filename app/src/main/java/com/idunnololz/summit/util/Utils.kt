@@ -24,6 +24,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.gson.FieldNamingPolicy
@@ -40,6 +41,7 @@ import java.util.zip.*
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext
+
 
 object Utils {
     private val TAG = Utils::class.java.simpleName
@@ -461,10 +463,14 @@ object Utils {
 
 
     fun openExternalLink(context: Context, url: String) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(url)
-        }
-        safeLaunchExternalIntent(context, intent)
+//        val intent = Intent(Intent.ACTION_VIEW).apply {
+//            data = Uri.parse(url)
+//        }
+//        safeLaunchExternalIntent(context, intent)
+
+        val intent = CustomTabsIntent.Builder()
+            .build()
+        intent.launchUrl(context, Uri.parse(url))
     }
 
     fun launchAppPlayStore(activity: Activity) {

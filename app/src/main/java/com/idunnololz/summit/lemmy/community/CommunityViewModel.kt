@@ -47,21 +47,11 @@ class CommunityViewModel @Inject constructor(
     private val postReadManager: PostReadManager,
     private val preferences: Preferences,
     private val state: SavedStateHandle,
-) : ViewModel() {
+) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
         private val TAG = CommunityViewModel::class.java.canonicalName
     }
-
-    @Parcelize
-    data class LoadedPostsData(
-        val posts: List<PostView>,
-        val instance: String,
-        val pageIndex: Int,
-        val hasMore: Boolean,
-        val isReadPostUpdate: Boolean = true,
-        val error: Throwable? = null,
-    ): Parcelable
 
     @Parcelize
     @JsonClass(generateAdapter = true)
@@ -90,14 +80,14 @@ class CommunityViewModel @Inject constructor(
     val accountInstance: String
         get() = postsRepository.accountInstance
 
-    var lastSelectedPost: PostRef? = null
+    override var lastSelectedPost: PostRef? = null
 
-    val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
+    override val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
 
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
     val currentAccount = MutableLiveData<AccountView?>(null)
 
-    var isHideReadEnabled = false
+    private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
 
     private var fetchingPages = mutableSetOf<Int>()
     var postListEngine = PostListEngine(preferences.infinity, state)
@@ -106,6 +96,10 @@ class CommunityViewModel @Inject constructor(
         get() = postListEngine.infinity
 
     init {
+        isHideReadEnabled.value?.let {
+            postsRepository.hideRead = it
+        }
+
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
         accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
@@ -146,8 +140,6 @@ class CommunityViewModel @Inject constructor(
             accountInfoManager.currentFullAccount.collect {
                 if (it != null) {
                     val accountView = accountInfoManager.getAccountViewForAccount(it.account)
-
-                    isHideReadEnabled = !(it.accountInfo.miscAccountInfo?.showReadPosts ?: true)
 
                     currentAccount.postValue(accountView)
                 }
@@ -244,6 +236,7 @@ class CommunityViewModel @Inject constructor(
 
     fun fetchCurrentPage(force: Boolean = false, resetHideRead: Boolean = false) {
         if (resetHideRead) {
+            isHideReadEnabled.value = false
             postsRepository.clearHideRead()
         }
 
@@ -439,7 +432,7 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun onHideRead(anchors: Set<Int>) {
-        val loadedPostData = loadedPostsData.valueOrNull
+        isHideReadEnabled.value = true
         loadedPostsData.setIsLoading()
 
         val anchorPosts = if (anchors.isEmpty()) {

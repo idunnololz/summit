@@ -27,9 +27,15 @@ class ViewPagerController(
     private val fragment: BaseFragment<*>,
     private val viewPager: CustomScrollViewPager,
     private val childFragmentManager: FragmentManager,
-    private val viewModel: CommunityViewModel,
+    private val viewModel: PostViewPagerViewModel,
+    private val lockPanes: Boolean = false,
     private val onPageSelected: (Int) -> Unit,
 ) {
+
+    interface PostViewPagerViewModel {
+        val viewPagerAdapter: ViewPagerAdapter
+        var lastSelectedPost: PostRef?
+    }
 
     companion object {
         private const val TAG = "ViewPagerController"
@@ -72,6 +78,7 @@ class ViewPagerController(
                                 remove(postFragment)
                             }
                         }
+                        fragment.getMainActivity()?.setNavUiOpenness(0f)
                     }
 
                     onPageSelected()
@@ -152,7 +159,9 @@ class ViewPagerController(
 
     private fun onPostClosed() {
         val mainFragment = fragment.requireParentFragment().requireParentFragment() as MainFragment
-        mainFragment.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+        if (!lockPanes) {
+            mainFragment.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+        }
 
         viewPagerAdapter.onPostClosed()
         viewPager.setPagingEnabled(false)

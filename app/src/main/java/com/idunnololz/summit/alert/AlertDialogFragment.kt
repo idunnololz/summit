@@ -59,6 +59,11 @@ class AlertDialogFragment : DialogFragment() {
             return this
         }
 
+        fun extras(fn: Bundle.() -> Unit): Builder {
+            args.fn()
+            return this
+        }
+
         fun create(): AlertDialogFragment {
             val frag = AlertDialogFragment()
             frag.arguments = args
