@@ -204,7 +204,7 @@ class WebsiteAdapterLoader {
                         Log.d(TAG, "Loading data from cache for: " + tl.url)
                         processDocument(
                             tl,
-                            dataCache.getCachedData(tl.key),
+                            requireNotNull(dataCache.getCachedData(tl.key)),
                             true /*fromCache*/,
                             false/*isStale*/,
                             dataCache.getCachedDate(tl.key)
@@ -217,7 +217,7 @@ class WebsiteAdapterLoader {
                         Log.d(TAG, "Loading stale data from cache for: " + tl.url)
                         processDocument(
                             tl,
-                            dataCache.getCachedData(tl.key),
+                            requireNotNull(dataCache.getCachedData(tl.key)),
                             true /*fromCache*/,
                             true /*isStale*/,
                             dataCache.getCachedDate(tl.key)

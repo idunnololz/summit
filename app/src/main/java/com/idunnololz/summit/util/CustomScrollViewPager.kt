@@ -2,7 +2,6 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.animation.DecelerateInterpolator
@@ -38,8 +37,12 @@ class CustomScrollViewPager : ViewPager {
             when (action and MotionEvent.ACTION_MASK) {
 
                 MotionEvent.ACTION_MOVE -> {
-
                     val pointerIndex: Int = event.findPointerIndex(activePointerId)
+                    if (pointerIndex == -1) {
+                        activePointerId = 0
+                        return false
+                    }
+
                     val x: Float = event.getX(pointerIndex)
                     val xDiff = x - lastMotionX
                     val xDiffAbs = abs(xDiff)
@@ -116,27 +119,27 @@ class CustomScrollViewPager : ViewPager {
         this.enabled = enabled
     }
 
-    fun setDurationScroll(millis: Int) {
-        try {
-            val viewpager: Class<*> = ViewPager::class.java
-            val scroller: Field = viewpager.getDeclaredField("mScroller")
-            scroller.setAccessible(true)
-            scroller.set(this, OwnScroller(context, millis))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    class OwnScroller(context: Context?, durationScroll: Int) :
-        Scroller(context, DecelerateInterpolator()) {
-        private var durationScrollMillis = 1
-
-        init {
-            durationScrollMillis = durationScroll
-        }
-
-        override fun startScroll(startX: Int, startY: Int, dx: Int, dy: Int, duration: Int) {
-            super.startScroll(startX, startY, dx, dy, durationScrollMillis)
-        }
-    }
+//    fun setDurationScroll(millis: Int) {
+//        try {
+//            val viewpager: Class<*> = ViewPager::class.java
+//            val scroller: Field = viewpager.getDeclaredField("mScroller")
+//            scroller.setAccessible(true)
+//            scroller.set(this, OwnScroller(context, millis))
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+//
+//    class OwnScroller(context: Context?, durationScroll: Int) :
+//        Scroller(context, DecelerateInterpolator()) {
+//        private var durationScrollMillis = 1
+//
+//        init {
+//            durationScrollMillis = durationScroll
+//        }
+//
+//        override fun startScroll(startX: Int, startY: Int, dx: Int, dy: Int, duration: Int) {
+//            super.startScroll(startX, startY, dx, dy, durationScrollMillis)
+//        }
+//    }
 }

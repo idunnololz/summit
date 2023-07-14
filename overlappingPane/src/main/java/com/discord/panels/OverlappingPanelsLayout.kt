@@ -321,8 +321,6 @@ open class OverlappingPanelsLayout : FrameLayout {
                   !isScrollingHorizontally
         }
 
-        Log.d("HAHA", "isClosedCenterPanelClick: " + isClosedCenterPanelClick)
-
         if (isClosedCenterPanelClick) {
           closePanels()
         } else {

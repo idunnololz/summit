@@ -41,6 +41,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.offline.OfflineManager
@@ -168,8 +169,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     }
 
     private fun goBack() {
-        (requireParentFragment() as CommunityFragment)
-            .closePost(this@PostFragment)
+        when (val fragment = requireParentFragment()) {
+            is CommunityFragment -> {
+                fragment.closePost(this@PostFragment)
+            }
+            is PersonTabbedFragment -> {
+                fragment.closePost(this@PostFragment)
+            }
+        }
     }
 
     override fun onCreateView(
@@ -313,19 +320,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         requireMainActivity().apply {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+        }
 
-            setupActionBar(
-                "",
-                showUp = false,
-                animateActionBarIn = false,
-            )
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title =
-                viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+        with(binding.toolbar) {
+            setNavigationIcon(
+                com.google.android.material.R.drawable.ic_arrow_back_black_24)
+            setNavigationOnClickListener {
+                if (args.isSinglePage) {
+                    findNavController().navigateUp()
+                } else {
+                    goBack()
+                }
+            }
+            title = viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
         }
 
         val swipeRefreshLayout = binding.swipeRefreshLayout
@@ -499,7 +506,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         }
 
         viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {
-            getMainActivity()?.supportActionBar?.title =
+            binding.toolbar.title =
                 viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
         }
 
@@ -514,15 +521,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                 when (menuItem.itemId) {
-                    android.R.id.home -> {
-                        if (args.isSinglePage) {
-                            false
-                        } else {
-                            goBack()
-                            true
-                        }
-                    }
-
                     R.id.share -> {
                         val sendIntent: Intent = Intent().apply {
                             action = Intent.ACTION_SEND

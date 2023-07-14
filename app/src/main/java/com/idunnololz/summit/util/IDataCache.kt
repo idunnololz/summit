@@ -30,7 +30,7 @@ interface IDataCache {
     fun getCachedDate(key: String): Long
 
     @Throws(IOException::class)
-    fun getCachedData(key: String): String
+    fun getCachedData(key: String): String?
 
     fun getCachedDataStream(key: String): InputStream
 

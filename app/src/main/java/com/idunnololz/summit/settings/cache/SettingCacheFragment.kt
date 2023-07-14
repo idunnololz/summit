@@ -110,6 +110,11 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
                             Utils.getSizeOfFile(offlineManager.videoCacheDir),
                     colors[1]
                 ),
+                StorageUsageItem(
+                    "Other",
+                    Utils.getSizeOfFile(offlineManager.tabsDir),
+                    colors[2]
+                ),
             )
         )
     }

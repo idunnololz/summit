@@ -11,8 +11,13 @@ import androidx.media3.datasource.cache.SimpleCache
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.ServerApiException
+import com.idunnololz.summit.cache.MoshiDiskCache
+import com.idunnololz.summit.cache.SimpleDiskCache
+import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import okhttp3.Request
@@ -32,7 +37,7 @@ import kotlin.collections.LinkedHashMap
 @Singleton
 class OfflineManager @Inject constructor(
     @ApplicationContext private val context: Context,
-
+    private val moshi: Moshi,
 ) {
 
     companion object {
@@ -44,6 +49,10 @@ class OfflineManager @Inject constructor(
     val imagesDir = File(context.filesDir, "imgs")
     val videosDir = File(context.filesDir, "videos")
     val videoCacheDir = File(context.cacheDir, "videos")
+    val tabsDir = File(context.cacheDir, "tabs")
+
+    val tabsDiskCache = MoshiDiskCache
+        .create(moshi, tabsDir, 1, 10L * 1024L * 1024L /* 10MB */)
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -562,5 +571,63 @@ class OfflineManager @Inject constructor(
         imagesDir.mkdirs()
         videosDir.mkdirs()
         videoCacheDir.mkdirs()
+    }
+
+    @JsonClass(generateAdapter = true)
+    data class PostListEngineCacheInfo(
+        val totalPages: Int
+    )
+
+    fun addPage(key: String?, secondaryKey: String?, data: LoadedPostsData, totalPages: Int) {
+        key ?: return
+
+        tabsDir.mkdirs()
+
+        val keyPrefix = "$key|$secondaryKey"
+        val infoKey = "$keyPrefix|info"
+
+        tabsDiskCache.cacheObject(infoKey, PostListEngineCacheInfo(totalPages))
+
+        val pageKey = "$keyPrefix|${data.pageIndex}"
+
+        tabsDiskCache.cacheObject(pageKey, data)
+
+        tabsDiskCache.printDebugInfo()
+    }
+
+    fun clearPages(key: String?, secondaryKey: String?) {
+        key ?: return
+
+        tabsDir.mkdirs()
+
+        val keyPrefix = "$key|$secondaryKey"
+        val infoKey = "$keyPrefix|info"
+
+        tabsDiskCache.evict(infoKey)
+    }
+
+    fun getPages(key: String?, secondaryKey: String?): List<LoadedPostsData>? {
+        key ?: return null
+
+        tabsDir.mkdirs()
+
+        val keyPrefix = "$key|$secondaryKey"
+        val infoKey = "$keyPrefix|info"
+
+        val pageCacheInfo = tabsDiskCache.getCachedObject<PostListEngineCacheInfo>(infoKey)
+
+        if (pageCacheInfo == null || pageCacheInfo.totalPages == 0) {
+            return null
+        }
+
+        val pages = mutableListOf<LoadedPostsData>()
+        for (i in 0 until pageCacheInfo.totalPages) {
+            val pageKey = "$keyPrefix|$i"
+            val postData = tabsDiskCache.getCachedObject<LoadedPostsData>(pageKey)
+                ?: return null
+            pages.add(postData)
+        }
+
+        return pages
     }
 }

@@ -16,6 +16,7 @@ import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.lemmy.inbox.InboxFragment
+import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
@@ -212,5 +213,9 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
                 binding.viewPager.adapter as ViewPagerAdapter,
             ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
         }
+    }
+
+    fun closePost(postFragment: PostFragment) {
+        viewPagerController?.closePost(postFragment)
     }
 }
