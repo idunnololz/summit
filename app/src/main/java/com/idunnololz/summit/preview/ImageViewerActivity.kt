@@ -372,11 +372,13 @@ class ImageViewerActivity : BaseActivity() {
             }
 
             var currentState = 0
-            override fun overScroll(offX: Float, offY: Float) {
-                if (offY > Utils.convertDpToPixel(EXIT_OFFSET_DP) ||
-                    offY < -Utils.convertDpToPixel(EXIT_OFFSET_DP) ||
-                    offX > Utils.convertDpToPixel(EXIT_OFFSET_DP) ||
-                    offX < -Utils.convertDpToPixel(EXIT_OFFSET_DP)) {
+            override fun overScroll(offX: Float, offY: Float, curZoom: Float) {
+                val exitOffsetScaled = Utils.convertDpToPixel(EXIT_OFFSET_DP) / curZoom
+                if (offY > exitOffsetScaled ||
+                    offY < -exitOffsetScaled ||
+                    offX > exitOffsetScaled ||
+                    offX < -exitOffsetScaled
+                ) {
                     if (currentState != R.id.exiting) {
                         currentState = R.id.exiting
                     }

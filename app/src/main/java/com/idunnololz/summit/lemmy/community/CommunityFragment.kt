@@ -190,6 +190,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.setTag(parentFragment?.tag)
+
         if (savedInstanceState == null) {
             requireMainActivity().apply {
                 setupForFragment<CommunityFragment>()

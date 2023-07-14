@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
@@ -14,6 +15,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
@@ -22,6 +24,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
@@ -47,6 +50,8 @@ class CommunityViewModel @Inject constructor(
     private val postReadManager: PostReadManager,
     private val preferences: Preferences,
     private val state: SavedStateHandle,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val offlineManager: OfflineManager,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -90,12 +95,14 @@ class CommunityViewModel @Inject constructor(
     private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
 
     private var fetchingPages = mutableSetOf<Int>()
-    var postListEngine = PostListEngine(preferences.infinity, state)
+    var postListEngine = PostListEngine(preferences.infinity, coroutineScopeFactory, offlineManager)
 
     val infinity: Boolean
         get() = postListEngine.infinity
 
     init {
+        Log.d("HAHA", "ViewModel created! ref: ${this.toString()}")
+
         isHideReadEnabled.value?.let {
             postsRepository.hideRead = it
         }
@@ -288,7 +295,7 @@ class CommunityViewModel @Inject constructor(
                             instance = postsRepository.accountInstance,
                             pageIndex = pageToFetch,
                             hasMore = true,
-                            error = it,
+                            error = PostLoadError(0),
                         )
                     )
                     postListEngine.createItems()
@@ -314,6 +321,9 @@ class CommunityViewModel @Inject constructor(
 
         currentCommunityRef.value = communityRefSafe
         postsRepository.setCommunity(communityRef)
+        postListEngine.setSecondaryKey(communityRef.getKey())
+
+        postListEngine.tryRestore()
     }
 
     fun createState(): CommunityViewState? {
@@ -466,5 +476,9 @@ class CommunityViewModel @Inject constructor(
                     loadedPostsData.postError(it)
                 }
         }
+    }
+
+    fun setTag(tag: String?) {
+        postListEngine.setKey(tag)
     }
 }

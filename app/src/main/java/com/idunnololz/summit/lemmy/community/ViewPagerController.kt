@@ -1,11 +1,15 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.animation.Animator
+import android.animation.ValueAnimator
+import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.LinearInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
 import androidx.viewpager.widget.PagerAdapter
@@ -22,6 +26,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomScrollViewPager
 import com.idunnololz.summit.util.DepthPageTransformer
 import com.idunnololz.summit.video.VideoState
+
 
 class ViewPagerController(
     private val fragment: BaseFragment<*>,
@@ -93,7 +98,6 @@ class ViewPagerController(
 
         })
         viewPager.setPageTransformer(false, DepthPageTransformer())
-        viewPager.setDurationScroll(350)
     }
 
     fun openPost(
@@ -123,7 +127,8 @@ class ViewPagerController(
         }
 
         onPostOpen()
-        viewPager.setCurrentItem(1, true)
+//        viewPager.setCurrentItem(1, true)
+        animatePagerTransition(true)
 
         viewModel.lastSelectedPost = PostRef(instance, id)
     }
@@ -193,5 +198,49 @@ class ViewPagerController(
                 1 -> container.getChildAt(1)
                 else -> error("ASDF")
             }
+    }
+
+    private fun animatePagerTransition(forward: Boolean) {
+        val animator = ValueAnimator.ofInt(
+            0,
+            viewPager.width - if (forward) viewPager.paddingLeft else viewPager.paddingRight
+        )
+        animator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
+                try {
+                    viewPager.endFakeDrag()
+                } catch (e: Exception) {
+                    // do nothing
+                }
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+                try {
+                    viewPager.endFakeDrag()
+                } catch (e: Exception) {
+                    // do nothing
+                }
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
+        animator.interpolator = LinearInterpolator()
+        animator.addUpdateListener(object : AnimatorUpdateListener {
+            private var oldDragPosition = 0
+            override fun onAnimationUpdate(animation: ValueAnimator) {
+                val dragPosition = animation.animatedValue as Int
+                val dragOffset = dragPosition - oldDragPosition
+                oldDragPosition = dragPosition
+                try {
+                    viewPager.fakeDragBy((dragOffset * if (forward) -1 else 1).toFloat())
+                } catch (e: Exception) {
+                    // do nothing
+                }
+            }
+        })
+        animator.duration = 250
+        viewPager.beginFakeDrag()
+        animator.start()
     }
 }

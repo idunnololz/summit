@@ -1,9 +1,15 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.offline.OfflineManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 sealed class Item {
@@ -31,8 +37,15 @@ sealed class Item {
 
 class PostListEngine(
     infinity: Boolean,
-    private val state: SavedStateHandle,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val offlineManager: OfflineManager,
 ) {
+
+    companion object {
+        private const val TAG = "PostListEngine"
+    }
+
+    private val coroutineScope = coroutineScopeFactory.create()
 
     var infinity: Boolean = infinity
         set(value) {
@@ -47,7 +60,7 @@ class PostListEngine(
             createItems()
         }
 
-    private val _pages = state.getLiveData<List<LoadedPostsData>>("pages")
+    private val _pages = MutableLiveData<List<LoadedPostsData>>()
 
     /**
      * Sorted pages in ascending order.
@@ -65,8 +78,20 @@ class PostListEngine(
     private var displayFirstItemsIndex: Int = -1
     private var displayLastItemsIndex: Int = -1
 
+    private var key: String? = null
+    private var secondaryKey: String? = null
+
     val biggestPageIndex: Int?
         get() = pages.lastOrNull()?.pageIndex
+
+    fun tryRestore() {
+        Log.d(TAG, "Attempting to restore. Using keys ${key}, ${secondaryKey}")
+        val cached = offlineManager.getPages(key, secondaryKey)
+        if (cached != null) {
+            Log.d(TAG, "Restoration successful! Restored ${cached.size} pages.")
+            _pages.value = cached
+        }
+    }
 
     fun addPage(data: LoadedPostsData) {
         if (infinity) {
@@ -82,6 +107,10 @@ class PostListEngine(
             _pages.value = pages
         } else {
             _pages.value = listOf(data)
+        }
+
+        coroutineScope.launch(Dispatchers.IO) {
+            offlineManager.addPage(key, secondaryKey, data, pages.size)
         }
     }
 
@@ -101,7 +130,7 @@ class PostListEngine(
         }
         for (page in pages) {
             if (page.error != null) {
-                items.add(Item.ErrorItem(page.error, page.pageIndex))
+                items.add(Item.ErrorItem(RuntimeException(), page.pageIndex))
             } else {
                 page.posts
                     .mapTo(items) {
@@ -238,6 +267,9 @@ class PostListEngine(
 
     fun clearPages() {
         _pages.value = listOf()
+        coroutineScope.launch(Dispatchers.IO) {
+            offlineManager.clearPages(key, secondaryKey)
+        }
     }
 
     fun getPostsCloseBy(): MutableList<PostView> {
@@ -259,4 +291,12 @@ class PostListEngine(
 
     fun getCommunityIcon(): String? =
         pages.firstOrNull()?.posts?.firstOrNull()?.community?.icon
+
+    fun setKey(tag: String?) {
+        key = tag
+    }
+
+    fun setSecondaryKey(key: String) {
+        secondaryKey = key
+    }
 }

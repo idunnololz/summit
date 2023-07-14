@@ -29,7 +29,7 @@ class GalleryImageView : AppCompatImageView {
         fun togggleUi()
         fun showUi()
         fun hideUi()
-        fun overScroll(offX: Float, offY: Float)
+        fun overScroll(offX: Float, offY: Float, curZoom: Float)
 
         /**
          * Called when the user lets go
@@ -170,14 +170,14 @@ class GalleryImageView : AppCompatImageView {
     private fun updateOverScrollBy(offX: Float, offY: Float) {
         overScrollX -= offX / curZoom
         overScrollY -= offY / curZoom
-        callback?.overScroll(overScrollX, overScrollY)
+        callback?.overScroll(overScrollX, overScrollY, curZoom)
         updateMatrix()
     }
 
     private fun updateOverScroll(newOverScrollX: Float, newOverScrollY: Float) {
         overScrollX = newOverScrollX
         overScrollY = newOverScrollY
-        callback?.overScroll(overScrollX, overScrollY)
+        callback?.overScroll(overScrollX, overScrollY, curZoom)
         updateMatrix()
     }
 

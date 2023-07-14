@@ -9,12 +9,15 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
+import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.lemmy.post.PostViewModel
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,6 +27,8 @@ import javax.inject.Inject
 class PersonTabbedViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val state: SavedStateHandle,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val offlineManager: OfflineManager,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -44,7 +49,7 @@ class PersonTabbedViewModel @Inject constructor(
     val postsState = StatefulLiveData<Unit>()
     val commentsState = StatefulLiveData<Unit>()
 
-    val postListEngine = PostListEngine(infinity = true, state)
+    val postListEngine = PostListEngine(infinity = true, coroutineScopeFactory, offlineManager)
     var commentPages: List<CommentPageResult> = listOf()
 
     val instance: String
@@ -136,7 +141,7 @@ class PersonTabbedViewModel @Inject constructor(
                             apiClient.instance,
                             pageIndex,
                             false,
-                            error = it
+                            error = PostLoadError(0)
                         ))
                         postListEngine.createItems()
                     }
