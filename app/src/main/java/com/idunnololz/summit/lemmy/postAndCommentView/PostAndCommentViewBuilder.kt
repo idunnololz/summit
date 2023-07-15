@@ -356,6 +356,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         topHotspot.setOnClickListener {
             collapseSection(h.bindingAdapterPosition)
         }
+        headerView.setOnClickListener {
+            collapseSection(h.absoluteAdapterPosition)
+        }
 
         commentButton?.isEnabled = !isPostLocked
         commentButton?.setOnClickListener {
@@ -458,7 +461,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             threadLinesContainer, depth, baseDepth
         )
         lemmyHeaderHelper.populateHeaderSpan(
-            headerContainer = headerContainer,
+            headerContainer = headerView,
             item = commentView,
             detailed = true,
             childrenCount = childrenCount
@@ -468,6 +471,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             expandSection(h.absoluteAdapterPosition)
         }
         topHotspot.setOnClickListener {
+            expandSection(h.absoluteAdapterPosition)
+        }
+        headerView.setOnClickListener {
             expandSection(h.absoluteAdapterPosition)
         }
         if (commentView.comment.distinguished) {
@@ -841,7 +847,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     private fun PostCommentCollapsedItemBinding.scaleTextSizes() {
-        headerContainer.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
+        headerView.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
     }
 
     private fun PostPendingCommentExpandedItemBinding.scaleTextSizes() {

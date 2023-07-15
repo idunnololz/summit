@@ -14,6 +14,7 @@ data class PostInListUiConfig(
     // We need this because some layouts show the full content or can show it
     val fullContentConfig: FullContentConfig = FullContentConfig(),
     val preferImagesAtEnd: Boolean = false,
+    val preferFullSizeImages: Boolean = false,
 ) {
     fun updateTextSizeMultiplier(it: Float): PostInListUiConfig =
         this.copy(

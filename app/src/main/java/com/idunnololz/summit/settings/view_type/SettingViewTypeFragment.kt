@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.transition.ChangeBounds
 import androidx.transition.ChangeClipBounds
 import androidx.transition.ChangeImageTransform
+import androidx.transition.ChangeTransform
 import androidx.transition.Fade
 import androidx.transition.Fade.IN
 import androidx.transition.Fade.OUT
@@ -168,6 +169,19 @@ AlertDialogFragment.AlertDialogFragmentListener {
                 updateRendering()
             }
         )
+        OnOffSettingItem(
+            getString(R.string.prefer_full_size_image),
+            null,
+        ).bindTo(
+            binding.preferFullSizeImage,
+            { viewModel.currentPostUiConfig.preferFullSizeImages },
+            {
+                viewModel.currentPostUiConfig =
+                    viewModel.currentPostUiConfig.copy(preferFullSizeImages = it)
+
+                updateRendering()
+            }
+        )
     }
 
     private val lastH: ListingItemViewHolder? = null
@@ -182,6 +196,15 @@ AlertDialogFragment.AlertDialogFragmentListener {
             .setOrdering(ORDERING_TOGETHER)
             .setDuration(ANIMATION_DURATION_MS)
         TransitionManager.beginDelayedTransition(binding.demoViewContainer, set)
+
+        binding.demoViewContainer.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    binding.demoViewContainer.viewTreeObserver.removeOnPreDrawListener(this)
+                    return true
+                }
+            }
+        )
 
         postListViewBuilder.postUiConfig = viewModel.currentPostUiConfig
 

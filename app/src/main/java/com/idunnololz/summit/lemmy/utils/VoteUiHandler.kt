@@ -205,3 +205,13 @@ sealed interface VotableRef {
         val commentId: Int
     ) : VotableRef
 }
+
+fun PostView.toVotableRef() =
+    VotableRef.PostRef(
+        this.post.id
+    )
+
+fun CommentView.toVotableRef() =
+    VotableRef.CommentRef(
+        this.comment.id
+    )

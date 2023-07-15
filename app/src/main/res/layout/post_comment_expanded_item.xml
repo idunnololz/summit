@@ -52,7 +52,7 @@
         app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
         style="?android:attr/progressBarStyleSmall" />
 
-    <HorizontalScrollView
+    <com.idunnololz.summit.view.LemmyHeaderView
         android:id="@+id/headerView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,13 +66,7 @@
         app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
         app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
         app:layout_constraintStart_toEndOf="@+id/progress_bar"
-        app:layout_constraintEnd_toStartOf="@+id/collapseSectionButton">
-
-        <com.idunnololz.summit.view.LemmyHeaderView
-            android:id="@+id/headerContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </HorizontalScrollView>
+        app:layout_constraintEnd_toStartOf="@+id/collapseSectionButton"/>
 
     <ImageButton
         android:id="@+id/collapseSectionButton"
