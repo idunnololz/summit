@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.community
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -86,10 +85,12 @@ class PostListEngine(
 
     fun tryRestore() {
         Log.d(TAG, "Attempting to restore. Using keys ${key}, ${secondaryKey}")
-        val cached = offlineManager.getPages(key, secondaryKey)
-        if (cached != null) {
-            Log.d(TAG, "Restoration successful! Restored ${cached.size} pages.")
-            _pages.value = cached
+        val cachedPages = offlineManager.getPages(key, secondaryKey)
+
+        cachedPages?.let {
+            // We need to use let here because Google's lint rule doesn't support smart cast
+            Log.d(TAG, "Restoration successful! Restored ${cachedPages.size} pages.")
+            _pages.value = it
         }
     }
 

@@ -290,6 +290,7 @@
     <string name="posts">Posts</string>
     <string name="comments">Comments</string>
     <string name="in_format">in %1$s</string>
+    <string name="prefer_full_size_image">Prefer full size image</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

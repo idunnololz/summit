@@ -411,4 +411,8 @@ class AccountActionsManager @Inject constructor(
     fun removePendingComment(pendingComment: PendingCommentView) {
         pendingCommentsManager.removePendingComment(pendingComment)
     }
+
+    fun setScore(ref: VotableRef.PostRef, score: Int) {
+        votesManager.setScore(ref, score)
+    }
 }

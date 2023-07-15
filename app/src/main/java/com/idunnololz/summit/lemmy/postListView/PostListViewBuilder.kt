@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup.LayoutParams
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
@@ -180,6 +181,24 @@ class PostListViewBuilder @Inject constructor(
             }
 
             holder.state.preferImagesAtEnd = postUiConfig.preferImagesAtEnd
+        }
+
+        if (postUiConfig.preferFullSizeImages) {
+            when (val rb = rawBinding) {
+                is ListingItemCardBinding -> {
+                    rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        this.dimensionRatio = null
+                    }
+                }
+            }
+        } else {
+            when (val rb = rawBinding) {
+                is ListingItemCardBinding -> {
+                    rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        this.dimensionRatio = "H,16:9"
+                    }
+                }
+            }
         }
 
 

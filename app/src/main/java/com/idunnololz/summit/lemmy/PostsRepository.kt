@@ -2,9 +2,11 @@ package com.idunnololz.summit.lemmy
 
 import android.util.Log
 import arrow.core.Either
+import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
+import com.idunnololz.summit.actions.VotesManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostId
@@ -12,6 +14,8 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +31,7 @@ class PostsRepository @Inject constructor(
     private val postReadManager: PostReadManager,
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
+    private val accountActionsManager: AccountActionsManager,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -305,7 +310,7 @@ class PostsRepository @Inject constructor(
         return newPosts.fold(
             onSuccess = { newPosts ->
                 Log.d(TAG, "Fetched ${newPosts.size} posts.")
-                addPosts(newPosts, pageIndex)
+                addPosts(newPosts, pageIndex, force)
                 Result.success(newPosts.isNotEmpty())
             },
             onFailure = {
@@ -314,9 +319,14 @@ class PostsRepository @Inject constructor(
         )
     }
 
-    private fun addPosts(newPosts: List<PostView>, pageIndex: Int,) {
+    private fun addPosts(newPosts: List<PostView>, pageIndex: Int, force: Boolean) {
         for (post in newPosts) {
             val uniquePostKey = post.getUniqueKey()
+
+            if (force) {
+                accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
+            }
+
             if (hideRead && (post.read || postReadManager.isPostRead(accountInstance, post.post.id))) {
                 continue
             }

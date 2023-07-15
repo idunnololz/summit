@@ -26,6 +26,9 @@
         android:textColor="@color/colorTextFaint"
         android:gravity="start"
         android:textAppearance="?textAppearanceBodySmall"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="end"
         app:drawableTint="?colorControlNormal"
         tools:text="Hello" />
 </merge>

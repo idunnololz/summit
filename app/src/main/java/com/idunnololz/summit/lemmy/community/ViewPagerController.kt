@@ -60,7 +60,6 @@ class ViewPagerController(
                     return
                 }
                 if (position == 0) {
-                    Log.d(TAG, "onPageScrolled: $positionOffset")
                     fragment.getMainActivity()?.setNavUiOpenness(positionOffset)
                 }
 

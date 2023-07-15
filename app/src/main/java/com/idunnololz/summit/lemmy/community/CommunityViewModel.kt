@@ -101,8 +101,6 @@ class CommunityViewModel @Inject constructor(
         get() = postListEngine.infinity
 
     init {
-        Log.d("HAHA", "ViewModel created! ref: ${this.toString()}")
-
         isHideReadEnabled.value?.let {
             postsRepository.hideRead = it
         }
