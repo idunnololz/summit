@@ -43,6 +43,7 @@ import com.idunnololz.summit.main.community_info_pane.CommunityInfoViewModel
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef
+import com.idunnololz.summit.tabs.hasTabId
 import com.idunnololz.summit.tabs.isHomeTab
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -172,7 +173,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 if (!tab.isHomeTab &&
                     currentFragment is CommunityFragment && currentFragment.isPristineFirstPage()) {
 
-                    changeCommunity(tabsManager.getHomeTab().communityRef)
+                    changeCommunity((
+                            tabsManager.getHomeTab() as TabsManager.Tab.UserCommunityTab
+                            ).userCommunityItem.id)
                 } else {
                     currentNavController?.popBackStack(R.id.community, false)
 
@@ -227,12 +230,15 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             viewLifecycleOwner,
         )
 
-        val firstTab = requireNotNull(tabsManager.currentTab.value)
-        firstFragmentTag = getTagForTab(firstTab.communityRef)
+        val currentTab = requireNotNull(tabsManager.currentTab.value)
+        firstFragmentTag = getTagForTab(
+            (tabsManager.getHomeTab() as TabsManager.Tab.UserCommunityTab).userCommunityItem.id
+        )
+        Log.d(TAG, "First fragment tag is $firstFragmentTag")
 
-        changeCommunity(when (firstTab) {
-            is TabsManager.Tab.SubscribedCommunityTab -> Either.Right(firstTab.subscribedCommunity)
-            is TabsManager.Tab.UserCommunityTab -> Either.Left(firstTab.userCommunityItem)
+        changeCommunity(when (currentTab) {
+            is TabsManager.Tab.SubscribedCommunityTab -> Either.Right(currentTab.subscribedCommunity)
+            is TabsManager.Tab.UserCommunityTab -> Either.Left(currentTab.userCommunityItem)
         })
 
         userCommunitiesManager.getAllUserCommunities().forEach { tab ->

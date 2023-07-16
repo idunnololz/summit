@@ -22,6 +22,7 @@ import androidx.core.view.updateLayoutParams
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.dto.PostView
@@ -42,6 +43,7 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
+import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
@@ -97,6 +99,7 @@ class LemmyContentHelper(
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
     ) {
+        assertMainThread()
         if (!lazyUpdate) {
             fullContentContainerView.removeAllViews()
         }
@@ -125,7 +128,7 @@ class LemmyContentHelper(
         fun addFooter() {
             if (lazyUpdate) {
                 // remove previous footers...
-                for (i in 0 until fullContentContainerView.childCount) {
+                for (i in fullContentContainerView.childCount - 1 downTo 0) {
                     val v = fullContentContainerView[i]
                     if (v.getTag(R.id.is_footer) == true) {
                         fullContentContainerView.removeViewAt(i)
@@ -602,6 +605,8 @@ class LemmyContentHelper(
         fullContentContainerView: ViewGroup,
         recycle: Boolean = false
     ): RecycledState {
+        assertMainThread()
+
         val stateBuilder = RecycledState.Builder()
 
         if (fullContentContainerView.childCount == 0) return stateBuilder.build()
