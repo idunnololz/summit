@@ -106,6 +106,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
                 viewModel.fetchPage(it)
             }
         )
+        onSelectedLayoutChanged()
 
     }
 
@@ -187,6 +188,35 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
         runAfterLayout {
             setupView()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        onSelectedLayoutChanged()
+    }
+
+    private fun onSelectedLayoutChanged() {
+        val newPostUiConfig = preferences.getPostInListUiConfig()
+        val didUiConfigChange = postListViewBuilder.postUiConfig != newPostUiConfig
+        val didLayoutChange = adapter?.layout != preferences.getPostsLayout()
+
+        if (didLayoutChange) {
+            if (isBindingAvailable()) {
+                updateDecorator(binding.recyclerView)
+            }
+        }
+
+        if (didUiConfigChange) {
+            postListViewBuilder.postUiConfig = newPostUiConfig
+        }
+
+        if (didLayoutChange || didUiConfigChange) {
+            adapter?.layout = preferences.getPostsLayout()
+        }
+    }
+
+    private fun updateDecorator(recyclerView: RecyclerView) {
+        recyclerView.setupDecoratorsForPostList(preferences)
     }
 
     private fun setupView() {

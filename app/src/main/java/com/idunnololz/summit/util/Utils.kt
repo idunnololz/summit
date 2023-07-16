@@ -31,6 +31,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import java.io.*
@@ -898,7 +899,9 @@ object Utils {
  * thread.
  */
 fun assertMainThread() {
-    require(Looper.myLooper() == Looper.getMainLooper()) { "You must call this method on the main thread" }
+    if (BuildConfig.DEBUG) {
+        require(Looper.myLooper() == Looper.getMainLooper()) { "You must call this method on the main thread" }
+    }
 }
 
 fun convertSpToPixel(sp: Float): Float {

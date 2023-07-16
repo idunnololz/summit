@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -323,6 +324,8 @@ class CommunityViewModel @Inject constructor(
         }
 
         val communityRefSafe: CommunityRef = communityRef
+
+        FirebaseCrashlytics.getInstance().setCustomKey("community", communityRef.toString())
 
         currentCommunityRef.value = communityRefSafe
         postsRepository.setCommunity(communityRef)
