@@ -37,7 +37,7 @@ class ListingItemAdapter(
     private val onPrevClick: () -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
-    private val onImageClick: (View?, String) -> Unit,
+    private val onImageClick: (PostView, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onItemClick: (

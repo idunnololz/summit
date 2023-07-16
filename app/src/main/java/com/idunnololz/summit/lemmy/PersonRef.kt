@@ -15,6 +15,9 @@ sealed interface PersonRef : Parcelable, PageRef {
     @TypeLabel("1")
     data class PersonRefByName(
         val name: String,
+        /**
+         * This should be the instance of the actual person.
+         */
         override val instance: String,
     ): PersonRef
 

@@ -93,7 +93,7 @@ class PostListViewBuilder @Inject constructor(
         highlight: Boolean,
         highlightForever: Boolean,
         onRevealContentClickedFn: () -> Unit,
-        onImageClick: (sharedElementView: View?, String) -> Unit,
+        onImageClick: (PostView, sharedElementView: View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onItemClick: (
@@ -175,6 +175,16 @@ class PostListViewBuilder @Inject constructor(
                             this.endToStart = rb.leftBarrier.id
                             this.marginStart = padding
                             this.marginEnd = paddingHalf
+                        }
+                    }
+
+                    is ListingItemCardBinding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.topToTop = ConstraintLayout.LayoutParams.UNSET
+                            this.topToBottom = rb.bottomBarrier.id
+                        }
+                        rb.headerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
                 }
@@ -263,7 +273,7 @@ class PostListViewBuilder @Inject constructor(
 
                     image.load(it) {
                         size(coil.size.Size.ORIGINAL)
-//                        placeholder(R.drawable.thumbnail_placeholder)
+                        fallback(R.drawable.thumbnail_placeholder)
 
                         if (!isRevealed && postView.post.nsfw) {
                             transformations(BlurTransformation(context, sampling = 10f))
@@ -277,7 +287,7 @@ class PostListViewBuilder @Inject constructor(
                     if (fullContentContainerView != null) {
                         toggleItem(postView)
                     } else {
-                        onImageClick(image, url)
+                        onImageClick(postView, image, url)
                     }
                 }
             }
@@ -303,10 +313,10 @@ class PostListViewBuilder @Inject constructor(
                     rootView = itemView,
                     fullContentContainerView = fullContentContainerView,
                     onFullImageViewClickListener = { v, url ->
-                        onImageClick(v, url)
+                        onImageClick(postView, v, url)
                     },
                     onImageClickListener = {
-                        onImageClick(null, it)
+                        onImageClick(postView, null, it)
                     },
                     onVideoClickListener = onVideoClick,
                     onItemClickListener = {
@@ -334,6 +344,13 @@ class PostListViewBuilder @Inject constructor(
 
                     iconImage?.visibility = View.VISIBLE
                     iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_black_24)
+                    iconImage?.setOnClickListener {
+                        if (fullContentContainerView != null) {
+                            toggleItem(postView)
+                        } else {
+                            onItemClick()
+                        }
+                    }
 
                     if (isExpanded) {
                         showFullContent()
@@ -375,6 +392,9 @@ class PostListViewBuilder @Inject constructor(
             image?.layoutParams = image?.layoutParams?.apply {
                 width = postImageWidth
             }
+            iconImage?.updateLayoutParams {
+                width = postImageWidth
+            }
 
             if (layoutShowsFullContent) {
                 showFullContent()
@@ -386,7 +406,7 @@ class PostListViewBuilder @Inject constructor(
             postView.post.name,
             instance,
             onImageClick = {
-                onImageClick(null, it)
+                onImageClick(postView, null, it)
             },
             onPageClick = onPageClick
         )

@@ -4,16 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.text.buildSpannedString
-import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentPersonAboutBinding
-import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
-import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.ext.appendLink
+import com.idunnololz.summit.util.dateStringToPretty
 
 class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
@@ -38,6 +35,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             parentFragment.viewModel.personData.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {
+                        swipeRefreshLayout.isRefreshing = false
                         loadingView.showDefaultErrorMessageFor(it.error)
                     }
                     is StatefulData.Loading -> {
@@ -45,42 +43,82 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                     }
                     is StatefulData.NotStarted -> {}
                     is StatefulData.Success -> {
+                        swipeRefreshLayout.isRefreshing = false
                         loadingView.hideAll()
 
                         setup(it.data)
                     }
                 }
             }
+
+            swipeRefreshLayout.setOnRefreshListener {
+                parentFragment.viewModel.fetchPage(0, true, true)
+            }
         }
     }
 
     private fun setup(data: PersonTabbedViewModel.PersonDetailsData) {
-        binding.text.text = buildSpannedString {
-            appendLine("Bio")
-            appendLine(data.personView.person.bio ?: "No bio.")
-            appendLine()
+        val parentFragment = parentFragment as PersonTabbedFragment
+        val personView = data.personView
 
-            append(PrettyPrintUtils.defaultDecimalFormat.format(data.personView.counts.post_score))
-            appendLine(" post score")
-            appendLine()
+        binding.postScore.text = PrettyPrintUtils.defaultDecimalFormat.format(
+            personView.counts.post_score)
+        binding.commentScore.text = PrettyPrintUtils.defaultDecimalFormat.format(
+            personView.counts.comment_score)
 
-            append(PrettyPrintUtils.defaultDecimalFormat.format(data.personView.counts.comment_count))
-            appendLine(" comment score")
-            appendLine()
+        LemmyTextHelper.bindText(
+            binding.bio,
+            personView.person.bio
+                ?: buildString {
+                    append("*")
+                    append(getString(R.string.blank))
+                    append("*")
+                },
+            parentFragment.viewModel.instance,
+            onImageClick = { url ->
+                getMainActivity()?.openImage(
+                    sharedElement = null,
+                    appBar = parentFragment.binding.appBar,
+                    title = null,
+                    url = url,
+                    mimeType = null
+                )
+            },
+            onPageClick = {
+                getMainActivity()?.launchPage(it)
+            }
+        )
 
-            appendLine("Is bot: ${data.personView.person.bot_account}")
-            appendLine()
-
-            if (data.moderates.isNotEmpty()) {
-                append("Moderates")
-                appendLine()
-                for (m in data.moderates) {
-                    appendLink(
-                        m.community.name,
-                        LinkUtils.getLinkForCommunity(CommunityRef.CommunityRefByName(m.community.name, m.community.instance)))
-                    appendLine()
+        binding.accountInfo.text = buildString {
+            append(
+                if (personView.person.admin) {
+                    getString(R.string.admin)
+                } else if (personView.person.bot_account) {
+                    getString(R.string.bot)
+                } else {
+                    getString(R.string.normal)
                 }
-                appendLine()
+            )
+
+            val status =
+                if (personView.person.banned) {
+                    if (personView.person.ban_expires != null) {
+                        getString(
+                            R.string.banned_until_format,
+                            dateStringToPretty(personView.person.ban_expires))
+                    } else {
+                        getString(R.string.banned)
+                    }
+                } else if (personView.person.deleted) {
+                    getString(R.string.deleted)
+                } else {
+                    null
+                }
+
+            if (status != null) {
+                append(" (")
+                append(status)
+                append(")")
             }
         }
     }

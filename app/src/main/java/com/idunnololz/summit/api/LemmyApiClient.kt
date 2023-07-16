@@ -740,7 +740,8 @@ class LemmyApiClient @Inject constructor(
         name: String?,
         page: Int? = null,
         limit: Int? = null,
-        account: Account?
+        account: Account?,
+        force: Boolean,
     ): Result<GetPersonDetailsResponse> {
         val form = GetPersonDetails(
             person_id = personId,
@@ -751,7 +752,11 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.getPersonDetails(form.serializeToMap())
+            if (force) {
+                api.getPersonDetailsNoCache(form.serializeToMap())
+            } else {
+                api.getPersonDetails(form.serializeToMap())
+            }
         }.fold(
             onSuccess = {
                 Result.success(it)

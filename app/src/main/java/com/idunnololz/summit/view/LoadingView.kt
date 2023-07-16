@@ -21,6 +21,7 @@ import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.scrape.LoaderException
 import com.idunnololz.summit.util.AnimationUtils
+import com.idunnololz.summit.util.toErrorMessage
 
 class LoadingView : ConstraintLayout {
 
@@ -181,44 +182,7 @@ class LoadingView : ConstraintLayout {
     }
 
     fun showDefaultErrorMessageFor(t: Throwable) {
-        when (t) {
-            is LoaderException -> showDefaultErrorMessageFor(t.errorCode)
-            is ApiException ->
-                when (t) {
-                    is ClientApiException -> {
-                        Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
-                        if (t is ServerTimeoutException) {
-                            showErrorWithRetry(R.string.error_server_timeout)
-                        } else if (t is NotAuthenticatedException) {
-                            showErrorWithRetry(R.string.error_not_signed_in)
-                        } else {
-                            if (t.errorCode == 404) {
-                                showErrorWithRetry(R.string.error_page_not_found)
-                            } else {
-                                showErrorWithRetry(R.string.error_unknown)
-                                FirebaseCrashlytics.getInstance().recordException(t)
-                            }
-                        }
-                    }
-                    is ServerApiException ->
-                        showErrorWithRetry(
-                            context.getString(R.string.error_server, t.errorCode.toString()))
-                }
-            is NetworkException ->
-                when (t) {
-                    is SocketTimeoutException ->
-                        showErrorWithRetry(
-                            context.getString(R.string.error_socket_timeout))
-
-                    is NoInternetException ->
-                        showErrorWithRetry(
-                            context.getString(R.string.error_network))
-                }
-            else -> {
-                Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
-                showErrorWithRetry(R.string.error_unknown)
-            }
-        }
+        showErrorWithRetry(t.toErrorMessage(context))
     }
 
     fun hideAll(animate: Boolean = true, makeViewGone: Boolean = false) {

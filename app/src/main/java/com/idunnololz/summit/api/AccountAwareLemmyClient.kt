@@ -11,6 +11,7 @@ import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetPersonMentions
 import com.idunnololz.summit.api.dto.GetPrivateMessages
@@ -138,8 +139,9 @@ class AccountAwareLemmyClient @Inject constructor(
     suspend fun fetchPersonByIdWithRetry(
         personId: PersonId,
         account: Account? = accountForInstance(),
+        force: Boolean,
     ): Result<GetPersonDetailsResponse> = retry {
-        apiClient.fetchPerson(personId = personId, name = null, account = account)
+        apiClient.fetchPerson(personId = personId, name = null, account = account, force = force)
             .autoSignOut(account)
     }
 
@@ -148,8 +150,17 @@ class AccountAwareLemmyClient @Inject constructor(
         page: Int,
         limit: Int,
         account: Account? = accountForInstance(),
+        force: Boolean,
     ): Result<GetPersonDetailsResponse> = retry {
-        apiClient.fetchPerson(personId = null, name = name, account = account, page = page, limit = limit)
+        apiClient
+            .fetchPerson(
+                personId = null,
+                name = name,
+                account = account,
+                page = page,
+                limit = limit,
+                force = force,
+            )
             .autoSignOut(account)
     }
 
@@ -384,6 +395,18 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.markPrivateMessageAsRead(id, read, account)
+                .autoSignOut(account)
+        }
+
+    suspend fun createPrivateMessage(
+        content: String,
+        recipient: PersonId,
+        account: Account? = accountForInstance(),
+    ): Result<PrivateMessageView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.createPrivateMessage(content, recipient, account)
                 .autoSignOut(account)
         }
 

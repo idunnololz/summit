@@ -82,8 +82,12 @@ class CustomScrollViewPager : ViewPager {
             when (action and MotionEvent.ACTION_MASK) {
 
                 MotionEvent.ACTION_MOVE -> {
-
                     val pointerIndex: Int = event.findPointerIndex(activePointerId)
+                    if (pointerIndex == -1) {
+                        activePointerId = 0
+                        return false
+                    }
+
                     val x: Float = event.getX(pointerIndex)
                     val xDiff = x - lastMotionX
                     val xDiffAbs = abs(xDiff)

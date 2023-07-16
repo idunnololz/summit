@@ -13,6 +13,8 @@ import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoConverters
 import com.idunnololz.summit.account.info.AccountInfoDao
+import com.idunnololz.summit.hidePosts.HiddenPostEntry
+import com.idunnololz.summit.hidePosts.HiddenPostsDao
 import com.idunnololz.summit.history.HistoryConverters
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.history.HistoryEntry
@@ -37,11 +39,13 @@ import com.idunnololz.summit.util.moshi
         LemmyAction::class,
         LemmyFailedAction::class,
         AccountInfo::class,
+        HiddenPostEntry::class,
     ],
     autoMigrations = [
         AutoMigration (from = 20, to = 21),
+        AutoMigration (from = 26, to = 27),
     ],
-    version = 26,
+    version = 27,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class)
@@ -53,6 +57,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun historyDao(): HistoryDao
     abstract fun accountDao(): AccountDao
     abstract fun accountInfoDao(): AccountInfoDao
+    abstract fun hiddenPostsDao(): HiddenPostsDao
 
     companion object {
 

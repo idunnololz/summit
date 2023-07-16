@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.Button
 import android.widget.ImageButton
@@ -35,6 +36,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.ContentUtils
+import com.idunnololz.summit.util.ContentUtils.isUrlMp4
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
@@ -441,20 +443,36 @@ class LemmyContentHelper(
 
                     val videoInfo = targetPostView.getVideoInfo()
                     if (videoInfo != null) {
+                        val videoType = if (isUrlMp4(videoInfo.videoUrl)) {
+                            VideoType.MP4
+                        } else {
+                            VideoType.DASH
+                        }
+
                         val bestSize = LemmyUtils.calculateBestVideoSize(
                             context,
                             videoInfo,
                             availableH = videoViewMaxHeight
                         )
-                        containerView.layoutParams = containerView.layoutParams.apply {
-                            //width = bestSize.x
-                            height = bestSize.y
+                        if (bestSize.y > 0) {
+                            containerView.layoutParams = containerView.layoutParams.apply {
+                                //width = bestSize.x
+                                height = bestSize.y
+                            }
+                            playerView.layoutParams = playerView.layoutParams.apply {
+                                //width = bestSize.x
+                                height = bestSize.y
+                            }
+                        } else {
+                            containerView.layoutParams = containerView.layoutParams.apply {
+                                //width = bestSize.x
+                                height = LayoutParams.WRAP_CONTENT
+                            }
+                            playerView.layoutParams = playerView.layoutParams.apply {
+                                //width = bestSize.x
+                                height = LayoutParams.WRAP_CONTENT
+                            }
                         }
-                        playerView.layoutParams = playerView.layoutParams.apply {
-                            //width = bestSize.x
-                            height = bestSize.y
-                        }
-
                         rootView.requestLayout()
 
                         playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
@@ -476,25 +494,26 @@ class LemmyContentHelper(
                                 show()
                             }
                         }
-                        playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
-                            .setOnClickListener {
-                                onVideoClickListener(
-                                    videoInfo.dashUrl,
-                                    VideoType.DASH,
-                                    customPlayerView?.getVideoState()?.let {
-                                        it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
-                                    }
-                                )
-                            }
+                        playerView.setFullscreenButtonClickListener {
+                            onVideoClickListener(
+                                videoInfo.videoUrl,
+                                videoType,
+                                customPlayerView?.getVideoState()?.let {
+                                    it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
+                                }
+                            )
+                        }
+//                        playerView.s
 
                         playerView.setup()
 
                         playerView.player = null
-                        playerView.player = exoPlayerManager.getPlayerForUrl(
-                            videoInfo.dashUrl,
-                            VideoType.DASH,
-                            videoState = videoState
-                        )
+                        playerView.player =
+                            exoPlayerManager.getPlayerForUrl(
+                                videoInfo.videoUrl,
+                                videoType,
+                                videoState = videoState
+                            )
                     } else {
                         playerView.visibility = View.GONE
                     }

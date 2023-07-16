@@ -269,8 +269,21 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         )
 
                 },
-                onImageClick = { view, url ->
-                    getMainActivity()?.openImage(view, binding.appBar, null, url, null)
+                onImageClick = { postOrCommentView, view, url ->
+                    getMainActivity()?.openImage(
+                        sharedElement = view,
+                        appBar = binding.appBar,
+                        title = postOrCommentView?.fold(
+                            {
+                                it.post.name
+                            },
+                            {
+                                null
+                            }
+                        ),
+                        url = url,
+                        mimeType = null
+                    )
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
@@ -457,30 +470,13 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             ItemTouchHelper(LemmySwipeActionCallback(
                 context,
                 binding.recyclerView,
-                listOf(
-                    LemmySwipeActionCallback.SwipeAction(
-                        R.id.swipe_action_upvote,
-                        context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)!!.mutate(),
-                        context.getColorCompat(R.color.style_red)
-                    ),
-                    LemmySwipeActionCallback.SwipeAction(
-                        R.id.swipe_action_bookmark,
-                        context.getDrawableCompat(R.drawable.baseline_bookmark_add_24)!!.mutate(),
-                        context.getColorCompat(R.color.style_amber)
-                    ),
-                    LemmySwipeActionCallback.SwipeAction(
-                        R.id.swipe_action_reply,
-                        context.getDrawableCompat(R.drawable.baseline_reply_24)!!.mutate(),
-                        context.getColorCompat(R.color.style_blue)
-                    )
-                ),
                 onActionSelected = { action, vh ->
                     val commentView = vh.itemView.getTag(R.id.comment_view) as? CommentView
                         ?: return@LemmySwipeActionCallback
 
                     when (action.id) {
                         R.id.swipe_action_upvote -> {
-                            actionsViewModel?.upvote(commentView)
+                            actionsViewModel?.vote(commentView, dir = 1)
                         }
 
                         R.id.swipe_action_bookmark -> {
@@ -496,7 +492,25 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         }
                     }
                 }
-            )).attachToRecyclerView(binding.recyclerView)
+            ).apply {
+                actions = listOf(
+                    LemmySwipeActionCallback.SwipeAction(
+                        R.id.swipe_action_upvote,
+                        context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)!!.mutate(),
+                        context.getColorCompat(R.color.style_red)
+                    ),
+                    LemmySwipeActionCallback.SwipeAction(
+                        R.id.swipe_action_bookmark,
+                        context.getDrawableCompat(R.drawable.baseline_bookmark_add_24)!!.mutate(),
+                        context.getColorCompat(R.color.style_amber)
+                    ),
+                    LemmySwipeActionCallback.SwipeAction(
+                        R.id.swipe_action_reply,
+                        context.getDrawableCompat(R.drawable.baseline_reply_24)!!.mutate(),
+                        context.getColorCompat(R.color.style_blue)
+                    )
+                )
+            }).attachToRecyclerView(binding.recyclerView)
         }
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
@@ -564,9 +578,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         }
     }
 
+    override fun onPause() {
+        if (args.isSinglePage) {
+            requireMainActivity().apply {
+                lockUiOpenness = false
+            }
+        }
+
+        super.onPause()
+    }
+
     override fun navigateToSignInScreen() {
         if (args.isSinglePage) {
-            val direction = PostFragmentDirections.actionPostFragmentToLogin()
+            val direction = PostFragmentDirections.actionGlobalLogin()
             findNavController().navigateSafe(direction)
         } else {
             (parentFragment as? SignInNavigator)?.navigateToSignInScreen()
@@ -637,7 +661,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 )
                 addItemWithIcon(
                     R.id.block_user,
-                    getString(R.string.block_this_user, postView.creator.name),
+                    getString(R.string.block_this_user_format, postView.creator.name),
                     R.drawable.baseline_person_off_24
                 )
             }

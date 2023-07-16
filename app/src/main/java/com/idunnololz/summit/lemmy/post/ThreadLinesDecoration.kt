@@ -34,15 +34,22 @@ class ThreadLinesDecoration(
 
         for (i in 0 until childCount) {
             val view = parent.getChildAt(i)
-            val lastTag = if (i == 0) {
+            val previousChild = if (i == 0) {
                 null
             } else {
-                parent.getChildAt(i - 1).tag
+                parent.getChildAt(i - 1)
             }
+            val previousTag = previousChild?.tag
             val tag = view.tag
             val translationX = view.translationX
             val translationY = view.translationY
-            val topOverdraw = topOverdraw
+            val topOverdraw =
+                if (previousChild != null && previousTag !is ThreadLinesData) {
+                    // Do not overdraw above if the element above is not a comment!
+                    0
+                } else {
+                    topOverdraw
+                }
             val totalDepth = when (tag) {
                 is ThreadLinesData -> {
                     tag.depth - tag.baseDepth

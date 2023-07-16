@@ -14,8 +14,10 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
@@ -32,6 +34,8 @@ import com.idunnololz.summit.util.assertMainThread
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -52,6 +56,7 @@ class CommunityViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val offlineManager: OfflineManager,
+    private val hiddenPostsManager: HiddenPostsManager,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -82,8 +87,8 @@ class CommunityViewModel @Inject constructor(
 
     val communityInstance: String
         get() = postsRepository.communityInstance
-    val accountInstance: String
-        get() = postsRepository.accountInstance
+    val apiInstance: String
+        get() = postsRepository.apiInstance
 
     override var lastSelectedPost: PostRef? = null
 
@@ -99,6 +104,8 @@ class CommunityViewModel @Inject constructor(
 
     val infinity: Boolean
         get() = postListEngine.infinity
+
+    private var hiddenPostObserverJob: Job? = null
 
     init {
         isHideReadEnabled.value?.let {
@@ -290,7 +297,7 @@ class CommunityViewModel @Inject constructor(
                     postListEngine.addPage(
                         LoadedPostsData(
                             posts = listOf(),
-                            instance = postsRepository.accountInstance,
+                            instance = postsRepository.apiInstance,
                             pageIndex = pageToFetch,
                             hasMore = true,
                             error = PostLoadError(0),
@@ -322,6 +329,37 @@ class CommunityViewModel @Inject constructor(
         postListEngine.setSecondaryKey(communityRef.getKey())
 
         postListEngine.tryRestore()
+
+        hiddenPostObserverJob?.cancel()
+        hiddenPostObserverJob = viewModelScope.launch {
+            Log.d(TAG, "Hidden posts changed. Refreshing!")
+            hiddenPostsManager.getOnHiddenPostsChangeFlow(apiInstance).collect {
+                val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
+                postsRepository.onHiddenPostsChange()
+
+                val pagesCopy = withContext(Dispatchers.Main) {
+                    ArrayList(postListEngine.pages)
+                }
+
+                val updatedPages = withContext(Dispatchers.Default) {
+                    pagesCopy.map {
+                        it.copy(
+                            posts = it.posts.filter { !hiddenPosts.contains(it.post.id) },
+                            isReadPostUpdate = false,
+                        )
+                    }
+                }
+
+                updatedPages.forEach {
+                    postListEngine.addPage(it)
+                }
+                postListEngine.createItems()
+
+                withContext(Dispatchers.Main) {
+                    loadedPostsData.setValue(PostUpdateInfo())
+                }
+            }
+        }
     }
 
     fun createState(): CommunityViewState? {
@@ -419,7 +457,7 @@ class CommunityViewModel @Inject constructor(
         postListEngine.clearPages()
         postListEngine.addPage(LoadedPostsData(
             posts = listOf(),
-            instance = postsRepository.accountInstance,
+            instance = postsRepository.apiInstance,
             pageIndex = 0,
             hasMore = false
         ))
@@ -429,13 +467,16 @@ class CommunityViewModel @Inject constructor(
         fetchCurrentPage()
     }
 
-    fun onPostRead(postView: PostView) {
+    fun onPostRead(postView: PostView, delayMs: Long = 0) {
         if (postView.read) {
             return
         }
 
         viewModelScope.launch {
-            accountActionsManager.markPostAsRead(accountInstance, postView.post.id, read = true)
+            if (delayMs > 0) {
+                delay(delayMs)
+            }
+            accountActionsManager.markPostAsRead(apiInstance, postView.post.id, read = true)
         }
     }
 
@@ -478,5 +519,9 @@ class CommunityViewModel @Inject constructor(
 
     fun setTag(tag: String?) {
         postListEngine.setKey(tag)
+    }
+
+    fun hidePost(id: PostId) {
+        hiddenPostsManager.hidePost(id, apiInstance)
     }
 }

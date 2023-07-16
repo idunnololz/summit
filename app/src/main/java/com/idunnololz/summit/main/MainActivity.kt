@@ -41,12 +41,19 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
+import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
+import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragment
+import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.preferences.ThemeManager
@@ -154,8 +161,7 @@ class MainActivity : BaseActivity() {
         hideActionBar(animate = true)
 
         fun updateBottomTranslationY() {
-            binding.bottomNavigationView.translationY =
-                bottomNavViewOffset.value!!.toFloat() + bottomNavViewAnimationOffset.value!!.toFloat()
+            binding.bottomNavigationView.translationY = bottomNavY
         }
 
         bottomNavViewOffset.observe(this) {
@@ -224,6 +230,9 @@ class MainActivity : BaseActivity() {
             }
         )
     }
+
+    private val bottomNavY
+        get() = bottomNavViewOffset.value!!.toFloat() + bottomNavViewAnimationOffset.value!!.toFloat()
 
     override fun onResume() {
         super.onResume()
@@ -424,10 +433,17 @@ class MainActivity : BaseActivity() {
             }
     }
 
-    fun showBottomNav() {
+    fun showBottomNav(supportOpenness: Boolean = false) {
         if (enableBottomNavViewScrolling && binding.bottomNavigationView.visibility == View.VISIBLE) {
             return
         }
+
+        val finalY =
+            if (supportOpenness) {
+                bottomNavY
+            } else {
+                0f
+            }
 
         bottomNavViewOffset.value = 0
         if (binding.bottomNavigationView.visibility != View.VISIBLE) {
@@ -435,17 +451,16 @@ class MainActivity : BaseActivity() {
             binding.bottomNavigationView.translationY =
                 binding.bottomNavigationView.height.toFloat()
             Log.d(TAG, "bottomNavigationView.height: ${binding.bottomNavigationView.height}")
+
             binding.bottomNavigationView.post {
                 binding.bottomNavigationView.animate()
-                    .translationY(0f)
-                    .setDuration(250)
+                    .translationY(finalY).duration = 250
             }
         } else {
             if (binding.bottomNavigationView.translationY == 0f) return
 
             binding.bottomNavigationView.animate()
-                .translationY(0f)
-                .setDuration(250)
+                .translationY(finalY).duration = 250
         }
     }
 
@@ -497,12 +512,57 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchPage(page: PageRef) {
-        if (binding.bottomNavigationView.selectedItemId != R.id.mainFragment) {
-            binding.bottomNavigationView.selectedItemId = R.id.mainFragment
+        val isMainFragment = binding.bottomNavigationView.selectedItemId == R.id.mainFragment
+
+        fun handleWithMainFragment() {
+            if (binding.bottomNavigationView.selectedItemId != R.id.mainFragment) {
+                binding.bottomNavigationView.selectedItemId = R.id.mainFragment
+            }
+            executeWhenMainFragmentAvailable { mainFragment ->
+                mainFragment.navigateToPage(page)
+            }
         }
 
-        executeWhenMainFragmentAvailable { mainFragment ->
-            mainFragment.navigateToPage(page)
+        if (isMainFragment) {
+            handleWithMainFragment()
+            return
+        }
+
+        when (page) {
+            is CommunityRef -> {
+                handleWithMainFragment()
+            }
+            is PostRef -> {
+                currentNavController?.navigate(
+                    R.id.postFragment2,
+                    PostFragmentArgs(
+                        page.instance,
+                        page.id,
+                        null,
+                        isSinglePage = true
+                    ).toBundle()
+                )
+            }
+            is CommentRef -> {
+                currentNavController?.navigate(
+                    R.id.postFragment2,
+                    PostFragmentArgs(
+                        instance = page.instance,
+                        id = 0,
+                        commentId = page.id,
+                        currentCommunity = null,
+                        isSinglePage = true
+                    ).toBundle()
+                )
+            }
+            is PersonRef -> {
+                currentNavController?.navigate(
+                    R.id.personTabbedFragment2,
+                    PersonTabbedFragmentArgs(
+                        page
+                    ).toBundle()
+                )
+            }
         }
     }
 
@@ -909,7 +969,7 @@ class MainActivity : BaseActivity() {
             InboxTabbedFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
-                showBottomNav()
+                showBottomNav(supportOpenness = true)
                 showNotificationBarBg()
             }
             else ->

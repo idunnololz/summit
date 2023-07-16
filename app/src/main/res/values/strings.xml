@@ -113,8 +113,8 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="save_hq">Save highest quality</string>
     <string name="local">Local</string>
-    <string name="deleted">[deleted]</string>
-    <string name="removed">[removed]</string>
+    <string name="deleted_special">[deleted]</string>
+    <string name="removed_special">[removed]</string>
     <string name="error_server">Server error. Code: %1$s.</string>
     <string name="login">Login</string>
     <string name="instance">Instance</string>
@@ -201,7 +201,9 @@
     <string name="community_info">Community info</string>
     <string name="more_actions">More actions</string>
     <string name="block_this_community_format">Block this community (%1$s)</string>
-    <string name="block_this_user">Block this user (%1$s)</string>
+    <string name="block_this_user_format">Block this user (%1$s)</string>
+    <string name="unblock_this_user_format">Unblock this user (%1$s)</string>
+    <string name="block_this_user">Block this user</string>
     <string name="theme_settings_desc">Change and customize the app theme</string>
     <string name="base_theme">Base theme</string>
     <string name="use_system_theme">Use system theme</string>
@@ -284,13 +286,41 @@
     <string name="infinity">Infinity</string>
     <string name="no_your_limits">No your limits.</string>
     <string name="view_all_comments">View all comments</string>
-    <string name="posts_format">%1$s posts</string>
-    <string name="comments_format">%1$s comments</string>
     <string name="cake_day_on_format">Cake day on %1$s</string>
     <string name="posts">Posts</string>
     <string name="comments">Comments</string>
     <string name="in_format">in %1$s</string>
     <string name="prefer_full_size_image">Prefer full size image</string>
+    <string name="user_blocked">User blocked</string>
+    <string name="user_unblocked">User unblocked</string>
+    <string name="send_message">Send message</string>
+    <string name="blank">Blank</string>
+    <string name="biography">Biography</string>
+    <string name="stats">Stats</string>
+    <string name="post_score">Post score</string>
+    <string name="comment_score">Comment score</string>
+    <string name="user_status">User status</string>
+    <string name="admin">Admin</string>
+    <string name="banned">Banned</string>
+    <string name="deleted">Deleted</string>
+    <string name="bot">Bot</string>
+    <string name="normal">Normal</string>
+    <string name="account_info">Account info</string>
+    <string name="banned_until_format">Banned until %1$s</string>
+    <string name="account_type">Account type</string>
+    <string name="hide_post">Hide post</string>
+    <string name="hidden_posts">Hidden posts</string>
+    <string name="hidden_posts_desc"><![CDATA[Reset hidden posts & more]]></string>
+    <string name="reset_hidden_posts">Reset hidden posts</string>
+    <string name="removed_hidden_posts_format">Removed %1$s hidden posts</string>
+    <string name="post_actions">Post actions</string>
+    <string name="gesture_action_1">Gesture action 1</string>
+    <string name="upvote">Upvote</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="mark_as_read">Mark as read</string>
+    <string name="gesture_action_2">Geature action 2</string>
+    <string name="gesture_action_3">Gesture action 3</string>
+    <string name="downvote">Downvote</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>
@@ -302,6 +332,14 @@
     <plurals name="replies_format">
         <item quantity="one">%1$d more reply</item>
         <item quantity="other">%1$d more replies</item>
+    </plurals>
+    <plurals name="posts_format">
+        <item quantity="one">%1$s post</item>
+        <item quantity="other">%1$s posts</item>
+    </plurals>
+    <plurals name="comments_format">
+        <item quantity="one">%1$s comment</item>
+        <item quantity="other">%1$s comments</item>
     </plurals>
 
 

@@ -2,7 +2,12 @@ package com.idunnololz.summit.lemmy.person
 
 import android.content.Context
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +36,7 @@ import com.idunnololz.summit.databinding.CommentListCommentItemBinding
 import com.idunnololz.summit.databinding.CommentListEndItemBinding
 import com.idunnololz.summit.databinding.FragmentPersonCommentsBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -176,51 +182,65 @@ class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val parentFragment = parentFragment as PersonTabbedFragment
+
+        val layoutManager = LinearLayoutManager(context)
+
+        fun fetchPageIfLoadItem(position: Int) {
+            (adapter?.items?.getOrNull(position) as? CommentsAdapter.Item.AutoLoadItem)
+                ?.pageToLoad
+                ?.let {
+                    parentFragment.viewModel.fetchPage(it)
+                }
+        }
+
+        fun checkIfFetchNeeded() {
+            val firstPos = layoutManager.findFirstVisibleItemPosition()
+            val lastPos = layoutManager.findLastVisibleItemPosition()
+
+            fetchPageIfLoadItem(firstPos)
+            fetchPageIfLoadItem(firstPos - 1)
+            fetchPageIfLoadItem(lastPos)
+            fetchPageIfLoadItem(lastPos + 1)
+        }
 
         parentFragment.viewModel.commentsState.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
                 }
                 is StatefulData.Loading ->
                     binding.loadingView.showProgressBar()
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
 
                     adapter?.setData(parentFragment.viewModel.commentPages)
+
+                    binding.root.post {
+                        checkIfFetchNeeded()
+                    }
                 }
             }
         }
 
         with(binding) {
-            val layoutManager = LinearLayoutManager(context)
             recyclerView.layoutManager = layoutManager
-
-            fun fetchPageIfLoadItem(position: Int) {
-                (adapter?.items?.getOrNull(position) as? CommentsAdapter.Item.AutoLoadItem)
-                    ?.pageToLoad
-                    ?.let {
-                        parentFragment.viewModel.fetchPage(it)
-                    }
-            }
-
 
             binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    Log.d("HAHA", "asdsafsdfasdfsadf")
                     super.onScrolled(recyclerView, dx, dy)
 
-                    val firstPos = layoutManager.findFirstVisibleItemPosition()
-                    val lastPos = layoutManager.findLastVisibleItemPosition()
-
-                    fetchPageIfLoadItem(firstPos)
-                    fetchPageIfLoadItem(firstPos - 1)
-                    fetchPageIfLoadItem(lastPos)
-                    fetchPageIfLoadItem(lastPos + 1)
+                    checkIfFetchNeeded()
                 }
             })
+
+            swipeRefreshLayout.setOnRefreshListener {
+                parentFragment.viewModel.fetchPage(0, true, true)
+            }
         }
 
         runAfterLayout {
@@ -299,6 +319,8 @@ class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
             object EndItem : Item
         }
 
+        private val regularColor: Int = ContextCompat.getColor(context, R.color.colorText)
+
         var viewLifecycleOwner: LifecycleOwner? = null
         val items: List<Item>
             get() = adapterHelper.items
@@ -318,10 +340,10 @@ class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
                 }
             }
         ).apply {
-            addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { item, b, h ->
+            addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { _, b, _ ->
                 b.loadingView.showProgressBar()
             }
-            addItemType(Item.CommentItem::class, CommentListCommentItemBinding::inflate) { item, b, h ->
+            addItemType(Item.CommentItem::class, CommentListCommentItemBinding::inflate) { item, b, _ ->
                 val post = item.commentView.post
                 b.postInfo.text = buildSpannedString {
                     appendLink(
@@ -332,9 +354,25 @@ class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
                                 item.commentView.community.instance))
                     )
                     appendSeparator()
+
+                    val s = length
                     appendLink(
                         post.name,
-                        LinkUtils.getLinkForPost(item.instance, post.id)
+                        LinkUtils.getLinkForPost(item.instance, post.id),
+                        underline = false
+                    )
+                    val e = length
+                    setSpan(
+                        ForegroundColorSpan(regularColor),
+                        s,
+                        e,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        s,
+                        e,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
                 }
                 b.postInfo.movementMethod = CustomLinkMovementMethod().apply {
@@ -358,7 +396,12 @@ class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
                     }
                 }
                 postAndCommentViewBuilder.lemmyHeaderHelper
-                    .populateHeaderSpan(b.headerContainer, item.commentView)
+                    .populateHeaderSpan(
+                        headerContainer = b.headerContainer,
+                        item = item.commentView,
+                        instance = item.instance,
+                        onPageClick = onPageClick
+                    )
                 LemmyTextHelper.bindText(
                     textView = b.text,
                     text = item.commentView.comment.content,
@@ -414,6 +457,9 @@ class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
                             true
                         }
                     }.show()
+                }
+                b.root.setOnClickListener {
+                    onPageClick(CommentRef(item.instance, item.commentView.comment.id))
                 }
             }
             addItemType(Item.EndItem::class, CommentListEndItemBinding::inflate) { _, _, _ -> }

@@ -17,7 +17,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 
-data class Item(
+data class PageItem(
     val id: Long,
     val clazz: Class<*>,
     val args: Bundle?,
@@ -32,7 +32,7 @@ class ViewPagerAdapter(
 ) : FragmentStateAdapter(fragmentManager, lifecycle), TabLayoutMediator.TabConfigurationStrategy {
 
     private val fragmentFactory: FragmentFactory = fragmentManager.fragmentFactory
-    private val items = ArrayList<Item>()
+    private val items = ArrayList<PageItem>()
 
     init {
         lifecycle.addObserver(object : LifecycleEventObserver {
@@ -68,7 +68,7 @@ class ViewPagerAdapter(
         args: Bundle? = null,
         @DrawableRes drawableRes: Int? = null,
     ) {
-        items.add(Item(View.generateViewId().toLong(), clazz, args, title, drawableRes))
+        items.add(PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes))
     }
 
     fun findIndexOfPage(className: String): Int =

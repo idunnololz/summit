@@ -124,6 +124,10 @@
         <action
             android:id="@+id/action_addOrEditCommentFragment_to_previewCommentDialogFragment"
             app:destination="@id/previewCommentDialogFragment" />
+        <argument
+            android:name="person_id"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
     <dialog
         android:id="@+id/previewCommentDialogFragment"

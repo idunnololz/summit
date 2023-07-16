@@ -8,6 +8,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class AddOrEditCommentViewModel @Inject constructor(
     private val context: Application,
     private val apiClient: LemmyApiClient,
+    private val authedApiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val accountActionsManager: AccountActionsManager,
 ) : ViewModel() {
@@ -134,6 +136,23 @@ class AddOrEditCommentViewModel @Inject constructor(
                 }
                 .onSuccess {
                     uploadImageEvent.postValue(it)
+                }
+        }
+    }
+
+    fun sendComment(personId: Int, content: String) {
+        viewModelScope.launch {
+            authedApiClient
+                .createPrivateMessage(
+                    content = content,
+                    recipient = personId,
+                    account = requireNotNull(currentAccount.value)
+                )
+                .onFailure {
+                    commentSentEvent.postValue(Event(Result.failure(it)))
+                }
+                .onSuccess {
+                    commentSentEvent.postValue(Event(Result.success(Unit)))
                 }
         }
     }

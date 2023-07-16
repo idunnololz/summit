@@ -155,7 +155,13 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     }
 
                     val inboxItem = args.inboxItem
-                    if (inboxItem != null) {
+                    val personId = args.personId
+                    if (personId != 0) {
+                        viewModel.sendComment(
+                            personId,
+                            binding.commentEditor.text.toString()
+                        )
+                    } else if (inboxItem != null) {
                         viewModel.sendComment(
                             args.instance,
                             inboxItem,
@@ -207,6 +213,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         val postView = args.postView
         val commentView = args.commentView
         val inboxItem = args.inboxItem
+        val personId = args.personId
 
         val commentEditor = binding.commentEditor
         if (isEdit()) {
@@ -221,6 +228,9 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
             binding.replyingTo.text = postView.post.body
         } else if (inboxItem != null) {
             binding.replyingTo.text = inboxItem.content
+        } else if (personId != 0) {
+            binding.scrollView.visibility = View.GONE
+            binding.divider.visibility = View.GONE
         } else {
             dismiss()
             return

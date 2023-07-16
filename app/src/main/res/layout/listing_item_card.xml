@@ -121,5 +121,13 @@
             app:layout_constraintBottom_toBottomOf="@+id/commentButton"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- used programatially when the image is is placed at the end. -->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/bottom_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="commentButton,open_link_button"
+            app:barrierDirection="bottom"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

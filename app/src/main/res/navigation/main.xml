@@ -98,7 +98,18 @@
             app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_settingsFragment_to_settingsContentFragment"
-            app:destination="@id/settingsContentFragment" />
+            app:destination="@id/settingsContentFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingHiddenPostsFragment"
+            app:destination="@id/settingHiddenPostsFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <action android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment"
@@ -186,4 +197,57 @@
         android:id="@+id/settingsContentFragment"
         android:name="com.idunnololz.summit.settings.content.SettingsContentFragment"
         android:label="SettingsContentFragment" />
+    <fragment
+        android:id="@+id/personTabbedFragment2"
+        android:name="com.idunnololz.summit.lemmy.person.PersonTabbedFragment"
+        android:label="PersonTabbedFragment">
+        <argument
+            android:name="personRef"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef" />
+    </fragment>
+    <fragment
+        android:id="@+id/postFragment2"
+        android:name="com.idunnololz.summit.lemmy.post.PostFragment"
+        android:label="PostFragment">
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="id"
+            app:argType="integer" />
+        <argument
+            android:name="commentId"
+            android:defaultValue="0"
+            app:argType="integer"/>
+        <argument
+            android:name="currentCommunity"
+            app:argType="com.idunnololz.summit.lemmy.CommunityRef"
+            app:nullable="true" />
+        <argument
+            android:name="post"
+            app:argType="com.idunnololz.summit.api.dto.PostView"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+        <argument
+            android:name="jumpToComments"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="reveal"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="videoState"
+            android:defaultValue="@null"
+            app:nullable="true"
+            app:argType="com.idunnololz.summit.video.VideoState"/>
+        <argument
+            android:name="isSinglePage"
+            android:defaultValue="false"
+            app:argType="boolean"/>
+    </fragment>
+    <fragment
+        android:id="@+id/settingHiddenPostsFragment"
+        android:name="com.idunnololz.summit.settings.hiddenPosts.SettingHiddenPostsFragment"
+        android:label="SettingHiddenPostsFragment" />
 </navigation>

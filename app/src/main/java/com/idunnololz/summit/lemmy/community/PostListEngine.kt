@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.community
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory

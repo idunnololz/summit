@@ -91,32 +91,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <LinearLayout android:id="@id/exo_time"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@id/exo_basic_controls"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/exo_styled_bottom_bar_time_padding"
-            android:paddingEnd="@dimen/exo_styled_bottom_bar_time_padding"
-            android:paddingLeft="@dimen/exo_styled_bottom_bar_time_padding"
-            android:paddingRight="@dimen/exo_styled_bottom_bar_time_padding"
-            android:layout_gravity="center_vertical|start"
-            android:layoutDirection="ltr">
-
-            <TextView android:id="@id/exo_position"
-                style="@style/ExoStyledControls.TimeText.Position"/>
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
-                style="@style/ExoStyledControls.TimeText.Separator"/>
+                android:id="@id/exo_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:textColor="#FFBEBEBE"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-            <TextView android:id="@id/exo_duration"
-                style="@style/ExoStyledControls.TimeText.Duration"/>
+            <androidx.media3.ui.DefaultTimeBar
+                android:id="@id/exo_progress"
+                android:layout_width="0dp"
+                android:layout_height="26dp"
+                android:layout_weight="1" />
 
-        </LinearLayout>
-
-        <LinearLayout android:id="@id/exo_basic_controls"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            android:layoutDirection="ltr">
+            <TextView
+                android:id="@id/exo_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:textColor="#FFBEBEBE"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <ImageButton android:id="@id/exo_vr"
                 style="@style/ExoStyledControls.Button.Bottom.VR"/>

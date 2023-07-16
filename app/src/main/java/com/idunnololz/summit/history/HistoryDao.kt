@@ -10,9 +10,6 @@ import io.reactivex.Single
 
 private const val TAG = "HistoryDao"
 
-/**
- * Data Access Object
- */
 @Dao
 interface HistoryDao {
 

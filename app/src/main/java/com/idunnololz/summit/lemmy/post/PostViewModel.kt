@@ -11,6 +11,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
@@ -41,6 +42,7 @@ class PostViewModel @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val accountManager: AccountManager,
     private val postReadManager: PostReadManager,
+    private val commentsFetcher: CommentsFetcher,
 ) : ViewModel() {
 
     companion object {
@@ -123,10 +125,10 @@ class PostViewModel @Inject constructor(
                 postOrCommentRef
                     .fold(
                         {
-                            lemmyApiClient.fetchCommentsWithRetry(Either.Left(it.id), sortOrder, force)
+                            commentsFetcher.fetchCommentsWithRetry(Either.Left(it.id), sortOrder, force)
                         },
                         {
-                            lemmyApiClient.fetchCommentsWithRetry(Either.Right(it.id), sortOrder, force)
+                            commentsFetcher.fetchCommentsWithRetry(Either.Right(it.id), sortOrder, force)
                         }
                     )
             } else {
@@ -197,7 +199,7 @@ class PostViewModel @Inject constructor(
         if (resolveCompletedPendingComments) {
             pendingComments?.forEach { pendingComment ->
                 if (pendingComment.complete) {
-                    val result = lemmyApiClient.fetchCommentsWithRetry(
+                    val result = commentsFetcher.fetchCommentsWithRetry(
                         Either.Left(pendingComment.postRef.id), sortOrder, force = true
                     )
 
@@ -297,7 +299,7 @@ class PostViewModel @Inject constructor(
         sortOrder: CommentSortType,
         force: Boolean = false
     ): Result<List<CommentView>> {
-        val result = lemmyApiClient.fetchCommentsWithRetry(
+        val result = commentsFetcher.fetchCommentsWithRetry(
             Either.Right(parentId),
             sortOrder,
             force,

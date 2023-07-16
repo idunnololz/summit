@@ -467,7 +467,6 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         }
 
         private var allData: List<LemmyListSource.PageResult<InboxItem>> = listOf()
-        private var hasMore = true
 
         private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
