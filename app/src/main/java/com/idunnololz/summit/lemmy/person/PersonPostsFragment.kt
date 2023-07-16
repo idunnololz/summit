@@ -62,11 +62,11 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
                     .setNegativeButton(R.string.go_to_account_instance)
                     .createAndShow(childFragmentManager, "onInstanceMismatch")
             },
-            onImageClick = { sharedElementView, url ->
+            onImageClick = { postView, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
                     appBar = parentFragment.binding.appBar,
-                    title = null,
+                    title = postView.post.name,
                     url = url,
                     mimeType = null
                 )
@@ -126,48 +126,62 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
 
         val parentFragment = parentFragment as PersonTabbedFragment
 
+        val layoutManager = LinearLayoutManager(context)
+
+        fun fetchPageIfLoadItem(position: Int) {
+            (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
+                ?.pageToLoad
+                ?.let {
+                    parentFragment.viewModel.fetchPage(it)
+                }
+        }
+
+        fun checkIfFetchNeeded() {
+            val firstPos = layoutManager.findFirstVisibleItemPosition()
+            val lastPos = layoutManager.findLastVisibleItemPosition()
+
+            fetchPageIfLoadItem(firstPos)
+            fetchPageIfLoadItem(firstPos - 1)
+            fetchPageIfLoadItem(lastPos)
+            fetchPageIfLoadItem(lastPos + 1)
+        }
+
         parentFragment.viewModel.postsState.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
                 }
                 is StatefulData.Loading ->
                     binding.loadingView.showProgressBar()
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
 
                     adapter?.onItemsChanged()
+
+                    binding.recyclerView.post {
+                        checkIfFetchNeeded()
+                    }
                 }
             }
         }
 
         with(binding) {
-            val layoutManager = LinearLayoutManager(context)
             recyclerView.layoutManager = layoutManager
-
-            fun fetchPageIfLoadItem(position: Int) {
-                (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
-                    ?.pageToLoad
-                    ?.let {
-                        parentFragment.viewModel.fetchPage(it)
-                    }
-            }
-
 
             binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    val firstPos = layoutManager.findFirstVisibleItemPosition()
-                    val lastPos = layoutManager.findLastVisibleItemPosition()
-
-                    fetchPageIfLoadItem(firstPos)
-                    fetchPageIfLoadItem(firstPos - 1)
-                    fetchPageIfLoadItem(lastPos)
-                    fetchPageIfLoadItem(lastPos + 1)
+                    checkIfFetchNeeded()
                 }
             })
+
+            swipeRefreshLayout.setOnRefreshListener {
+                parentFragment.viewModel.fetchPage(0, true, true)
+            }
         }
 
         runAfterLayout {

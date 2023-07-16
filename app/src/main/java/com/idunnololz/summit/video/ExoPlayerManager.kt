@@ -14,6 +14,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
@@ -35,7 +36,7 @@ class ExoPlayerManager(
 
         private val managersMap = HashMap<LifecycleOwner, ExoPlayerManager>()
 
-        private val players = LinkedList<SimpleExoPlayer>()
+        private val players = LinkedList<ExoPlayer>()
 
         private lateinit var context: Context
 
@@ -88,9 +89,9 @@ class ExoPlayerManager(
         }
     }
 
-    private val allocatedPlayers = LinkedList<SimpleExoPlayer>()
+    private val allocatedPlayers = LinkedList<ExoPlayer>()
 
-    private val savedState = HashMap<SimpleExoPlayer, ExoPlayerConfig>()
+    private val savedState = HashMap<ExoPlayer, ExoPlayerConfig>()
 
     data class ExoPlayerConfig(
         val url: String,
@@ -103,7 +104,7 @@ class ExoPlayerManager(
         url: String,
         videoType: VideoType,
         videoState: VideoState?
-    ): SimpleExoPlayer =
+    ): ExoPlayer =
         getPlayer().also {
             val config = ExoPlayerConfig(
                 url = url,
@@ -125,7 +126,7 @@ class ExoPlayerManager(
         if (!removed) {
             Log.e(TAG, "Released a player that did not belong to this manager!")
         } else {
-            players.add(player as SimpleExoPlayer)
+            players.add(player as ExoPlayer)
         }
     }
 
@@ -170,11 +171,11 @@ class ExoPlayerManager(
         }
     }
 
-    private fun getPlayer(): SimpleExoPlayer =
+    private fun getPlayer(): ExoPlayer =
         if (players.isNotEmpty()) {
             players.pop()
         } else {
-            SimpleExoPlayer.Builder(context)
+            ExoPlayer.Builder(context)
                 .build()
         }.also {
             allocatedPlayers.push(it)
@@ -185,7 +186,7 @@ class ExoPlayerManager(
             )
         }
 
-    private fun setupPlayer(player: SimpleExoPlayer, config: ExoPlayerConfig) {
+    private fun setupPlayer(player: ExoPlayer, config: ExoPlayerConfig) {
         // Create a data source factory.
         val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
             .setUserAgent("summit")

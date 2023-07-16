@@ -38,6 +38,7 @@ class SettingsManager @Inject constructor(
             context.getString(R.string.systems),
             listOf(
                 mainSettings.settingCache,
+                mainSettings.settingHiddenPosts,
             )
         )
     )
@@ -62,7 +63,7 @@ data class SubgroupItem(
 
 @Parcelize
 data class BasicSettingItem(
-    @DrawableRes val icon: Int,
+    @DrawableRes val icon: Int?,
     override val title: String,
     val description: String?,
 ) : SettingItem()

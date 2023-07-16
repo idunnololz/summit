@@ -21,7 +21,6 @@ import com.idunnololz.summit.util.ext.getDimen
 class LemmySwipeActionCallback(
     private val context: Context,
     val recyclerView: RecyclerView,
-    private val actions: List<SwipeAction>,
     val onActionSelected: (SwipeAction, ViewHolder) -> Unit,
 ) : ItemTouchHelper.Callback() {
 
@@ -45,6 +44,8 @@ class LemmySwipeActionCallback(
     private var lastVhSwiped: ViewHolder? = null
 
     private var currentSwipeAction: SwipeAction? = null
+
+    var actions: List<SwipeAction> = listOf()
 
     init {
         clearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)

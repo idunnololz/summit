@@ -68,7 +68,7 @@ class PersonTabbedViewModel @Inject constructor(
         fetchPage(0, isPeronInfoFetch = true)
     }
 
-    fun fetchPage(pageIndex: Int, isPeronInfoFetch: Boolean = false) {
+    fun fetchPage(pageIndex: Int, isPeronInfoFetch: Boolean = false, force: Boolean = false) {
         if (fetchingPages.contains(pageIndex)) {
             return
         }
@@ -91,7 +91,8 @@ class PersonTabbedViewModel @Inject constructor(
                     apiClient.fetchPersonByNameWithRetry(
                         name = personRef.fullName,
                         page = pageIndex.toLemmyPageIndex(),
-                        limit = PAGE_SIZE
+                        limit = PAGE_SIZE,
+                        force = force,
                     )
                 }
             }
@@ -123,7 +124,7 @@ class PersonTabbedViewModel @Inject constructor(
                             it.comments,
                             apiClient.instance,
                             pageIndex,
-                            it.posts.size == PAGE_SIZE,
+                            it.comments.size == PAGE_SIZE,
                             null,
                         ))
                     }

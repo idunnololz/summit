@@ -60,4 +60,8 @@
     <item name="swipe_action_reply" type="id" />
     <item name="swipeable" type="id" />
     <item name="comment_view" type="id" />
+    <item name="unblock_user" type="id" />
+    <item name="swipe_action_hide_post" type="id"/>
+    <item name="hide_post" type="id" />
+    <item name="swipe_action_mark_as_read" type="id"/>
 </resources>

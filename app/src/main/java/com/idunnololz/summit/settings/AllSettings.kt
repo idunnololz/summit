@@ -2,6 +2,9 @@ package com.idunnololz.summit.settings
 
 import android.content.Context
 import com.idunnololz.summit.R
+import com.idunnololz.summit.preferences.PostGestureAction
+import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,6 +47,11 @@ class MainSettings @Inject constructor(
         R.drawable.baseline_cached_24,
         context.getString(R.string.cache),
         context.getString(R.string.cache_info_and_preferences)
+    )
+    val settingHiddenPosts = BasicSettingItem(
+        R.drawable.baseline_hide_24,
+        context.getString(R.string.hidden_posts),
+        context.getString(R.string.hidden_posts_desc)
     )
     val settingContent = BasicSettingItem(
         R.drawable.baseline_pages_24,
@@ -204,4 +212,71 @@ class LemmyWebSettings @Inject constructor(
         null,
     )
 
+}
+
+@Singleton
+class GestureSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
+    private val postGestureActionOptions =
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                PostGestureAction.Upvote,
+                context.getString(R.string.upvote),
+                null,
+                R.drawable.baseline_arrow_upward_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostGestureAction.Downvote,
+                context.getString(R.string.downvote),
+                null,
+                R.drawable.baseline_arrow_downward_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostGestureAction.Reply,
+                context.getString(R.string.reply),
+                null,
+                R.drawable.baseline_reply_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostGestureAction.MarkAsRead,
+                context.getString(R.string.mark_as_read),
+                null,
+                R.drawable.baseline_check_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostGestureAction.Hide,
+                context.getString(R.string.hide_post),
+                null,
+                R.drawable.baseline_hide_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostGestureAction.Bookmark,
+                context.getString(R.string.bookmark),
+                null,
+                R.drawable.baseline_bookmark_add_24,
+            ),
+        )
+
+
+    val postGestureAction1 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.gesture_action_1),
+        null,
+        postGestureActionOptions,
+    )
+
+    val postGestureAction2 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.gesture_action_2),
+        null,
+        postGestureActionOptions,
+    )
+
+    val postGestureAction3 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.gesture_action_3),
+        null,
+        postGestureActionOptions,
+    )
 }

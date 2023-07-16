@@ -67,12 +67,26 @@
                         android:textAppearance="?textAppearanceBodyMedium"
                         android:singleLine="true"
                         android:maxLines="1"
-                        android:layout_marginTop="@dimen/padding_half"
+                        android:layout_marginTop="@dimen/padding"
                         android:layout_marginHorizontal="@dimen/padding"
                         android:gravity="center"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/name"/>
+
+                    <TextView
+                        android:id="@+id/subtitle2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?textAppearanceBodyMedium"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:layout_marginTop="@dimen/padding"
+                        android:layout_marginHorizontal="@dimen/padding"
+                        android:gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/subtitle"/>
 
                     <TextView
                         android:id="@+id/cake_date"
@@ -81,14 +95,14 @@
                         android:textAppearance="?textAppearanceBodyMedium"
                         android:singleLine="true"
                         android:maxLines="1"
-                        android:layout_marginTop="@dimen/padding_half"
+                        android:layout_marginTop="@dimen/padding"
                         android:layout_marginHorizontal="@dimen/padding"
                         android:gravity="center"
                         android:drawablePadding="@dimen/padding_half"
                         app:layout_constrainedWidth="true"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/subtitle"
+                        app:layout_constraintTop_toBottomOf="@+id/subtitle2"
                         app:drawableStartCompat="@drawable/baseline_cake_24"
                         app:drawableTint="?colorControlNormal" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -138,6 +152,16 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"/>
         </FrameLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:contentDescription="@string/more_actions"
+            app:srcCompat="@drawable/baseline_more_horiz_black_24"
+            />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.fragment.app.FragmentContainerView

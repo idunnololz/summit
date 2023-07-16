@@ -109,7 +109,7 @@ class ImageViewerActivity : BaseActivity() {
 
         onViewCreated(binding.root, savedInstanceState)
 
-        setupActionBar("", true)
+        setupActionBar(args.title, true)
 
         binding.appBar.transitionName = Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME
         binding.bottomNavigationView.transitionName = Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME

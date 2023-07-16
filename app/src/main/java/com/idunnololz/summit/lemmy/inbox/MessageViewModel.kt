@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MessageViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
+    private val commentsFetcher: CommentsFetcher,
     val accountManager: AccountManager,
 ) : ViewModel() {
 
@@ -44,7 +46,7 @@ class MessageViewModel @Inject constructor(
                 apiClient.fetchPostWithRetry(Either.Left(postId), force)
             }
             val commentJob = async {
-                apiClient
+                commentsFetcher
                     .fetchCommentsWithRetry(
                         Either.Right(topCommentId),
                         CommentSortType.Top,

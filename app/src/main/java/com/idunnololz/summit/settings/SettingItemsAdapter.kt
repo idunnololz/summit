@@ -12,6 +12,7 @@ import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
+import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
@@ -73,7 +74,7 @@ class SettingItemsAdapter(
 
         if (!handled) {
             when (settingItem) {
-                is BasicSettingItem -> TODO()
+                is BasicSettingItem -> {}
                 is OnOffSettingItem -> {
                     updateSettingValue(settingItem.id, (it as MaterialSwitch).isChecked)
                 }
@@ -103,12 +104,10 @@ class SettingItemsAdapter(
         addItemType(Item.BasicItem::class, BasicSettingItemBinding::inflate) { item, b, h ->
             val settingItem = item.settingItem
 
-            b.icon.setImageResource(settingItem.icon)
-            b.title.text = settingItem.title
-            b.desc.text = settingItem.description
-
             b.root.tag = settingItem
-            b.root.setOnClickListener(onSettingClickListener)
+            settingItem.bindTo(b) {
+                onSettingClickListener.onClick(b.root)
+            }
         }
         addItemType(Item.TitleItem::class, SubgroupSettingItemBinding::inflate) { item, b, h ->
             val settingItem = item.settingItem

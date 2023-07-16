@@ -3,21 +3,35 @@ package com.idunnololz.summit.lemmy.person
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import coil.load
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxFragment
+import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
@@ -27,6 +41,8 @@ import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
@@ -41,6 +57,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
 
     val viewModel: PersonTabbedViewModel by viewModels()
     var viewPagerController: ViewPagerController? = null
+    val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
@@ -76,20 +93,49 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
 
         viewModel.fetchPersonIfNotDone(args.personRef)
 
+        binding.fab.hide()
         with(binding) {
             viewModel.personData.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {
+                        binding.fab.hide()
                         loadingView.showDefaultErrorMessageFor(it.error)
                     }
                     is StatefulData.Loading -> {
+                        binding.fab.hide()
                         loadingView.showProgressBar()
                     }
                     is StatefulData.NotStarted -> {}
                     is StatefulData.Success -> {
+                        binding.fab.show()
                         loadingView.hideAll()
 
                         setup()
+                    }
+                }
+            }
+
+            actionsViewModel.blockPersonResult.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> {
+                        Snackbar.make(
+                            binding.coordinatorLayout,
+                            it.error.toErrorMessage(context),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
+                    is StatefulData.Loading -> {}
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        Snackbar.make(
+                            binding.coordinatorLayout,
+                            if (it.data.blockedPerson) {
+                                getString(R.string.user_blocked)
+                            } else {
+                                getString(R.string.user_unblocked)
+                            },
+                            Snackbar.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
@@ -150,6 +196,63 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
                 }
             }
         }
+
+        binding.fab.setOnClickListener {
+            showOverflowMenu()
+        }
+    }
+
+    private fun showOverflowMenu() {
+        if (!isBindingAvailable()) return
+
+        val personData = viewModel.personData.valueOrNull ?: return
+        val person = personData.personView.person
+
+        val bottomMenu = BottomMenu(requireContext()).apply {
+
+            addItemWithIcon(
+                id = R.id.block_user,
+                title = getString(R.string.block_this_user_format, person.name),
+                icon = R.drawable.baseline_person_off_24
+            )
+            addItemWithIcon(
+                id = R.id.unblock_user,
+                title = getString(R.string.unblock_this_user_format, person.name),
+                icon = R.drawable.baseline_person_24
+            )
+            addItemWithIcon(
+                id = R.id.message,
+                title = getString(R.string.send_message),
+                icon = R.drawable.baseline_message_24
+            )
+
+            setOnMenuItemClickListener {
+                when (it.id) {
+                    R.id.block_user -> {
+                        actionsViewModel.blockPerson(person.id)
+                    }
+                    R.id.unblock_user -> {
+                        actionsViewModel.blockPerson(person.id, false)
+                    }
+                    R.id.message -> {
+                        AddOrEditCommentFragment()
+                            .apply {
+                                arguments = AddOrEditCommentFragmentArgs(
+                                    instance = viewModel.instance,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    person.id,
+                                ).toBundle()
+                            }
+                            .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+                    }
+                }
+            }
+        }
+
+        requireMainActivity().showBottomMenu(bottomMenu)
     }
 
     override fun onResume() {
@@ -178,17 +281,19 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
             }
             name.text = displayName
             subtitle.text = buildSpannedString {
-                append("@")
                 append(data.personView.person.name)
-
-                appendSeparator()
-
-                append(context.getString(R.string.posts_format,
+                append("@")
+                append(data.personView.person.instance)
+            }
+            subtitle2.text = buildSpannedString {
+                append(context.resources.getQuantityString(R.plurals.posts_format,
+                    data.personView.counts.post_count,
                     defaultDecimalFormat.format(data.personView.counts.post_count)))
 
                 appendSeparator()
 
-                append(context.getString(R.string.comments_format,
+                append(context.resources.getQuantityString(R.plurals.comments_format,
+                    data.personView.counts.comment_count,
                     defaultDecimalFormat.format(data.personView.counts.comment_count)))
             }
 

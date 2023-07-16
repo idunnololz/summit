@@ -22,12 +22,12 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.post.PostsAdapter
 import com.idunnololz.summit.lemmy.post.ThreadLinesDecoration
@@ -138,6 +138,13 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         )
 
         binding.author.text = getString(R.string.from_format, args.inboxItem.authorName)
+        binding.author.setOnClickListener {
+            getMainActivity()?.launchPage(
+                PersonRef.PersonRefByName(
+                    args.inboxItem.authorName, args.inboxItem.authorInstance
+                )
+            )
+        }
 
         viewModel.commentContext.observe(viewLifecycleOwner) {
             when (it) {
@@ -306,7 +313,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 )
                 addItemWithIcon(
                     R.id.block_user,
-                    getString(R.string.block_this_user, postView.creator.name),
+                    getString(R.string.block_this_user_format, postView.creator.name),
                     R.drawable.baseline_person_off_24
                 )
             }
@@ -421,7 +428,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         )
 
                 },
-                onImageClick = { view, url ->
+                onImageClick = { postOrCommentView, view, url ->
                     getMainActivity()?.openImage(view, binding.appBar, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->

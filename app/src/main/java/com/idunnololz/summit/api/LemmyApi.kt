@@ -182,6 +182,9 @@ interface LemmyApi {
      */
     @GET("user")
     fun getPersonDetails(@QueryMap form: Map<String, String>): Call<GetPersonDetailsResponse>
+    @GET("user")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getPersonDetailsNoCache(@QueryMap form: Map<String, String>): Call<GetPersonDetailsResponse>
 
     /**
      * Get comment replies.

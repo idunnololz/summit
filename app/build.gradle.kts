@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 37
-        versionName = "0.1.37"
+        versionCode = 38
+        versionName = "0.1.38"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -121,6 +121,8 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.moshi.adapter)
     ksp(libs.moshi.kotlin.codegen)
+
+    implementation(libs.flow.layout)
 
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
 

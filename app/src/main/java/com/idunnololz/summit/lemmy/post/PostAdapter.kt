@@ -61,7 +61,7 @@ class PostsAdapter(
     private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
     private val onEditCommentClick: (CommentView) -> Unit,
     private val onDeleteCommentClick: (CommentView) -> Unit,
-    private val onImageClick: (View?, String) -> Unit,
+    private val onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onPostMoreClick: (PostView) -> Unit,
@@ -355,7 +355,9 @@ class PostsAdapter(
                         highlightForever,
                         item.isUpdating,
                         item.comment,
+                        instance,
                         ::expandSection,
+                        onPageClick,
                     )
                 }
 

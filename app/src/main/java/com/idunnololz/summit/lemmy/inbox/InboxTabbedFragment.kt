@@ -5,16 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -22,20 +17,16 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentInboxBinding
-import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.DepthPageTransformer2
-import com.idunnololz.summit.util.Item
+import com.idunnololz.summit.util.PageItem
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
-
-    private var adapter: InboxPagerAdapter? = null
 
     private val viewModel: InboxTabbedViewModel by viewModels()
     private val inboxViewModel: InboxViewModel by activityViewModels()
@@ -60,23 +51,34 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         val pagerAdapter = InboxPagerAdapter(
                 context,
                 this,
-                onPageCountChanged = { pageCount ->
-                    binding.viewPager.isUserInputEnabled = pageCount > 1
-                }
-            ).also { adapter ->
-                adapter.addFrag(
-                    InboxFragment::class.java,
-                    InboxViewModel.PageType.All.getName(context),
-                    InboxFragmentArgs(InboxViewModel.PageType.All).toBundle(),
-                )
-
-                this@InboxTabbedFragment.adapter = adapter
-            }.apply {
-                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            ).apply {
+                stateRestorationPolicy =
+                    RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
 
+        viewModel.pageItems.observe(viewLifecycleOwner) {
+            it ?: return@observe
+
+            pagerAdapter.setPages(it)
+
+            binding.viewPager.isUserInputEnabled = it.size > 1
+        }
+        viewModel.pageItems.value?.let {
+            pagerAdapter.setPages(it)
+        }
+
+        fun onPageChanged() {
+            if (binding.viewPager.currentItem == 0) {
+                viewModel.removeAllButFirst()
+
+                getMainActivity()?.setNavUiOpenness(0f)
+            } else {
+
+                getMainActivity()?.setNavUiOpenness(1f)
+            }
+        }
+
         binding.viewPager.offscreenPageLimit = 99
-//        binding.viewPager.isSaveEnabled = false
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.setPageTransformer(DepthPageTransformer2())
         binding.viewPager.setCurrentItem(viewModel.pagePosition, false)
@@ -99,18 +101,12 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
                 super.onPageScrollStateChanged(state)
 
                 if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                    if (binding.viewPager.currentItem == 0) {
-                        adapter?.removeAllButFirst()
-
-                        getMainActivity()?.setNavUiOpenness(0f)
-                    } else {
-
-                        getMainActivity()?.setNavUiOpenness(1f)
-                    }
+                    onPageChanged()
                 }
             }
         })
 
+        onPageChanged()
         viewModel.updateUnreadCount()
     }
 
@@ -132,19 +128,10 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     }
 
     fun openMessage(item: InboxItem, instance: String) {
-        adapter?.apply {
-            if (this.itemCount > 1) {
-                this.removeAllButFirst()
-            }
-            addFrag(
-                MessageFragment::class.java,
-                "Message",
-                MessageFragmentArgs(item, instance).toBundle(),
-            )
+        viewModel.openMessage(item, instance)
 
-            binding.viewPager.post {
-                binding.viewPager.currentItem = 1
-            }
+        binding.viewPager.post {
+            binding.viewPager.currentItem = 1
         }
     }
 
@@ -160,12 +147,9 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     class InboxPagerAdapter(
         private val context: Context,
         fragment: Fragment,
-        private val onPageCountChanged: (Int) -> Unit,
     ) : FragmentStateAdapter(fragment), TabLayoutMediator.TabConfigurationStrategy {
 
-
-        private val items = ArrayList<Item>()
-
+        var items: List<PageItem> = listOf()
 
         override fun getItemId(position: Int): Long {
             return items[position].id
@@ -185,28 +169,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
         override fun getItemCount(): Int = items.size
 
-        fun addFrag(
-            clazz: Class<*>,
-            title: String,
-            args: Bundle? = null,
-            @DrawableRes drawableRes: Int? = null,
-        ) {
-            items.add(Item(View.generateViewId().toLong(), clazz, args, title, drawableRes))
-
-            onPageCountChanged(items.size)
-
-            notifyItemChanged(items.size - 1)
-        }
-
-        fun findIndexOfPage(className: String): Int =
-            items.indexOfFirst { it.clazz.name == className }
-
-        fun getIdForPosition(position: Int): String = items[position].clazz.simpleName
-
-        fun getTitleForPosition(position: Int): CharSequence = items[position].title
-
-        fun getClassForPosition(position: Int): Class<*> = items[position].clazz
-
         override fun onConfigureTab(tab: TabLayout.Tab, position: Int) {
             val item = items[position]
             tab.text = item.title
@@ -217,15 +179,28 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             }
         }
 
-        fun removeAllButFirst() {
-            val originalSize = items.size
-            val first = items[0]
-            items.clear()
-            items.add(first)
+        fun setPages(newItems: List<PageItem>) {
+            val oldItems = items
 
-            onPageCountChanged(items.size)
+            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return oldItems[oldItemPosition].id == newItems[newItemPosition].id
+                }
 
-            notifyItemRangeRemoved(1, originalSize - 1)
+                override fun getOldListSize(): Int = oldItems.size
+
+                override fun getNewListSize(): Int = newItems.size
+
+                override fun areContentsTheSame(
+                    oldItemPosition: Int,
+                    newItemPosition: Int
+                ): Boolean {
+                    return true
+                }
+
+            })
+            this.items = newItems
+            diff.dispatchUpdatesTo(this)
         }
     }
 

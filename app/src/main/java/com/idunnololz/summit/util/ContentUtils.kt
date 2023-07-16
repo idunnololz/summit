@@ -6,4 +6,10 @@ object ContentUtils {
                 url.endsWith(".jpeg") ||
                 url.endsWith(".png") ||
                 url.endsWith(".webp")
+
+    fun isUrlVideo(url: String) =
+        url.endsWith(".mp4")
+
+    fun isUrlMp4(url: String) =
+        url.endsWith(".mp4")
 }

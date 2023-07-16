@@ -7,6 +7,11 @@ import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.lemmy.inbox.repository.InboxSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -74,6 +79,7 @@ class InboxRepository @Inject constructor(
         fun reset() {
             nextItem = null
             itemIndex = 0
+            inboxSource.reset()
         }
 
         fun markAsRead(id: Int, read: Boolean): InboxItem? {
@@ -101,7 +107,9 @@ class InboxRepository @Inject constructor(
 
             if (force) {
                 allItems.clear()
-                sources.forEach { it.reset() }
+                sources.forEach {
+                    it.reset()
+                }
             }
 
             val startIndex = pageIndex * PAGE_SIZE
@@ -109,7 +117,7 @@ class InboxRepository @Inject constructor(
             var hasMore = true
 
             while (allItems.size < endIndex) {
-                val results = sources.map { it.getItem(force) }
+                val results = sources.asFlow().map { it.getItem(force) }.toList()
                 val error = results.firstOrNull { it.isFailure }
 
                 if (error != null) {

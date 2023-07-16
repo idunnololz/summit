@@ -6,7 +6,6 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
-import com.idunnololz.summit.actions.VotesManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostId
@@ -14,7 +13,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -32,6 +31,7 @@ class PostsRepository @Inject constructor(
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
     private val accountActionsManager: AccountActionsManager,
+    private val hiddenPostsManager: HiddenPostsManager,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -45,6 +45,7 @@ class PostsRepository @Inject constructor(
     )
 
     private val coroutineScope = coroutineScopeFactory.create()
+    private val allPostsContext = Dispatchers.IO.limitedParallelism(1)
 
     private var allPosts = mutableListOf<PostData>()
     private var seenPosts = mutableSetOf<String>()
@@ -214,7 +215,7 @@ class PostsRepository @Inject constructor(
                 is CommunityRef.Subscribed -> communityRef.instance ?: apiClient.instance
             }
 
-    val accountInstance: String
+    val apiInstance: String
         get() = apiClient.instance
 
     fun setCommunity(communityRef: CommunityRef?) {
@@ -278,8 +279,13 @@ class PostsRepository @Inject constructor(
         seenPosts = mutableSetOf()
     }
 
+    suspend fun onHiddenPostsChange() {
+        val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
+        allPosts.retainAll { !hiddenPosts.contains(it.post.post.id) }
+    }
+
     private fun transformPostWithLocalData(postView: PostView): PostView {
-        val accountInstance = accountInstance
+        val accountInstance = apiInstance
         val localRead = postReadManager.isPostRead(accountInstance, postView.post.id)
         if (localRead && !postView.read) {
             return postView.copy(read = true)
@@ -306,11 +312,12 @@ class PostsRepository @Inject constructor(
                 limit = 20,
                 force = force,
             )
+        val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
 
         return newPosts.fold(
             onSuccess = { newPosts ->
                 Log.d(TAG, "Fetched ${newPosts.size} posts.")
-                addPosts(newPosts, pageIndex, force)
+                addPosts(newPosts, pageIndex, hiddenPosts, force)
                 Result.success(newPosts.isNotEmpty())
             },
             onFailure = {
@@ -319,15 +326,22 @@ class PostsRepository @Inject constructor(
         )
     }
 
-    private fun addPosts(newPosts: List<PostView>, pageIndex: Int, force: Boolean) {
+    private fun addPosts(
+        newPosts: List<PostView>,
+        pageIndex: Int,
+        hiddenPosts: Set<PostId>,
+        force: Boolean
+    ) {
         for (post in newPosts) {
             val uniquePostKey = post.getUniqueKey()
 
             if (force) {
                 accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
             }
-
-            if (hideRead && (post.read || postReadManager.isPostRead(accountInstance, post.post.id))) {
+            if (hideRead && (post.read || postReadManager.isPostRead(apiInstance, post.post.id))) {
+                continue
+            }
+            if (hiddenPosts.contains(post.post.id)) {
                 continue
             }
 

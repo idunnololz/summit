@@ -42,8 +42,8 @@ class LemmyHeaderHelper(
         const val SEPARATOR = " ● "
     }
 
-    private val unimportantColor: Int = ContextCompat.getColor(context, R.color.colorText)
-    private val regularColor: Int = ContextCompat.getColor(context, R.color.colorTextTitle)
+    private val unimportantColor: Int = ContextCompat.getColor(context, R.color.colorTextFaint)
+    private val regularColor: Int = ContextCompat.getColor(context, R.color.colorText)
     private val accentColor: Int = ContextCompat.getColor(context, R.color.colorAccent)
     private val infoColor: Int = ContextCompat.getColor(context, R.color.style_blue_gray)
     private val criticalWarningColor: Int = ContextCompat.getColor(context, R.color.style_red)
@@ -68,7 +68,7 @@ class LemmyHeaderHelper(
             sb.append(context.getString(R.string.nsfw))
             val e = sb.length
             sb.setSpan(
-                RoundedBackgroundSpan(criticalWarningColor, regularColor),
+                RoundedBackgroundSpan(criticalWarningColor, emphasisColor),
                 s,
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -158,7 +158,7 @@ class LemmyHeaderHelper(
                     LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name))
                 val e = sb.length
                 sb.setSpan(
-                    ForegroundColorSpan(emphasisColor),
+                    ForegroundColorSpan(regularColor),
                     s,
                     e,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -218,6 +218,8 @@ class LemmyHeaderHelper(
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,
         item: CommentView,
+        instance: String,
+        onPageClick: (PageRef) -> Unit,
         detailed: Boolean = false,
         childrenCount: Int? = null,
     ) {
@@ -244,7 +246,9 @@ class LemmyHeaderHelper(
         if (item.creator.admin) {
             run {
                 val s = sb.length
-                sb.append(item.creator.name)
+                sb.appendLink(
+                    item.creator.name,
+                    LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name))
                 val e = sb.length
                 sb.setSpan(
                     ForegroundColorSpan(adminColor),
@@ -260,7 +264,25 @@ class LemmyHeaderHelper(
                 )
             }
         } else {
-            sb.append(item.creator.name)
+            val s = sb.length
+            sb.appendLink(
+                text = item.creator.name,
+                url = LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name),
+                underline = false
+            )
+            val e = sb.length
+            sb.setSpan(
+                ForegroundColorSpan(unimportantColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            sb.setSpan(
+                StyleSpan(Typeface.BOLD),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
 
         if (item.creator.id == item.post.creator_id) {
@@ -376,9 +398,30 @@ class LemmyHeaderHelper(
 //            appendAwards(headerContainer, item.allAwardings, sb)
         }
         headerContainer.setTextSecondPart(sb)
+
+
+        val textView = headerContainer.getChildAt(0) as TextView
+        textView.movementMethod = CustomLinkMovementMethod().apply {
+            onLinkLongClickListener = DefaultLinkLongClickListener(context)
+            onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+                override fun onClick(
+                    textView: TextView,
+                    url: String,
+                    text: String,
+                    rect: RectF
+                ): Boolean {
+                    val pageRef = LinkResolver.parseUrl(url, instance)
+
+                    return if (pageRef != null) {
+                        onPageClick(pageRef)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        }
     }
-
-
 
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,

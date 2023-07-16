@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
@@ -12,7 +13,7 @@ import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.FrameLayout
-import androidx.annotation.LayoutRes
+import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -35,13 +36,13 @@ import com.idunnololz.summit.databinding.CommentActionsViewBinding
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
-import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
@@ -50,12 +51,13 @@ import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.utils.bind
-import com.idunnololz.summit.lemmy.utils.getFormattedAuthor
 import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.reddit.LemmyUtils
+import com.idunnololz.summit.util.CustomLinkMovementMethod
+import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
@@ -64,6 +66,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.abbrevNumber
 import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDrawableCompat
@@ -138,7 +141,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         videoState: VideoState?,
         updateContent: Boolean,
         onRevealContentClickedFn: () -> Unit,
-        onImageClick: (View?, String) -> Unit,
+        onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
@@ -154,11 +157,10 @@ class PostAndCommentViewBuilder @Inject constructor(
             postView = postView,
             instance = instance,
             onPageClick = onPageClick,
-            listAuthor = false
+            listAuthor = true
         )
 
         title.text = postView.getFormattedTitle()
-        author.text = postView.getFormattedAuthor()
 
         commentButton.text = abbrevNumber(postView.counts.comments.toLong())
         commentButton.isEnabled = !postView.post.locked
@@ -190,10 +192,10 @@ class PostAndCommentViewBuilder @Inject constructor(
             lazyUpdate = !updateContent,
             videoState = videoState,
             onFullImageViewClickListener = { view, url ->
-                onImageClick(view, url)
+                onImageClick(Either.Left(postView), view, url)
             },
             onImageClickListener = { url ->
-                onImageClick(null, url)
+                onImageClick(Either.Left(postView), null, url)
             },
             onVideoClickListener = onVideoClick,
             onRevealContentClickedFn = onRevealContentClickedFn,
@@ -230,7 +232,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         viewLifecycleOwner: LifecycleOwner,
         currentAccountId: PersonId?,
         isActionsExpanded: Boolean,
-        onImageClick: (View?, String) -> Unit,
+        onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
         toggleActionsExpanded: () -> Unit,
@@ -277,16 +279,16 @@ class PostAndCommentViewBuilder @Inject constructor(
         threadLinesHelper.populateThreadLines(
             threadLinesContainer, depth, baseDepth
         )
-        lemmyHeaderHelper.populateHeaderSpan(headerView, commentView)
+        lemmyHeaderHelper.populateHeaderSpan(headerView, commentView, instance, onPageClick)
 
         if (commentView.comment.deleted || isDeleting) {
             text.text = buildSpannedString {
-                append(context.getString(R.string.deleted))
+                append(context.getString(R.string.deleted_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
             }
         } else if (commentView.comment.removed) {
             text.text = buildSpannedString {
-                append(context.getString(R.string.removed))
+                append(context.getString(R.string.removed_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
             }
         } else {
@@ -295,7 +297,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 text = content,
                 instance = instance,
                 onImageClick = {
-                    onImageClick(null, it)
+                    onImageClick(Either.Right(commentView), null, it)
                 },
                 onPageClick = onPageClick,
             )
@@ -340,7 +342,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 imageView.controller = controller
 
                 imageView.setOnClickListener {
-                    onImageClick(null, fullUrl)
+                    onImageClick(Either.Right(commentView), null, fullUrl)
                 }
 
                 lastViewId = viewId
@@ -452,7 +454,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightForever: Boolean,
         isUpdating: Boolean,
         commentView: CommentView,
+        instance: String,
         expandSection: (position: Int) -> Unit,
+        onPageClick: (PageRef) -> Unit,
     ) = with(binding) {
 
         scaleTextSizes()
@@ -463,6 +467,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         lemmyHeaderHelper.populateHeaderSpan(
             headerContainer = headerView,
             item = commentView,
+            instance = instance,
+            onPageClick = onPageClick,
             detailed = true,
             childrenCount = childrenCount
         )
@@ -506,7 +512,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         author: String?,
         highlight: Boolean,
         highlightForever: Boolean,
-        onImageClick: (View?, String) -> Unit,
+        onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
     ) = with(binding) {
@@ -526,7 +532,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             text = content,
             instance = instance,
             onImageClick = {
-                onImageClick(null, it)
+                onImageClick(null, null, it)
             },
             onPageClick = onPageClick,
         )
@@ -570,7 +576,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 imageView.controller = controller
 
                 imageView.setOnClickListener {
-                    onImageClick(null, fullUrl)
+                    onImageClick(null, null, fullUrl)
                 }
 
                 lastViewId = viewId
@@ -645,16 +651,47 @@ class PostAndCommentViewBuilder @Inject constructor(
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(b) {
         b.author.text = buildSpannedString {
-            val s = length
-            append(LemmyUtils.formatAuthor(item.authorName))
-            LinkUtils.getLinkForPerson(item.authorInstance, item.authorName)
-            val e = length
-            setSpan(
-                ForegroundColorSpan(emphasisColor),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+            run {
+                val s = length
+                appendLink(
+                    item.authorName,
+                    LinkUtils.getLinkForPerson(item.authorInstance, item.authorName),
+                    underline = false
+                )
+                val e = length
+                setSpan(
+                    ForegroundColorSpan(normalTextColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+        b.author.movementMethod = CustomLinkMovementMethod().apply {
+            onLinkLongClickListener = DefaultLinkLongClickListener(context)
+            onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+                override fun onClick(
+                    textView: TextView,
+                    url: String,
+                    text: String,
+                    rect: RectF
+                ): Boolean {
+                    val pageRef = LinkResolver.parseUrl(url, instance)
+
+                    return if (pageRef != null) {
+                        onPageClick(pageRef)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
         }
 
         if (item is CommentBackedItem) {
@@ -722,12 +759,12 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         b.content.text = if (item.isDeleted) {
             buildSpannedString {
-                append(context.getString(R.string.deleted))
+                append(context.getString(R.string.deleted_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
             }
         } else if (item.isRemoved) {
             buildSpannedString {
-                append(context.getString(R.string.removed))
+                append(context.getString(R.string.removed_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
             }
         } else {
@@ -837,7 +874,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         title.textSize = postUiConfig.titleTextSizeSp.toPostTextSize()
         commentButton.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
         upvoteCount.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
-        author.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {

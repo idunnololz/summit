@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.transition.ChangeBounds
 import androidx.transition.ChangeClipBounds
 import androidx.transition.ChangeImageTransform
-import androidx.transition.ChangeTransform
 import androidx.transition.Fade
 import androidx.transition.Fade.IN
 import androidx.transition.Fade.OUT
@@ -250,7 +249,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             highlight = false,
             highlightForever = false,
             onRevealContentClickedFn = {},
-            onImageClick = { _, _ -> },
+            onImageClick = { _, _, _ -> },
             onVideoClick = { _, _, _ -> },
             onPageClick = {},
             onItemClick = { _, _, _, _, _, _, _ -> },

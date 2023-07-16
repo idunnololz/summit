@@ -1,8 +1,11 @@
 package com.idunnololz.summit.util
 
 import android.net.Uri
+import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toUrl
 import okhttp3.CacheControl
 import okhttp3.Request
@@ -110,4 +113,7 @@ object LinkUtils {
 
     fun getLinkForPost(instance: String, id: PostId): String =
         "https://${instance}/post/$id"
+
+    fun getLinkForComment(instance: String, commentId: CommentId): String =
+        "https://${instance}/comment/$commentId"
 }

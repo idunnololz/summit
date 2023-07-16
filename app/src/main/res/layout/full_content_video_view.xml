@@ -11,5 +11,5 @@
         android:layout_height="wrap_content"
         app:controller_layout_id="@layout/exo_player_control_view"
         app:show_buffering="always"
-        app:resize_mode="fit" />
+        app:resize_mode="fixed_width" />
 </FrameLayout>

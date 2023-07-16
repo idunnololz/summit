@@ -3,6 +3,7 @@ package com.idunnololz.summit.api.utils
 import android.net.Uri
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
+import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.video.VideoSizeHint
 
@@ -50,19 +51,33 @@ fun PostView.getThumbnailPreviewInfo(): PreviewInfo? {
 }
 
 fun PostView.getVideoInfo(): VideoSizeHint? {
-    if (post.embed_video_url == null) {
-        return null
+    val url = if (post.embed_video_url != null) {
+        post.embed_video_url
+    } else if (isUrlVideo(post.thumbnail_url ?: "")) {
+        post.thumbnail_url
+    } else if (isUrlVideo(post.url ?: "")) {
+        post.url
+    } else {
+        null
     }
+
+    url ?: return null
+
     return VideoSizeHint(
         0,
         0,
-        post.embed_video_url,
+        url,
     )
 }
 
 fun PostView.getType(): PostType {
     if (post.thumbnail_url != null) {
-        return PostType.Image
+        if (isUrlImage(post.thumbnail_url)) {
+            return PostType.Image
+        }
+        if (isUrlVideo(post.thumbnail_url)) {
+            return PostType.Video
+        }
     }
     if (post.url != null && isUrlImage(post.url)) {
         return PostType.ImageUrl

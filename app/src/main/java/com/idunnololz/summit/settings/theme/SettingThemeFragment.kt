@@ -15,6 +15,7 @@ import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.ui.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -90,7 +91,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                         R.drawable.baseline_dark_mode_24,
                     )
                 ),
-            ).bindTo(
+            ).bindToMultiView(
                 baseThemeSetting,
                 listOf(this.option1, this.option2, this.option3),
                 {

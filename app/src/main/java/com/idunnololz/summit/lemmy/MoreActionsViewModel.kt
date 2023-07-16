@@ -23,7 +23,7 @@ class MoreActionsViewModel @Inject constructor(
     val accountActionsManager: AccountActionsManager,
 ) : ViewModel() {
     val blockCommunityResult = StatefulLiveData<Unit>()
-    val blockPersonResult = StatefulLiveData<Unit>()
+    val blockPersonResult = StatefulLiveData<BlockPersonResult>()
     val deletePostResult = StatefulLiveData<PostView>()
 
     fun blockCommunity(id: CommunityId) {
@@ -39,15 +39,15 @@ class MoreActionsViewModel @Inject constructor(
         }
     }
 
-    fun blockPerson(id: PersonId) {
+    fun blockPerson(id: PersonId, block: Boolean = true) {
         blockPersonResult.setIsLoading()
         viewModelScope.launch {
-            apiClient.blockPerson(id, true)
+            apiClient.blockPerson(id, block)
                 .onFailure {
                     blockPersonResult.postError(it)
                 }
                 .onSuccess {
-                    blockCommunityResult.postValue(Unit)
+                    blockPersonResult.postValue(BlockPersonResult(block))
                 }
         }
     }
@@ -70,11 +70,15 @@ class MoreActionsViewModel @Inject constructor(
         }
     }
 
-    fun upvote(postView: PostView) {
-        accountActionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), 1)
+    fun vote(postView: PostView, dir: Int) {
+        accountActionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), dir)
     }
 
-    fun upvote(commentView: CommentView) {
-        accountActionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), 1)
+    fun vote(commentView: CommentView, dir: Int) {
+        accountActionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), dir)
     }
 }
+
+data class BlockPersonResult(
+    val blockedPerson: Boolean
+)

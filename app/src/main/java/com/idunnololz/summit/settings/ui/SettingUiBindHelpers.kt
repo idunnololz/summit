@@ -1,20 +1,47 @@
 package com.idunnololz.summit.settings.ui
 
-import android.util.Log
 import android.view.View
 import com.google.android.material.slider.Slider
+import com.idunnololz.summit.databinding.BasicSettingItemBinding
 import com.idunnololz.summit.databinding.OnOffSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupTitleSettingItemBinding
+import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.util.BottomMenu
 
+
+fun BasicSettingItem.bindTo(
+    b: BasicSettingItemBinding,
+    onValueChanged: () -> Unit,
+) {
+    if (this.icon == null) {
+        b.icon.visibility = View.GONE
+    } else {
+        b.icon.setImageResource(this.icon)
+        b.icon.visibility = View.VISIBLE
+    }
+
+    b.title.text = this.title
+
+    if (this.description == null) {
+        b.desc.visibility = View.GONE
+    } else {
+        b.desc.text = description
+        b.desc.visibility = View.VISIBLE
+    }
+
+    b.root.setOnClickListener {
+        onValueChanged()
+    }
+}
 
 fun OnOffSettingItem.bindTo(
     b: OnOffSettingItemBinding,
@@ -93,6 +120,20 @@ fun <T> TextOnlySettingItem.bindTo(
 }
 
 fun RadioGroupSettingItem.bindTo(
+    b: SettingTextValueBinding,
+    getCurrentValue: () -> Int,
+    onSettingClick: (RadioGroupSettingItem) -> Unit,
+) {
+    b.title.text = this.title
+    b.value.text = this.options.firstOrNull { it.id == getCurrentValue() }?.title
+
+    b.root.tag = this
+    b.root.setOnClickListener {
+        onSettingClick(this)
+    }
+}
+
+fun RadioGroupSettingItem.bindToMultiView(
     b: RadioGroupTitleSettingItemBinding,
     optionsB: List<RadioGroupOptionSettingItemBinding>,
     getCurrentValue: () -> Int,

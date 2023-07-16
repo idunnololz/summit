@@ -15,6 +15,9 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -151,6 +154,24 @@ class Preferences @Inject constructor(
         get() = prefs.getBoolean(KEY_INFINITY, true)
         set(value) {
             prefs.edit().putBoolean(KEY_INFINITY, value).apply()
+        }
+
+    var postGestureAction1: Int
+        get() = prefs.getInt(KEY_POST_GESTURE_ACTION_1, PostGestureAction.Upvote)
+        set(value) {
+            prefs.edit().putInt(KEY_POST_GESTURE_ACTION_1, value).apply()
+        }
+
+    var postGestureAction2: Int
+        get() = prefs.getInt(KEY_POST_GESTURE_ACTION_2, PostGestureAction.Reply)
+        set(value) {
+            prefs.edit().putInt(KEY_POST_GESTURE_ACTION_2, value).apply()
+        }
+
+    var postGestureAction3: Int
+        get() = prefs.getInt(KEY_POST_GESTURE_ACTION_3, PostGestureAction.MarkAsRead)
+        set(value) {
+            prefs.edit().putInt(KEY_POST_GESTURE_ACTION_3, value).apply()
         }
 
     private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {

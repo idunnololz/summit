@@ -123,6 +123,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             findNavController().navigateSafe(directions)
                             true
                         }
+                        mainSettings.settingHiddenPosts.id -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingHiddenPostsFragment()
+                            findNavController().navigateSafe(directions)
+                            true
+                        }
                         else -> false
                     }
                 },

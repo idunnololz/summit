@@ -97,7 +97,7 @@ open class LemmyListSource<T, O>(
         if (index < allObjects.size && !force) {
             return Result.success(allObjects[index].obj)
         }
-        val result = getPage(index / PAGE_SIZE, force)
+        val result = getPage(index / PAGE_SIZE, force, deleteCacheOnForce = false)
 
         return result.fold(
             {
@@ -109,22 +109,13 @@ open class LemmyListSource<T, O>(
         )
     }
 
-    suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult<T>> {
+    suspend fun getPage(pageIndex: Int, force: Boolean = false, deleteCacheOnForce: Boolean = true): Result<PageResult<T>> {
         Log.d(TAG, "getPage(): $pageIndex force: $force")
         val startIndex = pageIndex * PAGE_SIZE
         val endIndex = startIndex + PAGE_SIZE
 
-        if (force) {
-            // delete all cached data for the given page
-            val minPageInteral = allObjects
-                .slice(startIndex until min(endIndex, allObjects.size))
-                .map { it.pageIndexInternal }
-                .minOrNull() ?: 1
-
-            deleteFromPage(minPageInteral)
-            endReached = false
-
-            Log.d(TAG, "Force = true. Clearing data. Remaining: ${allObjects.size}")
+        if (force && deleteCacheOnForce) {
+            deleteCache(startIndex, endIndex)
         }
 
         var hasMore = true
@@ -168,11 +159,25 @@ open class LemmyListSource<T, O>(
         )
     }
 
+    private fun deleteCache(startIndex: Int, endIndex: Int) {
+        // delete all cached data for the given page
+        val minPageInteral = allObjects
+            .slice(startIndex until min(endIndex, allObjects.size))
+            .map { it.pageIndexInternal }
+            .minOrNull() ?: 1
+
+        deleteFromPage(minPageInteral)
+        endReached = false
+
+        Log.d(TAG, "Force = true. Clearing data. Remaining: ${allObjects.size}")
+    }
+
     fun reset() {
         currentPageInternal = 1
 
         allObjects.clear()
         seenObjects.clear()
+        endReached = false
     }
 
     /**

@@ -3,6 +3,7 @@
     <dimen name="action_button_margin">16dp</dimen>
 
     <dimen name="padding_two">32dp</dimen>
+    <dimen name="padding_one_half">24dp</dimen>
     <dimen name="padding">16dp</dimen>
     <dimen name="padding_half">8dp</dimen>
     <dimen name="padding_quarter">4dp</dimen>
