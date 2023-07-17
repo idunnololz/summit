@@ -78,7 +78,8 @@ data class TextOnlySettingItem(
 data class TextValueSettingItem(
     override val title: String,
     val supportsRichText: Boolean,
-    override val isEnabled: Boolean = true
+    override val isEnabled: Boolean = true,
+    val hint: String? = null,
 ) : SettingItem()
 
 @Parcelize
@@ -109,3 +110,10 @@ data class RadioGroupSettingItem(
         @DrawableRes val icon: Int?,
     ) : Parcelable
 }
+
+@Parcelize
+data class ImageValueSettingItem(
+    override val title: String,
+    val description: String?,
+    val isSquare: Boolean,
+) : SettingItem()

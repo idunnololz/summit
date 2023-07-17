@@ -24,7 +24,6 @@ import okhttp3.Request
 import okio.BufferedSink
 import okio.buffer
 import okio.sink
-import org.apache.commons.io.FileUtils
 import org.threeten.bp.Duration
 import java.io.File
 import java.util.*
@@ -151,7 +150,7 @@ class OfflineManager @Inject constructor(
     }
 
     fun deleteOfflineImages() {
-        FileUtils.deleteDirectory(imagesDir)
+        imagesDir.deleteRecursively()
     }
 
     fun setImageSizeHint(url: String, w: Int, h: Int) {

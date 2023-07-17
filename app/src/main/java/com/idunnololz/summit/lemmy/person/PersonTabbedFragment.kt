@@ -2,14 +2,17 @@ package com.idunnololz.summit.lemmy.person
 
 import android.os.Bundle
 import android.text.format.DateUtils
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
 import androidx.core.view.MenuProvider
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import coil.load
@@ -35,6 +38,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.dateStringToTs
@@ -269,12 +273,24 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
         val data = viewModel.personData.valueOrNull ?: return
         val context = requireContext()
 
+        TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
+
         with(binding) {
             val displayName = data.personView.person.display_name
                 ?: data.personView.person.name
 
             binding.title.text = displayName
 
+            if (data.personView.person.banner != null) {
+                profileIcon.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    this.topToBottom = bannerDummy.id
+                    this.topToTop = ConstraintLayout.LayoutParams.UNSET
+                    this.topMargin = -Utils.convertDpToPixel(32f).toInt()
+                }
+            }
+            banner.load(data.personView.person.banner) {
+                allowHardware(false)
+            }
             profileIcon.load(data.personView.person.avatar) {
                 fallback(R.drawable.thumbnail_placeholder)
                 allowHardware(false)

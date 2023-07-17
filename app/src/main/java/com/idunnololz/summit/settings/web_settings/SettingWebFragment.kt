@@ -1,5 +1,6 @@
 package com.idunnololz.summit.settings.web_settings
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -8,10 +9,13 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.drjacky.imagepicker.ImagePicker
+import com.github.drjacky.imagepicker.constant.ImageProvider
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -21,11 +25,12 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingValueUpdateCallback,
-AlertDialogFragment.AlertDialogFragmentListener {
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SettingsWebViewModel by viewModels()
 
@@ -41,6 +46,22 @@ AlertDialogFragment.AlertDialogFragmentListener {
                 .createAndShow(childFragmentManager, "unsaved_changes")
         }
     }
+    private val launcher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val uri = it.data?.data!!
+
+                viewModel.uploadImage(uri)
+                // Use the uri to load the image
+                // Only if you are not using crop feature:
+//                uri.let { galleryUri ->
+//                    contentResolver.takePersistableUriPermission(
+//                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+//                    )
+//                }
+                //////////////
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,7 +82,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
         requireMainActivity().apply {
             setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+            insetViewExceptTopAutomaticallyByMargin(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
             setSupportActionBar(binding.toolbar)
@@ -92,10 +113,12 @@ AlertDialogFragment.AlertDialogFragmentListener {
         viewModel.saveUserSettings.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
-                    binding.loadingView.showDefaultErrorMessageFor(it.error)
-                    binding.loadingView.setOnRefreshClickListener {
-                        save()
-                    }
+                    binding.loadingView.hideAll()
+                    AlertDialogFragment.Builder()
+                        .setTitle(R.string.error_save_failed)
+                        .setMessage(it.error.toErrorMessage(context))
+                        .setPositiveButton(android.R.string.ok)
+                        .createAndShow(childFragmentManager, "asdf")
                 }
                 is StatefulData.Loading -> binding.loadingView.showProgressBar()
                 is StatefulData.NotStarted -> {}
@@ -105,6 +128,24 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
                     Snackbar.make(binding.root, R.string.settings_saved, Snackbar.LENGTH_LONG)
                         .show()
+                }
+            }
+        }
+        viewModel.uploadImageStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.hideAll()
+                    AlertDialogFragment.Builder()
+                        .setTitle(R.string.upload_failed)
+                        .setMessage(it.error.toErrorMessage(context))
+                        .setPositiveButton(android.R.string.ok)
+                        .createAndShow(childFragmentManager, "asdf")
+                }
+                is StatefulData.Loading -> binding.loadingView.showProgressBar()
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+                    adapter?.updateSettingValue(it.data.first, it.data.second)
                 }
             }
         }
@@ -143,12 +184,28 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
     private fun loadWith(data: SettingsWebViewModel.AccountData) {
         val adapter = SettingItemsAdapter(
+            context = requireContext(),
             onSettingClick = {
                 when (it) {
                     else -> false
                 }
             },
             childFragmentManager,
+            onImagePickerClick = {
+                viewModel.imagePickerKey.value = it.id
+                ImagePicker.with(requireActivity())
+                    .apply {
+                        if (it.isSquare) {
+                            cropSquare()
+                        } else {
+                            crop()
+                            cropFreeStyle()
+                        }
+                    }
+                    .provider(ImageProvider.BOTH)
+                    .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
+                    .createIntentFromDialog { launcher.launch(it) }
+            }
         ).apply {
             this.defaultSettingValues = data.defaultValues
             this.data = data.settings

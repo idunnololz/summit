@@ -44,6 +44,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.reddit.CommentsSortOrder
@@ -346,6 +347,38 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 }
             }
             title = viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+
+            inflateMenu(R.menu.menu_fragment_post)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.share -> {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                LinkUtils.postIdToLink(viewModel.instance, args.id)
+                            )
+                            type = "text/plain"
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        startActivity(shareIntent)
+                        true
+                    }
+
+                    R.id.sort_comments_by -> {
+                        getMainActivity()?.showBottomMenu(getSortByMenu())
+                        true
+                    }
+
+                    R.id.refresh -> {
+                        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+                        true
+                    }
+
+                    else -> false
+                }
+            }
         }
 
         val swipeRefreshLayout = binding.swipeRefreshLayout
@@ -462,8 +495,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.addItemDecoration(
-            ThreadLinesDecoration(context, postAndCommentViewBuilder.hideCommentActions))
+        binding.recyclerView.setupForPostAndComments(preferences)
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         if (preferences.useGestureActions) {
@@ -527,43 +559,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         binding.root.doOnPreDraw {
             adapter.contentMaxWidth = binding.recyclerView.width
         }
-
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_fragment_post, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                when (menuItem.itemId) {
-                    R.id.share -> {
-                        val sendIntent: Intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(
-                                Intent.EXTRA_TEXT,
-                                LinkUtils.postIdToLink(viewModel.instance, args.id)
-                            )
-                            type = "text/plain"
-                        }
-
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-                        startActivity(shareIntent)
-                        true
-                    }
-
-                    R.id.sort_comments_by -> {
-                        getMainActivity()?.showBottomMenu(getSortByMenu())
-                        true
-                    }
-
-                    R.id.refresh -> {
-                        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
-                        true
-                    }
-
-                    else -> false
-                }
-
-        })
     }
 
     override fun onResume() {

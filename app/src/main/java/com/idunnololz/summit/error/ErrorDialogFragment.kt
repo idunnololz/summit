@@ -28,7 +28,7 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
                 .apply {
                     arguments = ErrorDialogFragmentArgs(
                         message = message,
-                        errorMessage = stackTrace,
+                        errorMessage = error.message ?: stackTrace,
                         errorType = error::class.simpleName ?: "UNKNOWN"
                     ).toBundle()
                 }
@@ -68,8 +68,11 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         with(binding) {
-            message.text = args.message
+            title.text = args.message
+            message.text = args.errorMessage
 
+            // Show the details card if we want to show even more info in the future
+            detailsCard.visibility = View.GONE
             detailsCard.setOnClickListener {
                 viewModel.isExpanded = !viewModel.isExpanded
 

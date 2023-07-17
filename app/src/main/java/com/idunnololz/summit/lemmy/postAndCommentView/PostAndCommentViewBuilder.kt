@@ -19,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -46,7 +47,8 @@ import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
-import com.idunnololz.summit.lemmy.post.ThreadLinesDecoration
+import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
+import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
@@ -116,6 +118,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
     private val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
+    private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -414,10 +417,19 @@ class PostAndCommentViewBuilder @Inject constructor(
               if (isCompactView) {
                   if (it > 0) {
                       upvoteCount.setTextColor(upvoteColor)
+                      TextViewCompat.setCompoundDrawableTintList(
+                          upvoteCount,
+                          ColorStateList.valueOf(upvoteColor))
                   } else if (it == 0) {
-                      upvoteCount.setTextColor(normalTextColor)
+                      upvoteCount.setTextColor(unimportantTextColor)
+                      TextViewCompat.setCompoundDrawableTintList(
+                          upvoteCount,
+                          ColorStateList.valueOf(unimportantTextColor))
                   } else {
                       upvoteCount.setTextColor(downvoteColor)
+                      TextViewCompat.setCompoundDrawableTintList(
+                          upvoteCount,
+                          ColorStateList.valueOf(downvoteColor))
                   }
               }
             },
@@ -439,7 +451,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             progressBar.visibility = View.GONE
         }
 
-        root.tag = ThreadLinesDecoration.ThreadLinesData(
+        root.tag = ThreadLinesData(
             depth, baseDepth
         )
     }
@@ -497,7 +509,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             progressBar.visibility = View.GONE
         }
 
-        root.tag = ThreadLinesDecoration.ThreadLinesData(
+        root.tag = ThreadLinesData(
             depth, baseDepth
         )
     }
@@ -595,7 +607,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         highlightComment(highlight, highlightForever, highlightBg)
 
-        root.tag = ThreadLinesDecoration.ThreadLinesData(
+        root.tag = ThreadLinesData(
             depth, baseDepth
         )
     }
@@ -630,7 +642,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         highlightComment(highlight, highlightForever, highlightBg)
 
-        root.tag = ThreadLinesDecoration.ThreadLinesData(
+        root.tag = ThreadLinesData(
             depth, baseDepth
         )
     }

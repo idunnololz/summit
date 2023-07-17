@@ -19,7 +19,6 @@ import io.reactivex.Single
 import kotlinx.coroutines.runInterruptible
 import okhttp3.Request
 import okio.*
-import org.apache.commons.io.FilenameUtils
 import java.io.File
 import java.io.OutputStream
 import java.nio.ByteBuffer

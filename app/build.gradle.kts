@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 39
-        versionName = "0.1.39"
+        versionCode = 40
+        versionName = "0.1.40"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -135,11 +135,7 @@ dependencies {
 
     implementation("com.github.Commit451.coil-transformations:transformations:2.0.2")
     implementation("com.otaliastudios:zoomlayout:1.9.0")
-
-    // TODO: Remove the following deps
-    implementation("org.apmem.tools:layouts:1.10@aar")
-    implementation("commons-io:commons-io:2.6")
-    implementation("org.apache.commons:commons-lang3:3.11")
+    implementation("com.github.Drjacky:ImagePicker:2.3.22")
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

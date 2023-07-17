@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
@@ -28,8 +27,6 @@ import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.ViewAllCommentsBinding
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.flatten
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.CommentItem
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.FooterItem
@@ -429,7 +426,7 @@ class PostsAdapter(
                     }
                 }
 
-                b.root.tag = ThreadLinesDecoration.ThreadLinesData(
+                b.root.tag = ThreadLinesData(
                     depth = item.depth,
                     baseDepth = item.baseDepth
                 )

@@ -96,6 +96,12 @@ class AdapterHelper<T : Any>(
         itemInfoByViewType[itemInfo.viewType] = itemInfo
     }
 
+    fun resetItemTypes() {
+        itemInfos.clear()
+        itemInfoByItemType.clear()
+        itemInfoByViewType.clear()
+    }
+
     inline fun <reified R : T, reified VB : ViewBinding> addItemType(
         clazz: KClass<R>,
         noinline inflateFn: (LayoutInflater, ViewGroup, Boolean) -> VB,

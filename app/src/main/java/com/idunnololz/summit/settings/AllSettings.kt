@@ -2,9 +2,8 @@ package com.idunnololz.summit.settings
 
 import android.content.Context
 import com.idunnololz.summit.R
+import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.PostGestureAction
-import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +18,7 @@ class MainSettings @Inject constructor(
         context.getString(R.string.theme_settings_desc)
     )
     val settingViewType = BasicSettingItem(
-        R.drawable.baseline_view_agenda_black_24,
+        R.drawable.baseline_view_agenda_24,
         context.getString(R.string.view_type),
         context.getString(R.string.view_type_settings_desc)
     )
@@ -74,6 +73,34 @@ class LemmyWebSettings @Inject constructor(
     val displayNameSetting = TextValueSettingItem(
         title = context.getString(R.string.display_name),
         supportsRichText = false
+    )
+
+    val bioSetting = TextValueSettingItem(
+        title = context.getString(R.string.biography),
+        supportsRichText = true
+    )
+
+    val emailSetting = TextValueSettingItem(
+        title = context.getString(R.string.email),
+        supportsRichText = false
+    )
+
+    val matrixSetting = TextValueSettingItem(
+        title = context.getString(R.string.matrix_user),
+        supportsRichText = false,
+        hint = "@user:example.com"
+    )
+
+    val avatarSetting = ImageValueSettingItem(
+        title = context.getString(R.string.profile_image),
+        description = null,
+        isSquare = true,
+    )
+
+    val bannerSetting = ImageValueSettingItem(
+        title = context.getString(R.string.banner_image),
+        description = null,
+        isSquare = false,
     )
 
     val defaultSortType = RadioGroupSettingItem(
@@ -278,5 +305,36 @@ class GestureSettings @Inject constructor(
         context.getString(R.string.gesture_action_3),
         null,
         postGestureActionOptions,
+    )
+}
+
+@Singleton
+class PostAndCommentsSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
+
+    val showCommentActions = OnOffSettingItem(
+        context.getString(R.string.show_comment_actions),
+        null,
+    )
+
+    val commentsThreadStyle = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.comments_thread_style),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentsThreadStyle.Modern,
+                context.getString(R.string.modern),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentsThreadStyle.Legacy,
+                context.getString(R.string.classic),
+                null,
+                null,
+            ),
+        ),
     )
 }

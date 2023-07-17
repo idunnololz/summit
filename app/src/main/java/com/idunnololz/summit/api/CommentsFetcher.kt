@@ -12,8 +12,7 @@ import com.idunnololz.summit.util.retry
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class CommentsFetcher @Inject constructor(
+class CommentsFetcher(
     private val apiClient: AccountAwareLemmyClient,
     private val accountActionsManager: AccountActionsManager,
 ) {

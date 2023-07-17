@@ -73,6 +73,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = SettingItemsAdapter(
+                context = context,
                 onSettingClick = {
                     when (it) {
                         mainSettings.settingViewType.id -> {

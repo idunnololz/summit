@@ -19,13 +19,15 @@ class TextValueDialogFragment : BaseDialogFragment<DialogFragmentTextValueBindin
     companion object {
         private const val ARG_TITLE = "ARG_TITLE"
         private const val ARG_KEY_ID = "ARG_KEY_ID"
+        private const val ARG_HINT = "ARG_HINT"
         private const val ARG_CURRENT_VALUE = "ARG_CURRENT_VALUE"
 
-        fun newInstance(title: String, key: Int, currentValue: String?) =
+        fun newInstance(title: String, key: Int, hint: String?, currentValue: String?) =
             TextValueDialogFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_TITLE, title)
                     putInt(ARG_KEY_ID, key)
+                    putString(ARG_HINT, hint)
                     putString(ARG_CURRENT_VALUE, currentValue)
                 }
             }
@@ -39,7 +41,8 @@ class TextValueDialogFragment : BaseDialogFragment<DialogFragmentTextValueBindin
 
         builder.setView(b.root)
 
-        b.inputText.hint = requireArguments().getString(ARG_TITLE)
+        b.inputText.hint = requireArguments().getString(ARG_HINT)
+            ?: requireArguments().getString(ARG_TITLE)
         b.inputText.editText?.setText(requireArguments().getString(ARG_CURRENT_VALUE))
 
         builder
