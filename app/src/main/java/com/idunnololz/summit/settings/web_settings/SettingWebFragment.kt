@@ -24,6 +24,7 @@ import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -183,28 +184,63 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
     }
 
     private fun loadWith(data: SettingsWebViewModel.AccountData) {
+        val context = requireContext()
         val adapter = SettingItemsAdapter(
-            context = requireContext(),
+            context = context,
             onSettingClick = {
                 when (it) {
                     else -> false
                 }
             },
             childFragmentManager,
-            onImagePickerClick = {
-                viewModel.imagePickerKey.value = it.id
-                ImagePicker.with(requireActivity())
-                    .apply {
-                        if (it.isSquare) {
-                            cropSquare()
-                        } else {
-                            crop()
-                            cropFreeStyle()
+            onImagePickerClick = { settingItem ->
+                viewModel.imagePickerKey.value = settingItem.id
+
+                val bottomMenu = BottomMenu(context).apply {
+                    setTitle(settingItem.title)
+                    addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
+                    addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
+                    addItemWithIcon(R.id.clear, R.string.clear_image, R.drawable.baseline_clear_24)
+
+                    setOnMenuItemClickListener {
+                        when (it.id) {
+                            R.id.from_camera -> {
+                                ImagePicker.with(requireActivity())
+                                    .apply {
+                                        if (settingItem.isSquare) {
+                                            cropSquare()
+                                        } else {
+                                            crop()
+                                            cropFreeStyle()
+                                        }
+                                    }
+                                    .provider(ImageProvider.CAMERA)
+                                    .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
+                                    .createIntentFromDialog { launcher.launch(it) }
+                            }
+                            R.id.from_gallery -> {
+                                ImagePicker.with(requireActivity())
+                                    .apply {
+                                        if (settingItem.isSquare) {
+                                            cropSquare()
+                                        } else {
+                                            crop()
+                                            cropFreeStyle()
+                                        }
+                                    }
+                                    .provider(ImageProvider.GALLERY)
+                                    .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
+                                    .createIntentFromDialog { launcher.launch(it) }
+                            }
+                            R.id.clear -> {
+                                adapter?.updateSettingValue(settingItem.id, "")
+                            }
                         }
                     }
-                    .provider(ImageProvider.BOTH)
-                    .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
-                    .createIntentFromDialog { launcher.launch(it) }
+                }
+
+                getMainActivity()?.showBottomMenu(bottomMenu)
+
             }
         ).apply {
             this.defaultSettingValues = data.defaultValues

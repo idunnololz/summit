@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 40
-        versionName = "0.1.40"
+        versionCode = 41
+        versionName = "0.1.41"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -134,7 +134,6 @@ dependencies {
     ksp("dev.zacsweers.moshix:moshi-sealed-codegen:0.22.1")
 
     implementation("com.github.Commit451.coil-transformations:transformations:2.0.2")
-    implementation("com.otaliastudios:zoomlayout:1.9.0")
     implementation("com.github.Drjacky:ImagePicker:2.3.22")
 
     implementation(libs.hilt.android)

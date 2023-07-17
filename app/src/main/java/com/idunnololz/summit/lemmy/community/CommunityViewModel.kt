@@ -232,11 +232,11 @@ class CommunityViewModel @Inject constructor(
         fetchPageInternal(pageIndex + 1, force)
     }
 
-    fun fetchPage(pageIndex: Int) {
+    fun fetchPage(pageIndex: Int, force: Boolean = false) {
         if (!postListEngine.infinity) {
             currentPageIndex.value = pageIndex
         }
-        fetchPageInternal(pageIndex, force = false)
+        fetchPageInternal(pageIndex, force = force)
     }
 
     fun fetchInitialPage() {
@@ -257,6 +257,14 @@ class CommunityViewModel @Inject constructor(
             postListEngine.getCurrentPages()
         } else {
             listOf(requireNotNull(currentPageIndex.value))
+        }
+        if (pages.isEmpty()) {
+            if (postListEngine.infinity) {
+                fetchPage(0, force = true)
+            } else {
+                fetchCurrentPage()
+            }
+            return
         }
         pages.forEach {
             fetchPageInternal(it, force)
@@ -325,7 +333,11 @@ class CommunityViewModel @Inject constructor(
 
         val communityRefSafe: CommunityRef = communityRef
 
-        FirebaseCrashlytics.getInstance().setCustomKey("community", communityRef.toString())
+        FirebaseCrashlytics.getInstance().apply {
+            setCustomKey("community", communityRef.toString())
+            setCustomKey("view_type", preferences.getPostsLayout().name)
+            setCustomKey("prefer_full_size_images", preferences.getPostInListUiConfig().preferFullSizeImages)
+        }
 
         currentCommunityRef.value = communityRefSafe
         postsRepository.setCommunity(communityRef)

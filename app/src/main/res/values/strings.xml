@@ -332,6 +332,9 @@
     <string name="profile_image">Profile image</string>
     <string name="upload_failed">Upload failed</string>
     <string name="banner_image">Banner image</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
+    <string name="clear_image">Clear image</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

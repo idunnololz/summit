@@ -186,9 +186,9 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                     clickableSpanWithText.text,
                     bounds
                 ) ?: false
+
                 if (!handled) {
-                    // Let Android handle this click.
-                    clickableSpanWithText.span.onClick(textView)
+                    Utils.openExternalLink(textView.context, clickableSpanWithText.url)
                 }
             } else {
                 clickableSpan.onClick(textView)
