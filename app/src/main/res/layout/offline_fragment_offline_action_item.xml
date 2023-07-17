@@ -18,7 +18,7 @@
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/baseline_save_alt_black_24"
+        android:src="@drawable/baseline_download_24"
         android:padding="@dimen/padding"
         app:tint="?colorControlNormal"
         app:layout_constraintTop_toTopOf="parent"

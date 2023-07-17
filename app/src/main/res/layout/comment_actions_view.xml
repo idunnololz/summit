@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/baseline_more_horiz_black_18"/>
+        android:src="@drawable/baseline_more_horiz_24"/>
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/controlsDivider2"

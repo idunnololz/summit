@@ -11,6 +11,7 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
@@ -173,6 +174,16 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit().putInt(KEY_POST_GESTURE_ACTION_3, value).apply()
         }
+
+    var commentThreadStyle: CommentThreadStyleId
+        get() = prefs.getInt(KEY_COMMENT_THREAD_STYLE, CommentsThreadStyle.Modern)
+        set(value) {
+            prefs.edit().putInt(KEY_COMMENT_THREAD_STYLE, value).apply()
+        }
+
+    fun reset(key: String) {
+        prefs.edit().remove(key).apply()
+    }
 
     private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
         return try {

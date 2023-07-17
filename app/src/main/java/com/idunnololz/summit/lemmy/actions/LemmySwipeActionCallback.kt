@@ -35,7 +35,9 @@ class LemmySwipeActionCallback(
     )
 
     private val noActionColor = context.getColorCompat(R.color.gray)
-    private val clearPaint: Paint = Paint()
+    private val clearPaint: Paint = Paint().apply {
+        xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+    }
     private val background: ColorDrawable = ColorDrawable()
     private val marginEnd = context.getDimen(R.dimen.padding)
     private val disabledBackground: ColorDrawable = ColorDrawable().apply {
@@ -46,10 +48,6 @@ class LemmySwipeActionCallback(
     private var currentSwipeAction: SwipeAction? = null
 
     var actions: List<SwipeAction> = listOf()
-
-    init {
-        clearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-    }
 
     private fun ViewHolder.isSwipeEnabled() =
         this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false

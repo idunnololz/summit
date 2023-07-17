@@ -47,6 +47,14 @@ class AccountAwareLemmyClient @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
+    class Factory @Inject constructor(
+        val apiClient: LemmyApiClient,
+        private val accountManager: AccountManager,
+        private val coroutineScopeFactory: CoroutineScopeFactory,
+    ) {
+        fun create() = AccountAwareLemmyClient(apiClient, accountManager, coroutineScopeFactory)
+    }
+
     companion object {
         private const val TAG = "AccountAwareLemmyClient"
     }
@@ -65,6 +73,36 @@ class AccountAwareLemmyClient @Inject constructor(
                 setAccount(it, accountChanged = false)
             }
         }
+    }
+
+    suspend fun fetchSavedPosts(
+        sortType: SortType? = null,
+        listingType: ListingType? = null,
+        page: Int,
+        limit: Int? = null,
+        force: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<List<PostView>> {
+        return apiClient.fetchPosts(
+            account = account,
+            communityIdOrName = null,
+            sortType = sortType
+                ?: if (account == null) {
+                    SortType.Active
+                } else {
+                    SortType.values()[account.defaultSortType]
+                },
+            listingType = listingType
+                ?: if (account == null) {
+                    ListingType.All
+                } else {
+                    ListingType.values()[account.defaultListingType]
+                },
+            limit = limit,
+            savedOnly = true,
+            page = page,
+            force = force,
+        ).autoSignOut(account)
     }
 
     suspend fun fetchPosts(

@@ -115,7 +115,7 @@
         android:id="@+id/more_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/baseline_more_horiz_black_24"
+        android:src="@drawable/baseline_more_horiz_24"
         android:padding="@dimen/padding_half"
         android:layout_marginEnd="@dimen/padding_half"
         android:background="?selectableItemBackgroundBorderless"

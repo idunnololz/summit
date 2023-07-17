@@ -43,7 +43,6 @@ import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.ext.showAboveCutout
 import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
-import org.apache.commons.io.FilenameUtils
 import java.io.IOException
 import javax.inject.Inject
 
@@ -349,12 +348,24 @@ class ImageViewerActivity : BaseActivity() {
         val imageName = args.title
         mimeType = args.mimeType
 
-        val title =
-            with(imageName ?: FilenameUtils.getName(url) ?: getString(R.string.image_viewer)) {
-                substring(lastIndexOf('/') + 1)
+        fileName = with(imageName ?: url ?: "unknown") {
+            val s = substring(lastIndexOf('/') + 1)
+            val indexOfDot = s.lastIndexOf('.')
+            if (indexOfDot != -1) {
+                s
+            } else {
+                if (url != null) {
+                    val urlHasExtension = url.lastIndexOf(".") != -1
+                    if (urlHasExtension) {
+                        s + url.substring(url.lastIndexOf("."))
+                    } else {
+                        s
+                    }
+                } else {
+                    s
+                }
             }
-
-        fileName = FilenameUtils.getName(url) ?: "unknown"
+        }
 
         setupActionBar(title, true)
 

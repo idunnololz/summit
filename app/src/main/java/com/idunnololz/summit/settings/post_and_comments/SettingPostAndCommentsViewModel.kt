@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingPostAndCommentsViewModel @Inject constructor(
-    private val preferences: Preferences
+    val preferences: Preferences
 ) : ViewModel() {
 
     var currentPostAndCommentUiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()

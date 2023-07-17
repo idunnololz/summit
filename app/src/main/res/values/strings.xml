@@ -234,7 +234,7 @@
     <string name="mark_as_unread">Mark as unread</string>
     <string name="reply">Reply</string>
     <string name="context">Context</string>
-    <string name="error_unable_to_send_message">Unable to send message. Got error %1$s. Details: %2$s.</string>
+    <string name="error_unable_to_send_message">Unable to send message.</string>
     <string name="error_details">Error details</string>
     <string name="caused_by_format">Caused by %1$s</string>
     <string name="error_unable_to_mark_message_as_read">Unable to mark message as read.</string>
@@ -321,6 +321,17 @@
     <string name="gesture_action_2">Geature action 2</string>
     <string name="gesture_action_3">Gesture action 3</string>
     <string name="downvote">Downvote</string>
+    <string name="comments_thread_style">Comments thread style</string>
+    <string name="modern">Modern</string>
+    <string name="classic">Classic</string>
+    <string name="show_comment_actions">Always show comment actions</string>
+    <string name="email">Email</string>
+    <string name="error_save_failed">Saved failed</string>
+    <string name="matrix_user">Matrix user</string>
+    <string name="empty">Empty</string>
+    <string name="profile_image">Profile image</string>
+    <string name="upload_failed">Upload failed</string>
+    <string name="banner_image">Banner image</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

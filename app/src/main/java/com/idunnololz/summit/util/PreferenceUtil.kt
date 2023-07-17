@@ -99,6 +99,8 @@ object PreferenceUtil {
     private const val KEY_OFFLINE_STORAGE_CAP_BYTES = "KEY_OFFLINE_STORAGE_CAP_BYTES"
     private const val KEY_VIDEO_PLAYER_ROTATION_LOCKED = "KEY_VIDEO_PLAYER_ROTATION_LOCKED"
 
+    const val KEY_COMMENT_THREAD_STYLE = "KEY_COMMENT_THREAD_STYLE"
+
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {
             preferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE)

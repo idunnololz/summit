@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,29 +23,42 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentSettingPostAndCommentsBinding
+import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
-import com.idunnololz.summit.lemmy.post.ThreadLinesDecoration
+import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
+import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
+import com.idunnololz.summit.settings.PostAndCommentsSettings
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.SliderSettingItem
+import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
+import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommentsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    AlertDialogFragment.AlertDialogFragmentListener,
+    SettingValueUpdateCallback {
 
     private val viewModel: SettingPostAndCommentsViewModel by viewModels()
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
+    @Inject
+    lateinit var settings: PostAndCommentsSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,6 +108,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
             postAndCommentViewBuilder,
             binding.demoViewContainer.width,
             viewLifecycleOwner,
+            viewModel.preferences,
         )
 
         val context = requireContext()
@@ -117,18 +132,16 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
         binding.demoViewContainer.adapter = adapter
         binding.demoViewContainer.setHasFixedSize(true)
         binding.demoViewContainer.layoutManager = LinearLayoutManager(context)
-        binding.demoViewContainer.addItemDecoration(ThreadLinesDecoration(
-            context, postAndCommentViewBuilder.hideCommentActions))
 
         viewModel.onPostUiChanged.observe(viewLifecycleOwner) {
-            updateRendering(adapter)
-            bindPostUiSettings(adapter)
+            updateRendering()
+            bindPostUiSettings()
         }
-        bindPostUiSettings(adapter)
-        updateRendering(adapter)
+        bindPostUiSettings()
+        updateRendering()
     }
 
-    private fun bindPostUiSettings(adapter: FakePostAndCommentsAdapter) {
+    private fun bindPostUiSettings() {
         SliderSettingItem(
             getString(R.string.font_size),
             0.2f,
@@ -144,7 +157,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                             .updateTextSizeMultiplier(it)
                     )
 
-                updateRendering(adapter)
+                updateRendering()
             }
         )
         SliderSettingItem(
@@ -162,12 +175,31 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                             .updateTextSizeMultiplier(it)
                     )
 
-                updateRendering(adapter)
+                updateRendering()
+            }
+        )
+
+        settings.showCommentActions.bindTo(
+            binding.showCommentActions,
+            { !viewModel.preferences.hideCommentActions },
+            {
+                viewModel.preferences.hideCommentActions = !it
+
+                updateRendering()
+            }
+        )
+
+        settings.commentsThreadStyle.bindTo(
+            binding.commentThreadStyle,
+            { viewModel.preferences.commentThreadStyle },
+            {
+                MultipleChoiceDialogFragment.newInstance(it)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             }
         )
     }
 
-    private fun updateRendering(adapter: FakePostAndCommentsAdapter) {
+    private fun updateRendering() {
         if (!isBindingAvailable()) return
 
         val set: Transition = TransitionSet()
@@ -180,8 +212,22 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
         TransitionManager.beginDelayedTransition(binding.demoViewContainer, set)
 
         binding.demoViewContainer.itemAnimator = null
+        postAndCommentViewBuilder.onPreferencesChanged()
         postAndCommentViewBuilder.uiConfig = viewModel.currentPostAndCommentUiConfig
-        adapter.notifyDataSetChanged()
+        (binding.demoViewContainer.adapter as? FakePostAndCommentsAdapter)?.refresh()
+        binding.demoViewContainer.adapter?.notifyDataSetChanged()
+        binding.demoViewContainer.setupForPostAndComments(viewModel.preferences)
+    }
+
+    override fun updateValue(key: Int, value: Any?) {
+        when (key) {
+            settings.commentsThreadStyle.id -> {
+                viewModel.preferences.commentThreadStyle = value as Int
+            }
+        }
+
+        bindPostUiSettings()
+        updateRendering()
     }
 
     private class FakePostAndCommentsAdapter(
@@ -189,6 +235,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
         private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
         private val contentMaxWidth: Int,
         private val viewLifecycleOwner: LifecycleOwner,
+        private val preferences: Preferences,
     ) : Adapter<ViewHolder>() {
 
         private val items = listOf(
@@ -207,8 +254,16 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         false
                 }
             }
-        ).apply {
-            addItemType(PostView::class, PostHeaderItemBinding::inflate) { item, b, h ->
+        )
+
+        init {
+            refresh()
+            adapterHelper.setItems(items, this)
+        }
+
+        fun refresh() {
+            adapterHelper.resetItemTypes()
+            adapterHelper.addItemType(PostView::class, PostHeaderItemBinding::inflate) { item, b, h ->
                 postAndCommentViewBuilder.bindPostView(
                     b,
                     container = container,
@@ -229,42 +284,81 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     onPostMoreClick = {},
                 )
             }
-            addItemType(CommentView::class, PostCommentExpandedItemBinding::inflate) { item, b, h ->
-                postAndCommentViewBuilder.bindCommentViewExpanded(
-                    h,
-                    CommentExpandedViewHolder.fromBinding(b),
-                    0,
-                    if (item.comment.id == LemmyFakeModels.fakeCommentView1.comment.id) {
-                        0
-                    } else {
-                        1
-                    },
-                    item,
-                    false,
-                    item.comment.content,
-                    instance = "https://fake.instance",
-                    false,
-                    false,
-                    false,
-                    false,
-                    viewLifecycleOwner,
-                    item.creator.id,
-                    false,
-                    onImageClick = { _, _, _ -> },
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    {},
-                    { _, _ -> }
-                )
-            }
-        }
+            if (preferences.hideCommentActions) {
+                adapterHelper.addItemType(CommentView::class, PostCommentExpandedCompactItemBinding::inflate) { item, b, h ->
 
-        init {
-            adapterHelper.setItems(items, this)
+                    b.headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        R.drawable.baseline_arrow_upward_16, 0, 0, 0)
+                    b.headerView.textView2.compoundDrawablePadding =
+                        Utils.convertDpToPixel(4f).toInt()
+                    b.headerView.textView2.updatePaddingRelative(
+                        start = Utils.convertDpToPixel(8f).toInt())
+
+                    postAndCommentViewBuilder.bindCommentViewExpanded(
+                        h = h,
+                        binding = CommentExpandedViewHolder.fromBinding(b),
+                        baseDepth = 0,
+                        depth = if (item.comment.id == LemmyFakeModels.fakeCommentView1.comment.id) {
+                            0
+                        } else {
+                            1
+                        },
+                        commentView = item,
+                        isDeleting = false,
+                        content = item.comment.content,
+                        instance = "https://fake.instance",
+                        isPostLocked = false,
+                        isUpdating = false,
+                        highlight = false,
+                        highlightForever = false,
+                        viewLifecycleOwner = viewLifecycleOwner,
+                        currentAccountId = item.creator.id,
+                        isActionsExpanded = false,
+                        onImageClick = { _, _, _ -> },
+                        onPageClick = {},
+                        collapseSection = {},
+                        toggleActionsExpanded = {},
+                        onAddCommentClick = {},
+                        onEditCommentClick = {},
+                        onDeleteCommentClick = {},
+                        onSignInRequired = {},
+                        onInstanceMismatch = { _, _ -> }
+                    )
+                }
+            } else {
+                adapterHelper.addItemType(CommentView::class, PostCommentExpandedItemBinding::inflate) { item, b, h ->
+                    postAndCommentViewBuilder.bindCommentViewExpanded(
+                        h = h,
+                        binding = CommentExpandedViewHolder.fromBinding(b),
+                        baseDepth = 0,
+                        depth = if (item.comment.id == LemmyFakeModels.fakeCommentView1.comment.id) {
+                            0
+                        } else {
+                            1
+                        },
+                        commentView = item,
+                        isDeleting = false,
+                        content = item.comment.content,
+                        instance = "https://fake.instance",
+                        isPostLocked = false,
+                        isUpdating = false,
+                        highlight = false,
+                        highlightForever = false,
+                        viewLifecycleOwner = viewLifecycleOwner,
+                        currentAccountId = item.creator.id,
+                        isActionsExpanded = false,
+                        onImageClick = { _, _, _ -> },
+                        onPageClick = {},
+                        collapseSection = {},
+                        toggleActionsExpanded = {},
+                        onAddCommentClick = {},
+                        onEditCommentClick = {},
+                        onDeleteCommentClick = {},
+                        onSignInRequired = {},
+                        onInstanceMismatch = { _, _ -> }
+                    )
+                }
+            }
         }
 
         override fun getItemViewType(position: Int): Int =
@@ -283,6 +377,8 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
         if (tag == "reset_post_to_default_styles") {
             viewModel.resetPostUiConfig()
         } else if (tag == "reset_comment_to_default_styles") {
+            viewModel.preferences.reset(PreferenceUtil.KEY_COMMENT_THREAD_STYLE)
+            viewModel.preferences.reset(PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS)
             viewModel.resetCommentUiConfig()
         }
     }

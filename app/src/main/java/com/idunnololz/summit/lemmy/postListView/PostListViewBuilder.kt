@@ -193,22 +193,26 @@ class PostListViewBuilder @Inject constructor(
             holder.state.preferImagesAtEnd = postUiConfig.preferImagesAtEnd
         }
 
-        if (postUiConfig.preferFullSizeImages) {
-            when (val rb = rawBinding) {
-                is ListingItemCardBinding -> {
-                    rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        this.dimensionRatio = null
+        if (holder.state.preferFullSizeImages != postUiConfig.preferFullSizeImages) {
+            if (postUiConfig.preferFullSizeImages) {
+                when (val rb = rawBinding) {
+                    is ListingItemCardBinding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = null
+                        }
+                    }
+                }
+            } else {
+                when (val rb = rawBinding) {
+                    is ListingItemCardBinding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = "H,16:9"
+                        }
                     }
                 }
             }
-        } else {
-            when (val rb = rawBinding) {
-                is ListingItemCardBinding -> {
-                    rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        this.dimensionRatio = "H,16:9"
-                    }
-                }
-            }
+
+            holder.state.preferFullSizeImages = postUiConfig.preferFullSizeImages
         }
 
 
@@ -343,7 +347,7 @@ class PostListViewBuilder @Inject constructor(
                     loadAndShowImage()
 
                     iconImage?.visibility = View.VISIBLE
-                    iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_black_24)
+                    iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_24)
                     iconImage?.setOnClickListener {
                         if (fullContentContainerView != null) {
                             toggleItem(postView)
@@ -385,11 +389,11 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     linkTypeImage?.visibility = View.GONE
-                    linkTypeImage?.setImageResource(R.drawable.baseline_open_in_new_black_18)
+                    linkTypeImage?.setImageResource(R.drawable.baseline_open_in_new_24)
                 }
             }
 
-            image?.layoutParams = image?.layoutParams?.apply {
+            image?.updateLayoutParams {
                 width = postImageWidth
             }
             iconImage?.updateLayoutParams {

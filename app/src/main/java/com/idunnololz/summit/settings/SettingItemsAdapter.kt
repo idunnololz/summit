@@ -1,24 +1,35 @@
 package com.idunnololz.summit.settings
 
+import android.content.Context
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.core.text.buildSpannedString
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
+import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingOnOffBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
+import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
 import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
 class SettingItemsAdapter(
+    private val context: Context,
     private val onSettingClick: (Int) -> Boolean,
     private val fragmentManager: FragmentManager,
+    private val onImagePickerClick: ((ImageValueSettingItem) -> Unit)? = null,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed interface Item {
@@ -45,6 +56,11 @@ class SettingItemsAdapter(
         data class OnOffItem(
             override val settingItem: OnOffSettingItem,
             val value: Boolean?,
+        ): Item
+
+        data class ImageValueItem(
+            override val settingItem: ImageValueSettingItem,
+            val value: String?,
         ): Item
     }
 
@@ -86,11 +102,23 @@ class SettingItemsAdapter(
                 is SubgroupItem -> TODO()
                 is TextOnlySettingItem -> TODO()
                 is TextValueSettingItem -> {
-                    TextValueDialogFragment.newInstance(
-                        settingItem.title,
-                        settingItem.id,
-                        value as? String,
-                    ).showAllowingStateLoss(fragmentManager, "asdf")
+                    if (settingItem.supportsRichText) {
+                        RichTextValueDialogFragment.newInstance(
+                            settingItem.title,
+                            settingItem.id,
+                            value as? String,
+                        ).showAllowingStateLoss(fragmentManager, "asdf")
+                    } else {
+                        TextValueDialogFragment.newInstance(
+                            settingItem.title,
+                            settingItem.id,
+                            settingItem.hint,
+                            value as? String,
+                        ).showAllowingStateLoss(fragmentManager, "asdf")
+                    }
+                }
+                is ImageValueSettingItem -> {
+                    onImagePickerClick?.invoke(settingItem)
                 }
             }
         }
@@ -119,6 +147,16 @@ class SettingItemsAdapter(
 
             b.title.text = settingItem.title
             b.value.text = item.value
+                ?: buildSpannedString {
+                    append(context.getString(R.string.empty))
+
+                    setSpan(
+                        StyleSpan(Typeface.ITALIC),
+                        0,
+                        length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
 
             if (settingItem.isEnabled) {
                 b.title.alpha = 1f
@@ -155,6 +193,22 @@ class SettingItemsAdapter(
 
             b.switchView.tag = settingItem
             b.switchView.setOnClickListener(onSettingClickListener)
+        }
+        addItemType(Item.ImageValueItem::class, SettingImageValueBinding::inflate) { item, b, h ->
+            val settingItem = item.settingItem
+
+            b.title.text = settingItem.title
+            if (settingItem.description != null) {
+                b.desc.visibility = View.VISIBLE
+                b.desc.text = settingItem.description
+            } else {
+                b.desc.visibility = View.GONE
+            }
+
+            b.imageView.load(item.value)
+
+            b.root.tag = settingItem
+            b.root.setOnClickListener(onSettingClickListener)
         }
     }
 
@@ -218,6 +272,11 @@ class SettingItemsAdapter(
                 val value = getCurrentValue(settingItem.id)
 
                 out.add(Item.TextValueItem(settingItem, value as String?))
+            }
+            is ImageValueSettingItem -> {
+                val value = getCurrentValue(settingItem.id)
+
+                out.add(Item.ImageValueItem(settingItem, value as String?))
             }
         }
     }

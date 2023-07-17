@@ -6,9 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
@@ -41,11 +43,26 @@ class AddOrEditCommentViewModel @Inject constructor(
     }
 
     fun sendComment(
+        account: Account,
         postRef: PostRef,
         parentId: CommentId?,
         content: String,
     ) {
         viewModelScope.launch {
+            if (postRef.instance != account.instance) {
+                commentSentEvent.postValue(
+                    Event(
+                        Result.failure(
+                            AccountInstanceMismatchException(
+                                account.instance,
+                                postRef.instance,
+                            )
+                        )
+                    )
+                )
+                return@launch
+            }
+
             accountActionsManager.createComment(
                 postRef,
                 parentId,
@@ -57,12 +74,27 @@ class AddOrEditCommentViewModel @Inject constructor(
     }
 
     fun sendComment(
+        account: Account,
         instance: String,
         inboxItem: InboxItem,
         content: String,
     ) {
         viewModelScope.launch {
             if (inboxItem is CommentBackedItem) {
+                if (instance != account.instance) {
+                    commentSentEvent.postValue(
+                        Event(
+                            Result.failure(
+                                AccountInstanceMismatchException(
+                                    account.instance,
+                                    instance,
+                                )
+                            )
+                        )
+                    )
+                    return@launch
+                }
+
                 accountActionsManager.createComment(
                     PostRef(instance, inboxItem.postId),
                     inboxItem.commentId,

@@ -123,6 +123,7 @@ class LemmyApiClient @Inject constructor(
         listingType: ListingType,
         page: Int,
         limit: Int? = null,
+        savedOnly: Boolean = false,
         force: Boolean,
     ): Result<List<PostView>> {
         val communityId = communityIdOrName?.fold({ it }, { null })
@@ -137,6 +138,7 @@ class LemmyApiClient @Inject constructor(
                 page = page,
                 limit = limit,
                 auth = account?.jwt,
+                saved_only = savedOnly,
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching posts", e)

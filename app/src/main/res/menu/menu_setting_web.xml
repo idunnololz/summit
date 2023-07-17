@@ -6,7 +6,7 @@
         android:id="@+id/save"
         android:title="@string/save"
         android:orderInCategory="100"
-        android:icon="@drawable/baseline_save_black_24"
+        android:icon="@drawable/baseline_save_24"
         app:showAsAction="always"
         app:iconTint="?attr/colorControlNormal"/>
 </menu>

@@ -1,5 +1,9 @@
 package com.idunnololz.summit.settings.web_settings
 
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
@@ -20,15 +24,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsWebViewModel @Inject constructor(
+    private val context: Application,
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
     private val lemmyApiClient: LemmyApiClient,
-    private val lemmyWebSettings: LemmyWebSettings
+    private val lemmyWebSettings: LemmyWebSettings,
+    private val state: SavedStateHandle,
 ) : ViewModel() {
 
+    var imagePickerKey: MutableLiveData<Int?> = state.getLiveData("imagePickerKey", null)
     val accountData = StatefulLiveData<AccountData>()
 
     val saveUserSettings = StatefulLiveData<Unit>()
+    val uploadImageStatus = StatefulLiveData<Pair<Int, String>>()
 
     fun fetchAccountInfo() {
         accountData.setIsLoading()
@@ -93,6 +101,21 @@ class SettingsWebViewModel @Inject constructor(
                 lemmyWebSettings.displayNameSetting.id -> {
                     settings = settings.copy(display_name = value as String?)
                 }
+                lemmyWebSettings.bioSetting.id -> {
+                    settings = settings.copy(bio = value as String?)
+                }
+                lemmyWebSettings.emailSetting.id -> {
+                    settings = settings.copy(email = value as String?)
+                }
+                lemmyWebSettings.matrixSetting.id -> {
+                    settings = settings.copy(matrix_user_id = value as String?)
+                }
+                lemmyWebSettings.avatarSetting.id -> {
+                    settings = settings.copy(avatar = value as String?)
+                }
+                lemmyWebSettings.bannerSetting.id -> {
+                    settings = settings.copy(banner = value as String?)
+                }
                 lemmyWebSettings.defaultSortType.id -> {
                     val order = value as Int? ?: continue
                     settings = settings.copy(
@@ -155,6 +178,11 @@ class SettingsWebViewModel @Inject constructor(
                 listOf(
                     lemmyWebSettings.instanceSetting,
                     lemmyWebSettings.displayNameSetting,
+                    lemmyWebSettings.bioSetting,
+                    lemmyWebSettings.emailSetting,
+                    lemmyWebSettings.matrixSetting,
+                    lemmyWebSettings.avatarSetting,
+                    lemmyWebSettings.bannerSetting,
                     lemmyWebSettings.defaultSortType,
                     lemmyWebSettings.showNsfwSetting,
                     lemmyWebSettings.showReadPostsSetting,
@@ -165,6 +193,11 @@ class SettingsWebViewModel @Inject constructor(
                 mapOf(
                     lemmyWebSettings.instanceSetting.id to account.instance,
                     lemmyWebSettings.displayNameSetting.id to person.name,
+                    lemmyWebSettings.bioSetting.id to person.bio,
+                    lemmyWebSettings.emailSetting.id to localUser.email,
+                    lemmyWebSettings.matrixSetting.id to person.matrix_user_id,
+                    lemmyWebSettings.avatarSetting.id to person.avatar,
+                    lemmyWebSettings.bannerSetting.id to person.banner,
                     lemmyWebSettings.defaultSortType.id to localUser.default_sort_type?.toId(),
                     lemmyWebSettings.showNsfwSetting.id to localUser.show_nsfw,
                     lemmyWebSettings.showReadPostsSetting.id to localUser.show_read_posts,
@@ -174,6 +207,31 @@ class SettingsWebViewModel @Inject constructor(
                 )
             )
         )
+    }
+
+    fun uploadImage(uri: Uri) {
+        val imagePickerKey = imagePickerKey.value ?: return
+        val fullAccount = accountInfoManager.currentFullAccount.value ?: return
+
+        uploadImageStatus.setIsLoading()
+        viewModelScope.launch {
+            lemmyApiClient.changeInstance(fullAccount.account.instance)
+
+            context.contentResolver
+                .openInputStream(uri)
+                .use {
+                    if (it == null) {
+                        return@use Result.failure(RuntimeException("file_not_found"))
+                    }
+                    lemmyApiClient.uploadImage(fullAccount.account, "asdf", it)
+                }
+                .onSuccess {
+                    uploadImageStatus.postValue(imagePickerKey to it.url)
+                }
+                .onFailure {
+                    uploadImageStatus.postError(it)
+                }
+        }
     }
 
     class AccountData(

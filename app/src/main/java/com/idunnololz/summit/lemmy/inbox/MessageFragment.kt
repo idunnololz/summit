@@ -30,7 +30,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.post.PostsAdapter
-import com.idunnololz.summit.lemmy.post.ThreadLinesDecoration
+import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
@@ -460,7 +460,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
-            recyclerView.addItemDecoration(ThreadLinesDecoration(
+            recyclerView.addItemDecoration(OldThreadLinesDecoration(
                 context, postAndCommentViewBuilder.hideCommentActions))
 
             adapter.setData(PostViewModel.PostData(

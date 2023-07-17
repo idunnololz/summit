@@ -24,6 +24,7 @@ import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -125,12 +126,11 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     dismiss()
                 }
                 .onFailure {
-                    AlertDialogFragment.Builder()
-                        .setMessage(context.getString(
-                            R.string.error_unable_to_send_message,
-                            it::class.qualifiedName,
-                            it.message))
-                        .createAndShow(childFragmentManager, "errr")
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_send_message),
+                        it,
+                        childFragmentManager
+                    )
                 }
         }
 
@@ -148,7 +148,8 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.send_comment -> {
-                    if (viewModel.currentAccount.value == null) {
+                    val account = viewModel.currentAccount.value
+                    if (account == null) {
                         PreAuthDialogFragment()
                             .showAllowingStateLoss(childFragmentManager, "AS")
                         return@setOnMenuItemClickListener true
@@ -163,12 +164,14 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                         )
                     } else if (inboxItem != null) {
                         viewModel.sendComment(
+                            account,
                             args.instance,
                             inboxItem,
                             binding.commentEditor.text.toString()
                         )
                     } else {
                         viewModel.sendComment(
+                            account,
                             PostRef(args.instance,
                                 requireNotNull(
                                     args.postView?.post?.id ?: args.commentView?.post?.id

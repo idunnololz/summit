@@ -4,7 +4,6 @@ import android.util.Log
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.IDataCache
 import com.jakewharton.disklrucache.DiskLruCache
-import org.apache.commons.io.FileUtils
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -59,7 +58,7 @@ class SimpleDiskCache(
         val maxSize = cache.maxSize
         cache.flush()
         cache.close()
-        FileUtils.deleteDirectory(dir)
+        dir.deleteRecursively()
         dir.mkdir()
 
         cache = DiskLruCache.open(dir, appVersion, VALUE_COUNT, maxSize)

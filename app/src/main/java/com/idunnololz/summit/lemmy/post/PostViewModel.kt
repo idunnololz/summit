@@ -38,11 +38,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val lemmyApiClient: AccountAwareLemmyClient,
+    private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
     private val accountActionsManager: AccountActionsManager,
     private val accountManager: AccountManager,
     private val postReadManager: PostReadManager,
-    private val commentsFetcher: CommentsFetcher,
 ) : ViewModel() {
 
     companion object {
@@ -50,6 +49,11 @@ class PostViewModel @Inject constructor(
 
         const val HIGHLIGHT_COMMENT_MS = 3_500L
     }
+
+    /**
+     * Create a new instance so we can change the instance without screwing up app state
+     */
+    private val lemmyApiClient = lemmyApiClientFactory.create()
 
     private var postOrCommentRef: Either<PostRef, CommentRef>? = null
 
@@ -67,6 +71,8 @@ class PostViewModel @Inject constructor(
      * Comments that didn't load by default but were loaded by the user requesting additional comments
      */
     private var supplementaryComments = mutableMapOf<Int, CommentView>()
+
+    private val commentsFetcher = CommentsFetcher(lemmyApiClient, accountActionsManager)
 
     val commentsSortOrderLiveData = MutableLiveData(CommentsSortOrder.Top)
 
@@ -99,6 +105,17 @@ class PostViewModel @Inject constructor(
         fetchCommentData: Boolean = true,
         force: Boolean = false
     ) {
+        lemmyApiClient.changeInstance(
+            postOrCommentRef
+                .fold(
+                    {
+                        it.instance
+                    },
+                    {
+                        it.instance
+                    }
+                ))
+
         this.postOrCommentRef = postOrCommentRef
         postData.setIsLoading()
 

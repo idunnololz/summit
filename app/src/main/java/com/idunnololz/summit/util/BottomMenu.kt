@@ -38,7 +38,7 @@ class BottomMenu(private val context: Context) {
     private val menuItems = ArrayList<MenuItem>()
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var adapter: BottomMenuAdapter? = null
-    private var checked: Int = 0
+    private var checked: Int? = null
     private var onMenuItemClickListener: ((menuItem: MenuItem) -> Unit)? = null
     private var title: String? = null
 

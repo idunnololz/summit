@@ -11,4 +11,5 @@
     <declare-styleable name="PrefixedEditText">
         <attr name="prefix" format="string" />
     </declare-styleable>
+
 </resources>

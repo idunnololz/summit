@@ -27,6 +27,10 @@
     <color name="colorSurface">#202225</color>
     <color name="colorSurfaceDarker">#111213</color>
 
+    <color name="ucrop_color_toolbar">@color/colorBackground</color>
+    <color name="ucrop_color_statusbar">@color/colorBackground</color>
+    <color name="ucrop_color_widget_active">@color/md_theme_dark_primary</color>
+
     <color name="colorLink">#0079d3</color>
 
     <color name="colorOverlay">@color/black50</color>

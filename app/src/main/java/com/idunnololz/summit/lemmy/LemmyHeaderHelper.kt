@@ -90,7 +90,7 @@ class LemmyHeaderHelper(
 //        }
 
         if (postView.post.featured_local || postView.post.featured_community) {
-            val d = Utils.tint(context, R.drawable.ic_pinned, R.color.style_green)
+            val d = Utils.tint(context, R.drawable.baseline_push_pin_24, R.color.style_green)
             val size: Int = Utils.convertDpToPixel(16f).toInt()
             d.setBounds(0, 0, size, size)
             val s = sb.length
@@ -272,13 +272,7 @@ class LemmyHeaderHelper(
             )
             val e = sb.length
             sb.setSpan(
-                ForegroundColorSpan(unimportantColor),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            sb.setSpan(
-                StyleSpan(Typeface.BOLD),
+                ForegroundColorSpan(emphasisColor),
                 s,
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -303,7 +297,7 @@ class LemmyHeaderHelper(
             }
         }
 
-        sb.appendSeparator()
+        sb.append("  ")
         sb.append(
             dateStringToPretty(item.comment.updated ?: item.comment.published)
         )

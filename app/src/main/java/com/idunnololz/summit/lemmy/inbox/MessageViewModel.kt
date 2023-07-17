@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.inbox
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
@@ -23,9 +24,11 @@ import javax.inject.Inject
 @HiltViewModel
 class MessageViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
-    private val commentsFetcher: CommentsFetcher,
+    private val accountActionsManager: AccountActionsManager,
     val accountManager: AccountManager,
 ) : ViewModel() {
+
+    private val commentsFetcher = CommentsFetcher(apiClient, accountActionsManager)
 
     val commentContext = StatefulLiveData<CommentContext>()
     var isContextShowing = false
