@@ -276,7 +276,7 @@ class PostListViewBuilder @Inject constructor(
                     offlineManager.getMaxImageSizeHint(it, tempSize)
 
                     image.load(it) {
-                        size(coil.size.Size.ORIGINAL)
+//                        size(coil.size.Size.ORIGINAL)
                         fallback(R.drawable.thumbnail_placeholder)
 
                         if (!isRevealed && postView.post.nsfw) {
