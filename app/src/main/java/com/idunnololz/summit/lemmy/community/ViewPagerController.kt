@@ -154,17 +154,17 @@ class ViewPagerController(
     }
 
     private fun onPostOpen() {
-        val mainFragment = fragment.requireParentFragment().requireParentFragment() as MainFragment
-        mainFragment.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
+        val mainFragment = fragment.parentFragment?.parentFragment as? MainFragment
+        mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
 
         viewPagerAdapter.onPostOpen()
         viewPager.setPagingEnabled(true)
     }
 
     private fun onPostClosed() {
-        val mainFragment = fragment.requireParentFragment().requireParentFragment() as MainFragment
+        val mainFragment = fragment.parentFragment?.parentFragment as? MainFragment
         if (!lockPanes) {
-            mainFragment.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+            mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
         }
 
         viewPagerAdapter.onPostClosed()

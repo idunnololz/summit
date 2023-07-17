@@ -26,6 +26,7 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
@@ -66,7 +67,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    AlertDialogFragment.AlertDialogFragmentListener, SignInNavigator {
 
     companion object {
         private const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
@@ -519,4 +520,11 @@ class PersonCommentsFragment : BaseFragment<FragmentPersonCommentsBinding>(),
 
     }
 
+    override fun navigateToSignInScreen() {
+        (parentFragment as? SignInNavigator)?.navigateToSignInScreen()
+    }
+
+    override fun proceedAnyways(tag: Int) {
+        (parentFragment as? SignInNavigator)?.proceedAnyways(tag)
+    }
 }

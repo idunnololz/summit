@@ -14,11 +14,13 @@ import androidx.core.text.buildSpannedString
 import androidx.core.view.MenuProvider
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
@@ -33,6 +35,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxFragment
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.post.PostFragment
+import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -45,6 +48,7 @@ import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +59,7 @@ import org.threeten.bp.format.FormatStyle
 import java.util.Calendar
 
 @AndroidEntryPoint
-class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
+class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
 
     private val args by navArgs<PersonTabbedFragmentArgs>()
 
@@ -338,5 +342,13 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>() {
 
     fun closePost(postFragment: PostFragment) {
         viewPagerController?.closePost(postFragment)
+    }
+
+    override fun navigateToSignInScreen() {
+        val direction = PostFragmentDirections.actionGlobalLogin()
+        findNavController().navigateSafe(direction)
+    }
+
+    override fun proceedAnyways(tag: Int) {
     }
 }
