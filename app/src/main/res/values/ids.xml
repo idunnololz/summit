@@ -64,4 +64,7 @@
     <item name="swipe_action_hide_post" type="id"/>
     <item name="hide_post" type="id" />
     <item name="swipe_action_mark_as_read" type="id"/>
+    <item name="from_camera" type="id" />
+    <item name="from_gallery" type="id" />
+    <item name="clear" type="id" />
 </resources>
