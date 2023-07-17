@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
 import com.idunnololz.summit.lemmy.community.Item
@@ -22,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
+class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNavigator {
 
     private var adapter: ListingItemAdapter? = null
 
@@ -233,5 +234,13 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>() {
             recyclerView.setHasFixedSize(true)
             recyclerView.setupDecoratorsForPostList(preferences)
         }
+    }
+
+    override fun navigateToSignInScreen() {
+        (parentFragment as? SignInNavigator)?.navigateToSignInScreen()
+    }
+
+    override fun proceedAnyways(tag: Int) {
+        (parentFragment as? SignInNavigator)?.proceedAnyways(tag)
     }
 }
