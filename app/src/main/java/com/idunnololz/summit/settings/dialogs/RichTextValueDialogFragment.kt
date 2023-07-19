@@ -1,5 +1,6 @@
 package com.idunnololz.summit.settings.dialogs
 
+import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -17,13 +19,16 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentViewModel
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
+import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextValueBinding>() {
+class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextValueBinding>(),
+    BackPressHandler {
 
     companion object {
         private const val ARG_TITLE = "ARG_TITLE"
@@ -43,13 +48,17 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
     private val viewModel: RichTextValueViewModel by viewModels()
 
     private val textFormatterHelper = TextFormatterHelper()
-    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        // Callback is invoked after the user selects a media item or closes the
-        // photo picker.
-        if (uri != null) {
-            viewModel.uploadImage(uri)
+
+    private val launcher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val uri = it.data?.data
+
+                if (uri != null) {
+                    viewModel.uploadImage(uri)
+                }
+            }
         }
-    }
 
     override fun onStart() {
         super.onStart()
@@ -78,6 +87,8 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
+
         with(binding) {
             textEditor.hint = requireArguments().getString(ARG_TITLE)
             textEditor.setText(requireArguments().getString(ARG_CURRENT_VALUE))
@@ -85,7 +96,55 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
             textFormatterHelper.setupTextFormatterToolbar(
                 textFormatToolbar,
                 textEditor,
-                imagePickerLauncher,
+                onChooseImageClick = {
+                    val bottomMenu = BottomMenu(context).apply {
+                        setTitle(R.string.insert_image)
+                        addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
+                        addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
+                        addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
+                        addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
+
+                        setOnMenuItemClickListener {
+                            when (it.id) {
+                                R.id.from_camera -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .cameraOnly()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                                R.id.from_gallery -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .galleryOnly()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                                R.id.from_camera_with_editor -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .cameraOnly()
+                                        .crop()
+                                        .cropFreeStyle()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                                R.id.from_gallery_with_editor -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .galleryOnly()
+                                        .crop()
+                                        .cropFreeStyle()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                            }
+                        }
+                    }
+
+                    bottomMenu.show(
+                        mainActivity = requireMainActivity(),
+                        viewGroup = binding.coordinatorLayout,
+                        expandFully = true,
+                        handleBackPress = false
+                    )
+                },
                 onPreviewClick = {
                     PreviewCommentDialogFragment()
                         .apply {
@@ -133,5 +192,21 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
                 dismiss()
             }
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (isBindingAvailable()) {
+            if (binding.coordinatorLayout.childCount > 0) {
+                binding.coordinatorLayout.removeAllViews()
+                return true
+            }
+        }
+
+        try {
+            dismiss()
+        } catch (e: IllegalStateException) {
+            // do nothing... very rare
+        }
+        return true
     }
 }

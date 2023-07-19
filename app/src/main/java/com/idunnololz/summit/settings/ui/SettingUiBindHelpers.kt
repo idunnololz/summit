@@ -74,6 +74,9 @@ fun SliderSettingItem.bindTo(
     b.slider.valueTo = this.maxValue
 
     b.slider.value = getCurrentValue()
+    stepSize?.let {
+        b.slider.stepSize = it
+    }
 
     b.slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
         override fun onStartTrackingTouch(slider: Slider) {}

@@ -1,153 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?backgroundColor">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent">
+        android:layout_height="match_parent"
+        android:background="?backgroundColor">
 
-    </com.google.android.material.appbar.MaterialToolbar>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/scroll_view"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/content"
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scroll_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:background="?backgroundColor">
+                android:layout_height="match_parent">
 
-                <EditText
-                    android:id="@+id/url"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:autofillHints="no"
-                    android:background="@null"
-                    android:padding="@dimen/padding"
-                    android:textIsSelectable="true"
-                    android:scrollbars="vertical"
-                    android:textAppearance="?textAppearanceBodyMedium"
-                    android:inputType="textUri"
-                    android:hint="@string/url_optional"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/upload_image"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <ImageView
-                    android:id="@+id/upload_image"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:padding="12dp"
-                    android:src="@drawable/baseline_image_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:tint="?colorControlNormal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/url"
-                    app:layout_constraintBottom_toBottomOf="@+id/url"/>
-
-                <com.google.android.material.divider.MaterialDivider
-                    android:id="@+id/divider1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/url"/>
-
-                <EditText
-                    android:id="@+id/title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:autofillHints="no"
-                    android:background="@null"
-                    android:padding="@dimen/padding"
-                    android:textIsSelectable="true"
-                    android:scrollbars="vertical"
-                    android:textAppearance="?textAppearanceBodyMedium"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:hint="@string/title"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/divider1"/>
-
-                <com.google.android.material.divider.MaterialDivider
-                    android:id="@+id/divider2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/title"/>
-
-                <EditText
-                    android:id="@+id/post_editor"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:autofillHints="no"
-                    android:background="@null"
-                    android:hint="@string/compose_post"
-                    android:padding="@dimen/padding"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:textAppearance="?textAppearanceBodyMedium"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/divider2"/>
-
-                <HorizontalScrollView
-                    android:id="@+id/post_body_toolbar"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorSurface"
-                    android:layout_gravity="bottom"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/post_editor">
+                    android:animateLayoutChanges="true"
+                    android:background="?backgroundColor">
 
-                    <include
-                        android:id="@+id/text_format_toolbar"
-                        layout="@layout/text_format_toolbar"/>
-                </HorizontalScrollView>
+                    <EditText
+                        android:id="@+id/url"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="no"
+                        android:background="@null"
+                        android:padding="@dimen/padding"
+                        android:textIsSelectable="true"
+                        android:scrollbars="vertical"
+                        android:textAppearance="?textAppearanceBodyMedium"
+                        android:inputType="textUri"
+                        android:hint="@string/url_optional"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/upload_image"
+                        app:layout_constraintTop_toTopOf="parent"/>
 
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/nsfw_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/padding"
-                    android:layout_marginEnd="@dimen/padding"
-                    app:layout_constraintTop_toBottomOf="@+id/post_body_toolbar"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    <ImageView
+                        android:id="@+id/upload_image"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:src="@drawable/baseline_image_24"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:tint="?colorControlNormal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/url"
+                        app:layout_constraintBottom_toBottomOf="@+id/url"/>
 
-                <TextView
-                    android:text="@string/nsfw"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintTop_toTopOf="@+id/nsfw_switch"
-                    app:layout_constraintBottom_toBottomOf="@+id/nsfw_switch"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/divider1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/url"/>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <EditText
+                        android:id="@+id/title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="no"
+                        android:background="@null"
+                        android:padding="@dimen/padding"
+                        android:textIsSelectable="true"
+                        android:scrollbars="vertical"
+                        android:textAppearance="?textAppearanceBodyMedium"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:hint="@string/title"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/divider1"/>
 
-        </androidx.core.widget.NestedScrollView>
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/divider2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/title"/>
 
-        <com.idunnololz.summit.view.LoadingView
-            android:id="@+id/loading_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-    </FrameLayout>
-</LinearLayout>
+                    <EditText
+                        android:id="@+id/post_editor"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="no"
+                        android:background="@null"
+                        android:hint="@string/compose_post"
+                        android:padding="@dimen/padding"
+                        android:gravity="start|top"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:textAppearance="?textAppearanceBodyMedium"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/divider2"/>
+
+                    <HorizontalScrollView
+                        android:id="@+id/post_body_toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorSurface"
+                        android:layout_gravity="bottom"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/post_editor">
+
+                        <include
+                            android:id="@+id/text_format_toolbar"
+                            layout="@layout/text_format_toolbar"/>
+                    </HorizontalScrollView>
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/nsfw_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/padding"
+                        android:layout_marginEnd="@dimen/padding"
+                        app:layout_constraintTop_toBottomOf="@+id/post_body_toolbar"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <TextView
+                        android:text="@string/nsfw"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/padding"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintTop_toTopOf="@+id/nsfw_switch"
+                        app:layout_constraintBottom_toBottomOf="@+id/nsfw_switch"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            <com.idunnololz.summit.view.LoadingView
+                android:id="@+id/loading_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+    </LinearLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false">
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

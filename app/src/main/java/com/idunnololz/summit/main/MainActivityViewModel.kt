@@ -119,7 +119,7 @@ class MainActivityViewModel @Inject constructor(
         communities.setIsLoading()
         viewModelScope.launch {
             apiClient.fetchCommunitiesWithRetry(
-                sortType = SortType.Active,
+                sortType = SortType.TopAll,
                 listingType = ListingType.All
             ).onSuccess {
                 communities.postValue(it)

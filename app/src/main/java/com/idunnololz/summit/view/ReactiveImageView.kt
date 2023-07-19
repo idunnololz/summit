@@ -18,17 +18,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 
 class ReactiveImageView : AppCompatImageView {
-
-    companion object {
-        fun makePrimaryColorIconImageView(context: Context) = ReactiveImageView(context).apply {
-            ImageViewCompat.setImageTintList(
-                this,
-                ColorStateList.valueOf(
-                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary))
-            )
-        }
-    }
-
     private val isRipple = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
     private var drawOverlay = false
     private lateinit var paint: Paint
@@ -81,10 +70,11 @@ class ReactiveImageView : AppCompatImageView {
     }
 
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+
         if (!canvas.isHardwareAccelerated) {
             return
         }
-        super.onDraw(canvas)
         if (drawOverlay) {
             canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
         }

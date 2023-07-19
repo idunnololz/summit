@@ -34,6 +34,7 @@ import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.lemmy.CommunityRef
 import java.io.*
 import java.security.MessageDigest
 import java.text.NumberFormat
@@ -464,14 +465,16 @@ object Utils {
 
 
     fun openExternalLink(context: Context, url: String) {
-//        val intent = Intent(Intent.ACTION_VIEW).apply {
-//            data = Uri.parse(url)
-//        }
-//        safeLaunchExternalIntent(context, intent)
-
-        val intent = CustomTabsIntent.Builder()
-            .build()
-        intent.launchUrl(context, Uri.parse(url))
+        try {
+            val intent = CustomTabsIntent.Builder()
+                .build()
+            intent.launchUrl(context, Uri.parse(url))
+        } catch (e: ActivityNotFoundException) {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(url)
+            }
+            safeLaunchExternalIntent(context, intent)
+        }
     }
 
     fun launchAppPlayStore(activity: Activity) {
@@ -910,3 +913,33 @@ fun convertSpToPixel(sp: Float): Float {
 
 fun Context.isLightTheme(): Boolean =
     resources.getBoolean(R.bool.isLightTheme)
+
+
+private const val EMAIL_FEEDBACK = "feedback@idunnololz.com"
+fun startFeedbackIntent(context: Context) {
+    try {
+        val versionName = context.packageManager
+            .getPackageInfo(context.packageName, 0).versionName
+
+        val footer = "Summit for Lemmy v" +
+                versionName +
+                "\n\nFeedback: \n"
+
+        val address = EMAIL_FEEDBACK
+        val subject = "LoL Catalyst feedback"
+
+        val i = Intent(Intent.ACTION_SENDTO)
+        // i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(crashLogFile));
+        i.putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
+        i.putExtra(Intent.EXTRA_SUBJECT, subject)
+        i.putExtra(Intent.EXTRA_TEXT, footer)
+        i.selector = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:$address")
+        }
+
+        context.startActivity(Intent.createChooser(i, "Send via email"))
+    } catch (e: PackageManager.NameNotFoundException) {
+    }
+}
+
+val summitCommunityPage = CommunityRef.CommunityRefByName("summit", "lemmy.world")

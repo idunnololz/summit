@@ -56,12 +56,11 @@ class PostsAdapter(
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
     private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-    private val onEditCommentClick: (CommentView) -> Unit,
-    private val onDeleteCommentClick: (CommentView) -> Unit,
     private val onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onPostMoreClick: (PostView) -> Unit,
+    private val onCommentMoreClick: (CommentView) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -277,6 +276,8 @@ class PostsAdapter(
                 val post = item.postView
                 val postKey = post.getUniqueKey()
 
+                holder.itemView.setTag(R.id.swipeable, true)
+
                 postAndCommentViewBuilder.bindPostView(
                     binding = b,
                     container = containerView,
@@ -320,7 +321,6 @@ class PostsAdapter(
                         highlight,
                         highlightForever,
                         lifecycleOwner,
-                        currentAccountId,
                         item.isActionsExpanded,
                         onImageClick,
                         onPageClick,
@@ -331,8 +331,7 @@ class PostsAdapter(
                             toggleActions(item.comment.comment.id)
                         },
                         onAddCommentClick,
-                        onEditCommentClick,
-                        onDeleteCommentClick,
+                        onCommentMoreClick,
                         onSignInRequired,
                         onInstanceMismatch,
                     )
@@ -413,9 +412,7 @@ class PostsAdapter(
             is MoreCommentsItem -> {
                 val b = holder.getBinding<PostMoreCommentsItemBinding>()
 
-                postAndCommentViewBuilder.threadLinesHelper.populateThreadLines(
-                    b.threadLinesContainer, item.depth, item.baseDepth
-                )
+                postAndCommentViewBuilder.bindMoreCommentsItem(b, item.depth, item.baseDepth)
                 b.moreButton.text = context.resources.getQuantityString(
                     R.plurals.replies_format, item.moreCount, item.moreCount
                 )
@@ -425,11 +422,6 @@ class PostsAdapter(
                         onFetchComments(item.parentId)
                     }
                 }
-
-                b.root.tag = ThreadLinesData(
-                    depth = item.depth,
-                    baseDepth = item.baseDepth
-                )
             }
 
             FooterItem -> {}

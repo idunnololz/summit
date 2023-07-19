@@ -388,26 +388,34 @@ class CommunitySelectorController @AssistedInject constructor(
                             CommunityRef.Subscribed(account.instance),
                         )
                     )
-                }
-                newItems.addAll(
-                    listOf(
+                    newItems.add(
                         Item.StaticChildItem(
-                            CommonLemmyInstance.LemmyMl.instance,
+                            context.getString(R.string.local),
                             R.drawable.ic_subreddit_home,
-                            CommunityRef.Local(CommonLemmyInstance.LemmyMl.instance),
-                        ),
-                        Item.StaticChildItem(
-                            CommonLemmyInstance.LemmyWorld.instance,
-                            R.drawable.ic_subreddit_home,
-                            CommunityRef.Local(CommonLemmyInstance.LemmyWorld.instance),
-                        ),
-                        Item.StaticChildItem(
-                            CommonLemmyInstance.Beehaw.instance,
-                            R.drawable.ic_subreddit_home,
-                            CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
-                        ),
+                            CommunityRef.Local(account.instance),
+                        )
                     )
-                )
+                } else {
+                    newItems.addAll(
+                        listOf(
+                            Item.StaticChildItem(
+                                CommonLemmyInstance.LemmyMl.instance,
+                                R.drawable.ic_subreddit_home,
+                                CommunityRef.Local(CommonLemmyInstance.LemmyMl.instance),
+                            ),
+                            Item.StaticChildItem(
+                                CommonLemmyInstance.LemmyWorld.instance,
+                                R.drawable.ic_subreddit_home,
+                                CommunityRef.Local(CommonLemmyInstance.LemmyWorld.instance),
+                            ),
+                            Item.StaticChildItem(
+                                CommonLemmyInstance.Beehaw.instance,
+                                R.drawable.ic_subreddit_home,
+                                CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
+                            ),
+                        )
+                    )
+                }
 
                 newItems.addAll(makeRecentItems(query))
                 newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))

@@ -83,7 +83,7 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
 
         requireMainActivity().apply {
             setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByMargin(viewLifecycleOwner, binding.recyclerView)
+            insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
             setSupportActionBar(binding.toolbar)
@@ -205,7 +205,7 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
                     setOnMenuItemClickListener {
                         when (it.id) {
                             R.id.from_camera -> {
-                                ImagePicker.with(requireActivity())
+                                val intent = ImagePicker.with(requireActivity())
                                     .apply {
                                         if (settingItem.isSquare) {
                                             cropSquare()
@@ -214,12 +214,13 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
                                             cropFreeStyle()
                                         }
                                     }
-                                    .provider(ImageProvider.CAMERA)
+                                    .cameraOnly()
                                     .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
-                                    .createIntentFromDialog { launcher.launch(it) }
+                                    .createIntent()
+                                launcher.launch(intent)
                             }
                             R.id.from_gallery -> {
-                                ImagePicker.with(requireActivity())
+                                val intent = ImagePicker.with(requireActivity())
                                     .apply {
                                         if (settingItem.isSquare) {
                                             cropSquare()
@@ -228,9 +229,10 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
                                             cropFreeStyle()
                                         }
                                     }
-                                    .provider(ImageProvider.GALLERY)
+                                    .galleryOnly()
                                     .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
-                                    .createIntentFromDialog { launcher.launch(it) }
+                                    .createIntent()
+                                launcher.launch(intent)
                             }
                             R.id.clear -> {
                                 adapter?.updateSettingValue(settingItem.id, "")

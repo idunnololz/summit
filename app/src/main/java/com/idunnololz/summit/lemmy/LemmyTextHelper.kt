@@ -20,6 +20,7 @@ import io.noties.markwon.html.span.SuperScriptSpan
 import io.noties.markwon.image.coil.CoilImagesPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
+import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -67,100 +68,73 @@ object LemmyTextHelper {
     ) : AbstractMarkwonPlugin() {
 
         /**
-         * Matches against words where the first character is a caret. Eg. '^hello'
+         * Combination of 4 regexes "or'd" (|) together.
+         * 1) Matches against words where the first character is a caret. Eg. '^hello'
+         * 2) Matches against spoiler blocks
+         * 3) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
+         * 4) Matches against full community names (!a@b.com)
          */
-        private val superscriptRegex = Pattern.compile("""\^(\S+)""")
+        private val largeRegex = Pattern.compile("""
+            \^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(!|[cC]/|@|[uU]/)([^@\s]+)@([^@\s]+\.[^@\s]+)
+        """.trimIndent())
 
-        /**
-         * Matches against strings wrapped in '!>', '<!'. Eg. '!>this is a spoiler<!'
-         */
-        private val spoilerBlockRegex = Pattern.compile(""":::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\n|${'$'})\s*""")
-
-        /**
-         * Matches against poorly formated header tags. Eg. `##Asdf` (proper would be `## Asdf`)
-         */
-        private val improperHeaderTagRegex = Pattern.compile("""(?m)^(#+)(\S*.*)${'$'}""")
-
-        /**
-         * Matches against subreddit names. DOES NOT MATCH SUBREDDIT URLS. (technically incomplete because it doesn't have the length limit)
-         */
-        private val communityNameRegex =
-            Pattern.compile("""(^|\s)(/?\bc/([a-zA-Z0-9-][a-zA-Z0-9-_]*)\b)""")
-
-        private fun processSubTags(s: String): String {
-            val matcher = superscriptRegex.matcher(s)
+        private fun processAll(s: String): String {
+            val matcher = largeRegex.matcher(s)
             val sb = StringBuffer()
             while (matcher.find()) {
                 val g1 = matcher.group(1)
-                if (!g1.endsWith("^")) {
+                if (g1 != null && !g1.endsWith("^")) {
                     matcher.appendReplacement(sb, "^${matcher.group(1)}^")
+                    continue
                 }
-            }
-            matcher.appendTail(sb)
-            return sb.toString()
-        }
 
-        private fun processSpoilerTags(s: String): String {
-            val matcher = spoilerBlockRegex.matcher(s)
-            val sb = StringBuffer()
-            while (matcher.find()) {
-                val spoilerTitle: String? = matcher.group(1)?.trim()
-                val spoilerText: String? = matcher.group(2)?.trim()
+                val spoilerTitle: String? = matcher.group(2)?.trim()
+                val spoilerText: String? = matcher.group(3)?.trim()
                 if (!spoilerTitle.isNullOrBlank() && !spoilerText.isNullOrBlank()) {
                     matcher.appendReplacement(sb, "<br>${spoilerTitle}<br>++${spoilerText}++<br>")
+                    continue
                 }
-            }
-            matcher.appendTail(sb)
-            return sb.toString()
-        }
 
-        private fun processHeaderTags(s: String): String {
-            val matcher = improperHeaderTagRegex.matcher(s)
-            val sb = StringBuffer()
-            while (matcher.find()) {
-                try {
-                    val formattingChar = requireNotNull(matcher.group(1)).trim()
-                    val rest = requireNotNull(matcher.group(2)).trim()
+                val formattingChar = matcher.group(5)?.trim()
+                val rest = matcher.group(6)?.trim()
+                if (formattingChar != null && rest != null) {
                     matcher.appendReplacement(
                         sb,
                         Matcher.quoteReplacement("$formattingChar $rest")
                     )
                     Log.d(TAG, "Fixed ${"$formattingChar $rest"}")
-                } catch (e: Exception) {
-                    throw RuntimeException("Error parsing header tag: $s.", e)
                 }
-            }
-            matcher.appendTail(sb)
-            return sb.toString()
-        }
 
-        private fun processSubredditMentions(s: String, instance: String): String {
-            val matcher = communityNameRegex.matcher(s)
-            val sb = StringBuffer()
-            while (matcher.find()) {
-                val communityUrl = matcher.group(3) ?: continue
-                val spacer = matcher.group(1) ?: ""
+                val referenceTypeToken = matcher.group(7)
+                val name = matcher.group(8)
+                val instance = matcher.group(9)
 
-                val pageRef = LinkResolver.parseUrl(communityUrl, instance)
-                    ?: continue
+                if (referenceTypeToken != null && name != null && instance != null) {
+                    when (referenceTypeToken.lowercase(Locale.US)) {
+                        "!", "c/" -> {
+                            val communityRef = CommunityRef.CommunityRefByName(name, instance)
 
-                val communityRef = pageRef as? CommunityRef
-                    ?: continue
-
-                matcher.appendReplacement(
-                    sb,
-                    "$spacer[${matcher.group(2)}](${LinkUtils.getLinkForCommunity(communityRef)})"
-                )
+                            matcher.appendReplacement(
+                                sb,
+                                "[${matcher.group(0)}](${LinkUtils.getLinkForCommunity(communityRef)})"
+                            )
+                        }
+                        "@", "u/" -> {
+                            val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
+                            matcher.appendReplacement(
+                                sb,
+                                "[${matcher.group(0)}](${url})"
+                            )
+                        }
+                    }
+                }
             }
             matcher.appendTail(sb)
             return sb.toString()
         }
 
         override fun processMarkdown(markdown: String): String =
-            processSubredditMentions(
-                s = processSpoilerTags(processSubTags(processHeaderTags(markdown))),
-                instance = instance
-            )
+            processAll(markdown)
 
         override fun configureTheme(builder: MarkwonTheme.Builder) {
             builder.blockQuoteColor(context.getColorCompat(R.color.colorQuoteLine))

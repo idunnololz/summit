@@ -33,7 +33,7 @@ class TextFormatterHelper {
     fun setupTextFormatterToolbar(
         textFormatToolbarBinding: TextFormatToolbarBinding,
         editText: EditText,
-        imagePickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>? = null,
+        onChooseImageClick: (() -> Unit)? = null,
         onPreviewClick: () -> Unit,
     ) {
         this.editText = editText
@@ -102,10 +102,10 @@ class TextFormatterHelper {
                 )
             }
 
-            if (imagePickerLauncher != null) {
+            if (onChooseImageClick != null) {
                 image.visibility = View.VISIBLE
                 image.setOnClickListener {
-                    imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    onChooseImageClick()
                 }
             } else {
                 image.visibility = View.GONE

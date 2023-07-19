@@ -19,6 +19,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -149,6 +150,12 @@ class Preferences @Inject constructor(
         get() = prefs.getBoolean(KEY_HIDE_COMMENT_ACTIONS, false)
         set(value) {
             prefs.edit().putBoolean(KEY_HIDE_COMMENT_ACTIONS, value).apply()
+        }
+
+    var tapCommentToCollapse: Boolean
+        get() = prefs.getBoolean(KEY_TAP_COMMENT_TO_COLLAPSE, false)
+        set(value) {
+            prefs.edit().putBoolean(KEY_TAP_COMMENT_TO_COLLAPSE, value).apply()
         }
 
     var infinity: Boolean

@@ -61,10 +61,16 @@ class CommunitiesPaneController @AssistedInject constructor(
         val adapter = UserCommunitiesAdapter(
             context = context,
             offlineManager = offlineManager,
-            onCommunitySelected = onCommunitySelected, onDeleteUserCommunity = { id ->
+            onCommunitySelected = onCommunitySelected,
+            onDeleteUserCommunity = { id ->
                 viewModel.deleteUserCommunity(id)
             }
         )
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = false
+            viewModel.loadCommunities()
+        }
 
         viewModel.communities.observe(viewLifecycleOwner) {
             if (it != null) {

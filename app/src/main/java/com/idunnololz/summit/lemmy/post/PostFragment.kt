@@ -3,14 +3,10 @@ package com.idunnololz.summit.lemmy.post
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnPreDrawListener
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.MenuProvider
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
@@ -21,6 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
+import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
@@ -30,6 +27,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -45,7 +43,12 @@ import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
+import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
+import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
+import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.reddit.CommentsSortOrder
 import com.idunnololz.summit.reddit.getLocalizedName
@@ -82,6 +85,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     private val args: PostFragmentArgs by navArgs()
 
     private val viewModel: PostViewModel by viewModels()
+    private val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var adapter: PostsAdapter? = null
 
@@ -101,8 +105,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
     @Inject
     lateinit var preferences: Preferences
-
-    private var actionsViewModel: MoreActionsViewModel? = null
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -163,7 +165,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         goBack()
                     }
                 })
-            actionsViewModel = (parentFragment as? CommunityFragment)?.actionsViewModel
         } else {
             // do things if this is a single page
         }
@@ -196,6 +197,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         val context = requireContext()
         if (adapter == null) {
+
             adapter = PostsAdapter(
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
                 context,
@@ -243,33 +245,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         }).toBundle()
                     }.show(childFragmentManager, "asdf")
                 },
-                onEditCommentClick = {
-                    if (accountManager.currentAccount.value == null) {
-                        PreAuthDialogFragment.newInstance(R.id.action_edit_comment)
-                            .show(childFragmentManager, "asdf")
-                        return@PostsAdapter
-                    }
-
-                    AddOrEditCommentFragment().apply {
-                        arguments =
-                            AddOrEditCommentFragmentArgs(
-                                args.instance, null, null, it
-                            ).toBundle()
-                    }.show(childFragmentManager, "asdf")
-
-                },
-                onDeleteCommentClick = {
-                    AlertDialogFragment.Builder()
-                        .setMessage(R.string.delete_comment_confirm)
-                        .setPositiveButton(android.R.string.ok)
-                        .setNegativeButton(android.R.string.cancel)
-                        .setExtra(EXTRA_COMMENT_ID, it.comment.id.toString())
-                        .createAndShow(
-                            childFragmentManager,
-                            CONFIRM_DELETE_COMMENT_TAG
-                        )
-
-                },
                 onImageClick = { postOrCommentView, view, url ->
                     getMainActivity()?.openImage(
                         sharedElement = view,
@@ -292,8 +267,15 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
-                onPostMoreClick = {
-                    getMainActivity()?.showBottomMenu(getPostMoreMenu(it))
+                onPostMoreClick = { postView ->
+                    actionsViewModel.let {
+                        showMorePostOptions(postView, it)
+                    }
+                },
+                onCommentMoreClick = { commentView ->
+                    actionsViewModel.let {
+                        showMoreCommentOptions(commentView, it)
+                    }
                 },
                 onFetchComments = {
                     viewModel.fetchMoreComments(it)
@@ -306,6 +288,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
         }
+
+        installOnActionResultHandler(requireNotNull(actionsViewModel), binding.coordinatorLayout)
 
         binding.recyclerView.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
             override fun onPreDraw(): Boolean {
@@ -456,7 +440,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
-        actionsViewModel?.deletePostResult?.observe(viewLifecycleOwner) {
+        actionsViewModel.deletePostResult?.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     AlertDialogFragment.Builder()
@@ -503,12 +487,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 context,
                 binding.recyclerView,
                 onActionSelected = { action, vh ->
+                    val postView = vh.itemView.tag as? PostView
+                    if (postView != null) {
+                        performPostAction(action.id, postView)
+                        return@LemmySwipeActionCallback
+                    }
+
                     val commentView = vh.itemView.getTag(R.id.comment_view) as? CommentView
                         ?: return@LemmySwipeActionCallback
 
                     when (action.id) {
                         R.id.swipe_action_upvote -> {
-                            actionsViewModel?.vote(commentView, dir = 1)
+                            actionsViewModel.vote(commentView, dir = 1)
                         }
 
                         R.id.swipe_action_bookmark -> {
@@ -542,6 +532,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         context.getColorCompat(R.color.style_blue)
                     )
                 )
+                postOnlyActions = preferences.getPostSwipeActions(context)
             }).attachToRecyclerView(binding.recyclerView)
         }
 
@@ -558,6 +549,44 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         binding.root.doOnPreDraw {
             adapter.contentMaxWidth = binding.recyclerView.width
+        }
+    }
+
+    private fun performPostAction(id: Int, postView: PostView) {
+        when (id) {
+            PostGestureAction.Upvote -> {
+                actionsViewModel.vote(postView, 1)
+            }
+
+            PostGestureAction.Downvote -> {
+                actionsViewModel.vote(postView, -1)
+            }
+
+            PostGestureAction.Bookmark -> {
+                actionsViewModel.savePost(postView.post.id, save = true)
+            }
+
+            PostGestureAction.Reply -> {
+                if (accountManager.currentAccount.value == null) {
+                    PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                        .show(childFragmentManager, "asdf")
+                    return
+                }
+
+                AddOrEditCommentFragment().apply {
+                    arguments = AddOrEditCommentFragmentArgs(
+                        viewModel.instance, null, postView, null,
+                    ).toBundle()
+                }.show(childFragmentManager, "asdf")
+            }
+
+            PostGestureAction.Hide -> {
+                actionsViewModel.hidePost(postView.post.id)
+            }
+
+            PostGestureAction.MarkAsRead -> {
+                actionsViewModel.onPostRead(postView, delayMs = 250)
+            }
         }
     }
 
@@ -639,61 +668,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         }
 
         return _sortByMenu
-    }
-
-    private fun getPostMoreMenu(postView: PostView): BottomMenu {
-        val bottomMenu = BottomMenu(requireContext()).apply {
-            if (postView.post.creator_id == accountManager.currentAccount.value?.id) {
-                addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
-                addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
-            }
-
-            if (actionsViewModel != null) {
-                addItemWithIcon(
-                    R.id.block_community,
-                    getString(R.string.block_this_community_format, postView.community.name),
-                    R.drawable.baseline_block_24
-                )
-                addItemWithIcon(
-                    R.id.block_user,
-                    getString(R.string.block_this_user_format, postView.creator.name),
-                    R.drawable.baseline_person_off_24
-                )
-            }
-
-            if (this.itemsCount() == 0) {
-                addItem(io.noties.markwon.R.id.none, R.string.no_options)
-            }
-
-            setTitle(R.string.post_options)
-
-            setOnMenuItemClickListener {
-                when (it.id) {
-                    R.id.edit_post -> {
-                        CreateOrEditPostFragment()
-                            .apply {
-                                arguments = CreateOrEditPostFragmentArgs(
-                                    instance = viewModel.instance,
-                                    post = postView.post,
-                                    communityName = null,
-                                ).toBundle()
-                            }
-                            .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
-                    }
-                    R.id.delete -> {
-                        actionsViewModel?.deletePost(postView.post)
-                    }
-                    R.id.block_community -> {
-                        actionsViewModel?.blockCommunity(postView.community.id)
-                    }
-                    R.id.block_user -> {
-                        actionsViewModel?.blockPerson(postView.creator.id)
-                    }
-                }
-            }
-        }
-
-        return bottomMenu
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

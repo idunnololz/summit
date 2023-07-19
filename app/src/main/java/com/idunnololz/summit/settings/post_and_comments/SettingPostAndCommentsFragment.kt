@@ -26,11 +26,9 @@ import com.idunnololz.summit.databinding.FragmentSettingPostAndCommentsBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
-import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
-import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.PostAndCommentsSettings
@@ -178,12 +176,41 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                 updateRendering()
             }
         )
+        SliderSettingItem(
+            getString(R.string.indentation_per_level),
+            0f,
+            32f,
+            stepSize = 1f
+        ).bindTo(
+            binding.indentationPerLevel,
+            { viewModel.currentPostAndCommentUiConfig.commentUiConfig.indentationPerLevelDp.toFloat() },
+            {
+                viewModel.currentPostAndCommentUiConfig =
+                    viewModel.currentPostAndCommentUiConfig.copy(
+                        commentUiConfig = viewModel.currentPostAndCommentUiConfig
+                            .commentUiConfig
+                            .updateIndentationPerLevelDp(it)
+                    )
+
+                updateRendering()
+            }
+        )
 
         settings.showCommentActions.bindTo(
             binding.showCommentActions,
             { !viewModel.preferences.hideCommentActions },
             {
                 viewModel.preferences.hideCommentActions = !it
+
+                updateRendering()
+            }
+        )
+
+        settings.tapCommentToCollapse.bindTo(
+            binding.tapCommentToCollapse,
+            { viewModel.preferences.tapCommentToCollapse },
+            {
+                viewModel.preferences.tapCommentToCollapse = it
 
                 updateRendering()
             }
@@ -242,6 +269,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
             LemmyFakeModels.fakePostView,
             LemmyFakeModels.fakeCommentView1,
             LemmyFakeModels.fakeCommentView2,
+            LemmyFakeModels.fakeCommentView3,
         )
 
         private val adapterHelper = AdapterHelper<Any>(
@@ -298,10 +326,16 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         h = h,
                         binding = CommentExpandedViewHolder.fromBinding(b),
                         baseDepth = 0,
-                        depth = if (item.comment.id == LemmyFakeModels.fakeCommentView1.comment.id) {
-                            0
-                        } else {
-                            1
+                        depth = when (item.comment.id) {
+                            LemmyFakeModels.fakeCommentView1.comment.id -> {
+                                0
+                            }
+                            LemmyFakeModels.fakeCommentView2.comment.id -> {
+                                1
+                            }
+                            else -> {
+                                2
+                            }
                         },
                         commentView = item,
                         isDeleting = false,
@@ -312,17 +346,15 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         highlight = false,
                         highlightForever = false,
                         viewLifecycleOwner = viewLifecycleOwner,
-                        currentAccountId = item.creator.id,
                         isActionsExpanded = false,
                         onImageClick = { _, _, _ -> },
                         onPageClick = {},
                         collapseSection = {},
                         toggleActionsExpanded = {},
                         onAddCommentClick = {},
-                        onEditCommentClick = {},
-                        onDeleteCommentClick = {},
                         onSignInRequired = {},
-                        onInstanceMismatch = { _, _ -> }
+                        onInstanceMismatch = { _, _ -> },
+                        onCommentMoreClick = {}
                     )
                 }
             } else {
@@ -331,10 +363,16 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         h = h,
                         binding = CommentExpandedViewHolder.fromBinding(b),
                         baseDepth = 0,
-                        depth = if (item.comment.id == LemmyFakeModels.fakeCommentView1.comment.id) {
-                            0
-                        } else {
-                            1
+                        depth = when (item.comment.id) {
+                            LemmyFakeModels.fakeCommentView1.comment.id -> {
+                                0
+                            }
+                            LemmyFakeModels.fakeCommentView2.comment.id -> {
+                                1
+                            }
+                            else -> {
+                                2
+                            }
                         },
                         commentView = item,
                         isDeleting = false,
@@ -345,17 +383,15 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         highlight = false,
                         highlightForever = false,
                         viewLifecycleOwner = viewLifecycleOwner,
-                        currentAccountId = item.creator.id,
                         isActionsExpanded = false,
                         onImageClick = { _, _, _ -> },
                         onPageClick = {},
                         collapseSection = {},
                         toggleActionsExpanded = {},
                         onAddCommentClick = {},
-                        onEditCommentClick = {},
-                        onDeleteCommentClick = {},
                         onSignInRequired = {},
-                        onInstanceMismatch = { _, _ -> }
+                        onInstanceMismatch = { _, _ -> },
+                        onCommentMoreClick = {}
                     )
                 }
             }

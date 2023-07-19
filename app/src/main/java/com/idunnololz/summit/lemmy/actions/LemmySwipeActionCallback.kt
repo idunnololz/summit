@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
@@ -47,6 +48,7 @@ class LemmySwipeActionCallback(
 
     private var currentSwipeAction: SwipeAction? = null
 
+    var postOnlyActions: List<SwipeAction>? = null
     var actions: List<SwipeAction> = listOf()
 
     private fun ViewHolder.isSwipeEnabled() =
@@ -55,15 +57,14 @@ class LemmySwipeActionCallback(
     private fun ViewHolder.isSwipeable() =
         this.itemView.getTag(R.id.swipeable) as? Boolean == true
 
-
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: ViewHolder
     ): Int {
-        if (viewHolder.isSwipeable()) {
-            return makeMovementFlags(0, ItemTouchHelper.LEFT)
+        return if (viewHolder.isSwipeable()) {
+            makeMovementFlags(0, ItemTouchHelper.LEFT)
         } else {
-            return 0
+            0
         }
     }
 
@@ -92,7 +93,7 @@ class LemmySwipeActionCallback(
         val currentSwipeAction = currentSwipeAction
         val lastVhSwiped = lastVhSwiped
 
-        if ( currentSwipeAction != null && lastVhSwiped != null) {
+        if (currentSwipeAction != null && lastVhSwiped != null) {
             onActionSelected(currentSwipeAction, lastVhSwiped)
         }
 
@@ -109,7 +110,6 @@ class LemmySwipeActionCallback(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-
         val itemView = viewHolder.itemView
         val itemHeight = itemView.height
 
@@ -149,6 +149,12 @@ class LemmySwipeActionCallback(
         val actionSpace = usableSpace / actions.size
 
         var drawable: Drawable? = null
+
+        val actions = if (viewHolder.itemView.tag is PostView) {
+            postOnlyActions ?: actions
+        } else {
+            actions
+        }
 
         val negDx = -dX
         val currentSwipeAction = currentSwipeAction

@@ -1,5 +1,6 @@
 package com.idunnololz.summit.util
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
@@ -62,6 +63,21 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         } else {
             window.setBackgroundDrawableResource(R.drawable.dialog_background)
         }
+    }
+
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        if (this is BackPressHandler) {
+            val dialog = object : Dialog(requireActivity(), theme) {
+                override fun onBackPressed() {
+                    (this@BaseDialogFragment as BackPressHandler).onBackPressed()
+                }
+            }
+
+            return dialog
+        }
+
+        return super.onCreateDialog(savedInstanceState)
     }
 
     @CallSuper

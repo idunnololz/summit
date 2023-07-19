@@ -89,10 +89,25 @@ sealed interface CommunityRef : PageRef, Parcelable {
 
     fun getKey(): String =
         when (this) {
-            is Local -> this.instance ?: "local@auto"
-            is All -> "all@${this.instance}"
-            is CommunityRefByName -> "cname@${this.name}".lowercase(Locale.US)
-            is Subscribed -> "subscribed@${this.instance}"
+            is Local ->
+                if (this.instance != null) {
+                    "local@${this.instance}"
+                } else {
+                    "local"
+                }
+            is All ->
+                if (this.instance != null) {
+                    "all@${this.instance}"
+                } else {
+                    "all"
+                }
+            is CommunityRefByName -> this.fullName
+            is Subscribed ->
+                if (this.instance != null) {
+                    "subscribed@${this.instance}"
+                } else {
+                    "subscribed"
+                }
         }
 }
 

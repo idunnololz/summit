@@ -36,7 +36,7 @@ class ListingItemViewHolder(
 
     data class State(
         var preferImagesAtEnd: Boolean = false,
-        var preferFullSizeImages: Boolean = false,
+        var preferFullSizeImages: Boolean = true,
     )
 
     var state = State()

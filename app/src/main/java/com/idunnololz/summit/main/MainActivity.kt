@@ -48,7 +48,6 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
-import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
@@ -61,7 +60,7 @@ import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
-import com.idunnololz.summit.saved.SavedFragment
+import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
@@ -814,7 +813,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun insetViewExceptTopAutomaticallyByMargin(lifecycleOwner: LifecycleOwner, rootView: View) {
+    fun insetViewExceptTopAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
 
@@ -857,6 +856,23 @@ class MainActivity : BaseActivity() {
                 insets.rightInset,
                 getBottomNavHeight() + additionalPaddingBottom,
             )
+        }
+    }
+
+    fun insetViewExceptTopAutomaticallyByMarginAndNavUi(
+        lifecycleOwner: LifecycleOwner,
+        rootView: View,
+        additionalPaddingBottom: Int = 0,
+    ) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = lastInsets
+
+
+            rootView.updateLayoutParams<MarginLayoutParams> {
+                bottomMargin = getBottomNavHeight() + additionalPaddingBottom
+                leftMargin = insets.leftInset
+                rightMargin = insets.rightInset
+            }
         }
     }
 
@@ -950,12 +966,6 @@ class MainActivity : BaseActivity() {
                 showBottomNav()
                 showNotificationBarBg()
             }
-            SavedFragment::class -> {
-                hideActionBar(animate)
-                disableBottomNavViewScrolling()
-                showBottomNav()
-                showNotificationBarBg()
-            }
             SettingsFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
@@ -963,6 +973,12 @@ class MainActivity : BaseActivity() {
                 hideNotificationBarBg()
             }
             PersonTabbedFragment::class -> {
+                hideActionBar(animate)
+                disableBottomNavViewScrolling()
+                showBottomNav()
+                showNotificationBarBg()
+            }
+            SavedTabbedFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()

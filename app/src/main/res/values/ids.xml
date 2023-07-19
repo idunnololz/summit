@@ -67,4 +67,11 @@
     <item name="from_camera" type="id" />
     <item name="from_gallery" type="id" />
     <item name="clear" type="id" />
+    <item name="remove_from_saved" type="id"/>
+    <item name="edit_comment" type="id" />
+    <item name="delete_comment" type="id"/>
+    <item name="summit_community" type="id" />
+    <item name="email" type="id" />
+    <item name="from_camera_with_editor" type="id" />
+    <item name="from_gallery_with_editor" type="id" />
 </resources>

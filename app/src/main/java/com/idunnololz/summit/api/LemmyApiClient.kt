@@ -51,6 +51,8 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.api.dto.SaveComment
+import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.Search
 import com.idunnololz.summit.api.dto.SearchResponse
@@ -123,7 +125,6 @@ class LemmyApiClient @Inject constructor(
         listingType: ListingType,
         page: Int,
         limit: Int? = null,
-        savedOnly: Boolean = false,
         force: Boolean,
     ): Result<List<PostView>> {
         val communityId = communityIdOrName?.fold({ it }, { null })
@@ -138,7 +139,6 @@ class LemmyApiClient @Inject constructor(
                 page = page,
                 limit = limit,
                 auth = account?.jwt,
-                saved_only = savedOnly,
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching posts", e)
@@ -204,6 +204,83 @@ class LemmyApiClient @Inject constructor(
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun fetchSavedPosts(
+        account: Account?,
+        page: Int,
+        limit: Int? = null,
+        force: Boolean,
+    ): Result<List<PostView>> {
+        val form = try {
+            GetPosts(
+                community_id = null,
+                community_name = null,
+                sort = null,
+                type_ = ListingType.All,
+                page = page,
+                limit = limit,
+                saved_only = true,
+                auth = account?.jwt,
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching posts", e)
+            false
+        }
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getPostsNoCache(form = form.serializeToMap())
+            } else {
+                api.getPosts(form = form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it.posts)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun fetchSavedComments(
+        account: Account?,
+        page: Int,
+        limit: Int? = null,
+        force: Boolean,
+    ): Result<List<CommentView>> {
+
+        val commentsForm =
+            GetComments(
+                max_depth = 1,
+                type_ = ListingType.All,
+                post_id = null,
+                sort = null,
+                saved_only = true,
+                auth = account?.jwt,
+            )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getCommentsNoCache(
+                    commentsForm
+                        .serializeToMap(),
+                )
+            } else {
+                api.getComments(
+                    commentsForm
+                        .serializeToMap(),
+                )
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it.comments)
             },
             onFailure = {
                 Result.failure(it)
@@ -933,6 +1010,44 @@ class LemmyApiClient @Inject constructor(
         }.fold(
             onSuccess = {
                 Result.success(it.private_message_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun savePost(
+        postId: PostId,
+        save: Boolean,
+        account: Account,
+    ): Result<PostView> {
+        val form = SavePost(postId, save, account.jwt)
+
+        return retrofitErrorHandler {
+            api.savePost(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.post_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
+    }
+
+    suspend fun saveComment(
+        commentId: CommentId,
+        save: Boolean,
+        account: Account,
+    ): Result<CommentView> {
+        val form = SaveComment(commentId, save, account.jwt)
+
+        return retrofitErrorHandler {
+            api.saveComment(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.comment_view)
             },
             onFailure = {
                 Result.failure(it)

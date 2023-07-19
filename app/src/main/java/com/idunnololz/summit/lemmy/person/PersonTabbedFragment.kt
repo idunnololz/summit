@@ -1,17 +1,12 @@
 package com.idunnololz.summit.lemmy.person
 
 import android.os.Bundle
-import android.text.format.DateUtils
 import android.transition.TransitionManager
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
-import androidx.core.view.MenuProvider
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -23,30 +18,22 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentPersonBinding
-import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.ViewPagerController
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.inbox.InboxFragment
-import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
+import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
-import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -56,7 +43,6 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.util.Calendar
 
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
@@ -88,7 +74,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         val context = requireContext()
 
         requireMainActivity().apply {
-
             setupForFragment<PersonTabbedFragment>()
 
             setSupportActionBar(binding.toolbar)
@@ -203,6 +188,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     }
                 }
             }
+
+            installOnActionResultHandler(actionsViewModel, coordinatorLayout)
         }
 
         binding.fab.setOnClickListener {
@@ -325,12 +312,15 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
             binding.cakeDate.visibility = View.VISIBLE
 
-            viewPager.offscreenPageLimit = 5
-            val adapter = ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
-            adapter.addFrag(PersonPostsFragment::class.java, getString(R.string.posts))
-            adapter.addFrag(PersonCommentsFragment::class.java, getString(R.string.comments))
-            adapter.addFrag(PersonAboutFragment::class.java, getString(R.string.about))
-            viewPager.adapter = adapter
+            if (viewPager.adapter == null) {
+                viewPager.offscreenPageLimit = 5
+                val adapter =
+                    ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
+                adapter.addFrag(PersonPostsFragment::class.java, getString(R.string.posts))
+                adapter.addFrag(PersonCommentsFragment::class.java, getString(R.string.comments))
+                adapter.addFrag(PersonAboutFragment::class.java, getString(R.string.about))
+                viewPager.adapter = adapter
+            }
 
             TabLayoutMediator(
                 tabLayout,

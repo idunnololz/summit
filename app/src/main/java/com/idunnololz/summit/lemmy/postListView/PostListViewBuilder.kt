@@ -89,6 +89,7 @@ class PostListViewBuilder @Inject constructor(
         viewLifecycleOwner: LifecycleOwner,
         isExpanded: Boolean,
         isActionsExpanded: Boolean,
+        alwaysRenderAsUnread: Boolean,
         updateContent: Boolean,
         highlight: Boolean,
         highlightForever: Boolean,
@@ -294,6 +295,12 @@ class PostListViewBuilder @Inject constructor(
                         onImageClick(postView, image, url)
                     }
                 }
+                if (fullContentContainerView != null) {
+                    image.setOnLongClickListener {
+                        onImageClick(postView, image, url)
+                        true
+                    }
+                }
             }
 
             linkTypeImage?.visibility = View.GONE
@@ -415,7 +422,7 @@ class PostListViewBuilder @Inject constructor(
             onPageClick = onPageClick
         )
 
-        if (postView.read) {
+        if (postView.read && !alwaysRenderAsUnread) {
             title.alpha = 0.66f
         } else {
             title.alpha = 1f

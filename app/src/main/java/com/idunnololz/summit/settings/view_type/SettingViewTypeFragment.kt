@@ -245,6 +245,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             viewLifecycleOwner = viewLifecycleOwner,
             isExpanded = false,
             isActionsExpanded = false,
+            alwaysRenderAsUnread = true,
             updateContent = true,
             highlight = false,
             highlightForever = false,

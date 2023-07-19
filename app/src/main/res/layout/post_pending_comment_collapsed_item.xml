@@ -14,16 +14,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <LinearLayout
-        android:id="@+id/threadLinesContainer"
+    <Space
+        android:id="@+id/threadLinesSpacer"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginLeft="@dimen/reddit_content_horizontal_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"></LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <View
         android:id="@+id/topHotspot"
@@ -40,7 +39,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@+id/expandSectionButton"
         app:layout_constraintBottom_toBottomOf="@+id/expandSectionButton"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
         style="?android:attr/progressBarStyleSmall" />
 
     <HorizontalScrollView
@@ -85,6 +84,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer" />
+        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,16 +1,13 @@
 package com.idunnololz.summit.lemmy.community
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.doOnPreDraw
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -43,6 +40,9 @@ import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
+import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
@@ -56,7 +56,6 @@ import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -100,6 +99,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     private lateinit var lemmyAppBarController: LemmyAppBarController
 
     private var swipeActionCallback: LemmySwipeActionCallback? = null
+    private var itemTouchHelper: ItemTouchHelper? = null
 
     private val onBackPressedHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -259,7 +259,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     )
                 },
                 onShowMoreActions = {
-                    showMoreOptionsFor(it)
+                    showMorePostOptions(it, actionsViewModel)
                 },
                 onPostRead = { postView ->
                     viewModel.onPostRead(postView)
@@ -331,6 +331,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         viewModel.currentAccount.observe(viewLifecycleOwner) {
             lemmyAppBarController.onAccountChanged(it)
         }
+
+        installOnActionResultHandler(
+            actionsViewModel = actionsViewModel,
+            snackbarContainer = binding.fabSnackbarCoordinatorLayout,
+        )
 
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.customActionBar)
@@ -423,17 +428,12 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         val view = binding.root
         checkNotNull(view.findNavController())
 
-        val mainActivity = requireMainActivity()
-        mainActivity.apply {
-            insetsChangedLiveData.observe(viewLifecycleOwner) {
-                binding.fab.updateLayoutParams<MarginLayoutParams> {
-                    this.bottomMargin = getBottomNavHeight() + getDimen(R.dimen.padding)
-                }
-            }
+        requireMainActivity().apply {
+            insetViewExceptTopAutomaticallyByPaddingAndNavUi(
+                viewLifecycleOwner, binding.fabSnackbarCoordinatorLayout)
+            insetViewExceptTopAutomaticallyByPaddingAndNavUi(
+                viewLifecycleOwner, binding.recyclerView, binding.customActionBar.height)
         }
-
-        mainActivity.insetViewExceptTopAutomaticallyByPaddingAndNavUi(
-            viewLifecycleOwner, binding.recyclerView, binding.customActionBar.height)
 
         val context = requireContext()
 
@@ -471,7 +471,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             })
         }
 
-        updateDecorator(binding.recyclerView)
+        updateDecoratorAndGestureHandler(binding.recyclerView)
 
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
@@ -516,57 +516,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         binding.rootView.post {
             if (!isBindingAvailable()) return@post
             scheduleStartPostponedTransition(binding.rootView)
-        }
-
-        if (preferences.useGestureActions) {
-            swipeActionCallback = LemmySwipeActionCallback(
-                context,
-                binding.recyclerView,
-                onActionSelected = { action, vh ->
-                    val postView = vh.itemView.getTag(R.id.post_view) as? PostView
-                        ?: return@LemmySwipeActionCallback
-
-                    when (action.id) {
-                        PostGestureAction.Upvote -> {
-                            actionsViewModel.vote(postView, 1)
-                        }
-                        PostGestureAction.Downvote -> {
-                            actionsViewModel.vote(postView, -1)
-                        }
-                        PostGestureAction.Bookmark -> {
-                            getMainActivity()?.showSnackbar(R.string.coming_soon)
-                        }
-                        PostGestureAction.Reply -> {
-
-                            viewPagerController?.openPost(
-                                instance = viewModel.apiInstance,
-                                id =  postView.post.id,
-                                reveal = false,
-                                post = postView,
-                                jumpToComments = false,
-                                currentCommunity = viewModel.currentCommunityRef.value,
-                                videoState = null,
-                            )
-
-                            AddOrEditCommentFragment().apply {
-                                arguments = AddOrEditCommentFragmentArgs(
-                                    viewModel.apiInstance, null, postView, null,
-                                ).toBundle()
-                            }.show(childFragmentManager, "asdf")
-                        }
-                        PostGestureAction.Hide -> {
-                            viewModel.hidePost(postView.post.id)
-                        }
-                        PostGestureAction.MarkAsRead -> {
-                            viewModel.onPostRead(postView, delayMs = 250)
-                        }
-                    }
-                }
-            )
-            updateSwipeActions()
-
-            ItemTouchHelper(requireNotNull(swipeActionCallback))
-                .attachToRecyclerView(binding.recyclerView)
         }
 
         viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
@@ -653,46 +602,74 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         viewPagerController?.onPageSelected()
     }
 
-    private fun updateSwipeActions() {
+    private fun attachGestureHandlerToRecyclerViewIfNeeded() {
         if (!isBindingAvailable()) return
+        if (!preferences.useGestureActions) return
+
         val context = requireContext()
 
-        fun Int.toIcon() =
-            when (this) {
-                PostGestureAction.Upvote ->
-                    R.drawable.baseline_arrow_upward_24
-                PostGestureAction.Downvote ->
-                    R.drawable.baseline_arrow_downward_24
-                PostGestureAction.Bookmark ->
-                    R.drawable.baseline_bookmark_add_24
-                PostGestureAction.Hide ->
-                    R.drawable.baseline_hide_24
-                PostGestureAction.MarkAsRead ->
-                    R.drawable.baseline_check_24
-                PostGestureAction.Reply ->
-                    R.drawable.baseline_reply_24
-                else ->
-                    R.drawable.baseline_close_24
-            }
+        if (itemTouchHelper == null) {
+            swipeActionCallback = LemmySwipeActionCallback(
+                context,
+                binding.recyclerView,
+                onActionSelected = { action, vh ->
+                    val postView = vh.itemView.getTag(R.id.post_view) as? PostView
+                        ?: return@LemmySwipeActionCallback
 
-        swipeActionCallback?.actions =
-            listOf(
-                LemmySwipeActionCallback.SwipeAction(
-                    preferences.postGestureAction1,
-                    context.getDrawableCompat(preferences.postGestureAction1.toIcon())!!.mutate(),
-                    context.getColorCompat(R.color.style_red)
-                ),
-                LemmySwipeActionCallback.SwipeAction(
-                    preferences.postGestureAction2,
-                    context.getDrawableCompat(preferences.postGestureAction2.toIcon())!!.mutate(),
-                    context.getColorCompat(R.color.style_blue)
-                ),
-                LemmySwipeActionCallback.SwipeAction(
-                    preferences.postGestureAction3,
-                    context.getDrawableCompat(preferences.postGestureAction3.toIcon())!!.mutate(),
-                    context.getColorCompat(R.color.style_amber)
-                ),
+                    when (action.id) {
+                        PostGestureAction.Upvote -> {
+                            actionsViewModel.vote(postView, 1)
+                        }
+
+                        PostGestureAction.Downvote -> {
+                            actionsViewModel.vote(postView, -1)
+                        }
+
+                        PostGestureAction.Bookmark -> {
+                            actionsViewModel.savePost(postView.post.id, save = true)
+                        }
+
+                        PostGestureAction.Reply -> {
+
+                            viewPagerController?.openPost(
+                                instance = viewModel.apiInstance,
+                                id = postView.post.id,
+                                reveal = false,
+                                post = postView,
+                                jumpToComments = false,
+                                currentCommunity = viewModel.currentCommunityRef.value,
+                                videoState = null,
+                            )
+
+                            AddOrEditCommentFragment().apply {
+                                arguments = AddOrEditCommentFragmentArgs(
+                                    viewModel.apiInstance, null, postView, null,
+                                ).toBundle()
+                            }.show(childFragmentManager, "asdf")
+                        }
+
+                        PostGestureAction.Hide -> {
+                            viewModel.hidePost(postView.post.id)
+                        }
+
+                        PostGestureAction.MarkAsRead -> {
+                            viewModel.onPostRead(postView, delayMs = 250)
+                        }
+                    }
+                }
             )
+            itemTouchHelper = ItemTouchHelper(requireNotNull(swipeActionCallback))
+        }
+
+        swipeActionCallback?.updatePostSwipeActions()
+
+        itemTouchHelper?.attachToRecyclerView(binding.recyclerView)
+    }
+
+    private fun LemmySwipeActionCallback.updatePostSwipeActions() {
+        if (!isBindingAvailable()) return
+        val context = requireContext()
+        this.actions = preferences.getPostSwipeActions(context)
     }
 
     override fun onResume() {
@@ -728,10 +705,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             adapter?.markPostsAsReadOnScroll = preferences.markPostsAsReadOnScroll
 
             onSelectedLayoutChanged()
-
-            if (preferences.useGestureActions) {
-                updateSwipeActions()
-            }
         }
     }
 
@@ -772,6 +745,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView()")
+
+        itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
+
         super.onDestroyView()
     }
 
@@ -1019,7 +995,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
         if (didLayoutChange) {
             if (isBindingAvailable()) {
-                updateDecorator(binding.recyclerView)
+                updateDecoratorAndGestureHandler(binding.recyclerView)
             }
         }
 
@@ -1032,51 +1008,15 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         }
     }
 
-    private fun updateDecorator(recyclerView: RecyclerView) {
+    private fun updateDecoratorAndGestureHandler(recyclerView: RecyclerView) {
+        // We need to set the gesture and decorator together
+        // Setting the decorator removes the gesture item decorator
+        // So we need to add it back right after
+
         recyclerView.setupDecoratorsForPostList(preferences)
-    }
 
-    @SuppressLint("ResourceType")
-    private fun showMoreOptionsFor(postView: PostView) {
-        if (!isBindingAvailable()) {
-            return
-        }
-
-        val context = requireContext()
-
-        val bottomMenu = BottomMenu(context).apply {
-            setTitle(R.string.more_actions)
-            addItemWithIcon(
-                R.id.hide_post,
-                getString(R.string.hide_post),
-                R.drawable.baseline_hide_24
-            )
-            addItemWithIcon(
-                R.id.block_community,
-                getString(R.string.block_this_community_format, postView.community.name),
-                R.drawable.baseline_block_24
-            )
-            addItemWithIcon(
-                R.id.block_user,
-                getString(R.string.block_this_user_format, postView.creator.name),
-                R.drawable.baseline_person_off_24
-            )
-
-            setOnMenuItemClickListener {
-                when (it.id) {
-                    R.id.hide_post -> {
-                        viewModel.hidePost(postView.post.id)
-                    }
-                    R.id.block_community -> {
-                        actionsViewModel.blockCommunity(postView.community.id)
-                    }
-                    R.id.block_user -> {
-                        actionsViewModel.blockPerson(postView.creator.id)
-                    }
-                }
-            }
-        }
-
-        getMainActivity()?.showBottomMenu(bottomMenu)
+        // Detach before attaching or else attach will no-op
+        itemTouchHelper?.attachToRecyclerView(null)
+        attachGestureHandlerToRecyclerViewIfNeeded()
     }
 }

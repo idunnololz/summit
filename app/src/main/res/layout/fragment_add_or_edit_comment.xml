@@ -1,99 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?backgroundColor">
+    android:fitsSystemWindows="false">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent">
+        android:layout_height="match_parent"
+        android:background="?backgroundColor">
 
-    </com.google.android.material.appbar.MaterialToolbar>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/content"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:background="?backgroundColor">
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
 
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/scroll_view"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:padding="@dimen/padding"
-                android:scrollbarStyle="outsideOverlay"
-                android:scrollbars="vertical"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/comment_editor"
-                app:layout_constraintVertical_weight="1">
+        </com.google.android.material.appbar.MaterialToolbar>
 
-                <TextView
-                    android:id="@+id/replying_to"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textIsSelectable="true"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:background="?backgroundColor">
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/scroll_view"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:padding="@dimen/padding"
+                    android:scrollbarStyle="outsideOverlay"
                     android:scrollbars="vertical"
-                    android:textAppearance="?textAppearanceBodyMedium"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/comment_editor"
+                    app:layout_constraintVertical_weight="1">
 
-            </androidx.core.widget.NestedScrollView>
+                    <TextView
+                        android:id="@+id/replying_to"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textIsSelectable="true"
+                        android:scrollbars="vertical"
+                        android:textAppearance="?textAppearanceBodyMedium"/>
 
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/divider"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/scroll_view"
-                app:layout_constraintBottom_toTopOf="@+id/comment_editor"/>
+                </androidx.core.widget.NestedScrollView>
 
-            <EditText
-                android:id="@+id/comment_editor"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:autofillHints="no"
-                android:hint="@string/comment"
-                android:padding="@dimen/padding"
-                android:background="@null"
-                android:gravity="start|top"
-                android:inputType="textMultiLine|textCapSentences"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/scroll_view"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintVertical_weight="1"/>
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/divider"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/scroll_view"
+                    app:layout_constraintBottom_toTopOf="@+id/comment_editor"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <EditText
+                    android:id="@+id/comment_editor"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:autofillHints="no"
+                    android:hint="@string/comment"
+                    android:padding="@dimen/padding"
+                    android:background="@null"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine|textCapSentences"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/scroll_view"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_weight="1"/>
 
-        <com.idunnololz.summit.view.LoadingView
-            android:id="@+id/loading_view"
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.idunnololz.summit.view.LoadingView
+                android:id="@+id/loading_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/bottom_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            android:background="@color/colorSurface"
+            android:layout_gravity="bottom">
 
-    </FrameLayout>
+            <include
+                android:id="@+id/text_format_toolbar"
+                layout="@layout/text_format_toolbar"/>
+        </HorizontalScrollView>
+    </LinearLayout>
 
-    <HorizontalScrollView
-        android:id="@+id/bottom_bar"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorSurface"
-        android:layout_gravity="bottom">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false">
 
-        <include
-            android:id="@+id/text_format_toolbar"
-            layout="@layout/text_format_toolbar"/>
-    </HorizontalScrollView>
-</LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

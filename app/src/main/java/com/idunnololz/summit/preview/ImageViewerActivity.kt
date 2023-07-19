@@ -3,30 +3,25 @@ package com.idunnololz.summit.preview
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.Transition
-import android.transition.TransitionListenerAdapter
 import android.util.Log
 import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import androidx.navigation.navArgs
-import coil.drawable.MovieDrawable
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
@@ -34,9 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
-import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.*
@@ -508,7 +501,7 @@ class ImageViewerActivity : BaseActivity() {
                         binding.imageView.setImageDrawable(result)
                         binding.dummyImageView.setImageDrawable(result)
 
-                        if (result is MovieDrawable) {
+                        if (result is Animatable) {
                             result.start()
                         }
                     }

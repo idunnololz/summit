@@ -256,6 +256,7 @@ class AccountActionsManager @Inject constructor(
                             {
                                 val voteRef = VotableRef.PostRef(it.post.id)
 
+                                votesManager.clearPendingVotes(action.info.ref)
                                 votesManager.setScore(voteRef, it.counts.score)
                                 it.counts.score
                             },
