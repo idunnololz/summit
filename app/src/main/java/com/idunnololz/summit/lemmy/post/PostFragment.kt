@@ -502,7 +502,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         }
 
                         R.id.swipe_action_bookmark -> {
-                            getMainActivity()?.showSnackbar(R.string.coming_soon)
+                            actionsViewModel.saveComment(commentView.comment.id, true)
                         }
 
                         R.id.swipe_action_reply -> {
