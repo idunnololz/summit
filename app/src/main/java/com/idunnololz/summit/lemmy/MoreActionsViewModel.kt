@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
@@ -27,6 +28,7 @@ class MoreActionsViewModel @Inject constructor(
     val accountManager: AccountManager,
     val accountActionsManager: AccountActionsManager,
     private val hiddenPostsManager: HiddenPostsManager,
+    private val savedManager: SavedManager,
 ) : ViewModel() {
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<BlockPersonResult>()
@@ -91,6 +93,7 @@ class MoreActionsViewModel @Inject constructor(
             apiClient.savePost(id, save)
                 .onSuccess {
                     savePostResult.postValue(it)
+                    savedManager.onPostSaveChanged()
                 }
                 .onFailure {
                     savePostResult.postError(it)
@@ -103,6 +106,7 @@ class MoreActionsViewModel @Inject constructor(
             apiClient.saveComment(id, save)
                 .onSuccess {
                     saveCommentResult.postValue(it)
+                    savedManager.onCommentSaveChanged()
                 }
                 .onFailure {
                     saveCommentResult.postError(it)

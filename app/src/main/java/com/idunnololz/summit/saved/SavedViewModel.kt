@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
@@ -37,6 +38,7 @@ class SavedViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val offlineManager: OfflineManager,
+    private val savedManager: SavedManager,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -89,6 +91,38 @@ class SavedViewModel @Inject constructor(
                     } else {
                         currentAccountView.value = null
                     }
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            savedManager.onPostSaveChange.collect {
+                if (it == SavedManager.SavedState.Changed) {
+                    Log.d(TAG, "onPostSaveChange() - changed")
+
+                    savedManager.resetPostSaveState()
+
+                    fetchingPostPages.clear()
+
+                    postListEngine.clearPages()
+
+                    fetchPostPage(0, true)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            savedManager.onCommentSaveChange.collect {
+                if (it == SavedManager.SavedState.Changed) {
+                    Log.d(TAG, "onCommentSaveChange() - changed")
+
+                    savedManager.resetCommentSaveState()
+
+                    fetchingCommentPages.clear()
+
+                    commentListEngine.clear()
+
+                    fetchCommentPage(0, true)
                 }
             }
         }
