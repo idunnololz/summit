@@ -223,7 +223,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 it
                     .onLeft { changeCommunity(it.id) }
                     .onRight { changeCommunity(it) }
-            }, 350)
+            }, 300)
         }
         communityInfoController = communityInfoViewModel.createController(
             binding.endPanel,
@@ -345,7 +345,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         })
 
         requireMainActivity().apply {
-            this.insetViewAutomaticallyByMargins(this, binding.startPanel.recyclerView)
+            this.insetViewAutomaticallyByMargins(this, binding.startPanel.swipeRefreshLayout)
             this.insetViewAutomaticallyByMargins(this, binding.endPanel.recyclerView)
         }
 

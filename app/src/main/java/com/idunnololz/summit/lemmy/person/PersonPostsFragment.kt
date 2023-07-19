@@ -15,6 +15,7 @@ import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
 import com.idunnololz.summit.lemmy.community.Item
 import com.idunnololz.summit.lemmy.community.ListingItemAdapter
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
@@ -98,7 +99,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                 )
             },
             onShowMoreActions = {
-//                showMoreOptionsFor(it)
+                showMorePostOptions(it, parentFragment.actionsViewModel)
             },
             onPostRead = { postView ->
 //                viewModel.onPostRead(postView)
@@ -108,7 +109,6 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
             }
         )
         onSelectedLayoutChanged()
-
     }
 
     override fun onCreateView(

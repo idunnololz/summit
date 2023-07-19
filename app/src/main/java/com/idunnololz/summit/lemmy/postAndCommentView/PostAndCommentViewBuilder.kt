@@ -13,6 +13,7 @@ import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.FrameLayout
+import android.widget.Space
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -38,6 +39,7 @@ import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
+import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.lemmy.LemmyContentHelper
@@ -47,7 +49,6 @@ import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
-import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
@@ -63,7 +64,6 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
-import com.idunnololz.summit.util.ThreadLinesHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.abbrevNumber
@@ -101,6 +101,9 @@ class PostAndCommentViewBuilder @Inject constructor(
     var hideCommentActions = preferences.hideCommentActions
         private set
 
+    var tapCommentToCollapse = preferences.tapCommentToCollapse
+        private set
+
     private val inflater = LayoutInflater.from(activity)
 
     private var postUiConfig: PostUiConfig = uiConfig.postUiConfig
@@ -113,7 +116,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         ExoPlayerManager.get(activity),
     )
     val voteUiHandler = accountActionsManager.voteUiHandler
-    val threadLinesHelper = ThreadLinesHelper(context)
 
     private val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
     private val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
@@ -131,6 +133,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     fun onPreferencesChanged() {
         uiConfig = preferences.getPostAndCommentsUiConfig()
         hideCommentActions = preferences.hideCommentActions
+        tapCommentToCollapse = preferences.tapCommentToCollapse
     }
 
     fun bindPostView(
@@ -217,6 +220,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             onSignInRequired,
             onInstanceMismatch,
         )
+
+        root.tag = postView
     }
 
     fun bindCommentViewExpanded(
@@ -233,15 +238,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlight: Boolean,
         highlightForever: Boolean,
         viewLifecycleOwner: LifecycleOwner,
-        currentAccountId: PersonId?,
         isActionsExpanded: Boolean,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
         toggleActionsExpanded: () -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-        onEditCommentClick: (CommentView) -> Unit,
-        onDeleteCommentClick: (CommentView) -> Unit,
+        onCommentMoreClick: (CommentView) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
@@ -279,9 +282,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
         }
 
-        threadLinesHelper.populateThreadLines(
-            threadLinesContainer, depth, baseDepth
-        )
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
         lemmyHeaderHelper.populateHeaderSpan(headerView, commentView, instance, onPageClick)
 
         if (commentView.comment.deleted || isDeleting) {
@@ -370,34 +371,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onAddCommentClick(Either.Right(commentView))
         }
         moreButton?.setOnClickListener {
-            PopupMenu(context, it).apply {
-                inflate(R.menu.menu_comment_item)
-                if (commentView.creator.id !=
-                    currentAccountId) {
-                    menu.setGroupVisible(R.id.mod_post_actions, false)
-                    //menu.findItem(R.id.edit_comment).isVisible = false
-                }
-
-                setOnMenuItemClickListener {
-                    when (it.itemId) {
-                        // fix this later or something
-//                        R.id.raw_comment -> {
-//                            val action =
-//                                PostFragmentDirections.actionPostFragmentToCommentRawDialogFragment(
-//                                    commentItemStr = Utils.gson.toJson(commentView)
-//                                )
-//                            findNavController().navigate(action)
-//                        }
-                        R.id.edit_comment -> {
-                            onEditCommentClick(commentView)
-                        }
-                        R.id.delete_comment -> {
-                            onDeleteCommentClick(commentView)
-                        }
-                    }
-                    true
-                }
-            }.show()
+            onCommentMoreClick(commentView)
         }
         if (commentView.comment.distinguished) {
             overlay.visibility = View.VISIBLE
@@ -439,9 +413,22 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         highlightComment(highlight, highlightForever, highlightBg)
 
-        if (isCompactView) {
+        if (tapCommentToCollapse) {
             binding.root.setOnClickListener {
-                toggleActionsExpanded()
+                collapseSection(h.bindingAdapterPosition)
+            }
+        }
+
+        if (isCompactView) {
+            if (tapCommentToCollapse) {
+                binding.root.setOnLongClickListener {
+                    toggleActionsExpanded()
+                    true
+                }
+            } else {
+                binding.root.setOnClickListener {
+                    toggleActionsExpanded()
+                }
             }
         }
 
@@ -452,7 +439,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         root.tag = ThreadLinesData(
-            depth, baseDepth
+            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -473,9 +460,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         scaleTextSizes()
 
-        threadLinesHelper.populateThreadLines(
-            threadLinesContainer, depth, baseDepth
-        )
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
         lemmyHeaderHelper.populateHeaderSpan(
             headerContainer = headerView,
             item = commentView,
@@ -510,7 +495,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         root.tag = ThreadLinesData(
-            depth, baseDepth
+            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -533,9 +518,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         val context = binding.root.context
 
-        threadLinesHelper.populateThreadLines(
-            threadLinesContainer, depth, baseDepth
-        )
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
         headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown))
         headerContainer.setTextSecondPart("")
 
@@ -608,7 +591,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesData(
-            depth, baseDepth
+            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -626,9 +609,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         scaleTextSizes()
 
         val context = holder.itemView.context
-        threadLinesHelper.populateThreadLines(
-            threadLinesContainer, depth, baseDepth
-        )
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
         headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown))
         headerContainer.setTextSecondPart("")
 
@@ -643,7 +624,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesData(
-            depth, baseDepth
+            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -842,6 +823,20 @@ class PostAndCommentViewBuilder @Inject constructor(
 //        )
     }
 
+    fun bindMoreCommentsItem(
+        b: PostMoreCommentsItemBinding,
+        depth: Int,
+        baseDepth: Int,
+    ) = with(b) {
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
+
+        b.root.tag = ThreadLinesData(
+            depth = depth,
+            baseDepth = baseDepth,
+            commentUiConfig.indentationPerLevelDp,
+        )
+    }
+
     fun recycle(b: PostHeaderItemBinding): RecycledState {
         val recycledState = lemmyContentHelper.recycleFullContent(b.fullContent)
         offlineManager.cancelFetch(b.root)
@@ -905,6 +900,19 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     private fun PostPendingCommentCollapsedItemBinding.scaleTextSizes() {
         headerContainer.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
+    }
+
+    private fun Space.updateThreadSpacer(depth: Int, baseDepth: Int) {
+        val absoluteDepth = depth - baseDepth
+
+        updateLayoutParams {
+            width = if (absoluteDepth == 0) {
+                0
+            } else {
+                Utils.convertDpToPixel(
+                    (commentUiConfig.indentationPerLevelDp * (absoluteDepth - 1)).toFloat() + 16f).toInt()
+            }
+        }
     }
 
     private fun Float.toPostTextSize(): Float =

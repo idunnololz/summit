@@ -52,10 +52,20 @@ class MainSettings @Inject constructor(
         context.getString(R.string.hidden_posts),
         context.getString(R.string.hidden_posts_desc)
     )
-    val settingContent = BasicSettingItem(
+    val settingPostList = BasicSettingItem(
         R.drawable.baseline_pages_24,
-        context.getString(R.string.content),
-        context.getString(R.string.setting_content_desc)
+        context.getString(R.string.post_list),
+        context.getString(R.string.setting_post_list_desc)
+    )
+    val settingAbout = BasicSettingItem(
+        R.drawable.outline_info_24,
+        context.getString(R.string.about_summit),
+        context.getString(R.string.about_summit_desc)
+    )
+    val settingSummitCommunity = BasicSettingItem(
+        R.drawable.ic_logo_mono_24,
+        context.getString(R.string.c_summit),
+        context.getString(R.string.summit_community_desc)
     )
 }
 
@@ -336,5 +346,10 @@ class PostAndCommentsSettings @Inject constructor(
                 null,
             ),
         ),
+    )
+
+    val tapCommentToCollapse = OnOffSettingItem(
+        context.getString(R.string.tap_comment_to_collapse),
+        context.getString(R.string.tap_comment_to_collapse_desc),
     )
 }

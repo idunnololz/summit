@@ -15,22 +15,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <LinearLayout
-        android:id="@+id/threadLinesContainer"
+    <Space
+        android:id="@+id/threadLinesSpacer"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginLeft="@dimen/reddit_content_horizontal_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"></LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <View
         android:id="@+id/startGuideLine"
         android:layout_width="@dimen/padding_quarter"
         android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintEnd_toEndOf="@+id/threadLinesSpacer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -49,7 +48,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
         app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
         style="?android:attr/progressBarStyleSmall" />
 
     <com.idunnololz.summit.view.LemmyHeaderView
@@ -87,7 +86,7 @@
         android:visibility="gone"
         android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintTop_toBottomOf="@+id/headerView"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.idunnololz.summit.view.FixedTextView
@@ -99,7 +98,7 @@
         android:textIsSelectable="true"
         android:layout_marginEnd="@dimen/padding_half"
         app:layout_constraintTop_toBottomOf="@+id/media_container"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesContainer"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.Barrier

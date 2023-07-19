@@ -5,14 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.Post
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,10 +26,13 @@ class MoreActionsViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     val accountManager: AccountManager,
     val accountActionsManager: AccountActionsManager,
+    private val hiddenPostsManager: HiddenPostsManager,
 ) : ViewModel() {
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<BlockPersonResult>()
     val deletePostResult = StatefulLiveData<PostView>()
+    val savePostResult = StatefulLiveData<PostView>()
+    val saveCommentResult = StatefulLiveData<CommentView>()
 
     fun blockCommunity(id: CommunityId) {
         blockCommunityResult.setIsLoading()
@@ -76,6 +84,47 @@ class MoreActionsViewModel @Inject constructor(
 
     fun vote(commentView: CommentView, dir: Int) {
         accountActionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), dir)
+    }
+
+    fun savePost(id: PostId, save: Boolean) {
+        viewModelScope.launch {
+            apiClient.savePost(id, save)
+                .onSuccess {
+                    savePostResult.postValue(it)
+                }
+                .onFailure {
+                    savePostResult.postError(it)
+                }
+        }
+    }
+
+    fun saveComment(id: CommentId, save: Boolean) {
+        viewModelScope.launch {
+            apiClient.saveComment(id, save)
+                .onSuccess {
+                    saveCommentResult.postValue(it)
+                }
+                .onFailure {
+                    saveCommentResult.postError(it)
+                }
+        }
+    }
+
+    fun hidePost(id: PostId) {
+        hiddenPostsManager.hidePost(id, apiClient.instance)
+    }
+
+    fun onPostRead(postView: PostView, delayMs: Long) {
+        if (postView.read) {
+            return
+        }
+
+        viewModelScope.launch {
+            if (delayMs > 0) {
+                delay(delayMs)
+            }
+            accountActionsManager.markPostAsRead(apiClient.instance, postView.post.id, read = true)
+        }
     }
 }
 

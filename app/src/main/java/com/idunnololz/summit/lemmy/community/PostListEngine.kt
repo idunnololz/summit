@@ -60,6 +60,9 @@ class PostListEngine(
             createItems()
         }
 
+    val hasMore: Boolean
+        get() = pages.lastOrNull()?.hasMore != false
+
     private val _pages = MutableLiveData<List<LoadedPostsData>>()
 
     /**
@@ -216,7 +219,7 @@ class PostListEngine(
     fun highlightForever(postToHighlight: PostRef): Int {
         this.postToHighlight = null
         this.postToHighlightForever = postToHighlight
-        return  _items.indexOfFirst {
+        return _items.indexOfFirst {
             when (it) {
                 is Item.FooterItem -> false
                 is Item.AutoLoadItem -> false
@@ -300,5 +303,15 @@ class PostListEngine(
 
     fun setSecondaryKey(key: String) {
         secondaryKey = key
+    }
+
+    fun removePost(id: PostId) {
+        val pages = _pages.value?.toMutableList() ?: return
+        for ((index, page) in pages.withIndex()) {
+            if (page.posts.any { it.post.id == id }) {
+                pages[index] = page.copy(posts = page.posts.filter { it.post.id != id })
+            }
+        }
+        _pages.value = pages
     }
 }

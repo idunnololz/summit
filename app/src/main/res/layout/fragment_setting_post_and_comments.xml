@@ -134,13 +134,31 @@
                     app:layout_constraintTop_toBottomOf="@+id/section_title2"/>
 
                 <include
+                    android:id="@+id/indentation_per_level"
+                    layout="@layout/slider_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting2"/>
+
+                <include
                     android:id="@+id/show_comment_actions"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting2"/>
+                    app:layout_constraintTop_toBottomOf="@+id/indentation_per_level"/>
+
+                <include
+                    android:id="@+id/tap_comment_to_collapse"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/show_comment_actions"/>
 
                 <include
                     android:id="@+id/comment_thread_style"
@@ -149,7 +167,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/show_comment_actions"/>
+                    app:layout_constraintTop_toBottomOf="@+id/tap_comment_to_collapse"/>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"

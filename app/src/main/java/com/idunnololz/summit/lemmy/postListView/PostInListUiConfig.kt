@@ -50,10 +50,16 @@ data class CommentUiConfig(
     val headerTextSizeSp: Float = 14f,
     val footerTextSizeSp: Float = 14f,
     val contentTextSizeSp: Float = 14f,
+    val indentationPerLevelDp: Int = 16,
 ) {
     fun updateTextSizeMultiplier(it: Float): CommentUiConfig =
         this.copy(
             textSizeMultiplier = it,
+        )
+
+    fun updateIndentationPerLevelDp(it: Float): CommentUiConfig =
+        this.copy(
+            indentationPerLevelDp = it.toInt(),
         )
 }
 

@@ -57,6 +57,7 @@ class ListingItemAdapter(
     private val inflater = LayoutInflater.from(context)
 
     var markPostsAsReadOnScroll: Boolean = false
+    var alwaysRenderAsUnread: Boolean = false
 
     var items: List<Item> = listOf()
         private set
@@ -143,6 +144,7 @@ class ListingItemAdapter(
                         viewLifecycleOwner = requireNotNull(viewLifecycleOwner),
                         isExpanded = isExpanded,
                         isActionsExpanded = isActionsExpanded,
+                        alwaysRenderAsUnread = alwaysRenderAsUnread,
                         updateContent = false,
                         highlight = item.highlight,
                         highlightForever = item.highlightForever,
@@ -218,6 +220,7 @@ class ListingItemAdapter(
                     viewLifecycleOwner = requireNotNull(viewLifecycleOwner),
                     isExpanded = isExpanded,
                     isActionsExpanded = isActionsExpanded,
+                    alwaysRenderAsUnread = alwaysRenderAsUnread,
                     updateContent = true,
                     highlight = item.highlight,
                     highlightForever = item.highlightForever,

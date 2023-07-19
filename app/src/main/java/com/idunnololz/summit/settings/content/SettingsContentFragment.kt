@@ -70,5 +70,17 @@ class SettingsContentFragment : BaseFragment<FragmentSettingsContentBinding>() {
                 updateRendering()
             }
         )
+        OnOffSettingItem(
+            getString(R.string.mark_posts_as_read_on_scroll),
+            getString(R.string.mark_posts_as_read_on_scroll_desc),
+        ).bindTo(
+            binding.markPostsAsReadOnScroll,
+            { preferences.markPostsAsReadOnScroll },
+            {
+                preferences.markPostsAsReadOnScroll = it
+
+                updateRendering()
+            }
+        )
     }
 }

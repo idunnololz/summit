@@ -120,7 +120,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
             supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPane)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.appBar)
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.recyclerView)
         }
 

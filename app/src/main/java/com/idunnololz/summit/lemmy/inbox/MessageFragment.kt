@@ -32,6 +32,8 @@ import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.post.PostsAdapter
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
+import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.util.BaseFragment
@@ -402,32 +404,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         }).toBundle()
                     }.show(childFragmentManager, "asdf")
                 },
-                onEditCommentClick = {
-                    if (viewModel.accountManager.currentAccount.value == null) {
-                        PreAuthDialogFragment.newInstance(R.id.action_edit_comment)
-                            .show(childFragmentManager, "asdf")
-                        return@PostsAdapter
-                    }
-
-                    AddOrEditCommentFragment().apply {
-                        arguments =
-                            AddOrEditCommentFragmentArgs(
-                                args.instance,null, null, it).toBundle()
-                    }.show(childFragmentManager, "asdf")
-
-                },
-                onDeleteCommentClick = {
-                    AlertDialogFragment.Builder()
-                        .setMessage(R.string.delete_comment_confirm)
-                        .setPositiveButton(android.R.string.ok)
-                        .setNegativeButton(android.R.string.cancel)
-                        .setExtra(EXTRA_COMMENT_ID, it.comment.id.toString())
-                        .createAndShow(
-                            childFragmentManager,
-                            CONFIRM_DELETE_COMMENT_TAG
-                        )
-
-                },
                 onImageClick = { postOrCommentView, view, url ->
                     getMainActivity()?.openImage(view, binding.appBar, null, url, null)
                 },
@@ -439,6 +415,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 },
                 onPostMoreClick = {
                     getMainActivity()?.showBottomMenu(getPostMoreMenu(it))
+                    showMorePostOptions(it, actionsViewModel)
+                },
+                onCommentMoreClick = {
+                    showMoreCommentOptions(it, actionsViewModel)
                 },
                 onFetchComments = {
                     val postId = when (val inboxItem = args.inboxItem) {

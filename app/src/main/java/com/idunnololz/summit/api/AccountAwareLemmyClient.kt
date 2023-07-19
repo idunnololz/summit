@@ -29,6 +29,8 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.api.dto.SaveComment
+import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
@@ -75,35 +77,43 @@ class AccountAwareLemmyClient @Inject constructor(
         }
     }
 
-    suspend fun fetchSavedPosts(
-        sortType: SortType? = null,
-        listingType: ListingType? = null,
+    suspend fun fetchSavedPostsWithRetry(
         page: Int,
         limit: Int? = null,
         force: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<List<PostView>> {
-        return apiClient.fetchPosts(
-            account = account,
-            communityIdOrName = null,
-            sortType = sortType
-                ?: if (account == null) {
-                    SortType.Active
-                } else {
-                    SortType.values()[account.defaultSortType]
-                },
-            listingType = listingType
-                ?: if (account == null) {
-                    ListingType.All
-                } else {
-                    ListingType.values()[account.defaultListingType]
-                },
-            limit = limit,
-            savedOnly = true,
-            page = page,
-            force = force,
-        ).autoSignOut(account)
-    }
+    ): Result<List<PostView>> =
+        if (account != null) {
+            retry {
+                apiClient.fetchSavedPosts(
+                    account = account,
+                    limit = limit,
+                    page = page,
+                    force = force,
+                ).autoSignOut(account)
+            }
+        } else {
+            createAccountErrorResult()
+        }
+
+    suspend fun fetchSavedCommentsWithRetry(
+        page: Int,
+        limit: Int? = null,
+        force: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<List<CommentView>> =
+        if (account != null) {
+            retry {
+                apiClient.fetchSavedComments(
+                    account = account,
+                    limit = limit,
+                    page = page,
+                    force = force,
+                ).autoSignOut(account)
+            }
+        } else {
+            createAccountErrorResult()
+        }
 
     suspend fun fetchPosts(
         communityIdOrName: Either<Int, String>? = null,
@@ -448,6 +458,29 @@ class AccountAwareLemmyClient @Inject constructor(
                 .autoSignOut(account)
         }
 
+    suspend fun savePost(
+        postId: PostId,
+        save: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<PostView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.savePost(postId, save, account)
+                .autoSignOut(account)
+        }
+
+    suspend fun saveComment(
+        commentId: CommentId,
+        save: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<CommentView> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.saveComment(commentId, save, account)
+                .autoSignOut(account)
+        }
 
     fun changeInstance(site: String) =
         apiClient.changeInstance(site)

@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.createOrEditPost
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.children
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
@@ -19,7 +21,9 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
+import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -28,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
-    FullscreenDialogFragment {
+    FullscreenDialogFragment, BackPressHandler {
 
     companion object {
         const val REQUEST_KEY = "CreateOrEditPostFragment_req_key"
@@ -41,21 +45,27 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
 
     private val textFormatterHelper = TextFormatterHelper()
 
-    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        // Callback is invoked after the user selects a media item or closes the
-        // photo picker.
-        if (uri != null) {
-            viewModel.uploadImage(args.instance, uri)
-        }
-    }
+    private val launcher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val uri = it.data?.data
 
-    private val imagePickerLauncherForUrl = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        // Callback is invoked after the user selects a media item or closes the
-        // photo picker.
-        if (uri != null) {
-            viewModel.uploadImageForUrl(args.instance, uri)
+                if (uri != null) {
+                    viewModel.uploadImage(args.instance, uri)
+                }
+            }
         }
-    }
+
+    private val launcherForUrl =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val uri = it.data?.data
+
+                if (uri != null) {
+                    viewModel.uploadImageForUrl(args.instance, uri)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -94,8 +104,8 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.content)
+            insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.coordinatorLayout)
         }
-
 
         if (isEdit()) {
             binding.toolbar.title = getString(R.string.edit_post)
@@ -143,7 +153,56 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
         textFormatterHelper.setupTextFormatterToolbar(
             binding.textFormatToolbar,
             postEditor,
-            imagePickerLauncher,
+            onChooseImageClick = {
+                val bottomMenu = BottomMenu(context).apply {
+                    setTitle(R.string.insert_image)
+                    addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
+                    addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
+                    addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
+                    addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
+
+                    setOnMenuItemClickListener {
+                        when (it.id) {
+                            R.id.from_camera -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .cameraOnly()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                            R.id.from_gallery -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .galleryOnly()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                            R.id.from_camera_with_editor -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .cameraOnly()
+                                    .crop()
+                                    .cropFreeStyle()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                            R.id.from_gallery_with_editor -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .galleryOnly()
+                                    .crop()
+                                    .cropFreeStyle()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                        }
+                    }
+                }
+
+
+                bottomMenu.show(
+                    mainActivity = requireMainActivity(),
+                    viewGroup = binding.coordinatorLayout,
+                    expandFully = true,
+                    handleBackPress = false
+                )
+            },
             onPreviewClick = {
                 PreviewCommentDialogFragment()
                     .apply {
@@ -159,7 +218,54 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
         binding.loadingView.hideAll()
 
         binding.uploadImage.setOnClickListener {
-            imagePickerLauncherForUrl.launch(PickVisualMediaRequest(ImageOnly))
+            val bottomMenu = BottomMenu(context).apply {
+                setTitle(R.string.insert_image)
+                addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
+                addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
+                addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
+                addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
+
+                setOnMenuItemClickListener {
+                    when (it.id) {
+                        R.id.from_camera -> {
+                            val intent = ImagePicker.with(requireActivity())
+                                .cameraOnly()
+                                .createIntent()
+                            launcherForUrl.launch(intent)
+                        }
+                        R.id.from_gallery -> {
+                            val intent = ImagePicker.with(requireActivity())
+                                .galleryOnly()
+                                .createIntent()
+                            launcherForUrl.launch(intent)
+                        }
+                        R.id.from_camera_with_editor -> {
+                            val intent = ImagePicker.with(requireActivity())
+                                .cameraOnly()
+                                .crop()
+                                .cropFreeStyle()
+                                .createIntent()
+                            launcherForUrl.launch(intent)
+                        }
+                        R.id.from_gallery_with_editor -> {
+                            val intent = ImagePicker.with(requireActivity())
+                                .galleryOnly()
+                                .crop()
+                                .cropFreeStyle()
+                                .createIntent()
+                            launcherForUrl.launch(intent)
+                        }
+                    }
+                }
+            }
+
+
+            bottomMenu.show(
+                mainActivity = requireMainActivity(),
+                viewGroup = binding.coordinatorLayout,
+                expandFully = true,
+                handleBackPress = false
+            )
         }
         viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
             updateEnableState()
@@ -270,4 +376,19 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
     private fun isEdit() =
         args.post != null
 
+    override fun onBackPressed(): Boolean {
+        if (isBindingAvailable()) {
+            if (binding.coordinatorLayout.childCount > 0) {
+                binding.coordinatorLayout.removeAllViews()
+                return true
+            }
+        }
+
+        try {
+            dismiss()
+        } catch (e: IllegalStateException) {
+            // do nothing... very rare
+        }
+        return true
+    }
 }

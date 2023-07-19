@@ -1,5 +1,7 @@
 package com.idunnololz.summit.lemmy.comment
 
+import android.app.Activity
+import android.app.Dialog
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.method.ScrollingMovementMethod
@@ -9,6 +11,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
@@ -18,6 +21,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
@@ -27,8 +31,10 @@ import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
+import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -42,7 +48,7 @@ import java.lang.Integer.min
 
 @AndroidEntryPoint
 class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
-    FullscreenDialogFragment, SignInNavigator {
+    FullscreenDialogFragment, SignInNavigator, BackPressHandler {
 
     companion object {
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
@@ -55,13 +61,16 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
 
     private val textFormatterHelper = TextFormatterHelper()
 
-    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        // Callback is invoked after the user selects a media item or closes the
-        // photo picker.
-        if (uri != null) {
-            viewModel.uploadImage(args.instance, uri)
+    private val launcher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val uri = it.data?.data
+
+                if (uri != null) {
+                    viewModel.uploadImage(args.instance, uri)
+                }
+            }
         }
-    }
 
     @Parcelize
     enum class Result : Parcelable {
@@ -106,6 +115,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomBar)
+            insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.coordinatorLayout)
         }
 
         viewModel.currentAccount.observe(viewLifecycleOwner) {
@@ -242,7 +252,55 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         textFormatterHelper.setupTextFormatterToolbar(
             binding.textFormatToolbar,
             commentEditor,
-            imagePickerLauncher,
+            onChooseImageClick = {
+                val bottomMenu = BottomMenu(context).apply {
+                    setTitle(R.string.insert_image)
+                    addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
+                    addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
+                    addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
+                    addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
+
+                    setOnMenuItemClickListener {
+                        when (it.id) {
+                            R.id.from_camera -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .cameraOnly()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                            R.id.from_gallery -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .galleryOnly()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                            R.id.from_camera_with_editor -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .cameraOnly()
+                                    .crop()
+                                    .cropFreeStyle()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                            R.id.from_gallery_with_editor -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .galleryOnly()
+                                    .crop()
+                                    .cropFreeStyle()
+                                    .createIntent()
+                                launcher.launch(intent)
+                            }
+                        }
+                    }
+                }
+
+                bottomMenu.show(
+                    mainActivity = requireMainActivity(),
+                    viewGroup = binding.coordinatorLayout,
+                    expandFully = true,
+                    handleBackPress = false
+                )
+            },
             onPreviewClick = {
                 PreviewCommentDialogFragment()
                     .apply {
@@ -289,5 +347,21 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
     }
 
     override fun proceedAnyways(tag: Int) {
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (isBindingAvailable()) {
+            if (binding.coordinatorLayout.childCount > 0) {
+                binding.coordinatorLayout.removeAllViews()
+                return true
+            }
+        }
+
+        try {
+            dismiss()
+        } catch (e: IllegalStateException) {
+            // do nothing... very rare
+        }
+        return true
     }
 }

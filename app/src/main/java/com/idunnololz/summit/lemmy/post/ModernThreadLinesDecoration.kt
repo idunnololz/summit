@@ -4,9 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
@@ -20,8 +17,8 @@ class ModernThreadLinesDecoration(
     private val isCompactView: Boolean,
 ) : RecyclerView.ItemDecoration() {
 
-    private val distanceBetweenLines =
-        context.resources.getDimensionPixelSize(R.dimen.thread_line_total_size)
+    private val distanceBetweenLinesUnit =
+        Utils.convertDpToPixel(1f)
     private val startingPadding =
         context.resources.getDimensionPixelSize(R.dimen.reddit_content_horizontal_padding)
     private val lineMargin = context.getDimen(R.dimen.padding_half)
@@ -78,31 +75,36 @@ class ModernThreadLinesDecoration(
             val translationX = view.translationX
             val translationY = view.translationY
 
-            val totalDepth = when (tag) {
+            val threadLinesData: ThreadLinesData? = when (tag) {
                 is ThreadLinesData -> {
-                    tag.depth - tag.baseDepth
+                    tag
                 }
                 else -> {
-                    -1
+                    null
                 }
             }
 
-            if (totalDepth == -1) continue
+            threadLinesData ?: continue
 
-            val x =
-                view.left + (totalDepth.toFloat() - 1f) * distanceBetweenLines + startingPadding
-            linePaint.color = getColorForDepth(totalDepth)
+            val totalDepth = threadLinesData.depth - threadLinesData.baseDepth
+            val indent = (totalDepth.toFloat() - 1f) * distanceBetweenLinesUnit *
+                    threadLinesData.indentationPerLevel
+            val x = view.left + indent + startingPadding + (linePaint.strokeWidth / 2)
 
-            linePaint.alpha = (view.alpha * 255).toInt()
-            dividerPaint.alpha = (view.alpha * 255).toInt()
+            if (totalDepth > 0) {
+                linePaint.color = getColorForDepth(totalDepth)
 
-            c.drawLine(
-                x + translationX,
-                view.top.toFloat() + translationY + lineMargin,
-                x + translationX,
-                view.bottom.toFloat() + translationY - lineMargin,
-                linePaint
-            )
+                linePaint.alpha = (view.alpha * 255).toInt()
+                dividerPaint.alpha = (view.alpha * 255).toInt()
+
+                c.drawLine(
+                    x + translationX,
+                    view.top.toFloat() + translationY + lineMargin,
+                    x + translationX,
+                    view.bottom.toFloat() + translationY - lineMargin,
+                    linePaint
+                )
+            }
 
             if (drawDividerAbove) {
                 val y = view.top.toFloat() + translationY

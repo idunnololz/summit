@@ -10,13 +10,14 @@ import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.CommentPageResult
+import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.ViewPagerController
-import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,20 +38,12 @@ class PersonTabbedViewModel @Inject constructor(
         private const val TAG = "PersonTabbedViewModel"
     }
 
-    data class CommentPageResult(
-        val comments: List<CommentView>,
-        val instance: String,
-        val pageIndex: Int,
-        val hasMore: Boolean,
-        val error: Throwable?,
-    )
-
     val personData = StatefulLiveData<PersonDetailsData>()
     val postsState = StatefulLiveData<Unit>()
     val commentsState = StatefulLiveData<Unit>()
 
     val postListEngine = PostListEngine(infinity = true, coroutineScopeFactory, offlineManager)
-    var commentPages: List<CommentPageResult> = listOf()
+    var commentListEngine = CommentListEngine()
 
     val instance: String
         get() = apiClient.instance
@@ -110,7 +103,7 @@ class PersonTabbedViewModel @Inject constructor(
                         )
                     }
 
-                    if (postListEngine.pages.lastOrNull()?.hasMore != false) {
+                    if (postListEngine.hasMore || force) {
                         postListEngine.addPage(LoadedPostsData(
                             it.posts,
                             apiClient.instance,
@@ -119,8 +112,8 @@ class PersonTabbedViewModel @Inject constructor(
                         ))
                         postListEngine.createItems()
                     }
-                    if (commentPages.lastOrNull()?.hasMore != false) {
-                        addComments(CommentPageResult(
+                    if (commentListEngine.hasMore || force) {
+                        commentListEngine.addComments(CommentPageResult(
                             it.comments,
                             apiClient.instance,
                             pageIndex,
@@ -136,7 +129,7 @@ class PersonTabbedViewModel @Inject constructor(
                 }
                 .onFailure {
 
-                    if (postListEngine.pages.lastOrNull()?.hasMore != false) {
+                    if (postListEngine.hasMore || force) {
                         postListEngine.addPage(LoadedPostsData(
                             listOf(),
                             apiClient.instance,
@@ -146,8 +139,8 @@ class PersonTabbedViewModel @Inject constructor(
                         ))
                         postListEngine.createItems()
                     }
-                    if (commentPages.lastOrNull()?.hasMore != false) {
-                        addComments(CommentPageResult(
+                    if (commentListEngine.hasMore || force) {
+                        commentListEngine.addComments(CommentPageResult(
                             listOf(),
                             apiClient.instance,
                             pageIndex,
@@ -168,20 +161,7 @@ class PersonTabbedViewModel @Inject constructor(
     }
 
     fun fetchNextCommentPage() {
-        val nextPage = (commentPages.lastOrNull()?.pageIndex ?: 0) + 1
-        fetchPage(nextPage, false)
-    }
-
-    private fun addComments(commentPageResult: CommentPageResult) {
-        val newPages = commentPages.toMutableList()
-        val existingPage = newPages.getOrNull(commentPageResult.pageIndex)
-        if (existingPage != null) {
-            newPages[commentPageResult.pageIndex] = existingPage
-        } else {
-            newPages.add(commentPageResult)
-        }
-
-        commentPages = newPages
+        fetchPage(commentListEngine.nextPage, false)
     }
 
     data class PersonDetailsData(

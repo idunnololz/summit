@@ -18,20 +18,19 @@ class SettingsManager @Inject constructor(
 
     private val mainSettingItems = listOf(
         SubgroupItem(
-            context.getString(R.string.appearance),
+            context.getString(R.string.look_and_feel),
             listOf(
                 mainSettings.settingTheme,
-                mainSettings.settingContent,
+                mainSettings.settingPostList,
                 mainSettings.settingViewType,
                 mainSettings.settingPostAndComment,
+                mainSettings.settingGestures,
             )
         ),
         SubgroupItem(
-            context.getString(R.string.behavior),
+            context.getString(R.string.account_settings),
             listOf(
                 mainSettings.settingLemmyWeb,
-                mainSettings.settingGestures,
-                mainSettings.settingHistory,
             )
         ),
         SubgroupItem(
@@ -39,6 +38,9 @@ class SettingsManager @Inject constructor(
             listOf(
                 mainSettings.settingCache,
                 mainSettings.settingHiddenPosts,
+//                mainSettings.settingHistory,
+                mainSettings.settingAbout,
+                mainSettings.settingSummitCommunity,
             )
         )
     )
@@ -87,6 +89,7 @@ data class SliderSettingItem(
     override val title: String,
     val minValue: Float,
     val maxValue: Float,
+    val stepSize: Float? = null,
 ) : SettingItem()
 
 @Parcelize

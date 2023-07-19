@@ -190,4 +190,39 @@ object LemmyFakeModels {
         creator_blocked = false,
         my_vote = null,
     )
+
+    val fakeCommentView3 = CommentView(
+        comment = Comment(
+            id = 3,
+            creator_id = 1,
+            post_id = 2,
+            content = "Quite.",
+            removed = false,
+            published = "2023-04-30T07:11:18Z",
+            updated = "2023-04-30T07:17:18Z",
+            deleted = false,
+            ap_id = "http://meme.idunnololz.com",
+            local = true,
+            path = "1234.456.789",
+            distinguished = false,
+            language_id = 1,
+        ),
+        creator = fakePerson2,
+        post = fakePost,
+        community = fakeCommunity,
+        counts = CommentAggregates(
+            3,
+            1,
+            4,
+            5,
+            1,
+            published = "2023-04-31T07:13:18Z",
+            0,
+        ),
+        creator_banned_from_community = false,
+        subscribed = SubscribedType.NotSubscribed,
+        saved = false,
+        creator_blocked = false,
+        my_vote = null,
+    )
 }
