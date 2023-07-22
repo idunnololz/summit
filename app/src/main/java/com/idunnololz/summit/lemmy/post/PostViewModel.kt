@@ -88,7 +88,7 @@ class PostViewModel @Inject constructor(
 
     }
 
-    val instance: String
+    val apiInstance: String
         get() = lemmyApiClient.instance
 
     fun fetchPostData(
@@ -157,7 +157,7 @@ class PostViewModel @Inject constructor(
             val comments = commentsResult.getOrNull()
 
             if (post != null) {
-                postReadManager.markPostAsReadLocal(instance, post.post.id, read = true)
+                postReadManager.markPostAsReadLocal(apiInstance, post.post.id, read = true)
             }
 
             if (post == null || comments == null) {

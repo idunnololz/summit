@@ -40,7 +40,7 @@ fun RecyclerView.setupDecoratorsForPostList(preferences: Preferences) {
         this.addItemDecoration(
             VerticalSpaceItemDecoration(
                 this.context.getDimen(R.dimen.padding),
-                false
+                true
             )
         )
     }

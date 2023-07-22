@@ -101,7 +101,7 @@ class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
                 parentFragment.viewModel.fetchCommentPage(it, false)
             },
             onCommentMoreClick = {
-                showMoreCommentOptions(it, actionsViewModel)
+                showMoreCommentOptions(parentFragment.viewModel.instance, it, actionsViewModel)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)

@@ -99,7 +99,11 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                 )
             },
             onShowMoreActions = {
-                showMorePostOptions(it, parentFragment.actionsViewModel)
+                showMorePostOptions(
+                    instance = parentFragment.viewModel.instance,
+                    postView = it,
+                    actionsViewModel = parentFragment.actionsViewModel
+                )
             },
             onPostRead = { postView ->
 //                viewModel.onPostRead(postView)
