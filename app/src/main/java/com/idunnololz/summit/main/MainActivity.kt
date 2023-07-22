@@ -19,6 +19,7 @@ import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -48,6 +49,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
@@ -91,8 +93,6 @@ class MainActivity : BaseActivity() {
     // holds the original Toolbar height.
     // this can also be obtained via (an)other method(s)
     private var toolbarHeight: Int = 0
-
-    private var lastCustomAppBarOffset = -1f
 
     private var lastToolbarAppBarOffset = -1f
 
@@ -513,7 +513,8 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchPage(page: PageRef) {
-        val isMainFragment = binding.bottomNavigationView.selectedItemId == R.id.mainFragment
+        val isMainFragment = binding.bottomNavigationView.selectedItemId == R.id.mainFragment &&
+                currentNavController?.currentDestination?.id == R.id.mainFragment
 
         fun handleWithMainFragment() {
             if (binding.bottomNavigationView.selectedItemId != R.id.mainFragment) {
@@ -706,21 +707,29 @@ class MainActivity : BaseActivity() {
 
     private fun createOrGetSubredditSelectorController(): CommunitySelectorController =
         communitySelectorController
-            ?: viewModel.communitySelectorControllerFactory.create(this).also {
-                it.inflate(binding.overlayContainer)
+            ?: viewModel.communitySelectorControllerFactory.create(
+                context = this,
+                viewModel = viewModel,
+                viewLifecycleOwner = this
+            ).also {
+                it.inflate(binding.bottomSheetContainer)
                 it.setCommunities(viewModel.communities.value)
 
                 communitySelectorController = it
             }
 
-    fun showCommunitySelector(): CommunitySelectorController {
+    fun showCommunitySelector(currentCommunityRef: CommunityRef? = null): CommunitySelectorController {
         val communitySelectorController = createOrGetSubredditSelectorController()
 
         viewModel.communities.value.let {
             communitySelectorController.setCommunities(it)
+            communitySelectorController.setCurrentCommunity(currentCommunityRef)
+            communitySelectorController.onCommunityInfoClick = {
+                showCommunityInfo(it)
+            }
         }
 
-        communitySelectorController.show(this, this)
+        communitySelectorController.show(binding.bottomSheetContainer, this, this)
 
         return communitySelectorController
     }
@@ -978,6 +987,12 @@ class MainActivity : BaseActivity() {
                 showBottomNav()
                 showNotificationBarBg()
             }
+            CommunityInfoFragment::class -> {
+                hideActionBar(animate)
+                disableBottomNavViewScrolling()
+                showBottomNav()
+                showNotificationBarBg()
+            }
             SavedTabbedFragment::class -> {
                 hideActionBar(animate)
                 disableBottomNavViewScrolling()
@@ -1028,11 +1043,17 @@ class MainActivity : BaseActivity() {
         }
 
         if (transitionName != null) {
+            val sharedElements = mutableListOf<Pair<View, String>>()
+            sharedElements += Pair.create(sharedElement, transitionName)
+            if (appBar != null) {
+                sharedElements += Pair.create(appBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME)
+            }
+            sharedElements += Pair.create(
+                binding.bottomNavigationView, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME)
+
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this,
-                androidx.core.util.Pair.create(sharedElement, transitionName),
-                androidx.core.util.Pair.create(appBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME),
-                androidx.core.util.Pair.create(binding.bottomNavigationView, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME),
+                *sharedElements.toTypedArray(),
             )
             startActivity(intent, options.toBundle())
 //            startActivity(intent)
@@ -1060,8 +1081,8 @@ class MainActivity : BaseActivity() {
         currentNavController?.navigateSafe(direction)
     }
 
-    fun showSnackbar(message: Int) {
-        Snackbar.make(getSnackbarContainer(), message, Snackbar.LENGTH_LONG)
-            .show()
+    fun showCommunityInfo(communityRef: CommunityRef) {
+        val direction = MainDirections.actionGlobalCommunityInfoFragment(communityRef)
+        currentNavController?.navigateSafe(direction)
     }
 }

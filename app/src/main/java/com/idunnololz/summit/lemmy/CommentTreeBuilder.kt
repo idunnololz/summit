@@ -42,8 +42,7 @@ class CommentTreeBuilder(
                 "Depth: ${firstComment?.getDepth()} First comment: ${firstComment?.content}. ")
 
         val topNodes = mutableListOf<CommentNodeData>()
-
-        supplementaryComments.values.forEach { comment ->
+        comments?.forEach { comment ->
             val depth = comment.comment.getDepth().minus(depthOffset)
             val node = CommentNodeData(
                 commentView = PostViewModel.ListView.CommentListView(
@@ -54,7 +53,7 @@ class CommentTreeBuilder(
             )
             map[comment.comment.id] = node
         }
-        comments?.forEach { comment ->
+        supplementaryComments.values.forEach { comment ->
             val depth = comment.comment.getDepth().minus(depthOffset)
             val node = CommentNodeData(
                 commentView = PostViewModel.ListView.CommentListView(

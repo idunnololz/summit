@@ -11,8 +11,13 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -182,10 +187,40 @@ class Preferences @Inject constructor(
             prefs.edit().putInt(KEY_POST_GESTURE_ACTION_3, value).apply()
         }
 
+    var commentGestureAction1: Int
+        get() = prefs.getInt(KEY_COMMENT_GESTURE_ACTION_1, CommentGestureAction.Upvote)
+        set(value) {
+            prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_1, value).apply()
+        }
+
+    var commentGestureAction2: Int
+        get() = prefs.getInt(KEY_COMMENT_GESTURE_ACTION_2, CommentGestureAction.Downvote)
+        set(value) {
+            prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_2, value).apply()
+        }
+
+    var commentGestureAction3: Int
+        get() = prefs.getInt(KEY_COMMENT_GESTURE_ACTION_3, CommentGestureAction.Reply)
+        set(value) {
+            prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_3, value).apply()
+        }
+
     var commentThreadStyle: CommentThreadStyleId
         get() = prefs.getInt(KEY_COMMENT_THREAD_STYLE, CommentsThreadStyle.Modern)
         set(value) {
             prefs.edit().putInt(KEY_COMMENT_THREAD_STYLE, value).apply()
+        }
+
+    var showNsfwPosts: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_NSFW_POSTS, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_HIDE_NSFW_POSTS, value).apply()
+        }
+
+    var blurNsfwPosts: Boolean
+        get() = prefs.getBoolean(KEY_BLUR_NSFW_POSTS, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_BLUR_NSFW_POSTS, value).apply()
         }
 
     fun reset(key: String) {

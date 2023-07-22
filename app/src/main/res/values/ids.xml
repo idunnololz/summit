@@ -74,4 +74,5 @@
     <item name="email" type="id" />
     <item name="from_camera_with_editor" type="id" />
     <item name="from_gallery_with_editor" type="id" />
+    <item name="unblock_community" type="id" />
 </resources>

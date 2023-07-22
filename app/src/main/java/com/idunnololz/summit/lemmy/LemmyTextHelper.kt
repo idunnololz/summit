@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy
 
 import android.content.Context
 import android.graphics.RectF
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.widget.TextView
 import com.idunnololz.summit.R
@@ -10,8 +11,11 @@ import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.markwon.DetailsTagHandler
+import com.idunnololz.summit.util.markwon.postProcessDetails
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonPlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
@@ -35,6 +39,7 @@ object LemmyTextHelper {
 
         onImageClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
         bindLemmyText(textView, text, instance)
         textView.movementMethod = CustomLinkMovementMethod().apply {
@@ -53,13 +58,18 @@ object LemmyTextHelper {
                     return pageRef != null
                 }
             }
-            onLinkLongClickListener = DefaultLinkLongClickListener(textView.context)
+            onLinkLongClickListener = DefaultLinkLongClickListener(textView.context, onLinkLongClick)
             this.onImageClickListener = onImageClick
         }
     }
 
     private fun bindLemmyText(textView: TextView, text: String, instance: String) {
-        createMarkwon(textView.context, instance).setMarkdown(textView, text)
+        createMarkwon(textView.context, instance).let {
+            val spanned = SpannableStringBuilder(it.toMarkdown(text))
+            postProcessDetails(spanned, textView)
+
+            textView.text = spanned
+        }
     }
 
     private class LemmyPlugin(
@@ -75,7 +85,7 @@ object LemmyTextHelper {
          * 4) Matches against full community names (!a@b.com)
          */
         private val largeRegex = Pattern.compile("""
-            \^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(!|[cC]/|@|[uU]/)([^@\s]+)@([^@\s]+\.[^@\s]+)
+            \^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\s+\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(!|[cC]/|@|[uU]/)([^@\s]+)@([^@\s]+\.[^@\s]+)
         """.trimIndent())
 
         private fun processAll(s: String): String {
@@ -91,7 +101,9 @@ object LemmyTextHelper {
                 val spoilerTitle: String? = matcher.group(2)?.trim()
                 val spoilerText: String? = matcher.group(3)?.trim()
                 if (!spoilerTitle.isNullOrBlank() && !spoilerText.isNullOrBlank()) {
-                    matcher.appendReplacement(sb, "<br>${spoilerTitle}<br>++${spoilerText}++<br>")
+                    matcher.appendReplacement(
+                        sb,
+                        "<br><details><summary>${spoilerTitle}</summary>${spoilerText}</details>")
                     continue
                 }
 
@@ -151,6 +163,13 @@ object LemmyTextHelper {
             .usePlugin(LemmyPlugin(context, instance))
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(HtmlPlugin.create())
+            .usePlugin(object : AbstractMarkwonPlugin() {
+                override fun configure(registry: MarkwonPlugin.Registry) {
+                    registry.require(HtmlPlugin::class.java) {
+                        it.addHandler(DetailsTagHandler())
+                    }
+                }
+            })
             .usePlugin(SimpleExtPlugin.create().apply {
                 addExtension(1, '^') { _, _ ->
                     SuperScriptSpan()

@@ -30,6 +30,7 @@ import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityViewState
+import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -41,6 +42,7 @@ import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
@@ -60,6 +62,7 @@ import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -266,10 +269,14 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 },
                 onLoadPage = {
                     viewModel.fetchPage(it)
-                }
+                },
+                onLinkLongClick = { url, text ->
+                    getMainActivity()?.showBottomMenuForLink(url, text)
+                },
             ).apply {
                 stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-                markPostsAsReadOnScroll = preferences.markPostsAsReadOnScroll
+
+                updateWithPreferences(preferences)
             }
             onSelectedLayoutChanged()
         }
@@ -523,7 +530,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
 
-                    if (viewModel.infinity) {
+                    if (it.error is LoadNsfwCommunityWhenNsfwDisabled) {
+                        binding.recyclerView.visibility = View.GONE
+                        binding.loadingView.showErrorText(R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden)
+                    } else if (viewModel.infinity) {
                         binding.loadingView.hideAll()
                         adapter?.onItemsChanged()
                     } else {
@@ -702,9 +712,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 getMainActivity()?.setNavUiOpenness(0f)
             }
 
-            adapter?.markPostsAsReadOnScroll = preferences.markPostsAsReadOnScroll
+            adapter?.updateWithPreferences(preferences)
 
             onSelectedLayoutChanged()
+
+            viewModel.recheckPreferences()
         }
     }
 
@@ -942,7 +954,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     }
 
                     R.id.community_info -> {
-                        (parentFragment?.parentFragment as? MainFragment)?.expandEndPane()
+                        getMainActivity()?.showCommunityInfo(currentCommunityRef)
                     }
 
                     R.id.my_communities -> {

@@ -3,10 +3,17 @@ package com.idunnololz.summit.lemmy.postListView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
-fun BaseFragment<*>.showMorePostOptions(postView: PostView, actionsViewModel: MoreActionsViewModel) {
+fun BaseFragment<*>.showMorePostOptions(
+    postView: PostView,
+    actionsViewModel: MoreActionsViewModel
+) {
+
     if (!isBindingAvailable()) {
         return
     }
@@ -54,6 +61,20 @@ fun BaseFragment<*>.showMorePostOptions(postView: PostView, actionsViewModel: Mo
 
         setOnMenuItemClickListener {
             when (it.id) {
+                R.id.edit_post -> {
+                    CreateOrEditPostFragment()
+                        .apply {
+                            arguments = CreateOrEditPostFragmentArgs(
+                                instance = actionsViewModel.apiInstance,
+                                post = postView.post,
+                                communityName = null,
+                            ).toBundle()
+                        }
+                        .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+                }
+                R.id.delete -> {
+                    actionsViewModel.deletePost(postView.post)
+                }
                 R.id.hide_post -> {
                     actionsViewModel.hidePost(postView.post.id)
                 }

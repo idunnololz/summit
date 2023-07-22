@@ -17,7 +17,6 @@ import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
@@ -58,6 +57,7 @@ class LemmyHeaderHelper(
         postView: PostView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
         listAuthor: Boolean = true,
     ) {
         val context = headerContainer.context
@@ -194,7 +194,7 @@ class LemmyHeaderHelper(
         val textView = headerContainer.getChildAt(0) as TextView
         textView.text = sb
         textView.movementMethod = CustomLinkMovementMethod().apply {
-            onLinkLongClickListener = DefaultLinkLongClickListener(context)
+            onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
                     textView: TextView,
@@ -220,6 +220,7 @@ class LemmyHeaderHelper(
         item: CommentView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
         detailed: Boolean = false,
         childrenCount: Int? = null,
     ) {
@@ -396,7 +397,7 @@ class LemmyHeaderHelper(
 
         val textView = headerContainer.getChildAt(0) as TextView
         textView.movementMethod = CustomLinkMovementMethod().apply {
-            onLinkLongClickListener = DefaultLinkLongClickListener(context)
+            onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
                     textView: TextView,

@@ -41,6 +41,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -125,7 +126,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
-            }
+            },
+            onLinkLongClick = { url, text ->
+                getMainActivity()?.showBottomMenuForLink(url, text)
+            },
         )
         LemmyTextHelper.bindText(
             binding.content,
@@ -136,7 +140,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
-            }
+            },
+            onLinkLongClick = { url, text ->
+                getMainActivity()?.showBottomMenuForLink(url, text)
+            },
         )
 
         binding.author.text = getString(R.string.from_format, args.inboxItem.authorName)
@@ -431,7 +438,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         PostRef(args.instance, postId)
                     )
                 },
-                onLoadPost = {}
+                onLoadPost = {},
+                onLinkLongClick = { url, text ->
+                    getMainActivity()?.showBottomMenuForLink(url, text)
+                },
             ).apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }

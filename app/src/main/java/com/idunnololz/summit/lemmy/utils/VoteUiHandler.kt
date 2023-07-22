@@ -12,13 +12,10 @@ import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
-import com.idunnololz.summit.lemmy.inbox.InboxItem
-import com.idunnololz.summit.reddit.LemmyUtils
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.squareup.moshi.JsonClass
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 
 private val TAG = "VoteUiHandler"

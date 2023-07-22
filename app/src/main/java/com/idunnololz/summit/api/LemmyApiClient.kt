@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetComments
 import com.idunnololz.summit.api.dto.GetCommunity
+import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetPersonDetails
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetPersonMentions
@@ -369,7 +370,7 @@ class LemmyApiClient @Inject constructor(
         account: Account?,
         idOrName: Either<Int, String>,
         force: Boolean,
-    ): Result<CommunityView> {
+    ): Result<GetCommunityResponse> {
         val form = idOrName.fold({ id ->
             GetCommunity(id = id, auth = account?.jwt)
         }, { name ->
@@ -384,7 +385,7 @@ class LemmyApiClient @Inject constructor(
             }
         }.fold(
             onSuccess = {
-                Result.success(it.community_view)
+                Result.success(it)
             },
             onFailure = {
                 Result.failure(it)

@@ -29,10 +29,9 @@
     </FrameLayout>
 
 
-    <include
+    <View
         android:id="@+id/end_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="end"
-        layout="@layout/community_info_pane"/>
+        android:layout_gravity="end"/>
 </com.discord.panels.OverlappingPanelsLayout>

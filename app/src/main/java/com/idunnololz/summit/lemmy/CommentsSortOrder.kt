@@ -1,4 +1,4 @@
-package com.idunnololz.summit.reddit
+package com.idunnololz.summit.lemmy
 
 import android.content.Context
 import com.idunnololz.summit.R

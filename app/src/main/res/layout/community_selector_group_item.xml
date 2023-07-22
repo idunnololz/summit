@@ -10,9 +10,8 @@
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceOverline"
+        android:textAppearance="?textAppearanceTitleMedium"
         android:layout_marginStart="@dimen/padding"
-        android:layout_marginLeft="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -23,17 +22,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:minWidth="@dimen/padding"
-        android:minHeight="@dimen/padding"
-        android:maxWidth="@dimen/padding"
-        android:maxHeight="@dimen/padding"
         android:layout_marginStart="@dimen/padding_half"
-        android:layout_marginLeft="@dimen/padding_half"
+        app:indicatorSize="16dp"
+        style="@style/Widget.Material3.CircularProgressIndicator.ExtraSmall"
         app:layout_constraintStart_toEndOf="@+id/titleTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/titleTextView"

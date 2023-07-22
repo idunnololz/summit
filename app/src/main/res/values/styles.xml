@@ -227,4 +227,16 @@
         <item name="android:textAppearance">?textAppearanceTitleLarge</item>
     </style>
 
+    <style name="RoundImageView">
+        <item name="strokeColor">@color/colorAccent</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="android:padding">1dp</item>
+        <item name="shapeAppearanceOverlay">@style/RoundImageViewAppearanceOverlay</item>
+        <item name="android:foreground">@drawable/round_image_ripple_bg</item>
+    </style>
+
+    <style name="RoundImageViewAppearanceOverlay">
+        <item name="cornerSize">@dimen/padding_half</item>
+    </style>
+
 </resources>

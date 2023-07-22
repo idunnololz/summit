@@ -38,12 +38,10 @@ import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneViewModel
-import com.idunnololz.summit.main.community_info_pane.CommunityInfoController
-import com.idunnololz.summit.main.community_info_pane.CommunityInfoViewModel
+import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef
-import com.idunnololz.summit.tabs.hasTabId
 import com.idunnololz.summit.tabs.isHomeTab
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -93,7 +91,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     lateinit var preferences: Preferences
 
     lateinit var communitiesPaneController: CommunitiesPaneController
-    lateinit var communityInfoController: CommunityInfoController
 
     private val fragmentTags = hashSetOf<String>()
 
@@ -104,22 +101,13 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     private var doubleBackToExitPressedOnce = false
 
     private val onDestinationChangedListener =
-        NavController.OnDestinationChangedListener { controller, destination, arguments ->
+        NavController.OnDestinationChangedListener { _, destination, _ ->
             Log.d(TAG, "onDestinationChangedListener(): ${destination.label}")
-
-            //tabsManager.persistTabBackstack(controller.saveState())
 
             if (destination.id == R.id.postFragment || destination.id == R.id.communityFragment) {
                 binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
-
-                if (preferences.useGestureActions) {
-                    binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
-                } else {
-                    binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
-                }
             } else {
                 binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
-                binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
             }
         }
 
@@ -225,10 +213,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     .onRight { changeCommunity(it) }
             }, 300)
         }
-        communityInfoController = communityInfoViewModel.createController(
-            binding.endPanel,
-            viewLifecycleOwner,
-        )
 
         val currentTab = requireNotNull(tabsManager.currentTab.value)
         firstFragmentTag = getTagForTab(
@@ -302,34 +286,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     }
                 }
             })
-        binding.rootView.registerEndPanelStateListeners(object : OverlappingPanelsLayout.PanelStateListener {
-            override fun onPanelStateChange(panelState: PanelState) {
-                Log.d(TAG, "panelState: ${panelState}")
-                when (panelState) {
-                    PanelState.Closed -> {
-                        getMainActivity()?.setNavUiOpenness(0f)
-
-                        if (preferences.useGestureActions) {
-                            binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
-                        }
-
-                        updatePaneBackPressHandler()
-                    }
-                    is PanelState.Closing -> {
-                        getMainActivity()?.setNavUiOpenness(panelState.progress)
-                    }
-                    PanelState.Opened -> {
-                        getMainActivity()?.setNavUiOpenness(100f)
-                        communityInfoController.onShown()
-
-                        updatePaneBackPressHandler()
-                    }
-                    is PanelState.Opening -> {
-                        getMainActivity()?.setNavUiOpenness(panelState.progress)
-                    }
-                }
-            }
-        })
+        binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
 
         addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {}
@@ -346,9 +303,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         requireMainActivity().apply {
             this.insetViewAutomaticallyByMargins(this, binding.startPanel.swipeRefreshLayout)
-            this.insetViewAutomaticallyByMargins(this, binding.endPanel.recyclerView)
         }
-
 
         lifecycleScope.launch {
             withContext(Dispatchers.Default) {
@@ -356,10 +311,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
                 }
             }
-        }
-
-        if (preferences.useGestureActions) {
-            binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
         }
     }
 
@@ -672,10 +623,5 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     fun expandStartPane() {
         binding.rootView.openStartPanel()
-    }
-
-    fun expandEndPane() {
-        binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
-        binding.rootView.openEndPanel()
     }
 }

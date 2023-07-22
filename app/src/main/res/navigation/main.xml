@@ -261,4 +261,12 @@
         android:id="@+id/settingAboutFragment"
         android:name="com.idunnololz.summit.settings.about.SettingAboutFragment"
         android:label="SettingAboutFragment" />
+    <fragment
+        android:id="@+id/communityInfoFragment"
+        android:name="com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment"
+        android:label="CommunityInfoFragment" >
+        <argument
+            android:name="communityRef"
+            app:argType="com.idunnololz.summit.lemmy.CommunityRef" />
+    </fragment><action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
 </navigation>

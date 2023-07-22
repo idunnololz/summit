@@ -51,7 +51,7 @@ class SettingsContentFragment : BaseFragment<FragmentSettingsContentBinding>() {
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.content)
+            supportActionBar?.title = context.getString(R.string.post_list)
         }
 
         updateRendering()
@@ -78,6 +78,30 @@ class SettingsContentFragment : BaseFragment<FragmentSettingsContentBinding>() {
             { preferences.markPostsAsReadOnScroll },
             {
                 preferences.markPostsAsReadOnScroll = it
+
+                updateRendering()
+            }
+        )
+        OnOffSettingItem(
+            getString(R.string.show_nsfw_posts),
+            null,
+        ).bindTo(
+            binding.showNsfwPosts,
+            { preferences.showNsfwPosts },
+            {
+                preferences.showNsfwPosts = it
+
+                updateRendering()
+            }
+        )
+        OnOffSettingItem(
+            getString(R.string.blur_nsfw_posts),
+            null,
+        ).bindTo(
+            binding.blurNsfwPosts,
+            { preferences.blurNsfwPosts },
+            {
+                preferences.blurNsfwPosts = it
 
                 updateRendering()
             }

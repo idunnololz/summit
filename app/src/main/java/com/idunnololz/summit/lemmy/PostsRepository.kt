@@ -56,6 +56,7 @@ class PostsRepository @Inject constructor(
 
     private var currentPageInternal = 1
     var hideRead = false
+    var showNsfw = true
 
     var sortOrder: CommunitySortOrder = CommunitySortOrder.Active
         set(value) {
@@ -78,9 +79,28 @@ class PostsRepository @Inject constructor(
         }
     }
 
-    suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> {
+    suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> =
+        updateStateMaintainingPosition({
+            hideRead = true
+        }, anchors, maxPage)
+
+    suspend fun updateShowNsfwReadPosts(
+        showNsfw: Boolean,
+        anchors: Set<PostId>,
+        maxPage: Int
+    ): Result<PageResult> =
+        updateStateMaintainingPosition({
+            this.showNsfw = showNsfw
+        }, anchors, maxPage)
+
+    suspend fun updateStateMaintainingPosition(
+        performChanges: PostsRepository.() -> Unit,
+        anchors: Set<PostId>,
+        maxPage: Int
+    ): Result<PageResult> {
         reset()
-        hideRead = true
+
+        this.performChanges()
 
         val anchorsSet = anchors
 
@@ -316,6 +336,14 @@ class PostsRepository @Inject constructor(
 
         return newPosts.fold(
             onSuccess = { newPosts ->
+                if (newPosts.isNotEmpty()) {
+                    if (newPosts.first().community.nsfw &&
+                        communityRef is CommunityRef.CommunityRefByName &&
+                        !showNsfw) {
+                        return@fold Result.failure(LoadNsfwCommunityWhenNsfwDisabled())
+                    }
+                }
+
                 Log.d(TAG, "Fetched ${newPosts.size} posts.")
                 addPosts(newPosts, pageIndex, hiddenPosts, force)
                 Result.success(newPosts.isNotEmpty())
@@ -339,6 +367,9 @@ class PostsRepository @Inject constructor(
                 accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
             }
             if (hideRead && (post.read || postReadManager.isPostRead(apiInstance, post.post.id))) {
+                continue
+            }
+            if (!showNsfw && post.post.nsfw) {
                 continue
             }
             if (hiddenPosts.contains(post.post.id)) {
@@ -386,3 +417,5 @@ class PostsRepository @Inject constructor(
         val hasMore: Boolean,
     )
 }
+
+class LoadNsfwCommunityWhenNsfwDisabled(): RuntimeException()

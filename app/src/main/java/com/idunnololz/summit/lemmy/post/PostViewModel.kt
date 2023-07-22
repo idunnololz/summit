@@ -1,39 +1,31 @@
 package com.idunnololz.summit.lemmy.post
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
-import arrow.core.right
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
-import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
-import com.idunnololz.summit.reddit.CommentsSortOrder
-import com.idunnololz.summit.reddit.toApiSortOrder
+import com.idunnololz.summit.lemmy.CommentsSortOrder
+import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.LinkedHashMap
-import java.util.LinkedList
 import javax.inject.Inject
 
 @HiltViewModel

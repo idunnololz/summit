@@ -63,6 +63,7 @@ class PostsAdapter(
     private val onCommentMoreClick: (CommentView) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
+    private val onLinkLongClick: (url: String, text: String) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed class Item(
@@ -262,6 +263,7 @@ class PostsAdapter(
                         onPostMoreClick = onPostMoreClick,
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch = onInstanceMismatch,
+                        onLinkLongClick = onLinkLongClick,
                     )
                 }
             }
@@ -299,6 +301,7 @@ class PostsAdapter(
                     onPostMoreClick = onPostMoreClick,
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
+                    onLinkLongClick = onLinkLongClick,
                 )
             }
             is CommentItem -> {
@@ -332,6 +335,7 @@ class PostsAdapter(
                         },
                         onAddCommentClick,
                         onCommentMoreClick,
+                        onLinkLongClick = onLinkLongClick,
                         onSignInRequired,
                         onInstanceMismatch,
                     )
@@ -354,11 +358,13 @@ class PostsAdapter(
                         instance,
                         ::expandSection,
                         onPageClick,
+                        onLinkLongClick = onLinkLongClick,
                     )
                 }
 
                 holder.itemView.setTag(R.id.swipeable, true)
                 holder.itemView.setTag(R.id.comment_view, item.comment)
+                holder.itemView.setTag(R.id.expanded, item.isExpanded)
             }
             is PendingCommentItem -> {
                 if (item.isExpanded) {
@@ -378,6 +384,7 @@ class PostsAdapter(
                         highlightForever,
                         onImageClick,
                         onPageClick,
+                        onLinkLongClick = onLinkLongClick,
                         ::collapseSection,
                     )
                 } else {
@@ -397,6 +404,7 @@ class PostsAdapter(
                         ::collapseSection,
                     )
                 }
+                holder.itemView.setTag(R.id.expanded, item.isExpanded)
             }
             is ProgressOrErrorItem -> {
                 val b = holder.getBinding<GenericLoadingItemBinding>()
@@ -664,6 +672,17 @@ class PostsAdapter(
         (items[position] as? PendingCommentItem)?.view?.isCollapsed = false
 
         refreshItems(refreshHeader = false)
+    }
+
+    fun toggleSection(position: Int) {
+        val isCollapsed = (items[position] as? CommentItem)?.view?.isCollapsed
+            ?: (items[position] as? PendingCommentItem)?.view?.isCollapsed
+
+        if (isCollapsed == true) {
+            expandSection(position)
+        } else if (isCollapsed == false) {
+            collapseSection(position)
+        }
     }
 
     private fun toggleActions(id: CommentId) {

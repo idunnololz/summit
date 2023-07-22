@@ -112,6 +112,7 @@ class CommunityViewModel @Inject constructor(
         isHideReadEnabled.value?.let {
             postsRepository.hideRead = it
         }
+        postsRepository.showNsfw = preferences.showNsfwPosts
 
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
@@ -497,17 +498,60 @@ class CommunityViewModel @Inject constructor(
 
     fun onHideRead(anchors: Set<Int>) {
         isHideReadEnabled.value = true
+
+        updateStateMaintainingPosition(
+            {
+                this.hideRead = true
+            },
+            anchors,
+        )
+    }
+
+    fun setTag(tag: String?) {
+        postListEngine.setKey(tag)
+    }
+
+    fun hidePost(id: PostId) {
+        hiddenPostsManager.hidePost(id, apiInstance)
+    }
+
+    fun recheckPreferences() {
+        updateNsfwState()
+    }
+
+    fun updateNsfwState() {
+        if (postsRepository.showNsfw == preferences.showNsfwPosts) {
+            return
+        }
+
+        updateStateMaintainingPosition(
+            {
+                this.showNsfw = preferences.showNsfwPosts
+            },
+            null,
+        )
+    }
+
+    private fun updateStateMaintainingPosition(
+        changeState: PostsRepository.() -> Unit,
+        anchors: Set<Int>?,
+    ) {
         loadedPostsData.setIsLoading()
 
-        val anchorPosts = if (anchors.isEmpty()) {
+        val anchorPosts = if (anchors.isNullOrEmpty()) {
             postListEngine.getPostsCloseBy()
                 .mapTo(mutableSetOf<Int>()) { it.post.id }
         } else {
             anchors
-        } ?: setOf()
+        }
 
         viewModelScope.launch {
-            postsRepository.hideReadPosts(anchorPosts, postListEngine.biggestPageIndex ?: 0)
+            postsRepository
+                .updateStateMaintainingPosition(
+                    changeState,
+                    anchorPosts,
+                    postListEngine.biggestPageIndex ?: 0
+                )
                 .onSuccess {
                     val position = it.posts.indexOfFirst { anchorPosts.contains(it.post.id) }
 
@@ -530,13 +574,5 @@ class CommunityViewModel @Inject constructor(
                     loadedPostsData.postError(it)
                 }
         }
-    }
-
-    fun setTag(tag: String?) {
-        postListEngine.setKey(tag)
-    }
-
-    fun hidePost(id: PostId) {
-        hiddenPostsManager.hidePost(id, apiInstance)
     }
 }

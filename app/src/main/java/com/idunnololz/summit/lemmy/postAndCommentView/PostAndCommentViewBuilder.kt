@@ -15,7 +15,6 @@ import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.Space
 import android.widget.TextView
-import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
@@ -58,7 +57,7 @@ import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.reddit.LemmyUtils
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
@@ -152,6 +151,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onPostMoreClick: (PostView) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
@@ -163,6 +163,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             postView = postView,
             instance = instance,
             onPageClick = onPageClick,
+            onLinkLongClick = onLinkLongClick,
             listAuthor = true
         )
 
@@ -206,7 +207,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             onVideoClickListener = onVideoClick,
             onRevealContentClickedFn = onRevealContentClickedFn,
             onItemClickListener = {},
-            onLemmyUrlClick = onPageClick
+            onLemmyUrlClick = onPageClick,
+            onLinkLongClick = onLinkLongClick,
         )
 
         voteUiHandler.bind(
@@ -245,6 +247,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         toggleActionsExpanded: () -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onCommentMoreClick: (CommentView) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
@@ -283,7 +286,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
-        lemmyHeaderHelper.populateHeaderSpan(headerView, commentView, instance, onPageClick)
+        lemmyHeaderHelper.populateHeaderSpan(headerView, commentView, instance, onPageClick, onLinkLongClick)
 
         if (commentView.comment.deleted || isDeleting) {
             text.text = buildSpannedString {
@@ -304,6 +307,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onImageClick(Either.Right(commentView), null, it)
                 },
                 onPageClick = onPageClick,
+                onLinkLongClick = onLinkLongClick,
             )
         }
 
@@ -456,6 +460,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         instance: String,
         expandSection: (position: Int) -> Unit,
         onPageClick: (PageRef) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(binding) {
 
         scaleTextSizes()
@@ -467,7 +472,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             instance = instance,
             onPageClick = onPageClick,
             detailed = true,
-            childrenCount = childrenCount
+            childrenCount = childrenCount,
+            onLinkLongClick = onLinkLongClick,
         )
 
         expandSectionButton.setOnClickListener {
@@ -511,6 +517,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightForever: Boolean,
         onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
         onPageClick: (PageRef) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
         collapseSection: (position: Int) -> Unit,
     ) = with(binding) {
 
@@ -530,6 +537,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onImageClick(null, null, it)
             },
             onPageClick = onPageClick,
+            onLinkLongClick = onLinkLongClick,
         )
 
         val giphyLinks = LemmyUtils.findGiphyLinks(content)
@@ -640,6 +648,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onMessageClick: (InboxItem) -> Unit,
         onAddCommentClick: (InboxItem) -> Unit,
         onOverflowMenuClick: (InboxItem) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(b) {
@@ -667,7 +676,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
         }
         b.author.movementMethod = CustomLinkMovementMethod().apply {
-            onLinkLongClickListener = DefaultLinkLongClickListener(context)
+            onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
                     textView: TextView,

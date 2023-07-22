@@ -16,13 +16,11 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.core.view.ViewCompat
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.dto.PostView
@@ -35,7 +33,6 @@ import com.idunnololz.summit.api.utils.shouldHideItem
 import com.idunnololz.summit.lemmy.postListView.FullContentConfig
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.reddit.LemmyUtils
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.isUrlMp4
 import com.idunnololz.summit.util.PreviewInfo
@@ -98,6 +95,7 @@ class LemmyContentHelper(
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
         assertMainThread()
         if (!lazyUpdate) {
@@ -218,8 +216,8 @@ class LemmyContentHelper(
                         offlineManager.getMaxImageSizeHint(it, tempSize)
 
                         fullImageView.load(it) {
-
-                            this.transformations(BlurTransformation(context, sampling = 30f))
+                            val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+                            this.transformations(BlurTransformation(context, sampling = sampling))
 
                             listener { _, result ->
                                 val d = result.drawable
@@ -538,7 +536,8 @@ class LemmyContentHelper(
                     text = content,
                     instance = instance,
                     onImageClick = onImageClickListener,
-                    onPageClick = onLemmyUrlClick
+                    onPageClick = onLemmyUrlClick,
+                    onLinkLongClick = onLinkLongClick,
                 )
                 bodyTextView.setOnClickListener {
                     onItemClickListener()

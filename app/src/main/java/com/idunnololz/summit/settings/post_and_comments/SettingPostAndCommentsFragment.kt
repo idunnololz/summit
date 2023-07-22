@@ -42,6 +42,7 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -310,6 +311,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     videoState = null,
                     onAddCommentClick = {},
                     onPostMoreClick = {},
+                    onLinkLongClick = { _, _ -> },
                 )
             }
             if (preferences.hideCommentActions) {
@@ -354,7 +356,8 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         onAddCommentClick = {},
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
-                        onCommentMoreClick = {}
+                        onCommentMoreClick = {},
+                        onLinkLongClick = { _, _ -> }
                     )
                 }
             } else {
@@ -391,7 +394,8 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         onAddCommentClick = {},
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
-                        onCommentMoreClick = {}
+                        onCommentMoreClick = {},
+                        onLinkLongClick = { _, _ -> }
                     )
                 }
             }

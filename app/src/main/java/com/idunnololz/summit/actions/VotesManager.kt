@@ -53,5 +53,6 @@ class VotesManager(
     fun reset() {
         votes.clear()
         pendingVotes.clear()
+        scores.clear()
     }
 }

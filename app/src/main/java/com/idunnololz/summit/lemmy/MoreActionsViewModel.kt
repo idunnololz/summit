@@ -30,16 +30,20 @@ class MoreActionsViewModel @Inject constructor(
     private val hiddenPostsManager: HiddenPostsManager,
     private val savedManager: SavedManager,
 ) : ViewModel() {
+
+    val apiInstance: String
+        get() = apiClient.instance
+
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<BlockPersonResult>()
     val deletePostResult = StatefulLiveData<PostView>()
     val savePostResult = StatefulLiveData<PostView>()
     val saveCommentResult = StatefulLiveData<CommentView>()
 
-    fun blockCommunity(id: CommunityId) {
+    fun blockCommunity(id: CommunityId, block: Boolean = true) {
         blockCommunityResult.setIsLoading()
         viewModelScope.launch {
-            apiClient.blockCommunity(id, true)
+            apiClient.blockCommunity(id, block)
                 .onFailure {
                     blockCommunityResult.postError(it)
                 }
