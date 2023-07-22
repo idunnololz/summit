@@ -14,7 +14,6 @@ import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.cache.MoshiDiskCache
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
-import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
