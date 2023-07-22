@@ -200,6 +200,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     data class PageData(
         val backingObject: Either<CommunityView, SiteView>,
+        val name: String,
+        val fullName: String,
         val iconUrl: String?,
         val bannerUrl: String?,
         val instance: String,
@@ -222,9 +224,13 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     private fun GetCommunityResponse.toPageData(): PageData {
         val communityView = this.community_view
+        val name = communityView.community.name
+        val instance = communityView.community.instance
 
         return PageData(
             Either.Left(communityView),
+            name,
+            "!${name}@${instance}",
             communityView.community.icon,
             communityView.community.banner,
             communityView.community.instance,
@@ -250,6 +256,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val siteView = this.site_view
         return PageData(
             Either.Right(siteView),
+            siteView.site.name,
+            "!${siteView.site.instance}",
             siteView.site.icon,
             siteView.site.banner,
             siteView.site.instance,
@@ -316,7 +324,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 banner.setOnClickListener(null)
             }
 
-            subtitle.text = data.instance
+            subtitle.text = data.fullName
 
             if (communityView != null) {
                 subscribe.visibility = View.VISIBLE

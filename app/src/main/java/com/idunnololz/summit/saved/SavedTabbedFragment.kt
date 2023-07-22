@@ -18,6 +18,7 @@ import com.idunnololz.summit.lemmy.person.PersonAboutFragment
 import com.idunnololz.summit.lemmy.person.PersonCommentsFragment
 import com.idunnololz.summit.lemmy.person.PersonPostsFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
+import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.util.BaseFragment
@@ -136,5 +137,9 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
     }
 
     override fun proceedAnyways(tag: Int) {
+    }
+
+    fun closePost(postFragment: PostFragment) {
+        viewPagerController?.closePost(postFragment)
     }
 }

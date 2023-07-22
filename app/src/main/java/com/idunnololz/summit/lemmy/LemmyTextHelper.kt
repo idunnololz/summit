@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.graphics.RectF
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.util.Log
 import android.widget.TextView
 import com.idunnololz.summit.R
@@ -68,7 +69,11 @@ object LemmyTextHelper {
             val spanned = SpannableStringBuilder(it.toMarkdown(text))
             postProcessDetails(spanned, textView)
 
-            textView.text = spanned
+            it.setParsedMarkdown(textView, spanned)
+
+//            it.setMarkdown(textView, text)
+
+//            textView.text = it.toMarkdown(text)
         }
     }
 

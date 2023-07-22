@@ -113,7 +113,7 @@ class TextFormatterHelper {
 
             linkApp.setOnClickListener {
                 editText.replaceTextAtCursor(
-                    "Play store link: [Summit - Lemmy Reader](https://play.google.com/store/apps/details?id=com.idunnololz.summit)"
+                    "Play store link: [Summit for Lemmy](https://play.google.com/store/apps/details?id=com.idunnololz.summit)"
                 )
             }
         }
