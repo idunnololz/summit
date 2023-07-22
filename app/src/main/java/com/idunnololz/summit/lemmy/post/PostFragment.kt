@@ -54,6 +54,8 @@ import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.preferences.CommentGestureAction
+import com.idunnololz.summit.saved.SavedPostsFragment
+import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
@@ -178,6 +180,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 fragment.closePost(this@PostFragment)
             }
             is PersonTabbedFragment -> {
+                fragment.closePost(this@PostFragment)
+            }
+            is SavedTabbedFragment -> {
                 fragment.closePost(this@PostFragment)
             }
         }

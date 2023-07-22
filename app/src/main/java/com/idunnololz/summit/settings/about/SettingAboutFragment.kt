@@ -93,7 +93,7 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
             null,
             getString(R.string.give_feedback),
             getString(R.string.give_feedback_desc)
-        ).bindTo(binding.playStoreListing) {
+        ).bindTo(binding.giveFeedback) {
             val bottomMenu = BottomMenu(requireContext()).apply {
                 setTitle(R.string.give_feedback)
                 addItemWithIcon(R.id.summit_community, R.string.through_the_community, R.drawable.ic_logo_mono_24)
