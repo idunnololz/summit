@@ -2,6 +2,7 @@ package com.idunnololz.summit.settings
 
 import android.content.Context
 import com.idunnololz.summit.R
+import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.PostGestureAction
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -294,6 +295,39 @@ class GestureSettings @Inject constructor(
                 R.drawable.baseline_bookmark_add_24,
             ),
         )
+    private val commentGestureActionOptions =
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentGestureAction.Upvote,
+                context.getString(R.string.upvote),
+                null,
+                R.drawable.baseline_arrow_upward_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentGestureAction.Downvote,
+                context.getString(R.string.downvote),
+                null,
+                R.drawable.baseline_arrow_downward_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentGestureAction.Reply,
+                context.getString(R.string.reply),
+                null,
+                R.drawable.baseline_reply_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentGestureAction.Bookmark,
+                context.getString(R.string.bookmark),
+                null,
+                R.drawable.baseline_bookmark_add_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentGestureAction.CollapseOrExpand,
+                context.getString(R.string.collapse_or_expand),
+                null,
+                R.drawable.baseline_unfold_less_24,
+            ),
+        )
 
 
     val postGestureAction1 = RadioGroupSettingItem(
@@ -315,6 +349,28 @@ class GestureSettings @Inject constructor(
         context.getString(R.string.gesture_action_3),
         null,
         postGestureActionOptions,
+    )
+
+
+    val commentGestureAction1 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.gesture_action_1),
+        null,
+        commentGestureActionOptions,
+    )
+
+    val commentGestureAction2 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.gesture_action_2),
+        null,
+        commentGestureActionOptions,
+    )
+
+    val commentGestureAction3 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.gesture_action_3),
+        null,
+        commentGestureActionOptions,
     )
 }
 

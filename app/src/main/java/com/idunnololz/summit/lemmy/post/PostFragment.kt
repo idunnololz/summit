@@ -17,12 +17,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
-import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.ApiException
+import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
@@ -38,7 +39,6 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
@@ -50,8 +50,10 @@ import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.reddit.CommentsSortOrder
-import com.idunnololz.summit.reddit.getLocalizedName
+import com.idunnololz.summit.lemmy.CommentsSortOrder
+import com.idunnololz.summit.lemmy.getLocalizedName
+import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
+import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
@@ -61,8 +63,8 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -282,7 +284,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 },
                 onLoadPost = {
                     viewModel.fetchPostData(Either.Left(PostRef(args.instance, it)))
-                }
+                },
+                onLinkLongClick = { url, text ->
+                    getMainActivity()?.showBottomMenuForLink(url, text)
+                },
             ).apply {
                 stateRestorationPolicy =
                     RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -440,14 +445,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
-        actionsViewModel.deletePostResult?.observe(viewLifecycleOwner) {
+        actionsViewModel.deletePostResult.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
-                    AlertDialogFragment.Builder()
-                        .setMessage(getString(
-                            R.string.error_unable_to_send_post,
-                            it.error::class.qualifiedName,
-                            it.error.message))
+                    if (it.error is ClientApiException && it.error.errorCode == 404) {
+                        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+                        (parentFragment as? CommunityFragment)?.onPostUpdated()
+                    } else {
+                        ErrorDialogFragment.show(
+                            getString(R.string.error_unable_to_delete_post),
+                            it.error,
+                            childFragmentManager
+                        )
+                    }
                 }
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
@@ -497,20 +507,28 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         ?: return@LemmySwipeActionCallback
 
                     when (action.id) {
-                        R.id.swipe_action_upvote -> {
+                        CommentGestureAction.Upvote -> {
                             actionsViewModel.vote(commentView, dir = 1)
                         }
 
-                        R.id.swipe_action_bookmark -> {
+                        CommentGestureAction.Downvote -> {
+                            actionsViewModel.vote(commentView, dir = -1)
+                        }
+
+                        CommentGestureAction.Bookmark -> {
                             actionsViewModel.saveComment(commentView.comment.id, true)
                         }
 
-                        R.id.swipe_action_reply -> {
+                        CommentGestureAction.Reply -> {
                             AddOrEditCommentFragment().apply {
                                 arguments = AddOrEditCommentFragmentArgs(
                                     args.instance, commentView, null, null
                                 ).toBundle()
                             }.show(childFragmentManager, "asdf")
+                        }
+
+                        CommentGestureAction.CollapseOrExpand -> {
+                            adapter.toggleSection(vh.bindingAdapterPosition)
                         }
                     }
                 }
@@ -533,6 +551,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     )
                 )
                 postOnlyActions = preferences.getPostSwipeActions(context)
+
+                updateCommentSwipeActions()
             }).attachToRecyclerView(binding.recyclerView)
         }
 
@@ -550,6 +570,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         binding.root.doOnPreDraw {
             adapter.contentMaxWidth = binding.recyclerView.width
         }
+    }
+
+    private fun LemmySwipeActionCallback.updateCommentSwipeActions() {
+        if (!isBindingAvailable()) return
+        val context = requireContext()
+        this.actions = preferences.getCommentSwipeActions(context)
     }
 
     private fun performPostAction(id: Int, postView: PostView) {

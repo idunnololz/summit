@@ -90,7 +90,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
 
 
         settings.postGestureAction1.bindTo(
-            binding.gestureAction1,
+            binding.postGestureAction1,
             { preferences.postGestureAction1 },
             {
                 MultipleChoiceDialogFragment.newInstance(it)
@@ -99,7 +99,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
         )
 
         settings.postGestureAction2.bindTo(
-            binding.gestureAction2,
+            binding.postGestureAction2,
             { preferences.postGestureAction2 },
             {
                 MultipleChoiceDialogFragment.newInstance(it)
@@ -108,8 +108,38 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
         )
 
         settings.postGestureAction3.bindTo(
-            binding.gestureAction3,
+            binding.postGestureAction3,
             { preferences.postGestureAction3 },
+            {
+                MultipleChoiceDialogFragment.newInstance(it)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            }
+        )
+
+
+
+
+        settings.commentGestureAction1.bindTo(
+            binding.commentGestureAction1,
+            { preferences.commentGestureAction1 },
+            {
+                MultipleChoiceDialogFragment.newInstance(it)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            }
+        )
+
+        settings.commentGestureAction2.bindTo(
+            binding.commentGestureAction2,
+            { preferences.commentGestureAction2 },
+            {
+                MultipleChoiceDialogFragment.newInstance(it)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            }
+        )
+
+        settings.commentGestureAction3.bindTo(
+            binding.commentGestureAction3,
+            { preferences.commentGestureAction3 },
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")

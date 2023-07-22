@@ -12,6 +12,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
+import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetPersonMentions
 import com.idunnololz.summit.api.dto.GetPrivateMessages
@@ -179,7 +180,7 @@ class AccountAwareLemmyClient @Inject constructor(
         idOrName: Either<Int, String>,
         force: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<CommunityView> = retry {
+    ): Result<GetCommunityResponse> = retry {
         apiClient.getCommunity(account, idOrName, force)
             .autoSignOut(account)
     }

@@ -24,6 +24,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
@@ -52,12 +53,14 @@ class ListingItemAdapter(
     private val onShowMoreActions: (PostView) -> Unit,
     private val onPostRead: (PostView) -> Unit,
     private val onLoadPage: (Int) -> Unit,
+    private val onLinkLongClick: (url: String, text: String) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val inflater = LayoutInflater.from(context)
 
     var markPostsAsReadOnScroll: Boolean = false
     var alwaysRenderAsUnread: Boolean = false
+    var blurNsfwPosts: Boolean = true
 
     var items: List<Item> = listOf()
         private set
@@ -129,6 +132,7 @@ class ListingItemAdapter(
                 } else {
                     val h: ListingItemViewHolder = holder as ListingItemViewHolder
                     val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
+                            || !blurNsfwPosts
                     val isActionsExpanded = item.isActionExpanded
                     val isExpanded = item.isExpanded
 
@@ -164,6 +168,7 @@ class ListingItemAdapter(
                         onHighlightComplete = {
                               postListEngine.clearHighlight()
                         },
+                        onLinkLongClick = onLinkLongClick,
                     )
                 }
             }
@@ -204,6 +209,7 @@ class ListingItemAdapter(
             is Item.PostItem -> {
                 val h: ListingItemViewHolder = holder as ListingItemViewHolder
                 val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
+                        || !blurNsfwPosts
                 val isActionsExpanded = item.isActionExpanded
                 val isExpanded = item.isExpanded
 
@@ -239,7 +245,8 @@ class ListingItemAdapter(
                     onInstanceMismatch = onInstanceMismatch,
                     onHighlightComplete = {
                         postListEngine.clearHighlight()
-                    }
+                    },
+                    onLinkLongClick = onLinkLongClick,
                 )
             }
 
@@ -369,5 +376,10 @@ class ListingItemAdapter(
         })
         this.items = newItems
         diff.dispatchUpdatesTo(this)
+    }
+
+    fun updateWithPreferences(preferences: Preferences) {
+        markPostsAsReadOnScroll = preferences.markPostsAsReadOnScroll
+        blurNsfwPosts = preferences.blurNsfwPosts
     }
 }

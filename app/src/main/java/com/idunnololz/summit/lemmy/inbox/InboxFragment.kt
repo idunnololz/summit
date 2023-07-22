@@ -48,6 +48,7 @@ import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -389,6 +390,9 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
+            onLinkLongClick = { url, text ->
+                getMainActivity()?.showBottomMenuForLink(url, text)
+            },
         )
     }
 
@@ -454,6 +458,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         private val onOverflowMenuClick: (InboxItem) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
+        private val onLinkLongClick: (String, String) -> Unit,
     ) : RecyclerView.Adapter<ViewHolder>() {
 
         private sealed interface Item {
@@ -492,6 +497,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                     onOverflowMenuClick = onOverflowMenuClick,
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
+                    onLinkLongClick = onLinkLongClick,
                 )
             }
             addItemType(Item.LoaderItem::class, InboxListLoaderItemBinding::inflate) { item, b, h ->

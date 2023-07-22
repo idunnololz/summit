@@ -2,15 +2,12 @@ package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup.LayoutParams
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import coil.load
-import coil.size.OriginalSize
-import coil.size.Scale
 import com.commit451.coiltransformations.BlurTransformation
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
@@ -27,11 +24,10 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
-import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.reddit.LemmyUtils
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getDimen
@@ -112,6 +108,7 @@ class PostListViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(holder) {
 
         scaleTextSizes()
@@ -242,6 +239,7 @@ class PostListViewBuilder @Inject constructor(
                 postView = postView,
                 instance = instance,
                 onPageClick = onPageClick,
+                onLinkLongClick = onLinkLongClick,
             )
 
             val thumbnailUrl = postView.post.thumbnail_url
@@ -281,7 +279,9 @@ class PostListViewBuilder @Inject constructor(
                         fallback(R.drawable.thumbnail_placeholder)
 
                         if (!isRevealed && postView.post.nsfw) {
-                            transformations(BlurTransformation(context, sampling = 10f))
+                            val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+
+                            transformations(BlurTransformation(context, sampling = sampling))
                         }
                     }
                 }, {
@@ -337,6 +337,7 @@ class PostListViewBuilder @Inject constructor(
                         onRevealContentClickedFn()
                     },
                     onLemmyUrlClick = onPageClick,
+                    onLinkLongClick = onLinkLongClick,
                 )
             }
 
@@ -419,7 +420,8 @@ class PostListViewBuilder @Inject constructor(
             onImageClick = {
                 onImageClick(postView, null, it)
             },
-            onPageClick = onPageClick
+            onPageClick = onPageClick,
+            onLinkLongClick = onLinkLongClick,
         )
 
         if (postView.read && !alwaysRenderAsUnread) {

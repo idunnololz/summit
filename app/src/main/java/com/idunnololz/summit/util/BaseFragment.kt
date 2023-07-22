@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.util.ext.runAfterLayout
 
 abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
@@ -60,22 +61,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     ) {
         if (!isBindingAvailable()) return
 
-        if (binding.root.isLaidOut) {
-            callback()
-
-            return
-        }
-
-        val view = binding.root
-        view.viewTreeObserver.addOnPreDrawListener(
-            object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    view.viewTreeObserver.removeOnPreDrawListener(this)
-                    callback()
-                    return true
-                }
-            }
-        )
+        binding.root.runAfterLayout(callback)
     }
 
     fun addMenuProvider(menuProvider: MenuProvider) {

@@ -47,7 +47,7 @@ class CreateOrEditPostViewModel @Inject constructor(
                 )
                     .fold(
                         {
-                            Result.success(it.community.id)
+                            Result.success(it.community_view.community.id)
                         },
                         {
                             Result.failure(it)

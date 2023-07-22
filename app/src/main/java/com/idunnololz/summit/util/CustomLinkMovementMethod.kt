@@ -14,6 +14,7 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.TextView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.util.markwon.DetailsClickableSpan
 import io.noties.markwon.core.spans.LinkSpan
 import io.noties.markwon.ext.tables.TableRowSpan
 import io.noties.markwon.image.AsyncDrawableSpan
@@ -174,7 +175,9 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         clickableSpan: Any,
         bounds: RectF
     ) {
-        if (clickableSpan is ClickableSpan) {
+        if (clickableSpan is DetailsClickableSpan) {
+            clickableSpan.onClick(textView)
+        } else if (clickableSpan is ClickableSpan) {
             val clickableSpanWithText =
                 ClickableSpanWithText.ofSpan(textView, clickableSpan)
 

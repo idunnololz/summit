@@ -19,6 +19,7 @@ import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -105,7 +106,10 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
             },
             onLoadPage = {
                 viewModel.fetchPostPage(it, false)
-            }
+            },
+            onLinkLongClick = { url, text ->
+                getMainActivity()?.showBottomMenuForLink(url, text)
+            },
         ).apply {
             alwaysRenderAsUnread = true
         }

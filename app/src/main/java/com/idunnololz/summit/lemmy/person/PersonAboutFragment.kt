@@ -11,6 +11,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.showBottomMenuForLink
 
 class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
@@ -86,7 +87,10 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
-            }
+            },
+            onLinkLongClick = { url, text ->
+                getMainActivity()?.showBottomMenuForLink(url, text)
+            },
         )
 
         binding.accountInfo.text = buildString {

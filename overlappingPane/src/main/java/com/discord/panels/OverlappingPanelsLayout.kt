@@ -125,18 +125,27 @@ open class OverlappingPanelsLayout : FrameLayout {
   private lateinit var endPanel: View
 
   constructor(context: Context) : super(context)
-
-  constructor(context: Context, attrs: AttributeSet? = null) : super(context, attrs) {
+  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
     initialize(attrs)
   }
 
-  constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : super(
+  constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
     context,
     attrs,
     defStyleAttr
   ) {
     initialize(attrs)
   }
+
+  constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
+    context,
+    attrs,
+    defStyleAttr,
+    defStyleRes
+  ) {
+    initialize(attrs)
+  }
+
 
   private fun initialize(attrs: AttributeSet?) {
     val locale = LocaleProvider.getPrimaryLocale(context)

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.community.usesDividers
+import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.CustomDividerItemDecoration
@@ -78,6 +79,42 @@ fun Preferences.getPostSwipeActions(context: Context): List<LemmySwipeActionCall
         LemmySwipeActionCallback.SwipeAction(
             postGestureAction3,
             context.getDrawableCompat(postGestureAction3.toIcon())!!.mutate(),
+            context.getColorCompat(R.color.style_amber)
+        ),
+    )
+}
+
+fun Preferences.getCommentSwipeActions(context: Context): List<LemmySwipeActionCallback.SwipeAction> {
+    fun Int.toIcon() =
+        when (this) {
+            CommentGestureAction.Upvote ->
+                R.drawable.baseline_arrow_upward_24
+            CommentGestureAction.Downvote ->
+                R.drawable.baseline_arrow_downward_24
+            CommentGestureAction.Bookmark ->
+                R.drawable.baseline_bookmark_add_24
+            CommentGestureAction.Reply ->
+                R.drawable.baseline_reply_24
+            CommentGestureAction.CollapseOrExpand ->
+                R.drawable.baseline_unfold_less_24
+            else ->
+                R.drawable.baseline_close_24
+        }
+
+    return listOf(
+        LemmySwipeActionCallback.SwipeAction(
+            commentGestureAction1,
+            context.getDrawableCompat(commentGestureAction1.toIcon())!!.mutate(),
+            context.getColorCompat(R.color.style_red)
+        ),
+        LemmySwipeActionCallback.SwipeAction(
+            commentGestureAction2,
+            context.getDrawableCompat(commentGestureAction2.toIcon())!!.mutate(),
+            context.getColorCompat(R.color.style_blue)
+        ),
+        LemmySwipeActionCallback.SwipeAction(
+            commentGestureAction3,
+            context.getDrawableCompat(commentGestureAction3.toIcon())!!.mutate(),
             context.getColorCompat(R.color.style_amber)
         ),
     )

@@ -1,10 +1,8 @@
 package com.idunnololz.summit.main
 
-import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import coil.load
@@ -13,8 +11,9 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.view.TabsImageButton
+import com.idunnololz.summit.lemmy.community.CommunityViewModel
 
 class LemmyAppBarController(
     private val mainActivity: MainActivity,
@@ -46,11 +45,11 @@ class LemmyAppBarController(
             onAccountClick(account)
         }
         communityTextView.setOnClickListener {
-            val controller = mainActivity.showCommunitySelector()
+            val controller = mainActivity.showCommunitySelector(currentCommunity)
             controller.onCommunitySelectedListener = communitySelectedListener
         }
         customActionBar.setOnClickListener {
-            val controller = mainActivity.showCommunitySelector()
+            val controller = mainActivity.showCommunitySelector(currentCommunity)
             controller.onCommunitySelectedListener = communitySelectedListener
         }
     }
@@ -106,7 +105,8 @@ class LemmyAppBarController(
     }
 
     fun setPageIndexInfinity() {
-        pageTextView.text = "∞"
+        pageTextView.text = ""
+        pageTextView.visibility = View.INVISIBLE
 
         pageTextView.setOnClickListener {}
     }

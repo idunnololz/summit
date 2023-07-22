@@ -28,6 +28,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -101,7 +102,10 @@ class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
             },
             onCommentMoreClick = {
                 showMoreCommentOptions(it, actionsViewModel)
-            }
+            },
+            onLinkLongClick = { url, text ->
+                getMainActivity()?.showBottomMenuForLink(url, text)
+            },
         ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }

@@ -1,12 +1,14 @@
 package com.idunnololz.summit.util
 
 import android.net.Uri
+import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.main.MainActivity
 import okhttp3.CacheControl
 import okhttp3.Request
 import okhttp3.Response
@@ -116,4 +118,26 @@ object LinkUtils {
 
     fun getLinkForComment(instance: String, commentId: CommentId): String =
         "https://${instance}/comment/$commentId"
+}
+
+fun MainActivity.showBottomMenuForLink(url: String, text: String) {
+    val context = this
+
+    BottomMenu(context).apply {
+        addItem(R.id.copy_link, R.string.copy_link_address)
+        addItem(R.id.share_link, R.string.share_link)
+
+        setOnMenuItemClickListener {
+            when (it.id) {
+                R.id.copy_link -> {
+                    Utils.copyToClipboard(context, url)
+                }
+                R.id.share_link -> {
+                    Utils.shareText(context, url)
+                }
+            }
+        }
+    }.let {
+        showBottomMenu(it)
+    }
 }

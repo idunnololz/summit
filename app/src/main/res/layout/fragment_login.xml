@@ -153,11 +153,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/barrier"/>
 
-            <ProgressBar
+            <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?android:attr/progressBarStyleSmall"
+                style="@style/Widget.Material3.CircularProgressIndicator.Small"
                 app:layout_constraintStart_toStartOf="@+id/login"
                 app:layout_constraintEnd_toEndOf="@+id/login"
                 app:layout_constraintTop_toTopOf="@+id/login"

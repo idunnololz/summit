@@ -12,7 +12,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.cache.MoshiDiskCache
-import com.idunnololz.summit.cache.SimpleDiskCache
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.reddit.*
 import com.idunnololz.summit.util.*

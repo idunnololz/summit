@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?textAppearanceTitleLarge"
+    android:layout_marginHorizontal="@dimen/padding"
+    android:layout_marginBottom="@dimen/padding_half"
+    android:layout_marginTop="@dimen/padding_two"
+    android:text="@string/stats"/>

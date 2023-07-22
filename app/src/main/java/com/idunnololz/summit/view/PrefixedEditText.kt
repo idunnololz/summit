@@ -55,7 +55,8 @@ class PrefixedEditText : AppCompatEditText {
             originalLeftPadding = compoundPaddingLeft.toFloat()
             setPadding(
                 (textWidth + originalLeftPadding).toInt(),
-                paddingRight, paddingTop,
+                paddingTop,
+                paddingRight,
                 paddingBottom
             )
         }

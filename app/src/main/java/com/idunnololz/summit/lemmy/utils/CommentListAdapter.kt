@@ -49,6 +49,7 @@ class CommentListAdapter(
     private val onCommentMoreClick: (CommentView) -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
+    private val onLinkLongClick: (url: String, text: String) -> Unit,
 ) : Adapter<ViewHolder>() {
 
     sealed interface Item {
@@ -122,7 +123,7 @@ class CommentListAdapter(
                 )
             }
             b.postInfo.movementMethod = CustomLinkMovementMethod().apply {
-                onLinkLongClickListener = DefaultLinkLongClickListener(context)
+                onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
                 onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                     override fun onClick(
                         textView: TextView,
@@ -146,7 +147,8 @@ class CommentListAdapter(
                     headerContainer = b.headerContainer,
                     item = item.commentView,
                     instance = item.instance,
-                    onPageClick = onPageClick
+                    onPageClick = onPageClick,
+                    onLinkLongClick = onLinkLongClick,
                 )
             LemmyTextHelper.bindText(
                 textView = b.text,
@@ -156,6 +158,7 @@ class CommentListAdapter(
                     onImageClick(null, it)
                 },
                 onPageClick = onPageClick,
+                onLinkLongClick = onLinkLongClick,
             )
 
             postAndCommentViewBuilder.voteUiHandler.bind(

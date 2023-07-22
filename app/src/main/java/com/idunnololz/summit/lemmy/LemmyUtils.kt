@@ -1,4 +1,4 @@
-package com.idunnololz.summit.reddit
+package com.idunnololz.summit.lemmy
 
 import android.content.Context
 import android.content.Intent
@@ -6,28 +6,13 @@ import android.graphics.Point
 import android.icu.text.CompactDecimalFormat
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.view.View
 import android.widget.*
 import com.idunnololz.summit.R
-import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.spans.SpoilerSpan
 import com.idunnololz.summit.util.*
-import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.video.VideoSizeHint
-import io.noties.markwon.*
-import io.noties.markwon.core.MarkwonTheme
-import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
-import io.noties.markwon.ext.tables.TablePlugin
-import io.noties.markwon.html.HtmlPlugin
-import io.noties.markwon.html.span.SuperScriptSpan
-import io.noties.markwon.image.coil.CoilImagesPlugin
-import io.noties.markwon.linkify.LinkifyPlugin
-import io.noties.markwon.simple.ext.SimpleExtPlugin
 import java.util.*
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object LemmyUtils {

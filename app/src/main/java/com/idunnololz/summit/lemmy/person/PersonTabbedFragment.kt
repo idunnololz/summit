@@ -26,6 +26,7 @@ import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
@@ -43,11 +44,15 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
 
     private val args by navArgs<PersonTabbedFragmentArgs>()
+
+    @Inject
+    lateinit var offlineManager: OfflineManager
 
     val viewModel: PersonTabbedViewModel by viewModels()
     var viewPagerController: ViewPagerController? = null
@@ -164,6 +169,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
             binding.cakeDate.visibility = View.GONE
 
+            binding.banner.transitionName = "banner_image"
+
             val actionBarHeight = context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize)
             binding.appBar.addOnOffsetChangedListener { _, verticalOffset ->
                 if (!isBindingAvailable()) {
@@ -272,15 +279,30 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
             binding.title.text = displayName
 
-            if (data.personView.person.banner != null) {
+            val bannerUrl = data.personView.person.banner
+            if (bannerUrl != null) {
                 profileIcon.updateLayoutParams<ConstraintLayout.LayoutParams> {
                     this.topToBottom = bannerDummy.id
                     this.topToTop = ConstraintLayout.LayoutParams.UNSET
                     this.topMargin = -Utils.convertDpToPixel(32f).toInt()
                 }
-            }
-            banner.load(data.personView.person.banner) {
-                allowHardware(false)
+
+                banner.setOnClickListener {
+                    getMainActivity()?.openImage(
+                        banner,
+                        null,
+                        args.personRef.fullName,
+                        bannerUrl,
+                        null
+                    )
+                }
+                offlineManager.fetchImage(root, bannerUrl) {
+                    offlineManager.calculateImageMaxSizeIfNeeded(it)
+
+                    banner.load(it) {
+                        allowHardware(false)
+                    }
+                }
             }
             profileIcon.load(data.personView.person.avatar) {
                 fallback(R.drawable.thumbnail_placeholder)

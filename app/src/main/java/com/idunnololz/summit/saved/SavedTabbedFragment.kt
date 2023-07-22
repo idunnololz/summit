@@ -68,7 +68,9 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
             fab.visibility = View.GONE
 
             viewModel.currentAccountView.observe(viewLifecycleOwner) {
-                accountImageView.load(it?.profileImage)
+                accountImageView.load(it?.profileImage) {
+                    allowHardware(false)
+                }
             }
             accountImageView.setOnClickListener {
                 AccountsAndSettingsDialogFragment.newInstance()

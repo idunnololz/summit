@@ -4,7 +4,7 @@ import android.text.Spanned
 import androidx.core.text.buildSpannedString
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.reddit.LemmyUtils
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.Utils
 
 

@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
+import com.idunnololz.summit.util.ext.getDrawableCompat
 
 class LemmySwipeActionCallback(
     private val context: Context,
@@ -50,6 +52,8 @@ class LemmySwipeActionCallback(
 
     var postOnlyActions: List<SwipeAction>? = null
     var actions: List<SwipeAction> = listOf()
+
+    private val expandDrawable = context.getDrawableCompat(R.drawable.baseline_unfold_more_24)!!
 
     private fun ViewHolder.isSwipeEnabled() =
         this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
@@ -184,7 +188,17 @@ class LemmySwipeActionCallback(
                             this.currentSwipeAction = swipeAction
                         }
 
-                        drawable = swipeAction.icon.apply {
+                        val icon = if (swipeAction.id == CommentGestureAction.CollapseOrExpand) {
+                            if (viewHolder.itemView.getTag(R.id.expanded) == false) {
+                                expandDrawable
+                            } else {
+                                swipeAction.icon
+                            }
+                        } else {
+                            swipeAction.icon
+                        }
+
+                        drawable = icon.apply {
                             val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
                             val iconLeft = itemView.right - marginEnd - intrinsicWidth
                             val iconRight = itemView.right - marginEnd

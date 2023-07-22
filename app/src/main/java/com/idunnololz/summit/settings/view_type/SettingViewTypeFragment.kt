@@ -259,7 +259,8 @@ AlertDialogFragment.AlertDialogFragmentListener {
             toggleActions = {},
             onSignInRequired = {},
             onInstanceMismatch = { _, _ -> },
-            onHighlightComplete = {}
+            onHighlightComplete = {},
+            onLinkLongClick = { _, _ -> }
         )
     }
 
