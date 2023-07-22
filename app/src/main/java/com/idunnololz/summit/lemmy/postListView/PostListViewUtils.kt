@@ -2,14 +2,18 @@ package com.idunnololz.summit.lemmy.postListView
 
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
 fun BaseFragment<*>.showMorePostOptions(
+    instance: String,
     postView: PostView,
     actionsViewModel: MoreActionsViewModel
 ) {
@@ -47,6 +51,12 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.drawable.baseline_bookmark_add_24
             )
         }
+
+        addItemWithIcon(
+            R.id.share,
+            getString(R.string.share),
+            R.drawable.baseline_share_24
+        )
 
         addItemWithIcon(
             R.id.block_community,
@@ -89,6 +99,12 @@ fun BaseFragment<*>.showMorePostOptions(
                 }
                 R.id.block_user -> {
                     actionsViewModel.blockPerson(postView.creator.id)
+                }
+                R.id.share -> {
+                    Utils.shareLink(
+                        context = context,
+                        link = LinkUtils.getLinkForPost(instance, postView.post.id)
+                    )
                 }
             }
         }

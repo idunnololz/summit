@@ -146,7 +146,7 @@ class Preferences @Inject constructor(
         }
 
     var useGestureActions: Boolean
-        get() = prefs.getBoolean(KEY_USE_GESTURE_ACTIONS, false)
+        get() = prefs.getBoolean(KEY_USE_GESTURE_ACTIONS, true)
         set(value) {
             prefs.edit().putBoolean(KEY_USE_GESTURE_ACTIONS, value).apply()
         }

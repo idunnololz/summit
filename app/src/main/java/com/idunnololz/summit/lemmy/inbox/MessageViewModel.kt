@@ -30,6 +30,9 @@ class MessageViewModel @Inject constructor(
 
     private val commentsFetcher = CommentsFetcher(apiClient, accountActionsManager)
 
+    val apiInstance: String
+        get() = apiClient.instance
+
     val commentContext = StatefulLiveData<CommentContext>()
     var isContextShowing = false
 

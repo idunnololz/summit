@@ -726,13 +726,13 @@ object Utils {
         clipboard.setPrimaryClip(clip)
     }
 
-    fun shareText(context: Context, text: String) {
+    fun shareLink(context: Context, link: String) {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, text)
+            putExtra(Intent.EXTRA_TEXT, link)
             type = "text/plain"
         }
-        context.startActivity(sendIntent)
+        context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.share_link)))
     }
 
     fun startIntentToRateApp(activity: Activity) {

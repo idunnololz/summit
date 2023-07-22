@@ -262,7 +262,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     )
                 },
                 onShowMoreActions = {
-                    showMorePostOptions(it, actionsViewModel)
+                    showMorePostOptions(viewModel.apiInstance, it, actionsViewModel)
                 },
                 onPostRead = { postView ->
                     viewModel.onPostRead(postView)

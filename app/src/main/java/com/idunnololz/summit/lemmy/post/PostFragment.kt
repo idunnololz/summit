@@ -22,7 +22,6 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
@@ -54,7 +53,6 @@ import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.preferences.CommentGestureAction
-import com.idunnololz.summit.saved.SavedPostsFragment
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -276,12 +274,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 },
                 onPostMoreClick = { postView ->
                     actionsViewModel.let {
-                        showMorePostOptions(postView, it)
+                        showMorePostOptions(viewModel.apiInstance, postView, it)
                     }
                 },
                 onCommentMoreClick = { commentView ->
                     actionsViewModel.let {
-                        showMoreCommentOptions(commentView, it)
+                        showMoreCommentOptions(viewModel.apiInstance, commentView, it)
                     }
                 },
                 onFetchComments = {
@@ -350,7 +348,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             action = Intent.ACTION_SEND
                             putExtra(
                                 Intent.EXTRA_TEXT,
-                                LinkUtils.postIdToLink(viewModel.instance, args.id)
+                                LinkUtils.postIdToLink(viewModel.apiInstance, args.id)
                             )
                             type = "text/plain"
                         }
@@ -606,7 +604,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
                 AddOrEditCommentFragment().apply {
                     arguments = AddOrEditCommentFragmentArgs(
-                        viewModel.instance, null, postView, null,
+                        viewModel.apiInstance, null, postView, null,
                     ).toBundle()
                 }.show(childFragmentManager, "asdf")
             }

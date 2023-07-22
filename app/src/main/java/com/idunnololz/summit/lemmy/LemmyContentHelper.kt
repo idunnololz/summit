@@ -342,22 +342,7 @@ class LemmyContentHelper(
                 }
             }
             externalContentView.setOnLongClickListener {
-                val popupMenu = PopupMenu(context, it)
-                popupMenu.inflate(R.menu.menu_url)
-                popupMenu.setOnMenuItemClickListener { item ->
-                    when (item.itemId) {
-                        R.id.copy_link -> {
-                            Utils.copyToClipboard(context, url)
-                            true
-                        }
-                        R.id.share_link -> {
-                            Utils.shareText(context, url)
-                            true
-                        }
-                        else -> false
-                    }
-                }
-                popupMenu.show()
+                onLinkLongClick(url, url)
                 true
             }
         }

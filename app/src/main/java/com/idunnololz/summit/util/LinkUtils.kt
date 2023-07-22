@@ -3,10 +3,8 @@ package com.idunnololz.summit.util
 import android.net.Uri
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.main.MainActivity
 import okhttp3.CacheControl
@@ -124,8 +122,8 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String) {
     val context = this
 
     BottomMenu(context).apply {
-        addItem(R.id.copy_link, R.string.copy_link_address)
-        addItem(R.id.share_link, R.string.share_link)
+        addItemWithIcon(R.id.copy_link, R.string.copy_link_address, R.drawable.baseline_content_copy_24)
+        addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -133,7 +131,7 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String) {
                     Utils.copyToClipboard(context, url)
                 }
                 R.id.share_link -> {
-                    Utils.shareText(context, url)
+                    Utils.shareLink(context, url)
                 }
             }
         }

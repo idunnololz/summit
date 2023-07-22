@@ -2,21 +2,21 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account_ui.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
-import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.clearItemDecorations
 
 const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
@@ -36,11 +36,13 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
 }
 
 fun BaseFragment<*>.showMoreCommentOptions(
+    instance: String,
     commentView: CommentView,
     actionsViewModel: MoreActionsViewModel,
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
 
+    val context = requireContext()
     val currentAccount = actionsViewModel.accountManager.currentAccount.value
 
     val onEditCommentClick: (CommentView) -> Unit = a@{
@@ -88,6 +90,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
         } else {
             addItemWithIcon(R.id.save, R.string.save, R.drawable.baseline_bookmark_add_24)
         }
+        addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -102,6 +105,12 @@ fun BaseFragment<*>.showMoreCommentOptions(
                 }
                 R.id.remove_from_saved -> {
                     actionsViewModel.saveComment(commentView.comment.id, false)
+                }
+                R.id.share -> {
+                    Utils.shareLink(
+                        context,
+                        LinkUtils.getLinkForComment(instance, commentView.comment.id)
+                    )
                 }
             }
         }

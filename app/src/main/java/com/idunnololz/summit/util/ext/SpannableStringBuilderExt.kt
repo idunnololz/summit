@@ -5,7 +5,7 @@ import android.text.Spanned
 import android.text.style.URLSpan
 import com.idunnololz.summit.util.CustomUrlSpan
 
-fun SpannableStringBuilder.appendLink(text: String, url: String, underline: Boolean = true) {
+fun SpannableStringBuilder.appendLink(text: String, url: String, underline: Boolean = false) {
     val start = length
     append(text)
     val end = length
