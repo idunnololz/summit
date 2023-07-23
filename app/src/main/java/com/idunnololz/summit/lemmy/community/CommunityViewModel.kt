@@ -233,11 +233,11 @@ class CommunityViewModel @Inject constructor(
         fetchPageInternal(pageIndex + 1, force)
     }
 
-    fun fetchPage(pageIndex: Int, force: Boolean = false) {
+    fun fetchPage(pageIndex: Int, force: Boolean = false, clearPagesOnSuccess: Boolean = false) {
         if (!postListEngine.infinity) {
             currentPageIndex.value = pageIndex
         }
-        fetchPageInternal(pageIndex, force = force)
+        fetchPageInternal(pageIndex, force = force, clearPagesOnSuccess)
     }
 
     fun fetchInitialPage() {
@@ -248,20 +248,28 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun fetchCurrentPage(force: Boolean = false, resetHideRead: Boolean = false) {
+    fun fetchCurrentPage(
+        force: Boolean = false,
+        resetHideRead: Boolean = false,
+        clearPages: Boolean = false,
+    ) {
         if (resetHideRead) {
             isHideReadEnabled.value = false
             postsRepository.clearHideRead()
         }
 
         val pages = if (postListEngine.infinity) {
-            postListEngine.getCurrentPages()
+            if (clearPages) {
+                listOf()
+            } else {
+                postListEngine.getCurrentPages()
+            }
         } else {
             listOf(requireNotNull(currentPageIndex.value))
         }
         if (pages.isEmpty()) {
             if (postListEngine.infinity) {
-                fetchPage(0, force = true)
+                fetchPage(0, force = true, clearPages)
             } else {
                 fetchCurrentPage()
             }
@@ -272,7 +280,11 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPageInternal(pageToFetch: Int, force: Boolean) {
+    private fun fetchPageInternal(
+        pageToFetch: Int,
+        force: Boolean,
+        clearPagesOnSuccess: Boolean = false
+    ) {
         if (fetchingPages.contains(pageToFetch)) {
             return
         }
@@ -294,6 +306,9 @@ class CommunityViewModel @Inject constructor(
                             pageIndex = pageToFetch,
                             hasMore = it.hasMore,
                         )
+                    if (clearPagesOnSuccess) {
+                        postListEngine.clearPages()
+                    }
                     postListEngine.addPage(pageData)
                     postListEngine.createItems()
 

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings"
+    app:startDestination="@id/settingsFragment">
+    <fragment
+        android:id="@+id/settingsAccountBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListFragment"
+        android:label="SettingsAccountBlockListFragment" >
+        <action
+            android:id="@+id/action_settingsAccountBlockListFragment_to_settingsCommunityBlockListFragment"
+            app:destination="@id/settingsCommunityBlockListFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
+        <action
+            android:id="@+id/action_settingsAccountBlockListFragment_to_settingsUserBlockListFragment"
+            app:destination="@id/settingsUserBlockListFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
+    </fragment>
+    <fragment
+        android:id="@+id/settingsWebFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.SettingsWebFragment"
+        android:label="SettingWebFragment">
+        <action
+            android:id="@+id/action_settingWebFragment_to_settingsAccountBlockListFragment"
+            app:destination="@id/settingsAccountBlockListFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingHiddenPostsFragment"
+        android:name="com.idunnololz.summit.settings.hiddenPosts.SettingHiddenPostsFragment"
+        android:label="SettingHiddenPostsFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.idunnololz.summit.settings.SettingsFragment"
+        android:label="SettingsFragment">
+        <action
+            android:id="@+id/action_settingsFragment_to_settingViewTypeFragment"
+            app:destination="@id/settingViewTypeFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingThemeFragment"
+            app:destination="@id/settingThemeFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingPostAndCommentsFragment"
+            app:destination="@id/settingPostAndCommentsFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingWebFragment"
+            app:destination="@id/settingsWebFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingCacheFragment"
+            app:destination="@id/settingCacheFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingHistoryFragment"
+            app:destination="@id/settingHistoryFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingGesturesFragment"
+            app:destination="@id/settingGesturesFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsContentFragment"
+            app:destination="@id/settingsContentFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingHiddenPostsFragment"
+            app:destination="@id/settingHiddenPostsFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingAboutFragment"
+            app:destination="@id/settingAboutFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingAboutFragment"
+        android:name="com.idunnololz.summit.settings.about.SettingAboutFragment"
+        android:label="SettingAboutFragment" />
+    <fragment
+        android:id="@+id/settingGesturesFragment"
+        android:name="com.idunnololz.summit.settings.gestures.SettingGesturesFragment"
+        android:label="SettingGesturesFragment" />
+    <fragment
+        android:id="@+id/settingCacheFragment"
+        android:name="com.idunnololz.summit.settings.cache.SettingCacheFragment"
+        android:label="SettingCacheFragment" />
+    <fragment
+        android:id="@+id/settingHistoryFragment"
+        android:name="com.idunnololz.summit.settings.history.SettingHistoryFragment"
+        android:label="SettingHistoryFragment" />
+    <fragment
+        android:id="@+id/settingViewTypeFragment"
+        android:name="com.idunnololz.summit.settings.view_type.SettingViewTypeFragment"
+        android:label="SettingViewTypeFragment" />
+    <fragment
+        android:id="@+id/settingThemeFragment"
+        android:name="com.idunnololz.summit.settings.theme.SettingThemeFragment"
+        android:label="SettingThemeFragment" />
+    <fragment
+        android:id="@+id/settingPostAndCommentsFragment"
+        android:name="com.idunnololz.summit.settings.post_and_comments.SettingPostAndCommentsFragment"
+        android:label="SettingPostAndCommentsFragment" />
+    <fragment
+        android:id="@+id/settingsContentFragment"
+        android:name="com.idunnololz.summit.settings.content.SettingsContentFragment"
+        android:label="SettingsContentFragment" />
+    <fragment
+        android:id="@+id/settingsCommunityBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.community.SettingsCommunityBlockListFragment"
+        android:label="SettingsCommunityBlockListFragment" />
+    <fragment
+        android:id="@+id/settingsUserBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.user.SettingsUserBlockListFragment"
+        android:label="SettingsUserBlockListFragment" />
+</navigation>

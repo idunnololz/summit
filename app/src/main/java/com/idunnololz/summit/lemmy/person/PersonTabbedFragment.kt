@@ -16,6 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
@@ -309,11 +310,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 allowHardware(false)
             }
             name.text = displayName
-            subtitle.text = buildSpannedString {
-                append(data.personView.person.name)
-                append("@")
-                append(data.personView.person.instance)
-            }
+            subtitle.text = data.personView.person.fullName
             subtitle2.text = buildSpannedString {
                 append(context.resources.getQuantityString(R.plurals.posts_format,
                     data.personView.counts.post_count,

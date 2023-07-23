@@ -1,4 +1,4 @@
-package com.idunnololz.summit.settings.web_settings
+package com.idunnololz.summit.settings.webSettings
 
 import android.app.Application
 import android.net.Uri
@@ -189,6 +189,7 @@ class SettingsWebViewModel @Inject constructor(
                     lemmyWebSettings.botAccountSetting,
                     lemmyWebSettings.showBotAccountsSetting,
                     lemmyWebSettings.sendNotificationsToEmailSetting,
+                    lemmyWebSettings.blockSettings,
                 ),
                 mapOf(
                     lemmyWebSettings.instanceSetting.id to account.instance,
@@ -204,6 +205,7 @@ class SettingsWebViewModel @Inject constructor(
                     lemmyWebSettings.botAccountSetting.id to person.bot_account,
                     lemmyWebSettings.showBotAccountsSetting.id to localUser.show_bot_accounts,
                     lemmyWebSettings.sendNotificationsToEmailSetting.id to localUser.send_notifications_to_email,
+                    lemmyWebSettings.blockSettings.id to Unit,
                 )
             )
         )
