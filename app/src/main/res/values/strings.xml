@@ -379,6 +379,11 @@
     <string name="collapse_or_expand">Collapse or expand</string>
     <string name="error_unable_to_delete_post">Unable to delete post</string>
     <string name="unblock_this_community_format">Unblock this community (%1$s)</string>
+    <string name="account_block_settings">Account block settings</string>
+    <string name="account_block_settings_desc">Choose which community/accounts to block</string>
+    <string name="blocked_users">Blocked users</string>
+    <string name="blocked_communities">Blocked communities</string>
+    <string name="error_unblock_failed">Unable to unblock user.</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>

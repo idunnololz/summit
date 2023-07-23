@@ -250,6 +250,12 @@ class LemmyWebSettings @Inject constructor(
         null,
     )
 
+    val blockSettings = BasicSettingItem(
+        null,
+        context.getString(R.string.account_block_settings),
+        context.getString(R.string.account_block_settings_desc),
+    )
+
 }
 
 @Singleton

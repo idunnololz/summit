@@ -450,7 +450,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             shouldScrollToTopAfterFresh = true
-            viewModel.fetchCurrentPage(true, resetHideRead = true)
+            viewModel.fetchCurrentPage(true, resetHideRead = true, clearPages = true)
             binding.recyclerView.scrollToPosition(0)
         }
         binding.loadingView.setOnRefreshClickListener {

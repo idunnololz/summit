@@ -1,4 +1,4 @@
-package com.idunnololz.summit.settings.web_settings
+package com.idunnololz.summit.settings.webSettings
 
 import android.app.Activity
 import android.os.Bundle
@@ -14,28 +14,34 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.github.drjacky.imagepicker.ImagePicker
-import com.github.drjacky.imagepicker.constant.ImageProvider
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingWebBinding
+import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingValueUpdateCallback,
+class SettingsWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingValueUpdateCallback,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SettingsWebViewModel by viewModels()
 
     private var adapter: SettingItemsAdapter? = null
+
+    @Inject
+    lateinit var lemmyWebSettings: LemmyWebSettings
 
     private val backPressHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -53,14 +59,6 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
                 val uri = it.data?.data!!
 
                 viewModel.uploadImage(uri)
-                // Use the uri to load the image
-                // Only if you are not using crop feature:
-//                uri.let { galleryUri ->
-//                    contentResolver.takePersistableUriPermission(
-//                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-//                    )
-//                }
-                //////////////
             }
         }
 
@@ -189,6 +187,12 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
             context = context,
             onSettingClick = {
                 when (it) {
+                    lemmyWebSettings.blockSettings.id -> {
+                        val direction = SettingsWebFragmentDirections
+                            .actionSettingWebFragmentToSettingsAccountBlockListFragment()
+                        findNavController().navigateSafe(direction)
+                        true
+                    }
                     else -> false
                 }
             },
@@ -245,6 +249,7 @@ class SettingWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVal
 
             }
         ).apply {
+            this.stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             this.defaultSettingValues = data.defaultValues
             this.data = data.settings
 
