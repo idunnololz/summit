@@ -735,7 +735,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         if (isCustomAppBarExpandedPercent > 0.8f) {
             binding.fab.show()
         } else {
-            Log.d("HAHA", "isCustomAppBarExpandedPercent: $isCustomAppBarExpandedPercent", RuntimeException())
             binding.fab.hide()
         }
     }

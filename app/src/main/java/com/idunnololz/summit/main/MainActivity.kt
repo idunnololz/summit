@@ -127,25 +127,12 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var themeManager: ThemeManager
 
-    private var isMaterialYou = false
-
-    private fun updateTheme() {
-        isMaterialYou = themeManager.useMaterialYou.value
-        if (isMaterialYou) {
-            DynamicColors.applyToActivityIfAvailable(this@MainActivity)
-        } else {
-            // do nothing
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         super.onCreate(savedInstanceState)
-
-        updateTheme()
 
         viewModel.communities.observe(this) {
             communitySelectorController?.setCommunities(it)
@@ -189,18 +176,6 @@ class MainActivity : BaseActivity() {
             if (savedInstanceState == null) {
                 setupBottomNavigationBar()
             } // Else, need to wait for onRestoreInstanceState
-
-            lifecycleScope.launch(Dispatchers.Default) {
-                themeManager.useMaterialYou.collect {
-                    withContext(Dispatchers.Main) {
-                        if (it != isMaterialYou) {
-                            updateTheme()
-
-                            recreate()
-                        }
-                    }
-                }
-            }
 
             lifecycleScope.launch(Dispatchers.Default) {
                 themeManager.themeOverlayChanged.collect {
