@@ -12,6 +12,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
+import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
@@ -90,6 +91,7 @@ class ListingItemAdapter(
             CommunityLayout.Compact -> R.layout.listing_item_compact
             CommunityLayout.List -> R.layout.listing_item_list
             CommunityLayout.Card -> R.layout.listing_item_card
+            CommunityLayout.Card2 -> R.layout.listing_item_card2
             CommunityLayout.Full -> R.layout.listing_item_full
         }
         is Item.FooterItem -> R.layout.main_footer_item
@@ -107,6 +109,8 @@ class ListingItemAdapter(
                 ListingItemViewHolder.fromBinding(ListingItemListBinding.bind(v))
             R.layout.listing_item_card ->
                 ListingItemViewHolder.fromBinding(ListingItemCardBinding.bind(v))
+            R.layout.listing_item_card2 ->
+                ListingItemViewHolder.fromBinding(ListingItemCard2Binding.bind(v))
             R.layout.listing_item_full ->
                 ListingItemViewHolder.fromBinding(ListingItemFullBinding.bind(v))
             R.layout.main_footer_item -> ViewBindingViewHolder(MainFooterItemBinding.bind(v))

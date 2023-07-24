@@ -32,7 +32,9 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/footer_spacer_height"
+                android:clipToPadding="false">
 
                 <include
                     android:id="@+id/infinity"
@@ -47,13 +49,71 @@
                     android:layout_height="wrap_content"/>
 
                 <include
-                    android:id="@+id/show_nsfw_posts"
+                    android:id="@+id/blur_nsfw_posts"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/filters_title"
+                    android:text="@string/filters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingBottom="@dimen/padding"
+                    android:paddingTop="@dimen/padding_two"
+                    style="@style/SettingHeaderStyle"/>
+
+                <include
+                    android:id="@+id/keyword_filters"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/instance_filters"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/community_filters"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/user_filters"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/show_link_posts"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
-                    android:id="@+id/blur_nsfw_posts"
+                    android:id="@+id/show_image_posts"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+s
+                <include
+                    android:id="@+id/show_video_posts"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/show_text_posts"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/show_nsfw_posts"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

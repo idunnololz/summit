@@ -16,14 +16,19 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
-import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.moshi
@@ -100,8 +105,6 @@ class Preferences @Inject constructor(
         prefs.putMoshiValue(KEY_POST_AND_COMMENTS_UI_CONFIG, config)
     }
 
-
-
     private fun getPostUiConfigKey() =
         when (getPostsLayout()) {
             CommunityLayout.Compact ->
@@ -110,8 +113,11 @@ class Preferences @Inject constructor(
                 PreferenceUtil.KEY_POST_UI_CONFIG_LIST
             CommunityLayout.Card ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_CARD
+            CommunityLayout.Card2 ->
+                PreferenceUtil.KEY_POST_UI_CONFIG_CARD2
             CommunityLayout.Full ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_FULL
+
         }
 
     fun getBaseTheme(): BaseTheme {
@@ -211,16 +217,42 @@ class Preferences @Inject constructor(
             prefs.edit().putInt(KEY_COMMENT_THREAD_STYLE, value).apply()
         }
 
-    var showNsfwPosts: Boolean
-        get() = prefs.getBoolean(KEY_HIDE_NSFW_POSTS, true)
-        set(value) {
-            prefs.edit().putBoolean(KEY_HIDE_NSFW_POSTS, value).apply()
-        }
-
     var blurNsfwPosts: Boolean
         get() = prefs.getBoolean(KEY_BLUR_NSFW_POSTS, true)
         set(value) {
             prefs.edit().putBoolean(KEY_BLUR_NSFW_POSTS, value).apply()
+        }
+
+    var showLinkPosts: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_LINK_POSTS, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_SHOW_LINK_POSTS, value).apply()
+        }
+    var showImagePosts: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_IMAGE_POSTS, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_SHOW_IMAGE_POSTS, value).apply()
+        }
+    var showVideoPosts: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_VIDEO_POSTS, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_SHOW_VIDEO_POSTS, value).apply()
+        }
+    var showTextPosts: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_TEXT_POSTS, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_SHOW_TEXT_POSTS, value).apply()
+        }
+    var showNsfwPosts: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_NSFW_POSTS, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_SHOW_NSFW_POSTS, value).apply()
+        }
+
+    var globalFontSize: Int
+        get() = prefs.getInt(KEY_GLOBAL_FONT_SIZE, GlobalFontSizeId.Normal)
+        set(value) {
+            prefs.edit().putInt(KEY_GLOBAL_FONT_SIZE, value).apply()
         }
 
     fun reset(key: String) {

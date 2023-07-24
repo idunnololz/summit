@@ -11,8 +11,11 @@ import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.utils.PostType
+import com.idunnololz.summit.api.utils.getDominantType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.util.retry
@@ -32,6 +35,7 @@ class PostsRepository @Inject constructor(
     private val accountInfoManager: AccountInfoManager,
     private val accountActionsManager: AccountActionsManager,
     private val hiddenPostsManager: HiddenPostsManager,
+    private val contentFiltersManager: ContentFiltersManager,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -56,7 +60,15 @@ class PostsRepository @Inject constructor(
 
     private var currentPageInternal = 1
     var hideRead = false
-    var showNsfw = true
+
+    var showLinkPosts = true
+    var showImagePosts = true
+    var showVideoPosts = true
+    var showTextPosts = true
+    var showNsfwPosts = true
+
+    private var consecutiveFilteredPostsByFilter = 0
+    private var consecutiveFilteredPostsByType = 0
 
     var sortOrder: CommunitySortOrder = CommunitySortOrder.Active
         set(value) {
@@ -90,7 +102,7 @@ class PostsRepository @Inject constructor(
         maxPage: Int
     ): Result<PageResult> =
         updateStateMaintainingPosition({
-            this.showNsfw = showNsfw
+            this.showNsfwPosts = showNsfw
         }, anchors, maxPage)
 
     suspend fun updateStateMaintainingPosition(
@@ -339,14 +351,21 @@ class PostsRepository @Inject constructor(
                 if (newPosts.isNotEmpty()) {
                     if (newPosts.first().community.nsfw &&
                         communityRef is CommunityRef.CommunityRefByName &&
-                        !showNsfw) {
+                        !showNsfwPosts) {
                         return@fold Result.failure(LoadNsfwCommunityWhenNsfwDisabled())
                     }
                 }
 
                 Log.d(TAG, "Fetched ${newPosts.size} posts.")
                 addPosts(newPosts, pageIndex, hiddenPosts, force)
-                Result.success(newPosts.isNotEmpty())
+
+                if (consecutiveFilteredPostsByFilter > 20) {
+                    Result.failure(FilterTooAggressiveException())
+                } else if (consecutiveFilteredPostsByType > 20) {
+                    Result.failure(ContentTypeFilterTooAggressiveException())
+                } else {
+                    Result.success(newPosts.isNotEmpty())
+                }
             },
             onFailure = {
                 Result.failure(it)
@@ -369,12 +388,36 @@ class PostsRepository @Inject constructor(
             if (hideRead && (post.read || postReadManager.isPostRead(apiInstance, post.post.id))) {
                 continue
             }
-            if (!showNsfw && post.post.nsfw) {
+            if (!showNsfwPosts && post.post.nsfw) {
+                continue
+            }
+            val postType = post.getDominantType()
+            if (!showLinkPosts && postType == PostType.Link) {
+                consecutiveFilteredPostsByType++
+                continue
+            }
+            if (!showImagePosts && postType == PostType.Image) {
+                consecutiveFilteredPostsByType++
+                continue
+            }
+            if (!showVideoPosts && postType == PostType.Video) {
+                consecutiveFilteredPostsByType++
+                continue
+            }
+            if (!showTextPosts && postType == PostType.Text) {
+                consecutiveFilteredPostsByType++
                 continue
             }
             if (hiddenPosts.contains(post.post.id)) {
                 continue
             }
+            if (contentFiltersManager.testPostView(post)) {
+                consecutiveFilteredPostsByFilter++
+                continue
+            }
+
+            consecutiveFilteredPostsByFilter = 0
+            consecutiveFilteredPostsByType = 0
 
             if (seenPosts.add(uniquePostKey)) {
                 allPosts.add(PostData(post, pageIndex))
@@ -419,3 +462,6 @@ class PostsRepository @Inject constructor(
 }
 
 class LoadNsfwCommunityWhenNsfwDisabled(): RuntimeException()
+class FilterTooAggressiveException(): RuntimeException()
+class ContentTypeFilterTooAggressiveException(): RuntimeException()
+

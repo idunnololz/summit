@@ -57,6 +57,16 @@ class ThemeManager @Inject constructor(
             activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
         }
 
+        when (preferences.globalFontSize) {
+            GlobalFontSizeId.Small ->
+                activity.theme.applyStyle(R.style.TextStyle_Small, true)
+            GlobalFontSizeId.Normal ->
+                activity.theme.applyStyle(R.style.TextStyle, true)
+            GlobalFontSizeId.Large ->
+                activity.theme.applyStyle(R.style.TextStyle_Large, true)
+            GlobalFontSizeId.ExtraLarge ->
+                activity.theme.applyStyle(R.style.TextStyle_ExtraLarge, true)
+        }
     }
 
 }

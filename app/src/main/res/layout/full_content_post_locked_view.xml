@@ -19,7 +19,7 @@
             android:id="@+id/text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="?textAppearanceBody2"
+            android:textAppearance="?textAppearanceBodyMedium"
             android:layout_margin="@dimen/padding"
             android:gravity="start"
             app:layout_constraintTop_toTopOf="parent"

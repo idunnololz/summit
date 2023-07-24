@@ -48,6 +48,13 @@ fun OnOffSettingItem.bindTo(
     getCurrentValue: () -> Boolean,
     onValueChanged: (Boolean) -> Unit,
 ) {
+    if (this.icon == null) {
+        b.icon.visibility = View.GONE
+    } else {
+        b.icon.setImageResource(this.icon)
+        b.icon.visibility = View.VISIBLE
+    }
+
     b.title.text = this.title
     if (this.description != null) {
         b.desc.visibility = View.VISIBLE

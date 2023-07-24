@@ -7,7 +7,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.idunnololz.summit.history.HistoryEntry
 
 private const val HIDDEN_POSTS_LIMIT = 1000
 
@@ -28,7 +27,7 @@ interface HiddenPostsDao {
     suspend fun count(): Long
 
     @Delete
-    suspend fun delete(historyEntry: HistoryEntry)
+    suspend fun delete(entry: HiddenPostEntry)
 
     @Query("DELETE FROM hidden_posts")
     suspend fun clear()

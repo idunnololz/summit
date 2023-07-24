@@ -58,6 +58,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
@@ -107,13 +108,17 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     private var postUiConfig: PostUiConfig = uiConfig.postUiConfig
     private var commentUiConfig: CommentUiConfig = uiConfig.commentUiConfig
+    private var globalFontSizeMultiplier: Float =
+        GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
 
     val lemmyHeaderHelper = LemmyHeaderHelper(context)
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,
         ExoPlayerManager.get(activity),
-    )
+    ).also {
+        it.globalFontSizeMultiplier = globalFontSizeMultiplier
+    }
     val voteUiHandler = accountActionsManager.voteUiHandler
 
     private val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
@@ -133,6 +138,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         uiConfig = preferences.getPostAndCommentsUiConfig()
         hideCommentActions = preferences.hideCommentActions
         tapCommentToCollapse = preferences.tapCommentToCollapse
+        globalFontSizeMultiplier = GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
+        lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
     }
 
     fun bindPostView(
@@ -756,7 +763,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             null,
             null
         )
-        b.date.text = dateStringToPretty(item.lastUpdate)
+        b.date.text = dateStringToPretty(context, item.lastUpdate)
         b.title.text = item.title
 
         b.content.text = if (item.isDeleted) {
@@ -925,8 +932,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     private fun Float.toPostTextSize(): Float =
-        this * postUiConfig.textSizeMultiplier
+        this * postUiConfig.textSizeMultiplier * globalFontSizeMultiplier
 
     private fun Float.toCommentTextSize(): Float =
-        this * commentUiConfig.textSizeMultiplier
+        this * commentUiConfig.textSizeMultiplier * globalFontSizeMultiplier
 }

@@ -69,6 +69,7 @@ class LemmyContentHelper(
     private val inflater = LayoutInflater.from(context)
 
     private var textSizeMultiplier: Float = config.textSizeMultiplier
+    var globalFontSizeMultiplier: Float = 1f
 
 
     /**
@@ -238,7 +239,7 @@ class LemmyContentHelper(
                 if (tempSize.width > 0 && tempSize.height > 0) {
                     val thumbnailMaxHeight =
                         (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-                    fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                    fullImageView.updateLayoutParams<LayoutParams> {
                         this.height = thumbnailMaxHeight
                     }
                 }
@@ -349,7 +350,6 @@ class LemmyContentHelper(
 
         if (!lazyUpdate) {
             when (val postType = postView.getType()) {
-                PostType.ImageUrl,
                 PostType.Image -> {
                     val fullContentImageView = getView<View>(R.layout.full_content_image_view)
                     val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.fullImage)
@@ -357,11 +357,7 @@ class LemmyContentHelper(
                         fullContentImageView.findViewById<LoadingView>(R.id.loadingView)
 
                     val imageUrl =
-                        if (postType == PostType.ImageUrl) {
-                            requireNotNull(targetPostView.post.url)
-                        } else {
-                            requireNotNull(targetPostView.post.thumbnail_url)
-                        }
+                        requireNotNull(targetPostView.post.url)
 
                     fullImageView.load(null)
 
@@ -370,11 +366,11 @@ class LemmyContentHelper(
                         if (tempSize.width > 0 && tempSize.height > 0) {
                             val thumbnailMaxHeight =
                                 (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-                            fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                            fullImageView.updateLayoutParams<LayoutParams> {
                                 this.height = thumbnailMaxHeight
                             }
                         } else {
-                            fullImageView.updateLayoutParams<ViewGroup.LayoutParams> {
+                            fullImageView.updateLayoutParams<LayoutParams> {
                                 this.height = WRAP_CONTENT
                             }
                         }
@@ -504,7 +500,7 @@ class LemmyContentHelper(
                         playerView.visibility = View.GONE
                     }
                 }
-                PostType.Text -> {
+                PostType.Text, PostType.Link -> {
                 }
             }
 
@@ -535,47 +531,6 @@ class LemmyContentHelper(
                 targetPostView.post.thumbnail_url != targetPostView.post.url) {
                 appendUiForExternalOrInternalUrl(targetPostView.post.url)
             }
-//            when (postType) {
-//                ListingItemType.DEFAULT_SELF -> {
-//                }
-//                ListingItemType.REDDIT_IMAGE -> {
-//                }
-//                ListingItemType.REDDIT_VIDEO -> {
-//                }
-//                ListingItemType.REDDIT_GALLERY -> {
-//                    val fullContentGalleryView = getView<View>(R.layout.full_content_gallery_view)
-//                    val galleryRecyclerView =
-//                        fullContentGalleryView.findViewById<RecyclerView>(R.id.galleryRecyclerView)
-//                    val loadingView =
-//                        fullContentGalleryView.findViewById<LoadingView>(R.id.loadingView)
-//                    val pageIndicator =
-//                        fullContentGalleryView.findViewById<GalleryPageIndicator>(R.id.pageIndicator)
-//
-//                    galleryRecyclerView.adapter =
-//                        GalleryAdapter(
-//                            context,
-//                            requireNotNull(listingItem.mediaMetadata),
-//                            requireNotNull(listingItem.galleryData),
-//                            fragment,
-//                            onFullImageViewClickListener
-//                        )
-//                    galleryRecyclerView.layoutManager =
-//                        LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-//                    galleryRecyclerView.setHasFixedSize(true)
-//
-//                    if (galleryRecyclerView.onFlingListener == null) {
-//                        // Check if PagerSnapHelper is already attached
-//                        PagerSnapHelper().attachToRecyclerView(galleryRecyclerView)
-//                    }
-//
-//                    pageIndicator.setup(galleryRecyclerView)
-//
-//                    Log.d(TAG, "GalleryView attached")
-//                }
-//                ListingItemType.UNKNOWN -> {
-//                    appendUiForExternalOrRedditUrl()
-//                }
-//            }
         }
 
         addFooter()
@@ -618,5 +573,5 @@ class LemmyContentHelper(
     }
 
     private fun Float.toTextSize(): Float =
-        this * textSizeMultiplier
+        this * textSizeMultiplier * globalFontSizeMultiplier
 }

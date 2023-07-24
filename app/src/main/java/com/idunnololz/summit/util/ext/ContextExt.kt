@@ -22,6 +22,13 @@ fun Context.getDimenFromAttribute(attribute: Int): Float {
     return dimen
 }
 
+fun Context.getResIdFromAttribute(attribute: Int): Int {
+    val attributes = obtainStyledAttributes(intArrayOf(attribute))
+    val resourceId = attributes.getResourceId(0, 0)
+    attributes.recycle()
+    return resourceId
+}
+
 fun Context.getDimen(@DimenRes dimen: Int): Int {
     return resources.getDimension(dimen).toInt()
 }

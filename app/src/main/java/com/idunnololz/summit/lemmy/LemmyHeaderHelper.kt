@@ -110,7 +110,7 @@ class LemmyHeaderHelper(
             LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
         )
         sb.appendSeparator()
-        dateStringToPretty(postView.post.updated ?: postView.post.published)?.let {
+        dateStringToPretty(context, postView.post.updated ?: postView.post.published).let {
             sb.append(it)
         }
         if (listAuthor) {
@@ -300,7 +300,7 @@ class LemmyHeaderHelper(
 
         sb.append("  ")
         sb.append(
-            dateStringToPretty(item.comment.updated ?: item.comment.published)
+            dateStringToPretty(context, item.comment.updated ?: item.comment.published)
         )
 
 //        if (item.comment.distinguished) {
@@ -448,7 +448,7 @@ class LemmyHeaderHelper(
 
         sb.appendSeparator()
         sb.append(
-            dateStringToPretty(item.private_message.updated ?: item.private_message.published)
+            dateStringToPretty(context, item.private_message.updated ?: item.private_message.published)
         )
         headerContainer.getFlairView().visibility = View.GONE
 
@@ -489,7 +489,7 @@ class LemmyHeaderHelper(
 
         sb.appendSeparator()
         sb.append(
-            dateStringToPretty(item.comment.updated ?: item.comment.published)
+            dateStringToPretty(context, item.comment.updated ?: item.comment.published)
         )
         headerContainer.getFlairView().visibility = View.GONE
 
@@ -530,7 +530,7 @@ class LemmyHeaderHelper(
 
         sb.appendSeparator()
         sb.append(
-            dateStringToPretty(item.comment.updated ?: item.comment.published)
+            dateStringToPretty(context, item.comment.updated ?: item.comment.published)
         )
         headerContainer.getFlairView().visibility = View.GONE
 

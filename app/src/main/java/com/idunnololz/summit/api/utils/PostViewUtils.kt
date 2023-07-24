@@ -9,9 +9,9 @@ import com.idunnololz.summit.video.VideoSizeHint
 
 enum class PostType {
     Image,
-    ImageUrl,
     Video,
     Text,
+    Link,
 }
 
 fun PostView.getUniqueKey(): String =
@@ -71,20 +71,25 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
 }
 
 fun PostView.getType(): PostType {
-    if (post.thumbnail_url != null) {
-        if (isUrlImage(post.thumbnail_url)) {
+    if (post.url != null && isUrlImage(post.url)) {
+        return PostType.Image
+    }
+    if (post.url != null && isUrlVideo(post.url)) {
+        return PostType.Video
+    }
+    return PostType.Text
+}
+
+fun PostView.getDominantType(): PostType {
+    if (post.url != null) {
+        if (isUrlImage(post.url)) {
             return PostType.Image
         }
-        if (isUrlVideo(post.thumbnail_url)) {
+        if (isUrlVideo(post.url)) {
             return PostType.Video
         }
+        return PostType.Link
     }
-    if (post.url != null && isUrlImage(post.url)) {
-        return PostType.ImageUrl
-    }
-//        if (post.embed_video_url != null) {
-//            return PostType.Video
-//        }
     return PostType.Text
 }
 

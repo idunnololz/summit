@@ -95,7 +95,6 @@ class ModernThreadLinesDecoration(
                 linePaint.color = getColorForDepth(totalDepth)
 
                 linePaint.alpha = (view.alpha * 255).toInt()
-                dividerPaint.alpha = (view.alpha * 255).toInt()
 
                 c.drawLine(
                     x + translationX,
@@ -107,10 +106,13 @@ class ModernThreadLinesDecoration(
             }
 
             if (drawDividerAbove) {
+                dividerPaint.alpha = (view.alpha * 255).toInt()
+
                 val y = view.top.toFloat() + translationY
                 // Don't transform dividers by X due to swipe actions
                 val start = x - (linePaint.strokeWidth / 2)
                 val end = view.right.toFloat()
+                dividerPaint.alpha = 255
                 c.drawLine(
                     start,
                     y,
@@ -119,6 +121,7 @@ class ModernThreadLinesDecoration(
                     dividerPaint
                 )
             }
+
 
         }
     }

@@ -38,16 +38,175 @@
     <!--letterSpacing, etc. to define a custom appearance for each and see how they are -->
     <!--applied globally across your app.-->
 
+    <style name="TextAppearance.App.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+    </style>
+    <style name="TextAppearance.App.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
+    </style>
+    <style name="TextAppearance.App.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+    </style>
+    <style name="TextAppearance.App.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+    </style>
+    <style name="TextAppearance.App.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+    </style>
+    <style name="TextAppearance.App.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+    </style>
+    <style name="TextAppearance.App.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+    </style>
+    <style name="TextAppearance.App.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+    </style>
+    <style name="TextAppearance.App.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+    </style>
     <style name="TextAppearance.App.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
-        <!--Your custom type style here-->
         <item name="android:textColor">@color/colorText</item>
     </style>
     <style name="TextAppearance.App.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
-        <!--Your custom type style here-->
         <item name="android:textColor">@color/colorText</item>
     </style>
     <style name="TextAppearance.App.BodySmall" parent="TextAppearance.Material3.BodySmall">
-        <!--Your custom type style here-->
         <item name="android:textColor">@color/colorText</item>
+    </style>
+    <style name="TextAppearance.App.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+    </style>
+    <style name="TextAppearance.App.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+    </style>
+    <style name="TextAppearance.App.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+    </style>
+
+    <style name="TextAppearance.App.Small.DisplayLarge" parent="TextAppearance.App.DisplayLarge">
+        <item name="android:textSize">52sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.DisplayMedium" parent="TextAppearance.App.DisplayMedium">
+        <item name="android:textSize">42sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.DisplaySmall" parent="TextAppearance.App.DisplaySmall">
+        <item name="android:textSize">32sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.HeadlineLarge" parent="TextAppearance.App.HeadlineLarge">
+        <item name="android:textSize">30sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.HeadlineMedium" parent="TextAppearance.App.HeadlineMedium">
+        <item name="android:textSize">26sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.HeadlineSmall" parent="TextAppearance.App.HeadlineSmall">
+        <item name="android:textSize">22sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.TitleLarge" parent="TextAppearance.App.TitleLarge">
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.TitleMedium" parent="TextAppearance.App.TitleMedium">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.TitleSmall" parent="TextAppearance.App.TitleSmall">
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.BodyLarge" parent="TextAppearance.App.BodyLarge">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.BodyMedium" parent="TextAppearance.App.BodyMedium">
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.BodySmall" parent="TextAppearance.App.BodySmall">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.LabelLarge" parent="TextAppearance.App.LabelLarge">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.LabelMedium" parent="TextAppearance.App.LabelMedium">
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="TextAppearance.App.Small.LabelSmall" parent="TextAppearance.App.LabelSmall">
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="TextAppearance.App.Large.DisplayLarge" parent="TextAppearance.App.DisplayLarge">
+        <item name="android:textSize">57sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.DisplayMedium" parent="TextAppearance.App.DisplayMedium">
+        <item name="android:textSize">50sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.DisplaySmall" parent="TextAppearance.App.DisplaySmall">
+        <item name="android:textSize">40sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.HeadlineLarge" parent="TextAppearance.App.HeadlineLarge">
+        <item name="android:textSize">36sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.HeadlineMedium" parent="TextAppearance.App.HeadlineMedium">
+        <item name="android:textSize">30sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.HeadlineSmall" parent="TextAppearance.App.HeadlineSmall">
+        <item name="android:textSize">26sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.TitleLarge" parent="TextAppearance.App.TitleLarge">
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.TitleMedium" parent="TextAppearance.App.TitleMedium">
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.TitleSmall" parent="TextAppearance.App.TitleSmall">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.BodyLarge" parent="TextAppearance.App.BodyLarge">
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.BodyMedium" parent="TextAppearance.App.BodyMedium">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.BodySmall" parent="TextAppearance.App.BodySmall">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.LabelLarge" parent="TextAppearance.App.LabelLarge">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.LabelMedium" parent="TextAppearance.App.LabelMedium">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance.App.Large.LabelSmall" parent="TextAppearance.App.LabelSmall">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.App.ExtraLarge.DisplayLarge" parent="TextAppearance.App.DisplayLarge">
+        <item name="android:textSize">57sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.DisplayMedium" parent="TextAppearance.App.DisplayMedium">
+        <item name="android:textSize">49sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.DisplaySmall" parent="TextAppearance.App.DisplaySmall">
+        <item name="android:textSize">39sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.HeadlineLarge" parent="TextAppearance.App.HeadlineLarge">
+        <item name="android:textSize">35sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.HeadlineMedium" parent="TextAppearance.App.HeadlineMedium">
+        <item name="android:textSize">31sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.HeadlineSmall" parent="TextAppearance.App.HeadlineSmall">
+        <item name="android:textSize">27sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.TitleLarge" parent="TextAppearance.App.TitleLarge">
+        <item name="android:textSize">25sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.TitleMedium" parent="TextAppearance.App.TitleMedium">
+        <item name="android:textSize">19sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.TitleSmall" parent="TextAppearance.App.TitleSmall">
+        <item name="android:textSize">17sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.BodyLarge" parent="TextAppearance.App.BodyLarge">
+        <item name="android:textSize">19sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.BodyMedium" parent="TextAppearance.App.BodyMedium">
+        <item name="android:textSize">17sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.BodySmall" parent="TextAppearance.App.BodySmall">
+        <item name="android:textSize">15sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.LabelLarge" parent="TextAppearance.App.LabelLarge">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.LabelMedium" parent="TextAppearance.App.LabelMedium">
+        <item name="android:textSize">15sp</item>
+    </style>
+    <style name="TextAppearance.App.ExtraLarge.LabelSmall" parent="TextAppearance.App.LabelSmall">
+        <item name="android:textSize">14sp</item>
     </style>
 </resources>

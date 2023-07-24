@@ -111,7 +111,9 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)
             },
-        )
+        ).apply {
+            updateWithPreferences(preferences)
+        }
         onSelectedLayoutChanged()
     }
 

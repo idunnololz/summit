@@ -64,6 +64,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/padding_half"
                     android:textColor="@color/colorTextFaint"
+                    android:textAppearance="?textAppearanceBodyMedium"
                     app:layout_constraintStart_toEndOf="@+id/author"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBaseline_toBaselineOf="@+id/author"

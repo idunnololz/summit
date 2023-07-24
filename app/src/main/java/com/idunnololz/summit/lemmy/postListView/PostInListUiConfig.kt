@@ -15,6 +15,7 @@ data class PostInListUiConfig(
     val fullContentConfig: FullContentConfig = FullContentConfig(),
     val preferImagesAtEnd: Boolean = false,
     val preferFullSizeImages: Boolean = false,
+    val preferTitleText: Boolean = false,
 ) {
     fun updateTextSizeMultiplier(it: Float): PostInListUiConfig =
         this.copy(
@@ -86,6 +87,10 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig =
                 imageWidthPercent = 0.2f
             )
         CommunityLayout.Card ->
+            PostInListUiConfig(
+                imageWidthPercent = 1f
+            )
+        CommunityLayout.Card2 ->
             PostInListUiConfig(
                 imageWidthPercent = 1f
             )

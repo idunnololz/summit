@@ -19,6 +19,7 @@ import androidx.transition.TransitionSet.ORDERING_TOGETHER
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingViewTypeBinding
+import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
@@ -112,12 +113,14 @@ AlertDialogFragment.AlertDialogFragmentListener {
         TextOnlySettingItem(
             getString(R.string.base_view_type),
             ""
-        ).bindTo(activity = parentActivity,
+        ).bindTo(
+            activity = parentActivity,
             b = binding.viewTypeSetting,
             choices = mapOf(
                 CommunityLayout.Compact to getString(R.string.compact),
                 CommunityLayout.List to getString(R.string.list),
                 CommunityLayout.Card to getString(R.string.card),
+                CommunityLayout.Card2 to getString(R.string.card2),
                 CommunityLayout.Full to getString(R.string.full),
             ),
             getCurrentChoice = {
@@ -156,6 +159,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             }
         )
         OnOffSettingItem(
+            null,
             getString(R.string.prefer_image_at_the_end),
             null,
         ).bindTo(
@@ -169,6 +173,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             }
         )
         OnOffSettingItem(
+            null,
             getString(R.string.prefer_full_size_image),
             null,
         ).bindTo(
@@ -177,6 +182,20 @@ AlertDialogFragment.AlertDialogFragmentListener {
             {
                 viewModel.currentPostUiConfig =
                     viewModel.currentPostUiConfig.copy(preferFullSizeImages = it)
+
+                updateRendering()
+            }
+        )
+        OnOffSettingItem(
+            null,
+            getString(R.string.prefer_title_text),
+            null,
+        ).bindTo(
+            binding.preferTitleText,
+            { viewModel.currentPostUiConfig.preferTitleText },
+            {
+                viewModel.currentPostUiConfig =
+                    viewModel.currentPostUiConfig.copy(preferTitleText = it)
 
                 updateRendering()
             }
@@ -222,6 +241,10 @@ AlertDialogFragment.AlertDialogFragmentListener {
             CommunityLayout.Card ->
                 ListingItemViewHolder.fromBinding(
                     ListingItemCardBinding.inflate(inflater, binding.demoViewContainer, false)
+                )
+            CommunityLayout.Card2 ->
+                ListingItemViewHolder.fromBinding(
+                    ListingItemCard2Binding.inflate(inflater, binding.demoViewContainer, false)
                 )
             CommunityLayout.Full ->
                 ListingItemViewHolder.fromBinding(

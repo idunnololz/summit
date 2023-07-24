@@ -13,6 +13,7 @@
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding"
         android:drawablePadding="@dimen/padding_quarter"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constrainedWidth="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/date"
@@ -26,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding_half"
         android:textColor="@color/colorTextFaint"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintStart_toEndOf="@+id/author"
         app:layout_constraintEnd_toStartOf="@+id/date"
         app:layout_constraintBaseline_toBaselineOf="@+id/author"
@@ -37,6 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/padding"
         android:textColor="@color/colorTextFaint"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@+id/author"/>
 
@@ -62,6 +65,7 @@
         android:layout_marginTop="@dimen/padding_quarter"
         android:maxLines="2"
         android:ellipsize="end"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"/>
