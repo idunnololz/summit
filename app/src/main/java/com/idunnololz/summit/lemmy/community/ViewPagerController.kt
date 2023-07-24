@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.discord.panels.OverlappingPanelsLayout
@@ -25,7 +26,14 @@ import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomScrollViewPager
 import com.idunnololz.summit.util.DepthPageTransformer
+import com.idunnololz.summit.util.assertMainThread
+import com.idunnololz.summit.util.ext.debounce
 import com.idunnololz.summit.video.VideoState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class ViewPagerController(
@@ -47,6 +55,8 @@ class ViewPagerController(
     }
 
     private val viewPagerAdapter = viewModel.viewPagerAdapter
+    private var currentTransitionAnimator: Animator? = null
+    private var activeOpenPostJob: Job? = null
 
     fun init() {
         viewPager.adapter = viewPagerAdapter
@@ -69,8 +79,6 @@ class ViewPagerController(
 
             override fun onPageScrollStateChanged(state: Int) {
                 if (state == ViewPager.SCROLL_STATE_IDLE) {
-                    Log.d(TAG, "REAL POSITION: ${viewPager.currentItem}")
-
                     val position = viewPager.currentItem
 
                     if (position == 0) {
@@ -83,12 +91,12 @@ class ViewPagerController(
                             }
                         }
                         fragment.getMainActivity()?.setNavUiOpenness(0f)
+                        currentTransitionAnimator?.cancel()
                     }
 
                     onPageSelected()
                     this@ViewPagerController.onPageSelected(position)
                 } else {
-
                     fragment.requireMainActivity().apply {
                         lockUiOpenness = false
                     }
@@ -108,28 +116,39 @@ class ViewPagerController(
         reveal: Boolean = false,
         videoState: VideoState? = null,
     ) {
-        val fragment = PostFragment()
-            .apply {
-                arguments = PostFragmentArgs(
-                    instance = instance,
-                    id =  id,
-                    reveal = reveal,
-                    post = post,
-                    jumpToComments = jumpToComments,
-                    currentCommunity = currentCommunity,
-                    videoState = videoState,
-                ).toBundle()
-            }
-
-        childFragmentManager.commitNow(allowStateLoss = true) {
-            replace(R.id.post_fragment_container, fragment)
+        if (activeOpenPostJob != null) {
+            Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
+            return
         }
 
-        onPostOpen()
-//        viewPager.setCurrentItem(1, true)
-        animatePagerTransition(true)
+        activeOpenPostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
+            val fragment = PostFragment()
+                .apply {
+                    arguments = PostFragmentArgs(
+                        instance = instance,
+                        id =  id,
+                        reveal = reveal,
+                        post = post,
+                        jumpToComments = jumpToComments,
+                        currentCommunity = currentCommunity,
+                        videoState = videoState,
+                    ).toBundle()
+                }
 
-        viewModel.lastSelectedPost = PostRef(instance, id)
+            childFragmentManager.commit(allowStateLoss = true) {
+                replace(R.id.post_fragment_container, fragment)
+            }
+
+            onPostOpen()
+            animatePagerTransition(true)
+
+            viewModel.lastSelectedPost = PostRef(instance, id)
+
+            withContext(Dispatchers.IO) {
+                delay(250)
+            }
+            activeOpenPostJob = null
+        }
     }
 
     fun closePost(fragment: Fragment) {
@@ -200,6 +219,8 @@ class ViewPagerController(
     }
 
     private fun animatePagerTransition(forward: Boolean) {
+        currentTransitionAnimator?.cancel()
+
         val animator = ValueAnimator.ofInt(
             0,
             viewPager.width - if (forward) viewPager.paddingLeft else viewPager.paddingRight
@@ -207,11 +228,20 @@ class ViewPagerController(
         animator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animation: Animator) {}
             override fun onAnimationEnd(animation: Animator) {
+                Log.d(TAG, "onAnimationEnd()")
                 try {
                     viewPager.endFakeDrag()
                 } catch (e: Exception) {
                     // do nothing
                 }
+                // do a begin and end to get out of bad states
+                viewPager.beginFakeDrag()
+                try {
+                    viewPager.endFakeDrag()
+                } catch (e: Exception) {
+                    // do nothing
+                }
+                viewPager.currentItem = 1
             }
 
             override fun onAnimationCancel(animation: Animator) {
@@ -241,5 +271,7 @@ class ViewPagerController(
         animator.duration = 250
         viewPager.beginFakeDrag()
         animator.start()
+
+        currentTransitionAnimator = animator
     }
 }
