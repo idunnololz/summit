@@ -116,6 +116,8 @@ class ContentFiltersManager @Inject constructor(
         dao.insertFilter(filter)
 
         refreshFilters()
+
+        regexCache.remove(filter.id)
     }
 
     suspend fun deleteFilter(filter: FilterEntry) {
@@ -125,9 +127,14 @@ class ContentFiltersManager @Inject constructor(
     }
 
     private fun getPattern(filter: FilterEntry): Pattern {
-        return regexCache[filter.id] ?: Pattern.compile(filter.filter).also {
-            regexCache[filter.id] = it
-        }
+        return regexCache[filter.id]
+            ?: try {
+                Pattern.compile(filter.filter)
+            } catch (e: Exception) {
+                Pattern.compile("""a^""")
+            }.also {
+                regexCache[filter.id] = it
+            }
     }
 }
 
