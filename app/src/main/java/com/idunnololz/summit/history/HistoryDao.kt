@@ -4,9 +4,6 @@ import android.util.Log
 import androidx.room.*
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.moshi
-import io.reactivex.Completable
-import io.reactivex.Single
-
 
 private const val TAG = "HistoryDao"
 

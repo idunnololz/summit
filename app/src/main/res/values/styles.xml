@@ -149,11 +149,11 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
 
-    <style name="Theme.App.DialogFullscreen" parent="">
-        <item name="android:windowFullscreen">true</item>
+    <style name="Theme.App.DialogFullscreen" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:windowIsFloating">false</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowFrame">@null</item>
         <item name="android:windowBackground">@color/colorWindowBackground</item>
         <item name="android:colorBackground">@color/colorWindowBackground</item>
         <item name="android:windowAnimationStyle">@style/DialogAnimationStyle</item>

@@ -24,8 +24,6 @@ import com.idunnololz.summit.util.*
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
-import io.reactivex.disposables.CompositeDisposable
-
 
 class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
@@ -38,8 +36,6 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     }
 
     private val args: VideoViewerFragmentArgs by navArgs()
-
-    private val disposables = CompositeDisposable()
 
     private var orientationListener: OrientationEventListener? = null
 
@@ -186,7 +182,6 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     override fun onDestroy() {
         super.onDestroy()
 
-        disposables.clear()
         orientationListener?.disable()
         orientationListener = null
 

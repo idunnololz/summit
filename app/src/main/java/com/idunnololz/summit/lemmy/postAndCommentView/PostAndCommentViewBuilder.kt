@@ -24,10 +24,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.drawable.ScalingUtils
-import com.facebook.drawee.interfaces.DraweeController
-import com.facebook.drawee.view.SimpleDraweeView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.CommentView
@@ -318,54 +314,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             )
         }
 
-        val giphyLinks = LemmyUtils.findGiphyLinks(content)
-        if (giphyLinks.isNotEmpty()) {
-            var lastViewId = 0
-            giphyLinks.withIndex().forEach { (index, giphyKey) ->
-                mediaContainer.visibility = View.VISIBLE
-                val viewId = View.generateViewId()
-                val imageView = SimpleDraweeView(context).apply {
-                    layoutParams = ConstraintLayout.LayoutParams(
-                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                    ).apply {
-                        if (index == 0) {
-                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                        } else {
-                            this.topToBottom = lastViewId
-                        }
-                        this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                        this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                        this.dimensionRatio = "H,16:9"
-                    }
-                    id = viewId
-                    hierarchy.actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER
-                }
-                mediaContainer.addView(imageView)
-
-                val processedGiphyKey: String = if (giphyKey.contains('|')) {
-                    giphyKey.split('|')[0]
-                } else {
-                    giphyKey
-                }
-
-                val fullUrl = "https://i.giphy.com/media/${processedGiphyKey}/giphy.webp"
-                val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-                    .setUri(fullUrl)
-                    .setAutoPlayAnimations(true)
-                    .build()
-                imageView.controller = controller
-
-                imageView.setOnClickListener {
-                    onImageClick(Either.Right(commentView), null, fullUrl)
-                }
-
-                lastViewId = viewId
-            }
-        } else {
-            mediaContainer.removeAllViews()
-            mediaContainer.visibility = View.GONE
-        }
+        mediaContainer.removeAllViews()
+        mediaContainer.visibility = View.GONE
 
         collapseSectionButton.setOnClickListener {
             collapseSection(h.bindingAdapterPosition)
@@ -546,55 +496,6 @@ class PostAndCommentViewBuilder @Inject constructor(
             onPageClick = onPageClick,
             onLinkLongClick = onLinkLongClick,
         )
-
-        val giphyLinks = LemmyUtils.findGiphyLinks(content)
-        if (giphyLinks.isNotEmpty()) {
-            var lastViewId = 0
-            giphyLinks.withIndex().forEach { (index, giphyKey) ->
-                mediaContainer.visibility = View.VISIBLE
-                val viewId = View.generateViewId()
-                val imageView = SimpleDraweeView(context).apply {
-                    layoutParams = ConstraintLayout.LayoutParams(
-                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                        ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                    ).apply {
-                        if (index == 0) {
-                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                        } else {
-                            this.topToBottom = lastViewId
-                        }
-                        this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                        this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                        this.dimensionRatio = "H,16:9"
-                    }
-                    id = viewId
-                    hierarchy.actualImageScaleType = ScalingUtils.ScaleType.FIT_CENTER
-                }
-                mediaContainer.addView(imageView)
-
-                val processedGiphyKey: String = if (giphyKey.contains('|')) {
-                    giphyKey.split('|')[0]
-                } else {
-                    giphyKey
-                }
-
-                val fullUrl = "https://i.giphy.com/media/${processedGiphyKey}/giphy.webp"
-                val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-                    .setUri(fullUrl)
-                    .setAutoPlayAnimations(true)
-                    .build()
-                imageView.controller = controller
-
-                imageView.setOnClickListener {
-                    onImageClick(null, null, fullUrl)
-                }
-
-                lastViewId = viewId
-            }
-        } else {
-            mediaContainer.removeAllViews()
-            mediaContainer.visibility = View.GONE
-        }
 
         collapseSectionButton.setOnClickListener {
             collapseSection(h.bindingAdapterPosition)

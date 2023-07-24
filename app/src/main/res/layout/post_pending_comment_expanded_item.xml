@@ -86,16 +86,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/media_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginTop="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/progress_bar"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
@@ -106,7 +96,7 @@
         android:textIsSelectable="true"
         android:layout_marginEnd="@dimen/padding_half"
         android:paddingBottom="@dimen/padding"
-        app:layout_constraintTop_toBottomOf="@+id/media_container"
+        app:layout_constraintTop_toBottomOf="@+id/progress_bar"
         app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
         app:layout_constraintEnd_toEndOf="parent" />
 
