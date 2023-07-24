@@ -71,7 +71,12 @@ class CustomScrollViewPager : ViewPager {
                 }
             }
 
-            super.onTouchEvent(event)
+            try {
+                super.onTouchEvent(event)
+            } catch (e: Exception) {
+                // sometimes sht happens...
+                // especially with multi touch
+            }
             false
         } else false
     }
