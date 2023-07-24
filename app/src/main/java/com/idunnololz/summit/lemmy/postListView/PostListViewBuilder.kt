@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
+import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.PostView
@@ -344,14 +345,20 @@ class PostListViewBuilder @Inject constructor(
                 image.visibility = View.VISIBLE
                 iconImage?.visibility = View.GONE
 
-                image.load(R.drawable.thumbnail_placeholder)
+                image.load(R.drawable.thumbnail_placeholder) {
+                    if (image is ShapeableImageView) {
+                        allowHardware(false)
+                    }
+                }
 
                 offlineManager.fetchImageWithError(itemView, url, {
                     offlineManager.calculateImageMaxSizeIfNeeded(it)
                     offlineManager.getMaxImageSizeHint(it, tempSize)
 
                     image.load(it) {
-//                        size(coil.size.Size.ORIGINAL)
+                        if (image is ShapeableImageView) {
+                            allowHardware(false)
+                        }
                         fallback(R.drawable.thumbnail_placeholder)
 
                         if (!isRevealed && postView.post.nsfw) {
