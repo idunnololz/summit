@@ -25,7 +25,6 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.CompositeDisposable
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -45,8 +44,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
 
     @Inject
     lateinit var historyManager: HistoryManager
-
-    private val disposables = CompositeDisposable()
 
     private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
         override fun onHistoryChanged() {
@@ -192,7 +189,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
     }
 
     override fun onDestroyView() {
-        disposables.clear()
         historyManager.unregisterOnHistoryChangedListener(onHistoryChangedListener)
         super.onDestroyView()
     }

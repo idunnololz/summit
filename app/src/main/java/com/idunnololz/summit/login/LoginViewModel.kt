@@ -35,9 +35,11 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result = apiClient.login(
-                instance,
-                username,
-                password,
+                instance.trim(),
+                username.trim(),
+
+                // From jerboa https://github.com/dessalines/jerboa/blob/main/app/src/main/java/com/jerboa/ui/components/login/Login.kt
+                password.take(60),
                 twoFactorCode,
             )
 

@@ -3,25 +3,21 @@ package com.idunnololz.summit.util
 import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
-import android.media.MediaCodec
-import android.media.MediaExtractor
-import android.media.MediaMuxer
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.idunnololz.summit.R
-import com.idunnololz.summit.offline.OfflineManager
-import io.reactivex.Single
 import kotlinx.coroutines.runInterruptible
 import okhttp3.Request
-import okio.*
+import okio.BufferedSink
+import okio.buffer
+import okio.sink
+import okio.source
 import java.io.File
 import java.io.OutputStream
-import java.nio.ByteBuffer
 
 object FileDownloadHelper {
 

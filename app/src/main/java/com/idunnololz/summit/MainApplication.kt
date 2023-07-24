@@ -12,10 +12,6 @@ import coil.Coil
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.google.android.material.color.DynamicColors
-import com.idunnololz.summit.history.HistoryManager
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.*
@@ -23,7 +19,6 @@ import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
-import io.reactivex.plugins.RxJavaPlugins
 import java.util.*
 import javax.inject.Inject
 
@@ -68,11 +63,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
             Locale.setDefault(locale)
             val conf = Configuration(config)
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
-                conf.setLocale(locale)
-            } else {
-                conf.locale = locale
-            }
+            conf.setLocale(locale)
             context.resources.updateConfiguration(
                 conf,
                 context.resources.displayMetrics
@@ -114,10 +105,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             )
         )
 
-        RxJavaPlugins.setErrorHandler {
-            Log.e(TAG, "RxGlobalExceptionHandler", it)
-        }
-
         super.onCreate()
 
 //        if (LeakCanary.isInAnalyzerProcess(this)) {
@@ -149,9 +136,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         DataFiles.initialize(context)
         DataCache.initialize(context)
         OfflineScheduleManager.initialize(context)
-        
-        Fresco.initialize(this)
-
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "Perf. Everything else: " + (System.currentTimeMillis() - startTime))

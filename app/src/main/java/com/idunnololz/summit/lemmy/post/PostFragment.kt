@@ -513,11 +513,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
                     when (action.id) {
                         CommentGestureAction.Upvote -> {
-                            actionsViewModel.vote(commentView, dir = 1)
+                            actionsViewModel.vote(commentView, dir = 1, toggle = true)
                         }
 
                         CommentGestureAction.Downvote -> {
-                            actionsViewModel.vote(commentView, dir = -1)
+                            actionsViewModel.vote(commentView, dir = -1, toggle = true)
                         }
 
                         CommentGestureAction.Bookmark -> {
@@ -586,11 +586,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     private fun performPostAction(id: Int, postView: PostView) {
         when (id) {
             PostGestureAction.Upvote -> {
-                actionsViewModel.vote(postView, 1)
+                actionsViewModel.vote(postView, 1, toggle = true)
             }
 
             PostGestureAction.Downvote -> {
-                actionsViewModel.vote(postView, -1)
+                actionsViewModel.vote(postView, -1, toggle = true)
             }
 
             PostGestureAction.Bookmark -> {
