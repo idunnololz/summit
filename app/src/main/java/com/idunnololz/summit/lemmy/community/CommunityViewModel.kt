@@ -112,7 +112,7 @@ class CommunityViewModel @Inject constructor(
         isHideReadEnabled.value?.let {
             postsRepository.hideRead = it
         }
-        postsRepository.showNsfw = preferences.showNsfwPosts
+        postsRepository.showNsfwPosts = preferences.showNsfwPosts
 
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
@@ -531,17 +531,26 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun recheckPreferences() {
-        updateNsfwState()
+        updatePreferencesState()
     }
 
-    fun updateNsfwState() {
-        if (postsRepository.showNsfw == preferences.showNsfwPosts) {
+    private fun updatePreferencesState() {
+        if (postsRepository.showLinkPosts == preferences.showLinkPosts &&
+            postsRepository.showImagePosts == preferences.showImagePosts &&
+            postsRepository.showVideoPosts == preferences.showVideoPosts &&
+            postsRepository.showTextPosts == preferences.showTextPosts &&
+            postsRepository.showNsfwPosts == preferences.showNsfwPosts) {
+
             return
         }
 
         updateStateMaintainingPosition(
             {
-                this.showNsfw = preferences.showNsfwPosts
+                this.showLinkPosts = preferences.showLinkPosts
+                this.showImagePosts = preferences.showImagePosts
+                this.showVideoPosts = preferences.showVideoPosts
+                this.showTextPosts = preferences.showTextPosts
+                this.showNsfwPosts = preferences.showNsfwPosts
             },
             null,
         )

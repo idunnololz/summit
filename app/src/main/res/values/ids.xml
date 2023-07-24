@@ -75,4 +75,5 @@
     <item name="from_camera_with_editor" type="id" />
     <item name="from_gallery_with_editor" type="id" />
     <item name="unblock_community" type="id" />
+    <item name="layout_card2" type="id" />
 </resources>

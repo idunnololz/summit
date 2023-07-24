@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.comment
 
 import android.app.Activity
 import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.method.ScrollingMovementMethod
@@ -11,6 +12,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.WindowManager
 import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,7 +47,6 @@ import kotlinx.parcelize.Parcelize
 import java.lang.Integer.max
 import java.lang.Integer.min
 
-
 @AndroidEntryPoint
 class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
     FullscreenDialogFragment, SignInNavigator, BackPressHandler {
@@ -78,10 +79,9 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
 
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_Dialog_Fullscreen)
+        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
     }
 
     override fun onStart() {
@@ -170,14 +170,14 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     if (personId != 0) {
                         viewModel.sendComment(
                             personId,
-                            binding.commentEditor.text.toString()
+                            binding.commentEditor.editText?.text.toString()
                         )
                     } else if (inboxItem != null) {
                         viewModel.sendComment(
                             account,
                             args.instance,
                             inboxItem,
-                            binding.commentEditor.text.toString()
+                            binding.commentEditor.editText?.text.toString()
                         )
                     } else {
                         viewModel.sendComment(
@@ -189,7 +189,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                                     "Both postView and commentView were null!"
                                 }),
                             args.commentView?.comment?.id,
-                            binding.commentEditor.text.toString(),
+                            binding.commentEditor.editText?.text.toString(),
                         )
                     }
                     true
@@ -207,7 +207,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                                 "editCommentView were null!"
                             }),
                         requireNotNull(args.editCommentView?.comment?.id),
-                        binding.commentEditor.text.toString(),
+                        binding.commentEditor.editText?.text.toString(),
                     )
                     true
                 }
@@ -234,7 +234,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
             binding.scrollView.visibility = View.GONE
             binding.divider.visibility = View.GONE
 
-            commentEditor.setText(commentToEdit.comment.content)
+            commentEditor.editText?.setText(commentToEdit.comment.content)
         } else if (commentView != null) {
             binding.replyingTo.text = commentView.comment.content
         } else if (postView != null) {
@@ -251,7 +251,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
 
         textFormatterHelper.setupTextFormatterToolbar(
             binding.textFormatToolbar,
-            commentEditor,
+            requireNotNull(commentEditor.editText),
             onChooseImageClick = {
                 val bottomMenu = BottomMenu(context).apply {
                     setTitle(R.string.insert_image)
@@ -306,7 +306,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     .apply {
                         arguments = PreviewCommentDialogFragmentArgs(
                             args.instance,
-                            commentEditor.text.toString()
+                            commentEditor.editText?.text.toString()
                         ).toBundle()
                     }
                     .showAllowingStateLoss(childFragmentManager, "AA")

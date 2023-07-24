@@ -226,26 +226,31 @@ class LemmyWebSettings @Inject constructor(
     )
 
     val showNsfwSetting = OnOffSettingItem(
+        null,
         context.getString(R.string.show_nsfw),
         null,
     )
 
     val showReadPostsSetting = OnOffSettingItem(
+        null,
         context.getString(R.string.show_read_posts),
         null,
     )
 
     val botAccountSetting = OnOffSettingItem(
+        null,
         context.getString(R.string.bot_account),
         null,
     )
 
     val showBotAccountsSetting = OnOffSettingItem(
+        null,
         context.getString(R.string.show_bot_accounts),
         null,
     )
 
     val sendNotificationsToEmailSetting = OnOffSettingItem(
+        null,
         context.getString(R.string.send_notifications_to_email),
         null,
     )
@@ -386,6 +391,7 @@ class PostAndCommentsSettings @Inject constructor(
 ) {
 
     val showCommentActions = OnOffSettingItem(
+        null,
         context.getString(R.string.show_comment_actions),
         null,
     )
@@ -411,6 +417,7 @@ class PostAndCommentsSettings @Inject constructor(
     )
 
     val tapCommentToCollapse = OnOffSettingItem(
+        null,
         context.getString(R.string.tap_comment_to_collapse),
         context.getString(R.string.tap_comment_to_collapse_desc),
     )

@@ -37,21 +37,29 @@
                     android:animateLayoutChanges="true"
                     android:background="?backgroundColor">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/url"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:autofillHints="no"
-                        android:background="@null"
-                        android:padding="@dimen/padding"
-                        android:textIsSelectable="true"
-                        android:scrollbars="vertical"
-                        android:textAppearance="?textAppearanceBodyMedium"
-                        android:inputType="textUri"
-                        android:hint="@string/url_optional"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/upload_image"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:hintEnabled="false">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autofillHints="no"
+                            android:background="@null"
+                            android:padding="@dimen/padding"
+                            android:textIsSelectable="true"
+                            android:scrollbars="vertical"
+                            android:textAppearance="?textAppearanceBodyMedium"
+                            android:inputType="textMultiLine|textUri"
+                            android:hint="@string/url_optional"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <ImageView
                         android:id="@+id/upload_image"
@@ -72,21 +80,29 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/url"/>
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:autofillHints="no"
-                        android:background="@null"
-                        android:padding="@dimen/padding"
-                        android:textIsSelectable="true"
-                        android:scrollbars="vertical"
-                        android:textAppearance="?textAppearanceBodyMedium"
-                        android:inputType="textMultiLine|textCapSentences"
-                        android:hint="@string/title"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/divider1"/>
+                        app:layout_constraintTop_toBottomOf="@+id/divider1"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:hintEnabled="false">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autofillHints="no"
+                            android:background="@null"
+                            android:padding="@dimen/padding"
+                            android:textIsSelectable="true"
+                            android:scrollbars="vertical"
+                            android:textAppearance="?textAppearanceBodyMedium"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:hint="@string/title"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/divider2"
@@ -95,20 +111,28 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/title"/>
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/post_editor"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:autofillHints="no"
-                        android:background="@null"
-                        android:hint="@string/compose_post"
-                        android:padding="@dimen/padding"
-                        android:gravity="start|top"
-                        android:inputType="textMultiLine|textCapSentences"
-                        android:textAppearance="?textAppearanceBodyMedium"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/divider2"/>
+                        app:layout_constraintTop_toBottomOf="@+id/divider2"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:hintEnabled="false">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autofillHints="no"
+                            android:background="@null"
+                            android:hint="@string/compose_post"
+                            android:padding="@dimen/padding"
+                            android:gravity="start|top"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:textAppearance="?textAppearanceBodyMedium"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <HorizontalScrollView
                         android:id="@+id/post_body_toolbar"

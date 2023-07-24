@@ -170,6 +170,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         } else {
             // do things if this is a single page
         }
+
+        actionsViewModel.setPageInstance(args.instance)
     }
 
     private fun goBack() {
@@ -297,7 +299,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             }
         }
 
-        installOnActionResultHandler(requireNotNull(actionsViewModel), binding.coordinatorLayout)
+        installOnActionResultHandler(actionsViewModel, binding.coordinatorLayout)
 
         binding.recyclerView.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
             override fun onPreDraw(): Boolean {

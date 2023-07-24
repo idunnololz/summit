@@ -20,6 +20,8 @@ import android.widget.LinearLayout
 
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.tint
 
 class FastScroller : LinearLayout {
 
@@ -126,8 +128,10 @@ class FastScroller : LinearLayout {
 
         val horizontalInset = if (!isVertical()) 0 else Utils.convertDpToPixel(16f).toInt()
         val verticalInset = if (isVertical()) 0 else Utils.convertDpToPixel(16f).toInt()
+        val drawable = ContextCompat.getDrawable(context, R.drawable.fastscroll__default_handle)
+        val tinted = drawable?.tint(context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary))
         val handleBg = InsetDrawable(
-            ContextCompat.getDrawable(context, R.drawable.fastscroll__default_handle),
+            tinted,
             horizontalInset,
             verticalInset,
             0,

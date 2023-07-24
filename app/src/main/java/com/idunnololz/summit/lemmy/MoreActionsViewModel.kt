@@ -6,6 +6,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
@@ -40,10 +41,12 @@ class MoreActionsViewModel @Inject constructor(
     val savePostResult = StatefulLiveData<PostView>()
     val saveCommentResult = StatefulLiveData<CommentView>()
 
+    private var currentPageInstance: String? = null
+
     fun blockCommunity(id: CommunityId, block: Boolean = true) {
         blockCommunityResult.setIsLoading()
         viewModelScope.launch {
-            apiClient.blockCommunity(id, block)
+            ensureRightInstance { apiClient.blockCommunity(id, block) }
                 .onFailure {
                     blockCommunityResult.postError(it)
                 }
@@ -56,7 +59,7 @@ class MoreActionsViewModel @Inject constructor(
     fun blockPerson(id: PersonId, block: Boolean = true) {
         blockPersonResult.setIsLoading()
         viewModelScope.launch {
-            apiClient.blockPerson(id, block)
+            ensureRightInstance { apiClient.blockPerson(id, block) }
                 .onFailure {
                     blockPersonResult.postError(it)
                 }
@@ -68,7 +71,7 @@ class MoreActionsViewModel @Inject constructor(
 
     fun deletePost(post: Post) {
         viewModelScope.launch {
-            apiClient.deletePost(post.id)
+            ensureRightInstance { apiClient.deletePost(post.id) }
                 .onSuccess {
                     deletePostResult.postValue(it)
                 }
@@ -84,17 +87,39 @@ class MoreActionsViewModel @Inject constructor(
         }
     }
 
-    fun vote(postView: PostView, dir: Int) {
-        accountActionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), dir)
+    fun vote(postView: PostView, dir: Int, toggle: Boolean = false) {
+        val finalDir = if (toggle) {
+            val curScore = accountActionsManager.getVote(VotableRef.PostRef(postView.post.id))
+                ?: postView.my_vote
+            if (curScore == dir) {
+                0
+            } else {
+                dir
+            }
+        } else {
+            dir
+        }
+        accountActionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), finalDir)
     }
 
-    fun vote(commentView: CommentView, dir: Int) {
-        accountActionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), dir)
+    fun vote(commentView: CommentView, dir: Int, toggle: Boolean = false) {
+        val finalDir = if (toggle) {
+            val curScore = accountActionsManager.getVote(VotableRef.PostRef(commentView.post.id))
+                ?: commentView.my_vote
+            if (curScore == dir) {
+                0
+            } else {
+                dir
+            }
+        } else {
+            dir
+        }
+        accountActionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), finalDir)
     }
 
     fun savePost(id: PostId, save: Boolean) {
         viewModelScope.launch {
-            apiClient.savePost(id, save)
+            ensureRightInstance { apiClient.savePost(id, save) }
                 .onSuccess {
                     savePostResult.postValue(it)
                     savedManager.onPostSaveChanged()
@@ -107,7 +132,7 @@ class MoreActionsViewModel @Inject constructor(
 
     fun saveComment(id: CommentId, save: Boolean) {
         viewModelScope.launch {
-            apiClient.saveComment(id, save)
+            ensureRightInstance { apiClient.saveComment(id, save) }
                 .onSuccess {
                     saveCommentResult.postValue(it)
                     savedManager.onCommentSaveChanged()
@@ -132,6 +157,26 @@ class MoreActionsViewModel @Inject constructor(
                 delay(delayMs)
             }
             accountActionsManager.markPostAsRead(apiClient.instance, postView.post.id, read = true)
+        }
+    }
+
+    fun setPageInstance(instance: String) {
+        currentPageInstance = instance
+    }
+
+    private suspend fun <T> ensureRightInstance(
+        onCorrectInstance: suspend () -> Result<T>
+    ): Result<T> {
+        val currentPageInstance = currentPageInstance
+        return if (currentPageInstance != null && currentPageInstance != apiInstance) {
+            Result.failure(
+                AccountInstanceMismatchException(
+                    apiInstance,
+                    currentPageInstance,
+                )
+            )
+        } else {
+            onCorrectInstance()
         }
     }
 }

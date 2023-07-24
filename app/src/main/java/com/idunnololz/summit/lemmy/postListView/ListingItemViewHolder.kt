@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
+import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
@@ -37,6 +38,7 @@ class ListingItemViewHolder(
     data class State(
         var preferImagesAtEnd: Boolean = false,
         var preferFullSizeImages: Boolean = true,
+        var preferTitleText: Boolean = false,
     )
 
     var state = State()
@@ -64,6 +66,27 @@ class ListingItemViewHolder(
             )
 
         fun fromBinding(binding: ListingItemCardBinding) =
+            ListingItemViewHolder(
+                rawBinding = binding,
+                root = binding.root,
+                headerContainer = binding.headerContainer,
+                image = binding.image,
+                title = binding.title,
+                commentText = binding.commentButton,
+                commentButton = binding.commentButton,
+                upvoteCount = binding.upvoteCount,
+                upvoteButton = binding.upvoteButton,
+                downvoteButton = binding.downvoteButton,
+                linkTypeImage = null,
+                iconImage = null,
+                openLinkButton = binding.openLinkButton,
+                fullContentContainerView = null,
+                highlightBg = binding.highlightBg,
+                layoutShowsFullContent = false,
+                createCommentButton = null,
+            )
+
+        fun fromBinding(binding: ListingItemCard2Binding) =
             ListingItemViewHolder(
                 rawBinding = binding,
                 root = binding.root,

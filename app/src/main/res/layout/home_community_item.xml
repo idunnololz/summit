@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_quarter"
         android:layout_marginEnd="@dimen/dialog_padding"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

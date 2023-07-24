@@ -71,7 +71,7 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
 
         super.onCreate(savedInstanceState)
 
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_Dialog_Fullscreen)
+        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
     }
 
     override fun onStart() {
@@ -104,7 +104,6 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.content)
-            insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.coordinatorLayout)
         }
 
         if (isEdit()) {
@@ -127,9 +126,9 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                             name = requireNotNull(args.communityName),
                             instance = args.instance
                         ),
-                        name = binding.title.text.toString(),
-                        body = binding.postEditor.text.toString(),
-                        url = binding.url.text.toString(),
+                        name = binding.title.editText?.text.toString(),
+                        body = binding.postEditor.editText?.text.toString(),
+                        url = binding.url.editText?.text.toString(),
                         isNsfw = binding.nsfwSwitch.isChecked,
                     )
                     true
@@ -137,9 +136,9 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                 R.id.update_post -> {
                     viewModel.updatePost(
                         instance = args.instance,
-                        name = binding.title.text.toString(),
-                        body = binding.postEditor.text.toString(),
-                        url = binding.url.text.toString(),
+                        name = binding.title.editText?.text.toString(),
+                        body = binding.postEditor.editText?.text.toString(),
+                        url = binding.url.editText?.text.toString(),
                         isNsfw = binding.nsfwSwitch.isChecked,
                         postId = requireNotNull(args.post?.id) { "POST ID WAS NULL!" },
                     )
@@ -152,7 +151,7 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
         val postEditor = binding.postEditor
         textFormatterHelper.setupTextFormatterToolbar(
             binding.textFormatToolbar,
-            postEditor,
+            requireNotNull(postEditor.editText),
             onChooseImageClick = {
                 val bottomMenu = BottomMenu(context).apply {
                     setTitle(R.string.insert_image)
@@ -208,7 +207,7 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                     .apply {
                         arguments = PreviewCommentDialogFragmentArgs(
                             args.instance,
-                            postEditor.text.toString()
+                            postEditor.editText?.text.toString()
                         ).toBundle()
                     }
                     .showAllowingStateLoss(childFragmentManager, "AA")
@@ -340,7 +339,7 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                     binding.loadingView.hideAll()
                     viewModel.uploadImageResult.clear()
 
-                    binding.url.setText(it.data.url)
+                    binding.url.editText?.setText(it.data.url)
                 }
             }
         }
@@ -350,9 +349,9 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
 
             val post = args.post
             if (post != null) {
-                binding.url.setText(post.url)
-                binding.title.setText(post.name)
-                binding.postEditor.setText(post.body)
+                binding.url.editText?.setText(post.url)
+                binding.title.editText?.setText(post.name)
+                binding.postEditor.editText?.setText(post.body)
                 binding.nsfwSwitch.isChecked = post.nsfw
             }
         }

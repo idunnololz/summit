@@ -144,8 +144,16 @@
         android:label="SettingPostAndCommentsFragment" />
     <fragment
         android:id="@+id/settingsContentFragment"
-        android:name="com.idunnololz.summit.settings.content.SettingsContentFragment"
-        android:label="SettingsContentFragment" />
+        android:name="com.idunnololz.summit.settings.postList.SettingsPostListFragment"
+        android:label="SettingsContentFragment" >
+        <action
+            android:id="@+id/action_settingsContentFragment_to_settingsFilterListFragment"
+            app:destination="@id/settingsFilterListFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+    </fragment>
     <fragment
         android:id="@+id/settingsCommunityBlockListFragment"
         android:name="com.idunnololz.summit.settings.webSettings.blockList.community.SettingsCommunityBlockListFragment"
@@ -154,4 +162,18 @@
         android:id="@+id/settingsUserBlockListFragment"
         android:name="com.idunnololz.summit.settings.webSettings.blockList.user.SettingsUserBlockListFragment"
         android:label="SettingsUserBlockListFragment" />
+    <fragment
+        android:id="@+id/settingsFilterListFragment"
+        android:name="com.idunnololz.summit.settings.postList.SettingsFilterListFragment"
+        android:label="SettingsFilterListFragment" >
+        <argument
+            android:name="contentType"
+            app:argType="integer" />
+        <argument
+            android:name="filterType"
+            app:argType="integer" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+    </fragment>
 </navigation>

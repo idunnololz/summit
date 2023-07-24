@@ -59,6 +59,10 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
     }
 
     private fun setup(data: PersonTabbedViewModel.PersonDetailsData) {
+        if (!isBindingAvailable()) return
+
+        val context = requireContext()
+
         val parentFragment = parentFragment as PersonTabbedFragment
         val personView = data.personView
 
@@ -109,7 +113,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                     if (personView.person.ban_expires != null) {
                         getString(
                             R.string.banned_until_format,
-                            dateStringToPretty(personView.person.ban_expires))
+                            dateStringToPretty(context, personView.person.ban_expires))
                     } else {
                         getString(R.string.banned)
                     }

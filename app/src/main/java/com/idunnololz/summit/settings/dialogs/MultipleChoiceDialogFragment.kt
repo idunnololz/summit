@@ -37,7 +37,7 @@ class MultipleChoiceDialogFragment : BaseDialogFragment<DialogFragmentBottomMenu
 
         super.onCreate(savedInstanceState)
 
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_Dialog_Fullscreen)
+        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
     }
 
     override fun onStart() {

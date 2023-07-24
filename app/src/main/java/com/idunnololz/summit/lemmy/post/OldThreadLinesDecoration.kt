@@ -13,8 +13,8 @@ class OldThreadLinesDecoration(
     private val isCompactView: Boolean,
 ) : RecyclerView.ItemDecoration() {
 
-    private val distanceBetweenLines =
-        context.resources.getDimensionPixelSize(R.dimen.thread_line_total_size)
+    private val distanceBetweenLinesUnit =
+        Utils.convertDpToPixel(1f)
     private val startingPadding =
         context.resources.getDimensionPixelSize(R.dimen.reddit_content_horizontal_padding)
     private val topOverdraw =
@@ -50,24 +50,26 @@ class OldThreadLinesDecoration(
                 } else {
                     topOverdraw
                 }
-            val totalDepth = when (tag) {
+            val threadLinesData: ThreadLinesData? = when (tag) {
                 is ThreadLinesData -> {
-                    tag.depth - tag.baseDepth
+                    tag
                 }
                 else -> {
-                    -1
+                    null
                 }
             }
 
-            if (totalDepth == -1) continue
+            threadLinesData ?: continue
+
+            val totalDepth = threadLinesData.depth - threadLinesData.baseDepth
 
             for (lineIndex in 0 until totalDepth) {
-                val x =
-                    view.left + (lineIndex.toFloat()) * distanceBetweenLines + startingPadding
+                val indent = view.left + (lineIndex.toFloat()) * distanceBetweenLinesUnit *
+                        threadLinesData.indentationPerLevel + startingPadding
                 c.drawLine(
-                    x + translationX,
+                    indent + translationX,
                     view.top.toFloat() - topOverdraw + translationY,
-                    x + translationX,
+                    indent + translationX,
                     view.bottom.toFloat() + translationY,
                     linePaint
                 )

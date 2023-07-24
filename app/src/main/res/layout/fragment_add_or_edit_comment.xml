@@ -63,21 +63,30 @@
                     app:layout_constraintTop_toBottomOf="@+id/scroll_view"
                     app:layout_constraintBottom_toTopOf="@+id/comment_editor"/>
 
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/comment_editor"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:autofillHints="no"
-                    android:hint="@string/comment"
-                    android:padding="@dimen/padding"
                     android:background="@null"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine|textCapSentences"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/scroll_view"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintVertical_weight="1"/>
+                    app:layout_constraintVertical_weight="1"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:autofillHints="no"
+                        android:hint="@string/comment"
+                        android:padding="@dimen/padding"
+                        android:background="@null"
+                        android:gravity="start|top"
+                        android:inputType="textMultiLine|textCapSentences"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

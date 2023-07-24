@@ -5,6 +5,7 @@ import android.view.View
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import coil.load
@@ -14,6 +15,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
+import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
@@ -28,9 +30,13 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
+import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -54,14 +60,23 @@ class PostListViewBuilder @Inject constructor(
 
             postImageWidth = (Utils.getScreenWidth(context) * postUiConfig.imageWidthPercent).toInt()
             textSizeMultiplier = postUiConfig.textSizeMultiplier
+
+            globalFontSizeMultiplier =
+                GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
+            lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
         }
+
+    private var globalFontSizeMultiplier: Float =
+        GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
 
     private val lemmyHeaderHelper = LemmyHeaderHelper(context)
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,
         ExoPlayerManager.get(activity),
-    )
+    ).also {
+        it.globalFontSizeMultiplier = globalFontSizeMultiplier
+    }
 
     private val padding = context.getDimen(R.dimen.padding)
     private val paddingHalf = context.getDimen(R.dimen.padding_half)
@@ -110,6 +125,46 @@ class PostListViewBuilder @Inject constructor(
         onHighlightComplete: () -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(holder) {
+
+        if (holder.state.preferTitleText != postUiConfig.preferTitleText) {
+            if (postUiConfig.preferTitleText) {
+                when (val rb = rawBinding) {
+                    is ListingItemListBinding -> {
+                        TextViewCompat.setTextAppearance(
+                            rb.title,
+                            context.getResIdFromAttribute(
+                                com.google.android.material.R.attr.textAppearanceTitleMedium)
+                        )
+                    }
+                    is ListingItemCompactBinding -> {
+                        TextViewCompat.setTextAppearance(
+                            rb.title,
+                            context.getResIdFromAttribute(
+                                com.google.android.material.R.attr.textAppearanceTitleMedium)
+                        )
+                    }
+                }
+            } else {
+                when (val rb = rawBinding) {
+                    is ListingItemListBinding -> {
+                        TextViewCompat.setTextAppearance(
+                            rb.title,
+                            context.getResIdFromAttribute(
+                                com.google.android.material.R.attr.textAppearanceBodyMedium)
+                        )
+                    }
+                    is ListingItemCompactBinding -> {
+                        TextViewCompat.setTextAppearance(
+                            rb.title,
+                            context.getResIdFromAttribute(
+                                com.google.android.material.R.attr.textAppearanceBodyMedium)
+                        )
+                    }
+                }
+            }
+
+            holder.state.preferTitleText = postUiConfig.preferTitleText
+        }
 
         scaleTextSizes()
 
@@ -199,10 +254,20 @@ class PostListViewBuilder @Inject constructor(
                             this.dimensionRatio = null
                         }
                     }
+                    is ListingItemCard2Binding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = null
+                        }
+                    }
                 }
             } else {
                 when (val rb = rawBinding) {
                     is ListingItemCardBinding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = "H,16:9"
+                        }
+                    }
+                    is ListingItemCard2Binding -> {
                         rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             this.dimensionRatio = "H,16:9"
                         }
@@ -212,7 +277,6 @@ class PostListViewBuilder @Inject constructor(
 
             holder.state.preferFullSizeImages = postUiConfig.preferFullSizeImages
         }
-
 
         fun onItemClick() {
             val videoState = if (fullContentContainerView == null) {
@@ -253,7 +317,14 @@ class PostListViewBuilder @Inject constructor(
             fun loadAndShowImage() {
                 image ?: return
 
-                val url = thumbnailUrl ?: postView.post.url
+                val thumbnailImageUrl = if (thumbnailUrl != null &&
+                    ContentUtils.isUrlImage(thumbnailUrl)) {
+                    thumbnailUrl
+                } else {
+                    null
+                }
+
+                val url = thumbnailImageUrl ?: postView.post.url
 
                 if (url == "default") {
                     showDefaultImage()
@@ -261,6 +332,11 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 if (url.isNullOrBlank()) {
+                    image.visibility = View.GONE
+                    return
+                }
+
+                if (!ContentUtils.isUrlImage(url)) {
                     image.visibility = View.GONE
                     return
                 }
@@ -342,7 +418,6 @@ class PostListViewBuilder @Inject constructor(
             }
 
             when (postView.getType()) {
-                PostType.ImageUrl,
                 PostType.Image -> {
                     loadAndShowImage()
 
@@ -369,6 +444,7 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
 
+                PostType.Link,
                 PostType.Text -> {
                     if (thumbnailUrl == null) {
                         image?.visibility = View.GONE
@@ -485,7 +561,7 @@ class PostListViewBuilder @Inject constructor(
         }
 
 
-        if (rawBinding is ListingItemCardBinding) {
+        if (rawBinding is ListingItemCardBinding || rawBinding is ListingItemCard2Binding) {
             postView.post.url?.let { url ->
                 openLinkButton?.visibility = View.VISIBLE
                 openLinkButton?.setOnClickListener {
@@ -531,7 +607,7 @@ class PostListViewBuilder @Inject constructor(
     }
 
     private fun Float.toTextSize(): Float =
-        this * textSizeMultiplier
+        this * textSizeMultiplier * globalFontSizeMultiplier
 
     fun recycle(holder: ListingItemViewHolder) {
         if (holder.fullContentContainerView != null) {

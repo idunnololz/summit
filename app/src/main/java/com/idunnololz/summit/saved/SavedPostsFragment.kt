@@ -116,6 +116,8 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
             },
         ).apply {
             alwaysRenderAsUnread = true
+
+            updateWithPreferences(preferences)
         }
         onSelectedLayoutChanged()
     }

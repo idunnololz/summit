@@ -30,6 +30,8 @@ import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityViewState
+import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
+import com.idunnololz.summit.lemmy.FilterTooAggressiveException
 import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
@@ -167,6 +169,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_list_24)
             addItemWithIcon(R.id.layout_compact, R.string.compact, R.drawable.baseline_list_24)
             addItemWithIcon(R.id.layout_card, R.string.card, R.drawable.baseline_article_24)
+            addItemWithIcon(R.id.layout_card2, R.string.card2, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
             setTitle(R.string.layout)
 
@@ -178,6 +181,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         preferences.setPostsLayout(CommunityLayout.List)
                     R.id.layout_card ->
                         preferences.setPostsLayout(CommunityLayout.Card)
+                    R.id.layout_card2 ->
+                        preferences.setPostsLayout(CommunityLayout.Card2)
                     R.id.layout_full ->
                         preferences.setPostsLayout(CommunityLayout.Full)
                 }
@@ -533,6 +538,12 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     if (it.error is LoadNsfwCommunityWhenNsfwDisabled) {
                         binding.recyclerView.visibility = View.GONE
                         binding.loadingView.showErrorText(R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden)
+                    } else if (it.error is FilterTooAggressiveException) {
+                        binding.recyclerView.visibility = View.GONE
+                        binding.loadingView.showErrorText(R.string.error_filter_too_aggressive)
+                    } else if (it.error is ContentTypeFilterTooAggressiveException) {
+                        binding.recyclerView.visibility = View.GONE
+                        binding.loadingView.showErrorText(R.string.error_content_type_filter_too_aggressive)
                     } else if (viewModel.infinity) {
                         binding.loadingView.hideAll()
                         adapter?.onItemsChanged()
@@ -628,11 +639,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
                     when (action.id) {
                         PostGestureAction.Upvote -> {
-                            actionsViewModel.vote(postView, 1)
+                            actionsViewModel.vote(postView, 1, toggle = true)
                         }
 
                         PostGestureAction.Downvote -> {
-                            actionsViewModel.vote(postView, -1)
+                            actionsViewModel.vote(postView, -1, toggle = true)
                         }
 
                         PostGestureAction.Bookmark -> {
@@ -692,7 +703,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 val currentDefaultPage = preferences.getDefaultPage()
                 customAppBarController.setCommunity(it, it == currentDefaultPage)
 
-                updateFabState()
+//                updateFabState()
             }
             if (viewModel.infinity) {
                 customAppBarController.setPageIndexInfinity()
@@ -724,6 +735,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         if (isCustomAppBarExpandedPercent > 0.8f) {
             binding.fab.show()
         } else {
+            Log.d("HAHA", "isCustomAppBarExpandedPercent: $isCustomAppBarExpandedPercent", RuntimeException())
             binding.fab.hide()
         }
     }
@@ -823,6 +835,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 _layoutSelectorMenu.setChecked(R.id.layout_list)
             CommunityLayout.Card ->
                 _layoutSelectorMenu.setChecked(R.id.layout_card)
+            CommunityLayout.Card2 ->
+                _layoutSelectorMenu.setChecked(R.id.layout_card2)
             CommunityLayout.Full ->
                 _layoutSelectorMenu.setChecked(R.id.layout_full)
         }

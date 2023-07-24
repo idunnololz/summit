@@ -26,6 +26,7 @@
         android:layout_marginEnd="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -94,6 +94,7 @@ data class SliderSettingItem(
 
 @Parcelize
 data class OnOffSettingItem(
+    @DrawableRes val icon: Int?,
     override val title: String,
     val description: String?,
 ) : SettingItem()

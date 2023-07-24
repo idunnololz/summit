@@ -2,8 +2,6 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.community.CommunityLayout
 
 import java.util.HashSet
 import java.util.StringTokenizer
@@ -74,6 +72,7 @@ object PreferenceUtil {
     const val KEY_POST_UI_CONFIG_COMPACT = "KEY_POST_UI_CONFIG_COMPACT"
     const val KEY_POST_UI_CONFIG_LIST = "KEY_POST_UI_CONFIG_LIST"
     const val KEY_POST_UI_CONFIG_CARD = "KEY_POST_UI_CONFIG_CARD"
+    const val KEY_POST_UI_CONFIG_CARD2 = "KEY_POST_UI_CONFIG_CARD2"
     const val KEY_POST_UI_CONFIG_FULL = "KEY_POST_UI_CONFIG_FULL"
 
     const val KEY_BASE_THEME = "KEY_BASE_THEME"
@@ -101,8 +100,15 @@ object PreferenceUtil {
     const val KEY_COMMENT_GESTURE_ACTION_2 = "KEY_COMMENT_GESTURE_ACTION_2"
     const val KEY_COMMENT_GESTURE_ACTION_3 = "KEY_COMMENT_GESTURE_ACTION_3"
 
-    const val KEY_HIDE_NSFW_POSTS = "KEY_HIDE_NSFW_POSTS"
     const val KEY_BLUR_NSFW_POSTS = "KEY_BLUR_NSFW_POSTS"
+
+    const val KEY_SHOW_LINK_POSTS = "KEY_SHOW_LINK_POSTS"
+    const val KEY_SHOW_IMAGE_POSTS = "KEY_SHOW_IMAGE_POSTS"
+    const val KEY_SHOW_VIDEO_POSTS = "KEY_SHOW_VIDEO_POSTS"
+    const val KEY_SHOW_TEXT_POSTS = "KEY_SHOW_TEXT_POSTS"
+    const val KEY_SHOW_NSFW_POSTS = "KEY_SHOW_NSFW_POSTS"
+
+    const val KEY_GLOBAL_FONT_SIZE = "KEY_GLOBAL_FONT_SIZE"
 
     private const val KEY_OFFLINE_STORAGE_CAP_BYTES = "KEY_OFFLINE_STORAGE_CAP_BYTES"
     private const val KEY_VIDEO_PLAYER_ROTATION_LOCKED = "KEY_VIDEO_PLAYER_ROTATION_LOCKED"

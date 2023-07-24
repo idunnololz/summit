@@ -3,6 +3,7 @@ package com.idunnololz.summit.db
 import android.content.Context
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfoDao
+import com.idunnololz.summit.filterLists.ContentFiltersDao
 import com.idunnololz.summit.hidePosts.HiddenPostsDao
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
@@ -45,6 +46,10 @@ class DatabaseModule {
     @Provides
     fun provideHiddenPostsDao(db: MainDatabase): HiddenPostsDao =
         db.hiddenPostsDao()
+
+    @Provides
+    fun provideContentFiltersDao(db: MainDatabase): ContentFiltersDao =
+        db.contentFiltersDao()
 
     @Provides
     @Singleton

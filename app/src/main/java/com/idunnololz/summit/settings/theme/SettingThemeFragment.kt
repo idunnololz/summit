@@ -8,12 +8,16 @@ import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingThemeBinding
+import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.preferences.BaseTheme
+import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.SliderSettingItem
+import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.settings.ui.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
@@ -52,6 +56,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
         if (!isBindingAvailable()) return
 
         val context = requireContext()
+        val parentActivity = requireMainActivity()
 
         requireMainActivity().apply {
             setupForFragment<SettingsFragment>(animate = false)
@@ -119,6 +124,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
 
             OnOffSettingItem(
+                null,
                 getString(R.string.material_you),
                 getString(R.string.personalized_theming_based_on_your_wallpaper),
             ).bindTo(
@@ -140,6 +146,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
             )
 
             OnOffSettingItem(
+                null,
                 getString(R.string.black_theme),
                 getString(R.string.black_theme_desc),
             ).bindTo(
@@ -147,6 +154,27 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 { preferences.isBlackTheme() },
                 {
                     preferences.setUseBlackTheme(it)
+                    themeManager.onThemeOverlayChanged()
+                }
+            )
+
+            TextOnlySettingItem(
+                getString(R.string.font_size),
+                "",
+            ).bindTo(
+                activity = parentActivity,
+                b = binding.fontSize,
+                choices = mapOf(
+                    GlobalFontSizeId.Small to getString(R.string.small),
+                    GlobalFontSizeId.Normal to getString(R.string.normal),
+                    GlobalFontSizeId.Large to getString(R.string.large),
+                    GlobalFontSizeId.ExtraLarge to getString(R.string.extra_large),
+                ),
+                getCurrentChoice = {
+                    preferences.globalFontSize
+                },
+                onChoiceSelected = {
+                    preferences.globalFontSize = it
                     themeManager.onThemeOverlayChanged()
                 }
             )

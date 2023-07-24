@@ -29,4 +29,12 @@
             android:name="errorType"
             app:argType="string" />
     </dialog>
+    <dialog
+        android:id="@+id/addOrEditFilterDialogFragment"
+        android:name="com.idunnololz.summit.settings.postList.AddOrEditFilterDialogFragment"
+        android:label="AddOrEditFilterDialogFragment" >
+        <argument
+            android:name="filterToEdit"
+            app:argType="com.idunnololz.summit.filterLists.FilterEntry" />
+    </dialog>
 </navigation>

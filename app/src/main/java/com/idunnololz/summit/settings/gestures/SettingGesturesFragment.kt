@@ -73,6 +73,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
         val context = requireContext()
 
         OnOffSettingItem(
+            null,
             getString(R.string.use_gesture_actions),
             getString(R.string.use_gesture_actions_desc),
         ).bindTo(

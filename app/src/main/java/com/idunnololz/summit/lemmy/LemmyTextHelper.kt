@@ -89,9 +89,7 @@ object LemmyTextHelper {
          * 3) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
          * 4) Matches against full community names (!a@b.com)
          */
-        private val largeRegex = Pattern.compile("""
-            \^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\s+\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(!|[cC]/|@|[uU]/)([^@\s]+)@([^@\s]+\.[^@\s]+)
-        """.trimIndent())
+        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\s+\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(!|[cC]/|@|[uU]/)([^@\s]+)@([^@\s]+\.[^@\s]+)""")
 
         private fun processAll(s: String): String {
             val matcher = largeRegex.matcher(s)
@@ -126,7 +124,10 @@ object LemmyTextHelper {
                 val name = matcher.group(8)
                 val instance = matcher.group(9)
 
-                if (referenceTypeToken != null && name != null && instance != null) {
+                if (referenceTypeToken != null
+                    && name != null
+                    && instance != null
+                    && !instance.contains("]") /* make sure we are not within a link def */) {
                     when (referenceTypeToken.lowercase(Locale.US)) {
                         "!", "c/" -> {
                             val communityRef = CommunityRef.CommunityRefByName(name, instance)
