@@ -149,7 +149,7 @@
         <item name="imageButtonStyle">@style/MyApp.Widget.AppCompat.ImageButton</item>
     </style>
 
-    <style name="Theme.App.DialogFullscreen" parent="Theme.AppCompat.Light.Dialog">
+    <style name="Theme.App.DialogFullscreen" parent="">
         <item name="android:windowIsFloating">false</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -160,6 +160,9 @@
 
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Necessary or else background will be messed up? -->
+        <item name="android:windowElevation">@dimen/abc_floating_window_z</item>
     </style>
 
     <style name="TextStyleLarge">
