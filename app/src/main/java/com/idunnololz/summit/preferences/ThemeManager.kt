@@ -4,14 +4,19 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.core.app.ActivityCompat.recreate
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.isLightTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -66,6 +71,23 @@ class ThemeManager @Inject constructor(
                 activity.theme.applyStyle(R.style.TextStyle_Large, true)
             GlobalFontSizeId.ExtraLarge ->
                 activity.theme.applyStyle(R.style.TextStyle_ExtraLarge, true)
+        }
+
+        activity.isMaterialYou = useMaterialYou.value
+        if (activity.isMaterialYou) {
+            DynamicColors.applyToActivityIfAvailable(activity)
+        } else {
+            // do nothing
+        }
+
+        activity.lifecycleScope.launch(Dispatchers.Default) {
+            useMaterialYou.collect {
+                withContext(Dispatchers.Main) {
+                    if (it != activity.isMaterialYou) {
+                        recreate(activity)
+                    }
+                }
+            }
         }
     }
 

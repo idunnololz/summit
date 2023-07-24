@@ -33,6 +33,7 @@ import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorViewBinding
+import com.idunnololz.summit.databinding.DummyTopItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -181,6 +182,8 @@ class CommunitySelectorController @AssistedInject constructor(
 
     fun show(container: ViewGroup, activity: MainActivity, lifecycleOwner: LifecycleOwner) {
         container.addView(rootView)
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.scrollToPosition(0)
 
         rootView?.visibility = View.VISIBLE
 
@@ -221,6 +224,7 @@ class CommunitySelectorController @AssistedInject constructor(
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
         coroutineScope.cancel()
         coroutineScope = createCoroutineScope()
+        binding.recyclerView.adapter = null
     }
 
     fun setCommunities(it: StatefulData<List<CommunityView>>) {
@@ -239,20 +243,18 @@ class CommunitySelectorController @AssistedInject constructor(
 
     fun setCurrentCommunity(communityRef: CommunityRef?) {
         currentCommunity = communityRef
-        adapter.setCurrentCommunity(communityRef, null, {})
+        adapter.setCurrentCommunity(communityRef, null) {}
 
         if (communityRef != null) {
             viewModel.onCommunityChanged(communityRef)
-        }
-
-        recyclerView.post {
-            recyclerView.scrollToPosition(0)
         }
     }
 
     private sealed class Item(
         val id: String
     ) {
+        object TopItem : Item("#always_the_top")
+
         data class CurrentCommunity(
             val communityRef: CommunityRef,
             val siteResponse: GetSiteResponse?,
@@ -304,6 +306,7 @@ class CommunitySelectorController @AssistedInject constructor(
             },
             areContentsTheSame = {old, new ->
                 when (old) {
+                    is Item.TopItem -> true
                     is Item.GroupHeaderItem ->
                         old.stillLoading == (new as Item.GroupHeaderItem).stillLoading
                     is Item.NoResultsItem -> true
@@ -314,6 +317,10 @@ class CommunitySelectorController @AssistedInject constructor(
                 }
             }
         ).apply {
+            addItemType(
+                clazz = Item.TopItem::class,
+                inflateFn = DummyTopItemBinding::inflate
+            ) { _, _, _ -> }
             addItemType(
                 clazz = Item.CurrentCommunity::class,
                 inflateFn = CommunitySelectorCurrentCommunityItemBinding::inflate
@@ -513,6 +520,8 @@ class CommunitySelectorController @AssistedInject constructor(
             val isQueryActive = !query.isNullOrBlank()
 
             val newItems = mutableListOf<Item>()
+
+            newItems += Item.TopItem
 
             if (!isQueryActive) {
                 val currentCommunityData = currentCommunityData

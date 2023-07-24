@@ -8,10 +8,14 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.preferences.ThemeManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -24,6 +28,8 @@ abstract class BaseActivity : AppCompatActivity() {
     private var navigationBarColor = 0
 
     private val logTag: String = javaClass.canonicalName ?: "UNKNOWN_CLASS"
+
+    var isMaterialYou = false
 
     fun runOnUiThreadSafe(f: () -> Unit) {
         if (!isFinishing) {
