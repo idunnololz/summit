@@ -88,8 +88,9 @@ class MoreActionsViewModel @Inject constructor(
     }
 
     fun vote(postView: PostView, dir: Int, toggle: Boolean = false) {
+        val ref = VotableRef.PostRef(postView.post.id)
         val finalDir = if (toggle) {
-            val curScore = accountActionsManager.getVote(VotableRef.PostRef(postView.post.id))
+            val curScore = accountActionsManager.getVote(ref)
                 ?: postView.my_vote
             if (curScore == dir) {
                 0
@@ -99,12 +100,13 @@ class MoreActionsViewModel @Inject constructor(
         } else {
             dir
         }
-        accountActionsManager.vote(apiClient.instance, VotableRef.PostRef(postView.post.id), finalDir)
+        accountActionsManager.vote(apiClient.instance, ref, finalDir)
     }
 
     fun vote(commentView: CommentView, dir: Int, toggle: Boolean = false) {
+        val ref = VotableRef.CommentRef(commentView.comment.id)
         val finalDir = if (toggle) {
-            val curScore = accountActionsManager.getVote(VotableRef.PostRef(commentView.post.id))
+            val curScore = accountActionsManager.getVote(ref)
                 ?: commentView.my_vote
             if (curScore == dir) {
                 0
@@ -114,7 +116,7 @@ class MoreActionsViewModel @Inject constructor(
         } else {
             dir
         }
-        accountActionsManager.vote(apiClient.instance, VotableRef.CommentRef(commentView.comment.id), finalDir)
+        accountActionsManager.vote(apiClient.instance, ref, finalDir)
     }
 
     fun savePost(id: PostId, save: Boolean) {
