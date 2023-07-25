@@ -26,6 +26,9 @@ import com.idunnololz.summit.tabs.isSubscribedCommunity
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -162,9 +165,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             addItemType(
                 clazz = Item.BookmarkHeaderItem::class,
                 inflateFn = BookmarkHeaderItemBinding::inflate
-            ) { item, b, h ->
-
-            }
+            ) { _, _, _ -> }
             addItemType(
                 clazz = Item.HomeCommunityItem::class,
                 inflateFn = HomeCommunityItemBinding::inflate,
@@ -189,8 +190,16 @@ class CommunitiesPaneController @AssistedInject constructor(
                 } else {
                     View.GONE
                 }
-                offlineManager.fetchImage(h.itemView, item.iconUrl) {
-                    b.icon.load(it)
+                if (item.communityRef is CommunityRef.Subscribed) {
+                    b.icon.load(
+                        context.getDrawableCompat(R.drawable.baseline_dynamic_feed_24)
+                            ?.tint(context.getColorFromAttribute(
+                                androidx.appcompat.R.attr.colorControlNormal))
+                    ) {}
+                } else {
+                    offlineManager.fetchImage(h.itemView, item.iconUrl) {
+                        b.icon.load(it)
+                    }
                 }
                 b.textView.text = item.communityRef.getName(context)
                 b.root.setOnClickListener {

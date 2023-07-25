@@ -6,7 +6,7 @@
     android:background="?selectableItemBackground">
 
     <com.google.android.material.imageview.ShapeableImageView
-        style="@style/CircleImageView"
+        style="@style/RoundImageView"
         android:id="@+id/icon"
         android:layout_width="24dp"
         android:layout_height="24dp"

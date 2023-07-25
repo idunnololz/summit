@@ -76,4 +76,5 @@
     <item name="from_gallery_with_editor" type="id" />
     <item name="unblock_community" type="id" />
     <item name="layout_card2" type="id" />
+    <item name="copy_link_text" type="id" />
 </resources>

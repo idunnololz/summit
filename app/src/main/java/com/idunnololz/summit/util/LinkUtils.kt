@@ -122,13 +122,18 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String) {
     val context = this
 
     BottomMenu(context).apply {
+        setTitle(R.string.link_actions)
         addItemWithIcon(R.id.copy_link, R.string.copy_link_address, R.drawable.baseline_content_copy_24)
+        addItemWithIcon(R.id.copy_link_text, R.string.copy_link_text, R.drawable.baseline_content_copy_24)
         addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
                 R.id.copy_link -> {
                     Utils.copyToClipboard(context, url)
+                }
+                R.id.copy_link_text -> {
+                    Utils.copyToClipboard(context, text)
                 }
                 R.id.share_link -> {
                     Utils.shareLink(context, url)

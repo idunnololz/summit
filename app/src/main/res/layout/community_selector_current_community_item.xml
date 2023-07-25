@@ -41,7 +41,7 @@
                 android:padding="@dimen/padding"
                 android:foreground="@drawable/account_ripple"
                 android:scaleType="centerCrop"
-                style="@style/CircleImageView"
+                style="@style/RoundImageView"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>

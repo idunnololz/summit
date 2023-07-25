@@ -17,16 +17,13 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.google.android.material.imageview.ShapeableImageView
-        style="@style/CircleImageView"
+        style="@style/RoundImageView"
         android:id="@+id/icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginVertical="12dp"
         android:layout_marginStart="@dimen/dialog_padding"
         android:layout_marginEnd="@dimen/padding"
-        app:border_color="@color/colorOnSurface"
-        app:border_width="1dp"
-        app:fill_color="@color/style_blue"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
