@@ -347,75 +347,75 @@ class LemmyContentHelper(
                 true
             }
         }
+        fun insertAndLoadFullImage(imageUrl: String) {
+            val fullContentImageView = getView<View>(R.layout.full_content_image_view)
+            val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.fullImage)
+            val loadingView =
+                fullContentImageView.findViewById<LoadingView>(R.id.loadingView)
+
+            fullImageView.load(null)
+
+            fun updateLayoutParams() {
+                offlineManager.getImageSizeHint(imageUrl, tempSize)
+                if (tempSize.width > 0 && tempSize.height > 0) {
+                    val thumbnailMaxHeight =
+                        (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+                    fullImageView.updateLayoutParams<LayoutParams> {
+                        this.height = thumbnailMaxHeight
+                    }
+                } else {
+                    fullImageView.updateLayoutParams<LayoutParams> {
+                        this.height = WRAP_CONTENT
+                    }
+                }
+            }
+
+            fun fetchFullImage() {
+                loadingView?.showProgressBar()
+                offlineManager.fetchImageWithError(rootView, imageUrl, b@{
+                    loadingView?.hideAll(animate = false)
+                    offlineManager.calculateImageMaxSizeIfNeeded(it)
+                    offlineManager.getMaxImageSizeHint(it, tempSize)
+
+                    fullImageView.load(it) {
+                        allowHardware(false)
+
+                        listener { _, result ->
+                            val d = result.drawable
+                            if (d is BitmapDrawable) {
+                                offlineManager.setImageSizeHint(
+                                    imageUrl,
+                                    d.bitmap.width,
+                                    d.bitmap.height
+                                )
+                                Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
+
+                                updateLayoutParams()
+                            }
+                        }
+                    }
+                }, {
+                    loadingView?.showDefaultErrorMessageFor(it)
+                })
+            }
+
+            updateLayoutParams()
+
+            loadingView?.setOnRefreshClickListener {
+                fetchFullImage()
+            }
+            fetchFullImage()
+
+            fullImageView.transitionName = fullImageViewTransitionName
+            fullImageView.setOnClickListener {
+                onFullImageViewClickListener(it, imageUrl)
+            }
+        }
 
         if (!lazyUpdate) {
             when (val postType = postView.getType()) {
                 PostType.Image -> {
-                    val fullContentImageView = getView<View>(R.layout.full_content_image_view)
-                    val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.fullImage)
-                    val loadingView =
-                        fullContentImageView.findViewById<LoadingView>(R.id.loadingView)
-
-                    val imageUrl =
-                        requireNotNull(targetPostView.post.url)
-
-                    fullImageView.load(null)
-
-                    fun updateLayoutParams() {
-                        offlineManager.getImageSizeHint(imageUrl, tempSize)
-                        if (tempSize.width > 0 && tempSize.height > 0) {
-                            val thumbnailMaxHeight =
-                                (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-                            fullImageView.updateLayoutParams<LayoutParams> {
-                                this.height = thumbnailMaxHeight
-                            }
-                        } else {
-                            fullImageView.updateLayoutParams<LayoutParams> {
-                                this.height = WRAP_CONTENT
-                            }
-                        }
-                    }
-
-                    fun fetchFullImage() {
-                        loadingView?.showProgressBar()
-                        offlineManager.fetchImageWithError(rootView, imageUrl, b@{
-                            loadingView?.hideAll(animate = false)
-                            offlineManager.calculateImageMaxSizeIfNeeded(it)
-                            offlineManager.getMaxImageSizeHint(it, tempSize)
-
-                            fullImageView.load(it) {
-                                allowHardware(false)
-
-                                listener { _, result ->
-                                    val d = result.drawable
-                                    if (d is BitmapDrawable) {
-                                        offlineManager.setImageSizeHint(
-                                            imageUrl,
-                                            d.bitmap.width,
-                                            d.bitmap.height
-                                        )
-                                        Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
-
-                                        updateLayoutParams()
-                                    }
-                                }
-                            }
-                        }, {
-                            loadingView?.showDefaultErrorMessageFor(it)
-                        })
-                    }
-
-                    updateLayoutParams()
-
-                    loadingView?.setOnRefreshClickListener {
-                        fetchFullImage()
-                    }
-                    fetchFullImage()
-
-                    fullImageView.transitionName = fullImageViewTransitionName
-                    fullImageView.setOnClickListener {
-                        onFullImageViewClickListener(it, imageUrl)
-                    }
+                    insertAndLoadFullImage(requireNotNull(targetPostView.post.url))
                 }
                 PostType.Video -> {
                     val containerView = getView<View>(R.layout.full_content_video_view)
@@ -501,6 +501,10 @@ class LemmyContentHelper(
                     }
                 }
                 PostType.Text, PostType.Link -> {
+                    val thumbnail = targetPostView.post.thumbnail_url
+                    if (thumbnail != null && ContentUtils.isUrlImage(thumbnail)) {
+                        insertAndLoadFullImage(thumbnail)
+                    }
                 }
             }
 
