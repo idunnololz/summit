@@ -3,7 +3,9 @@ package com.idunnololz.summit.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostInListUiConfig
@@ -16,9 +18,10 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
-import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -27,10 +30,13 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.util.ext.fromJsonSafe
+import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -117,7 +123,6 @@ class Preferences @Inject constructor(
                 PreferenceUtil.KEY_POST_UI_CONFIG_CARD2
             CommunityLayout.Full ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_FULL
-
         }
 
     fun getBaseTheme(): BaseTheme {
@@ -253,6 +258,18 @@ class Preferences @Inject constructor(
         get() = prefs.getInt(KEY_GLOBAL_FONT_SIZE, GlobalFontSizeId.Normal)
         set(value) {
             prefs.edit().putInt(KEY_GLOBAL_FONT_SIZE, value).apply()
+        }
+
+    var defaultCommunitySortOrder: CommunitySortOrder?
+        get() = moshi.fromJsonSafe(prefs.getString(KEY_DEFAULT_COMMUNITY_SORT_ORDER, null))
+        set(value) {
+            prefs.edit().putString(KEY_DEFAULT_COMMUNITY_SORT_ORDER, moshi.toJsonSafe(value)).apply()
+        }
+
+    var defaultCommentsSortOrder: CommentsSortOrder?
+        get() = moshi.fromJsonSafe(prefs.getString(KEY_DEFAULT_COMMENTS_SORT_ORDER, null))
+        set(value) {
+            prefs.edit().putString(KEY_DEFAULT_COMMENTS_SORT_ORDER, moshi.toJsonSafe(value)).apply()
         }
 
     fun reset(key: String) {

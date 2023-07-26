@@ -38,6 +38,10 @@
         <action
             android:id="@+id/action_communityFragment_to_login"
             app:destination="@id/login" />
+        <argument
+            android:name="tab"
+            app:argType="com.idunnololz.summit.tabs.TabsManager$Tab"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/postFragment"

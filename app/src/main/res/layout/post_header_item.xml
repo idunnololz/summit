@@ -9,7 +9,7 @@
         android:id="@+id/headerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding"
         android:fadingEdge="horizontal"
@@ -47,23 +47,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier"
+    <Space
+        android:id="@+id/content_footer"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="fullContent"
-        app:barrierDirection="bottom" />
+        android:layout_height="@dimen/padding_half"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fullContent"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/commentButton"
         style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
+        android:layout_marginStart="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_quarter"
         app:layout_constraintStart_toStartOf="parent"
         app:icon="@drawable/baseline_comment_18"
-        app:layout_constraintTop_toBottomOf="@+id/barrier" />
-
+        app:layout_constraintTop_toBottomOf="@+id/content_footer"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ImageButton
         android:id="@+id/moreButton"
@@ -72,7 +73,8 @@
         android:padding="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/baseline_more_horiz_24"
-        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
         app:layout_constraintEnd_toStartOf="@+id/controlsDivider2" />
 
     <com.google.android.material.divider.MaterialDivider
@@ -92,7 +94,8 @@
         android:padding="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/baseline_add_comment_24"
-        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintTop_toTopOf="@+id/commentButton"
+        app:layout_constraintBottom_toBottomOf="@+id/commentButton"
         app:layout_constraintEnd_toStartOf="@+id/controlsDivider" />
 
     <com.google.android.material.divider.MaterialDivider

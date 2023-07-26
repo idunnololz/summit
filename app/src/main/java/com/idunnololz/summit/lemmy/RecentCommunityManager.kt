@@ -18,13 +18,6 @@ class RecentCommunityManager @Inject constructor() {
 
         private const val MAX_RECENTS = 3
         private const val PREF_KEY_RECENT_COMMUNITIES = "PREF_KEY_RECENT_COMMUNITIES"
-
-        /**
-         * Set of subreddits we do not want to have on the recents list...
-         */
-        private val RECENTS_BLACKLIST = setOf(
-            ""
-        )
     }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -39,11 +32,16 @@ class RecentCommunityManager @Inject constructor() {
         getRecents().values.reversed().toList()
 
     fun addRecentCommunity(communityRef: CommunityRef) {
-        Log.d(TAG, "Add recent community: ${communityRef}")
-        val key = communityRef.getKey()
-        if (RECENTS_BLACKLIST.contains(key)) {
+        if (communityRef is CommunityRef.All ||
+            communityRef is CommunityRef.Subscribed ||
+            communityRef is CommunityRef.Local) {
+
+            // These communities are always at the top anyways...
             return
         }
+
+        val key = communityRef.getKey()
+        Log.d(TAG, "Add recent community: ${key}")
 
         val recents = getRecents()
 

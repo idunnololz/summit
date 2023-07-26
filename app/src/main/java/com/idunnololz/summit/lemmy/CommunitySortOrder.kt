@@ -1,27 +1,36 @@
 package com.idunnololz.summit.lemmy
 
+import android.os.Parcelable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SortType
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import kotlinx.parcelize.Parcelize
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
-sealed interface CommunitySortOrder {
+sealed interface CommunitySortOrder : Parcelable {
 
+    @Parcelize
     @TypeLabel("1")
     object Hot : CommunitySortOrder
+    @Parcelize
     @TypeLabel("2")
     object Active : CommunitySortOrder
+    @Parcelize
     @TypeLabel("3")
     object New : CommunitySortOrder
+    @Parcelize
     @TypeLabel("4")
     object Old : CommunitySortOrder
+    @Parcelize
     @TypeLabel("5")
     object MostComments : CommunitySortOrder
+    @Parcelize
     @TypeLabel("6")
     object NewComments : CommunitySortOrder
 
+    @Parcelize
     @TypeLabel("7")
     @JsonClass(generateAdapter = true)
     data class TopOrder(

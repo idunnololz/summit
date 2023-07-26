@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.idunnololz.summit.R
@@ -18,6 +19,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
+    private val args by navArgs<SettingsFragmentArgs>()
 
     @Inject
     lateinit var settingsManager: SettingsManager
@@ -26,6 +28,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     lateinit var mainSettings: MainSettings
 
     private var adapter: SettingItemsAdapter? = null
+
+    private var handledLink = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,9 +98,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 true
                             }
                             mainSettings.settingLemmyWeb.id -> {
-                                val directions = SettingsFragmentDirections
-                                    .actionSettingsFragmentToSettingWebFragment()
-                                findNavController().navigateSafe(directions)
+                                launchWebSettings()
                                 true
                             }
                             mainSettings.settingGestures.id -> {
@@ -120,6 +122,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             mainSettings.settingPostList.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingsContentFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
+                            mainSettings.commentListSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingCommentListFragment()
                                 findNavController().navigateSafe(directions)
                                 true
                             }
@@ -153,6 +161,29 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 this.data = settingsManager.getSettingsForMainPage()
             }
         }
+
+        handleLinkIfNeeded()
+    }
+
+    private fun handleLinkIfNeeded() {
+        val link = args.link
+        if (link != null && !handledLink) {
+            handledLink = true
+
+            arguments = args.copy(link = null).toBundle()
+
+            when (link) {
+                "web" -> {
+                    launchWebSettings()
+                }
+            }
+        }
+    }
+
+    private fun launchWebSettings() {
+        val directions = SettingsFragmentDirections
+            .actionSettingsFragmentToSettingWebFragment()
+        findNavController().navigateSafe(directions)
     }
 
 }

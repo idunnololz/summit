@@ -18,9 +18,11 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.utils.toVotableRef
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -36,6 +38,7 @@ class PostsRepository @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val hiddenPostsManager: HiddenPostsManager,
     private val contentFiltersManager: ContentFiltersManager,
+    private val preferences: Preferences,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -73,19 +76,28 @@ class PostsRepository @Inject constructor(
     var sortOrder: CommunitySortOrder = CommunitySortOrder.Active
         set(value) {
             field = value
+
+            coroutineScope.launch {
+                sortOrderFlow.value = value
+            }
+
             reset()
         }
+    val sortOrderFlow = MutableStateFlow<CommunitySortOrder>(sortOrder)
 
     init {
         coroutineScope.launch {
-            accountInfoManager.currentFullAccount.collect {
-                if (it != null) {
-                    sortOrder = it
-                        .accountInfo
-                        .miscAccountInfo
-                        ?.defaultCommunitySortType
-                        ?.toSortOrder()
-                        ?: return@collect
+            accountInfoManager.currentFullAccount.collect { fullAccount ->
+                if (fullAccount != null) {
+                    sortOrder =
+                        preferences.defaultCommunitySortOrder
+                            ?:
+                            fullAccount
+                                .accountInfo
+                                .miscAccountInfo
+                                ?.defaultCommunitySortType
+                                ?.toSortOrder()
+                                ?: return@collect
                 }
             }
         }

@@ -1,9 +1,11 @@
 package com.idunnololz.summit.user
 
+import android.os.Parcelable
 import androidx.room.*
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.squareup.moshi.Moshi
+import kotlinx.parcelize.Parcelize
 
 /**
  * Data Access Object
@@ -39,13 +41,14 @@ data class UserCommunityEntry(
     val iconUrl: String?,
 )
 
+@Parcelize
 data class UserCommunityItem(
     val id: Long = 0L,
     val sortOrder: Long = 0L,
     val communitySortOrder: CommunitySortOrder = CommunitySortOrder.Active,
     val communityRef: CommunityRef,
     val iconUrl: String? = null,
-)
+): Parcelable
 
 fun UserCommunityItem.toEntry() =
     UserCommunityEntry(

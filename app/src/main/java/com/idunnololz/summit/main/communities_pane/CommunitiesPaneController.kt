@@ -17,12 +17,14 @@ import com.idunnololz.summit.databinding.CommunitiesPaneBinding
 import com.idunnololz.summit.databinding.GenericCommunityItemBinding
 import com.idunnololz.summit.databinding.HomeCommunityItemBinding
 import com.idunnololz.summit.databinding.NoSubscriptionsItemBinding
+import com.idunnololz.summit.databinding.TabStateItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.hasTabId
 import com.idunnololz.summit.tabs.isSubscribedCommunity
+import com.idunnololz.summit.tabs.toTab
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.StatefulData
@@ -34,7 +36,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
-typealias OnCommunitySelected = (Either<UserCommunityItem, CommunityRef>) -> Unit
+typealias OnCommunitySelected = (Either<UserCommunityItem, CommunityRef>, resetTab: Boolean) -> Unit
 
 class CommunitiesPaneController @AssistedInject constructor(
     private val offlineManager: OfflineManager,
@@ -64,6 +66,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         val adapter = UserCommunitiesAdapter(
             context = context,
             offlineManager = offlineManager,
+            tabsManager = tabsManager,
             onCommunitySelected = onCommunitySelected,
             onDeleteUserCommunity = { id ->
                 viewModel.deleteUserCommunity(id)
@@ -99,6 +102,7 @@ class CommunitiesPaneController @AssistedInject constructor(
     private class UserCommunitiesAdapter(
         private val context: Context,
         private val offlineManager: OfflineManager,
+        private val tabsManager: TabsManager,
         private val onCommunitySelected: OnCommunitySelected,
         private val onDeleteUserCommunity: (Long) -> Unit,
     ) : Adapter<ViewHolder>() {
@@ -109,12 +113,14 @@ class CommunitiesPaneController @AssistedInject constructor(
                 val communityRef: CommunityRef,
                 val userCommunityItem: UserCommunityItem,
                 val isSelected: Boolean,
+                val resetTabOnClick: Boolean,
             ) : Item
             data class BookmarkedCommunityItem(
                 val communityRef: CommunityRef,
                 val iconUrl: String?,
                 val userCommunityItem: UserCommunityItem,
                 val isSelected: Boolean,
+                val resetTabOnClick: Boolean,
             ) : Item
             data class SubscriptionHeaderItem(
                 val isRefreshing: Boolean,
@@ -123,8 +129,17 @@ class CommunitiesPaneController @AssistedInject constructor(
                 val communityRef: CommunityRef,
                 val iconUrl: String?,
                 val isSelected: Boolean,
+                val resetTabOnClick: Boolean,
             ) : Item
             object NoSubscriptionsItem : Item
+
+
+            data class TabStateItem(
+                val parentKey: String,
+                val tab: TabsManager.Tab,
+                val tabState: TabsManager.TabState,
+                val isSelected: Boolean,
+            ) : Item
         }
 
         var currentTab: TabsManager.Tab? = null
@@ -159,6 +174,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                                 (new as Item.SubscribedCommunityItem).communityRef.getKey()
                     is Item.SubscriptionHeaderItem -> true
                     Item.NoSubscriptionsItem -> true
+                    is Item.TabStateItem ->
+                        old.parentKey == (new as Item.TabStateItem).parentKey
                 }
             }
         ).apply {
@@ -177,7 +194,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                     View.GONE
                 }
                 b.root.setOnClickListener {
-                    onCommunitySelected(Either.Left(item.userCommunityItem))
+                    onCommunitySelected(Either.Left(item.userCommunityItem), item.resetTabOnClick)
                 }
             }
             addItemType(
@@ -203,7 +220,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 }
                 b.textView.text = item.communityRef.getName(context)
                 b.root.setOnClickListener {
-                    onCommunitySelected(Either.Left(item.userCommunityItem))
+                    onCommunitySelected(Either.Left(item.userCommunityItem), item.resetTabOnClick)
                 }
                 b.root.setOnLongClickListener {
                     PopupMenu(context, it).apply {
@@ -250,13 +267,32 @@ class CommunitiesPaneController @AssistedInject constructor(
                 b.textView.text = item.communityRef.getName(context)
 
                 b.root.setOnClickListener {
-                    onCommunitySelected(Either.Right(item.communityRef))
+                    onCommunitySelected(Either.Right(item.communityRef), item.resetTabOnClick)
                 }
             }
             addItemType(
                 clazz = Item.NoSubscriptionsItem::class,
                 inflateFn = NoSubscriptionsItemBinding::inflate
             ) { _, _, _ -> }
+            addItemType(
+                clazz = Item.TabStateItem::class,
+                inflateFn = TabStateItemBinding::inflate
+            ) { item, b, h ->
+                b.textView.text = item.tabState.currentCommunity.getName(context)
+                b.selectedIndicator.visibility = if (item.isSelected) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+                b.root.setOnClickListener {
+                    when (val tab = item.tab) {
+                        is TabsManager.Tab.SubscribedCommunityTab ->
+                            onCommunitySelected(Either.Right(tab.subscribedCommunity), false)
+                        is TabsManager.Tab.UserCommunityTab ->
+                            onCommunitySelected(Either.Left(tab.userCommunityItem), false)
+                    }
+                }
+            }
         }
 
         override fun getItemViewType(position: Int): Int =
@@ -275,20 +311,43 @@ class CommunitiesPaneController @AssistedInject constructor(
 
             val newItems = mutableListOf<Item>()
             newItems.add(Item.BookmarkHeaderItem)
-            data.userCommunities.mapTo(newItems) {
-                if (it.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
-                    Item.HomeCommunityItem(
-                        communityRef = it.communityRef,
-                        userCommunityItem = it,
-                        isSelected = currentTab?.hasTabId(it.id) ?: false
+
+            for (userCommunity in data.userCommunities) {
+                val isSelected = currentTab?.hasTabId(userCommunity.id) ?: false
+                val tab = userCommunity.toTab()
+
+                val tabStateItem = data.tabsState[tab]?.let {
+                    if (it.currentCommunity == userCommunity.communityRef) {
+                        null
+                    } else {
+                        Item.TabStateItem(
+                            "tabid:${userCommunity.id}",
+                            tab,
+                            it,
+                            isSelected
+                        )
+                    }
+                }
+
+                if (userCommunity.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
+                    newItems += Item.HomeCommunityItem(
+                        communityRef = userCommunity.communityRef,
+                        userCommunityItem = userCommunity,
+                        isSelected = isSelected && tabStateItem == null,
+                        resetTabOnClick = tabStateItem != null,
                     )
                 } else {
-                    Item.BookmarkedCommunityItem(
-                        communityRef = it.communityRef,
-                        iconUrl = it.iconUrl,
-                        userCommunityItem = it,
-                        isSelected = currentTab?.hasTabId(it.id) ?: false
+                    newItems += Item.BookmarkedCommunityItem(
+                        communityRef = userCommunity.communityRef,
+                        iconUrl = userCommunity.iconUrl,
+                        userCommunityItem = userCommunity,
+                        isSelected = isSelected && tabStateItem == null,
+                        resetTabOnClick = tabStateItem != null,
                     )
+                }
+
+                if (tabStateItem != null) {
+                    newItems += tabStateItem
                 }
             }
 
@@ -296,12 +355,34 @@ class CommunitiesPaneController @AssistedInject constructor(
                 data.accountInfoUpdateState is StatefulData.Loading
             ))
             if (data.subscriptionCommunities.isNotEmpty()) {
-                data.subscriptionCommunities.mapTo(newItems) {
-                    Item.SubscribedCommunityItem(
-                        communityRef = it.toCommunityRef(),
-                        iconUrl = it.icon,
-                        isSelected = currentTab?.isSubscribedCommunity(it.toCommunityRef()) ?: false
+                for (subscriptionCommunity in data.subscriptionCommunities) {
+                    val isSelected = currentTab
+                        ?.isSubscribedCommunity(subscriptionCommunity.toCommunityRef())
+                        ?: false
+                    val tab = subscriptionCommunity.toCommunityRef().toTab()
+
+                    val tabStateItem = data.tabsState[tab]?.let {
+                        if (it.currentCommunity == subscriptionCommunity.toCommunityRef()) {
+                            null
+                        } else {
+                            Item.TabStateItem(
+                                subscriptionCommunity.name,
+                                tab,
+                                tabState = it,
+                                isSelected = isSelected
+                            )
+                        }
+                    }
+
+                    newItems += Item.SubscribedCommunityItem(
+                        communityRef = subscriptionCommunity.toCommunityRef(),
+                        iconUrl = subscriptionCommunity.icon,
+                        isSelected = isSelected && tabStateItem == null,
+                        resetTabOnClick = tabStateItem != null,
                     )
+                    if (tabStateItem != null) {
+                        newItems += tabStateItem
+                    }
                 }
             } else {
                 newItems.add(Item.NoSubscriptionsItem)

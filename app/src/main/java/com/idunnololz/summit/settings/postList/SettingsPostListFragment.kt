@@ -9,22 +9,36 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsContentBinding
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
+import com.idunnololz.summit.lemmy.idToSortOrder
+import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.OnOffSettingItem
+import com.idunnololz.summit.settings.PostListSettings
+import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
+import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
+import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
+import com.idunnololz.summit.settings.makeCommunitySortOrderChoices
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>() {
+class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
+    SettingValueUpdateCallback {
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var postListSettings: PostListSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +77,8 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>() 
     }
 
     private fun updateRendering() {
+        val context = requireContext()
+
         OnOffSettingItem(
             null,
             getString(R.string.infinity),
@@ -102,6 +118,16 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>() 
                 updateRendering()
             }
         )
+        postListSettings.defaultCommunitySortOrder.bindTo(
+            binding.defaultCommunitySortOrder,
+            { preferences.defaultCommunitySortOrder?.toApiSortOrder()?.toId()
+                ?: R.id.community_sort_order_default },
+            {
+                MultipleChoiceDialogFragment.newInstance(it)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            }
+        )
+
         BasicSettingItem(
             null,
             getString(R.string.keyword_filters),
@@ -220,5 +246,15 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>() 
                 updateRendering()
             }
         )
+    }
+
+    override fun updateValue(key: Int, value: Any?) {
+        when (key) {
+            postListSettings.defaultCommunitySortOrder.id -> {
+                preferences.defaultCommunitySortOrder = idToSortOrder(value as Int)
+            }
+        }
+
+        updateRendering()
     }
 }

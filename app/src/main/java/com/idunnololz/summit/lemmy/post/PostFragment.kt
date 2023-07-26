@@ -51,6 +51,7 @@ import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.getLocalizedName
+import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.saved.SavedTabbedFragment
@@ -117,16 +118,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             setTitle(R.string.sort_by)
 
             setOnMenuItemClickListener { menuItem ->
-                when(menuItem.id) {
-                    R.id.sort_order_hot ->
-                        viewModel.setCommentsSortOrder(CommentsSortOrder.Hot)
-                    R.id.sort_order_top ->
-                        viewModel.setCommentsSortOrder(CommentsSortOrder.Top)
-                    R.id.sort_order_new ->
-                        viewModel.setCommentsSortOrder(CommentsSortOrder.New)
-                    R.id.sort_order_old ->
-                        viewModel.setCommentsSortOrder(CommentsSortOrder.Old)
-                }
+                viewModel.setCommentsSortOrder(
+                    idToCommentsSortOrder(menuItem.id) ?: CommentsSortOrder.Hot)
             }
         }
     }

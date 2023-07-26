@@ -22,6 +22,7 @@ class SettingsManager @Inject constructor(
             listOf(
                 mainSettings.settingTheme,
                 mainSettings.settingPostList,
+                mainSettings.commentListSettings,
                 mainSettings.settingViewType,
                 mainSettings.settingPostAndComment,
                 mainSettings.settingGestures,

@@ -48,7 +48,12 @@
         app:enterAnim="@anim/slide_in"
         app:exitAnim="@anim/fade_out"
         app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/slide_out"  />
+        app:popExitAnim="@anim/slide_out">
+        <argument
+            android:name="link"
+            app:argType="string"
+            app:nullable="true" />
+    </action>
     <fragment
         android:id="@+id/videoViewerFragment"
         android:name="com.idunnololz.summit.preview.VideoViewerFragment"
@@ -97,7 +102,6 @@
             app:argType="string"
             app:nullable="true" />
     </activity>
-    <action android:id="@+id/action_global_settingWebFragment" app:destination="@id/settings"/>
     <fragment
         android:id="@+id/personTabbedFragment2"
         android:name="com.idunnololz.summit.lemmy.person.PersonTabbedFragment"
@@ -154,6 +158,7 @@
         <argument
             android:name="communityRef"
             app:argType="com.idunnololz.summit.lemmy.CommunityRef" />
-    </fragment><action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
+    </fragment>
+    <action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
     <include app:graph="@navigation/settings"/>
 </navigation>

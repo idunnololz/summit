@@ -1,12 +1,15 @@
 package com.idunnololz.summit.tabs
 
+import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
 import arrow.core.Either
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,6 +24,10 @@ class TabsManager @Inject constructor(
     val currentTab = MutableLiveData<Tab>(userCommunitiesManager.getHomeItem().toTab())
 
     val previousTabs = linkedSetOf<Tab>()
+
+    val tabStateChangedFlow = MutableSharedFlow<Unit>()
+
+    private val tabState = mutableMapOf<Tab, TabState>()
 
     init {
         coroutineScope.launch {
@@ -37,15 +44,18 @@ class TabsManager @Inject constructor(
         }
     }
 
-    fun updateCurrentTab(tabObj: Either<UserCommunityItem, CommunityRef>) {
-        updateCurrentTab(tabObj.fold(
+    fun getTab(tabObj: Either<UserCommunityItem, CommunityRef>) =
+        tabObj.fold(
             {
                 it.toTab()
             },
             {
                 it.toTab()
             }
-        ))
+        )
+
+    fun updateCurrentTab(tabObj: Either<UserCommunityItem, CommunityRef>) {
+        updateCurrentTab(getTab(tabObj))
     }
 
     fun updateCurrentTab(tab: Tab) {
@@ -59,21 +69,45 @@ class TabsManager @Inject constructor(
     fun getHomeTab(): Tab =
         userCommunitiesManager.getHomeItem().toTab()
 
-    sealed interface Tab {
+    fun getTabState(): Map<Tab, TabState> =
+        tabState
+
+    fun updateTabState(tab: Tab, communityRef: CommunityRef) {
+        val newTabState = (tabState[tab] ?: makeDefaultState(tab)).copy(
+            currentCommunity = communityRef
+        )
+        tabState[tab] = newTabState
+
+        coroutineScope.launch {
+            tabStateChangedFlow.emit(Unit)
+        }
+    }
+
+    private fun makeDefaultState(tab: Tab): TabState =
+        TabState(tab.communityRef)
+
+    sealed interface Tab : Parcelable {
+
+        @Parcelize
         data class UserCommunityTab(
             val userCommunityItem: UserCommunityItem
         ) : Tab
 
+        @Parcelize
         data class SubscribedCommunityTab(
             val subscribedCommunity: CommunityRef
         ) : Tab
     }
+
+    data class TabState(
+        val currentCommunity: CommunityRef
+    )
 }
 
-private fun UserCommunityItem.toTab(): TabsManager.Tab =
+fun UserCommunityItem.toTab(): TabsManager.Tab =
     TabsManager.Tab.UserCommunityTab(this)
 
-private fun CommunityRef.toTab(): TabsManager.Tab =
+fun CommunityRef.toTab(): TabsManager.Tab =
     TabsManager.Tab.SubscribedCommunityTab(this)
 
 val TabsManager.Tab.communityRef: CommunityRef

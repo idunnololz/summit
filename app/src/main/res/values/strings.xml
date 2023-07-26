@@ -424,6 +424,12 @@
     <string name="extra_large">Extra large</string>
     <string name="copy_link_text">Copy link text</string>
     <string name="link_actions">Link actions</string>
+    <string name="default_posts_sort_order">Default posts sort order</string>
+    <string name="_default">Default</string>
+    <string name="sort_order_top_format">Top (%1$s)</string>
+    <string name="default_comments_sort_order">Default comments sort order</string>
+    <string name="comment_list">Comment list</string>
+    <string name="comment_list_desc">Customize the comment list of posts</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
