@@ -11,24 +11,25 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountView
-import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.databinding.CustomAppBarBinding
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.community.CommunityViewModel
+import com.idunnololz.summit.lemmy.CommunitySortOrder
+import com.idunnololz.summit.lemmy.toApiSortOrder
 
 class LemmyAppBarController(
     private val mainActivity: MainActivity,
-    v: View
+    private val binding: CustomAppBarBinding
 ) {
 
     private val TAG = "RedditAppBarController"
 
     private val context = mainActivity
 
-    private val customActionBar: ViewGroup = v.findViewById(R.id.customActionBar)
-    private val accountChip: Chip = v.findViewById(R.id.account_chip)
-    private val accountImageView: ShapeableImageView = v.findViewById(R.id.account_image_view)
-    private val communityTextView: Chip = v.findViewById(R.id.communityTextView)
-    private val pageTextView: TextView = v.findViewById(R.id.pageTextView)
+    private val customActionBar: ViewGroup = binding.customActionBar
+    private val accountChip: Chip = binding.accountChip
+    private val accountImageView: ShapeableImageView = binding.accountImageView
+    private val communityTextView: Chip = binding.communityTextView
+    private val pageTextView: TextView = binding.pageTextView
 
     private var currentCommunity: CommunityRef? = null
     private var defaultCommunity: CommunityRef? = null
@@ -36,6 +37,7 @@ class LemmyAppBarController(
     fun setup(
         communitySelectedListener: CommunitySelectedListener,
         onAccountClick: (currentAccount: Account?) -> Unit,
+        onSortOrderClick: () -> Unit,
     ) {
         accountChip.setOnClickListener {
             onAccountClick(null)
@@ -52,13 +54,16 @@ class LemmyAppBarController(
             val controller = mainActivity.showCommunitySelector(currentCommunity)
             controller.onCommunitySelectedListener = communitySelectedListener
         }
+        binding.communitySortOrder.setOnClickListener {
+            onSortOrderClick()
+        }
     }
 
     fun showCommunitySelector() {
         communityTextView.performClick()
     }
 
-    fun setCommunity(communityRef: CommunityRef?, isHome: Boolean) {
+    fun setCommunity(communityRef: CommunityRef?) {
         currentCommunity = communityRef
 
         updateCommunityButton()
@@ -86,6 +91,8 @@ class LemmyAppBarController(
         pageIndex: Int,
         onPageSelectedListener: (pageIndex: Int) -> Unit
     ) {
+        binding.communitySortOrder.visibility = View.GONE
+
         pageTextView.text = context.getString(R.string.page_format, (pageIndex + 1).toString())
 
         pageTextView.setOnClickListener {
@@ -104,11 +111,54 @@ class LemmyAppBarController(
         }
     }
 
-    fun setPageIndexInfinity() {
-        pageTextView.text = ""
-        pageTextView.visibility = View.INVISIBLE
+    fun setIsInfinity(isInfinity: Boolean) {
+        if (isInfinity) {
+            binding.communitySortOrder.visibility = View.VISIBLE
+            pageTextView.visibility = View.GONE
+        } else {
+            binding.communitySortOrder.visibility = View.GONE
+            pageTextView.visibility = View.VISIBLE
+        }
+    }
 
-        pageTextView.setOnClickListener {}
+    fun setSortOrder(communitySortOrder: CommunitySortOrder) {
+        binding.communitySortOrder.text =
+            when (communitySortOrder) {
+                CommunitySortOrder.Active -> context.getString(R.string.sort_order_active)
+                CommunitySortOrder.Hot -> context.getString(R.string.sort_order_hot)
+                CommunitySortOrder.MostComments -> context.getString(R.string.sort_order_most_comments)
+                CommunitySortOrder.New -> context.getString(R.string.sort_order_new)
+                CommunitySortOrder.NewComments -> context.getString(R.string.sort_order_new_comments)
+                CommunitySortOrder.Old -> context.getString(R.string.sort_order_old)
+                is CommunitySortOrder.TopOrder ->
+                    context.getString(
+                        R.string.sort_order_top_format,
+                        when (communitySortOrder.timeFrame) {
+                            CommunitySortOrder.TimeFrame.LastHour ->
+                                context.getString(R.string.time_frame_last_hour)
+                            CommunitySortOrder.TimeFrame.LastSixHour ->
+                                context.getString(R.string.time_frame_last_hours_format, "6")
+                            CommunitySortOrder.TimeFrame.LastTwelveHour ->
+                                context.getString(R.string.time_frame_last_hours_format, "12")
+                            CommunitySortOrder.TimeFrame.Today ->
+                                context.getString(R.string.time_frame_today)
+                            CommunitySortOrder.TimeFrame.ThisWeek ->
+                                context.getString(R.string.time_frame_this_week)
+                            CommunitySortOrder.TimeFrame.ThisMonth ->
+                                context.getString(R.string.time_frame_this_month)
+                            CommunitySortOrder.TimeFrame.LastThreeMonth ->
+                                context.getString(R.string.time_frame_last_months_format, "3")
+                            CommunitySortOrder.TimeFrame.LastSixMonth ->
+                                context.getString(R.string.time_frame_last_months_format, "6")
+                            CommunitySortOrder.TimeFrame.LastNineMonth ->
+                                context.getString(R.string.time_frame_last_months_format, "9")
+                            CommunitySortOrder.TimeFrame.ThisYear ->
+                                context.getString(R.string.time_frame_this_year)
+                            CommunitySortOrder.TimeFrame.AllTime ->
+                                context.getString(R.string.time_frame_all_time)
+                        }
+                    )
+            }
     }
 
     fun clearPageIndex() {

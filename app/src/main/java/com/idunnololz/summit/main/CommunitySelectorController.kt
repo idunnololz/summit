@@ -585,14 +585,14 @@ class CommunitySelectorController @AssistedInject constructor(
                         Item.StaticChildItem(
                             context.getString(R.string.subscribed),
                             R.drawable.baseline_dynamic_feed_24,
-                            CommunityRef.Subscribed(account.instance),
+                            CommunityRef.Subscribed(null),
                         )
                     )
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.local),
                             R.drawable.ic_subreddit_home,
-                            CommunityRef.Local(account.instance),
+                            CommunityRef.Local(null),
                         )
                     )
                 } else {

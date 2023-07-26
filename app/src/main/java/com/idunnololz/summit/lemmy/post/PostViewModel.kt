@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,7 @@ class PostViewModel @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val accountManager: AccountManager,
     private val postReadManager: PostReadManager,
+    private val preferences: Preferences,
 ) : ViewModel() {
 
     companion object {
@@ -66,7 +68,9 @@ class PostViewModel @Inject constructor(
 
     private val commentsFetcher = CommentsFetcher(lemmyApiClient, accountActionsManager)
 
-    val commentsSortOrderLiveData = MutableLiveData(CommentsSortOrder.Top)
+    val commentsSortOrderLiveData = MutableLiveData(
+        preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top
+    )
 
     val postData = StatefulLiveData<PostData>()
 

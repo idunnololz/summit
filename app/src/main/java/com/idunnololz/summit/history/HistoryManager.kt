@@ -2,6 +2,7 @@ package com.idunnololz.summit.history
 
 import android.content.Context
 import android.util.Log
+import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.db.MainDatabase
@@ -24,6 +25,7 @@ class HistoryManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val historyDao: HistoryDao,
+    private val apiClient: AccountAwareLemmyClient,
 ) {
 
     companion object {
@@ -85,7 +87,7 @@ class HistoryManager @Inject constructor(
                     id = 0,
                     type = HistoryEntry.TYPE_COMMUNITY_STATE,
                     reason = saveReason,
-                    url = state.toUrl(),
+                    url = state.toUrl(apiClient.instance),
                     shortDesc = shortDesc,
                     ts = ts,
                     extras = moshi.adapter(TabCommunityState::class.java)

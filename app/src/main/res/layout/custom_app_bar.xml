@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/custom_app_bar"
+    android:animateLayoutChanges="true"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:background="?backgroundColor">
+
+    <!-- Scrollflags set programatically -->
+    <FrameLayout
+        android:id="@+id/customActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_scrollFlags="scroll|enterAlways">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/customActionBarContent"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/custom_ab_height"
+            android:animateLayoutChanges="true">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintGuide_begin="@dimen/custom_ab_height"
+                android:orientation="horizontal" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/communityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:minWidth="0dp"
+                android:paddingStart="@dimen/padding_half"
+                android:paddingEnd="@dimen/padding_half"
+                android:textStyle="bold"
+                android:gravity="start|center_vertical"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textAppearance="?textAppearanceLabelSmall"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_marginStart="@dimen/padding"
+                android:layout_marginEnd="@dimen/padding"
+                app:chipIconTint="?colorControlNormal"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/start_barrier"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/start_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="start"
+                app:constraint_referenced_ids="community_sort_order,pageTextView"/>
+
+            <TextView
+                android:id="@+id/community_sort_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleSmall"
+                android:layout_marginStart="@dimen/padding"
+                android:gravity="center_vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline"
+                app:drawableEndCompat="@drawable/baseline_arrow_drop_down_24"
+                app:drawableTint="?colorControlNormal" />
+
+            <TextView
+                android:id="@+id/pageTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:paddingStart="@dimen/padding"
+                android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/account_image_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:textAppearance="?textAppearanceTitleMedium"
+                android:gravity="start|center_vertical"
+                android:padding="8dp"
+                android:foreground="@drawable/account_ripple"
+                android:layout_marginStart="@dimen/padding_half"
+                android:layout_marginEnd="@dimen/padding_half"
+                android:visibility="invisible"
+                android:scaleType="centerCrop"
+                style="@style/CircleImageView"
+                app:layout_constraintDimensionRatio="W,1:1"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/account_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:minWidth="0dp"
+                android:textAppearance="?textAppearanceTitleMedium"
+                android:textStyle="bold"
+                android:gravity="start|center_vertical"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:layout_marginStart="@dimen/padding_quarter"
+                android:visibility="invisible"
+                app:chipIcon="@drawable/baseline_add_24"
+                app:chipIconTint="?colorControlNormal"
+                app:textStartPadding="0dp"
+                app:textEndPadding="0dp"
+                app:chipStartPadding="4dp"
+                app:chipEndPadding="4dp"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</com.google.android.material.appbar.AppBarLayout>

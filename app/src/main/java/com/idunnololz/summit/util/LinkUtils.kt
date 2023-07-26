@@ -45,7 +45,7 @@ object LinkUtils {
     }
 
     fun getLinkForCommunity(communityRef: CommunityRef): String =
-        communityRef.toUrl()
+        communityRef.toUrl("lemmy.world")
 
     fun getLinkForMoreChildren(
         linkId: String,

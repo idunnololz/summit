@@ -43,6 +43,10 @@
         android:id="@+id/settingsFragment"
         android:name="com.idunnololz.summit.settings.SettingsFragment"
         android:label="SettingsFragment">
+        <argument
+            android:name="link"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_settingsFragment_to_settingViewTypeFragment"
             app:destination="@id/settingViewTypeFragment"
@@ -113,6 +117,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingCommentListFragment"
+            app:destination="@id/settingCommentListFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -176,4 +187,8 @@
             android:name="title"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/settingCommentListFragment"
+        android:name="com.idunnololz.summit.settings.commentList.SettingCommentListFragment"
+        android:label="SettingCommentListFragment" />
 </navigation>

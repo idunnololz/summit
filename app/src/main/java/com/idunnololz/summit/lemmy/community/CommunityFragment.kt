@@ -44,7 +44,6 @@ import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
-import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
@@ -59,8 +58,6 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -235,7 +232,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 onImageClick = { postView, sharedElementView, url ->
                     getMainActivity()?.openImage(
                         sharedElement = sharedElementView,
-                        appBar = binding.customAppBar,
+                        appBar = binding.customAppBar.root,
                         title = postView.post.name,
                         url = url,
                         mimeType = null
@@ -343,6 +340,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         viewModel.currentAccount.observe(viewLifecycleOwner) {
             lemmyAppBarController.onAccountChanged(it)
         }
+        viewModel.sortOrder.observe(viewLifecycleOwner) {
+            lemmyAppBarController.setSortOrder(it)
+        }
 
         installOnActionResultHandler(
             actionsViewModel = actionsViewModel,
@@ -350,10 +350,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         )
 
         requireMainActivity().apply {
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.customActionBar)
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.customAppBar.customActionBar)
 
-            binding.customAppBar.addOnOffsetChangedListener { _, verticalOffset ->
-                val percentShown = -verticalOffset.toFloat() / binding.customAppBar.height
+            binding.customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
+                val percentShown = -verticalOffset.toFloat() / binding.customAppBar.root.height
 
                 bottomNavViewOffset.value =
                     (percentShown * getBottomNavHeight()).toInt()
@@ -365,7 +365,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             lemmyAppBarController.setup(
                 communitySelectedListener = { controller, communityRef ->
                     val action = CommunityFragmentDirections.actionSubredditFragmentSwitchSubreddit(
-                        communityRef = communityRef
+                        communityRef = communityRef,
+                        tab = args.tab,
                     )
                     findNavController().navigate(action)
                     Utils.hideKeyboard(activity)
@@ -374,7 +375,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 onAccountClick = {
                     AccountsAndSettingsDialogFragment.newInstance()
                         .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
-                })
+                },
+                onSortOrderClick = {
+                    getMainActivity()?.showBottomMenu(getSortByMenu())
+                }
+            )
         }
 
         view.doOnPreDraw {
@@ -444,7 +449,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner, binding.fabSnackbarCoordinatorLayout)
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner, binding.recyclerView, binding.customActionBar.height)
+                viewLifecycleOwner, binding.recyclerView, binding.customAppBar.customActionBar.height)
         }
 
         val context = requireContext()
@@ -585,7 +590,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                                         )
                                 } else {
                                     binding.recyclerView.scrollToPosition(0)
-                                    binding.customAppBar.setExpanded(true)
+                                    binding.customAppBar.root.setExpanded(true)
                                 }
                             }
                         }
@@ -700,13 +705,16 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             val customAppBarController = lemmyAppBarController
 
             viewModel.currentCommunityRef.observe(viewLifecycleOwner) {
-                val currentDefaultPage = preferences.getDefaultPage()
-                customAppBarController.setCommunity(it, it == currentDefaultPage)
+                customAppBarController.setCommunity(it)
 
-//                updateFabState()
+                val tab = args.tab
+                if (tab != null) {
+                    viewModel.updateTab(tab, it)
+                }
             }
+
+            customAppBarController.setIsInfinity(viewModel.infinity)
             if (viewModel.infinity) {
-                customAppBarController.setPageIndexInfinity()
                 onBackPressedHandler.isEnabled = false
             } else {
                 viewModel.currentPageIndex.observe(viewLifecycleOwner) { currentPageIndex ->

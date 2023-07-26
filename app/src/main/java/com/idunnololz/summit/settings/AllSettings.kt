@@ -68,6 +68,12 @@ class MainSettings @Inject constructor(
         context.getString(R.string.c_summit),
         context.getString(R.string.summit_community_desc)
     )
+
+    val commentListSettings = BasicSettingItem(
+        R.drawable.baseline_comment_24,
+        context.getString(R.string.comment_list),
+        context.getString(R.string.comment_list_desc),
+    )
 }
 
 @Singleton
@@ -118,111 +124,7 @@ class LemmyWebSettings @Inject constructor(
         null,
         context.getString(R.string.default_sort_type),
         null,
-        listOf(
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_active,
-                context.getString(R.string.sort_order_active),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_hot,
-                context.getString(R.string.sort_order_hot),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_new,
-                context.getString(R.string.sort_order_new),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_old,
-                context.getString(R.string.sort_order_old),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_most_comments,
-                context.getString(R.string.sort_order_most_comments),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_new_comments,
-                context.getString(R.string.sort_order_new_comments),
-                null,
-                null,
-            ),
-
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_last_hour,
-                context.getString(R.string.time_frame_last_hour),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_last_six_hour,
-                context.getString(R.string.time_frame_last_hours_format, "6"),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_last_twelve_hour,
-                context.getString(R.string.time_frame_last_hours_format, "12"),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_day,
-                context.getString(R.string.time_frame_today),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_week,
-                context.getString(R.string.time_frame_this_week),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_month,
-                context.getString(R.string.time_frame_this_month),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_last_three_month,
-                context.getString(R.string.time_frame_last_months_format, "3"),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_last_six_month,
-                context.getString(R.string.time_frame_last_months_format, "6"),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_last_nine_month,
-                context.getString(R.string.time_frame_last_months_format, "9"),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_year,
-                context.getString(R.string.time_frame_this_year),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                R.id.sort_order_top_all_time,
-                context.getString(R.string.time_frame_all_time),
-                null,
-                null,
-            ),
-        ),
+        makeCommunitySortOrderChoices(context)
     )
 
     val showNsfwSetting = OnOffSettingItem(
@@ -386,6 +288,67 @@ class GestureSettings @Inject constructor(
 }
 
 @Singleton
+class PostListSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
+    val defaultCommunitySortOrder = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.default_posts_sort_order),
+        null,
+        makeCommunitySortOrderChoices(context) +
+                RadioGroupSettingItem.RadioGroupOption(
+                    R.id.community_sort_order_default,
+                    context.getString(R.string._default),
+                    null,
+                    null,
+                ),
+    )
+}
+
+@Singleton
+class CommentListSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
+    val defaultCommentsSortOrder = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.default_comments_sort_order),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.sort_order_hot,
+                context.getString(R.string.sort_order_hot),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.sort_order_top,
+                context.getString(R.string.sort_order_top),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.sort_order_new,
+                context.getString(R.string.sort_order_new),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.sort_order_old,
+                context.getString(R.string.sort_order_old),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.comments_sort_order_default,
+                context.getString(R.string._default),
+                null,
+                null,
+            ),
+        ),
+    )
+}
+
+@Singleton
 class PostAndCommentsSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
@@ -422,3 +385,111 @@ class PostAndCommentsSettings @Inject constructor(
         context.getString(R.string.tap_comment_to_collapse_desc),
     )
 }
+
+
+fun makeCommunitySortOrderChoices(context: Context) =
+    listOf(
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_active,
+            context.getString(R.string.sort_order_active),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_hot,
+            context.getString(R.string.sort_order_hot),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_new,
+            context.getString(R.string.sort_order_new),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_old,
+            context.getString(R.string.sort_order_old),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_most_comments,
+            context.getString(R.string.sort_order_most_comments),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_new_comments,
+            context.getString(R.string.sort_order_new_comments),
+            null,
+            null,
+        ),
+
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_last_hour,
+            context.getString(R.string.time_frame_last_hour),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_last_six_hour,
+            context.getString(R.string.time_frame_last_hours_format, "6"),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_last_twelve_hour,
+            context.getString(R.string.time_frame_last_hours_format, "12"),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_day,
+            context.getString(R.string.time_frame_today),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_week,
+            context.getString(R.string.time_frame_this_week),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_month,
+            context.getString(R.string.time_frame_this_month),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_last_three_month,
+            context.getString(R.string.time_frame_last_months_format, "3"),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_last_six_month,
+            context.getString(R.string.time_frame_last_months_format, "6"),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_last_nine_month,
+            context.getString(R.string.time_frame_last_months_format, "9"),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_year,
+            context.getString(R.string.time_frame_this_year),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_top_all_time,
+            context.getString(R.string.time_frame_all_time),
+            null,
+            null,
+        ),
+    )

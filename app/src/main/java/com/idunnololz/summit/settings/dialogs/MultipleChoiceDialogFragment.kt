@@ -76,6 +76,7 @@ class MultipleChoiceDialogFragment : BaseDialogFragment<DialogFragmentBottomMenu
 
         BottomMenu(requireContext())
             .apply {
+                setTitle(settingItem.title)
                 settingItem.options.forEach {
                     if (it.icon != null) {
                         addItemWithIcon(it.id, it.title, it.icon)

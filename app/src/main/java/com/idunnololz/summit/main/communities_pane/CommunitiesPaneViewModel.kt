@@ -9,6 +9,7 @@ import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
+import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.StatefulData
@@ -21,10 +22,12 @@ class CommunitiesPaneViewModel @Inject constructor(
     private val communitiesPaneControllerFactory: CommunitiesPaneController.Factory,
     private val accountInfoManager: AccountInfoManager,
     private val userCommunitiesManager: UserCommunitiesManager,
+    private val tabsManager: TabsManager,
 ) : ViewModel() {
 
     private var subscriptionCommunities: List<AccountSubscription> = listOf()
     private var userCommunities: List<UserCommunityItem> = listOf()
+    private var tabsState: Map<TabsManager.Tab, TabsManager.TabState> = mapOf()
     private var accountInfoUpdateState: StatefulData<Account?> = StatefulData.NotStarted()
 
     val communities = MutableLiveData<CommunityData?>(null)
@@ -53,6 +56,14 @@ class CommunitiesPaneViewModel @Inject constructor(
                 updateCommunities()
             }
         }
+
+        viewModelScope.launch {
+            tabsManager.tabStateChangedFlow.collect {
+                updateTabsState()
+            }
+        }
+
+        updateTabsState()
     }
 
     fun createController(
@@ -79,11 +90,18 @@ class CommunitiesPaneViewModel @Inject constructor(
         }
     }
 
+    private fun updateTabsState() {
+        tabsState = tabsManager.getTabState()
+
+        updateCommunities()
+    }
+
     private fun updateCommunities() {
         communities.postValue(CommunityData(
             userCommunities = userCommunities,
             subscriptionCommunities = subscriptionCommunities,
             accountInfoUpdateState = accountInfoUpdateState,
+            tabsState = tabsState,
         ))
     }
 
@@ -91,5 +109,6 @@ class CommunitiesPaneViewModel @Inject constructor(
         val subscriptionCommunities: List<AccountSubscription>,
         val userCommunities: List<UserCommunityItem>,
         val accountInfoUpdateState: StatefulData<Account?>,
+        val tabsState: Map<TabsManager.Tab, TabsManager.TabState>,
     )
 }

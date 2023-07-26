@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.commitNow
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
@@ -222,9 +223,10 @@ fun removeNavHostFragment(
 
     existingFragment ?: return
 
-    fragmentManager.beginTransaction()
-        .remove(existingFragment)
-        .commitNow()
+    fragmentManager.commitNow {
+        detach(existingFragment)
+        remove(existingFragment)
+    }
 }
 
 fun obtainNavHostFragment(

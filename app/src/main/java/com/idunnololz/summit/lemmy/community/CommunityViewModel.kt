@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.account.Account
@@ -29,6 +30,7 @@ import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
@@ -51,13 +53,13 @@ class CommunityViewModel @Inject constructor(
     private val userCommunitiesManager: UserCommunitiesManager,
     private val accountInfoManager: AccountInfoManager,
     private val accountActionsManager: AccountActionsManager,
-    private val apiClient: AccountAwareLemmyClient,
     private val postReadManager: PostReadManager,
     private val preferences: Preferences,
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val offlineManager: OfflineManager,
     private val hiddenPostsManager: HiddenPostsManager,
+    private val tabsManager: TabsManager,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -105,6 +107,8 @@ class CommunityViewModel @Inject constructor(
 
     val infinity: Boolean
         get() = postListEngine.infinity
+
+    val sortOrder = postsRepository.sortOrderFlow.asLiveData()
 
     private var hiddenPostObserverJob: Job? = null
 
@@ -416,7 +420,7 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun getSharedLinkForCurrentPage(): String? =
-        createState()?.toUrl()
+        createState()?.toUrl(apiInstance)
 
     fun setPagePositionAtTop(pageIndex: Int) {
         getPagePosition(pageIndex).apply {
@@ -598,5 +602,11 @@ class CommunityViewModel @Inject constructor(
                     loadedPostsData.postError(it)
                 }
         }
+    }
+
+    fun updateTab(tab: TabsManager.Tab, communityRef: CommunityRef?) {
+        communityRef ?: return
+
+        tabsManager.updateTabState(tab, communityRef)
     }
 }

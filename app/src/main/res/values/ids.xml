@@ -77,4 +77,6 @@
     <item name="unblock_community" type="id" />
     <item name="layout_card2" type="id" />
     <item name="copy_link_text" type="id" />
+    <item name="community_sort_order_default" type="id" />
+    <item name="comments_sort_order_default" type="id" />
 </resources>

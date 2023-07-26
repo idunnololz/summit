@@ -1047,12 +1047,12 @@ class MainActivity : BaseActivity() {
     }
 
     fun openSettings() {
-        val direction = MainDirections.actionGlobalSettingsFragment()
+        val direction = MainDirections.actionGlobalSettingsFragment(null)
         currentNavController?.navigateSafe(direction)
     }
 
     fun openAccountSettings() {
-        val direction = MainDirections.actionGlobalSettingWebFragment()
+        val direction = MainDirections.actionGlobalSettingsFragment("web")
         currentNavController?.navigateSafe(direction)
     }
 

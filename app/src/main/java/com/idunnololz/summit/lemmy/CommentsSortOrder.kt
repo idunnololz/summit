@@ -28,3 +28,23 @@ fun CommentsSortOrder.toApiSortOrder(): CommentSortType =
         CommentsSortOrder.New -> CommentSortType.New
         CommentsSortOrder.Old -> CommentSortType.Old
     }
+fun CommentSortType.toId(): Int =
+    when (this) {
+        CommentSortType.Hot -> R.id.sort_order_hot
+        CommentSortType.Top -> R.id.sort_order_top
+        CommentSortType.New -> R.id.sort_order_new
+        CommentSortType.Old -> R.id.sort_order_old
+    }
+
+fun idToCommentsSortOrder(id: Int) =
+    when (id) {
+        R.id.sort_order_hot ->
+            CommentsSortOrder.Hot
+        R.id.sort_order_top ->
+            CommentsSortOrder.Top
+        R.id.sort_order_new ->
+            CommentsSortOrder.New
+        R.id.sort_order_old ->
+            CommentsSortOrder.Old
+        else -> null
+    }

@@ -230,15 +230,17 @@ class OfflineManager @Inject constructor(
             }
         }
 
-        val job = coroutineScope.launch {
-            val result = downloadFileIfNeeded(
-                url = url,
-                destDir = destDir,
-                force = force,
-                saveToFileFn = saveToFileFn,
-                listener = listener,
-                errorListener = errorListener
-            )
+        val job = coroutineScope.launch(Dispatchers.Default) {
+            val result = withContext(Dispatchers.IO) {
+                downloadFileIfNeeded(
+                    url = url,
+                    destDir = destDir,
+                    force = force,
+                    saveToFileFn = saveToFileFn,
+                    listener = listener,
+                    errorListener = errorListener
+                )
+            }
 
             val file = result.fold(
                 onSuccess = { it },

@@ -33,22 +33,22 @@ data class CommunityViewState(
     }
 }
 
-fun CommunityViewState.toUrl(): String =
-    communityState.communityRef.toUri()
+fun CommunityViewState.toUrl(apiInstance: String): String =
+    communityState.communityRef.toUri(apiInstance)
         .buildUpon()
         .appendQueryParameter("page", this.communityState.currentPageIndex.toString())
         .build()
         .toString()
 
-fun CommunityRef.toUrl(): String = toUri().toString()
+fun CommunityRef.toUrl(apiInstance: String): String = toUri(apiInstance).toString()
 
-fun CommunityRef.toUri(): Uri {
+fun CommunityRef.toUri(apiInstance: String): Uri {
     val url = when (val community = this) {
         is CommunityRef.All ->
-            "https://${community.instance ?: "lemmy.world"}/?dataType=Post&listingType=All"
-        is CommunityRef.Local -> "https://${community.instance}/?dataType=Post&listingType=Local"
+            "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=All"
+        is CommunityRef.Local -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Local"
         is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
-        is CommunityRef.Subscribed -> "https://${community.instance}/?dataType=Post&listingType=Subscribed"
+        is CommunityRef.Subscribed -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Subscribed"
     }
 
     return Uri.parse(url)
