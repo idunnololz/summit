@@ -20,7 +20,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -32,7 +31,7 @@ class InboxViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
     private val inboxRepositoryFactory: InboxRepository.Factory,
-): ViewModel() {
+) : ViewModel() {
 
     companion object {
         private const val TAG = "InboxViewModel"
@@ -119,7 +118,7 @@ class InboxViewModel @Inject constructor(
     fun fetchInbox(
         pageIndex: Int = this.pageIndex,
         pageType: PageType = requireNotNull(this.pageTypeFlow.value),
-        force: Boolean = false
+        force: Boolean = false,
     ) {
         fetchInboxJob?.cancel()
         Log.d(TAG, "Loading inbox page $pageIndex. PageType: $pageType")
@@ -145,7 +144,7 @@ class InboxViewModel @Inject constructor(
         markAsReadResult.setIsLoading()
         markAsReadInViewData(
             inboxItem.id,
-            delete,//pageType.value == PageType.Unread,
+            delete, // pageType.value == PageType.Unread,
             read,
         )
         viewModelScope.launch {
@@ -187,7 +186,7 @@ class InboxViewModel @Inject constructor(
                     } else {
                         this[position] = newItem
                     }
-                }
+                },
             )
         }
 
@@ -203,8 +202,10 @@ class InboxViewModel @Inject constructor(
         val nextPageIndex = currentPageIndex + 1
 
         if (data.pageIndex != nextPageIndex) {
-            Log.d(TAG, "addData(): Data with unexpected page index. " +
-                        "Expected $nextPageIndex. Got ${data.pageIndex}"
+            Log.d(
+                TAG,
+                "addData(): Data with unexpected page index. " +
+                    "Expected $nextPageIndex. Got ${data.pageIndex}",
             )
             return
         }

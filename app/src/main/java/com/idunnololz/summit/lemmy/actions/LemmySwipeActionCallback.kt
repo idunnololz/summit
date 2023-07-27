@@ -25,6 +25,7 @@ class LemmySwipeActionCallback(
     private val context: Context,
     val recyclerView: RecyclerView,
     val onActionSelected: (SwipeAction, ViewHolder) -> Unit,
+    var gestureSize: Float,
 ) : ItemTouchHelper.Callback() {
 
     companion object {
@@ -34,7 +35,7 @@ class LemmySwipeActionCallback(
     data class SwipeAction(
         val id: Int,
         val icon: Drawable,
-        @ColorInt val color: Int
+        @ColorInt val color: Int,
     )
 
     private val noActionColor = context.getColorCompat(R.color.gray)
@@ -51,6 +52,7 @@ class LemmySwipeActionCallback(
     private var currentSwipeAction: SwipeAction? = null
 
     var postOnlyActions: List<SwipeAction>? = null
+    var postOnlyGestureSize: Float = 0.5f
     var actions: List<SwipeAction> = listOf()
 
     private val expandDrawable = context.getDrawableCompat(R.drawable.baseline_unfold_more_24)!!
@@ -63,7 +65,7 @@ class LemmySwipeActionCallback(
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: ViewHolder
+        viewHolder: ViewHolder,
     ): Int {
         return if (viewHolder.isSwipeable()) {
             makeMovementFlags(0, ItemTouchHelper.LEFT)
@@ -75,7 +77,7 @@ class LemmySwipeActionCallback(
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: ViewHolder,
-        viewHolder1: ViewHolder
+        viewHolder1: ViewHolder,
     ): Boolean {
         return false
     }
@@ -84,7 +86,7 @@ class LemmySwipeActionCallback(
         recyclerView: RecyclerView,
         animationType: Int,
         animateDx: Float,
-        animateDy: Float
+        animateDy: Float,
     ): Long {
         // from the documentation:
         // Called by the ItemTouchHelper when user action finished on a ViewHolder and now the View
@@ -101,7 +103,6 @@ class LemmySwipeActionCallback(
             onActionSelected(currentSwipeAction, lastVhSwiped)
         }
 
-
         return super.getAnimationDuration(recyclerView, animationType, animateDx, animateDy)
     }
 
@@ -112,7 +113,7 @@ class LemmySwipeActionCallback(
         dX: Float,
         dY: Float,
         actionState: Int,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
         val itemView = viewHolder.itemView
         val itemHeight = itemView.height
@@ -127,7 +128,7 @@ class LemmySwipeActionCallback(
                 itemView.right + finalDx.toInt(),
                 itemView.top,
                 itemView.right,
-                itemView.bottom
+                itemView.bottom,
             )
             disabledBackground.draw(c)
             super.onChildDraw(c, recyclerView, viewHolder, finalDx, dY, actionState, isCurrentlyActive)
@@ -141,24 +142,25 @@ class LemmySwipeActionCallback(
                 itemView.right + dX,
                 itemView.top.toFloat(),
                 itemView.right.toFloat(),
-                itemView.bottom.toFloat()
+                itemView.bottom.toFloat(),
             )
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             return
         }
 
-        val maxActionW = itemView.width / 2
-        val deadSpace = Utils.convertDpToPixel(24f)
-        val usableSpace = maxActionW - deadSpace
-        val actionSpace = usableSpace / actions.size
-
+        var maxActionW = itemView.width * gestureSize
         var drawable: Drawable? = null
 
-        val actions = if (viewHolder.itemView.tag is PostView) {
+        val actions = if (viewHolder.itemView.tag is PostView && postOnlyActions != null) {
+            maxActionW = itemView.width * postOnlyGestureSize
             postOnlyActions ?: actions
         } else {
             actions
         }
+
+        val deadSpace = Utils.convertDpToPixel(24f)
+        val usableSpace = maxActionW - deadSpace
+        val actionSpace = usableSpace / actions.size
 
         val negDx = -dX
         val currentSwipeAction = currentSwipeAction
@@ -182,9 +184,9 @@ class LemmySwipeActionCallback(
                         val swipeAction = actions[index]
                         background.color = swipeAction.color
                         if (currentSwipeAction != swipeAction) {
-
                             viewHolder.itemView.performHapticFeedback(
-                                HapticFeedbackConstants.VIRTUAL_KEY)
+                                HapticFeedbackConstants.VIRTUAL_KEY,
+                            )
                             this.currentSwipeAction = swipeAction
                         }
 
@@ -228,7 +230,7 @@ class LemmySwipeActionCallback(
             itemView.right + dX.toInt(),
             itemView.top,
             itemView.right,
-            itemView.bottom
+            itemView.bottom,
         )
         background.draw(c)
         drawable?.draw(c)

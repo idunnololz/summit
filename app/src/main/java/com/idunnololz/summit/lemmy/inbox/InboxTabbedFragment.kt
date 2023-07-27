@@ -34,7 +34,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -49,12 +49,12 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         val context = requireContext()
 
         val pagerAdapter = InboxPagerAdapter(
-                context,
-                this,
-            ).apply {
-                stateRestorationPolicy =
-                    RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            }
+            context,
+            this,
+        ).apply {
+            stateRestorationPolicy =
+                RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
 
         viewModel.pageItems.observe(viewLifecycleOwner) {
             it ?: return@observe
@@ -73,7 +73,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
                 getMainActivity()?.setNavUiOpenness(0f)
             } else {
-
                 getMainActivity()?.setNavUiOpenness(1f)
             }
         }
@@ -82,29 +81,31 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.setPageTransformer(DepthPageTransformer2())
         binding.viewPager.setCurrentItem(viewModel.pagePosition, false)
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                if (!binding.viewPager.isLaidOut) {
-                    return
+        binding.viewPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int,
+                ) {
+                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                    if (!binding.viewPager.isLaidOut) {
+                        return
+                    }
+                    if (position == 0) {
+                        getMainActivity()?.setNavUiOpenness(positionOffset)
+                    }
                 }
-                if (position == 0) {
-                    getMainActivity()?.setNavUiOpenness(positionOffset)
-                }
-            }
 
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
 
-                if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                    onPageChanged()
+                    if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                        onPageChanged()
+                    }
                 }
-            }
-        })
+            },
+        )
 
         onPageChanged()
         viewModel.updateUnreadCount()
@@ -182,26 +183,26 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         fun setPages(newItems: List<PageItem>) {
             val oldItems = items
 
-            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return oldItems[oldItemPosition].id == newItems[newItemPosition].id
-                }
+            val diff = DiffUtil.calculateDiff(
+                object : DiffUtil.Callback() {
+                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                        return oldItems[oldItemPosition].id == newItems[newItemPosition].id
+                    }
 
-                override fun getOldListSize(): Int = oldItems.size
+                    override fun getOldListSize(): Int = oldItems.size
 
-                override fun getNewListSize(): Int = newItems.size
+                    override fun getNewListSize(): Int = newItems.size
 
-                override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int
-                ): Boolean {
-                    return true
-                }
-
-            })
+                    override fun areContentsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int,
+                    ): Boolean {
+                        return true
+                    }
+                },
+            )
             this.items = newItems
             diff.dispatchUpdatesTo(this)
         }
     }
-
 }

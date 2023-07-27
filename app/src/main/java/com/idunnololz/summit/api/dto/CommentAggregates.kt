@@ -12,4 +12,4 @@ data class CommentAggregates(
     val downvotes: Int,
     val published: String,
     val child_count: Int,
-): Parcelable
+) : Parcelable

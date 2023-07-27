@@ -62,17 +62,20 @@ fun dateStringToPretty(context: Context, dateStr: String): String {
 }
 
 fun dateStringToTs(dateString: String): Long =
-    Instant.parse(if (dateString.endsWith("Z")) {
-        dateString
-    } else {
-        dateString + "Z"
-    }).toEpochMilli()
+    Instant.parse(
+        if (dateString.endsWith("Z")) {
+            dateString
+        } else {
+            dateString + "Z"
+        },
+    ).toEpochMilli()
 
 fun abbrevNumber(number: Long): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         val formatter = CompactDecimalFormat.getInstance(
-            Locale.getDefault(), CompactDecimalFormat.CompactStyle.SHORT
-        );
+            Locale.getDefault(),
+            CompactDecimalFormat.CompactStyle.SHORT,
+        )
 
         formatter.format(number)
     } else {

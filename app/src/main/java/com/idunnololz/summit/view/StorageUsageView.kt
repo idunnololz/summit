@@ -19,7 +19,7 @@ import java.text.NumberFormat
 data class StorageUsageItem(
     val label: String,
     val sizeInBytes: Long,
-    val color: Int
+    val color: Int,
 )
 
 class StorageUsageView : ConstraintLayout {
@@ -47,7 +47,7 @@ class StorageUsageView : ConstraintLayout {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     init {
@@ -73,7 +73,6 @@ class StorageUsageView : ConstraintLayout {
         val totalSize = storageUsageItems.sumByDouble { it.sizeInBytes.toDouble() }
         var x: Float = offsetViewBounds.left.toFloat()
 
-
         canvas.drawRect(offsetViewBounds, borderPaint)
         storageUsageItems.forEach {
             val w: Float = (it.sizeInBytes / totalSize * offsetViewBounds.width()).toFloat()
@@ -83,7 +82,7 @@ class StorageUsageView : ConstraintLayout {
                 y,
                 x + w,
                 y + offsetViewBounds.height(),
-                paint
+                paint,
             )
 
             x += w
@@ -116,7 +115,7 @@ class StorageUsageView : ConstraintLayout {
             tv.text = context.getString(
                 R.string.storage_usage_legend_format,
                 item.label,
-                pf.format(percent)
+                pf.format(percent),
             )
             tv.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
             tv.compoundDrawablePadding =
@@ -134,5 +133,4 @@ class StorageUsageView : ConstraintLayout {
 
         invalidate()
     }
-
 }

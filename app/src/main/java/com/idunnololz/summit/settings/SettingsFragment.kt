@@ -38,7 +38,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -151,6 +151,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 getMainActivity()?.launchPage(summitCommunityPage)
                                 true
                             }
+                            mainSettings.patreonSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToPatreonFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
                             else -> false
                         }
                     },
@@ -185,5 +191,4 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             .actionSettingsFragmentToSettingWebFragment()
         findNavController().navigateSafe(directions)
     }
-
 }

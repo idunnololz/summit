@@ -124,6 +124,9 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_patreonFragment"
+            app:destination="@id/patreonFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -191,4 +194,8 @@
         android:id="@+id/settingCommentListFragment"
         android:name="com.idunnololz.summit.settings.commentList.SettingCommentListFragment"
         android:label="SettingCommentListFragment" />
+    <fragment
+        android:id="@+id/patreonFragment"
+        android:name="com.idunnololz.summit.settings.patreon.PatreonFragment"
+        android:label="PatreonFragment" />
 </navigation>

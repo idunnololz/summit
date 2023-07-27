@@ -48,19 +48,26 @@ data class UserCommunityItem(
     val communitySortOrder: CommunitySortOrder = CommunitySortOrder.Active,
     val communityRef: CommunityRef,
     val iconUrl: String? = null,
-): Parcelable
+) : Parcelable
 
 fun UserCommunityItem.toEntry() =
     UserCommunityEntry(
-        id, sortOrder, communitySortOrder, communityRef, iconUrl
+        id,
+        sortOrder,
+        communitySortOrder,
+        communityRef,
+        iconUrl,
     )
 
 fun UserCommunityEntry.toItem(): UserCommunityItem? {
     return UserCommunityItem(
-        id, sortOrder, communitySortOrder, communityRef ?: return null, iconUrl
+        id,
+        sortOrder,
+        communitySortOrder,
+        communityRef ?: return null,
+        iconUrl,
     )
 }
-
 
 @ProvidedTypeConverter
 class UserCommunitiesConverters(private val moshi: Moshi) {

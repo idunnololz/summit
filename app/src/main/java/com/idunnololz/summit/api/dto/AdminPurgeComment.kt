@@ -1,8 +1,5 @@
 package com.idunnololz.summit.api.dto
 
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PostId
-
 data class AdminPurgeComment(
     val id: Int,
     val admin_person_id: PersonId,

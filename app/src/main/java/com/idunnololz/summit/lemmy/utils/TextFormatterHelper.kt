@@ -1,17 +1,9 @@
 package com.idunnololz.summit.lemmy.utils
 
-import android.net.Uri
 import android.view.View
 import android.widget.EditText
 import android.widget.PopupMenu
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentDirections
-import com.idunnololz.summit.util.ext.navigateSafe
 
 class TextFormatterHelper {
 
@@ -24,7 +16,7 @@ class TextFormatterHelper {
             "¯\\_(ツ)_/¯",
             "༼ つ ◕_◕ ༽つ",
             "ᕕ( ᐛ )ᕗ",
-            "(•_•) ( •_•)>⌐■-■ (⌐■_■)"
+            "(•_•) ( •_•)>⌐■-■ (⌐■_■)",
         )
     }
 
@@ -60,31 +52,31 @@ class TextFormatterHelper {
             spoiler.setOnClickListener {
                 editText.wrapTextAtCursor(
                     startText = "::: spoiler spoiler\n",
-                    endText = "\n:::"
+                    endText = "\n:::",
                 )
             }
             bold.setOnClickListener {
                 editText.wrapTextAtCursor(
                     startText = "**",
-                    endText = "**"
+                    endText = "**",
                 )
             }
             italic.setOnClickListener {
                 editText.wrapTextAtCursor(
                     startText = "*",
-                    endText = "*"
+                    endText = "*",
                 )
             }
             strikethrough.setOnClickListener {
                 editText.wrapTextAtCursor(
                     startText = "~~",
-                    endText = "~~"
+                    endText = "~~",
                 )
             }
             quote.setOnClickListener {
                 editText.wrapTextAtCursor(
                     startText = "> ",
-                    endText = ""
+                    endText = "",
                 )
             }
             bulletedList.setOnClickListener {
@@ -113,7 +105,7 @@ class TextFormatterHelper {
 
             linkApp.setOnClickListener {
                 editText.replaceTextAtCursor(
-                    "Play store link: [Summit for Lemmy](https://play.google.com/store/apps/details?id=com.idunnololz.summit)"
+                    "Play store link: [Summit for Lemmy](https://play.google.com/store/apps/details?id=com.idunnololz.summit)",
                 )
             }
         }
@@ -128,14 +120,14 @@ class TextFormatterHelper {
             start.coerceAtLeast(end),
             text,
             0,
-            text.length
+            text.length,
         )
     }
 
     private fun EditText.wrapTextAtCursor(
         startText: String,
         endText: String,
-        autoLineBreak: Boolean = false
+        autoLineBreak: Boolean = false,
     ) {
         val editText = this
         val start = editText.selectionStart.coerceAtLeast(0)

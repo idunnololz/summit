@@ -14,7 +14,6 @@ import androidx.appcompat.widget.PopupMenu
 import com.idunnololz.summit.R
 import com.idunnololz.summit.spans.CenteredImageSpan
 
-
 private val TAG = "PopupMenuExt"
 
 @SuppressLint("RestrictedApi")
@@ -44,7 +43,7 @@ fun PopupMenu.insertMenuIcons(context: Context) {
  */
 private fun insertMenuItemIcons(
     context: Context,
-    popupMenu: PopupMenu
+    popupMenu: PopupMenu,
 ) {
     val menu: Menu = popupMenu.menu
     if (hasIcon(menu)) {

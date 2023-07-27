@@ -70,7 +70,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             onCommunitySelected = onCommunitySelected,
             onDeleteUserCommunity = { id ->
                 viewModel.deleteUserCommunity(id)
-            }
+            },
         )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -96,7 +96,6 @@ class CommunitiesPaneController @AssistedInject constructor(
     }
 
     fun onShown() {
-
     }
 
     private class UserCommunitiesAdapter(
@@ -133,7 +132,6 @@ class CommunitiesPaneController @AssistedInject constructor(
             ) : Item
             object NoSubscriptionsItem : Item
 
-
             data class TabStateItem(
                 val parentKey: String,
                 val tab: TabsManager.Tab,
@@ -165,23 +163,23 @@ class CommunitiesPaneController @AssistedInject constructor(
                     Item.BookmarkHeaderItem -> true
                     is Item.BookmarkedCommunityItem ->
                         old.communityRef.getKey() ==
-                                (new as Item.BookmarkedCommunityItem).communityRef.getKey()
+                            (new as Item.BookmarkedCommunityItem).communityRef.getKey()
                     is Item.HomeCommunityItem ->
                         old.communityRef.getKey() ==
-                                (new as Item.HomeCommunityItem).communityRef.getKey()
+                            (new as Item.HomeCommunityItem).communityRef.getKey()
                     is Item.SubscribedCommunityItem ->
                         old.communityRef.getKey() ==
-                                (new as Item.SubscribedCommunityItem).communityRef.getKey()
+                            (new as Item.SubscribedCommunityItem).communityRef.getKey()
                     is Item.SubscriptionHeaderItem -> true
                     Item.NoSubscriptionsItem -> true
                     is Item.TabStateItem ->
                         old.parentKey == (new as Item.TabStateItem).parentKey
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.BookmarkHeaderItem::class,
-                inflateFn = BookmarkHeaderItemBinding::inflate
+                inflateFn = BookmarkHeaderItemBinding::inflate,
             ) { _, _, _ -> }
             addItemType(
                 clazz = Item.HomeCommunityItem::class,
@@ -199,7 +197,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             }
             addItemType(
                 clazz = Item.BookmarkedCommunityItem::class,
-                inflateFn = GenericCommunityItemBinding::inflate
+                inflateFn = GenericCommunityItemBinding::inflate,
             ) { item, b, h ->
                 b.icon.setImageResource(R.drawable.ic_subreddit_default)
                 b.selectedIndicator.visibility = if (item.isSelected) {
@@ -210,8 +208,11 @@ class CommunitiesPaneController @AssistedInject constructor(
                 if (item.communityRef is CommunityRef.Subscribed) {
                     b.icon.load(
                         context.getDrawableCompat(R.drawable.baseline_dynamic_feed_24)
-                            ?.tint(context.getColorFromAttribute(
-                                androidx.appcompat.R.attr.colorControlNormal))
+                            ?.tint(
+                                context.getColorFromAttribute(
+                                    androidx.appcompat.R.attr.colorControlNormal,
+                                ),
+                            ),
                     ) {}
                 } else {
                     offlineManager.fetchImage(h.itemView, item.iconUrl) {
@@ -243,7 +244,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             }
             addItemType(
                 clazz = Item.SubscriptionHeaderItem::class,
-                inflateFn = BookmarkedCommunityHeaderItemBinding::inflate
+                inflateFn = BookmarkedCommunityHeaderItemBinding::inflate,
             ) { item, b, h ->
                 if (item.isRefreshing) {
                     b.progressBar.visibility = View.VISIBLE
@@ -253,7 +254,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             }
             addItemType(
                 clazz = Item.SubscribedCommunityItem::class,
-                inflateFn = GenericCommunityItemBinding::inflate
+                inflateFn = GenericCommunityItemBinding::inflate,
             ) { item, b, h ->
                 b.icon.load(R.drawable.ic_subreddit_default)
                 offlineManager.fetchImage(h.itemView, item.iconUrl) {
@@ -272,11 +273,11 @@ class CommunitiesPaneController @AssistedInject constructor(
             }
             addItemType(
                 clazz = Item.NoSubscriptionsItem::class,
-                inflateFn = NoSubscriptionsItemBinding::inflate
+                inflateFn = NoSubscriptionsItemBinding::inflate,
             ) { _, _, _ -> }
             addItemType(
                 clazz = Item.TabStateItem::class,
-                inflateFn = TabStateItemBinding::inflate
+                inflateFn = TabStateItemBinding::inflate,
             ) { item, b, h ->
                 b.textView.text = item.tabState.currentCommunity.getName(context)
                 b.selectedIndicator.visibility = if (item.isSelected) {
@@ -324,7 +325,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                             "tabid:${userCommunity.id}",
                             tab,
                             it,
-                            isSelected
+                            isSelected,
                         )
                     }
                 }
@@ -351,9 +352,11 @@ class CommunitiesPaneController @AssistedInject constructor(
                 }
             }
 
-            newItems.add(Item.SubscriptionHeaderItem(
-                data.accountInfoUpdateState is StatefulData.Loading
-            ))
+            newItems.add(
+                Item.SubscriptionHeaderItem(
+                    data.accountInfoUpdateState is StatefulData.Loading,
+                ),
+            )
             if (data.subscriptionCommunities.isNotEmpty()) {
                 for (subscriptionCommunity in data.subscriptionCommunities) {
                     val isSelected = currentTab
@@ -369,7 +372,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                                 subscriptionCommunity.name,
                                 tab,
                                 tabState = it,
-                                isSelected = isSelected
+                                isSelected = isSelected,
                             )
                         }
                     }

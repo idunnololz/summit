@@ -30,7 +30,7 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -81,7 +81,7 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
             val adapter = UserBlockListAdapter(
                 onRemoveUser = {
                     viewModel.unblockPerson(it)
-                }
+                },
             )
             binding.recyclerView.setHasFixedSize(true)
             binding.recyclerView.adapter = adapter
@@ -107,7 +107,7 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
     }
 
     private class UserBlockListAdapter(
-        val onRemoveUser: (PersonId) -> Unit
+        val onRemoveUser: (PersonId) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         var data: List<BlockedPersonItem> = listOf()
@@ -120,7 +120,7 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
         private val adapterHelper = AdapterHelper<BlockedPersonItem>(
             areItemsTheSame = { old, new ->
                 old.blockedPerson.target.id == new.blockedPerson.target.id
-            }
+            },
         ).apply {
             addItemType(BlockedPersonItem::class, BlockListUserItemBinding::inflate) { item, b, h ->
                 b.icon.load(item.blockedPerson.target.avatar)
@@ -143,7 +143,7 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int  =
+        override fun getItemCount(): Int =
             adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
@@ -152,6 +152,5 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
         private fun refreshItems() {
             adapterHelper.setItems(data, this)
         }
-
     }
 }

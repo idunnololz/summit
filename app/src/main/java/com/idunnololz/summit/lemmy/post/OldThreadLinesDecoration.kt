@@ -65,13 +65,13 @@ class OldThreadLinesDecoration(
 
             for (lineIndex in 0 until totalDepth) {
                 val indent = view.left + (lineIndex.toFloat()) * distanceBetweenLinesUnit *
-                        threadLinesData.indentationPerLevel + startingPadding
+                    threadLinesData.indentationPerLevel + startingPadding
                 c.drawLine(
                     indent + translationX,
                     view.top.toFloat() - topOverdraw + translationY,
                     indent + translationX,
                     view.bottom.toFloat() + translationY,
-                    linePaint
+                    linePaint,
                 )
             }
         }

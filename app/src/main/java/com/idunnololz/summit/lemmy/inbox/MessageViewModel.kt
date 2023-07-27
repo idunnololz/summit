@@ -7,11 +7,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
-import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
@@ -56,7 +52,7 @@ class MessageViewModel @Inject constructor(
                     .fetchCommentsWithRetry(
                         Either.Right(topCommentId),
                         CommentSortType.Top,
-                        force
+                        force,
                     )
             }
 
@@ -78,14 +74,14 @@ class MessageViewModel @Inject constructor(
                 comments = commentResult.getOrNull(),
                 parentComment = true,
                 pendingComments = null,
-                supplementaryComments = mapOf()
+                supplementaryComments = mapOf(),
             )
 
             commentContext.postValue(
                 CommentContext(
                     requireNotNull(postResult.getOrNull()),
                     tree.first(),
-                )
+                ),
             )
         }
     }

@@ -12,4 +12,6 @@
         <attr name="prefix" format="string" />
     </declare-styleable>
 
+    <attr name="textColorNormal" format="color"/>
+
 </resources>

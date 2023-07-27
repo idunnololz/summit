@@ -8,9 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.button.MaterialButton
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
+import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.view.LemmyHeaderView
 
@@ -65,6 +67,27 @@ class ListingItemViewHolder(
                 createCommentButton = null,
             )
 
+        fun fromBinding(binding: ListingItemLargeListBinding) =
+            ListingItemViewHolder(
+                rawBinding = binding,
+                root = binding.root,
+                headerContainer = binding.headerContainer,
+                image = binding.image,
+                title = binding.title,
+                commentText = binding.commentButton,
+                commentButton = binding.commentButton,
+                upvoteCount = binding.upvoteCount,
+                upvoteButton = binding.upvoteButton,
+                downvoteButton = binding.downvoteButton,
+                linkTypeImage = null,
+                iconImage = null,
+                openLinkButton = binding.openLinkButton,
+                fullContentContainerView = null,
+                highlightBg = binding.highlightBg,
+                layoutShowsFullContent = false,
+                createCommentButton = null,
+            )
+
         fun fromBinding(binding: ListingItemCardBinding) =
             ListingItemViewHolder(
                 rawBinding = binding,
@@ -87,6 +110,27 @@ class ListingItemViewHolder(
             )
 
         fun fromBinding(binding: ListingItemCard2Binding) =
+            ListingItemViewHolder(
+                rawBinding = binding,
+                root = binding.root,
+                headerContainer = binding.headerContainer,
+                image = binding.image,
+                title = binding.title,
+                commentText = binding.commentButton,
+                commentButton = binding.commentButton,
+                upvoteCount = binding.upvoteCount,
+                upvoteButton = binding.upvoteButton,
+                downvoteButton = binding.downvoteButton,
+                linkTypeImage = null,
+                iconImage = null,
+                openLinkButton = binding.openLinkButton,
+                fullContentContainerView = null,
+                highlightBg = binding.highlightBg,
+                layoutShowsFullContent = false,
+                createCommentButton = null,
+            )
+
+        fun fromBinding(binding: ListingItemCard3Binding) =
             ListingItemViewHolder(
                 rawBinding = binding,
                 root = binding.root,

@@ -51,7 +51,7 @@ class TabsManager @Inject constructor(
             },
             {
                 it.toTab()
-            }
+            },
         )
 
     fun updateCurrentTab(tabObj: Either<UserCommunityItem, CommunityRef>) {
@@ -74,7 +74,7 @@ class TabsManager @Inject constructor(
 
     fun updateTabState(tab: Tab, communityRef: CommunityRef) {
         val newTabState = (tabState[tab] ?: makeDefaultState(tab)).copy(
-            currentCommunity = communityRef
+            currentCommunity = communityRef,
         )
         tabState[tab] = newTabState
 
@@ -90,17 +90,17 @@ class TabsManager @Inject constructor(
 
         @Parcelize
         data class UserCommunityTab(
-            val userCommunityItem: UserCommunityItem
+            val userCommunityItem: UserCommunityItem,
         ) : Tab
 
         @Parcelize
         data class SubscribedCommunityTab(
-            val subscribedCommunity: CommunityRef
+            val subscribedCommunity: CommunityRef,
         ) : Tab
     }
 
     data class TabState(
-        val currentCommunity: CommunityRef
+        val currentCommunity: CommunityRef,
     )
 }
 
@@ -122,7 +122,6 @@ val TabsManager.Tab.isHomeTab: Boolean
         is TabsManager.Tab.UserCommunityTab ->
             this.userCommunityItem.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID
     }
-
 
 fun TabsManager.Tab.hasTabId(id: Long): Boolean =
     when (this) {

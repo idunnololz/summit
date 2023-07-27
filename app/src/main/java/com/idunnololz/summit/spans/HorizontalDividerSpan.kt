@@ -15,7 +15,7 @@ class HorizontalDividerSpan : ReplacementSpan() {
         text: CharSequence?,
         start: Int,
         end: Int,
-        fm: Paint.FontMetricsInt?
+        fm: Paint.FontMetricsInt?,
     ): Int = dividerTotalSize
 
     override fun draw(
@@ -27,7 +27,7 @@ class HorizontalDividerSpan : ReplacementSpan() {
         top: Int,
         y: Int,
         bottom: Int,
-        paint: Paint
+        paint: Paint,
     ) {
         val oldStyle = paint.style
 
@@ -38,5 +38,4 @@ class HorizontalDividerSpan : ReplacementSpan() {
 
         paint.style = oldStyle
     }
-
 }

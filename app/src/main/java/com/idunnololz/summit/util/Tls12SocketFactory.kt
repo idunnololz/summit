@@ -56,7 +56,7 @@ class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFact
         host: String,
         port: Int,
         localHost: InetAddress,
-        localPort: Int
+        localPort: Int,
     ): Socket? {
         return delegate.createSocket(host, port, localHost, localPort)
             .patchForTls12()
@@ -73,7 +73,7 @@ class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFact
         address: InetAddress,
         port: Int,
         localAddress: InetAddress,
-        localPort: Int
+        localPort: Int,
     ): Socket? {
         return delegate.createSocket(address, port, localAddress, localPort)
             .patchForTls12()
@@ -114,7 +114,7 @@ fun OkHttpClient.Builder.enableTls12(): OkHttpClient.Builder = apply {
 
             sslSocketFactory(
                 Tls12SocketFactory(sslContext.socketFactory),
-                trustManager
+                trustManager,
             )
         } catch (e: Exception) {
             Log.e("Tls12SocketFactory", "Error while setting TLS 1.2 compatibility", e)

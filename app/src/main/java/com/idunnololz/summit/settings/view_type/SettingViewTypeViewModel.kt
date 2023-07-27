@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewTypeViewModel @Inject constructor(
-    private val preferences: Preferences
+    private val preferences: Preferences,
 ) : ViewModel() {
 
     var currentPostUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()

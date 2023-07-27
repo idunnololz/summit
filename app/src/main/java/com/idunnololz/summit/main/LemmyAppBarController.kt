@@ -14,11 +14,10 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.databinding.CustomAppBarBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
-import com.idunnololz.summit.lemmy.toApiSortOrder
 
 class LemmyAppBarController(
     private val mainActivity: MainActivity,
-    private val binding: CustomAppBarBinding
+    private val binding: CustomAppBarBinding,
 ) {
 
     private val TAG = "RedditAppBarController"
@@ -89,7 +88,7 @@ class LemmyAppBarController(
 
     fun setPageIndex(
         pageIndex: Int,
-        onPageSelectedListener: (pageIndex: Int) -> Unit
+        onPageSelectedListener: (pageIndex: Int) -> Unit,
     ) {
         binding.communitySortOrder.visibility = View.GONE
 
@@ -156,7 +155,7 @@ class LemmyAppBarController(
                                 context.getString(R.string.time_frame_this_year)
                             CommunitySortOrder.TimeFrame.AllTime ->
                                 context.getString(R.string.time_frame_all_time)
-                        }
+                        },
                     )
             }
     }

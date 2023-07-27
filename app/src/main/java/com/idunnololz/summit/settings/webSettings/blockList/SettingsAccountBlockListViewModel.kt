@@ -13,7 +13,6 @@ import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,8 +48,8 @@ class SettingsAccountBlockListViewModel @Inject constructor(
 
                     if (account == null) {
                         RuntimeException(
-                            "Unable to find account that matches the account info fetched.").let {
-
+                            "Unable to find account that matches the account info fetched.",
+                        ).let {
                             userBlockList.postError(it)
                             communityBlockList.postError(it)
                         }
@@ -123,7 +122,6 @@ class SettingsAccountBlockListViewModel @Inject constructor(
         userBlockList.postValue(blockedPersonItems ?: listOf())
         communityBlockList.postValue(blockedCommunityItems ?: listOf())
     }
-
 
     data class BlockedPersonItem(
         val blockedPerson: PersonBlockView,

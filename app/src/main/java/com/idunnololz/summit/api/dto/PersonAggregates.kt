@@ -11,4 +11,4 @@ data class PersonAggregates(
     val post_score: Int,
     val comment_count: Int,
     val comment_score: Int,
-): Parcelable
+) : Parcelable

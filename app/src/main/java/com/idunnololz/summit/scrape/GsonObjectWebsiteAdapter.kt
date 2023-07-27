@@ -1,20 +1,17 @@
 package com.idunnololz.summit.scrape
 
 import android.util.Log
-
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.JsonSyntaxException
 import com.idunnololz.summit.util.Utils
-
 import org.json.JSONException
-
 import java.io.IOException
 import java.lang.reflect.Type
 
 open class GsonObjectWebsiteAdapter<T : Any>(
     private var obj: T,
     private val type: Type,
-    private val isSourceGzipped: Boolean
+    private val isSourceGzipped: Boolean,
 ) : WebsiteAdapter<T>() {
 
     companion object {

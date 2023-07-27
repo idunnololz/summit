@@ -38,16 +38,15 @@ import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommentsBinding>(),
+class SettingPostAndCommentsFragment :
+    BaseFragment<FragmentSettingPostAndCommentsBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener,
     SettingValueUpdateCallback {
 
@@ -62,7 +61,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -88,15 +87,17 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
             supportActionBar?.title = context.getString(R.string.post_and_comments)
         }
 
-        binding.root.viewTreeObserver.addOnPreDrawListener(object :
-            ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                binding.root.viewTreeObserver.removeOnPreDrawListener(this)
+        binding.root.viewTreeObserver.addOnPreDrawListener(
+            object :
+                ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    binding.root.viewTreeObserver.removeOnPreDrawListener(this)
 
-                setup()
-                return false
-            }
-        })
+                    setup()
+                    return false
+                }
+            },
+        )
     }
 
     fun setup() {
@@ -145,6 +146,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
             getString(R.string.font_size),
             0.2f,
             3f,
+            0.1f,
         ).bindTo(
             binding.textScalingSetting1,
             { viewModel.currentPostAndCommentUiConfig.postUiConfig.textSizeMultiplier },
@@ -153,16 +155,17 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     viewModel.currentPostAndCommentUiConfig.copy(
                         postUiConfig = viewModel.currentPostAndCommentUiConfig
                             .postUiConfig
-                            .updateTextSizeMultiplier(it)
+                            .updateTextSizeMultiplier(it),
                     )
 
                 updateRendering()
-            }
+            },
         )
         SliderSettingItem(
             getString(R.string.font_size),
             0.2f,
             3f,
+            0.1f,
         ).bindTo(
             binding.textScalingSetting2,
             { viewModel.currentPostAndCommentUiConfig.commentUiConfig.textSizeMultiplier },
@@ -171,17 +174,17 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     viewModel.currentPostAndCommentUiConfig.copy(
                         commentUiConfig = viewModel.currentPostAndCommentUiConfig
                             .commentUiConfig
-                            .updateTextSizeMultiplier(it)
+                            .updateTextSizeMultiplier(it),
                     )
 
                 updateRendering()
-            }
+            },
         )
         SliderSettingItem(
             getString(R.string.indentation_per_level),
             0f,
             32f,
-            stepSize = 1f
+            stepSize = 1f,
         ).bindTo(
             binding.indentationPerLevel,
             { viewModel.currentPostAndCommentUiConfig.commentUiConfig.indentationPerLevelDp.toFloat() },
@@ -190,11 +193,11 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     viewModel.currentPostAndCommentUiConfig.copy(
                         commentUiConfig = viewModel.currentPostAndCommentUiConfig
                             .commentUiConfig
-                            .updateIndentationPerLevelDp(it)
+                            .updateIndentationPerLevelDp(it),
                     )
 
                 updateRendering()
-            }
+            },
         )
 
         settings.showCommentActions.bindTo(
@@ -204,7 +207,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                 viewModel.preferences.hideCommentActions = !it
 
                 updateRendering()
-            }
+            },
         )
 
         settings.tapCommentToCollapse.bindTo(
@@ -214,7 +217,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                 viewModel.preferences.tapCommentToCollapse = it
 
                 updateRendering()
-            }
+            },
         )
 
         settings.commentsThreadStyle.bindTo(
@@ -223,7 +226,17 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
+        )
+
+        settings.alwaysShowLinkBelowPost.bindTo(
+            binding.alwaysShowLinkBelowPost,
+            { viewModel.preferences.alwaysShowLinkButtonBelowPost },
+            {
+                viewModel.preferences.alwaysShowLinkButtonBelowPost = it
+
+                updateRendering()
+            },
         )
     }
 
@@ -282,7 +295,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                     else ->
                         false
                 }
-            }
+            },
         )
 
         init {
@@ -292,7 +305,11 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
 
         fun refresh() {
             adapterHelper.resetItemTypes()
-            adapterHelper.addItemType(PostView::class, PostHeaderItemBinding::inflate) { item, b, h ->
+            adapterHelper.addItemType(
+                clazz = PostView::class,
+                inflateFn = PostHeaderItemBinding::inflate,
+            ) { item, b, _ ->
+
                 postAndCommentViewBuilder.bindPostView(
                     b,
                     container = container,
@@ -315,14 +332,22 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                 )
             }
             if (preferences.hideCommentActions) {
-                adapterHelper.addItemType(CommentView::class, PostCommentExpandedCompactItemBinding::inflate) { item, b, h ->
+                adapterHelper.addItemType(
+                    clazz = CommentView::class,
+                    inflateFn = PostCommentExpandedCompactItemBinding::inflate,
+                ) { item, b, h ->
 
                     b.headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        R.drawable.baseline_arrow_upward_16, 0, 0, 0)
+                        R.drawable.baseline_arrow_upward_16,
+                        0,
+                        0,
+                        0,
+                    )
                     b.headerView.textView2.compoundDrawablePadding =
                         Utils.convertDpToPixel(4f).toInt()
                     b.headerView.textView2.updatePaddingRelative(
-                        start = Utils.convertDpToPixel(8f).toInt())
+                        start = Utils.convertDpToPixel(8f).toInt(),
+                    )
 
                     postAndCommentViewBuilder.bindCommentViewExpanded(
                         h = h,
@@ -357,11 +382,15 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
                         onCommentMoreClick = {},
-                        onLinkLongClick = { _, _ -> }
+                        onLinkLongClick = { _, _ -> },
                     )
                 }
             } else {
-                adapterHelper.addItemType(CommentView::class, PostCommentExpandedItemBinding::inflate) { item, b, h ->
+                adapterHelper.addItemType(
+                    clazz = CommentView::class,
+                    inflateFn = PostCommentExpandedItemBinding::inflate,
+                ) { item, b, h ->
+
                     postAndCommentViewBuilder.bindCommentViewExpanded(
                         h = h,
                         binding = CommentExpandedViewHolder.fromBinding(b),
@@ -395,7 +424,7 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
                         onCommentMoreClick = {},
-                        onLinkLongClick = { _, _ -> }
+                        onLinkLongClick = { _, _ -> },
                     )
                 }
             }
@@ -417,13 +446,10 @@ class SettingPostAndCommentsFragment : BaseFragment<FragmentSettingPostAndCommen
         if (tag == "reset_post_to_default_styles") {
             viewModel.resetPostUiConfig()
         } else if (tag == "reset_comment_to_default_styles") {
-            viewModel.preferences.reset(PreferenceUtil.KEY_COMMENT_THREAD_STYLE)
-            viewModel.preferences.reset(PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS)
             viewModel.resetCommentUiConfig()
         }
     }
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
-
     }
 }

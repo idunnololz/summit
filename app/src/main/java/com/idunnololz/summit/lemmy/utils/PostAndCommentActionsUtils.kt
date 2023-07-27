@@ -19,7 +19,6 @@ fun BaseFragment<*>.installOnActionResultHandler(
     onSaveCommentChanged: ((CommentView) -> Unit)? = null,
     getSnackbarOffset: (() -> Int)? = null,
 ) {
-
     fun Snackbar.setup(): Snackbar =
         apply {
             if (getSnackbarOffset != null) {
@@ -36,20 +35,22 @@ fun BaseFragment<*>.installOnActionResultHandler(
                 ErrorDialogFragment.show(
                     getString(R.string.unable_to_save_post),
                     it.error,
-                    childFragmentManager
+                    childFragmentManager,
                 )
             }
             is StatefulData.Loading -> {}
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {
                 actionsViewModel.savePostResult.setIdle()
-                Snackbar.make(snackbarContainer,
+                Snackbar.make(
+                    snackbarContainer,
                     if (it.data.saved) {
                         R.string.post_saved
                     } else {
                         R.string.post_removed_from_saved
-                    }
-                    , Snackbar.LENGTH_SHORT)
+                    },
+                    Snackbar.LENGTH_SHORT,
+                )
                     .setup()
                     .show()
 
@@ -64,19 +65,22 @@ fun BaseFragment<*>.installOnActionResultHandler(
                 ErrorDialogFragment.show(
                     getString(R.string.unable_to_save_comment),
                     it.error,
-                    childFragmentManager
+                    childFragmentManager,
                 )
             }
             is StatefulData.Loading -> {}
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {
                 actionsViewModel.saveCommentResult.setIdle()
-                Snackbar.make(snackbarContainer,
+                Snackbar.make(
+                    snackbarContainer,
                     if (it.data.saved) {
                         R.string.comment_saved
                     } else {
                         R.string.comment_removed_from_saved
-                    }, Snackbar.LENGTH_SHORT)
+                    },
+                    Snackbar.LENGTH_SHORT,
+                )
                     .setup()
                     .show()
 

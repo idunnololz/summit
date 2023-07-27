@@ -10,8 +10,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:animateLayoutChanges="true">
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -38,10 +37,7 @@
                     android:id="@+id/gesture_actions"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/post_actions"
@@ -51,37 +47,31 @@
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
                     android:paddingTop="@dimen/padding_two"
-                    style="@style/SettingHeaderStyle"
-                    app:layout_constraintTop_toBottomOf="@+id/gesture_actions"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    style="@style/SettingHeaderStyle"/>
 
                 <include
                     android:id="@+id/post_gesture_action_1"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/post_actions"/>
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/post_gesture_action_2"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/gesture_action_1"/>
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/post_gesture_action_3"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/gesture_action_2"/>
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/post_gesture_size"
+                    layout="@layout/slider_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/comment_actions"
@@ -91,37 +81,28 @@
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
                     android:paddingTop="@dimen/padding_two"
-                    style="@style/SettingHeaderStyle"
-                    app:layout_constraintTop_toBottomOf="@+id/gesture_actions"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    style="@style/SettingHeaderStyle"/>
 
                 <include
                     android:id="@+id/comment_gesture_action_1"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/post_actions"/>
-
+                    android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/comment_gesture_action_2"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/gesture_action_1"/>
-
+                    android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/comment_gesture_action_3"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/gesture_action_2"/>
+                    android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/comment_gesture_size"
+                    layout="@layout/slider_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

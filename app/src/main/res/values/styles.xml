@@ -260,6 +260,13 @@
         <item name="textAppearanceLabelSmall">@style/TextAppearance.App.ExtraLarge.LabelSmall</item>
     </style>
 
+    <style name="TextColor">
+        <item name="textColorNormal">@color/colorText</item>
+    </style>
+    <style name="TextColor.HighContrast">
+        <item name="textColorNormal">@color/colorTextTitle</item>
+    </style>
+
     <style name="Theme.App.Dialog.Alert.Transparent">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
@@ -273,9 +280,9 @@
         <item name="android:background">?backgroundColor</item>
     </style>
 
-    <style name="MyApp.Widget.MaterialComponents.Button.TextButton.Icon" parent="Widget.MaterialComponents.Button.TextButton.Icon">
-        <item name="android:textColor">@color/colorTextTitle</item>
-        <item name="iconTint">@color/colorTextTitle</item>
+    <style name="MyApp.Widget.MaterialComponents.Button.TextButton.Icon" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="iconTint">@color/colorText</item>
     </style>
 
     <style name="MyApp.Widget.AppCompat.ImageButton" parent="Widget.AppCompat.ImageButton">

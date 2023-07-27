@@ -1,25 +1,20 @@
 package com.idunnololz.summit.settings.dialogs
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.DialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentBottomMenuBinding
-import com.idunnololz.summit.databinding.DialogFragmentTextValueBinding
 import com.idunnololz.summit.settings.RadioGroupSettingItem
-import com.idunnololz.summit.settings.SettingItem
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.getParcelableCompat
 
-class MultipleChoiceDialogFragment : BaseDialogFragment<DialogFragmentBottomMenuBinding>(),
+class MultipleChoiceDialogFragment :
+    BaseDialogFragment<DialogFragmentBottomMenuBinding>(),
     FullscreenDialogFragment {
 
     companion object {
@@ -34,7 +29,6 @@ class MultipleChoiceDialogFragment : BaseDialogFragment<DialogFragmentBottomMenu
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
 
         setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
@@ -54,7 +48,7 @@ class MultipleChoiceDialogFragment : BaseDialogFragment<DialogFragmentBottomMenu
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -67,7 +61,8 @@ class MultipleChoiceDialogFragment : BaseDialogFragment<DialogFragmentBottomMenu
         super.onViewCreated(view, savedInstanceState)
 
         val settingItem = requireArguments().getParcelableCompat<RadioGroupSettingItem>(
-            ARG_SETTING_ITEM)
+            ARG_SETTING_ITEM,
+        )
 
         if (settingItem == null) {
             dismiss()

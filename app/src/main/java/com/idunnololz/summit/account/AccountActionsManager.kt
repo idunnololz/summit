@@ -7,16 +7,17 @@ import android.widget.TextView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.AccountInstanceMismatchException
-import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PendingCommentsManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.actions.VotesManager
+import com.idunnololz.summit.api.AccountInstanceMismatchException
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
@@ -25,7 +26,6 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
-import com.idunnololz.summit.lemmy.LemmyUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -126,25 +126,28 @@ class AccountActionsManager @Inject constructor(
 
             registration.voteCurrent(
                 score = votesManager.getVote(ref) ?: 0,
-                totalScore = votesManager.getScore(ref) ?: 0
+                totalScore = votesManager.getScore(ref) ?: 0,
             )
 
-            Log.d(TAG, "Binding vote handler - ${ref}")
+            Log.d(TAG, "Binding vote handler - $ref")
 
             scoreView.text = LemmyUtils.abbrevNumber(
-                votesManager.getScore(ref)?.toLong() ?: currentScore.toLong())
+                votesManager.getScore(ref)?.toLong() ?: currentScore.toLong(),
+            )
 
-            lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
-                override fun onDestroy(owner: LifecycleOwner) {
-                    Log.d(TAG, "Lifecycle onDestroy. Unbinding - ${ref}")
+            lifecycleOwner.lifecycle.addObserver(
+                object : DefaultLifecycleObserver {
+                    override fun onDestroy(owner: LifecycleOwner) {
+                        Log.d(TAG, "Lifecycle onDestroy. Unbinding - $ref")
 
-                    lifecycleOwner.lifecycle.removeObserver(this)
+                        lifecycleOwner.lifecycle.removeObserver(this)
 
-                    unbindVoteUi(scoreView)
-                    upVoteView?.setOnClickListener(null)
-                    downVoteView?.setOnClickListener(null)
-                }
-            })
+                        unbindVoteUi(scoreView)
+                        upVoteView?.setOnClickListener(null)
+                        downVoteView?.setOnClickListener(null)
+                    }
+                },
+            )
         }
 
         override fun unbindVoteUi(scoreView: View) {
@@ -163,7 +166,7 @@ class AccountActionsManager @Inject constructor(
                     voteRefToRegistrations[action.info.ref]?.forEach {
                         it.votePending(
                             pendingScore = action.info.dir,
-                            totalScore = votesManager.getScore(action.info.ref) ?: 0
+                            totalScore = votesManager.getScore(action.info.ref) ?: 0,
                         )
                     }
                 }
@@ -208,7 +211,7 @@ class AccountActionsManager @Inject constructor(
                         it.voteFailed(
                             score = votesManager.getVote(action.info.ref) ?: 0,
                             totalScore = votesManager.getScore(action.info.ref) ?: 0,
-                            e = LemmyActionFailureException(reason)
+                            e = LemmyActionFailureException(reason),
                         )
                     }
                 }
@@ -223,7 +226,7 @@ class AccountActionsManager @Inject constructor(
                         pendingCommentsManager.onDeleteCommentActionFailed(
                             id = action.id,
                             info = action.info,
-                            reason = reason
+                            reason = reason,
                         )
                         onCommentActionChanged.emit(Unit)
                     }
@@ -265,7 +268,7 @@ class AccountActionsManager @Inject constructor(
 
                                 votesManager.setScore(voteRef, it.counts.score)
                                 it.counts.score
-                            }
+                            },
                         )
 
                     votesManager.setVote(action.info.ref, action.info.dir)
@@ -307,11 +310,13 @@ class AccountActionsManager @Inject constructor(
     }
 
     init {
-        accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
-            override suspend fun onAccountChanged(newAccount: Account?) {
-                votesManager.reset()
-            }
-        })
+        accountManager.addOnAccountChangedListener(
+            object : AccountManager.OnAccountChangedListener {
+                override suspend fun onAccountChanged(newAccount: Account?) {
+                    votesManager.reset()
+                }
+            },
+        )
 
         pendingActionsManager.addActionCompleteListener(onActionChangedListener)
     }

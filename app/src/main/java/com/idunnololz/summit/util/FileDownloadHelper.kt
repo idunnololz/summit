@@ -300,7 +300,7 @@ object FileDownloadHelper {
         destFileName: String,
         url: String?,
         cacheFile: File? = null,
-        mimeType: String? = null
+        mimeType: String? = null,
     ): Result<DownloadResult> {
         val context = c.applicationContext
         val mimeType = mimeType
@@ -378,9 +378,14 @@ object FileDownloadHelper {
 
         val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Uri.parse(uriOrFilePath).also { uri ->
-                context.contentResolver.update(uri, ContentValues().apply {
-                    put(MediaStore.DownloadColumns.IS_PENDING, 0)
-                }, null, null)
+                context.contentResolver.update(
+                    uri,
+                    ContentValues().apply {
+                        put(MediaStore.DownloadColumns.IS_PENDING, 0)
+                    },
+                    null,
+                    null,
+                )
             }
         } else {
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -391,7 +396,8 @@ object FileDownloadHelper {
                 mimeType,
                 uriOrFilePath,
                 File(uriOrFilePath).length(),
-                true)
+                true,
+            )
             downloadManager.getUriForDownloadedFile(id)
         }
 
@@ -403,6 +409,6 @@ object FileDownloadHelper {
     data class DownloadResult(
         val uri: Uri,
         val filePath: String?,
-        val mimeType: String?
+        val mimeType: String?,
     )
 }

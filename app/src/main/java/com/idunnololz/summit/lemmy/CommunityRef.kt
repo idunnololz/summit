@@ -9,10 +9,8 @@ import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.utils.instance
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
-import java.util.Locale
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface CommunityRef : PageRef, Parcelable {
@@ -37,7 +35,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
     @JsonClass(generateAdapter = true)
     @TypeLabel("2")
     data class Local(
-        val instance: String?
+        val instance: String?,
     ) : CommunityRef
 
     @Parcelize
@@ -45,7 +43,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
     @TypeLabel("3")
     data class All(
         @Json(name = "site")
-        val instance: String? = null
+        val instance: String? = null,
     ) : CommunityRef
 
     @Parcelize
@@ -59,16 +57,16 @@ sealed interface CommunityRef : PageRef, Parcelable {
         val fullName: String
             get() {
                 if (instance == null) {
-                    return "${name}@"
+                    return "$name@"
                 }
-                return "${name}@${instance}"
+                return "$name@$instance"
             }
 
         fun getServerId(): String {
             if (instance == null) {
-                return "${name}@"
+                return "$name@"
             }
-            return "${name}@${instance}"
+            return "$name@$instance"
         }
     }
 

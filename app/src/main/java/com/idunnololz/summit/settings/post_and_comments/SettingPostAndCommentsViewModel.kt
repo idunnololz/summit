@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingPostAndCommentsViewModel @Inject constructor(
-    val preferences: Preferences
+    val preferences: Preferences,
 ) : ViewModel() {
 
     var currentPostAndCommentUiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()
@@ -37,14 +37,14 @@ class SettingPostAndCommentsViewModel @Inject constructor(
 
     fun resetPostUiConfig() {
         currentPostAndCommentUiConfig = currentPostAndCommentUiConfig.copy(
-            postUiConfig = getDefaultPostAndCommentsUiConfig().postUiConfig
+            postUiConfig = getDefaultPostAndCommentsUiConfig().postUiConfig,
         )
         onPostUiChanged.value = Unit
     }
 
     fun resetCommentUiConfig() {
         currentPostAndCommentUiConfig = currentPostAndCommentUiConfig.copy(
-            commentUiConfig = getDefaultPostAndCommentsUiConfig().commentUiConfig
+            commentUiConfig = getDefaultPostAndCommentsUiConfig().commentUiConfig,
         )
         onPostUiChanged.value = Unit
     }

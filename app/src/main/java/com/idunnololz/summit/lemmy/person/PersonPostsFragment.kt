@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
-import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
 import com.idunnololz.summit.lemmy.community.Item
@@ -31,6 +30,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
 
     @Inject
     lateinit var postListViewBuilder: PostListViewBuilder
+
     @Inject
     lateinit var preferences: Preferences
 
@@ -58,9 +58,11 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                 AlertDialogFragment.Builder()
                     .setTitle(R.string.error_account_instance_mismatch_title)
                     .setMessage(
-                        getString(R.string.error_account_instance_mismatch,
+                        getString(
+                            R.string.error_account_instance_mismatch,
                             accountInstance,
-                            apiInstance)
+                            apiInstance,
+                        ),
                     )
                     .setNegativeButton(R.string.go_to_account_instance)
                     .createAndShow(childFragmentManager, "onInstanceMismatch")
@@ -71,7 +73,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     appBar = parentFragment.binding.appBar,
                     title = postView.post.name,
                     url = url,
-                    mimeType = null
+                    mimeType = null,
                 )
             },
             onVideoClick = { url, videoType, state ->
@@ -87,11 +89,11 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     post,
                     jumpToComments,
                     reveal,
-                    videoState ->
+                    videoState, ->
 
                 parentFragment.viewPagerController?.openPost(
                     instance = instance,
-                    id =  id,
+                    id = id,
                     reveal = reveal,
                     post = post,
                     jumpToComments = jumpToComments,
@@ -120,7 +122,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -179,13 +181,15 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
         with(binding) {
             recyclerView.layoutManager = layoutManager
 
-            binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
+            binding.recyclerView.addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
 
-                    checkIfFetchNeeded()
-                }
-            })
+                        checkIfFetchNeeded()
+                    }
+                },
+            )
 
             swipeRefreshLayout.setOnRefreshListener {
                 parentFragment.viewModel.fetchPage(0, true, true)

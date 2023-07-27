@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.community
 
 import android.os.Parcelable
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.lemmy.CommunityRef
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 
@@ -15,10 +14,10 @@ data class LoadedPostsData(
     val hasMore: Boolean,
     val isReadPostUpdate: Boolean = true,
     val error: PostLoadError? = null,
-): Parcelable
+) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class PostLoadError(
-    val errorCode: Int
-): Parcelable
+    val errorCode: Int,
+) : Parcelable

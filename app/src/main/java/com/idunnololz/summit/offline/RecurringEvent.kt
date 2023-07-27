@@ -3,7 +3,7 @@ package com.idunnololz.summit.offline
 data class RecurringEvent(
     val daysOfWeek: List<Int>,
     val hourOfDay: Int,
-    val minuteOfHour: Int
+    val minuteOfHour: Int,
 ) {
     fun serializeToString(): String = buildString {
         append(hourOfDay)
@@ -22,7 +22,7 @@ data class RecurringEvent(
             RecurringEvent(
                 daysOfWeek = tokens.drop(2).map { it.toInt() },
                 hourOfDay = tokens[0].toInt(),
-                minuteOfHour = tokens[1].toInt()
+                minuteOfHour = tokens[1].toInt(),
             )
         }
     }

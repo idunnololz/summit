@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.util.StatefulLiveData

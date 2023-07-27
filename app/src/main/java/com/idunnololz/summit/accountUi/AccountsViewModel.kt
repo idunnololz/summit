@@ -1,6 +1,5 @@
-package com.idunnololz.summit.account_ui
+package com.idunnololz.summit.accountUi
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account

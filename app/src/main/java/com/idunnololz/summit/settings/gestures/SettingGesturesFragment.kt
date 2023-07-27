@@ -10,33 +10,34 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.GestureSettings
 import com.idunnololz.summit.settings.OnOffSettingItem
-import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.ui.bindTo
-import com.idunnololz.summit.settings.ui.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
+class SettingGesturesFragment :
+    BaseFragment<FragmentSettingGesturesBinding>(),
     SettingValueUpdateCallback {
 
     @Inject
     lateinit var preferences: Preferences
+
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
     @Inject
     lateinit var settings: GestureSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -70,8 +71,6 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
     }
 
     private fun updateRendering() {
-        val context = requireContext()
-
         OnOffSettingItem(
             null,
             getString(R.string.use_gesture_actions),
@@ -86,9 +85,8 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
                 postAndCommentViewBuilder.onPreferencesChanged()
 
                 updateRendering()
-            }
+            },
         )
-
 
         settings.postGestureAction1.bindTo(
             binding.postGestureAction1,
@@ -96,7 +94,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
 
         settings.postGestureAction2.bindTo(
@@ -105,7 +103,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
 
         settings.postGestureAction3.bindTo(
@@ -114,11 +112,17 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
+        settings.postGestureSize.bindTo(
+            binding.postGestureSize,
+            { preferences.postGestureSize },
+            {
+                preferences.postGestureSize = it
 
-
-
+                updateRendering()
+            },
+        )
 
         settings.commentGestureAction1.bindTo(
             binding.commentGestureAction1,
@@ -126,7 +130,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
 
         settings.commentGestureAction2.bindTo(
@@ -135,7 +139,7 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
 
         settings.commentGestureAction3.bindTo(
@@ -144,7 +148,16 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
+        )
+        settings.commentGestureSize.bindTo(
+            binding.commentGestureSize,
+            { preferences.commentGestureSize },
+            {
+                preferences.commentGestureSize = it
+
+                updateRendering()
+            },
         )
     }
 
@@ -158,6 +171,15 @@ class SettingGesturesFragment : BaseFragment<FragmentSettingGesturesBinding>(),
             }
             settings.postGestureAction3.id -> {
                 preferences.postGestureAction3 = value as Int
+            }
+            settings.commentGestureAction1.id -> {
+                preferences.commentGestureAction1 = value as Int
+            }
+            settings.commentGestureAction2.id -> {
+                preferences.commentGestureAction2 = value as Int
+            }
+            settings.commentGestureAction3.id -> {
+                preferences.commentGestureAction3 = value as Int
             }
         }
 

@@ -69,7 +69,6 @@ abstract class AccountInfoDao {
     abstract suspend fun delete(accountId: Int)
 }
 
-
 @ProvidedTypeConverter
 class AccountInfoConverters(private val moshi: Moshi) {
 
@@ -80,7 +79,8 @@ class AccountInfoConverters(private val moshi: Moshi) {
     @TypeConverter
     fun subscriptionsToString(value: List<AccountSubscription>): String {
         return moshi.adapter<List<AccountSubscription>>(
-            Types.newParameterizedType(List::class.java, AccountSubscription::class.java))
+            Types.newParameterizedType(List::class.java, AccountSubscription::class.java),
+        )
             .toJson(value)
     }
 
@@ -88,7 +88,8 @@ class AccountInfoConverters(private val moshi: Moshi) {
     fun stringToSubscriptions(value: String): List<AccountSubscription>? =
         try {
             moshi.adapter<List<AccountSubscription>>(
-                Types.newParameterizedType(List::class.java, AccountSubscription::class.java))
+                Types.newParameterizedType(List::class.java, AccountSubscription::class.java),
+            )
                 .fromJson(value)
         } catch (e: Exception) {
             Log.e(TAG, "", e)

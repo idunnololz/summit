@@ -50,7 +50,7 @@ data class LemmyAction(
     @ColumnInfo(name = "cts")
     val creationTs: Long,
     @ColumnInfo(name = "info")
-    val info: ActionInfo?
+    val info: ActionInfo?,
 )
 
 @ProvidedTypeConverter
@@ -190,33 +190,28 @@ sealed interface ActionInfo {
             is VoteActionInfo -> this.copy(retries = this.retries + 1)
             is MarkPostAsReadActionInfo -> this.copy(retries = this.retries + 1)
         }
-
 }
 
-interface LemmyActionResult<T: ActionInfo, R> {
+interface LemmyActionResult<T : ActionInfo, R> {
 
     val result: R
 
     class VoteLemmyActionResult(
-        override val result: Either<PostView, CommentView>
-    ): LemmyActionResult<ActionInfo.VoteActionInfo, Either<PostView, CommentView>>
+        override val result: Either<PostView, CommentView>,
+    ) : LemmyActionResult<ActionInfo.VoteActionInfo, Either<PostView, CommentView>>
 
-    class CommentLemmyActionResult(
-    ): LemmyActionResult<ActionInfo.CommentActionInfo, Unit> {
+    class CommentLemmyActionResult() : LemmyActionResult<ActionInfo.CommentActionInfo, Unit> {
         override val result = Unit
     }
 
-    class DeleteCommentLemmyActionResult(
-    ): LemmyActionResult<ActionInfo.DeleteCommentActionInfo, Unit> {
+    class DeleteCommentLemmyActionResult() : LemmyActionResult<ActionInfo.DeleteCommentActionInfo, Unit> {
         override val result = Unit
     }
 
-    class EditLemmyActionResult(
-    ): LemmyActionResult<ActionInfo.EditActionInfo, Unit> {
+    class EditLemmyActionResult() : LemmyActionResult<ActionInfo.EditActionInfo, Unit> {
         override val result = Unit
     }
-    class MarkPostAsReadActionResult(
-    ): LemmyActionResult<ActionInfo.MarkPostAsReadActionInfo, Unit> {
+    class MarkPostAsReadActionResult() : LemmyActionResult<ActionInfo.MarkPostAsReadActionInfo, Unit> {
         override val result = Unit
     }
 }
@@ -228,7 +223,8 @@ enum class ActionType constructor(val code: Int) {
     UNKNOWN(-1),
     VOTE(1),
     COMMENT(2),
-    DELETE_COMMENT(3);
+    DELETE_COMMENT(3),
+    ;
 
     companion object {
         fun fromCode(code: Int): ActionType = values().first { it.ordinal == code }

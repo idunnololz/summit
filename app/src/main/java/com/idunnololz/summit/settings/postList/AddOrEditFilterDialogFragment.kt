@@ -10,8 +10,6 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentAddFilterBinding
 import com.idunnololz.summit.filterLists.FilterEntry
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
-import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.getParcelableCompat
 
@@ -47,7 +45,7 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -59,7 +57,7 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        with (binding) {
+        with(binding) {
             title.text = getString(R.string.add_filter)
 
             currentFilter = currentFilter
@@ -97,11 +95,11 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
 
         val filter = args.filterToEdit.copy(
             filter = filterText,
-            isRegex = isRegex
+            isRegex = isRegex,
         )
         setFragmentResult(
             REQUEST_KEY,
-            bundleOf(REQUEST_KEY_RESULT to filter)
+            bundleOf(REQUEST_KEY_RESULT to filter),
         )
 
         dismiss()

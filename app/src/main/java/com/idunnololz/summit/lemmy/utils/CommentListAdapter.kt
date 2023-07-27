@@ -9,7 +9,6 @@ import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.lifecycle.LifecycleOwner
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
@@ -85,7 +83,7 @@ class CommentListAdapter(
                 is Item.ErrorItem ->
                     old.pageToLoad == (new as Item.ErrorItem).pageToLoad
             }
-        }
+        },
     ).apply {
         addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { _, b, _ ->
             b.loadingView.showProgressBar()
@@ -98,7 +96,9 @@ class CommentListAdapter(
                     LinkUtils.getLinkForCommunity(
                         CommunityRef.CommunityRefByName(
                             item.commentView.community.name,
-                            item.commentView.community.instance))
+                            item.commentView.community.instance,
+                        ),
+                    ),
                 )
                 appendSeparator()
 
@@ -106,20 +106,20 @@ class CommentListAdapter(
                 appendLink(
                     post.name,
                     LinkUtils.getLinkForPost(item.instance, post.id),
-                    underline = false
+                    underline = false,
                 )
                 val e = length
                 setSpan(
                     ForegroundColorSpan(regularColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     StyleSpan(Typeface.BOLD),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
             b.postInfo.movementMethod = CustomLinkMovementMethod().apply {
@@ -129,7 +129,7 @@ class CommentListAdapter(
                         textView: TextView,
                         url: String,
                         text: String,
-                        rect: RectF
+                        rect: RectF,
                     ): Boolean {
                         val pageRef = LinkResolver.parseUrl(url, item.instance)
 
@@ -223,11 +223,13 @@ class CommentListAdapter(
 
         for (page in commentPages) {
             for (comment in page.comments) {
-                newItems.add(Item.CommentItem(
-                    comment,
-                    page.instance,
-                    page.pageIndex,
-                ))
+                newItems.add(
+                    Item.CommentItem(
+                        comment,
+                        page.instance,
+                        page.pageIndex,
+                    ),
+                )
             }
         }
 

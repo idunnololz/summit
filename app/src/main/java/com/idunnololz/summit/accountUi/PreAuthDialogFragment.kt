@@ -1,9 +1,7 @@
-package com.idunnololz.summit.account_ui
+package com.idunnololz.summit.accountUi
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R

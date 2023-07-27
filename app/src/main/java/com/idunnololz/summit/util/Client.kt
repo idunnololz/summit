@@ -6,7 +6,6 @@ import okhttp3.OkHttpClient
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-
 object Client {
     private val TAG = Client::class.java.simpleName
 
@@ -24,7 +23,7 @@ object Client {
             .connectTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
-                // shouldnt need this as okhttp uses
+            // shouldnt need this as okhttp uses
 //            .addNetworkInterceptor { chain ->
 //                val requestBuilder = chain.request().newBuilder()
 //                    .header(
@@ -43,4 +42,3 @@ object Client {
         return client
     }
 }
-

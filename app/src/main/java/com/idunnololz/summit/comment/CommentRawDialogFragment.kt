@@ -53,9 +53,12 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
         when {
             elem.isJsonObject -> {
                 val jsonObj = elem.asJsonObject
-                JsonNode.JsonNodeObj(jsonObj, jsonObj.entrySet().associate {
-                    it.key to generateIntermediateTree(it.value)
-                })
+                JsonNode.JsonNodeObj(
+                    jsonObj,
+                    jsonObj.entrySet().associate {
+                        it.key to generateIntermediateTree(it.value)
+                    },
+                )
             }
             elem.isJsonArray -> {
                 val jsonArr = elem.asJsonArray
@@ -69,20 +72,20 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
         }
 
     private sealed class JsonNode(
-        val isExpanded: Boolean = true
+        val isExpanded: Boolean = true,
     ) {
         data class JsonNodePrimitive(
-            val jsonPrimitive: JsonPrimitive
+            val jsonPrimitive: JsonPrimitive,
         ) : JsonNode()
 
         data class JsonNodeArray(
             val jsonArray: JsonArray,
-            val children: List<JsonNode>
+            val children: List<JsonNode>,
         ) : JsonNode()
 
         data class JsonNodeObj(
             val jsonObject: JsonObject,
-            val children: Map<String, JsonNode>
+            val children: Map<String, JsonNode>,
         ) : JsonNode()
 
         object JsonNodeNull : JsonNode()
@@ -92,7 +95,7 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
         val key: String,
         val value: JsonNode,
         val currentDepth: Int,
-        val isEnd: Boolean = false
+        val isEnd: Boolean = false,
     )
 
     private class Item(
@@ -105,7 +108,7 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
         val isArray: Boolean = false,
         val isNull: Boolean = false,
         val isEnd: Boolean = false,
-        val isEmpty: Boolean = false
+        val isEmpty: Boolean = false,
     )
 
     private class ItemViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -114,7 +117,7 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
 
     private class JsonAdapter(
         private val context: Context,
-        private val indentSize: Int = context.resources.getDimensionPixelOffset(R.dimen.padding_half)
+        private val indentSize: Int = context.resources.getDimensionPixelOffset(R.dimen.padding_half),
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val inflater = LayoutInflater.from(context)
@@ -184,28 +187,29 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
             val newItems = generateItems(raw)
             val oldItems = items
 
-            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return oldItems[oldItemPosition].raw === newItems[newItemPosition].raw
-                }
+            val diff = DiffUtil.calculateDiff(
+                object : DiffUtil.Callback() {
+                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                        return oldItems[oldItemPosition].raw === newItems[newItemPosition].raw
+                    }
 
-                override fun getOldListSize(): Int = oldItems.size
+                    override fun getOldListSize(): Int = oldItems.size
 
-                override fun getNewListSize(): Int = newItems.size
+                    override fun getNewListSize(): Int = newItems.size
 
-                override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int
-                ): Boolean {
-                    val oldItem = oldItems[oldItemPosition]
-                    val newItem = newItems[newItemPosition]
-                    return oldItem.isExpanded == newItem.isExpanded && areContentsTheSame(
-                        oldItemPosition,
-                        newItemPosition
-                    )
-                }
-
-            })
+                    override fun areContentsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int,
+                    ): Boolean {
+                        val oldItem = oldItems[oldItemPosition]
+                        val newItem = newItems[newItemPosition]
+                        return oldItem.isExpanded == newItem.isExpanded && areContentsTheSame(
+                            oldItemPosition,
+                            newItemPosition,
+                        )
+                    }
+                },
+            )
             this.items = newItems
             diff.dispatchUpdatesTo(this)
         }
@@ -227,8 +231,8 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
                                 depth = currentDepth,
                                 isExpanded = elem.isExpanded,
                                 raw = elem,
-                                value = elem.jsonPrimitive
-                            )
+                                value = elem.jsonPrimitive,
+                            ),
                         )
                     }
                     is JsonNode.JsonNodeArray -> {
@@ -240,8 +244,8 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
                                     isExpanded = elem.isExpanded,
                                     raw = elem,
                                     isArray = true,
-                                    isEnd = true
-                                )
+                                    isEnd = true,
+                                ),
                             )
                         } else {
                             val isEmpty = elem.children.isEmpty()
@@ -252,8 +256,8 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
                                     isExpanded = elem.isExpanded,
                                     raw = elem,
                                     isArray = true,
-                                    isEmpty = isEmpty
-                                )
+                                    isEmpty = isEmpty,
+                                ),
                             )
 
                             if (!isEmpty) {
@@ -275,8 +279,8 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
                                     isExpanded = elem.isExpanded,
                                     raw = elem,
                                     isObj = true,
-                                    isEnd = true
-                                )
+                                    isEnd = true,
+                                ),
                             )
                         } else {
                             val isEmpty = elem.children.isEmpty()
@@ -287,8 +291,8 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
                                     isExpanded = elem.isExpanded,
                                     raw = elem,
                                     isObj = true,
-                                    isEmpty = isEmpty
-                                )
+                                    isEmpty = isEmpty,
+                                ),
                             )
 
                             if (!isEmpty) {
@@ -308,8 +312,8 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
                                 isExpanded = elem.isExpanded,
                                 raw = elem,
                                 depth = currentDepth,
-                                isNull = true
-                            )
+                                isNull = true,
+                            ),
                         )
                     }
                 }
@@ -318,5 +322,4 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
             return result
         }
     }
-
 }

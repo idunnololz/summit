@@ -74,7 +74,6 @@ class CommunityInfoViewModel @Inject constructor(
                             siteOrCommunity.postError(it)
                         }
                 }
-
         }
     }
 
@@ -87,7 +86,7 @@ class CommunityInfoViewModel @Inject constructor(
                 .onSuccess {
                     if (communityRef == it.community.toCommunityRef()) {
                         siteOrCommunity.valueOrNull?.getOrNull()?.copy(
-                            community_view = it
+                            community_view = it,
                         )?.let {
                             siteOrCommunity.postValue(Either.Right(it))
                         }

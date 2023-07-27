@@ -21,7 +21,7 @@ class PrefixedEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     ) {
         loadAttrs(attrs, defStyleAttr)
     }
@@ -37,7 +37,7 @@ class PrefixedEditText : AppCompatEditText {
 
     override fun onMeasure(
         widthMeasureSpec: Int,
-        heightMeasureSpec: Int
+        heightMeasureSpec: Int,
     ) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         calculatePrefix()
@@ -57,7 +57,7 @@ class PrefixedEditText : AppCompatEditText {
                 (textWidth + originalLeftPadding).toInt(),
                 paddingTop,
                 paddingRight,
-                paddingBottom
+                paddingBottom,
             )
         }
     }
@@ -66,8 +66,10 @@ class PrefixedEditText : AppCompatEditText {
         super.onDraw(canvas)
         prefix?.let { prefix ->
             canvas.drawText(
-                prefix, originalLeftPadding,
-                getLineBounds(0, null).toFloat(), paint
+                prefix,
+                originalLeftPadding,
+                getLineBounds(0, null).toFloat(),
+                paint,
             )
         }
     }

@@ -34,7 +34,6 @@
                     android:id="@+id/content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:animateLayoutChanges="true"
                     android:background="?backgroundColor">
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -49,6 +48,7 @@
                         app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/url_edit_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:autofillHints="no"
@@ -92,6 +92,7 @@
                         app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/title_edit_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:autofillHints="no"
@@ -123,6 +124,7 @@
                         app:hintEnabled="false">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/post_edit_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:autofillHints="no"

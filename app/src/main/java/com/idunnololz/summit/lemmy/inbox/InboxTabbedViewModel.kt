@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InboxTabbedViewModel @Inject constructor(
     private val context: Application,
-    private val accountInfoManager: AccountInfoManager
+    private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
     var pageItems = MutableLiveData<List<PageItem>>()
@@ -56,5 +56,4 @@ class InboxTabbedViewModel @Inject constructor(
         pageItems.value =
             currentItems + PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes)
     }
-
 }

@@ -10,13 +10,13 @@ import java.util.Locale
  */
 object LocaleProvider {
 
-  private var provider: (Context) -> Locale? = { context: Context ->
-    ConfigurationCompat.getLocales(context.resources.configuration)[0]
-  }
+    private var provider: (Context) -> Locale? = { context: Context ->
+        ConfigurationCompat.getLocales(context.resources.configuration)[0]
+    }
 
-  fun getPrimaryLocale(context: Context): Locale? = provider.invoke(context)
+    fun getPrimaryLocale(context: Context): Locale? = provider.invoke(context)
 
-  fun setProvider(provider: (Context) -> Locale) {
-    this.provider = provider
-  }
+    fun setProvider(provider: (Context) -> Locale) {
+        this.provider = provider
+    }
 }

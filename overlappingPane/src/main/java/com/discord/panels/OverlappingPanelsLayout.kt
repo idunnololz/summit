@@ -7,7 +7,6 @@ import android.graphics.Rect
 import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
@@ -31,181 +30,178 @@ import kotlin.math.min
  */
 open class OverlappingPanelsLayout : FrameLayout {
 
-  companion object {
-    private const val SIDE_PANEL_CLOSE_DURATION_MS = 200L
-    private const val SIDE_PANEL_OPEN_DURATION_MS = 250L
+    companion object {
+        private const val SIDE_PANEL_CLOSE_DURATION_MS = 200L
+        private const val SIDE_PANEL_OPEN_DURATION_MS = 250L
 
-    private const val TAG = "OverlappingPanelsLayout"
-  }
-
-  interface PanelStateListener {
-    fun onPanelStateChange(panelState: PanelState)
-  }
-
-  enum class Panel {
-    START,
-    CENTER,
-    END
-  }
-
-  enum class LockState {
-    OPEN,
-    CLOSE,
-    UNLOCKED
-  }
-
-  enum class SwipeDirection {
-    LEFT,
-    RIGHT
-  }
-
-  private var isLeftToRight: Boolean = true
-  private var scrollingSlopPx: Float = 0f
-  private var homeGestureFromBottomThreshold: Float = 0f
-  private var minFlingPxPerSecond: Float = 0f
-  private var velocityTracker: VelocityTracker? = null
-  private var nonFullScreenSidePanelWidth: Int = 0
-
-  private var isScrollingHorizontally = false
-  private var wasActionDownOnClosedCenterPanel = false
-
-  // We detect the home system gesture in the ACTION_DOWN of onInterceptTouchEvent.
-  // We use isHomeSystemGesture to check whether we should handle events in onTouchEvent.
-  private var isHomeSystemGesture = false
-
-  private var xFromInterceptActionDown: Float = 0f
-  private var yFromInterceptActionDown: Float = 0f
-
-  // difference between the center panel position and the ACTION_DOWN
-  // event position
-  private var centerPanelDiffX: Float = 0f
-
-  private var startPanelOpenedCenterPanelX: Float = Float.MIN_VALUE
-  private var endPanelOpenedCenterPanelX: Float = Float.MAX_VALUE
-
-  private var centerPanelXAnimator: ValueAnimator? = null
-
-  private val startPanelStateListeners = arrayListOf<PanelStateListener>()
-  private val endPanelStateListeners = arrayListOf<PanelStateListener>()
-
-  private var selectedPanel: Panel = Panel.CENTER
-
-  private var startPanelLockState: LockState = LockState.UNLOCKED
-  private var endPanelLockState: LockState = LockState.UNLOCKED
-
-  private var startPanelState: PanelState = PanelState.Closed
-  private var endPanelState: PanelState = PanelState.Closed
-
-  private var useFullWidthForStartPanel: Boolean = false
-
-  private var pendingUpdate: (() -> Unit)? = null
-
-  // Sometimes we need to make a decision based on the expected end X of an animation
-  // before the animation completes. For example, if we open the right panel in portrait
-  // mode and then rotate the device, the center panel will start animating toward the left
-  // to open the right panel. Before that animation completes, we need to save the end X
-  // value of the animation. While the animation is in progress, the width of the right panel
-  // may get reset. After the width resets, we check if the end X of the current animation
-  // is the Opened state based on the previous width. If it is, then we start a new animation
-  // to update the center panel X based on the new right panel width.
-  private var centerPanelAnimationEndX = 0f
-
-  // If a touch event happens inside this childGestureRegion, we should not intercept it,
-  // and we should not make the panels horizontally scroll. Instead, we should let the child
-  // views handle this touch event.
-  private var childGestureRegions = emptyList<Rect>()
-
-  private var swipeDirection: SwipeDirection? = null
-
-  private val isSystemGestureNavigationPossible: Boolean =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-
-  private lateinit var startPanel: View
-  private lateinit var centerPanel: View
-  private lateinit var endPanel: View
-
-  constructor(context: Context) : super(context)
-  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-    initialize(attrs)
-  }
-
-  constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-    context,
-    attrs,
-    defStyleAttr
-  ) {
-    initialize(attrs)
-  }
-
-  constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
-    context,
-    attrs,
-    defStyleAttr,
-    defStyleRes
-  ) {
-    initialize(attrs)
-  }
-
-
-  private fun initialize(attrs: AttributeSet?) {
-    val locale = LocaleProvider.getPrimaryLocale(context)
-    isLeftToRight = TextUtils.getLayoutDirectionFromLocale(locale) == View.LAYOUT_DIRECTION_LTR
-
-    val configuration = ViewConfiguration.get(context)
-    scrollingSlopPx = configuration.scaledTouchSlop.toFloat()
-    homeGestureFromBottomThreshold =
-      resources.getDimension(R.dimen.overlapping_panels_home_gesture_from_bottom_threshold)
-    minFlingPxPerSecond = resources.getDimension(R.dimen.overlapping_panels_min_fling_dp_per_second)
-
-    val portraitModeWidth =
-      if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-        resources.displayMetrics.widthPixels
-      } else {
-        resources.displayMetrics.heightPixels
-      }
-
-    val marginBetweenPanels =
-      resources.getDimension(R.dimen.overlapping_panels_margin_between_panels)
-    val visibleWidthOfClosedCenterPanel =
-      resources.getDimension(R.dimen.overlapping_panels_closed_center_panel_visible_width)
-
-    nonFullScreenSidePanelWidth =
-      (portraitModeWidth - marginBetweenPanels - visibleWidthOfClosedCenterPanel).toInt()
-
-    val styledAttrs = context.obtainStyledAttributes(
-      attrs,
-      R.styleable.OverlappingPanelsLayout,
-      0,
-      0
-    )
-
-    try {
-      val maxSidePanelNonFullScreenWidth =
-        styledAttrs.getDimension(
-          R.styleable.OverlappingPanelsLayout_maxSidePanelNonFullScreenWidth,
-          Int.MAX_VALUE.toFloat()
-        ).toInt()
-
-      nonFullScreenSidePanelWidth = min(nonFullScreenSidePanelWidth, maxSidePanelNonFullScreenWidth)
-    } finally {
-      styledAttrs.recycle()
+        private const val TAG = "OverlappingPanelsLayout"
     }
-  }
 
-  override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-    super.onLayout(changed, left, top, right, bottom)
+    interface PanelStateListener {
+        fun onPanelStateChange(panelState: PanelState)
+    }
 
+    enum class Panel {
+        START,
+        CENTER,
+        END,
+    }
+
+    enum class LockState {
+        OPEN,
+        CLOSE,
+        UNLOCKED,
+    }
+
+    enum class SwipeDirection {
+        LEFT,
+        RIGHT,
+    }
+
+    private var isLeftToRight: Boolean = true
+    private var scrollingSlopPx: Float = 0f
+    private var homeGestureFromBottomThreshold: Float = 0f
+    private var minFlingPxPerSecond: Float = 0f
+    private var velocityTracker: VelocityTracker? = null
+    private var nonFullScreenSidePanelWidth: Int = 0
+
+    private var isScrollingHorizontally = false
+    private var wasActionDownOnClosedCenterPanel = false
+
+    // We detect the home system gesture in the ACTION_DOWN of onInterceptTouchEvent.
+    // We use isHomeSystemGesture to check whether we should handle events in onTouchEvent.
+    private var isHomeSystemGesture = false
+
+    private var xFromInterceptActionDown: Float = 0f
+    private var yFromInterceptActionDown: Float = 0f
+
+    // difference between the center panel position and the ACTION_DOWN
+    // event position
+    private var centerPanelDiffX: Float = 0f
+
+    private var startPanelOpenedCenterPanelX: Float = Float.MIN_VALUE
+    private var endPanelOpenedCenterPanelX: Float = Float.MAX_VALUE
+
+    private var centerPanelXAnimator: ValueAnimator? = null
+
+    private val startPanelStateListeners = arrayListOf<PanelStateListener>()
+    private val endPanelStateListeners = arrayListOf<PanelStateListener>()
+
+    private var selectedPanel: Panel = Panel.CENTER
+
+    private var startPanelLockState: LockState = LockState.UNLOCKED
+    private var endPanelLockState: LockState = LockState.UNLOCKED
+
+    private var startPanelState: PanelState = PanelState.Closed
+    private var endPanelState: PanelState = PanelState.Closed
+
+    private var useFullWidthForStartPanel: Boolean = false
+
+    private var pendingUpdate: (() -> Unit)? = null
+
+    // Sometimes we need to make a decision based on the expected end X of an animation
+    // before the animation completes. For example, if we open the right panel in portrait
+    // mode and then rotate the device, the center panel will start animating toward the left
+    // to open the right panel. Before that animation completes, we need to save the end X
+    // value of the animation. While the animation is in progress, the width of the right panel
+    // may get reset. After the width resets, we check if the end X of the current animation
+    // is the Opened state based on the previous width. If it is, then we start a new animation
+    // to update the center panel X based on the new right panel width.
+    private var centerPanelAnimationEndX = 0f
+
+    // If a touch event happens inside this childGestureRegion, we should not intercept it,
+    // and we should not make the panels horizontally scroll. Instead, we should let the child
+    // views handle this touch event.
+    private var childGestureRegions = emptyList<Rect>()
+
+    private var swipeDirection: SwipeDirection? = null
+
+    private val isSystemGestureNavigationPossible: Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+    private lateinit var startPanel: View
+    private lateinit var centerPanel: View
+    private lateinit var endPanel: View
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        initialize(attrs)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr,
+    ) {
+        initialize(attrs)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
+        context,
+        attrs,
+        defStyleAttr,
+        defStyleRes,
+    ) {
+        initialize(attrs)
+    }
+
+    private fun initialize(attrs: AttributeSet?) {
+        val locale = LocaleProvider.getPrimaryLocale(context)
+        isLeftToRight = TextUtils.getLayoutDirectionFromLocale(locale) == View.LAYOUT_DIRECTION_LTR
+
+        val configuration = ViewConfiguration.get(context)
+        scrollingSlopPx = configuration.scaledTouchSlop.toFloat()
+        homeGestureFromBottomThreshold =
+            resources.getDimension(R.dimen.overlapping_panels_home_gesture_from_bottom_threshold)
+        minFlingPxPerSecond = resources.getDimension(R.dimen.overlapping_panels_min_fling_dp_per_second)
+
+        val portraitModeWidth =
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                resources.displayMetrics.widthPixels
+            } else {
+                resources.displayMetrics.heightPixels
+            }
+
+        val marginBetweenPanels =
+            resources.getDimension(R.dimen.overlapping_panels_margin_between_panels)
+        val visibleWidthOfClosedCenterPanel =
+            resources.getDimension(R.dimen.overlapping_panels_closed_center_panel_visible_width)
+
+        nonFullScreenSidePanelWidth =
+            (portraitModeWidth - marginBetweenPanels - visibleWidthOfClosedCenterPanel).toInt()
+
+        val styledAttrs = context.obtainStyledAttributes(
+            attrs,
+            R.styleable.OverlappingPanelsLayout,
+            0,
+            0,
+        )
+
+        try {
+            val maxSidePanelNonFullScreenWidth =
+                styledAttrs.getDimension(
+                    R.styleable.OverlappingPanelsLayout_maxSidePanelNonFullScreenWidth,
+                    Int.MAX_VALUE.toFloat(),
+                ).toInt()
+
+            nonFullScreenSidePanelWidth = min(nonFullScreenSidePanelWidth, maxSidePanelNonFullScreenWidth)
+        } finally {
+            styledAttrs.recycle()
+        }
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
 
 //    setSystemGestureExclusionRects()
 
-
-    // OverlappingPanelsLayout expects exactly three child views where each child view
-    // is a panel. If there are not exactly three child views, OverlappingPanelsLayout
-    // will throw an exception from the lateinit var panel views not getting initialized.
-    if (childCount == 3 && !::centerPanel.isInitialized) {
-      initPanels()
+        // OverlappingPanelsLayout expects exactly three child views where each child view
+        // is a panel. If there are not exactly three child views, OverlappingPanelsLayout
+        // will throw an exception from the lateinit var panel views not getting initialized.
+        if (childCount == 3 && !::centerPanel.isInitialized) {
+            initPanels()
+        }
     }
-  }
 
   /*
    * This method only returns whether we want to intercept the motion.
@@ -214,763 +210,766 @@ open class OverlappingPanelsLayout : FrameLayout {
    *
    * https://developer.android.com/training/gestures/viewgroup.html
    */
-  override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-    if (!isEnabled) {
-      return false
+    override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+        if (!isEnabled) {
+            return false
+        }
+
+        return when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                isScrollingHorizontally = false
+                wasActionDownOnClosedCenterPanel = isTouchingCenterPanelWhileSidePanelOpen(event)
+                centerPanelDiffX = centerPanel.x - event.rawX
+
+                xFromInterceptActionDown = event.x
+                yFromInterceptActionDown = event.y
+
+                val yDiffFromBottomOfDisplay =
+                    abs(yFromInterceptActionDown - resources.displayMetrics.heightPixels)
+                isHomeSystemGesture = yDiffFromBottomOfDisplay < homeGestureFromBottomThreshold &&
+                    isSystemGestureNavigationPossible
+
+                if (velocityTracker == null) {
+                    velocityTracker = VelocityTracker.obtain()
+                    velocityTracker?.addMovement(event)
+                } else {
+                    velocityTracker?.clear()
+                }
+
+                wasActionDownOnClosedCenterPanel
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (isScrollingHorizontally) {
+                    true
+                } else {
+                    // If the horizontally distance in the MotionEvent is more than
+                    // the scroll slop, and if the horizontal distance is greater than
+                    // the vertical distance, start the horizontal scroll for the panels.
+                    val xDiff = calculateDistanceX(startX = xFromInterceptActionDown, event = event)
+                    val yDiff = calculateDistanceY(startY = yFromInterceptActionDown, event = event)
+                    val isTouchingChildGestureRegion = isTouchingChildGestureRegion(event)
+                    val isFullyLocked = startPanelLockState != LockState.UNLOCKED &&
+                        endPanelLockState != LockState.UNLOCKED
+                    val isDirectionLocked = if (startPanelLockState != LockState.UNLOCKED && xDiff > 0) {
+                        endPanelState != PanelState.Opened
+                    } else if (endPanelLockState != LockState.UNLOCKED && xDiff < 0) {
+                        startPanelState != PanelState.Opened
+                    } else {
+                        false
+                    }
+
+                    if (abs(xDiff) > scrollingSlopPx &&
+                        abs(xDiff) > abs(yDiff) &&
+                        !isTouchingChildGestureRegion &&
+                        !isFullyLocked &&
+                        !isDirectionLocked
+                    ) {
+                        isScrollingHorizontally = true
+                        this.parent?.requestDisallowInterceptTouchEvent(true)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
+                velocityTracker?.recycle()
+                velocityTracker = null
+                isScrollingHorizontally || wasActionDownOnClosedCenterPanel
+            }
+            else -> {
+                // When the center panel is closed (but still visible at the edges of the screen)
+                // intercept all touch events so that the user cannot interact with the child views of
+                // the center panel.
+                wasActionDownOnClosedCenterPanel
+            }
+        }
     }
 
-    return when (event.actionMasked) {
-      MotionEvent.ACTION_DOWN -> {
-        isScrollingHorizontally = false
-        wasActionDownOnClosedCenterPanel = isTouchingCenterPanelWhileSidePanelOpen(event)
-        centerPanelDiffX = centerPanel.x - event.rawX
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (isHomeSystemGesture) {
+            return false
+        }
 
-        xFromInterceptActionDown = event.x
-        yFromInterceptActionDown = event.y
+        return when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                true
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (isTouchingChildGestureRegion(event)) {
+                    return false
+                }
 
-        val yDiffFromBottomOfDisplay =
-          abs(yFromInterceptActionDown - resources.displayMetrics.heightPixels)
-        isHomeSystemGesture = yDiffFromBottomOfDisplay < homeGestureFromBottomThreshold &&
-                isSystemGestureNavigationPossible
+                val xDiff = calculateDistanceX(startX = xFromInterceptActionDown, event = event)
 
-        if (velocityTracker == null) {
-          velocityTracker = VelocityTracker.obtain()
-          velocityTracker?.addMovement(event)
+                if (abs(xDiff) > scrollingSlopPx) {
+                    if (swipeDirection == null) {
+                        swipeDirection = if (xDiff > 0) SwipeDirection.RIGHT else SwipeDirection.LEFT
+                    }
+                }
+
+                velocityTracker?.addMovement(event)
+
+                if (shouldHandleActionMoveEvent(event)) {
+                    translateCenterPanel(event)
+                }
+
+                true
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                val isClosedCenterPanelClick = if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
+                    false
+                } else {
+                    wasActionDownOnClosedCenterPanel &&
+                        abs(event.x - xFromInterceptActionDown) < scrollingSlopPx &&
+                        !isScrollingHorizontally
+                }
+
+                if (isClosedCenterPanelClick) {
+                    closePanels()
+                } else {
+                    // If we're not treating this as a click, then assume it's a horizontal scroll.
+                    velocityTracker?.addMovement(event)
+                    snapOpenOrClose(event)
+                }
+
+                wasActionDownOnClosedCenterPanel = false
+                isScrollingHorizontally = false
+                swipeDirection = null
+
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
+    /**
+     * Open the start panel with the non-fling animation.
+     */
+    fun openStartPanel() {
+        openStartPanel(isFling = false)
+    }
+
+    /**
+     * Open the end panel with the non-fling animation.
+     */
+    fun openEndPanel() {
+        openEndPanel(isFling = false)
+    }
+
+    /**
+     * Close side panels with the non-fling animation. This centers the center panel.
+     */
+    fun closePanels() {
+        closePanels(isFling = false)
+    }
+
+    /**
+     * Set the lock panel state for the start panel. [LockState.OPEN] means the start panel stays
+     * opened, and the center panel cannot be moved. [LockState.CLOSE] means the start panel stays
+     * closed, and the selected panel can either be the center panel or the end panel.
+     * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move freely
+     * to open either of the two side panels.
+     */
+    fun setStartPanelLockState(lockState: LockState) {
+        startPanelLockState = lockState
+        if (lockState == LockState.OPEN) {
+            openStartPanel()
+        }
+    }
+
+    /**
+     * Set the lock panel state for the end panel. [LockState.OPEN] means the end panel stays
+     * opened, and the center panel cannot be moved. [LockState.CLOSE] means the end panel stays
+     * closed, and the selected panel can either be the center panel or the start panel.
+     * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move freely
+     * to open either of the two side panels.
+     */
+    fun setEndPanelLockState(lockState: LockState) {
+        endPanelLockState = lockState
+        if (lockState == LockState.OPEN) {
+            openEndPanel()
+        }
+    }
+
+    /**
+     * By default, [OverlappingPanelsLayout] sets the start panel width so that when the start panel
+     * is opened, it leaves room to show the partially visible closed center panel. To make the start
+     * panel fill the full screen width, call [setStartPanelUseFullPortraitWidth] with
+     * [useFullPortraitWidth] set to true.
+     */
+    fun setStartPanelUseFullPortraitWidth(useFullPortraitWidth: Boolean) {
+        useFullWidthForStartPanel = useFullPortraitWidth
+        resetStartPanelWidth()
+    }
+
+    /**
+     * By default, [OverlappingPanelsLayout] intercepts horizontal scrolls on all child views and
+     * handles them by swiping the panels. To allow child views to handle their own horizontal
+     * scroll gestures, call [setChildGestureRegions] where the [Rect] represents the region where
+     * [OverlappingPanelsLayout] should not handle horizontal scrolls. The best way to register
+     * child gesture regions is via [PanelsChildGestureRegionObserver].
+     */
+    fun setChildGestureRegions(childGestureRegions: List<Rect>) {
+        this.childGestureRegions = childGestureRegions
+    }
+
+    /**
+     * Register one or multiple [PanelStateListener]s for the start panel. This is useful for
+     * storing the panel state, e.g. in an androidx.lifecycle.ViewModel, so the panel state can be
+     * restored after Android configuration changes.
+     */
+    fun registerStartPanelStateListeners(vararg panelStateListenerArgs: PanelStateListener) {
+        for (panelStateListener in panelStateListenerArgs) {
+            startPanelStateListeners.add(panelStateListener)
+        }
+    }
+
+    /**
+     * Register one or multiple [PanelStateListener]s for the end panel. This is useful for
+     * storing the panel state, e.g. in an androidx.lifecycle.ViewModel, so the panel state can be
+     * restored after Android configuration changes.
+     */
+    fun registerEndPanelStateListeners(vararg panelStateListenerArgs: PanelStateListener) {
+        for (panelStateListener in panelStateListenerArgs) {
+            endPanelStateListeners.add(panelStateListener)
+        }
+    }
+
+    /**
+     * Get the currently selected [Panel]. If the [Panel] is currently in between opened and closed
+     * states, then get the selected panel based on the last opened or closed panel state.
+     */
+    fun getSelectedPanel(): Panel = selectedPanel
+
+    /**
+     * Handle panel state changes from the app. This can be used for restoring state after Android
+     * configuration changes or for changing the panel state based on business logic on classes
+     * that don't have access to the view.
+     *
+     * This diffs [startPanelState] with the actual panel state before opening or closing panels.
+     * This allows us to update the panel state without an infinite loop of syncing updates between
+     * the view and model layer.
+     */
+    fun handleStartPanelState(startPanelState: PanelState) {
+        val previousStartPanelState = this.startPanelState
+        when {
+            (
+                startPanelState == PanelState.Opened &&
+                    previousStartPanelState != PanelState.Opened
+                ) -> {
+                openStartPanel()
+            }
+
+            (
+                startPanelState == PanelState.Closed &&
+                    previousStartPanelState == PanelState.Opened
+                ) -> {
+                closePanels()
+            }
+        }
+
+        this.startPanelState = startPanelState
+    }
+
+    /**
+     * Handle panel state changes from the app. This can be used for restoring state after Android
+     * configuration changes or for changing the panel state based on business logic on classes
+     * that don't have access to the view.
+     *
+     * This diffs [endPanelState] with the actual panel state before opening or closing panels.
+     * This allows us to update the panel state without an infinite loop of syncing updates between
+     * the view and model layer.
+     */
+    fun handleEndPanelState(endPanelState: PanelState) {
+        val previousEndPanelState = this.endPanelState
+
+        when {
+            (
+                endPanelState == PanelState.Opened &&
+                    previousEndPanelState != PanelState.Opened
+                ) -> {
+                openEndPanel()
+            }
+
+            (
+                endPanelState is PanelState.Closed &&
+                    previousEndPanelState == PanelState.Opened
+                ) -> {
+                closePanels()
+            }
+        }
+
+        this.endPanelState = endPanelState
+    }
+
+    private fun resetStartPanelWidth() {
+        if (::startPanel.isInitialized) {
+            val layoutParams = startPanel.layoutParams
+            layoutParams.width = if (useFullWidthForStartPanel) {
+                ViewGroup.LayoutParams.MATCH_PARENT
+            } else {
+                nonFullScreenSidePanelWidth
+            }
+            startPanel.layoutParams = layoutParams
+        }
+    }
+
+    private fun resetEndPanelWidth() {
+        val layoutParams = endPanel.layoutParams
+        layoutParams.width = nonFullScreenSidePanelWidth
+        endPanel.layoutParams = layoutParams
+    }
+
+    private fun openPanel(panel: Panel) {
+        when (panel) {
+            Panel.START -> openStartPanel(isFling = false)
+            Panel.END -> openEndPanel(isFling = false)
+            Panel.CENTER -> closePanels(isFling = false)
+        }
+    }
+
+    private fun openStartPanel(isFling: Boolean = false) {
+        // This can get called before onLayout() where centerPanel gets initialized.
+        // If that happens, save the pendingUpdate for after centerPanel gets initialized
+        if (!::centerPanel.isInitialized) {
+            pendingUpdate = { openStartPanel(isFling) }
+            return
+        }
+
+        if (startPanelLockState == LockState.OPEN) {
+            updateCenterPanelX(x = startPanelOpenedCenterPanelX)
         } else {
-          velocityTracker?.clear()
+            updateCenterPanelXWithAnimation(
+                x = startPanelOpenedCenterPanelX,
+                isFling = isFling,
+                animationDurationMs = SIDE_PANEL_OPEN_DURATION_MS,
+            )
+        }
+    }
+
+    private fun openEndPanel(isFling: Boolean = false) {
+        // This can get called before onLayout() where centerPanel gets initialized.
+        // If that happens, save the pendingUpdate for after centerPanel gets initialized
+        if (!::centerPanel.isInitialized) {
+            pendingUpdate = { openEndPanel(isFling) }
+            return
         }
 
-        wasActionDownOnClosedCenterPanel
-      }
-      MotionEvent.ACTION_MOVE -> {
-        if (isScrollingHorizontally) {
-          true
-        } else {
-
-          // If the horizontally distance in the MotionEvent is more than
-          // the scroll slop, and if the horizontal distance is greater than
-          // the vertical distance, start the horizontal scroll for the panels.
-          val xDiff = calculateDistanceX(startX = xFromInterceptActionDown, event = event)
-          val yDiff = calculateDistanceY(startY = yFromInterceptActionDown, event = event)
-          val isTouchingChildGestureRegion = isTouchingChildGestureRegion(event)
-          val isFullyLocked = startPanelLockState != LockState.UNLOCKED &&
-                  endPanelLockState != LockState.UNLOCKED
-          val isDirectionLocked = if (startPanelLockState != LockState.UNLOCKED && xDiff > 0) {
-            endPanelState != PanelState.Opened
-          } else if (endPanelLockState != LockState.UNLOCKED && xDiff < 0) {
-            startPanelState != PanelState.Opened
-          } else {
-            false
-          }
-
-          if (abs(xDiff) > scrollingSlopPx &&
-            abs(xDiff) > abs(yDiff) &&
-            !isTouchingChildGestureRegion &&
-            !isFullyLocked &&
-            !isDirectionLocked
-          ) {
-            isScrollingHorizontally = true
-            this.parent?.requestDisallowInterceptTouchEvent(true)
-            true
-          } else {
-            false
-          }
-        }
-      }
-      MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-        velocityTracker?.recycle()
-        velocityTracker = null
-        isScrollingHorizontally || wasActionDownOnClosedCenterPanel
-      }
-      else -> {
-        // When the center panel is closed (but still visible at the edges of the screen)
-        // intercept all touch events so that the user cannot interact with the child views of
-        // the center panel.
-        wasActionDownOnClosedCenterPanel
-      }
-    }
-  }
-
-  override fun onTouchEvent(event: MotionEvent): Boolean {
-    if (isHomeSystemGesture) {
-      return false
+        updateCenterPanelXWithAnimation(
+            x = endPanelOpenedCenterPanelX,
+            isFling = isFling,
+            animationDurationMs = SIDE_PANEL_OPEN_DURATION_MS,
+        )
     }
 
-    return when (event.actionMasked) {
-      MotionEvent.ACTION_DOWN -> {
-        true
-      }
-      MotionEvent.ACTION_MOVE -> {
-        if (isTouchingChildGestureRegion(event)) {
-          return false
+    private fun closePanels(isFling: Boolean = false) {
+        // This can get called before onLayout() where centerPanel gets initialized.
+        // If that happens, save the pendingUpdate for after centerPanel gets initialized
+        if (!::centerPanel.isInitialized) {
+            pendingUpdate = { closePanels(isFling) }
+            return
         }
 
-        val xDiff = calculateDistanceX(startX = xFromInterceptActionDown, event = event)
+        updateCenterPanelXWithAnimation(
+            x = 0f,
+            isFling = isFling,
+            animationDurationMs = SIDE_PANEL_CLOSE_DURATION_MS,
+        )
+    }
 
-        if (abs(xDiff) > scrollingSlopPx) {
-          if (swipeDirection == null) {
-            swipeDirection = if (xDiff > 0) SwipeDirection.RIGHT else SwipeDirection.LEFT
-          }
+    /**
+     * Snap to one of the following states:
+     * - center panel horizontally centered (side panels closed)
+     * - left panel open
+     * - right panel open
+     */
+    private fun snapOpenOrClose(event: MotionEvent) {
+        val targetedX = getTargetedX(event)
+
+        // Setting [units] to 1000 provides pixels per second.
+        velocityTracker?.computeCurrentVelocity(1000 /* units */)
+        val pxPerSecond =
+            if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
+                0f
+            } else {
+                velocityTracker?.xVelocity ?: Float.MIN_VALUE
+            }
+        val isFling = abs(pxPerSecond) > minFlingPxPerSecond
+        val isDirectionStartToEnd = if (isLeftToRight) pxPerSecond > 0 else pxPerSecond < 0
+
+        if (isFling) {
+            if (isDirectionStartToEnd) {
+                if (selectedPanel == Panel.END) {
+                    closePanels(isFling = true)
+                    return
+                } else if (selectedPanel == Panel.CENTER) {
+                    openStartPanel(isFling = true)
+                    return
+                }
+            } else {
+                if (selectedPanel == Panel.START) {
+                    closePanels(isFling = true)
+                    return
+                } else if (selectedPanel == Panel.CENTER) {
+                    openEndPanel(isFling = true)
+                    return
+                }
+            }
         }
 
-        velocityTracker?.addMovement(event)
+        val maxCenterPanelX = max(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
+        val minCenterPanelX = min(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
 
-        if (shouldHandleActionMoveEvent(event)) {
-          translateCenterPanel(event)
+        // Select the panel state based on the x position of the up or cancel event.
+        when {
+            targetedX > maxCenterPanelX / 2 -> {
+                openPanel(getLeftPanel())
+            }
+            targetedX < minCenterPanelX / 2 -> {
+                openPanel(getRightPanel())
+            }
+            else -> {
+                closePanels()
+            }
+        }
+    }
+
+    private fun getLeftPanel() = if (isLeftToRight) Panel.START else Panel.END
+
+    private fun getRightPanel() = if (isLeftToRight) Panel.END else Panel.START
+
+    private fun getLeftPanelLockState() =
+        if (isLeftToRight) startPanelLockState else endPanelLockState
+
+    private fun getRightPanelLockState() =
+        if (isLeftToRight) endPanelLockState else startPanelLockState
+
+    private fun translateCenterPanel(event: MotionEvent) {
+        val targetedX = getTargetedX(event)
+        val normalizedX = getNormalizedX(targetedX)
+        updateCenterPanelX(normalizedX)
+    }
+
+    /**
+     * Return an x value that is within the bounds of the center panel's
+     * allowed horizontal translation range.
+     */
+    private fun getNormalizedX(targetedX: Float): Float {
+        if (startPanelLockState == LockState.OPEN) {
+            return startPanelOpenedCenterPanelX
+        } else if (endPanelLockState == LockState.OPEN) {
+            return endPanelOpenedCenterPanelX
         }
 
-        true
-      }
-      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-        val isClosedCenterPanelClick = if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
-          false
-        } else {
-          wasActionDownOnClosedCenterPanel &&
-                  abs(event.x - xFromInterceptActionDown) < scrollingSlopPx &&
-                  !isScrollingHorizontally
+        val maxX = when {
+            (getLeftPanelLockState() == LockState.CLOSE) -> 0f
+            else -> max(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
         }
 
-        if (isClosedCenterPanelClick) {
-          closePanels()
-        } else {
-          // If we're not treating this as a click, then assume it's a horizontal scroll.
-          velocityTracker?.addMovement(event)
-          snapOpenOrClose(event)
+        val minX = when {
+            (getRightPanelLockState() == LockState.CLOSE) -> 0f
+            else -> min(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
         }
 
-        wasActionDownOnClosedCenterPanel = false
-        isScrollingHorizontally = false
-        swipeDirection = null
-
-        true
-      }
-      else -> {
-        false
-      }
-    }
-  }
-
-  /**
-   * Open the start panel with the non-fling animation.
-   */
-  fun openStartPanel() {
-    openStartPanel(isFling = false)
-  }
-
-  /**
-   * Open the end panel with the non-fling animation.
-   */
-  fun openEndPanel() {
-    openEndPanel(isFling = false)
-  }
-
-  /**
-   * Close side panels with the non-fling animation. This centers the center panel.
-   */
-  fun closePanels() {
-    closePanels(isFling = false)
-  }
-
-  /**
-   * Set the lock panel state for the start panel. [LockState.OPEN] means the start panel stays
-   * opened, and the center panel cannot be moved. [LockState.CLOSE] means the start panel stays
-   * closed, and the selected panel can either be the center panel or the end panel.
-   * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move freely
-   * to open either of the two side panels.
-   */
-  fun setStartPanelLockState(lockState: LockState) {
-    startPanelLockState = lockState
-    if (lockState == LockState.OPEN) {
-      openStartPanel()
-    }
-  }
-
-  /**
-   * Set the lock panel state for the end panel. [LockState.OPEN] means the end panel stays
-   * opened, and the center panel cannot be moved. [LockState.CLOSE] means the end panel stays
-   * closed, and the selected panel can either be the center panel or the start panel.
-   * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move freely
-   * to open either of the two side panels.
-   */
-  fun setEndPanelLockState(lockState: LockState) {
-    endPanelLockState = lockState
-    if (lockState == LockState.OPEN) {
-      openEndPanel()
-    }
-  }
-
-  /**
-   * By default, [OverlappingPanelsLayout] sets the start panel width so that when the start panel
-   * is opened, it leaves room to show the partially visible closed center panel. To make the start
-   * panel fill the full screen width, call [setStartPanelUseFullPortraitWidth] with
-   * [useFullPortraitWidth] set to true.
-   */
-  fun setStartPanelUseFullPortraitWidth(useFullPortraitWidth: Boolean) {
-    useFullWidthForStartPanel = useFullPortraitWidth
-    resetStartPanelWidth()
-  }
-
-  /**
-   * By default, [OverlappingPanelsLayout] intercepts horizontal scrolls on all child views and
-   * handles them by swiping the panels. To allow child views to handle their own horizontal
-   * scroll gestures, call [setChildGestureRegions] where the [Rect] represents the region where
-   * [OverlappingPanelsLayout] should not handle horizontal scrolls. The best way to register
-   * child gesture regions is via [PanelsChildGestureRegionObserver].
-   */
-  fun setChildGestureRegions(childGestureRegions: List<Rect>) {
-    this.childGestureRegions = childGestureRegions
-  }
-
-  /**
-   * Register one or multiple [PanelStateListener]s for the start panel. This is useful for
-   * storing the panel state, e.g. in an androidx.lifecycle.ViewModel, so the panel state can be
-   * restored after Android configuration changes.
-   */
-  fun registerStartPanelStateListeners(vararg panelStateListenerArgs: PanelStateListener) {
-    for (panelStateListener in panelStateListenerArgs) {
-      startPanelStateListeners.add(panelStateListener)
-    }
-  }
-
-  /**
-   * Register one or multiple [PanelStateListener]s for the end panel. This is useful for
-   * storing the panel state, e.g. in an androidx.lifecycle.ViewModel, so the panel state can be
-   * restored after Android configuration changes.
-   */
-  fun registerEndPanelStateListeners(vararg panelStateListenerArgs: PanelStateListener) {
-    for (panelStateListener in panelStateListenerArgs) {
-      endPanelStateListeners.add(panelStateListener)
-    }
-  }
-
-  /**
-   * Get the currently selected [Panel]. If the [Panel] is currently in between opened and closed
-   * states, then get the selected panel based on the last opened or closed panel state.
-   */
-  fun getSelectedPanel(): Panel = selectedPanel
-
-  /**
-   * Handle panel state changes from the app. This can be used for restoring state after Android
-   * configuration changes or for changing the panel state based on business logic on classes
-   * that don't have access to the view.
-   *
-   * This diffs [startPanelState] with the actual panel state before opening or closing panels.
-   * This allows us to update the panel state without an infinite loop of syncing updates between
-   * the view and model layer.
-   */
-  fun handleStartPanelState(startPanelState: PanelState) {
-    val previousStartPanelState = this.startPanelState
-    when {
-      (startPanelState == PanelState.Opened &&
-              previousStartPanelState != PanelState.Opened) -> {
-        openStartPanel()
-      }
-
-      (startPanelState == PanelState.Closed &&
-              previousStartPanelState == PanelState.Opened) -> {
-        closePanels()
-      }
-    }
-
-    this.startPanelState = startPanelState
-  }
-
-  /**
-   * Handle panel state changes from the app. This can be used for restoring state after Android
-   * configuration changes or for changing the panel state based on business logic on classes
-   * that don't have access to the view.
-   *
-   * This diffs [endPanelState] with the actual panel state before opening or closing panels.
-   * This allows us to update the panel state without an infinite loop of syncing updates between
-   * the view and model layer.
-   */
-  fun handleEndPanelState(endPanelState: PanelState) {
-    val previousEndPanelState = this.endPanelState
-
-    when {
-      (endPanelState == PanelState.Opened &&
-              previousEndPanelState != PanelState.Opened) -> {
-        openEndPanel()
-      }
-
-      (endPanelState is PanelState.Closed &&
-              previousEndPanelState == PanelState.Opened) -> {
-        closePanels()
-      }
-    }
-
-    this.endPanelState = endPanelState
-  }
-
-  private fun resetStartPanelWidth() {
-    if (::startPanel.isInitialized) {
-      val layoutParams = startPanel.layoutParams
-      layoutParams.width = if (useFullWidthForStartPanel) {
-        ViewGroup.LayoutParams.MATCH_PARENT
-      } else {
-        nonFullScreenSidePanelWidth
-      }
-      startPanel.layoutParams = layoutParams
-    }
-  }
-
-  private fun resetEndPanelWidth() {
-    val layoutParams = endPanel.layoutParams
-    layoutParams.width = nonFullScreenSidePanelWidth
-    endPanel.layoutParams = layoutParams
-  }
-
-  private fun openPanel(panel: Panel) {
-    when (panel) {
-      Panel.START -> openStartPanel(isFling = false)
-      Panel.END -> openEndPanel(isFling = false)
-      Panel.CENTER -> closePanels(isFling = false)
-    }
-  }
-
-  private fun openStartPanel(isFling: Boolean = false) {
-
-    // This can get called before onLayout() where centerPanel gets initialized.
-    // If that happens, save the pendingUpdate for after centerPanel gets initialized
-    if (!::centerPanel.isInitialized) {
-      pendingUpdate = { openStartPanel(isFling) }
-      return
-    }
-
-    if (startPanelLockState == LockState.OPEN) {
-      updateCenterPanelX(x = startPanelOpenedCenterPanelX)
-    } else {
-      updateCenterPanelXWithAnimation(
-        x = startPanelOpenedCenterPanelX,
-        isFling = isFling,
-        animationDurationMs = SIDE_PANEL_OPEN_DURATION_MS
-      )
-    }
-  }
-
-  private fun openEndPanel(isFling: Boolean = false) {
-
-    // This can get called before onLayout() where centerPanel gets initialized.
-    // If that happens, save the pendingUpdate for after centerPanel gets initialized
-    if (!::centerPanel.isInitialized) {
-      pendingUpdate = { openEndPanel(isFling) }
-      return
-    }
-
-    updateCenterPanelXWithAnimation(
-      x = endPanelOpenedCenterPanelX,
-      isFling = isFling,
-      animationDurationMs = SIDE_PANEL_OPEN_DURATION_MS
-    )
-  }
-
-  private fun closePanels(isFling: Boolean = false) {
-
-    // This can get called before onLayout() where centerPanel gets initialized.
-    // If that happens, save the pendingUpdate for after centerPanel gets initialized
-    if (!::centerPanel.isInitialized) {
-      pendingUpdate = { closePanels(isFling) }
-      return
-    }
-
-    updateCenterPanelXWithAnimation(
-      x = 0f,
-      isFling = isFling,
-      animationDurationMs = SIDE_PANEL_CLOSE_DURATION_MS
-    )
-  }
-
-  /**
-   * Snap to one of the following states:
-   * - center panel horizontally centered (side panels closed)
-   * - left panel open
-   * - right panel open
-   */
-  private fun snapOpenOrClose(event: MotionEvent) {
-    val targetedX = getTargetedX(event)
-
-    // Setting [units] to 1000 provides pixels per second.
-    velocityTracker?.computeCurrentVelocity(1000 /* units */)
-    val pxPerSecond =
-      if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
-        0f
-      } else {
-        velocityTracker?.xVelocity ?: Float.MIN_VALUE
-      }
-    val isFling = abs(pxPerSecond) > minFlingPxPerSecond
-    val isDirectionStartToEnd = if (isLeftToRight) pxPerSecond > 0 else pxPerSecond < 0
-
-    if (isFling) {
-      if (isDirectionStartToEnd) {
-        if (selectedPanel == Panel.END) {
-          closePanels(isFling = true)
-          return
-        } else if (selectedPanel == Panel.CENTER) {
-          openStartPanel(isFling = true)
-          return
+        return when {
+            targetedX > maxX -> {
+                maxX
+            }
+            targetedX < minX -> {
+                minX
+            }
+            else -> {
+                targetedX
+            }
         }
-      } else {
-        if (selectedPanel == Panel.START) {
-          closePanels(isFling = true)
-          return
-        } else if (selectedPanel == Panel.CENTER) {
-          openEndPanel(isFling = true)
-          return
-        }
-      }
     }
 
-    val maxCenterPanelX = max(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
-    val minCenterPanelX = min(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
+    /**
+     * This method is necessary because users can't keep their fingers perfectly still on
+     * the phone screen. If the user is trying to hold a finger in one place, but the finger actually
+     * deviates to the left or right by a pixel, it will trigger a drawer state change between
+     * Opening and Closing. We generally want the drawer state to stay the same in this situation,
+     * so we only handle the ACTION_MOVE event if it is either one of the fully opened or closed
+     * positions or if it the targeted x position is greater than 1dp different from the current
+     * x position.
+     */
+    private fun shouldHandleActionMoveEvent(event: MotionEvent): Boolean {
+        val targetedX = getTargetedX(event)
+        val normalizedX = getNormalizedX(targetedX)
+        val greaterThanMinChange = abs(normalizedX - centerPanel.x) > resources.displayMetrics.density
 
-    // Select the panel state based on the x position of the up or cancel event.
-    when {
-      targetedX > maxCenterPanelX / 2 -> {
-        openPanel(getLeftPanel())
-      }
-      targetedX < minCenterPanelX / 2 -> {
-        openPanel(getRightPanel())
-      }
-      else -> {
-        closePanels()
-      }
-    }
-  }
-
-  private fun getLeftPanel() = if (isLeftToRight) Panel.START else Panel.END
-
-  private fun getRightPanel() = if (isLeftToRight) Panel.END else Panel.START
-
-  private fun getLeftPanelLockState() =
-    if (isLeftToRight) startPanelLockState else endPanelLockState
-
-  private fun getRightPanelLockState() =
-    if (isLeftToRight) endPanelLockState else startPanelLockState
-
-  private fun translateCenterPanel(event: MotionEvent) {
-    val targetedX = getTargetedX(event)
-    val normalizedX = getNormalizedX(targetedX)
-    updateCenterPanelX(normalizedX)
-  }
-
-  /**
-   * Return an x value that is within the bounds of the center panel's
-   * allowed horizontal translation range.
-   */
-  private fun getNormalizedX(targetedX: Float): Float {
-    if (startPanelLockState == LockState.OPEN) {
-      return startPanelOpenedCenterPanelX
-    } else if (endPanelLockState == LockState.OPEN) {
-      return endPanelOpenedCenterPanelX
-    }
-
-    val maxX = when {
-      (getLeftPanelLockState() == LockState.CLOSE) -> 0f
-      else -> max(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
-    }
-
-    val minX = when {
-      (getRightPanelLockState() == LockState.CLOSE) -> 0f
-      else -> min(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
-    }
-
-    return when {
-      targetedX > maxX -> {
-        maxX
-      }
-      targetedX < minX -> {
-        minX
-      }
-      else -> {
-        targetedX
-      }
-    }
-  }
-
-  /**
-   * This method is necessary because users can't keep their fingers perfectly still on
-   * the phone screen. If the user is trying to hold a finger in one place, but the finger actually
-   * deviates to the left or right by a pixel, it will trigger a drawer state change between
-   * Opening and Closing. We generally want the drawer state to stay the same in this situation,
-   * so we only handle the ACTION_MOVE event if it is either one of the fully opened or closed
-   * positions or if it the targeted x position is greater than 1dp different from the current
-   * x position.
-   */
-  private fun shouldHandleActionMoveEvent(event: MotionEvent): Boolean {
-    val targetedX = getTargetedX(event)
-    val normalizedX = getNormalizedX(targetedX)
-    val greaterThanMinChange = abs(normalizedX - centerPanel.x) > resources.displayMetrics.density
-
-    return normalizedX == 0f ||
+        return normalizedX == 0f ||
             normalizedX == startPanelOpenedCenterPanelX ||
             normalizedX == endPanelOpenedCenterPanelX ||
             greaterThanMinChange
-  }
-
-  private fun getTargetedX(event: MotionEvent): Float = event.rawX + centerPanelDiffX
-
-  private fun calculateDistanceX(startX: Float, event: MotionEvent): Float = event.x - startX
-
-  private fun calculateDistanceY(startY: Float, event: MotionEvent): Float = event.y - startY
-
-  /**
-   * [animationDurationMs] should generally be 250ms for opening and 200ms for closing
-   * according to https://material.io/design/motion/speed.html#duration
-   */
-  private fun updateCenterPanelXWithAnimation(
-    x: Float,
-    isFling: Boolean = false,
-    animationDurationMs: Long = SIDE_PANEL_OPEN_DURATION_MS
-  ) {
-    val previousX = centerPanel.x
-    centerPanelXAnimator?.cancel()
-
-    val normalizedX = getNormalizedX(targetedX = x)
-    centerPanelAnimationEndX = normalizedX
-
-    if (isFling) {
-      centerPanelXAnimator = ValueAnimator.ofFloat(previousX, normalizedX).apply {
-        // https://material.io/design/motion/speed.html#easing
-        // Use the suggested interpolator for Decelerated Easing
-        interpolator = LinearOutSlowInInterpolator()
-        duration = animationDurationMs
-      }
-      centerPanelXAnimator?.addUpdateListener { animator ->
-        updateCenterPanelX(animator.animatedValue as Float)
-      }
-    } else {
-      centerPanelXAnimator = ValueAnimator.ofFloat(previousX, normalizedX).apply {
-        // https://material.io/design/motion/speed.html#easing
-        // Use the suggested interpolator for Standard Easing
-        interpolator = FastOutSlowInInterpolator()
-        duration = animationDurationMs
-      }
-      centerPanelXAnimator?.addUpdateListener { animator ->
-        updateCenterPanelX(animator.animatedValue as Float)
-      }
     }
 
-    centerPanelXAnimator?.start()
-  }
+    private fun getTargetedX(event: MotionEvent): Float = event.rawX + centerPanelDiffX
 
-  private fun updateCenterPanelX(x: Float) {
-    val previousX = centerPanel.x
-    centerPanel.x = x
-    handleCenterPanelX(previousX, x)
-  }
+    private fun calculateDistanceX(startX: Float, event: MotionEvent): Float = event.x - startX
 
-  /**
-   * Call this method anytime the x position of the center panel changes, so we can
-   * notify listeners of drawer state changes.
-   */
-  private fun handleCenterPanelX(previousX: Float, x: Float) {
-    startPanel.visibility =
-      if ((isLeftToRight && centerPanel.x > 0) || (!isLeftToRight && centerPanel.x < 0)) {
-        View.VISIBLE
-      } else {
-        View.INVISIBLE
-      }
-    endPanel.visibility =
-      if ((isLeftToRight && centerPanel.x < 0) || (!isLeftToRight && centerPanel.x > 0)) {
-        View.VISIBLE
-      } else {
-        View.INVISIBLE
-      }
+    private fun calculateDistanceY(startY: Float, event: MotionEvent): Float = event.y - startY
 
-    when (x) {
-      0f -> {
-        selectedPanel = Panel.CENTER
-      }
-      startPanelOpenedCenterPanelX -> {
-        selectedPanel = Panel.START
-      }
-      endPanelOpenedCenterPanelX -> {
-        selectedPanel = Panel.END
-      }
+    /**
+     * [animationDurationMs] should generally be 250ms for opening and 200ms for closing
+     * according to https://material.io/design/motion/speed.html#duration
+     */
+    private fun updateCenterPanelXWithAnimation(
+        x: Float,
+        isFling: Boolean = false,
+        animationDurationMs: Long = SIDE_PANEL_OPEN_DURATION_MS,
+    ) {
+        val previousX = centerPanel.x
+        centerPanelXAnimator?.cancel()
+
+        val normalizedX = getNormalizedX(targetedX = x)
+        centerPanelAnimationEndX = normalizedX
+
+        if (isFling) {
+            centerPanelXAnimator = ValueAnimator.ofFloat(previousX, normalizedX).apply {
+                // https://material.io/design/motion/speed.html#easing
+                // Use the suggested interpolator for Decelerated Easing
+                interpolator = LinearOutSlowInInterpolator()
+                duration = animationDurationMs
+            }
+            centerPanelXAnimator?.addUpdateListener { animator ->
+                updateCenterPanelX(animator.animatedValue as Float)
+            }
+        } else {
+            centerPanelXAnimator = ValueAnimator.ofFloat(previousX, normalizedX).apply {
+                // https://material.io/design/motion/speed.html#easing
+                // Use the suggested interpolator for Standard Easing
+                interpolator = FastOutSlowInInterpolator()
+                duration = animationDurationMs
+            }
+            centerPanelXAnimator?.addUpdateListener { animator ->
+                updateCenterPanelX(animator.animatedValue as Float)
+            }
+        }
+
+        centerPanelXAnimator?.start()
     }
 
-    val isCenterPanelClosed = x == endPanelOpenedCenterPanelX || x == startPanelOpenedCenterPanelX
-    centerPanel.setEnabledAlpha(enabled = !isCenterPanelClosed, disabledAlpha = 0.5f)
-
-    // Hide the center panel from TalkBack if it's closed. This ensures
-    // that TalkBack does not traverse the off-screen content in the center panel
-    // when the side panels are expanded.
-    centerPanel.importantForAccessibility = if (isCenterPanelClosed) {
-      View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-    } else {
-      View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+    private fun updateCenterPanelX(x: Float) {
+        val previousX = centerPanel.x
+        centerPanel.x = x
+        handleCenterPanelX(previousX, x)
     }
 
-    val isCenterPanelInRestingState = x == 0f || isCenterPanelClosed
-    centerPanel.elevation = if (isCenterPanelInRestingState) {
-      0f
-    } else {
-      resources.getDimension(R.dimen.overlapping_panels_center_panel_non_resting_elevation)
+    /**
+     * Call this method anytime the x position of the center panel changes, so we can
+     * notify listeners of drawer state changes.
+     */
+    private fun handleCenterPanelX(previousX: Float, x: Float) {
+        startPanel.visibility =
+            if ((isLeftToRight && centerPanel.x > 0) || (!isLeftToRight && centerPanel.x < 0)) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
+        endPanel.visibility =
+            if ((isLeftToRight && centerPanel.x < 0) || (!isLeftToRight && centerPanel.x > 0)) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
+
+        when (x) {
+            0f -> {
+                selectedPanel = Panel.CENTER
+            }
+            startPanelOpenedCenterPanelX -> {
+                selectedPanel = Panel.START
+            }
+            endPanelOpenedCenterPanelX -> {
+                selectedPanel = Panel.END
+            }
+        }
+
+        val isCenterPanelClosed = x == endPanelOpenedCenterPanelX || x == startPanelOpenedCenterPanelX
+        centerPanel.setEnabledAlpha(enabled = !isCenterPanelClosed, disabledAlpha = 0.5f)
+
+        // Hide the center panel from TalkBack if it's closed. This ensures
+        // that TalkBack does not traverse the off-screen content in the center panel
+        // when the side panels are expanded.
+        centerPanel.importantForAccessibility = if (isCenterPanelClosed) {
+            View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        } else {
+            View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        }
+
+        val isCenterPanelInRestingState = x == 0f || isCenterPanelClosed
+        centerPanel.elevation = if (isCenterPanelInRestingState) {
+            0f
+        } else {
+            resources.getDimension(R.dimen.overlapping_panels_center_panel_non_resting_elevation)
+        }
+
+        val oldStartPanelState = startPanelState
+        startPanelState = getStartPanelState(previousX, x)
+        for (startPanelStateListener in startPanelStateListeners) {
+            if (startPanelState != oldStartPanelState) {
+                startPanelStateListener.onPanelStateChange(startPanelState)
+            }
+        }
+
+        val oldEndPanelState = endPanelState
+        endPanelState = getEndPanelState(previousX, x)
+        for (endPanelStateListener in endPanelStateListeners) {
+            if (endPanelState != oldEndPanelState) {
+                endPanelStateListener.onPanelStateChange(endPanelState)
+            }
+        }
     }
 
-
-    val oldStartPanelState = startPanelState
-    startPanelState = getStartPanelState(previousX, x)
-    for (startPanelStateListener in startPanelStateListeners) {
-      if (startPanelState != oldStartPanelState) {
-        startPanelStateListener.onPanelStateChange(startPanelState)
-      }
+    private fun getStartPanelState(previousX: Float, x: Float): PanelState {
+        return when {
+            isLeftToRight && x <= 0F -> PanelState.Closed
+            !isLeftToRight && x >= 0f -> PanelState.Closed
+            x == startPanelOpenedCenterPanelX -> PanelState.Opened
+            isLeftToRight && x > previousX -> PanelState.Opening(x, x / startPanelOpenedCenterPanelX)
+            !isLeftToRight && x < previousX -> PanelState.Opening(x, x / startPanelOpenedCenterPanelX)
+            else -> PanelState.Closing(x, x / startPanelOpenedCenterPanelX)
+        }
     }
 
-    val oldEndPanelState = endPanelState
-    endPanelState = getEndPanelState(previousX, x)
-    for (endPanelStateListener in endPanelStateListeners) {
-      if (endPanelState != oldEndPanelState) {
-        endPanelStateListener.onPanelStateChange(endPanelState)
-      }
+    private fun getEndPanelState(previousX: Float, x: Float): PanelState {
+        return when {
+            isLeftToRight && x >= 0F -> PanelState.Closed
+            !isLeftToRight && x <= 0f -> PanelState.Closed
+            x == endPanelOpenedCenterPanelX -> PanelState.Opened
+            isLeftToRight && x < previousX -> PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
+            !isLeftToRight && x > previousX -> PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
+            else -> PanelState.Closing(x, x / endPanelOpenedCenterPanelX)
+        }
     }
-  }
 
-  private fun getStartPanelState(previousX: Float, x: Float): PanelState {
-    return when {
-      isLeftToRight && x <= 0F -> PanelState.Closed
-      !isLeftToRight && x >= 0f -> PanelState.Closed
-      x == startPanelOpenedCenterPanelX -> PanelState.Opened
-      isLeftToRight && x > previousX -> PanelState.Opening(x, x / startPanelOpenedCenterPanelX)
-      !isLeftToRight && x < previousX -> PanelState.Opening(x, x / startPanelOpenedCenterPanelX)
-      else -> PanelState.Closing(x, x / startPanelOpenedCenterPanelX)
-    }
-  }
+    private fun initPanels() {
+        startPanel = getChildAt(0)
+        centerPanel = getChildAt(1)
+        endPanel = getChildAt(2)
 
-  private fun getEndPanelState(previousX: Float, x: Float): PanelState {
-    return when {
-      isLeftToRight && x >= 0F -> PanelState.Closed
-      !isLeftToRight && x <= 0f -> PanelState.Closed
-      x == endPanelOpenedCenterPanelX -> PanelState.Opened
-      isLeftToRight && x < previousX -> PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
-      !isLeftToRight && x > previousX -> PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
-      else -> PanelState.Closing(x, x / endPanelOpenedCenterPanelX)
-    }
-  }
+        startPanel.visibility = View.INVISIBLE
+        startPanel.elevation = 0f
 
-  private fun initPanels() {
-    startPanel = getChildAt(0)
-    centerPanel = getChildAt(1)
-    endPanel = getChildAt(2)
+        centerPanel.visibility = View.VISIBLE
+        centerPanel.elevation = 0f
 
-    startPanel.visibility = View.INVISIBLE
-    startPanel.elevation = 0f
+        endPanel.visibility = View.INVISIBLE
+        endPanel.elevation = 0f
 
-    centerPanel.visibility = View.VISIBLE
-    centerPanel.elevation = 0f
+        // OverlappingPanelsLayout controls the widths of the side panel views depending
+        // on state like useFullPortraitWidthForStartPanel and the portrait mode width
+        // of the device.
+        resetStartPanelWidth()
+        resetEndPanelWidth()
 
-    endPanel.visibility = View.INVISIBLE
-    endPanel.elevation = 0f
-
-    // OverlappingPanelsLayout controls the widths of the side panel views depending
-    // on state like useFullPortraitWidthForStartPanel and the portrait mode width
-    // of the device.
-    resetStartPanelWidth()
-    resetEndPanelWidth()
-
-    // Get the min and max x values for the center panel based on the initial widths.
-    handleStartPanelWidthUpdate()
-    handleEndPanelWidthUpdate()
-
-    // Apply the pending update once after the child views are available and
-    // after we've handled the initial side panel widths.
-    pendingUpdate?.invoke()
-    pendingUpdate = null
-
-    // If the side panel sizes change (e.g. when the left panel starts full screen for a new
-    // user and then becomes non-full-screen after the user has channels or guilds), then
-    // recalculate the min and max x values.
-    startPanel.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
-      if (isLeftToRight && right != oldRight) {
+        // Get the min and max x values for the center panel based on the initial widths.
         handleStartPanelWidthUpdate()
-      } else if (!isLeftToRight && left != oldLeft) {
-        handleStartPanelWidthUpdate()
-      }
-    }
-    endPanel.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
-      if (isLeftToRight && left != oldLeft) {
         handleEndPanelWidthUpdate()
-      } else if (!isLeftToRight && right != oldRight) {
-        handleEndPanelWidthUpdate()
-      }
+
+        // Apply the pending update once after the child views are available and
+        // after we've handled the initial side panel widths.
+        pendingUpdate?.invoke()
+        pendingUpdate = null
+
+        // If the side panel sizes change (e.g. when the left panel starts full screen for a new
+        // user and then becomes non-full-screen after the user has channels or guilds), then
+        // recalculate the min and max x values.
+        startPanel.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
+            if (isLeftToRight && right != oldRight) {
+                handleStartPanelWidthUpdate()
+            } else if (!isLeftToRight && left != oldLeft) {
+                handleStartPanelWidthUpdate()
+            }
+        }
+        endPanel.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
+            if (isLeftToRight && left != oldLeft) {
+                handleEndPanelWidthUpdate()
+            } else if (!isLeftToRight && right != oldRight) {
+                handleEndPanelWidthUpdate()
+            }
+        }
     }
-  }
 
-  private fun isTouchingCenterPanelWhileSidePanelOpen(event: MotionEvent): Boolean {
-    val x = event.x
-    val centerPanelX = centerPanel.x
+    private fun isTouchingCenterPanelWhileSidePanelOpen(event: MotionEvent): Boolean {
+        val x = event.x
+        val centerPanelX = centerPanel.x
 
-    val maxCenterPanelX = max(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
-    val minCenterPanelX = min(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
-    val centerPanelRightEdgeXWhenRightPanelFullyOpen = minCenterPanelX + centerPanel.width
+        val maxCenterPanelX = max(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
+        val minCenterPanelX = min(startPanelOpenedCenterPanelX, endPanelOpenedCenterPanelX)
+        val centerPanelRightEdgeXWhenRightPanelFullyOpen = minCenterPanelX + centerPanel.width
 
-    val isTouchingCenterPanelWithLeftPanelOpen = x > maxCenterPanelX
-    val isTouchingCenterPanelWithRightPanelOpen =
-      x < centerPanelRightEdgeXWhenRightPanelFullyOpen
-    val isLeftPanelFullyOpen = centerPanelX == maxCenterPanelX
-    val isRightPanelFullyOpen = centerPanelX == minCenterPanelX
+        val isTouchingCenterPanelWithLeftPanelOpen = x > maxCenterPanelX
+        val isTouchingCenterPanelWithRightPanelOpen =
+            x < centerPanelRightEdgeXWhenRightPanelFullyOpen
+        val isLeftPanelFullyOpen = centerPanelX == maxCenterPanelX
+        val isRightPanelFullyOpen = centerPanelX == minCenterPanelX
 
-    return (isLeftPanelFullyOpen && isTouchingCenterPanelWithLeftPanelOpen) ||
+        return (isLeftPanelFullyOpen && isTouchingCenterPanelWithLeftPanelOpen) ||
             (isRightPanelFullyOpen && isTouchingCenterPanelWithRightPanelOpen)
-  }
-
-  private fun isTouchingChildGestureRegion(event: MotionEvent): Boolean {
-    val rawX = event.rawX
-    val rawY = event.rawY
-
-    childGestureRegions.forEach { childGestureRegion ->
-      val isInXRange = rawX >= childGestureRegion.left && rawX <= childGestureRegion.right
-
-      // https://stackoverflow.com/questions/11483345/how-do-android-screen-coordinates-work
-      // Y value 0 represents the top of the screen, so we need to check that the Y value is
-      // greater than the top and less than the bottom.
-      val isInYRange = rawY <= childGestureRegion.bottom && rawY >= childGestureRegion.top
-
-      val isInChildGestureRegion = isInXRange && isInYRange
-
-      if (isInChildGestureRegion) {
-        return true
-      }
     }
 
-    return false
-  }
+    private fun isTouchingChildGestureRegion(event: MotionEvent): Boolean {
+        val rawX = event.rawX
+        val rawY = event.rawY
 
-  private fun handleStartPanelWidthUpdate() {
-    val previousStartPanelOpenedCenterPanelX = startPanelOpenedCenterPanelX
-    val marginBetweenPanels =
-      resources.getDimension(R.dimen.overlapping_panels_margin_between_panels)
-    startPanelOpenedCenterPanelX = startPanel.width + marginBetweenPanels
-    startPanelOpenedCenterPanelX =
-      if (isLeftToRight) startPanelOpenedCenterPanelX else -startPanelOpenedCenterPanelX
+        childGestureRegions.forEach { childGestureRegion ->
+            val isInXRange = rawX >= childGestureRegion.left && rawX <= childGestureRegion.right
 
-    // If the start panel was in a fully opened state based on the previous startPanelOpenedCenterPanelX,
-    // then translate the center panel to the new startPanelOpenedCenterPanelX
-    if (centerPanel.x == previousStartPanelOpenedCenterPanelX ||
-      centerPanelAnimationEndX == previousStartPanelOpenedCenterPanelX
-    ) {
-      openStartPanel()
-    }
-  }
+            // https://stackoverflow.com/questions/11483345/how-do-android-screen-coordinates-work
+            // Y value 0 represents the top of the screen, so we need to check that the Y value is
+            // greater than the top and less than the bottom.
+            val isInYRange = rawY <= childGestureRegion.bottom && rawY >= childGestureRegion.top
 
-  private fun handleEndPanelWidthUpdate() {
-    val previousEndPanelOpenedCenterPanelX = endPanelOpenedCenterPanelX
-    val marginBetweenPanels =
-      resources.getDimension(R.dimen.overlapping_panels_margin_between_panels)
-    endPanelOpenedCenterPanelX = -(endPanel.width + marginBetweenPanels)
-    endPanelOpenedCenterPanelX = if (isLeftToRight) {
-      endPanelOpenedCenterPanelX
-    } else {
-      -endPanelOpenedCenterPanelX
+            val isInChildGestureRegion = isInXRange && isInYRange
+
+            if (isInChildGestureRegion) {
+                return true
+            }
+        }
+
+        return false
     }
 
-    // If the end panel was in a fully opened state based on the previous endPanelOpenedCenterPanelX,
-    // then translate the center panel to the new endPanelOpenedCenterPanelX
-    if (
-      centerPanel.x == previousEndPanelOpenedCenterPanelX ||
-      centerPanelAnimationEndX == previousEndPanelOpenedCenterPanelX
-    ) {
-      openEndPanel()
+    private fun handleStartPanelWidthUpdate() {
+        val previousStartPanelOpenedCenterPanelX = startPanelOpenedCenterPanelX
+        val marginBetweenPanels =
+            resources.getDimension(R.dimen.overlapping_panels_margin_between_panels)
+        startPanelOpenedCenterPanelX = startPanel.width + marginBetweenPanels
+        startPanelOpenedCenterPanelX =
+            if (isLeftToRight) startPanelOpenedCenterPanelX else -startPanelOpenedCenterPanelX
+
+        // If the start panel was in a fully opened state based on the previous startPanelOpenedCenterPanelX,
+        // then translate the center panel to the new startPanelOpenedCenterPanelX
+        if (centerPanel.x == previousStartPanelOpenedCenterPanelX ||
+            centerPanelAnimationEndX == previousStartPanelOpenedCenterPanelX
+        ) {
+            openStartPanel()
+        }
     }
-  }
+
+    private fun handleEndPanelWidthUpdate() {
+        val previousEndPanelOpenedCenterPanelX = endPanelOpenedCenterPanelX
+        val marginBetweenPanels =
+            resources.getDimension(R.dimen.overlapping_panels_margin_between_panels)
+        endPanelOpenedCenterPanelX = -(endPanel.width + marginBetweenPanels)
+        endPanelOpenedCenterPanelX = if (isLeftToRight) {
+            endPanelOpenedCenterPanelX
+        } else {
+            -endPanelOpenedCenterPanelX
+        }
+
+        // If the end panel was in a fully opened state based on the previous endPanelOpenedCenterPanelX,
+        // then translate the center panel to the new endPanelOpenedCenterPanelX
+        if (
+            centerPanel.x == previousEndPanelOpenedCenterPanelX ||
+            centerPanelAnimationEndX == previousEndPanelOpenedCenterPanelX
+        ) {
+            openEndPanel()
+        }
+    }
 }

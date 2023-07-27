@@ -16,7 +16,6 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.utils.VotableRef
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -167,7 +166,7 @@ class MoreActionsViewModel @Inject constructor(
     }
 
     private suspend fun <T> ensureRightInstance(
-        onCorrectInstance: suspend () -> Result<T>
+        onCorrectInstance: suspend () -> Result<T>,
     ): Result<T> {
         val currentPageInstance = currentPageInstance
         return if (currentPageInstance != null && currentPageInstance != apiInstance) {
@@ -175,7 +174,7 @@ class MoreActionsViewModel @Inject constructor(
                 AccountInstanceMismatchException(
                     apiInstance,
                     currentPageInstance,
-                )
+                ),
             )
         } else {
             onCorrectInstance()
@@ -184,5 +183,5 @@ class MoreActionsViewModel @Inject constructor(
 }
 
 data class BlockPersonResult(
-    val blockedPerson: Boolean
+    val blockedPerson: Boolean,
 )

@@ -79,6 +79,7 @@ private const val TAG = "LemmyApi"
 interface LemmyApi {
     @GET("site")
     fun getSite(@QueryMap form: Map<String, String>): Call<GetSiteResponse>
+
     @GET("site")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getSiteNoCache(@QueryMap form: Map<String, String>): Call<GetSiteResponse>
@@ -88,6 +89,7 @@ interface LemmyApi {
      */
     @GET("post/list")
     fun getPosts(@QueryMap form: Map<String, String>): Call<GetPostsResponse>
+
     @GET("post/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getPostsNoCache(@QueryMap form: Map<String, String>): Call<GetPostsResponse>
@@ -97,6 +99,7 @@ interface LemmyApi {
      */
     @GET("post")
     fun getPost(@QueryMap form: Map<String, String>): Call<GetPostResponse>
+
     @GET("post")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getPostNoCache(@QueryMap form: Map<String, String>): Call<GetPostResponse>
@@ -158,6 +161,7 @@ interface LemmyApi {
      */
     @GET("comment/list")
     fun getComments(@QueryMap form: Map<String, String>): Call<GetCommentsResponse>
+
     @GET("comment/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getCommentsNoCache(@QueryMap form: Map<String, String>): Call<GetCommentsResponse>
@@ -167,6 +171,7 @@ interface LemmyApi {
      */
     @GET("community")
     fun getCommunity(@QueryMap form: Map<String, String>): Call<GetCommunityResponse>
+
     @GET("community")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getCommunityNoCache(@QueryMap form: Map<String, String>): Call<GetCommunityResponse>
@@ -182,6 +187,7 @@ interface LemmyApi {
      */
     @GET("user")
     fun getPersonDetails(@QueryMap form: Map<String, String>): Call<GetPersonDetailsResponse>
+
     @GET("user")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getPersonDetailsNoCache(@QueryMap form: Map<String, String>): Call<GetPersonDetailsResponse>
@@ -191,6 +197,7 @@ interface LemmyApi {
      */
     @GET("user/replies")
     fun getReplies(@QueryMap form: Map<String, String>): Call<GetRepliesResponse>
+
     @GET("user/replies")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getRepliesNoCache(@QueryMap form: Map<String, String>): Call<GetRepliesResponse>
@@ -224,6 +231,7 @@ interface LemmyApi {
      */
     @GET("user/mention")
     fun getPersonMentions(@QueryMap form: Map<String, String>): Call<GetPersonMentionsResponse>
+
     @GET("user/mention")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getPersonMentionsNoCache(@QueryMap form: Map<String, String>): Call<GetPersonMentionsResponse>
@@ -233,6 +241,7 @@ interface LemmyApi {
      */
     @GET("private_message/list")
     fun getPrivateMessages(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
+
     @GET("private_message/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getPrivateMessagesNoCache(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
@@ -248,6 +257,7 @@ interface LemmyApi {
      */
     @GET("user/unread_count")
     fun getUnreadCount(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
+
     @GET("user/unread_count")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getUnreadCountNoCache(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
@@ -342,8 +352,9 @@ interface LemmyApi {
             var isConnected = false // Initial Value
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-            if (activeNetwork != null && activeNetwork.isConnected)
+            if (activeNetwork != null && activeNetwork.isConnected) {
                 isConnected = true
+            }
             return isConnected
         }
 
@@ -360,7 +371,7 @@ interface LemmyApi {
 
         private fun buildInstance(
             context: Context,
-            instance: String = DEFAULT_INSTANCE
+            instance: String = DEFAULT_INSTANCE,
         ): LemmyApiWithSite {
             return buildApi(context, instance)
         }
@@ -375,7 +386,7 @@ interface LemmyApi {
 
             val myCache = Cache(
                 directory = File(context.cacheDir, "okhttp_cache"),
-                maxSize = 20L * 1024L * 1024L // 20MB
+                maxSize = 20L * 1024L * 1024L, // 20MB
             )
             val okHttpClient = OkHttpClient.Builder()
                 // Specify the cache we created earlier.
@@ -394,8 +405,8 @@ interface LemmyApi {
                     *  we initialize the request and change its header depending on whether
                     *  the device is connected to Internet or not.
                     */
-                    request = if (hasNetwork(context))
-                    /*
+                    request = if (hasNetwork(context)) {
+                            /*
                     *  If there is Internet, get the cache that was stored 5 seconds ago.
                     *  If the cache is older than 5 seconds, then discard it,
                     *  and indicate an error in fetching the response.
@@ -404,12 +415,12 @@ interface LemmyApi {
                         request.newBuilder()
                             .header(
                                 CACHE_CONTROL_HEADER,
-                                "public, max-stale=600" // 600 = 10 minutes
+                                "public, max-stale=600", // 600 = 10 minutes
                             )
                             .removeHeader("Pragma")
                             .build()
-                    else
-                    /*
+                    } else {
+                            /*
                     *  If there is no Internet, get the cache that was stored 7 days ago.
                     *  If the cache is older than 7 days, then discard it,
                     *  and indicate an error in fetching the response.
@@ -423,14 +434,15 @@ interface LemmyApi {
                                     .maxAge(7, TimeUnit.DAYS)
                                     .onlyIfCached()
                                     .build()
-                                    .toString())
+                                    .toString(),
+                            )
                             .removeHeader("Pragma")
                             .build()
+                    }
                     // End of if-else statement
 
                     // Add the modified request to the chain.
                     val response = chain.proceed(request)
-
 
                     Log.d(TAG, "Response 1 response:          $response")
                     Log.d(
@@ -470,14 +482,13 @@ interface LemmyApi {
                     .client(getOkHttpClient(context))
                     .build()
                     .create(LemmyApi::class.java),
-                instance
+                instance,
             )
         }
     }
 }
 
-
 class LemmyApiWithSite(
     private val lemmyApi: LemmyApi,
     val instance: String,
-): LemmyApi by lemmyApi
+) : LemmyApi by lemmyApi

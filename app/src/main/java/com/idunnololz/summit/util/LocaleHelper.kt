@@ -40,7 +40,9 @@ object LocaleHelper {
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             updateResourcesLocale(base, locale)
-        } else updateResourcesLocaleLegacy(base, locale)
+        } else {
+            updateResourcesLocaleLegacy(base, locale)
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.N)

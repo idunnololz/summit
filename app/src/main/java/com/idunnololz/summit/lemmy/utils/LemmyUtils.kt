@@ -7,7 +7,6 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.Utils
 
-
 fun PostView.getUpvoteText(): CharSequence? =
     LemmyUtils.abbrevNumber(counts.score.toLong())
 

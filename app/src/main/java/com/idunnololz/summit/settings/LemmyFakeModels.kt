@@ -48,7 +48,7 @@ object LemmyFakeModels {
         admin = false,
         bot_account = false,
         ban_expires = null,
-        instance_id = 1
+        instance_id = 1,
     )
 
     val fakePerson2 = Person(
@@ -68,7 +68,7 @@ object LemmyFakeModels {
         admin = false,
         bot_account = false,
         ban_expires = null,
-        instance_id = 1
+        instance_id = 1,
     )
 
     val fakePost = Post(

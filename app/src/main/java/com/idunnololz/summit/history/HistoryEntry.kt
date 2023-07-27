@@ -3,7 +3,6 @@ package com.idunnololz.summit.history
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 
 @Entity(tableName = "history")
 data class HistoryEntry(
@@ -14,7 +13,7 @@ data class HistoryEntry(
     val url: String,
     val shortDesc: String,
     val ts: Long,
-    val extras: String
+    val extras: String,
 ) {
     companion object {
         const val TYPE_PAGE_VISIT = 1
@@ -28,7 +27,7 @@ data class LiteHistoryEntry(
     val reason: HistorySaveReason,
     val url: String,
     val shortDesc: String,
-    val ts: Long
+    val ts: Long,
 )
 
 /**
@@ -39,7 +38,7 @@ enum class HistorySaveReason {
     LOADING,
     LOADED,
     LEAVE_SCREEN,
-    CLOSE
+    CLOSE,
 }
 
 class HistoryConverters {

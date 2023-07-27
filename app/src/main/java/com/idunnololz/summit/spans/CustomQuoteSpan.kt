@@ -13,7 +13,7 @@ class CustomQuoteSpan(
     private val backgroundColor: Int,
     private val stripeColor: Int,
     private val stripeWidth: Float,
-    private val gap: Float
+    private val gap: Float,
 ) : LeadingMarginSpan, LineBackgroundSpan {
 
     override fun getLeadingMargin(first: Boolean): Int {
@@ -32,7 +32,7 @@ class CustomQuoteSpan(
         start: Int,
         end: Int,
         first: Boolean,
-        layout: Layout
+        layout: Layout,
     ) {
         val style = p.style
         val paintColor = p.color
@@ -54,12 +54,11 @@ class CustomQuoteSpan(
         text: CharSequence,
         start: Int,
         end: Int,
-        lnum: Int
+        lnum: Int,
     ) {
         val paintColor = p.color
         p.color = backgroundColor
         c.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), p)
         p.color = paintColor
     }
-
 }

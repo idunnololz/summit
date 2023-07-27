@@ -98,7 +98,8 @@ class MainActivityViewModel @Inject constructor(
                 while (true) {
                     Log.d(TAG, "Waiting for 'userCommunitiesManager'")
                     val mainTab = userCommunitiesManager.waitForTab(
-                        UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID)
+                        UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID,
+                    )
 
                     if (mainTab != null) {
                         break
@@ -130,7 +131,7 @@ class MainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             apiClient.fetchCommunitiesWithRetry(
                 sortType = SortType.TopAll,
-                listingType = ListingType.All
+                listingType = ListingType.All,
             ).onSuccess {
                 communities.postValue(it)
             }.onFailure {
@@ -180,7 +181,6 @@ class MainActivityViewModel @Inject constructor(
                             siteOrCommunity.postError(it)
                         }
                 }
-
         }
     }
 

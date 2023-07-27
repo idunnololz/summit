@@ -25,9 +25,9 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
-import com.idunnololz.summit.user.UserCommunityEntry
 import com.idunnololz.summit.user.UserCommunitiesConverters
 import com.idunnololz.summit.user.UserCommunitiesDao
+import com.idunnololz.summit.user.UserCommunityEntry
 import com.idunnololz.summit.util.moshi
 
 /**
@@ -45,9 +45,9 @@ import com.idunnololz.summit.util.moshi
         FilterEntry::class,
     ],
     autoMigrations = [
-        AutoMigration (from = 20, to = 21),
-        AutoMigration (from = 26, to = 27),
-        AutoMigration (from = 27, to = 28),
+        AutoMigration(from = 20, to = 21),
+        AutoMigration(from = 26, to = 27),
+        AutoMigration(from = 27, to = 28),
     ],
     version = 28,
     exportSchema = true,
@@ -80,7 +80,8 @@ abstract class MainDatabase : RoomDatabase() {
             return Room
                 .databaseBuilder(
                     context.applicationContext,
-                    MainDatabase::class.java, "main.db"
+                    MainDatabase::class.java,
+                    "main.db",
                 )
                 .fallbackToDestructiveMigration()
                 .addTypeConverter(LemmyActionConverters(moshi))

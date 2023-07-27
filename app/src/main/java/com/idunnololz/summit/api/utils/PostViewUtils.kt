@@ -23,7 +23,7 @@ fun PostView.getLowestResHiddenPreviewInfo(): PreviewInfo? {
     return PreviewInfo(
         url = post.thumbnail_url ?: return null,
         width = 16,
-        height = 16
+        height = 16,
     )
 }
 
@@ -43,7 +43,7 @@ fun PostView.getPreviewInfo(): PreviewInfo? {
 }
 
 fun PostView.getUrl(instance: String): String {
-    return "https://${instance}/post/${post.id}"
+    return "https://$instance/post/${post.id}"
 }
 
 fun PostView.getThumbnailPreviewInfo(): PreviewInfo? {

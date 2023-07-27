@@ -8,16 +8,16 @@ import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingThemeBinding
-import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.preferences.BaseTheme
+import com.idunnololz.summit.preferences.GlobalFontColorId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
+import com.idunnololz.summit.settings.ThemeSettings
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.settings.ui.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
@@ -29,13 +29,17 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
     @Inject
     lateinit var preferences: Preferences
+
     @Inject
     lateinit var themeManager: ThemeManager
+
+    @Inject
+    lateinit var themeSettings: ThemeSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -94,20 +98,20 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                         getString(R.string.dark_theme),
                         null,
                         R.drawable.baseline_dark_mode_24,
-                    )
+                    ),
                 ),
             ).bindToMultiView(
                 baseThemeSetting,
                 listOf(this.option1, this.option2, this.option3),
                 {
-                    when(preferences.getBaseTheme()) {
+                    when (preferences.getBaseTheme()) {
                         BaseTheme.UseSystem -> R.id.setting_option_use_system
                         BaseTheme.Light -> R.id.setting_option_light_theme
                         BaseTheme.Dark -> R.id.setting_option_dark_theme
                     }
                 },
                 {
-                    when(it) {
+                    when (it) {
                         R.id.setting_option_use_system ->
                             preferences.setBaseTheme(BaseTheme.UseSystem)
                         R.id.setting_option_light_theme ->
@@ -119,9 +123,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     binding.root.post {
                         themeManager.applyThemeFromPreferences()
                     }
-                }
+                },
             )
-
 
             OnOffSettingItem(
                 null,
@@ -142,26 +145,19 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     } else {
                         preferences.setUseMaterialYou(false)
                     }
-                }
+                },
             )
 
-            OnOffSettingItem(
-                null,
-                getString(R.string.black_theme),
-                getString(R.string.black_theme_desc),
-            ).bindTo(
+            themeSettings.blackTheme.bindTo(
                 binding.useBlackTheme,
                 { preferences.isBlackTheme() },
                 {
                     preferences.setUseBlackTheme(it)
                     themeManager.onThemeOverlayChanged()
-                }
+                },
             )
 
-            TextOnlySettingItem(
-                getString(R.string.font_size),
-                "",
-            ).bindTo(
+            themeSettings.fontSize.bindTo(
                 activity = parentActivity,
                 b = binding.fontSize,
                 choices = mapOf(
@@ -176,7 +172,23 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 onChoiceSelected = {
                     preferences.globalFontSize = it
                     themeManager.onThemeOverlayChanged()
-                }
+                },
+            )
+
+            themeSettings.fontColor.bindTo(
+                activity = parentActivity,
+                b = binding.fontColor,
+                choices = mapOf(
+                    GlobalFontColorId.Calm to getString(R.string.calm),
+                    GlobalFontColorId.HighContrast to getString(R.string.high_contrast)
+                ),
+                getCurrentChoice = {
+                    preferences.globalFontColor
+                },
+                onChoiceSelected = {
+                    preferences.globalFontColor = it
+                    themeManager.onThemeOverlayChanged()
+                },
             )
         }
     }

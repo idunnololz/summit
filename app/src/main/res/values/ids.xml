@@ -79,4 +79,7 @@
     <item name="copy_link_text" type="id" />
     <item name="community_sort_order_default" type="id" />
     <item name="comments_sort_order_default" type="id" />
+    <item name="share_fediverse_link" type="id" />
+    <item name="layout_card3" type="id" />
+    <item name="layout_large_list" type="id" />
 </resources>

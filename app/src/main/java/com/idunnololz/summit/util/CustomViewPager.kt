@@ -15,13 +15,17 @@ class CustomViewPager : ViewPager {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return if (enabled) {
             super.onTouchEvent(event)
-        } else false
+        } else {
+            false
+        }
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
         return if (enabled) {
             super.onInterceptTouchEvent(event)
-        } else false
+        } else {
+            false
+        }
     }
 
     fun setPagingEnabled(enabled: Boolean) {

@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingAboutBinding
-import com.idunnololz.summit.databinding.FragmentSettingHistoryBinding
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
@@ -31,7 +30,7 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -64,27 +63,27 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
         BasicSettingItem(
             null,
             getString(R.string.build_version, BuildConfig.VERSION_NAME),
-            getString(R.string.version_code, BuildConfig.VERSION_CODE.toString())
+            getString(R.string.version_code, BuildConfig.VERSION_CODE.toString()),
         ).bindTo(binding.version, {})
 
         BasicSettingItem(
             null,
             getString(R.string.view_on_the_play_store),
-            null
+            null,
         ).bindTo(binding.playStoreListing) {
             try {
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=com.idunnololz.summit")
-                    )
+                        Uri.parse("market://details?id=com.idunnololz.summit"),
+                    ),
                 )
             } catch (e: ActivityNotFoundException) {
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=com.idunnololz.summit")
-                    )
+                        Uri.parse("https://play.google.com/store/apps/details?id=com.idunnololz.summit"),
+                    ),
                 )
             }
         }
@@ -92,7 +91,7 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
         BasicSettingItem(
             null,
             getString(R.string.give_feedback),
-            getString(R.string.give_feedback_desc)
+            getString(R.string.give_feedback_desc),
         ).bindTo(binding.giveFeedback) {
             val bottomMenu = BottomMenu(requireContext()).apply {
                 setTitle(R.string.give_feedback)
@@ -100,7 +99,7 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
                 addItemWithIcon(R.id.email, R.string.by_email, R.drawable.baseline_email_24)
 
                 setOnMenuItemClickListener {
-                    when(it.id) {
+                    when (it.id) {
                         R.id.email -> startFeedbackIntent(requireContext())
                         R.id.summit_community -> {
                             val fm = parentFragmentManager

@@ -15,7 +15,7 @@ import java.util.*
  * every day at 1am.
  */
 class OfflineScheduleManager(
-    private val context: Context
+    private val context: Context,
 ) {
 
     companion object {
@@ -43,7 +43,7 @@ class OfflineScheduleManager(
                 context,
                 OFFLINE_DOWNLOAD_REQUEST_CODE,
                 getOfflineIntent(),
-                PendingIntent.FLAG_NO_CREATE
+                PendingIntent.FLAG_NO_CREATE,
             )
             if (olderIntent == null) {
                 Log.d(TAG, "There were no pending intents registered. Registering a new one...")
@@ -76,7 +76,7 @@ class OfflineScheduleManager(
             context,
             OFFLINE_DOWNLOAD_REQUEST_CODE,
             getOfflineIntent(),
-            0
+            0,
         )
 
         // Cancel any existing alarms
@@ -93,23 +93,24 @@ class OfflineScheduleManager(
             AlarmManager.RTC_WAKEUP,
             calendar.timeInMillis,
             AlarmManager.INTERVAL_DAY,
-            alarmIntent
+            alarmIntent,
         )
         Log.d(
             TAG,
             "Alarm set for ${
-                SimpleDateFormat(
-                    "dd/MM/yy hh:mm aa",
-                    Locale.US
-                ).format(Date(calendar.timeInMillis))
-            }"
+            SimpleDateFormat(
+                "dd/MM/yy hh:mm aa",
+                Locale.US,
+            ).format(Date(calendar.timeInMillis))
+            }",
         )
     }
 
     private fun getOfflineIntent(): Intent = OfflineBroadcastReceiver.newIntent(
-        context, OfflineTaskConfig(
+        context,
+        OfflineTaskConfig(
             minPosts = 100,
-            roundPostsToNearestPage = true
-        )
+            roundPostsToNearestPage = true,
+        ),
     )
 }

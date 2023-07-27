@@ -6,7 +6,7 @@ import org.jsoup.Jsoup
 import java.net.URL
 
 class ImgurWebsiteAdapter(
-    val url: String
+    val url: String,
 ) : WebsiteAdapter<ImgurWebsiteAdapter.PreviewInfo>() {
 
     companion object {
@@ -15,7 +15,7 @@ class ImgurWebsiteAdapter(
 
     data class PreviewInfo(
         val url: String,
-        val wasUrlRawGif: Boolean = false
+        val wasUrlRawGif: Boolean = false,
     )
 
     private var content: String? = null

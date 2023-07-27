@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference
 
 class CenteredImageSpan @JvmOverloads constructor(
     drawable: Drawable,
-    verticalAlignment: Int = DynamicDrawableSpan.ALIGN_BOTTOM
+    verticalAlignment: Int = DynamicDrawableSpan.ALIGN_BOTTOM,
 ) : ImageSpan(drawable, verticalAlignment) {
 
     private var mDrawableRef: WeakReference<Drawable?>? = null
@@ -20,9 +20,15 @@ class CenteredImageSpan @JvmOverloads constructor(
     private var extraSpace = 0
 
     override fun draw(
-        canvas: Canvas, text: CharSequence,
-        start: Int, end: Int, x: Float,
-        top: Int, y: Int, bottom: Int, paint: Paint
+        canvas: Canvas,
+        text: CharSequence,
+        start: Int,
+        end: Int,
+        x: Float,
+        top: Int,
+        y: Int,
+        bottom: Int,
+        paint: Paint,
     ) {
         canvas.save()
         canvas.translate(x, 0f)
@@ -36,7 +42,7 @@ class CenteredImageSpan @JvmOverloads constructor(
         text: CharSequence,
         start: Int,
         end: Int,
-        fm: FontMetricsInt?
+        fm: FontMetricsInt?,
     ): Int {
         val d = cachedDrawable
         val rect = d!!.bounds

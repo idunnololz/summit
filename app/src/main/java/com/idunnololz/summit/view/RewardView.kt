@@ -2,7 +2,6 @@ package com.idunnololz.summit.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,7 +17,7 @@ class RewardView : LinearLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     init {
@@ -29,9 +28,10 @@ class RewardView : LinearLayout {
         rewardIcon = findViewById(R.id.rewardIcon)
 
         setPadding(
-            context.resources.getDimensionPixelOffset(R.dimen.padding_quarter), 0,
-            context.resources.getDimensionPixelOffset(R.dimen.padding_quarter), 0
+            context.resources.getDimensionPixelOffset(R.dimen.padding_quarter),
+            0,
+            context.resources.getDimensionPixelOffset(R.dimen.padding_quarter),
+            0,
         )
     }
-
 }

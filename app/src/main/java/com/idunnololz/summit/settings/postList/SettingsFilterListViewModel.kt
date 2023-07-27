@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsFilterListViewModel @Inject constructor(
-    private val contentFiltersManager: ContentFiltersManager
+    private val contentFiltersManager: ContentFiltersManager,
 ) : ViewModel() {
 
     val filters = StatefulLiveData<List<FilterEntry>>()

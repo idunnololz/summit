@@ -46,7 +46,7 @@ data class LemmyFailedAction(
     @ColumnInfo(name = "error")
     val error: LemmyActionFailureReason,
     @ColumnInfo(name = "info")
-    val info: ActionInfo?
+    val info: ActionInfo?,
 )
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
@@ -55,7 +55,7 @@ sealed interface LemmyActionFailureReason {
     @JsonClass(generateAdapter = true)
     @TypeLabel("1")
     data class RateLimit(
-        val recommendedTimeoutMs: Long
+        val recommendedTimeoutMs: Long,
     ) : LemmyActionFailureReason
 
     @JsonClass(generateAdapter = true)
@@ -67,13 +67,13 @@ sealed interface LemmyActionFailureReason {
     @JsonClass(generateAdapter = true)
     @TypeLabel("3")
     data class UnknownError(
-        val errorCode: Int
+        val errorCode: Int,
     ) : LemmyActionFailureReason
 
     @JsonClass(generateAdapter = true)
     @TypeLabel("4")
     data class AccountNotFoundError(
-        val accountId: Int
+        val accountId: Int,
     ) : LemmyActionFailureReason
 
     @TypeLabel("5")
@@ -90,5 +90,5 @@ sealed interface LemmyActionFailureReason {
 }
 
 class LemmyActionFailureException(val reason: LemmyActionFailureReason) : RuntimeException(
-    "LemmyAction failed. Cause: ${reason::class.qualifiedName}. Details: $reason"
+    "LemmyAction failed. Cause: ${reason::class.qualifiedName}. Details: $reason",
 )

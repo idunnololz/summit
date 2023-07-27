@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.graphics.RectF
 import android.text.SpannableStringBuilder
-import android.text.Spanned
 import android.util.Log
 import android.widget.TextView
 import com.idunnololz.summit.R
@@ -49,7 +48,7 @@ object LemmyTextHelper {
                     textView: TextView,
                     url: String,
                     text: String,
-                    rect: RectF
+                    rect: RectF,
                 ): Boolean {
                     val pageRef = LinkResolver.parseUrl(url, instance)
 
@@ -106,7 +105,8 @@ object LemmyTextHelper {
                 if (!spoilerTitle.isNullOrBlank() && !spoilerText.isNullOrBlank()) {
                     matcher.appendReplacement(
                         sb,
-                        "<br><details><summary>${spoilerTitle}</summary>${spoilerText}</details>")
+                        "<br><details><summary>$spoilerTitle</summary>$spoilerText</details>",
+                    )
                     continue
                 }
 
@@ -115,7 +115,7 @@ object LemmyTextHelper {
                 if (formattingChar != null && rest != null) {
                     matcher.appendReplacement(
                         sb,
-                        Matcher.quoteReplacement("$formattingChar $rest")
+                        Matcher.quoteReplacement("$formattingChar $rest"),
                     )
                     Log.d(TAG, "Fixed ${"$formattingChar $rest"}")
                 }
@@ -124,24 +124,25 @@ object LemmyTextHelper {
                 val name = matcher.group(8)
                 val instance = matcher.group(9)
 
-                if (referenceTypeToken != null
-                    && name != null
-                    && instance != null
-                    && !instance.contains("]") /* make sure we are not within a link def */) {
+                if (referenceTypeToken != null &&
+                    name != null &&
+                    instance != null &&
+                    !instance.contains("]") /* make sure we are not within a link def */
+                ) {
                     when (referenceTypeToken.lowercase(Locale.US)) {
                         "!", "c/" -> {
                             val communityRef = CommunityRef.CommunityRefByName(name, instance)
 
                             matcher.appendReplacement(
                                 sb,
-                                "[${matcher.group(0)}](${LinkUtils.getLinkForCommunity(communityRef)})"
+                                "[${matcher.group(0)}](${LinkUtils.getLinkForCommunity(communityRef)})",
                             )
                         }
                         "@", "u/" -> {
                             val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
                             matcher.appendReplacement(
                                 sb,
-                                "[${matcher.group(0)}](${url})"
+                                "[${matcher.group(0)}]($url)",
                             )
                         }
                     }
@@ -169,28 +170,32 @@ object LemmyTextHelper {
             .usePlugin(LemmyPlugin(context, instance))
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(HtmlPlugin.create())
-            .usePlugin(object : AbstractMarkwonPlugin() {
-                override fun configure(registry: MarkwonPlugin.Registry) {
-                    registry.require(HtmlPlugin::class.java) {
-                        it.addHandler(DetailsTagHandler())
+            .usePlugin(
+                object : AbstractMarkwonPlugin() {
+                    override fun configure(registry: MarkwonPlugin.Registry) {
+                        registry.require(HtmlPlugin::class.java) {
+                            it.addHandler(DetailsTagHandler())
+                        }
                     }
-                }
-            })
-            .usePlugin(SimpleExtPlugin.create().apply {
-                addExtension(1, '^') { _, _ ->
-                    SuperScriptSpan()
-                }
-                addExtension(2, '+') { configuration, _ ->
-                    configuration.theme()
+                },
+            )
+            .usePlugin(
+                SimpleExtPlugin.create().apply {
+                    addExtension(1, '^') { _, _ ->
+                        SuperScriptSpan()
+                    }
+                    addExtension(2, '+') { configuration, _ ->
+                        configuration.theme()
 
-                    val spoilerSpan = SpoilerSpan(
-                        context.getColorCompat(R.color.colorTextTitle),
-                        context.getColorCompat(R.color.colorSpoilerRevealed),
-                        context.getColorCompat(R.color.colorTextTitle)
-                    )
+                        val spoilerSpan = SpoilerSpan(
+                            context.getColorCompat(R.color.colorTextTitle),
+                            context.getColorCompat(R.color.colorSpoilerRevealed),
+                            context.getColorCompat(R.color.colorTextTitle),
+                        )
 
-                    spoilerSpan
-                }
-            })
+                        spoilerSpan
+                    }
+                },
+            )
             .build()
 }

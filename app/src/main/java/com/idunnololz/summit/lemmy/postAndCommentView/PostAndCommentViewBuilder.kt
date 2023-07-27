@@ -15,7 +15,6 @@ import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.Space
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.updateLayoutParams
@@ -40,6 +39,7 @@ import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
@@ -51,10 +51,9 @@ import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
@@ -136,6 +135,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         tapCommentToCollapse = preferences.tapCommentToCollapse
         globalFontSizeMultiplier = GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
         lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
+        lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
     }
 
     fun bindPostView(
@@ -158,7 +158,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
-
         scaleTextSizes()
 
         lemmyHeaderHelper.populateHeaderSpan(
@@ -167,7 +166,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             instance = instance,
             onPageClick = onPageClick,
             onLinkLongClick = onLinkLongClick,
-            listAuthor = true
+            listAuthor = true,
         )
 
         title.text = postView.getFormattedTitle()
@@ -189,10 +188,11 @@ class PostAndCommentViewBuilder @Inject constructor(
         lemmyContentHelper.setupFullContent(
             reveal = isRevealed,
             tempSize = tempSize,
-            videoViewMaxHeight = (container.height
-                    - Utils.convertDpToPixel(56f)
-                    - Utils.convertDpToPixel(16f)
-                    ).toInt(),
+            videoViewMaxHeight = (
+                container.height -
+                    Utils.convertDpToPixel(56f) -
+                    Utils.convertDpToPixel(16f)
+                ).toInt(),
             contentMaxWidth = contentMaxWidth,
             fullImageViewTransitionName = "post_image",
             postView = postView,
@@ -254,19 +254,20 @@ class PostAndCommentViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
-
         scaleTextSizes()
 
         val isCompactView = this.rawBinding is PostCommentExpandedCompactItemBinding
 
         fun getActionsView(): CommentActionsViewBinding =
-            (viewRecycler.getRecycledView(R.layout.comment_actions_view)
-                ?.let { CommentActionsViewBinding.bind(it) }
-                ?: CommentActionsViewBinding.inflate(
-                    inflater,
-                    binding.actionsContainer,
-                    false
-                ))
+            (
+                viewRecycler.getRecycledView(R.layout.comment_actions_view)
+                    ?.let { CommentActionsViewBinding.bind(it) }
+                    ?: CommentActionsViewBinding.inflate(
+                        inflater,
+                        binding.actionsContainer,
+                        false,
+                    )
+                )
                 .also {
                     it.root.updateLayoutParams<FrameLayout.LayoutParams> {
                         gravity = Gravity.END
@@ -294,12 +295,12 @@ class PostAndCommentViewBuilder @Inject constructor(
         if (commentView.comment.deleted || isDeleting) {
             text.text = buildSpannedString {
                 append(context.getString(R.string.deleted_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
             }
         } else if (commentView.comment.removed) {
             text.text = buildSpannedString {
                 append(context.getString(R.string.removed_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
             }
         } else {
             LemmyTextHelper.bindText(
@@ -349,24 +350,27 @@ class PostAndCommentViewBuilder @Inject constructor(
             downvoteButton,
             upvoteCount,
             {
-              if (isCompactView) {
-                  if (it > 0) {
-                      upvoteCount.setTextColor(upvoteColor)
-                      TextViewCompat.setCompoundDrawableTintList(
-                          upvoteCount,
-                          ColorStateList.valueOf(upvoteColor))
-                  } else if (it == 0) {
-                      upvoteCount.setTextColor(unimportantTextColor)
-                      TextViewCompat.setCompoundDrawableTintList(
-                          upvoteCount,
-                          ColorStateList.valueOf(unimportantTextColor))
-                  } else {
-                      upvoteCount.setTextColor(downvoteColor)
-                      TextViewCompat.setCompoundDrawableTintList(
-                          upvoteCount,
-                          ColorStateList.valueOf(downvoteColor))
-                  }
-              }
+                if (isCompactView) {
+                    if (it > 0) {
+                        upvoteCount.setTextColor(upvoteColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            upvoteCount,
+                            ColorStateList.valueOf(upvoteColor),
+                        )
+                    } else if (it == 0) {
+                        upvoteCount.setTextColor(unimportantTextColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            upvoteCount,
+                            ColorStateList.valueOf(unimportantTextColor),
+                        )
+                    } else {
+                        upvoteCount.setTextColor(downvoteColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            upvoteCount,
+                            ColorStateList.valueOf(downvoteColor),
+                        )
+                    }
+                }
             },
             onSignInRequired,
             onInstanceMismatch,
@@ -400,7 +404,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         root.tag = ThreadLinesData(
-            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
+            depth,
+            baseDepth,
+            commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -419,7 +425,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(binding) {
-
         scaleTextSizes()
 
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
@@ -458,7 +463,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         root.tag = ThreadLinesData(
-            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
+            depth,
+            baseDepth,
+            commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -477,7 +484,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         onLinkLongClick: (url: String, text: String) -> Unit,
         collapseSection: (position: Int) -> Unit,
     ) = with(binding) {
-
         scaleTextSizes()
 
         val context = binding.root.context
@@ -507,7 +513,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesData(
-            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
+            depth,
+            baseDepth,
+            commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -521,7 +529,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightForever: Boolean,
         expandSection: (position: Int) -> Unit,
     ) = with(binding) {
-
         scaleTextSizes()
 
         val context = holder.itemView.context
@@ -540,7 +547,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesData(
-            depth, baseDepth, commentUiConfig.indentationPerLevelDp,
+            depth,
+            baseDepth,
+            commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -566,20 +575,20 @@ class PostAndCommentViewBuilder @Inject constructor(
                 appendLink(
                     item.authorName,
                     LinkUtils.getLinkForPerson(item.authorInstance, item.authorName),
-                    underline = false
+                    underline = false,
                 )
                 val e = length
                 setSpan(
                     ForegroundColorSpan(normalTextColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     StyleSpan(Typeface.BOLD),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         }
@@ -590,7 +599,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     textView: TextView,
                     url: String,
                     text: String,
-                    rect: RectF
+                    rect: RectF,
                 ): Boolean {
                     val pageRef = LinkResolver.parseUrl(url, instance)
 
@@ -610,13 +619,13 @@ class PostAndCommentViewBuilder @Inject constructor(
                 0,
                 0,
                 Utils.convertDpToPixel(16f).toInt(),
-                Utils.convertDpToPixel(16f).toInt()
+                Utils.convertDpToPixel(16f).toInt(),
             )
             b.score.setCompoundDrawablesRelative(
                 scoreDrawable,
                 null,
                 null,
-                null
+                null,
             )
             b.score.text = LemmyUtils.abbrevNumber(item.score.toLong())
             b.score.visibility = View.VISIBLE
@@ -654,7 +663,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             0,
             0,
             Utils.convertDpToPixel(16f).toInt(),
-            Utils.convertDpToPixel(16f).toInt()
+            Utils.convertDpToPixel(16f).toInt(),
         )
         val faintTextColor = context.getColorCompat(R.color.colorTextFaint)
 
@@ -662,7 +671,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             drawable,
             null,
             null,
-            null
+            null,
         )
         b.date.text = dateStringToPretty(context, item.lastUpdate)
         b.title.text = item.title
@@ -670,12 +679,12 @@ class PostAndCommentViewBuilder @Inject constructor(
         b.content.text = if (item.isDeleted) {
             buildSpannedString {
                 append(context.getString(R.string.deleted_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
             }
         } else if (item.isRemoved) {
             buildSpannedString {
                 append(context.getString(R.string.removed_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0);
+                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
             }
         } else {
             item.content
@@ -699,7 +708,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             b.content.setTextColor(context.getColorCompat(R.color.colorText))
             b.markAsRead.imageTintList =
                 ColorStateList.valueOf(
-                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+                )
             b.markAsRead.setOnClickListener {
                 onMarkAsRead(item, true)
             }
@@ -716,10 +726,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             onMessageClick(item)
         }
 
-
         if (item is InboxItem.MessageInboxItem &&
-            item.authorId == accountId) {
-
+            item.authorId == accountId
+        ) {
             b.root.setTag(R.id.swipe_enabled, false)
 //            b.markAsRead.isEnabled = false
         } else {
@@ -767,11 +776,10 @@ class PostAndCommentViewBuilder @Inject constructor(
             if (it.childCount > 0) {
                 val actionsView = it.getChildAt(0)
                 it.removeAllViews()
-                viewRecycler.addRecycledView(actionsView,R.layout.comment_actions_view)
+                viewRecycler.addRecycledView(actionsView, R.layout.comment_actions_view)
             }
         }
     }
-
 
     private fun highlightComment(isCommentHighlighted: Boolean, highlightForever: Boolean, bg: View) {
         if (highlightForever) {
@@ -827,7 +835,8 @@ class PostAndCommentViewBuilder @Inject constructor(
                 0
             } else {
                 Utils.convertDpToPixel(
-                    (commentUiConfig.indentationPerLevelDp * (absoluteDepth - 1)).toFloat() + 16f).toInt()
+                    (commentUiConfig.indentationPerLevelDp * (absoluteDepth - 1)).toFloat() + 16f,
+                ).toInt()
             }
         }
     }

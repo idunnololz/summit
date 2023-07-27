@@ -53,8 +53,8 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
                 200,
                 Color.red(bgColor),
                 Color.green(bgColor),
-                Color.blue(bgColor)
-            )
+                Color.blue(bgColor),
+            ),
         )
 
         fun onEnableChanged() {
@@ -93,7 +93,7 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
             val recurringEvent = RecurringEvent(
                 daysOfWeek = dayPicker.getSelectedDays(),
                 hourOfDay = timePicker.currentHour,
-                minuteOfHour = timePicker.currentMinute
+                minuteOfHour = timePicker.currentMinute,
             )
 
             PreferenceUtil.preferences.edit()
@@ -105,7 +105,7 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
 
             cb?.onOfflineScheduleChanged(
                 enable = enabled,
-                recurringEvent = recurringEvent
+                recurringEvent = recurringEvent,
             )
         }
         builder.setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.cancel() }

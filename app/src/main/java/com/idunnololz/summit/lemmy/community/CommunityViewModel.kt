@@ -15,7 +15,6 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
-import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -25,8 +24,8 @@ import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.PostsRepository
+import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
@@ -71,7 +70,7 @@ class CommunityViewModel @Inject constructor(
     class PageScrollState(
         var isAtBottom: Boolean = false,
         var itemIndex: Int = 0,
-        var offset: Int = 0
+        var offset: Int = 0,
     ) : Parcelable
 
     // Dont use data class so every change triggers the observers
@@ -120,11 +119,13 @@ class CommunityViewModel @Inject constructor(
 
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
-        accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
-            override suspend fun onAccountChanged(newAccount: Account?) {
-                postsRepository.reset()
-            }
-        })
+        accountManager.addOnAccountChangedListener(
+            object : AccountManager.OnAccountChangedListener {
+                override suspend fun onAccountChanged(newAccount: Account?) {
+                    postsRepository.reset()
+                }
+            },
+        )
 
         viewModelScope.launch {
             accountInfoManager.currentFullAccountOnChange
@@ -287,7 +288,7 @@ class CommunityViewModel @Inject constructor(
     private fun fetchPageInternal(
         pageToFetch: Int,
         force: Boolean,
-        clearPagesOnSuccess: Boolean = false
+        clearPagesOnSuccess: Boolean = false,
     ) {
         if (fetchingPages.contains(pageToFetch)) {
             return
@@ -299,7 +300,9 @@ class CommunityViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result = postsRepository.getPage(
-                pageToFetch, force)
+                pageToFetch,
+                force,
+            )
 
             result
                 .onSuccess {
@@ -330,7 +333,7 @@ class CommunityViewModel @Inject constructor(
                             pageIndex = pageToFetch,
                             hasMore = true,
                             error = PostLoadError(0),
-                        )
+                        ),
                     )
                     postListEngine.createItems()
                     loadedPostsData.postError(it)
@@ -408,7 +411,7 @@ class CommunityViewModel @Inject constructor(
                     currentPageIndex.value
                 } ?: return null,
             ),
-            pagePositions
+            pagePositions,
         )
     }
 
@@ -490,12 +493,14 @@ class CommunityViewModel @Inject constructor(
         assertMainThread()
 
         postListEngine.clearPages()
-        postListEngine.addPage(LoadedPostsData(
-            posts = listOf(),
-            instance = postsRepository.apiInstance,
-            pageIndex = 0,
-            hasMore = false
-        ))
+        postListEngine.addPage(
+            LoadedPostsData(
+                posts = listOf(),
+                instance = postsRepository.apiInstance,
+                pageIndex = 0,
+                hasMore = false,
+            ),
+        )
         loadedPostsData.setValue(PostUpdateInfo())
         currentPageIndex.value = 0
         setPagePositionAtTop(0)
@@ -543,8 +548,8 @@ class CommunityViewModel @Inject constructor(
             postsRepository.showImagePosts == preferences.showImagePosts &&
             postsRepository.showVideoPosts == preferences.showVideoPosts &&
             postsRepository.showTextPosts == preferences.showTextPosts &&
-            postsRepository.showNsfwPosts == preferences.showNsfwPosts) {
-
+            postsRepository.showNsfwPosts == preferences.showNsfwPosts
+        ) {
             return
         }
 
@@ -578,7 +583,7 @@ class CommunityViewModel @Inject constructor(
                 .updateStateMaintainingPosition(
                     changeState,
                     anchorPosts,
-                    postListEngine.biggestPageIndex ?: 0
+                    postListEngine.biggestPageIndex ?: 0,
                 )
                 .onSuccess {
                     val position = it.posts.indexOfFirst { anchorPosts.contains(it.post.id) }

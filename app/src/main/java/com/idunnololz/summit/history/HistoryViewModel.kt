@@ -55,7 +55,7 @@ class HistoryViewModel @Inject constructor(
                     HistoryEntryData(
                         entries,
                         hasMore,
-                    )
+                    ),
                 )
             } catch (e: Exception) {
                 historyData.postError(e)
@@ -78,7 +78,7 @@ class HistoryViewModel @Inject constructor(
                     HistoryQueryResult(
                         query,
                         searchEntries,
-                    )
+                    ),
                 )
             } catch (e: Exception) {
                 historyData.postError(e)
@@ -121,7 +121,7 @@ class HistoryViewModel @Inject constructor(
 
     data class HistoryEntryData(
         val sortedEntries: List<LiteHistoryEntry>,
-        val hasMore: Boolean
+        val hasMore: Boolean,
     )
 
     data class HistoryQueryResult(

@@ -36,32 +36,32 @@ class SettingItemsAdapter(
         val settingItem: SettingItem
 
         data class BasicItem(
-            override val settingItem: BasicSettingItem
-        ): Item
+            override val settingItem: BasicSettingItem,
+        ) : Item
 
         data class TextValueItem(
             override val settingItem: TextValueSettingItem,
             val value: String?,
-        ): Item
+        ) : Item
 
         data class TitleItem(
-            override val settingItem: SubgroupItem
-        ): Item
+            override val settingItem: SubgroupItem,
+        ) : Item
 
         data class RadioGroupItem(
             override val settingItem: RadioGroupSettingItem,
             @IdRes val value: Int?,
-        ): Item
+        ) : Item
 
         data class OnOffItem(
             override val settingItem: OnOffSettingItem,
             val value: Boolean?,
-        ): Item
+        ) : Item
 
         data class ImageValueItem(
             override val settingItem: ImageValueSettingItem,
             val value: String?,
-        ): Item
+        ) : Item
     }
 
     var data: List<SettingItem> = listOf()
@@ -127,7 +127,7 @@ class SettingItemsAdapter(
     private val adapterHelper = AdapterHelper<Item>(
         areItemsTheSame = { old, new ->
             old.settingItem.id == new.settingItem.id
-        }
+        },
     ).apply {
         addItemType(Item.BasicItem::class, BasicSettingItemBinding::inflate) { item, b, h ->
             val settingItem = item.settingItem
@@ -154,7 +154,7 @@ class SettingItemsAdapter(
                         StyleSpan(Typeface.ITALIC),
                         0,
                         length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                     )
                 }
 

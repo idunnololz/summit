@@ -10,8 +10,8 @@ import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.CommentPageResult
 import com.idunnololz.summit.lemmy.CommentListEngine
+import com.idunnololz.summit.lemmy.CommentPageResult
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
@@ -99,27 +99,31 @@ class PersonTabbedViewModel @Inject constructor(
                                 it.comments,
                                 it.posts,
                                 it.moderates,
-                            )
+                            ),
                         )
                     }
 
                     if (postListEngine.hasMore || force) {
-                        postListEngine.addPage(LoadedPostsData(
-                            it.posts,
-                            apiClient.instance,
-                            pageIndex,
-                            it.posts.size == PAGE_SIZE,
-                        ))
+                        postListEngine.addPage(
+                            LoadedPostsData(
+                                it.posts,
+                                apiClient.instance,
+                                pageIndex,
+                                it.posts.size == PAGE_SIZE,
+                            ),
+                        )
                         postListEngine.createItems()
                     }
                     if (commentListEngine.hasMore || force) {
-                        commentListEngine.addComments(CommentPageResult(
-                            it.comments,
-                            apiClient.instance,
-                            pageIndex,
-                            it.comments.size == PAGE_SIZE,
-                            null,
-                        ))
+                        commentListEngine.addComments(
+                            CommentPageResult(
+                                it.comments,
+                                apiClient.instance,
+                                pageIndex,
+                                it.comments.size == PAGE_SIZE,
+                                null,
+                            ),
+                        )
                     }
 
                     postsState.postValue(Unit)
@@ -128,25 +132,28 @@ class PersonTabbedViewModel @Inject constructor(
                     fetchingPages.remove(pageIndex)
                 }
                 .onFailure {
-
                     if (postListEngine.hasMore || force) {
-                        postListEngine.addPage(LoadedPostsData(
-                            listOf(),
-                            apiClient.instance,
-                            pageIndex,
-                            false,
-                            error = PostLoadError(0)
-                        ))
+                        postListEngine.addPage(
+                            LoadedPostsData(
+                                listOf(),
+                                apiClient.instance,
+                                pageIndex,
+                                false,
+                                error = PostLoadError(0),
+                            ),
+                        )
                         postListEngine.createItems()
                     }
                     if (commentListEngine.hasMore || force) {
-                        commentListEngine.addComments(CommentPageResult(
-                            listOf(),
-                            apiClient.instance,
-                            pageIndex,
-                            false,
-                            it,
-                        ))
+                        commentListEngine.addComments(
+                            CommentPageResult(
+                                listOf(),
+                                apiClient.instance,
+                                pageIndex,
+                                false,
+                                it,
+                            ),
+                        )
                     }
 
                     if (isPeronInfoFetch) {

@@ -1,9 +1,7 @@
 package com.idunnololz.summit.actions
 
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -70,5 +68,5 @@ class PostReadManager @Inject constructor(
 
     @Suppress("NOTHING_TO_INLINE")
     private inline fun toKey(instance: String, postId: PostId): String =
-        "${postId}@$instance"
+        "$postId@$instance"
 }

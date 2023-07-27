@@ -23,7 +23,7 @@ class PendingCommentsManager {
     fun onCommentActionFailed(
         id: Long,
         info: ActionInfo.CommentActionInfo,
-        reason: LemmyActionFailureReason
+        reason: LemmyActionFailureReason,
     ) {
         idToPendingCommentView[id]?.error = reason
     }
@@ -61,7 +61,7 @@ class PendingCommentsManager {
     fun onEditCommentActionFailed(
         id: Long,
         info: ActionInfo.EditActionInfo,
-        reason: LemmyActionFailureReason
+        reason: LemmyActionFailureReason,
     ) {
         idToPendingCommentView[id]?.error = reason
     }
@@ -87,7 +87,7 @@ class PendingCommentsManager {
     fun onDeleteCommentActionFailed(
         id: Long,
         info: ActionInfo.DeleteCommentActionInfo,
-        reason: LemmyActionFailureReason
+        reason: LemmyActionFailureReason,
     ) {
         idToPendingCommentView[id]?.error = reason
     }

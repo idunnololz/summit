@@ -7,7 +7,6 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -48,10 +47,9 @@ class InboxSwipeToActionCallback(
     fun ViewHolder.isSwipeEnabled() =
         this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
 
-
     override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: ViewHolder
+        viewHolder: ViewHolder,
     ): Int {
         return makeMovementFlags(0, ItemTouchHelper.LEFT)
     }
@@ -59,7 +57,7 @@ class InboxSwipeToActionCallback(
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: ViewHolder,
-        viewHolder1: ViewHolder
+        viewHolder1: ViewHolder,
     ): Boolean {
         return false
     }
@@ -71,7 +69,7 @@ class InboxSwipeToActionCallback(
         dX: Float,
         dY: Float,
         actionState: Int,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
         val itemView = viewHolder.itemView
         val itemHeight = itemView.height
@@ -86,7 +84,7 @@ class InboxSwipeToActionCallback(
                 itemView.right + finalDx.toInt(),
                 itemView.top,
                 itemView.right,
-                itemView.bottom
+                itemView.bottom,
             )
             disabledBackground.draw(c)
             super.onChildDraw(c, recyclerView, viewHolder, finalDx, dY, actionState, isCurrentlyActive)
@@ -100,7 +98,7 @@ class InboxSwipeToActionCallback(
                 itemView.right + dX,
                 itemView.top.toFloat(),
                 itemView.right.toFloat(),
-                itemView.bottom.toFloat()
+                itemView.bottom.toFloat(),
             )
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             return
@@ -111,7 +109,7 @@ class InboxSwipeToActionCallback(
             itemView.right + dX.toInt(),
             itemView.top,
             itemView.right,
-            itemView.bottom
+            itemView.bottom,
         )
         background.draw(c)
         val deleteIconTop = itemView.top + (itemHeight - intrinsicHeight) / 2

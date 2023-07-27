@@ -22,7 +22,6 @@ import dagger.hilt.android.HiltAndroidApp
 import java.util.*
 import javax.inject.Inject
 
-
 @HiltAndroidApp
 class MainApplication : Application(), androidx.work.Configuration.Provider {
 
@@ -53,8 +52,8 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             } else {
                 config.locale
             }
-            isAlreadyThatLocale = curLocale.language.equals(locale.language, ignoreCase = true)
-                    && curLocale.country.equals(locale.country, ignoreCase = true)
+            isAlreadyThatLocale = curLocale.language.equals(locale.language, ignoreCase = true) &&
+                curLocale.country.equals(locale.country, ignoreCase = true)
 
             if (isAlreadyThatLocale) {
                 Log.d(TAG, "Looks like the locale did not change. Skipping locale set.")
@@ -66,7 +65,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             conf.setLocale(locale)
             context.resources.updateConfiguration(
                 conf,
-                context.resources.displayMetrics
+                context.resources.displayMetrics,
             )
         }
     }
@@ -83,6 +82,8 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         super.onConfigurationChanged(newConfig)
         setLocaleFromPrefs(this)
         LocaleHelper.setLocale(this)
+
+        themeManager.updateTextConfig()
 
         onLocaleMightHaveChanged()
     }
@@ -101,8 +102,9 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         AppCompatDelegate.setDefaultNightMode(
             preferences.getInt(
-                PreferenceUtil.KEY_THEME, AppCompatDelegate.MODE_NIGHT_YES
-            )
+                PreferenceUtil.KEY_THEME,
+                AppCompatDelegate.MODE_NIGHT_YES,
+            ),
         )
 
         super.onCreate()
@@ -113,7 +115,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 //            return
 //        }
 //        LeakCanary.install(this)
-
 
         var startTime = System.currentTimeMillis()
 

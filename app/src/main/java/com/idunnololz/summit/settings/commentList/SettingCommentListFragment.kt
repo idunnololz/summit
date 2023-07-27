@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsCommentListBinding
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
-import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
@@ -22,7 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingCommentListFragment : BaseFragment<FragmentSettingsCommentListBinding>(),
+class SettingCommentListFragment :
+    BaseFragment<FragmentSettingsCommentListBinding>(),
     SettingValueUpdateCallback {
 
     @Inject
@@ -34,7 +34,7 @@ class SettingCommentListFragment : BaseFragment<FragmentSettingsCommentListBindi
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -66,12 +66,14 @@ class SettingCommentListFragment : BaseFragment<FragmentSettingsCommentListBindi
     private fun updateRendering() {
         commentListSettings.defaultCommentsSortOrder.bindTo(
             binding.defaultCommentsSortOrder,
-            { preferences.defaultCommentsSortOrder?.toApiSortOrder()?.toId()
-                ?: R.id.comments_sort_order_default },
+            {
+                preferences.defaultCommentsSortOrder?.toApiSortOrder()?.toId()
+                    ?: R.id.comments_sort_order_default
+            },
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
     }
 

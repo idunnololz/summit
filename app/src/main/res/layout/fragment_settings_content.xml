@@ -10,8 +10,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:animateLayoutChanges="true">
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -57,6 +56,12 @@
                 <include
                     android:id="@+id/default_community_sort_order"
                     layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/view_image_on_single_tap"
+                    layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

@@ -18,4 +18,4 @@ data class Comment(
     val path: String,
     val distinguished: Boolean,
     val language_id: LanguageId,
-): Parcelable
+) : Parcelable

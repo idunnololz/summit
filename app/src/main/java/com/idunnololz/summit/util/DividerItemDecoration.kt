@@ -33,7 +33,7 @@ class CustomDividerItemDecoration
 constructor(
     val context: Context,
     orientation: Int,
-    val dividerAfterLastItem: Boolean = false
+    val dividerAfterLastItem: Boolean = false,
 ) : ItemDecoration() {
     /**
      * @return the [Drawable] for this divider.
@@ -58,8 +58,8 @@ constructor(
         if (drawable == null) {
             Log.w(
                 TAG,
-                "@android:attr/listDivider was not set in the theme used for this "
-                        + "DividerItemDecoration. Please set that attribute all call setDrawable()"
+                "@android:attr/listDivider was not set in the theme used for this " +
+                    "DividerItemDecoration. Please set that attribute all call setDrawable()",
             )
         }
         a.recycle()
@@ -78,7 +78,7 @@ constructor(
     override fun onDraw(
         c: Canvas,
         parent: RecyclerView,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ) {
         if (parent.layoutManager == null || drawable == null) {
             return
@@ -98,8 +98,10 @@ constructor(
             left = parent.paddingLeft
             right = parent.width - parent.paddingRight
             canvas.clipRect(
-                left, parent.paddingTop, right,
-                parent.height - parent.paddingBottom
+                left,
+                parent.paddingTop,
+                right,
+                parent.height - parent.paddingBottom,
             )
         } else {
             left = 0
@@ -129,8 +131,10 @@ constructor(
             top = parent.paddingTop
             bottom = parent.height - parent.paddingBottom
             canvas.clipRect(
-                parent.paddingLeft, top,
-                parent.width - parent.paddingRight, bottom
+                parent.paddingLeft,
+                top,
+                parent.width - parent.paddingRight,
+                bottom,
             )
         } else {
             top = 0
@@ -153,8 +157,10 @@ constructor(
     }
 
     override fun getItemOffsets(
-        outRect: Rect, view: View, parent: RecyclerView,
-        state: RecyclerView.State
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State,
     ) {
         if (drawable == null) {
             outRect[0, 0, 0] = 0

@@ -72,7 +72,7 @@ class AccountImageGenerator @Inject constructor(
                     textToDraw,
                     (bitmap.width - width) / 2f,
                     (bitmap.height + inRect.height()) / 2f,
-                    textPaint
+                    textPaint,
                 )
             }
         }
@@ -94,10 +94,12 @@ class AccountImageGenerator @Inject constructor(
         val s = normalizeHash(accountHash, sRange.first, sRange.last)
         val l = normalizeHash(accountHash, lRange.first, lRange.last)
 
-        return Color.HSVToColor(floatArrayOf(
-            h.toFloat(),
-            s / 100f,
-            s / 100f
-        ))
+        return Color.HSVToColor(
+            floatArrayOf(
+                h.toFloat(),
+                s / 100f,
+                l / 100f,
+            ),
+        )
     }
 }

@@ -1,11 +1,8 @@
 package com.idunnololz.summit.scrape
 
 import android.util.Log
-
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-
 import org.json.JSONException
-
 import java.io.IOException
 import java.util.ArrayList
 

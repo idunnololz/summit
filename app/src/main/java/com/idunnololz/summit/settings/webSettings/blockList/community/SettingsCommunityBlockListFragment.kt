@@ -12,7 +12,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.BlockListCommunityItemBinding
-import com.idunnololz.summit.databinding.BlockListUserItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsCommunityBlockListBinding
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel
@@ -30,7 +29,7 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -60,7 +59,7 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
             val adapter = CommunityBlockListAdapter(
                 onRemoveCommunity = {
                     viewModel.unblockCommunity(it)
-                }
+                },
             )
             binding.recyclerView.setHasFixedSize(true)
             binding.recyclerView.adapter = adapter
@@ -86,7 +85,7 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
     }
 
     private class CommunityBlockListAdapter(
-        val onRemoveCommunity: (CommunityId) -> Unit
+        val onRemoveCommunity: (CommunityId) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var data: List<BlockedCommunityItem> = listOf()
@@ -99,7 +98,7 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
         private val adapterHelper = AdapterHelper<BlockedCommunityItem>(
             areItemsTheSame = { old, new ->
                 old.blockedCommunity.community.id == new.blockedCommunity.community.id
-            }
+            },
         ).apply {
             addItemType(BlockedCommunityItem::class, BlockListCommunityItemBinding::inflate) { item, b, h ->
                 b.icon.load(item.blockedCommunity.community.icon)
@@ -122,7 +121,7 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int  =
+        override fun getItemCount(): Int =
             adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
@@ -131,6 +130,5 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
         private fun refreshItems() {
             adapterHelper.setItems(data, this)
         }
-
     }
 }

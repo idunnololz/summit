@@ -15,7 +15,7 @@ import kotlin.reflect.KClass
 class AdapterHelper<T : Any>(
     private val areItemsTheSame: (old: T, new: T) -> Boolean,
     private val areContentsTheSame: (old: T, new: T) -> Boolean =
-        { oldItem, newItem -> oldItem == newItem }
+        { oldItem, newItem -> oldItem == newItem },
 ) {
 
     data class ItemInfo<T>(
@@ -23,7 +23,7 @@ class AdapterHelper<T : Any>(
         val viewBindingClass: KClass<out ViewBinding>,
         val inflateFn: (LayoutInflater, ViewGroup, Boolean) -> ViewBinding,
         val bindViewHolder: (item: T, b: ViewBinding, h: ViewHolder) -> Unit,
-        val onViewCreated: ((b: ViewBinding) -> Unit)?
+        val onViewCreated: ((b: ViewBinding) -> Unit)?,
     )
 
     private var adapter: Adapter<ViewHolder>? = null
@@ -45,13 +45,15 @@ class AdapterHelper<T : Any>(
                 adapter?.notifyItemRangeChanged(position, count, payload)
             }
         },
-        AsyncDifferConfig.Builder<T>(object : DiffUtil.ItemCallback<T>() {
-            override fun areItemsTheSame(oldItem: T, newItem: T): Boolean =
-                this@AdapterHelper.areItemsTheSame(oldItem, newItem)
+        AsyncDifferConfig.Builder<T>(
+            object : DiffUtil.ItemCallback<T>() {
+                override fun areItemsTheSame(oldItem: T, newItem: T): Boolean =
+                    this@AdapterHelper.areItemsTheSame(oldItem, newItem)
 
-            override fun areContentsTheSame(oldItem: T, newItem: T): Boolean =
-                this@AdapterHelper.areContentsTheSame(oldItem, newItem)
-        }).build(),
+                override fun areContentsTheSame(oldItem: T, newItem: T): Boolean =
+                    this@AdapterHelper.areContentsTheSame(oldItem, newItem)
+            },
+        ).build(),
     )
 
     private val itemInfos = mutableListOf<ItemInfo<T>>()
@@ -68,7 +70,7 @@ class AdapterHelper<T : Any>(
         viewBindingClass: KClass<VB>,
         inflateFn: (LayoutInflater, ViewGroup, Boolean) -> ViewBinding,
         bindViewHolder: (item: R, b: VB, h: ViewHolder) -> Unit,
-        onViewCreated: ((b: VB) -> Unit)? = null
+        onViewCreated: ((b: VB) -> Unit)? = null,
     ) {
         require(itemInfoByItemType[clazz] == null) {
             "Item type $clazz has already been added."
@@ -105,7 +107,7 @@ class AdapterHelper<T : Any>(
     inline fun <reified R : T, reified VB : ViewBinding> addItemType(
         clazz: KClass<R>,
         noinline inflateFn: (LayoutInflater, ViewGroup, Boolean) -> VB,
-        noinline bindViewHolder: (item: R, b: VB, h: ViewHolder) -> Unit
+        noinline bindViewHolder: (item: R, b: VB, h: ViewHolder) -> Unit,
     ) {
         addItemTypeInternal(clazz, VB::class, inflateFn, bindViewHolder, null)
     }
@@ -114,7 +116,7 @@ class AdapterHelper<T : Any>(
         clazz: KClass<R>,
         noinline inflateFn: (LayoutInflater, ViewGroup, Boolean) -> VB,
         noinline onViewCreated: ((b: VB) -> Unit),
-        noinline bindViewHolder: (item: R, b: VB, h: ViewHolder) -> Unit
+        noinline bindViewHolder: (item: R, b: VB, h: ViewHolder) -> Unit,
     ) {
         addItemTypeInternal(clazz, VB::class, inflateFn, bindViewHolder, onViewCreated)
     }
@@ -166,7 +168,7 @@ class AdapterHelper<T : Any>(
     fun setItems(
         newItems: List<T>,
         adapter: Adapter<ViewHolder>,
-        cb: (() -> Unit)? = null
+        cb: (() -> Unit)? = null,
     ) {
         this.adapter = adapter
 
@@ -175,7 +177,7 @@ class AdapterHelper<T : Any>(
 }
 
 class ViewBindingViewHolder<T : ViewBinding>(
-    val binding: T
+    val binding: T,
 ) : ViewHolder(binding.root)
 
 @Suppress("unchecked_cast")

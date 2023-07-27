@@ -2,7 +2,6 @@ package com.idunnololz.summit.filterLists
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.idunnololz.summit.account.info.AccountInfoConverters
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -139,5 +138,5 @@ class ContentFiltersManager @Inject constructor(
 }
 
 class TooManyFiltersException(filtersCount: Long) : RuntimeException(
-    "Has $filtersCount filters!"
+    "Has $filtersCount filters!",
 )

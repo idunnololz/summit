@@ -69,16 +69,16 @@ class OfflineManager @Inject constructor(
         SimpleCache(videosDir, NoOpCacheEvictor(), exoDatabaseProvider)
     }
 
-    private data class DownloadTask (
+    private data class DownloadTask(
         val url: String,
         val listeners: LinkedList<TaskListener> = LinkedList(),
-        val errorListeners: LinkedList<TaskFailedListener> = LinkedList()
+        val errorListeners: LinkedList<TaskFailedListener> = LinkedList(),
     )
 
-    class Registration (
+    class Registration(
         private val key: String,
         private val listener: TaskListener,
-        private val errorListener: TaskFailedListener?
+        private val errorListener: TaskFailedListener?,
     ) {
         fun cancel(offlineManager: OfflineManager) {
             offlineManager.cancelFetch(key, listener)
@@ -111,13 +111,15 @@ class OfflineManager @Inject constructor(
 
     fun fetchImageWithError(rootView: View, url: String?, listener: TaskListener, errorListener: TaskFailedListener?) {
         url ?: return
-        val registrations: MutableList<Registration> = (rootView.getTag(
-            R.id.offline_manager_registrations
-        ) as? MutableList<Registration>) ?: arrayListOf<Registration>().also {
+        val registrations: MutableList<Registration> = (
+            rootView.getTag(
+                R.id.offline_manager_registrations,
+            ) as? MutableList<Registration>
+            ) ?: arrayListOf<Registration>().also {
             rootView.setTag(R.id.offline_manager_registrations, it)
         }
         registrations.add(
-            fetchImage(url, listener, errorListener)
+            fetchImage(url, listener, errorListener),
         )
     }
 
@@ -141,9 +143,11 @@ class OfflineManager @Inject constructor(
     }
 
     fun cancelFetch(rootView: View) {
-        (rootView.getTag(
-            R.id.offline_manager_registrations
-        ) as? MutableList<Registration>)?.forEach {
+        (
+            rootView.getTag(
+                R.id.offline_manager_registrations,
+            ) as? MutableList<Registration>
+            )?.forEach {
             it.cancel(this)
         }
     }
@@ -207,7 +211,7 @@ class OfflineManager @Inject constructor(
         force: Boolean = false,
         saveToFileFn: (File) -> Result<Unit>,
         listener: TaskListener,
-        errorListener: TaskFailedListener?
+        errorListener: TaskFailedListener?,
     ): Registration {
         assertMainThread()
         check(!destDir.exists() || destDir.isDirectory)
@@ -238,7 +242,7 @@ class OfflineManager @Inject constructor(
                     force = force,
                     saveToFileFn = saveToFileFn,
                     listener = listener,
-                    errorListener = errorListener
+                    errorListener = errorListener,
                 )
             }
 
@@ -262,7 +266,7 @@ class OfflineManager @Inject constructor(
                         }
                     }
                     null
-                }
+                },
             ) ?: return@launch
 
             withContext(Dispatchers.Main) {
@@ -285,9 +289,8 @@ class OfflineManager @Inject constructor(
         force: Boolean,
         saveToFileFn: (File) -> Result<Unit>,
         listener: (File) -> Unit,
-        errorListener: ((e: Throwable) -> Unit)?
+        errorListener: ((e: Throwable) -> Unit)?,
     ): Result<File> {
-
         val fileName = getFilenameForUrl(url)
         val downloadedFile = File(destDir, fileName)
         val downloadingFile = File(downloadInProgressDir, fileName)
@@ -318,7 +321,7 @@ class OfflineManager @Inject constructor(
     private fun fetchImage(
         url: String,
         listener: TaskListener,
-        errorListener: TaskFailedListener? = null
+        errorListener: TaskFailedListener? = null,
     ): Registration = fetchGeneric(
         url = url,
         destDir = imagesDir,
@@ -351,7 +354,7 @@ class OfflineManager @Inject constructor(
             }
         },
         listener = listener,
-        errorListener = errorListener
+        errorListener = errorListener,
     )
 
     fun calculateImageMaxSizeIfNeeded(file: File) {
@@ -362,18 +365,19 @@ class OfflineManager @Inject constructor(
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
 
-        //Returns null, sizes are in the options variable
+        // Returns null, sizes are in the options variable
         BitmapFactory.decodeFile(file.path, options)
         val width = options.outWidth
         val height = options.outHeight
 
-        if (width > Utils.getScreenWidth(context)
-            || height > Utils.getScreenHeight(context)) {
+        if (width > Utils.getScreenWidth(context) ||
+            height > Utils.getScreenHeight(context)
+        ) {
             val size =
                 LemmyUtils.calculateMaxImagePreviewSize(
                     context,
                     width,
-                    height
+                    height,
                 )
             setMaxImageSizeHint(file, size.width, size.height)
         } else {
@@ -575,7 +579,7 @@ class OfflineManager @Inject constructor(
 
     @JsonClass(generateAdapter = true)
     data class PostListEngineCacheInfo(
-        val totalPages: Int
+        val totalPages: Int,
     )
 
     fun addPage(key: String?, secondaryKey: String?, data: LoadedPostsData, totalPages: Int) {

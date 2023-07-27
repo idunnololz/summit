@@ -27,7 +27,7 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -94,7 +94,7 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
             ContextCompat.getColor(context, R.color.style_amber),
             ContextCompat.getColor(context, R.color.style_blue),
             ContextCompat.getColor(context, R.color.style_green),
-            ContextCompat.getColor(context, R.color.style_orange)
+            ContextCompat.getColor(context, R.color.style_orange),
         )
 
         binding.storageUsageView.setStorageUsage(
@@ -102,21 +102,20 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
                 StorageUsageItem(
                     "Images",
                     Utils.getSizeOfFile(offlineManager.imagesDir),
-                    colors[0]
+                    colors[0],
                 ),
                 StorageUsageItem(
                     "Videos",
                     Utils.getSizeOfFile(offlineManager.videosDir) +
-                            Utils.getSizeOfFile(offlineManager.videoCacheDir),
-                    colors[1]
+                        Utils.getSizeOfFile(offlineManager.videoCacheDir),
+                    colors[1],
                 ),
                 StorageUsageItem(
                     "Other",
                     Utils.getSizeOfFile(offlineManager.tabsDir),
-                    colors[2]
+                    colors[2],
                 ),
-            )
+            ),
         )
     }
-
 }

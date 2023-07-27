@@ -42,6 +42,7 @@ class UserCommunitiesManager @Inject constructor(
     private val userCommunityItems = arrayListOf<UserCommunityItem>()
 
     private val coroutineScope = coroutineScopeFactory.create()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dbContext = Dispatchers.Default.limitedParallelism(1)
 
@@ -65,7 +66,7 @@ class UserCommunitiesManager @Inject constructor(
                 }
 
                 nextAvailableSortId = checkNotNull(
-                    userCommunityItems.maxByOrNull { it.sortOrder }
+                    userCommunityItems.maxByOrNull { it.sortOrder },
                 ).sortOrder + 1
 
                 isLoading = false
@@ -119,7 +120,7 @@ class UserCommunitiesManager @Inject constructor(
         userCommunityItems.any { it.communityRef == communityRef }
 
     private suspend fun addCommunityOrUpdateInternal(
-        communityItem: UserCommunityItem
+        communityItem: UserCommunityItem,
     ): UserCommunityItem = withContext(dbContext) {
         var newCommunityItem = communityItem
 
@@ -149,7 +150,7 @@ class UserCommunitiesManager @Inject constructor(
     }
 
     private suspend fun removeCommunityInternal(
-        community: UserCommunityItem
+        community: UserCommunityItem,
     ) = withContext(dbContext) {
         if (community.id == FIRST_FRAGMENT_TAB_ID) {
             return@withContext

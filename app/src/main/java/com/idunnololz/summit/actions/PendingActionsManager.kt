@@ -2,15 +2,7 @@ package com.idunnololz.summit.actions
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LifecycleOwner
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.connectivity.ConnectivityChangedWorker
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
@@ -21,7 +13,6 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.lemmy.utils.VotableRef
-import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +73,7 @@ class PendingActionsManager @Inject constructor(
         },
         completeActionSuccess = { action: LemmyAction, result: LemmyActionResult<*, *> ->
             completeActionSuccess(action, result)
-        }
+        },
     )
 
     init {
@@ -133,7 +124,7 @@ class PendingActionsManager @Inject constructor(
                 ref = ref,
                 dir = dir,
                 rank = 2,
-                accountId = accountId
+                accountId = accountId,
             )
             action.removeSimilarActionsBy { ref }
             action.insert()
@@ -156,7 +147,7 @@ class PendingActionsManager @Inject constructor(
                 postRef = postRef,
                 parentId = parentId,
                 content = content,
-                accountId = accountId
+                accountId = accountId,
             )
             action.insert()
         }
@@ -180,7 +171,7 @@ class PendingActionsManager @Inject constructor(
                 postRef = postRef,
                 commentId = commentId,
                 content = content,
-                accountId = accountId
+                accountId = accountId,
             )
             action.insert()
         }
@@ -197,7 +188,7 @@ class PendingActionsManager @Inject constructor(
             val action = ActionInfo.DeleteCommentActionInfo(
                 postRef = postRef,
                 commentId = commentId,
-                accountId = accountId
+                accountId = accountId,
             )
             action.insert()
         }
@@ -252,9 +243,8 @@ class PendingActionsManager @Inject constructor(
     }
 
     private suspend fun insertAction(
-        action: LemmyAction
+        action: LemmyAction,
     ): LemmyAction = withContext(Dispatchers.Default) {
-
         val newAction = withContext(actionsContext) {
             val actionId = actionsDao.insertAction(action)
             val newAction = action.copy(id = actionId)
@@ -274,8 +264,8 @@ class PendingActionsManager @Inject constructor(
         newAction
     }
 
-    private suspend inline fun <reified T: ActionInfo, ID> T.removeSimilarActionsBy(
-        crossinline id: T.() -> ID
+    private suspend inline fun <reified T : ActionInfo, ID> T.removeSimilarActionsBy(
+        crossinline id: T.() -> ID,
     ) =
         withContext(actionsContext) {
             val iterator = actions.iterator()
@@ -300,9 +290,8 @@ class PendingActionsManager @Inject constructor(
                 ts = System.currentTimeMillis(),
                 creationTs = System.currentTimeMillis(),
                 info = this,
-            )
+            ),
         )
-
 
     private fun delayAction(action: LemmyAction, nextRefreshMs: Long) {
         coroutineScope.launch {
@@ -338,12 +327,12 @@ class PendingActionsManager @Inject constructor(
     sealed class ActionExecutionResult {
         class Success(val result: LemmyActionResult<*, *>) : ActionExecutionResult()
         data class Failure(
-            val failureReason: LemmyActionFailureReason
+            val failureReason: LemmyActionFailureReason,
         ) : ActionExecutionResult()
     }
 
     private fun LemmyAction.toLemmyFailedAction(
-        error: LemmyActionFailureReason
+        error: LemmyActionFailureReason,
     ): LemmyFailedAction =
         LemmyFailedAction(
             id = 0L,

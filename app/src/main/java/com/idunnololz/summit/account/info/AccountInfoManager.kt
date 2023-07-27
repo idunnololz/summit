@@ -69,7 +69,7 @@ class AccountInfoManager @Inject constructor(
                     accountInfoUpdateState.emit(StatefulData.NotStarted())
                     unreadCount.emit(UnreadCount(0))
                 }
-            }
+            },
         )
 
         coroutineScope.launch {
@@ -117,7 +117,7 @@ class AccountInfoManager @Inject constructor(
                 } catch (e: Exception) {
                     null
                 }
-            } ?: Uri.fromFile(getImageForAccount(account))
+            } ?: Uri.fromFile(getImageForAccount(account)),
         )
     }
 
@@ -153,13 +153,13 @@ class AccountInfoManager @Inject constructor(
                 response.my_user?.local_user_view?.person?.avatar,
                 response.my_user?.local_user_view?.local_user?.default_sort_type,
                 response.my_user?.local_user_view?.local_user?.show_read_posts,
-            )
+            ),
         )
         currentFullAccount.emit(
             FullAccount(
                 account,
                 accountInfo,
-            )
+            ),
         )
 
         accountInfoDao.insert(accountInfo)
@@ -203,19 +203,18 @@ class AccountInfoManager @Inject constructor(
         val accountInfo = accountInfoDao.getAccountInfo(account.id)
             ?: return
 
-
         currentFullAccount.emit(
             FullAccount(
                 account,
                 accountInfo,
-            )
+            ),
         )
 
         subscribedCommunities.emit(accountInfo.subscriptions ?: listOf())
     }
 
     data class UnreadCount(
-        val totalUnreadCount: Int
+        val totalUnreadCount: Int,
     )
 
 //    private class AccountInfo(

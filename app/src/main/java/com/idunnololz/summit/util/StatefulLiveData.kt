@@ -57,7 +57,7 @@ class StatefulLiveData<T> {
         statusDesc: String? = null,
         progress: Int = 0,
         maxProgress: Int = 0,
-        payload: T? = null
+        payload: T? = null,
     ) {
         data.value = StatefulData.Loading(
             statusDesc = statusDesc,
@@ -70,7 +70,7 @@ class StatefulLiveData<T> {
         statusDesc: String? = null,
         progress: Int = 0,
         maxProgress: Int = 0,
-        payload: T? = null
+        payload: T? = null,
     ) {
         data.postValue(
             StatefulData.Loading(
@@ -86,7 +86,7 @@ class StatefulLiveData<T> {
     fun postIsLoading(
         statusDesc: String? = null,
         progress: Int = 0,
-        maxProgress: Int = 0
+        maxProgress: Int = 0,
     ) {
         data.postValue(
             StatefulData.Loading(
@@ -149,7 +149,7 @@ sealed class StatefulData<T> {
         val statusDesc: String? = null,
         val progress: Int = 0,
         val maxProgress: Int = 0,
-        val payload: T? = null
+        val payload: T? = null,
     ) : StatefulData<T>() {
         fun requirePayload(): T = requireNotNull(payload)
     }

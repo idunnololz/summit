@@ -20,7 +20,7 @@ data class FilterEntry(
     val filterType: FilterTypeId,
     val filter: String,
     val isRegex: Boolean,
-): Parcelable
+) : Parcelable
 
 typealias FilterTypeId = Int
 

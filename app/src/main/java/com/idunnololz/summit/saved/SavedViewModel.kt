@@ -20,7 +20,6 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.ViewPagerController
-import com.idunnololz.summit.lemmy.person.PersonTabbedViewModel
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -147,7 +146,7 @@ class SavedViewModel @Inject constructor(
                                 apiClient.instance,
                                 pageIndex,
                                 it.size == PAGE_SIZE,
-                            )
+                            ),
                         )
                         postListEngine.createItems()
                     }
@@ -158,13 +157,15 @@ class SavedViewModel @Inject constructor(
                 }
                 .onFailure {
                     if (postListEngine.hasMore || force) {
-                        postListEngine.addPage(LoadedPostsData(
-                            listOf(),
-                            apiClient.instance,
-                            pageIndex,
-                            false,
-                            error = PostLoadError(0)
-                        ))
+                        postListEngine.addPage(
+                            LoadedPostsData(
+                                listOf(),
+                                apiClient.instance,
+                                pageIndex,
+                                false,
+                                error = PostLoadError(0),
+                            ),
+                        )
                         postListEngine.createItems()
                     }
 
@@ -188,13 +189,15 @@ class SavedViewModel @Inject constructor(
             apiClient.fetchSavedCommentsWithRetry(pageIndex.toLemmyPageIndex(), PAGE_SIZE, force)
                 .onSuccess {
                     if (commentListEngine.hasMore || force) {
-                        commentListEngine.addComments(CommentPageResult(
-                            it,
-                            apiClient.instance,
-                            pageIndex,
-                            it.size == PAGE_SIZE,
-                            null,
-                        ))
+                        commentListEngine.addComments(
+                            CommentPageResult(
+                                it,
+                                apiClient.instance,
+                                pageIndex,
+                                it.size == PAGE_SIZE,
+                                null,
+                            ),
+                        )
                     }
 
                     commentsState.postValue(Unit)
@@ -203,13 +206,15 @@ class SavedViewModel @Inject constructor(
                 }
                 .onFailure {
                     if (commentListEngine.hasMore || force) {
-                        commentListEngine.addComments(CommentPageResult(
-                            listOf(),
-                            apiClient.instance,
-                            pageIndex,
-                            false,
-                            it,
-                        ))
+                        commentListEngine.addComments(
+                            CommentPageResult(
+                                listOf(),
+                                apiClient.instance,
+                                pageIndex,
+                                false,
+                                it,
+                            ),
+                        )
                     }
 
                     commentsState.postError(it)

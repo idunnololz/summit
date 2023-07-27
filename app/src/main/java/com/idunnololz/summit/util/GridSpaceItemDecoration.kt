@@ -1,14 +1,14 @@
 package com.idunnololz.summit.util
 
 import android.graphics.Rect
+import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
 
 class GridSpaceItemDecoration(
     private val space: Int,
     private val spaceAboveFirstAndBelowLastItem: Boolean,
-    private val spaceBeforeStartAndAfterEnd: Boolean
+    private val spaceBeforeStartAndAfterEnd: Boolean,
 ) : RecyclerView.ItemDecoration() {
 
     private var needLeftSpacing = false
@@ -17,14 +17,14 @@ class GridSpaceItemDecoration(
         outRect: Rect,
         view: View,
         parent: RecyclerView,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ) {
         val layoutManager = parent.layoutManager
         val gridSize = (layoutManager as GridLayoutManager).spanCount
 
         val frameWidth = ((parent.width - space.toFloat() * (gridSize - 1)) / gridSize).toInt()
         val padding = parent.width / gridSize - frameWidth
-        val itemPosition = (view.layoutParams as RecyclerView.LayoutParams).viewAdapterPosition
+        val itemPosition = (view.layoutParams as RecyclerView.LayoutParams).absoluteAdapterPosition
 
         outRect.top = space
         outRect.bottom = 0

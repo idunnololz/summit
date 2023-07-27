@@ -60,6 +60,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/password">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/username_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="username"
@@ -82,6 +83,7 @@
 
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/password_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -128,8 +130,8 @@
                 app:layout_constraintBottom_toTopOf="@+id/login"
                 app:passwordToggleEnabled="true">
 
-
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/two_factor_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"

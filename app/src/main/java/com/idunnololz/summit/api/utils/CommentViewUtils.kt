@@ -3,7 +3,6 @@ package com.idunnololz.summit.api.utils
 import android.net.Uri
 import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
 
 fun Comment.getDepth(): Int {
     val depth = path.split(".").size.minus(2)

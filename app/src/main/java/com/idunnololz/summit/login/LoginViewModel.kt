@@ -8,7 +8,6 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.util.StatefulLiveData
@@ -44,8 +43,8 @@ class LoginViewModel @Inject constructor(
             )
 
             if (result.exceptionOrNull()?.message?.contains("totp", ignoreCase = true) ==
-                true) {
-
+                true
+            ) {
                 // user has 2fa enabled
                 state.postValue(State.TwoFactorAuth(instance, username, password))
                 return@launch
@@ -95,7 +94,6 @@ class LoginViewModel @Inject constructor(
             accountInfoManager.updateAccountInfoWith(account, site)
 
             accountLiveData.postValue(account)
-
         }
     }
 
@@ -106,7 +104,7 @@ class LoginViewModel @Inject constructor(
                 currentState.instance,
                 currentState.username,
                 currentState.password,
-                twoFactorCode
+                twoFactorCode,
             )
         }
     }

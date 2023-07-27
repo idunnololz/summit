@@ -14,7 +14,6 @@ import org.jsoup.HttpStatusException
 
 object LinkUtils {
 
-
     const val APP_PERMISSIONS_HELP_ARTICLE = "https://support.google.com/android/answer/9431959"
 
     fun downloadSite(url: String, cache: Boolean = false): String {
@@ -27,7 +26,7 @@ object LinkUtils {
             throw HttpStatusException(
                 "Response was not 200. Response code: $responseCode",
                 responseCode,
-                url
+                url,
             )
         }
     }
@@ -50,7 +49,7 @@ object LinkUtils {
     fun getLinkForMoreChildren(
         linkId: String,
         children: List<String>,
-        commentsSortOrder: String?
+        commentsSortOrder: String?,
     ): String =
         Uri.parse("https://www.reddit.com/api/morechildren.json")
             .buildUpon()
@@ -78,7 +77,7 @@ object LinkUtils {
         "https://oauth.reddit.com/api/editusertext"
 
     fun subreddits(sortOrder: String = "popular", limit: Int, showAll: Boolean): String =
-        Uri.parse("https://www.reddit.com/subreddits/${sortOrder}.json")
+        Uri.parse("https://www.reddit.com/subreddits/$sortOrder.json")
             .buildUpon()
             .appendQueryParameter("limit", limit.toString())
             .apply {
@@ -106,16 +105,16 @@ object LinkUtils {
         "https://www.reddit.com/$thingId"
 
     fun postIdToLink(instance: String, postId: Int) =
-        "https://${instance}/post/$postId"
+        "https://$instance/post/$postId"
 
     fun getLinkForPerson(instance: String, name: String): String =
-        "https://${instance}/u/$name"
+        "https://$instance/u/$name"
 
     fun getLinkForPost(instance: String, id: PostId): String =
-        "https://${instance}/post/$id"
+        "https://$instance/post/$id"
 
     fun getLinkForComment(instance: String, commentId: CommentId): String =
-        "https://${instance}/comment/$commentId"
+        "https://$instance/comment/$commentId"
 }
 
 fun MainActivity.showBottomMenuForLink(url: String, text: String) {

@@ -1,11 +1,11 @@
 package com.idunnololz.summit.util
 
-import androidx.core.view.ViewCompat
-import androidx.core.view.ViewPropertyAnimatorListenerAdapter
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorListenerAdapter
 
 object AnimationUtils {
 
@@ -38,11 +38,13 @@ object AnimationUtils {
             .setStartDelay(startDelay)
             .translationY(0f)
             .alpha(1f)
-            .setListener(object : ViewPropertyAnimatorListenerAdapter() {
-                override fun onAnimationCancel(view: View) {
-                    view?.translationY = 0f
-                }
-            })
+            .setListener(
+                object : ViewPropertyAnimatorListenerAdapter() {
+                    override fun onAnimationCancel(view: View) {
+                        view.translationY = 0f
+                    }
+                },
+            )
     }
 
     fun animateInInnerViewsWithDelay(rootView: View, toIgnore: Set<View>, duration: Long) {
@@ -53,7 +55,7 @@ object AnimationUtils {
         rootView: View,
         delay: Long,
         toIgnore: Set<View>,
-        duration: Long
+        duration: Long,
     ) {
         if (rootView is ViewGroup) {
             val childCount = rootView.childCount
@@ -70,9 +72,9 @@ object AnimationUtils {
 
     @JvmOverloads
     fun expand(v: View, duration: Long = DEFAULT_ANIMATION_DURATION_MS) {
-        if (v.visibility == View.VISIBLE
-            && v.alpha != 0f
-            && v.layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT
+        if (v.visibility == View.VISIBLE &&
+            v.alpha != 0f &&
+            v.layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT
         ) {
             return
         }
@@ -85,10 +87,11 @@ object AnimationUtils {
         v.visibility = View.VISIBLE
         val a = object : Animation() {
             override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-                v.layoutParams.height = if (interpolatedTime == 1f)
+                v.layoutParams.height = if (interpolatedTime == 1f) {
                     ViewGroup.LayoutParams.WRAP_CONTENT
-                else
+                } else {
                     (targetHeight * interpolatedTime).toInt()
+                }
                 v.requestLayout()
             }
 

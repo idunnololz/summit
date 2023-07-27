@@ -2,24 +2,13 @@ package com.idunnololz.summit.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.ApiException
-import com.idunnololz.summit.api.ClientApiException
-import com.idunnololz.summit.api.NetworkException
-import com.idunnololz.summit.api.NoInternetException
-import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.ServerApiException
-import com.idunnololz.summit.api.ServerTimeoutException
-import com.idunnololz.summit.api.SocketTimeoutException
-import com.idunnololz.summit.scrape.LoaderException
+import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.AnimationUtils
 import com.idunnololz.summit.util.toErrorMessage
 
@@ -42,7 +31,7 @@ class LoadingView : ConstraintLayout {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     init {
@@ -68,9 +57,9 @@ class LoadingView : ConstraintLayout {
         progressBar: Boolean = false,
         errorText: Boolean = false,
         positiveButton: Boolean = false,
-        negativeButton: Boolean = false
+        negativeButton: Boolean = false,
     ) {
-        //val animateChanges = rootViewAnimationController.isVisible
+        // val animateChanges = rootViewAnimationController.isVisible
 
         rootViewAnimationController.cancelAnimations()
         progressView.visibility = if (progressBar) View.VISIBLE else View.GONE
@@ -114,7 +103,7 @@ class LoadingView : ConstraintLayout {
     fun showProgressBarWithMessageAndButton(
         @StringRes message: Int,
         @StringRes buttonText: Int,
-        onClickListener: (View) -> Unit
+        onClickListener: (View) -> Unit,
     ) {
         show(progressBar = true, errorText = true, positiveButton = true)
         bindErrorText(context.getString(message))
@@ -142,7 +131,7 @@ class LoadingView : ConstraintLayout {
         positiveButtonText: String,
         positiveButtonListener: (View) -> Unit,
         negativeButtonText: String,
-        negativeButtonListener: (View) -> Unit
+        negativeButtonListener: (View) -> Unit,
     ) {
         show(errorText = true, positiveButton = true, negativeButton = true)
         bindErrorText(errorText)
@@ -166,7 +155,7 @@ class LoadingView : ConstraintLayout {
     fun showErrorWithRetry(
         @StringRes msg: Int,
         @StringRes negativeButtonText: Int,
-        negativeButtonListener: (View) -> Unit
+        negativeButtonListener: (View) -> Unit,
     ) {
         show(errorText = true, positiveButton = true, negativeButton = true)
         bindErrorText(context.getString(msg))

@@ -6,23 +6,15 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
-import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.GetPersonMentions
-import com.idunnololz.summit.api.dto.GetPrivateMessages
-import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
-import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
-import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionId
 import com.idunnololz.summit.api.dto.PersonMentionView
@@ -30,13 +22,10 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
-import com.idunnololz.summit.api.dto.SaveComment
-import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import kotlinx.coroutines.launch
 import java.io.InputStream
@@ -66,11 +55,13 @@ class AccountAwareLemmyClient @Inject constructor(
     private var currentAccount: Account? = null
 
     init {
-        accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
-            override suspend fun onAccountChanged(newAccount: Account?) {
-                setAccount(newAccount, accountChanged = true)
-            }
-        })
+        accountManager.addOnAccountChangedListener(
+            object : AccountManager.OnAccountChangedListener {
+                override suspend fun onAccountChanged(newAccount: Account?) {
+                    setAccount(newAccount, accountChanged = true)
+                }
+            },
+        )
         coroutineScope.launch {
             accountManager.currentAccount.collect {
                 setAccount(it, accountChanged = false)
@@ -234,7 +225,7 @@ class AccountAwareLemmyClient @Inject constructor(
             searchType = searchType,
             page = page,
             limit = limit,
-            query = query
+            query = query,
         )
             .autoSignOut(account)
 
@@ -278,7 +269,7 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun fetchUnreadCountWithRetry(
         force: Boolean,
-        account: Account? = currentAccount
+        account: Account? = currentAccount,
     ): Result<GetUnreadCountResponse> =
         retry {
             if (account == null) {
@@ -516,7 +507,8 @@ class AccountAwareLemmyClient @Inject constructor(
         val currentAccount = currentAccount
         if (currentAccount != null) {
             return Result.failure(
-                AccountInstanceMismatchException(currentAccount.instance, instance))
+                AccountInstanceMismatchException(currentAccount.instance, instance),
+            )
         }
 
         return Result.failure(NotAuthenticatedException())

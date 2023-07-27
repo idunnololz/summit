@@ -16,7 +16,7 @@ object ViewTypeManager {
 }
 
 class ViewTypeGenerator(
-    private val baseType: Int
+    private val baseType: Int,
 ) {
     private var nextViewType = AtomicInteger(0)
 

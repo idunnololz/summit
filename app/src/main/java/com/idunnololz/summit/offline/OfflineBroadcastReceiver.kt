@@ -29,5 +29,4 @@ class OfflineBroadcastReceiver : BroadcastReceiver() {
 
         OfflineService.startWithConfig(context, config)
     }
-
 }
