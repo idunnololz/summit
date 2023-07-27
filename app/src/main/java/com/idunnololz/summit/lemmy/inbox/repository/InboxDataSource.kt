@@ -5,13 +5,16 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.util.retry
 import kotlin.math.min
-import kotlin.reflect.KClass
 
 class InboxSource<O>(
     private val apiClient: AccountAwareLemmyClient,
     defaultSortOrder: O,
     private val fetchObjects: suspend AccountAwareLemmyClient.(
-        pageIndex: Int, sortOrder: O, limit: Int, force: Boolean) -> Result<List<InboxItem>>
+        pageIndex: Int,
+        sortOrder: O,
+        limit: Int,
+        force: Boolean,
+    ) -> Result<List<InboxItem>>,
 ) : LemmyListSource<InboxItem, O>(
     apiClient,
     {
@@ -59,7 +62,11 @@ open class LemmyListSource<T, O>(
     private val id: T.() -> Int,
     defaultSortOrder: O,
     private val fetchObjects: suspend AccountAwareLemmyClient.(
-        pageIndex: Int, sortOrder: O, limit: Int, force: Boolean) -> Result<List<T>>
+        pageIndex: Int,
+        sortOrder: O,
+        limit: Int,
+        force: Boolean,
+    ) -> Result<List<T>>,
 ) {
 
     companion object {
@@ -67,7 +74,6 @@ open class LemmyListSource<T, O>(
 
         private const val PAGE_SIZE = 20
     }
-
 
     data class ObjectData<T>(
         val obj: T,
@@ -105,7 +111,7 @@ open class LemmyListSource<T, O>(
             },
             {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -141,7 +147,6 @@ open class LemmyListSource<T, O>(
                 currentPageInternal++
             }
 
-
             if (!hasMore) {
                 endReached = true
                 break
@@ -154,8 +159,8 @@ open class LemmyListSource<T, O>(
                 items = allObjects
                     .slice(startIndex until min(endIndex, allObjects.size))
                     .map { it.obj },
-                hasMore = hasMore
-            )
+                hasMore = hasMore,
+            ),
         )
     }
 
@@ -200,11 +205,11 @@ open class LemmyListSource<T, O>(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
-    private fun addObjects(newObjects: List<T>, pageIndex: Int,) {
+    private fun addObjects(newObjects: List<T>, pageIndex: Int) {
         newObjects.forEach {
             val id = it.id()
             if (seenObjects.add(id)) {
@@ -224,7 +229,7 @@ open class LemmyListSource<T, O>(
 
         currentPageInternal = minPageInternal
 
-        Log.d(TAG, "Deleted pages ${minPageInternal} and beyond. Posts left: ${allObjects.size}")
+        Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allObjects.size}")
     }
 
     protected fun removeItemAt(position: Int): ObjectData<T> {

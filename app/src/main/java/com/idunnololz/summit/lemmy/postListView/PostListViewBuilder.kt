@@ -19,23 +19,24 @@ import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
+import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preferences.ThemeManager
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -51,20 +52,14 @@ class PostListViewBuilder @Inject constructor(
     private val offlineManager: OfflineManager,
     private val accountActionsManager: AccountActionsManager,
     private val preferences: Preferences,
+    private val themeManager: ThemeManager,
 ) {
 
     var postUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
         set(value) {
             field = value
 
-            lemmyContentHelper.config = value.fullContentConfig
-
-            postImageWidth = (Utils.getScreenWidth(context) * postUiConfig.imageWidthPercent).toInt()
-            textSizeMultiplier = postUiConfig.textSizeMultiplier
-
-            globalFontSizeMultiplier =
-                GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
-            lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
+            onPostUiConfigUpdated()
         }
 
     private var globalFontSizeMultiplier: Float =
@@ -85,8 +80,26 @@ class PostListViewBuilder @Inject constructor(
     private val voteUiHandler = accountActionsManager.voteUiHandler
     private var postImageWidth: Int = (Utils.getScreenWidth(context) * postUiConfig.imageWidthPercent).toInt()
     private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
+    private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
 
     private val tempSize = Size()
+
+    init {
+        onPostUiConfigUpdated()
+    }
+
+    private fun onPostUiConfigUpdated() {
+        lemmyContentHelper.config = postUiConfig.fullContentConfig
+
+        postImageWidth = (Utils.getScreenWidth(context) * postUiConfig.imageWidthPercent).toInt()
+        textSizeMultiplier = postUiConfig.textSizeMultiplier
+
+        globalFontSizeMultiplier =
+            GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
+        lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
+        lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
+        singleTapToViewImage = preferences.postListViewImageOnSingleTap
+    }
 
     /**
      * @param updateContent False for a fast update (also removes flickering)
@@ -116,7 +129,7 @@ class PostListViewBuilder @Inject constructor(
             post: PostView,
             jumpToComments: Boolean,
             reveal: Boolean,
-            videoState: VideoState?
+            videoState: VideoState?,
         ) -> Unit,
         onShowMoreOptions: (PostView) -> Unit,
         toggleItem: (postView: PostView) -> Unit,
@@ -126,7 +139,6 @@ class PostListViewBuilder @Inject constructor(
         onHighlightComplete: () -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(holder) {
-
         if (holder.state.preferTitleText != postUiConfig.preferTitleText) {
             if (postUiConfig.preferTitleText) {
                 when (val rb = rawBinding) {
@@ -134,14 +146,16 @@ class PostListViewBuilder @Inject constructor(
                         TextViewCompat.setTextAppearance(
                             rb.title,
                             context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceTitleMedium)
+                                com.google.android.material.R.attr.textAppearanceTitleMedium,
+                            ),
                         )
                     }
                     is ListingItemCompactBinding -> {
                         TextViewCompat.setTextAppearance(
                             rb.title,
                             context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceTitleMedium)
+                                com.google.android.material.R.attr.textAppearanceTitleMedium,
+                            ),
                         )
                     }
                 }
@@ -151,14 +165,16 @@ class PostListViewBuilder @Inject constructor(
                         TextViewCompat.setTextAppearance(
                             rb.title,
                             context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceBodyMedium)
+                                com.google.android.material.R.attr.textAppearanceBodyMedium,
+                            ),
                         )
                     }
                     is ListingItemCompactBinding -> {
                         TextViewCompat.setTextAppearance(
                             rb.title,
                             context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceBodyMedium)
+                                com.google.android.material.R.attr.textAppearanceBodyMedium,
+                            ),
                         )
                     }
                 }
@@ -241,6 +257,19 @@ class PostListViewBuilder @Inject constructor(
                             this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
+
+                    is ListingItemLargeListBinding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.topToTop = ConstraintLayout.LayoutParams.UNSET
+                            this.topToBottom = rb.bottomBarrier.id
+                            this.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                            this.bottomMargin = context.getDimen(R.dimen.padding)
+                            this.topMargin = 0
+                        }
+                        rb.headerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
                 }
             }
 
@@ -260,6 +289,11 @@ class PostListViewBuilder @Inject constructor(
                             this.dimensionRatio = null
                         }
                     }
+                    is ListingItemLargeListBinding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = null
+                        }
+                    }
                 }
             } else {
                 when (val rb = rawBinding) {
@@ -269,6 +303,11 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemCard2Binding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = "H,16:9"
+                        }
+                    }
+                    is ListingItemLargeListBinding -> {
                         rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             this.dimensionRatio = "H,16:9"
                         }
@@ -294,7 +333,7 @@ class PostListViewBuilder @Inject constructor(
                 postView,
                 false,
                 isRevealed,
-                videoState
+                videoState,
             )
         }
 
@@ -319,7 +358,8 @@ class PostListViewBuilder @Inject constructor(
                 image ?: return
 
                 val thumbnailImageUrl = if (thumbnailUrl != null &&
-                    ContentUtils.isUrlImage(thumbnailUrl)) {
+                    ContentUtils.isUrlImage(thumbnailUrl)
+                ) {
                     thumbnailUrl
                 } else {
                     null
@@ -369,18 +409,27 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }, {
                     image.visibility = View.GONE
-                })
+                },)
                 image.transitionName = "image_$absoluteAdapterPosition"
                 image.setOnClickListener {
                     if (fullContentContainerView != null) {
-                        toggleItem(postView)
+                        if (singleTapToViewImage) {
+                            onImageClick(postView, image, url)
+                        } else {
+                            toggleItem(postView)
+                        }
                     } else {
                         onImageClick(postView, image, url)
                     }
                 }
+
                 if (fullContentContainerView != null) {
                     image.setOnLongClickListener {
-                        onImageClick(postView, image, url)
+                        if (singleTapToViewImage) {
+                            toggleItem(postView)
+                        } else {
+                            onImageClick(postView, image, url)
+                        }
                         true
                     }
                 }
@@ -452,14 +501,15 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 PostType.Link,
-                PostType.Text -> {
+                PostType.Text,
+                -> {
                     if (thumbnailUrl == null) {
                         image?.visibility = View.GONE
 
                         // see if this text post has additional content
                         val hasAdditionalContent =
                             !postView.post.body.isNullOrBlank() ||
-                                    !postView.post.url.isNullOrBlank()
+                                !postView.post.url.isNullOrBlank()
 
                         if (hasAdditionalContent) {
                             showDefaultImage()
@@ -508,7 +558,11 @@ class PostListViewBuilder @Inject constructor(
         )
 
         if (postView.read && !alwaysRenderAsUnread) {
-            title.alpha = 0.66f
+            if (themeManager.isLightTheme) {
+                title.alpha = 0.41f
+            } else {
+                title.alpha = 0.66f
+            }
         } else {
             title.alpha = 1f
         }
@@ -527,7 +581,7 @@ class PostListViewBuilder @Inject constructor(
                 postView,
                 true,
                 isRevealed,
-                null
+                null,
             )
         }
         commentButton?.isEnabled = !postView.post.locked
@@ -566,7 +620,6 @@ class PostListViewBuilder @Inject constructor(
         moreButton?.setOnClickListener {
             onShowMoreOptions(postView)
         }
-
 
         if (rawBinding is ListingItemCardBinding || rawBinding is ListingItemCard2Binding) {
             postView.post.url?.let { url ->

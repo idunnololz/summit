@@ -10,8 +10,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:animateLayoutChanges="true">
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -29,7 +28,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -39,10 +39,7 @@
                     android:layout_height="wrap_content"
                     android:padding="@dimen/padding"
                     android:layout_marginHorizontal="@dimen/padding"
-                    app:cardBackgroundColor="@color/colorSurfaceDarker"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:cardBackgroundColor="@color/colorSurfaceDarker">
 
                     <LinearLayout
                         android:orientation="vertical"
@@ -68,15 +65,12 @@
                 <TextView
                     android:id="@+id/section_title"
                     android:text="@string/post_settings"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
                     android:paddingTop="@dimen/padding_two"
-                    style="@style/SettingHeaderStyle"
-                    app:layout_constraintTop_toBottomOf="@+id/demo_view_card"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    style="@style/SettingHeaderStyle"/>
 
                 <include
                     android:id="@+id/text_scaling_setting1"
@@ -95,7 +89,7 @@
 
                 <TextView
                     android:id="@+id/reset_post_styles"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/padding"
                     android:background="?selectableItemBackground"
@@ -111,10 +105,16 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/reset_post_styles"/>
 
+                <include
+                    android:id="@+id/always_show_link_below_post"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <TextView
                     android:id="@+id/section_title2"
                     android:text="@string/comment_settings"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
@@ -142,58 +142,42 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting2"/>
 
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/reset_comment_styles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/padding"
+                    android:background="?selectableItemBackground"
+                    android:text="@string/reset_comment_styles"
+                    android:textAppearance="?textAppearanceTitleMedium"/>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <include
                     android:id="@+id/show_comment_actions"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/indentation_per_level"/>
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/tap_comment_to_collapse"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/show_comment_actions"/>
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/comment_thread_style"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tap_comment_to_collapse"/>
+                    android:layout_height="wrap_content"/>
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/comment_thread_style"/>
-
-                <TextView
-                    android:id="@+id/reset_comment_styles"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/padding"
-                    android:background="?selectableItemBackground"
-                    android:text="@string/reset_comment_styles"
-                    android:textAppearance="?textAppearanceTitleMedium"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/comment_thread_style"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/reset_comment_styles"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

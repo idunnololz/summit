@@ -15,4 +15,4 @@ data class CommentView(
     val saved: Boolean,
     val creator_blocked: Boolean,
     val my_vote: Int? = null,
-): Parcelable
+) : Parcelable

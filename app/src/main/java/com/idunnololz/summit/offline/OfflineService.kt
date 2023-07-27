@@ -1,17 +1,9 @@
 package com.idunnololz.summit.offline
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.JobIntentService
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.idunnololz.summit.R
-import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.util.NotificationHelper
 import com.idunnololz.summit.util.Utils
-import java.text.NumberFormat
 
 class OfflineService : JobIntentService() {
 
@@ -86,5 +78,4 @@ class OfflineService : JobIntentService() {
 //            offlineManager.removeOfflineDownloadProgressListener(listener)
 //        }
     }
-
 }

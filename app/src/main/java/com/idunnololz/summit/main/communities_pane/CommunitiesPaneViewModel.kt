@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
@@ -97,12 +96,14 @@ class CommunitiesPaneViewModel @Inject constructor(
     }
 
     private fun updateCommunities() {
-        communities.postValue(CommunityData(
-            userCommunities = userCommunities,
-            subscriptionCommunities = subscriptionCommunities,
-            accountInfoUpdateState = accountInfoUpdateState,
-            tabsState = tabsState,
-        ))
+        communities.postValue(
+            CommunityData(
+                userCommunities = userCommunities,
+                subscriptionCommunities = subscriptionCommunities,
+                accountInfoUpdateState = accountInfoUpdateState,
+                tabsState = tabsState,
+            ),
+        )
     }
 
     class CommunityData(

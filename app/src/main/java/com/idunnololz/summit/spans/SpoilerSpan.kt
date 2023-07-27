@@ -1,27 +1,20 @@
 package com.idunnololz.summit.spans
 
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
 import android.text.TextPaint
 import android.text.style.ClickableSpan
-import android.text.style.ReplacementSpan
 import android.view.View
-import com.idunnololz.summit.util.Utils
-import kotlin.math.roundToInt
-
 
 class SpoilerSpan(
     private val spoilerColor: Int,
     private val spoilerRevealedColor: Int,
-    private val textColor: Int
+    private val textColor: Int,
 ) : ClickableSpan() {
 
     var showSpoiler = false
 
     override fun onClick(widget: View) {
-        //Toggle the shown state
+        // Toggle the shown state
         showSpoiler = !showSpoiler
 
         widget.requestLayout()
@@ -29,7 +22,7 @@ class SpoilerSpan(
     }
 
     override fun updateDrawState(ds: TextPaint) {
-        //Don't call the super method otherwise this may override our settings!
+        // Don't call the super method otherwise this may override our settings!
         super.updateDrawState(ds)
 
         ds.isUnderlineText = false
@@ -37,17 +30,17 @@ class SpoilerSpan(
             ds.color = textColor
             ds.bgColor = spoilerRevealedColor
         } else {
-            //Spoiler is not shown, make the text color the same as the background color
+            // Spoiler is not shown, make the text color the same as the background color
             ds.color = Color.TRANSPARENT
             ds.bgColor = spoilerColor
         }
     }
 }
 
-//class SpoilerReplacementSpan(
+// class SpoilerReplacementSpan(
 //    private val spoilerColor: Int,
 //    private val textColor: Int
-//) : ReplacementSpan() {
+// ) : ReplacementSpan() {
 //
 //    var showSpoiler = false
 //
@@ -104,4 +97,4 @@ class SpoilerSpan(
 //    ): Float {
 //        return paint.measureText(text, start, end)
 //    }
-//}
+// }

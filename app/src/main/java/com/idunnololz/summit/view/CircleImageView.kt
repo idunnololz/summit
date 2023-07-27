@@ -10,16 +10,16 @@ import android.graphics.drawable.*
 import android.graphics.drawable.shapes.OvalShape
 import android.net.Uri
 import android.os.Build
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
-import androidx.appcompat.widget.AppCompatImageView
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 
@@ -145,7 +145,7 @@ class CircleImageView : AppCompatImageView {
     constructor(context: Context, attrs: AttributeSet, defStyle: Int = 0) : super(
         context,
         attrs,
-        defStyle
+        defStyle,
     ) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.CircleImageView, defStyle, 0)
 
@@ -165,7 +165,7 @@ class CircleImageView : AppCompatImageView {
         ready = true
 
         loadingDrawable =
-            null//ContextCompat.getDrawable(context, R.drawable.ic_image_black_24dp)!!.mutate()
+            null // ContextCompat.getDrawable(context, R.drawable.ic_image_black_24dp)!!.mutate()
 
         @Suppress("NewApi") // isRipple will ensure the that the API level req is met
         if (isRipple) {
@@ -292,7 +292,7 @@ class CircleImageView : AppCompatImageView {
                 drawableRect.centerX(),
                 drawableRect.centerY(),
                 drawableRadius,
-                fillPaint
+                fillPaint,
             )
         }
 
@@ -303,7 +303,7 @@ class CircleImageView : AppCompatImageView {
                 l,
                 t,
                 l + loadingDrawable.intrinsicWidth,
-                t + loadingDrawable.intrinsicHeight
+                t + loadingDrawable.intrinsicHeight,
             )
             loadingDrawable.draw(canvas)
         } else if (bitmap != null) {
@@ -311,7 +311,7 @@ class CircleImageView : AppCompatImageView {
                 drawableRect.centerX(),
                 drawableRect.centerY(),
                 drawableRadius,
-                bitmapPaint
+                bitmapPaint,
             )
         }
 
@@ -397,7 +397,7 @@ class CircleImageView : AppCompatImageView {
             val colorAnimator = colorAnimator ?: ValueAnimator.ofObject(
                 ArgbEvaluator(),
                 this.borderColor,
-                borderColor
+                borderColor,
             ).apply {
                 addUpdateListener { animator ->
                     val c = animator.animatedValue as Int
@@ -454,7 +454,7 @@ class CircleImageView : AppCompatImageView {
                 Bitmap.createBitmap(
                     drawable.intrinsicWidth,
                     drawable.intrinsicHeight,
-                    BITMAP_CONFIG
+                    BITMAP_CONFIG,
                 )
             }
 
@@ -525,7 +525,7 @@ class CircleImageView : AppCompatImageView {
                 borderRect.left.toInt(),
                 borderRect.top.toInt(),
                 borderRect.right.toInt(),
-                borderRect.bottom.toInt()
+                borderRect.bottom.toInt(),
             )
         }
 
@@ -534,7 +534,7 @@ class CircleImageView : AppCompatImageView {
             drawableRect.centerX(),
             drawableRect.centerY(),
             borderRadius,
-            Path.Direction.CW
+            Path.Direction.CW,
         )
 
         setupFreeUi()
@@ -604,10 +604,9 @@ class CircleImageView : AppCompatImageView {
         shaderMatrix.setScale(scale, scale)
         shaderMatrix.postTranslate(
             (dx + 0.5f).toInt() + drawableRect.left,
-            (dy + 0.5f).toInt() + drawableRect.top
+            (dy + 0.5f).toInt() + drawableRect.top,
         )
 
         bitmapShader?.setLocalMatrix(shaderMatrix)
     }
-
 }

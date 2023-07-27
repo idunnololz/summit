@@ -6,7 +6,6 @@ import android.transition.ChangeImageTransform
 import android.transition.ChangeTransform
 import android.transition.TransitionSet
 
-
 class SharedElementTransition : TransitionSet() {
     init {
         ordering = ORDERING_TOGETHER

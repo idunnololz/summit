@@ -2,15 +2,9 @@ package com.idunnololz.summit.settings.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
-import com.idunnololz.summit.account_ui.SignInNavigator
 import com.idunnololz.summit.databinding.DialogFragmentTextValueBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 

@@ -26,7 +26,7 @@ class TabsImageButton : AppCompatImageButton {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     fun setTabs(tabs: Int) {
@@ -52,9 +52,9 @@ class TabsImageButton : AppCompatImageButton {
         val xPos = width / 2
         val yPos = (canvas.height / 2) + (textHeight / 2)
 
-        //((textPaint.descent() + textPaint.ascent()) / 2) is the distance from the baseline to the center.
+        // ((textPaint.descent() + textPaint.ascent()) / 2) is the distance from the baseline to the center.
 
-        //((textPaint.descent() + textPaint.ascent()) / 2) is the distance from the baseline to the center.
+        // ((textPaint.descent() + textPaint.ascent()) / 2) is the distance from the baseline to the center.
         canvas.drawText(numTabs.toString(), xPos.toFloat(), yPos.toFloat(), paintText)
     }
 }

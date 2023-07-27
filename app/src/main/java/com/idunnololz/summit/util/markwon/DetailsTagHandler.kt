@@ -17,13 +17,12 @@ import io.noties.markwon.html.TagHandler
 import io.noties.markwon.image.AsyncDrawableScheduler
 import java.util.Collections
 
-class DetailsTagHandler: TagHandler() {
+class DetailsTagHandler : TagHandler() {
 
     override fun handle(visitor: MarkwonVisitor, renderer: MarkwonHtmlRenderer, tag: HtmlTag) {
         var summaryEnd = -1
         var summaryStart = -1
         for (child in tag.asBlock.children()) {
-
             if (!child.isClosed) {
                 continue
             }
@@ -60,7 +59,7 @@ enum class DetailsSpanState { DORMANT, CLOSED, OPENED }
 
 data class DetailsParsingSpan(
     val summary: DetailsSummarySpan,
-    var state: DetailsSpanState = DetailsSpanState.CLOSED
+    var state: DetailsSpanState = DetailsSpanState.CLOSED,
 )
 
 private var markwonTheme: MarkwonTheme? = null
@@ -100,12 +99,11 @@ fun postProcessDetails(spanned: SpannableStringBuilder, view: TextView) {
         // replace text inside spoiler tag with just spoiler summary that is clickable
         val summaryText = when (span.state) {
             DetailsSpanState.CLOSED -> "${span.summary.text} ▼\n\n"
-            DetailsSpanState.OPENED  -> "${span.summary.text} ▲\n\n"
+            DetailsSpanState.OPENED -> "${span.summary.text} ▲\n\n"
             else -> ""
         }
 
         when (span.state) {
-
             DetailsSpanState.CLOSED -> {
                 span.state = DetailsSpanState.DORMANT
                 spanned.removeSpan(span.summary) // will be added later

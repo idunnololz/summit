@@ -15,9 +15,8 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 fun BaseFragment<*>.showMorePostOptions(
     instance: String,
     postView: PostView,
-    actionsViewModel: MoreActionsViewModel
+    actionsViewModel: MoreActionsViewModel,
 ) {
-
     if (!isBindingAvailable()) {
         return
     }
@@ -35,38 +34,44 @@ fun BaseFragment<*>.showMorePostOptions(
         addItemWithIcon(
             R.id.hide_post,
             getString(R.string.hide_post),
-            R.drawable.baseline_hide_24
+            R.drawable.baseline_hide_24,
         )
 
         if (postView.saved) {
             addItemWithIcon(
                 R.id.remove_from_saved,
                 getString(R.string.remove_from_saved),
-                R.drawable.baseline_bookmark_remove_24
+                R.drawable.baseline_bookmark_remove_24,
             )
         } else {
             addItemWithIcon(
                 R.id.save,
                 getString(R.string.save),
-                R.drawable.baseline_bookmark_add_24
+                R.drawable.baseline_bookmark_add_24,
             )
         }
 
         addItemWithIcon(
             R.id.share,
             getString(R.string.share),
-            R.drawable.baseline_share_24
+            R.drawable.baseline_share_24,
+        )
+
+        addItemWithIcon(
+            R.id.share_fediverse_link,
+            getString(R.string.share_source_link),
+            R.drawable.ic_fediverse_24,
         )
 
         addItemWithIcon(
             R.id.block_community,
             getString(R.string.block_this_community_format, postView.community.name),
-            R.drawable.baseline_block_24
+            R.drawable.baseline_block_24,
         )
         addItemWithIcon(
             R.id.block_user,
             getString(R.string.block_this_user_format, postView.creator.name),
-            R.drawable.baseline_person_off_24
+            R.drawable.baseline_person_off_24,
         )
 
         setOnMenuItemClickListener {
@@ -103,7 +108,13 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.id.share -> {
                     Utils.shareLink(
                         context = context,
-                        link = LinkUtils.getLinkForPost(instance, postView.post.id)
+                        link = LinkUtils.getLinkForPost(instance, postView.post.id),
+                    )
+                }
+                R.id.share_fediverse_link -> {
+                    Utils.shareLink(
+                        context = context,
+                        link = postView.post.ap_id,
                     )
                 }
             }

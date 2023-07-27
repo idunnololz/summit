@@ -17,7 +17,7 @@ class FlairView : LinearLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     init {
@@ -37,7 +37,7 @@ class FlairView : LinearLayout {
                         val view = ImageView(context).apply {
                             layoutParams = LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
                             )
                         }
 
@@ -57,7 +57,7 @@ class FlairView : LinearLayout {
                             Utils.convertDpToPixel(4f).toInt(),
                             0,
                             Utils.convertDpToPixel(4f).toInt(),
-                            0
+                            0,
                         )
                         addView(view)
                     }

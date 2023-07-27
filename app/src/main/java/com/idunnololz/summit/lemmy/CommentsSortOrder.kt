@@ -5,7 +5,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentSortType
 
 enum class CommentsSortOrder(
-    val key: String
+    val key: String,
 ) {
     Hot("hot"),
     Top("top"),

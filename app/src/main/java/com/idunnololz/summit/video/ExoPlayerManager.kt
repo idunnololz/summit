@@ -5,17 +5,12 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.idunnololz.summit.preview.VideoType
@@ -27,7 +22,7 @@ import kotlin.collections.HashMap
  */
 @SuppressLint("UnsafeOptInUsageError")
 class ExoPlayerManager(
-    private val context: Context
+    private val context: Context,
 ) {
 
     companion object {
@@ -54,24 +49,26 @@ class ExoPlayerManager(
             return managersMap[lifecycleOwner] ?: ExoPlayerManager(context).also { manager ->
                 Log.d(TAG, "No manager found for $lifecycleOwner. Creating one...")
                 managersMap[lifecycleOwner] = manager
-                lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+                lifecycleOwner.lifecycle.addObserver(
+                    object : DefaultLifecycleObserver {
 
-                    override fun onResume(owner: LifecycleOwner) {
-                        Log.d(TAG, "Fragment resumed. Restoring players")
-                        managersMap[lifecycleOwner]?.restorePlayers()
-                    }
+                        override fun onResume(owner: LifecycleOwner) {
+                            Log.d(TAG, "Fragment resumed. Restoring players")
+                            managersMap[lifecycleOwner]?.restorePlayers()
+                        }
 
-                    override fun onPause(owner: LifecycleOwner) {
-                        Log.d(TAG, "Fragment paused. Stopping players")
-                        managersMap[lifecycleOwner]?.stop()
-                    }
+                        override fun onPause(owner: LifecycleOwner) {
+                            Log.d(TAG, "Fragment paused. Stopping players")
+                            managersMap[lifecycleOwner]?.stop()
+                        }
 
-                    override fun onDestroy(owner: LifecycleOwner) {
-                        Log.d(TAG, "Fragment destroyed. Cleaning up ExoPlayerManager instance")
-                        //managersMap.remove(lifecycleOwner)?.destroy()
-                        managersMap.remove(lifecycleOwner)?.viewDestroy()
-                    }
-                })
+                        override fun onDestroy(owner: LifecycleOwner) {
+                            Log.d(TAG, "Fragment destroyed. Cleaning up ExoPlayerManager instance")
+                            // managersMap.remove(lifecycleOwner)?.destroy()
+                            managersMap.remove(lifecycleOwner)?.viewDestroy()
+                        }
+                    },
+                )
             }
         }
 
@@ -97,19 +94,19 @@ class ExoPlayerManager(
         val url: String,
         val videoType: VideoType,
         val playing: Boolean = true,
-        val videoState: VideoState? = null
+        val videoState: VideoState? = null,
     )
 
     fun getPlayerForUrl(
         url: String,
         videoType: VideoType,
-        videoState: VideoState?
+        videoState: VideoState?,
     ): ExoPlayer =
         getPlayer().also {
             val config = ExoPlayerConfig(
                 url = url,
                 videoType = videoType,
-                videoState = videoState
+                videoState = videoState,
             )
             setupPlayer(it, config)
             savedState[it] = config
@@ -182,7 +179,7 @@ class ExoPlayerManager(
 
             Log.d(
                 TAG,
-                "Allocating another player. Alloced: ${allocatedPlayers.size} Total: ${allocatedPlayers.size + players.size}"
+                "Allocating another player. Alloced: ${allocatedPlayers.size} Total: ${allocatedPlayers.size + players.size}",
             )
         }
 

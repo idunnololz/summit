@@ -5,5 +5,5 @@ package com.idunnololz.summit.offline
  */
 data class OfflineTaskConfig(
     val minPosts: Int,
-    val roundPostsToNearestPage: Boolean
+    val roundPostsToNearestPage: Boolean,
 )

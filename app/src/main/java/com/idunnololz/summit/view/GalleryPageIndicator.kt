@@ -40,7 +40,7 @@ class GalleryPageIndicator : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     fun setup(recyclerView: RecyclerView) {

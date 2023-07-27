@@ -29,7 +29,7 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
                     arguments = ErrorDialogFragmentArgs(
                         message = message,
                         errorMessage = error.message ?: stackTrace,
-                        errorType = error::class.simpleName ?: "UNKNOWN"
+                        errorType = error::class.simpleName ?: "UNKNOWN",
                     ).toBundle()
                 }
                 .showAllowingStateLoss(fm, "ErrorDialogFragment")
@@ -55,7 +55,7 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -100,7 +100,6 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
                     appendLine(getString(R.string.caused_by_format, args.errorType))
                     append(args.errorMessage)
                 }
-
             } else {
                 indicator.setImageResource(R.drawable.baseline_expand_more_18)
                 contextContainer.visibility = View.GONE

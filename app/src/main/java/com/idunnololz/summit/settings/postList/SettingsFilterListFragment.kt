@@ -10,13 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FilterItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsFilterListBinding
 import com.idunnololz.summit.filterLists.FilterEntry
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -36,10 +32,11 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
 
         childFragmentManager.setFragmentResultListener(
             AddOrEditFilterDialogFragment.REQUEST_KEY,
-            this
+            this,
         ) { _, bundle ->
             val result = bundle.getParcelableCompat<FilterEntry>(
-                AddOrEditFilterDialogFragment.REQUEST_KEY_RESULT)
+                AddOrEditFilterDialogFragment.REQUEST_KEY_RESULT,
+            )
 
             if (result != null) {
                 viewModel.addFilter(result)
@@ -50,7 +47,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -80,13 +77,13 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
                 onEditClick = {
                     AddOrEditFilterDialogFragment
                         .newInstance(
-                            it
+                            it,
                         )
                         .show(childFragmentManager, "dddssf")
                 },
                 onDeleteClick = {
                     viewModel.deleteFilter(it)
-                }
+                },
             )
 
             viewModel.filters.observe(viewLifecycleOwner) {
@@ -113,7 +110,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
             fab.setOnClickListener {
                 AddOrEditFilterDialogFragment
                     .newInstance(
-                        FilterEntry(0, args.contentType, args.filterType, "", false)
+                        FilterEntry(0, args.contentType, args.filterType, "", false),
                     )
                     .show(childFragmentManager, "sadsaad")
             }
@@ -133,8 +130,8 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
 
         sealed interface Item {
             data class FilterItem(
-                val filter: FilterEntry
-            ): Item
+                val filter: FilterEntry,
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -143,7 +140,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
                     is Item.FilterItem ->
                         old.filter.id == (new as Item.FilterItem).filter.id
                 }
-            }
+            },
         ).apply {
             this.addItemType(Item.FilterItem::class, FilterItemBinding::inflate) { item, b, h ->
                 b.icon.setImageResource(
@@ -151,7 +148,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
                         R.drawable.ic_regex_24
                     } else {
                         R.drawable.baseline_text_fields_24
-                    }
+                    },
                 )
                 b.title.text = item.filter.filter
                 b.edit.setOnClickListener {
@@ -184,6 +181,5 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
             val newItems = data.map { Item.FilterItem(it) }
             adapterHelper.setItems(newItems, this)
         }
-
     }
 }

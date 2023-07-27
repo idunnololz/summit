@@ -21,12 +21,12 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.connectivity.ConnectivityChangedWorker
 import com.idunnololz.summit.lemmy.RateLimitManager
 import com.idunnololz.summit.lemmy.actions.ActionInfo
-import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.AccountNotFoundError
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
+import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -146,7 +146,8 @@ class PendingActionsRunner @AssistedInject constructor(
                             completeActionError(
                                 action,
                                 AccountNotFoundError(
-                                    result.failureReason.accountId)
+                                    result.failureReason.accountId,
+                                ),
                             )
                         LemmyActionFailureReason.ConnectionError ->
                             connectionIssue = true
@@ -156,15 +157,14 @@ class PendingActionsRunner @AssistedInject constructor(
                             if (result.failureReason.retries < PendingActionsManager.MAX_RETRIES) {
                                 // Prob just sending too fast...
                                 val delay = (2.0.pow(result.failureReason.retries + 1) * 1000).toLong()
-                                Log.d(TAG, "429. Retrying after ${delay}...")
-
+                                Log.d(TAG, "429. Retrying after $delay...")
 
                                 delayAction(action, delay)
                             } else {
                                 Log.e(
                                     TAG,
                                     "Request failed. Too many retries. ",
-                                    RuntimeException()
+                                    RuntimeException(),
                                 )
 
                                 completeActionError(action, result.failureReason)
@@ -174,7 +174,8 @@ class PendingActionsRunner @AssistedInject constructor(
 
                         is LemmyActionFailureReason.UnknownError,
                         LemmyActionFailureReason.DeserializationError,
-                        LemmyActionFailureReason.ActionOverwritten ->
+                        LemmyActionFailureReason.ActionOverwritten,
+                        ->
                             completeActionError(action, result.failureReason)
                     }
                 }
@@ -187,7 +188,7 @@ class PendingActionsRunner @AssistedInject constructor(
 
     private suspend fun executeAction(
         action: LemmyAction,
-        retries: Int
+        retries: Int,
     ): PendingActionsManager.ActionExecutionResult {
         var shouldDeleteAction = true
 
@@ -247,26 +248,32 @@ class PendingActionsRunner @AssistedInject constructor(
                 val result: Result<Either<PostView, CommentView>> = when (actionInfo.ref) {
                     is VotableRef.CommentRef -> {
                         apiClient.likeCommentWithRetry(
-                            actionInfo.ref.commentId, actionInfo.dir, account)
+                            actionInfo.ref.commentId,
+                            actionInfo.dir,
+                            account,
+                        )
                             .fold(
                                 onSuccess = {
                                     Result.success(Either.Right(it))
                                 },
                                 onFailure = {
                                     Result.failure(it)
-                                }
+                                },
                             )
                     }
                     is VotableRef.PostRef -> {
                         apiClient.likePostWithRetry(
-                            actionInfo.ref.postId, actionInfo.dir, account)
+                            actionInfo.ref.postId,
+                            actionInfo.dir,
+                            account,
+                        )
                             .fold(
                                 onSuccess = {
                                     Result.success(Either.Left(it))
                                 },
                                 onFailure = {
                                     Result.failure(it)
-                                }
+                                },
                             )
                     }
                 }
@@ -274,11 +281,12 @@ class PendingActionsRunner @AssistedInject constructor(
                 return result.fold(
                     onSuccess = {
                         PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.VoteLemmyActionResult(it))
+                            LemmyActionResult.VoteLemmyActionResult(it),
+                        )
                     },
                     onFailure = {
                         getResultForError(it)
-                    }
+                    },
                 )
             }
             is ActionInfo.CommentActionInfo -> {
@@ -290,17 +298,18 @@ class PendingActionsRunner @AssistedInject constructor(
                     account = account,
                     content = actionInfo.content,
                     postId = actionInfo.postRef.id,
-                    parentId = actionInfo.parentId
+                    parentId = actionInfo.parentId,
                 )
 
                 return result.fold(
                     onSuccess = {
                         PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.CommentLemmyActionResult())
+                            LemmyActionResult.CommentLemmyActionResult(),
+                        )
                     },
                     onFailure = {
                         getResultForError(it)
-                    }
+                    },
                 )
             }
             is ActionInfo.EditActionInfo -> {
@@ -317,11 +326,12 @@ class PendingActionsRunner @AssistedInject constructor(
                 return result.fold(
                     onSuccess = {
                         PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.EditLemmyActionResult())
+                            LemmyActionResult.EditLemmyActionResult(),
+                        )
                     },
                     onFailure = {
                         getResultForError(it)
-                    }
+                    },
                 )
             }
             is ActionInfo.DeleteCommentActionInfo -> {
@@ -337,11 +347,12 @@ class PendingActionsRunner @AssistedInject constructor(
                 return result.fold(
                     onSuccess = {
                         PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.DeleteCommentLemmyActionResult())
+                            LemmyActionResult.DeleteCommentLemmyActionResult(),
+                        )
                     },
                     onFailure = {
                         getResultForError(it)
-                    }
+                    },
                 )
             }
             is ActionInfo.MarkPostAsReadActionInfo -> {
@@ -358,11 +369,12 @@ class PendingActionsRunner @AssistedInject constructor(
                 return result.fold(
                     onSuccess = {
                         PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.MarkPostAsReadActionResult())
+                            LemmyActionResult.MarkPostAsReadActionResult(),
+                        )
                     },
                     onFailure = {
                         getResultForError(it)
-                    }
+                    },
                 )
             }
         }
@@ -373,7 +385,7 @@ class PendingActionsRunner @AssistedInject constructor(
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
+                    .build(),
             )
             .build()
         WorkManager.getInstance(context).enqueue(workRequest)

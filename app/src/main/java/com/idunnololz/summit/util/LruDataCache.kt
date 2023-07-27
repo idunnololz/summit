@@ -54,5 +54,4 @@ class LruDataCache(private val diskLruCache: DiskLruCache) : IDataCache {
     fun delete() {
         diskLruCache.delete()
     }
-
 }

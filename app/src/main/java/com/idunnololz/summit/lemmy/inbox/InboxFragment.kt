@@ -12,7 +12,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,10 +22,9 @@ import coil.load
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
-import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentInboxBinding
@@ -36,7 +34,6 @@ import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.util.BaseFragment
@@ -45,7 +42,6 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.VerticalSpaceItemDecoration
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
-import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
@@ -56,7 +52,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class InboxFragment : BaseFragment<FragmentInboxBinding>(),
+class InboxFragment :
+    BaseFragment<FragmentInboxBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -98,7 +95,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -156,7 +153,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
 
             binding.recyclerView.postDelayed({
                 binding.recyclerView.scrollToPosition(0)
-            }, 100)
+            }, 100,)
         }
 
         viewModel.inboxData.observe(viewLifecycleOwner) {
@@ -193,39 +190,43 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
         binding.recyclerView.addItemDecoration(
             VerticalSpaceItemDecoration(
                 verticalSpaceHeight = context.getDimen(R.dimen.padding_half),
-                hasStartAndEndSpace = false
-            )
+                hasStartAndEndSpace = false,
+            ),
         )
-        binding.recyclerView.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+        binding.recyclerView.addOnScrollListener(
+            object : OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-                val layoutManager = binding.recyclerView.layoutManager as? LinearLayoutManager
-                    ?: return
+                    val layoutManager = binding.recyclerView.layoutManager as? LinearLayoutManager
+                        ?: return
 
-                if (layoutManager.findLastVisibleItemPosition() == adapter.itemCount - 1) {
-                    if (!viewModel.inboxData.isLoading && adapter.hasMore()) {
-                        viewModel.pageIndex++
-                        viewModel.fetchInbox()
+                    if (layoutManager.findLastVisibleItemPosition() == adapter.itemCount - 1) {
+                        if (!viewModel.inboxData.isLoading && adapter.hasMore()) {
+                            viewModel.pageIndex++
+                            viewModel.fetchInbox()
+                        }
                     }
                 }
-            }
-        })
-        ItemTouchHelper(InboxSwipeToActionCallback(
-            context,
-            context.getColorCompat(R.color.style_green),
-            R.drawable.baseline_check_24,
-            binding.recyclerView,
-        ) { viewHolder, direction ->
-            val inboxItem = adapter.getItemAt(viewHolder.absoluteAdapterPosition)
-            if (inboxItem != null) {
-                viewModel.markAsRead(
-                    inboxItem = inboxItem,
-                    read = true,
-                    delete = viewModel.pageType.value == InboxViewModel.PageType.Unread
-                )
-            }
-        }).attachToRecyclerView(binding.recyclerView)
+            },
+        )
+        ItemTouchHelper(
+            InboxSwipeToActionCallback(
+                context,
+                context.getColorCompat(R.color.style_green),
+                R.drawable.baseline_check_24,
+                binding.recyclerView,
+            ) { viewHolder, direction ->
+                val inboxItem = adapter.getItemAt(viewHolder.absoluteAdapterPosition)
+                if (inboxItem != null) {
+                    viewModel.markAsRead(
+                        inboxItem = inboxItem,
+                        read = true,
+                        delete = viewModel.pageType.value == InboxViewModel.PageType.Unread,
+                    )
+                }
+            },
+        ).attachToRecyclerView(binding.recyclerView)
 
         fun updatePaneBackPressHandler() {
             if (binding.paneLayout.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
@@ -238,28 +239,30 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
 
         binding.paneLayout.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
         binding.paneLayout
-            .registerStartPanelStateListeners(object : OverlappingPanelsLayout.PanelStateListener {
-                override fun onPanelStateChange(panelState: PanelState) {
-                    Log.d(TAG, "panelState: ${panelState}")
-                    when (panelState) {
-                        PanelState.Closed -> {
-                            getMainActivity()?.setNavUiOpenness(0f)
+            .registerStartPanelStateListeners(
+                object : OverlappingPanelsLayout.PanelStateListener {
+                    override fun onPanelStateChange(panelState: PanelState) {
+                        Log.d(TAG, "panelState: $panelState")
+                        when (panelState) {
+                            PanelState.Closed -> {
+                                getMainActivity()?.setNavUiOpenness(0f)
 
-                            updatePaneBackPressHandler()
-                        }
-                        is PanelState.Closing -> {
-                            getMainActivity()?.setNavUiOpenness(panelState.progress)
-                        }
-                        PanelState.Opened -> {
-                            getMainActivity()?.setNavUiOpenness(100f)
-                            updatePaneBackPressHandler()
-                        }
-                        is PanelState.Opening -> {
-                            getMainActivity()?.setNavUiOpenness(panelState.progress)
+                                updatePaneBackPressHandler()
+                            }
+                            is PanelState.Closing -> {
+                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                            }
+                            PanelState.Opened -> {
+                                getMainActivity()?.setNavUiOpenness(100f)
+                                updatePaneBackPressHandler()
+                            }
+                            is PanelState.Opening -> {
+                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                            }
                         }
                     }
-                }
-            })
+                },
+            )
 
         binding.toolbar.setNavigationIcon(R.drawable.baseline_menu_24)
         binding.toolbar.setNavigationOnClickListener {
@@ -271,7 +274,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
         }
 
-        with (binding) {
+        with(binding) {
             unread.setOnClickListener {
                 viewModel.pageTypeFlow.value = InboxViewModel.PageType.Unread
                 paneLayout.closePanels()
@@ -318,7 +321,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                     ErrorDialogFragment.show(
                         message = getString(R.string.error_unable_to_mark_message_as_read),
                         error = it.error,
-                        fm = childFragmentManager
+                        fm = childFragmentManager,
                     )
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
@@ -364,7 +367,11 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 AddOrEditCommentFragment().apply {
                     arguments =
                         AddOrEditCommentFragmentArgs(
-                            viewModel.instance, null, null, null, inboxItem
+                            viewModel.instance,
+                            null,
+                            null,
+                            null,
+                            inboxItem,
                         ).toBundle()
                 }.show(childFragmentManager, "asdf")
             },
@@ -373,7 +380,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                     BottomMenu(requireContext()).apply {
                         setTitle(R.string.message_actions)
                         addItem(io.noties.markwon.R.id.none, R.string.no_options)
-                    }
+                    },
                 )
             },
             onSignInRequired = {
@@ -384,9 +391,11 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 AlertDialogFragment.Builder()
                     .setTitle(R.string.error_account_instance_mismatch_title)
                     .setMessage(
-                        getString(R.string.error_account_instance_mismatch,
+                        getString(
+                            R.string.error_account_instance_mismatch,
                             accountInstance,
-                            apiInstance)
+                            apiInstance,
+                        ),
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
@@ -403,7 +412,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 if (data.error is NotAuthenticatedException) {
                     binding.loadingView.showErrorWithRetry(
                         getString(R.string.please_sign_in_to_view_your_inbox),
-                        getString(R.string.sign_in)
+                        getString(R.string.sign_in),
                     )
                 } else {
                     binding.loadingView.showDefaultErrorMessageFor(data.error)
@@ -423,7 +432,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                 if (itemCount == 0 && (adapter?.itemCount ?: 0) == 0) {
                     binding.loadingView.showErrorWithRetry(
                         getString(R.string.there_doesnt_seem_to_be_anything_here),
-                        getString(R.string.refresh)
+                        getString(R.string.refresh),
                     )
                 } else {
                     Log.d(TAG, "onUpdate. Got ${data.data.sumOf { it.items.size }} items!")
@@ -463,12 +472,12 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
 
         private sealed interface Item {
             data class InboxListItem(
-                val inboxItem: InboxItem
-            ): Item
+                val inboxItem: InboxItem,
+            ) : Item
 
             data class LoaderItem(
-                val state: StatefulData<Unit>
-            ): Item
+                val state: StatefulData<Unit>,
+            ) : Item
         }
 
         private var allData: List<LemmyListSource.PageResult<InboxItem>> = listOf()
@@ -480,7 +489,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(),
                         old.inboxItem.id == (new as Item.InboxListItem).inboxItem.id
                     is Item.LoaderItem -> true
                 }
-            }
+            },
         ).apply {
             addItemType(Item.InboxListItem::class, InboxListItemBinding::inflate) { item, b, h ->
                 postAndCommentViewBuilder.bindMessage(

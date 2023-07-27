@@ -5,11 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.drawable.InsetDrawable
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
-import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -17,7 +12,11 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.LinearLayout
-
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -73,7 +72,7 @@ class FastScroller : LinearLayout {
 
     private var isTouchingHandle = false
 
-    //TODO the name should be fixed, also check if there is a better way of handling the visibility, because this is somewhat convoluted
+    // TODO the name should be fixed, also check if there is a better way of handling the visibility, because this is somewhat convoluted
     private var maxVisibility: Int = 0
 
     private var manuallyChangingPosition: Boolean = false
@@ -106,7 +105,7 @@ class FastScroller : LinearLayout {
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
         context,
         attrs,
-        defStyle
+        defStyle,
     )
 
     init {
@@ -135,7 +134,7 @@ class FastScroller : LinearLayout {
             horizontalInset,
             verticalInset,
             0,
-            0
+            0,
         )
         ViewCompat.setBackground(handle, handleBg)
 
@@ -157,55 +156,59 @@ class FastScroller : LinearLayout {
     fun setRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
         recyclerView.addOnScrollListener(scrollListener)
-        recyclerView.adapter?.registerAdapterDataObserver(object :
-            RecyclerView.AdapterDataObserver() {
-            override fun onChanged() {
-                super.onChanged()
-                updateScrollerPosition()
-            }
+        recyclerView.adapter?.registerAdapterDataObserver(
+            object :
+                RecyclerView.AdapterDataObserver() {
+                override fun onChanged() {
+                    super.onChanged()
+                    updateScrollerPosition()
+                }
 
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                super.onItemRangeChanged(positionStart, itemCount)
-                updateScrollerPosition()
-            }
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeChanged(positionStart, itemCount)
+                    updateScrollerPosition()
+                }
 
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-                super.onItemRangeChanged(positionStart, itemCount, payload)
-                updateScrollerPosition()
-            }
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                    super.onItemRangeChanged(positionStart, itemCount, payload)
+                    updateScrollerPosition()
+                }
 
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                updateScrollerPosition()
-            }
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    updateScrollerPosition()
+                }
 
-            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                super.onItemRangeRemoved(positionStart, itemCount)
-                updateScrollerPosition()
-            }
+                override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeRemoved(positionStart, itemCount)
+                    updateScrollerPosition()
+                }
 
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                updateScrollerPosition()
-            }
-        })
+                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                    updateScrollerPosition()
+                }
+            },
+        )
         invalidateVisibility()
-        recyclerView.setOnHierarchyChangeListener(object : ViewGroup.OnHierarchyChangeListener {
-            override fun onChildViewAdded(parent: View, child: View) {
-                invalidateVisibility()
-            }
+        recyclerView.setOnHierarchyChangeListener(
+            object : ViewGroup.OnHierarchyChangeListener {
+                override fun onChildViewAdded(parent: View, child: View) {
+                    invalidateVisibility()
+                }
 
-            override fun onChildViewRemoved(parent: View, child: View) {
-                invalidateVisibility()
-            }
-        })
+                override fun onChildViewRemoved(parent: View, child: View) {
+                    invalidateVisibility()
+                }
+            },
+        )
     }
 
     private fun updateScrollerPosition() {
         recyclerView?.let {
             it.postDelayed({
                 scrollListener.onScrolled(it, 0, 0)
-            }, 250)
+            }, 250,)
         }
     }
 
@@ -235,14 +238,14 @@ class FastScroller : LinearLayout {
      */
     override fun setOrientation(orientation: Int) {
         scrollerOrientation = orientation
-        //switching orientation, because orientation in linear layout
-        //is something different than orientation of fast scroller
+        // switching orientation, because orientation in linear layout
+        // is something different than orientation of fast scroller
         super.setOrientation(
             if (orientation == LinearLayout.HORIZONTAL) {
                 LinearLayout.VERTICAL
             } else {
                 LinearLayout.HORIZONTAL
-            }
+            },
         )
     }
 
@@ -253,7 +256,7 @@ class FastScroller : LinearLayout {
         initHandleMovement()
 
         if (!isInEditMode) {
-            //sometimes recycler starts with a defined scroll (e.g. when coming from saved state)
+            // sometimes recycler starts with a defined scroll (e.g. when coming from saved state)
             updateHandlePosition(recyclerView)
         }
     }
@@ -328,12 +331,12 @@ class FastScroller : LinearLayout {
 
     private fun invalidateVisibility() {
         val recyclerView = recyclerView
-        if (recyclerView == null
-            || recyclerView.adapter == null
-            || recyclerView.adapter?.itemCount == 0
-            || recyclerView.getChildAt(0) == null
-            || !isRecyclerViewScrollable()
-            || maxVisibility != View.VISIBLE
+        if (recyclerView == null ||
+            recyclerView.adapter == null ||
+            recyclerView.adapter?.itemCount == 0 ||
+            recyclerView.getChildAt(0) == null ||
+            !isRecyclerViewScrollable() ||
+            maxVisibility != View.VISIBLE
         ) {
             super.setVisibility(View.INVISIBLE)
         } else {
@@ -347,7 +350,7 @@ class FastScroller : LinearLayout {
             val targetPos = getValueInRange(
                 0f,
                 itemCount - 1f,
-                (relativePos * itemCount.toFloat()).toInt().toFloat()
+                (relativePos * itemCount.toFloat()).toInt().toFloat(),
             ).toInt()
             it.scrollToPosition(targetPos)
         }
@@ -359,13 +362,13 @@ class FastScroller : LinearLayout {
             handle.y = getValueInRange(
                 0f,
                 (height - handle.height).toFloat(),
-                relativePos * (height - handle.height)
+                relativePos * (height - handle.height),
             )
         } else {
             handle.x = getValueInRange(
                 0f,
                 (width - handle.width).toFloat(),
-                relativePos * (width - handle.width)
+                relativePos * (width - handle.width),
             )
         }
     }
@@ -395,19 +398,21 @@ class FastScroller : LinearLayout {
                 setFloatValues(handle.translationX, 0f)
                 interpolator = LinearOutSlowInInterpolator()
                 duration = 250
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationCancel(animation: Animator) {
-                        super.onAnimationCancel(animation)
-                        animation.removeListener(this)
-                        animatingShow = false
-                    }
+                addListener(
+                    object : AnimatorListenerAdapter() {
+                        override fun onAnimationCancel(animation: Animator) {
+                            super.onAnimationCancel(animation)
+                            animation.removeListener(this)
+                            animatingShow = false
+                        }
 
-                    override fun onAnimationEnd(animation: Animator) {
-                        super.onAnimationEnd(animation)
-                        animation.removeListener(this)
-                        animatingShow = false
-                    }
-                })
+                        override fun onAnimationEnd(animation: Animator) {
+                            super.onAnimationEnd(animation)
+                            animation.removeListener(this)
+                            animatingShow = false
+                        }
+                    },
+                )
             }.also {
                 it.start()
             }

@@ -15,4 +15,9 @@
         <item>system_default</item>
     </string-array>
 
+
+    <string name="patrons">
+        No one yet!
+    </string>
+
 </resources>

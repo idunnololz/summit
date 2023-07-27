@@ -16,13 +16,10 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.PostListSettings
-import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.makeCommunitySortOrderChoices
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -31,7 +28,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
+class SettingsPostListFragment :
+    BaseFragment<FragmentSettingsContentBinding>(),
     SettingValueUpdateCallback {
 
     @Inject
@@ -43,7 +41,7 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -90,7 +88,7 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.infinity = it
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             null,
@@ -103,7 +101,7 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.markPostsAsReadOnScroll = it
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             null,
@@ -116,16 +114,18 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.blurNsfwPosts = it
 
                 updateRendering()
-            }
+            },
         )
         postListSettings.defaultCommunitySortOrder.bindTo(
             binding.defaultCommunitySortOrder,
-            { preferences.defaultCommunitySortOrder?.toApiSortOrder()?.toId()
-                ?: R.id.community_sort_order_default },
+            {
+                preferences.defaultCommunitySortOrder?.toApiSortOrder()?.toId()
+                    ?: R.id.community_sort_order_default
+            },
             {
                 MultipleChoiceDialogFragment.newInstance(it)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
 
         BasicSettingItem(
@@ -192,7 +192,7 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.showLinkPosts = it
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             R.drawable.baseline_image_24,
@@ -205,7 +205,7 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.showImagePosts = it
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             R.drawable.baseline_videocam_24,
@@ -218,7 +218,7 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.showVideoPosts = it
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             R.drawable.baseline_text_fields_24,
@@ -231,7 +231,7 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.showTextPosts = it
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             R.drawable.ic_nsfw_24,
@@ -244,7 +244,15 @@ class SettingsPostListFragment : BaseFragment<FragmentSettingsContentBinding>(),
                 preferences.showNsfwPosts = it
 
                 updateRendering()
-            }
+            },
+        )
+
+        postListSettings.viewImageOnSingleTap.bindTo(
+            binding.viewImageOnSingleTap,
+            { preferences.postListViewImageOnSingleTap },
+            {
+                preferences.postListViewImageOnSingleTap = it
+            },
         )
     }
 

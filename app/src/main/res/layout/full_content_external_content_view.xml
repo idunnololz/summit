@@ -39,7 +39,6 @@
             android:layout_height="48dp"
             android:padding="15dp"
             android:src="@drawable/baseline_open_in_new_24"
-            android:layout_marginEnd="@dimen/padding"
             android:layout_marginStart="@dimen/padding"
             app:tint="?attr/colorControlNormal"
             app:layout_constraintTop_toTopOf="@+id/externalContentText"

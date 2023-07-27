@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentMessageBinding
@@ -28,9 +28,9 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.post.PostsAdapter
-import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -73,7 +73,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -85,7 +85,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 override fun handleOnBackPressed() {
                     (parentFragment as? InboxTabbedFragment)?.closeMessage()
                 }
-            })
+            },
+        )
 
         return binding.root
     }
@@ -107,9 +108,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         }
 
         binding.toolbar.setNavigationIcon(
-            com.google.android.material.R.drawable.ic_arrow_back_black_24)
+            com.google.android.material.R.drawable.ic_arrow_back_black_24,
+        )
         binding.toolbar.setNavigationIconTint(
-            context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+            context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+        )
 
         binding.toolbar.setNavigationOnClickListener {
             (parentFragment as? InboxTabbedFragment)?.closeMessage()
@@ -150,8 +153,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         binding.author.setOnClickListener {
             getMainActivity()?.launchPage(
                 PersonRef.PersonRefByName(
-                    args.inboxItem.authorName, args.inboxItem.authorInstance
-                )
+                    args.inboxItem.authorName,
+                    args.inboxItem.authorInstance,
+                ),
             )
         }
 
@@ -204,7 +208,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             AddOrEditCommentFragment().apply {
                 arguments =
                     AddOrEditCommentFragmentArgs(
-                        args.instance, null, null, null, inboxItem
+                        args.instance,
+                        null,
+                        null,
+                        null,
+                        inboxItem,
                     ).toBundle()
             }.show(childFragmentManager, "asdf")
         }
@@ -238,9 +246,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         AlertDialogFragment.Builder()
                             .setTitle(R.string.error_account_instance_mismatch_title)
                             .setMessage(
-                                getString(R.string.error_account_instance_mismatch,
+                                getString(
+                                    R.string.error_account_instance_mismatch,
                                     accountInstance,
-                                    apiInstance)
+                                    apiInstance,
+                                ),
                             )
                             .createAndShow(childFragmentManager, "aa")
                     },
@@ -248,7 +258,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
                 binding.goToPost.setOnClickListener {
                     getMainActivity()?.launchPage(
-                        PostRef(args.instance, inboxItem.postId)
+                        PostRef(args.instance, inboxItem.postId),
                     )
                 }
             }
@@ -259,7 +269,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }
 
             is InboxItem.MentionInboxItem,
-            is InboxItem.ReplyInboxItem -> error("THIS SHOULDNT HAPPEN!!!")
+            is InboxItem.ReplyInboxItem,
+            -> error("THIS SHOULDNT HAPPEN!!!")
         }
 
         binding.contextCard.setOnClickListener {
@@ -306,7 +317,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         }
     }
 
-
     private fun getPostMoreMenu(postView: PostView): BottomMenu {
         val bottomMenu = BottomMenu(requireContext()).apply {
             if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.value?.id) {
@@ -318,12 +328,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 addItemWithIcon(
                     R.id.block_community,
                     getString(R.string.block_this_community_format, postView.community.name),
-                    R.drawable.baseline_block_24
+                    R.drawable.baseline_block_24,
                 )
                 addItemWithIcon(
                     R.id.block_user,
                     getString(R.string.block_this_user_format, postView.creator.name),
-                    R.drawable.baseline_person_off_24
+                    R.drawable.baseline_person_off_24,
                 )
             }
 
@@ -388,9 +398,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     AlertDialogFragment.Builder()
                         .setTitle(R.string.error_account_instance_mismatch_title)
                         .setMessage(
-                            getString(R.string.error_account_instance_mismatch,
+                            getString(
+                                R.string.error_account_instance_mismatch,
                                 accountInstance,
-                                apiInstance)
+                                apiInstance,
+                            ),
                         )
                         .createAndShow(childFragmentManager, "aa")
                 },
@@ -404,11 +416,19 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     AddOrEditCommentFragment().apply {
                         arguments = postOrComment.fold({
                             AddOrEditCommentFragmentArgs(
-                                args.instance, null, it, null)
+                                args.instance,
+                                null,
+                                it,
+                                null,
+                            )
                         }, {
                             AddOrEditCommentFragmentArgs(
-                                args.instance, it, null, null)
-                        }).toBundle()
+                                args.instance,
+                                it,
+                                null,
+                                null,
+                            )
+                        },).toBundle()
                     }.show(childFragmentManager, "asdf")
                 },
                 onImageClick = { postOrCommentView, view, url ->
@@ -435,7 +455,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     }
 
                     getMainActivity()?.launchPage(
-                        PostRef(args.instance, postId)
+                        PostRef(args.instance, postId),
                     )
                 },
                 onLoadPost = {},
@@ -450,16 +470,22 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
-            recyclerView.addItemDecoration(OldThreadLinesDecoration(
-                context, postAndCommentViewBuilder.hideCommentActions))
+            recyclerView.addItemDecoration(
+                OldThreadLinesDecoration(
+                    context,
+                    postAndCommentViewBuilder.hideCommentActions,
+                ),
+            )
 
-            adapter.setData(PostViewModel.PostData(
-                PostViewModel.ListView.PostListView(data.post),
-                listOf(data.commentTree),
-                null,
-                null,
-                false,
-            ))
+            adapter.setData(
+                PostViewModel.PostData(
+                    PostViewModel.ListView.PostListView(data.post),
+                    listOf(data.commentTree),
+                    null,
+                    null,
+                    false,
+                ),
+            )
 
             val commentId = args.inboxItem.commentId
             if (commentId != null) {

@@ -21,7 +21,6 @@ import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -56,9 +55,9 @@ class AddOrEditCommentViewModel @Inject constructor(
                             AccountInstanceMismatchException(
                                 account.instance,
                                 postRef.instance,
-                            )
-                        )
-                    )
+                            ),
+                        ),
+                    ),
                 )
                 return@launch
             }
@@ -88,9 +87,9 @@ class AddOrEditCommentViewModel @Inject constructor(
                                 AccountInstanceMismatchException(
                                     account.instance,
                                     instance,
-                                )
-                            )
-                        )
+                                ),
+                            ),
+                        ),
                     )
                     return@launch
                 }
@@ -105,14 +104,15 @@ class AddOrEditCommentViewModel @Inject constructor(
             } else {
                 when (inboxItem) {
                     is InboxItem.MentionInboxItem,
-                    is InboxItem.ReplyInboxItem -> error("Should never happen!")
+                    is InboxItem.ReplyInboxItem,
+                    -> error("Should never happen!")
                     is InboxItem.MessageInboxItem -> {
                         apiClient.changeInstance(instance)
                         apiClient
                             .createPrivateMessage(
                                 content = content,
                                 recipient = inboxItem.authorId,
-                                account = requireNotNull(currentAccount.value)
+                                account = requireNotNull(currentAccount.value),
                             )
                             .onFailure {
                                 commentSentEvent.postValue(Event(Result.failure(it)))
@@ -178,7 +178,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                 .createPrivateMessage(
                     content = content,
                     recipient = personId,
-                    account = requireNotNull(currentAccount.value)
+                    account = requireNotNull(currentAccount.value),
                 )
                 .onFailure {
                     commentSentEvent.postValue(Event(Result.failure(it)))

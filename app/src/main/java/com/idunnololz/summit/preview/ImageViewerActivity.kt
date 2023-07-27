@@ -129,14 +129,12 @@ class ImageViewerActivity : BaseActivity() {
 //                topMargin = insetsSystemBars.top
 //            }
 
-
             insets
         }
 //        if (!LemmyUtils.isUrlAGif(args.url)) {
 //            sharedElementEnterTransition = SharedElementTransition()
 //            sharedElementReturnTransition = SharedElementTransition()
 //        }
-
 
         window.enterTransition = Fade(Fade.IN).apply {
             duration = 200
@@ -153,29 +151,31 @@ class ImageViewerActivity : BaseActivity() {
 
         binding.dummyImageView.visibility = View.VISIBLE
         binding.imageView.visibility = View.INVISIBLE
-        window.sharedElementEnterTransition.addListener(object : Transition.TransitionListener  {
-            override fun onTransitionStart(p0: Transition?) {
-            }
-
-            override fun onTransitionEnd(p0: Transition?) {
-                binding.dummyImageView.post {
-                    binding.dummyImageView.transitionName = null
-                    binding.imageView.transitionName = args.transitionName
-
-                    binding.dummyImageView.visibility = View.GONE
-                    binding.imageView.visibility = View.VISIBLE
+        window.sharedElementEnterTransition.addListener(
+            object : Transition.TransitionListener {
+                override fun onTransitionStart(p0: Transition?) {
                 }
-            }
 
-            override fun onTransitionCancel(p0: Transition?) {
-            }
+                override fun onTransitionEnd(p0: Transition?) {
+                    binding.dummyImageView.post {
+                        binding.dummyImageView.transitionName = null
+                        binding.imageView.transitionName = args.transitionName
 
-            override fun onTransitionPause(p0: Transition?) {
-            }
+                        binding.dummyImageView.visibility = View.GONE
+                        binding.imageView.visibility = View.VISIBLE
+                    }
+                }
 
-            override fun onTransitionResume(p0: Transition?) {
-            }
-        })
+                override fun onTransitionCancel(p0: Transition?) {
+                }
+
+                override fun onTransitionPause(p0: Transition?) {
+                }
+
+                override fun onTransitionResume(p0: Transition?) {
+                }
+            },
+        )
 
         if (args.transitionName == null) {
             binding.dummyImageView.post {
@@ -206,9 +206,9 @@ class ImageViewerActivity : BaseActivity() {
 
         loadImage(args.url)
 
-        binding.imageView.postDelayed( {
+        binding.imageView.postDelayed({
             startPostponedEnterTransition()
-        }, 50)
+        }, 50,)
 
         viewModel.downloadResult.observe(this) {
             when (it) {
@@ -226,7 +226,7 @@ class ImageViewerActivity : BaseActivity() {
                                 Snackbar.make(
                                     getSnackbarContainer(),
                                     snackbarMsg,
-                                    Snackbar.LENGTH_LONG
+                                    Snackbar.LENGTH_LONG,
                                 ).setAction(R.string.view) {
                                     Utils.safeLaunchExternalIntentWithErrorDialog(
                                         context,
@@ -235,9 +235,10 @@ class ImageViewerActivity : BaseActivity() {
                                             flags =
                                                 Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
                                             setDataAndType(uri, mimeType)
-                                        })
+                                        },
+                                    )
                                 }.show()
-                            } catch (e: IOException) {/* do nothing */
+                            } catch (e: IOException) { /* do nothing */
                             }
                         }
                         .onFailure {
@@ -249,36 +250,37 @@ class ImageViewerActivity : BaseActivity() {
             }
         }
 
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_image_viewer, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                when (menuItem.itemId) {
-                    R.id.save -> {
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
-                            ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            requestPermissionLauncher.launch(
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            )
-                        } else {
-                            downloadImage()
-                        }
-                        true
-                    }
-                    R.id.openInBrowser -> {
-                        Utils.openExternalLink(context, args.url)
-                        true
-                    }
-                    else -> false
+        addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.menu_image_viewer, menu)
                 }
 
-        })
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                    when (menuItem.itemId) {
+                        R.id.save -> {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+                                ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    ) != PackageManager.PERMISSION_GRANTED
+                            ) {
+                                requestPermissionLauncher.launch(
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                )
+                            } else {
+                                downloadImage()
+                            }
+                            true
+                        }
+                        R.id.openInBrowser -> {
+                            Utils.openExternalLink(context, args.url)
+                            true
+                        }
+                        else -> false
+                    }
+            },
+        )
     }
     override fun onDestroy() {
         offlineManager.cancelFetch(binding.root)
@@ -290,7 +292,7 @@ class ImageViewerActivity : BaseActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -393,7 +395,6 @@ class ImageViewerActivity : BaseActivity() {
                 }
             }
 
-
             override fun overScrollEnd(): Boolean {
                 if (currentState == R.id.exiting) {
                     supportFinishAfterTransition()
@@ -427,7 +428,6 @@ class ImageViewerActivity : BaseActivity() {
         hideSystemUI()
     }
 
-
     fun hideSystemUI() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -457,15 +457,15 @@ class ImageViewerActivity : BaseActivity() {
                 fileName,
                 url,
                 it,
-                mimeType = mimeType
+                mimeType = mimeType,
             )
         }, {
             Snackbar.make(
                 getSnackbarContainer(),
                 R.string.error_downloading_image,
-                Snackbar.LENGTH_LONG
+                Snackbar.LENGTH_LONG,
             ).show()
-        })
+        },)
     }
 
     private fun loadImageFromUrl(url: String) {
@@ -481,36 +481,37 @@ class ImageViewerActivity : BaseActivity() {
             val request = ImageRequest.Builder(binding.imageView.context)
                 .data(it)
                 .allowHardware(false)
-                .target(object : Target {
-                    override fun onError(error: Drawable?) {
-                        super.onError(error)
-                        binding.loadingView.showErrorWithRetry(R.string.error_downloading_image)
-                    }
-
-                    override fun onStart(placeholder: Drawable?) {
-                        super.onStart(placeholder)
-                    }
-
-                    override fun onSuccess(result: Drawable) {
-                        super.onSuccess(result)
-
-
-                        startPostponedEnterTransition()
-                        binding.loadingView.hideAll()
-
-                        binding.imageView.setImageDrawable(result)
-                        binding.dummyImageView.setImageDrawable(result)
-
-                        if (result is Animatable) {
-                            result.start()
+                .target(
+                    object : Target {
+                        override fun onError(error: Drawable?) {
+                            super.onError(error)
+                            binding.loadingView.showErrorWithRetry(R.string.error_downloading_image)
                         }
-                    }
-                })
+
+                        override fun onStart(placeholder: Drawable?) {
+                            super.onStart(placeholder)
+                        }
+
+                        override fun onSuccess(result: Drawable) {
+                            super.onSuccess(result)
+
+                            startPostponedEnterTransition()
+                            binding.loadingView.hideAll()
+
+                            binding.imageView.setImageDrawable(result)
+                            binding.dummyImageView.setImageDrawable(result)
+
+                            if (result is Animatable) {
+                                result.start()
+                            }
+                        }
+                    },
+                )
                 .build()
             binding.imageView.context.imageLoader.enqueue(request)
         }, {
             binding.loadingView.showDefaultErrorMessageFor(it)
-        })
+        },)
     }
 
     fun setupActionBar(

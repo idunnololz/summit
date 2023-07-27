@@ -6,7 +6,6 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
@@ -21,28 +20,21 @@ import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SiteView
 import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.databinding.CommunityHeaderItemBinding
 import com.idunnololz.summit.databinding.FragmentCommunityInfoBinding
 import com.idunnololz.summit.databinding.PageDataAdminItemBinding
 import com.idunnololz.summit.databinding.PageDataDescriptionItemBinding
 import com.idunnololz.summit.databinding.PageDataModItemBinding
 import com.idunnololz.summit.databinding.PageDataStatsItemBinding
 import com.idunnololz.summit.databinding.PageDataTitleItemBinding
-import com.idunnololz.summit.databinding.SiteHeaderItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -50,10 +42,8 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
-import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -74,7 +64,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -111,7 +101,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     appBar = binding.appBar,
                     title = imageName,
                     url = url,
-                    mimeType = null
+                    mimeType = null,
                 )
             },
             onPageClick = {
@@ -138,7 +128,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     binding.loadingView.hideAll()
                     val pageData = it.data.fold(
                         { it.toPageData() },
-                        { it.toPageData() }
+                        { it.toPageData() },
                     )
 
                     adapter.data = pageData
@@ -154,7 +144,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             when (args.communityRef) {
                 is CommunityRef.All,
                 is CommunityRef.Local,
-                is CommunityRef.Subscribed -> {
+                is CommunityRef.Subscribed,
+                -> {
                     subscribe.visibility = View.GONE
                 }
                 is CommunityRef.CommunityRefByName -> {
@@ -230,7 +221,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         return PageData(
             Either.Left(communityView),
             name,
-            "!${name}@${instance}",
+            "!$name@$instance",
             communityView.community.icon,
             communityView.community.banner,
             communityView.community.instance,
@@ -317,7 +308,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         null,
                         args.communityRef.getName(context),
                         data.bannerUrl,
-                        null
+                        null,
                     )
                 }
             } else {
@@ -354,16 +345,15 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         if (!isBindingAvailable()) return
 
         val bottomMenu = BottomMenu(requireContext()).apply {
-
             addItemWithIcon(
                 id = R.id.block_community,
                 title = getString(R.string.block_this_community_format, communityView.community.name),
-                icon = R.drawable.baseline_block_24
+                icon = R.drawable.baseline_block_24,
             )
             addItemWithIcon(
                 id = R.id.unblock_community,
                 title = getString(R.string.unblock_this_community_format, communityView.community.name),
-                icon = R.drawable.ic_subreddit_default
+                icon = R.drawable.ic_subreddit_default,
             )
 
             setOnMenuItemClickListener {
@@ -404,13 +394,13 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 val content: String,
             ) : Item
             data class ModItem(
-                val mod: Person
+                val mod: Person,
             ) : Item
             data class AdminItem(
-                val admin: PersonView
+                val admin: PersonView,
             ) : Item
             data class TitleItem(
-                val title: String
+                val title: String,
             ) : Item
         }
 
@@ -438,11 +428,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     is Item.TitleItem ->
                         old.title == (new as Item.TitleItem).title
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.DescriptionItem::class,
-                inflateFn = PageDataDescriptionItemBinding::inflate
+                inflateFn = PageDataDescriptionItemBinding::inflate,
             ) { item, b, h ->
                 LemmyTextHelper.bindText(
                     textView = b.text,
@@ -457,7 +447,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
             addItemType(
                 Item.StatsItem::class,
-                PageDataStatsItemBinding::inflate
+                PageDataStatsItemBinding::inflate,
             ) { item, b, h ->
                 b.posts.text = nf.format(item.postCount)
                 b.comments.text = nf.format(item.commentCount)
@@ -491,7 +481,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
             addItemType(
                 Item.TitleItem::class,
-                PageDataTitleItemBinding::inflate
+                PageDataTitleItemBinding::inflate,
             ) { item, b, h ->
                 b.title.text = item.title
             }
@@ -508,20 +498,21 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
 
-
         private fun refreshItems() {
             val data = data ?: return
             val newItems = mutableListOf<Item>()
 
-            newItems.add(Item.StatsItem(
-                data.postCount,
-                data.commentCount,
-                data.userCount,
-                data.usersPerDay,
-                data.usersPerWeek,
-                data.usersPerMonth,
-                data.usersPerSixMonth,
-            ))
+            newItems.add(
+                Item.StatsItem(
+                    data.postCount,
+                    data.commentCount,
+                    data.userCount,
+                    data.usersPerDay,
+                    data.usersPerWeek,
+                    data.usersPerMonth,
+                    data.usersPerSixMonth,
+                ),
+            )
             newItems.add(Item.DescriptionItem(data.content ?: ""))
 
             if (data.admins.isNotEmpty()) {

@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
@@ -31,8 +29,10 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
-    FullscreenDialogFragment, BackPressHandler {
+class CreateOrEditPostFragment :
+    BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
+    FullscreenDialogFragment,
+    BackPressHandler {
 
     companion object {
         const val REQUEST_KEY = "CreateOrEditPostFragment_req_key"
@@ -68,7 +68,6 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
 
         setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
@@ -87,7 +86,7 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -124,7 +123,7 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                     viewModel.createPost(
                         communityRef = CommunityRef.CommunityRefByName(
                             name = requireNotNull(args.communityName),
-                            instance = args.instance
+                            instance = args.instance,
                         ),
                         name = binding.title.editText?.text.toString(),
                         body = binding.postEditor.editText?.text.toString(),
@@ -194,12 +193,11 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                     }
                 }
 
-
                 bottomMenu.show(
                     mainActivity = requireMainActivity(),
                     viewGroup = binding.coordinatorLayout,
                     expandFully = true,
-                    handleBackPress = false
+                    handleBackPress = false,
                 )
             },
             onPreviewClick = {
@@ -207,11 +205,11 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                     .apply {
                         arguments = PreviewCommentDialogFragmentArgs(
                             args.instance,
-                            postEditor.editText?.text.toString()
+                            postEditor.editText?.text.toString(),
                         ).toBundle()
                     }
                     .showAllowingStateLoss(childFragmentManager, "AA")
-            }
+            },
         )
 
         binding.loadingView.hideAll()
@@ -258,12 +256,11 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                 }
             }
 
-
             bottomMenu.show(
                 mainActivity = requireMainActivity(),
                 viewGroup = binding.coordinatorLayout,
                 expandFully = true,
-                handleBackPress = false
+                handleBackPress = false,
             )
         }
         viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
@@ -276,10 +273,13 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                         binding.title.error = getString(R.string.required)
                     } else {
                         AlertDialogFragment.Builder()
-                            .setMessage(getString(
-                                R.string.error_unable_to_send_post,
-                                it.error::class.qualifiedName,
-                                it.error.message))
+                            .setMessage(
+                                getString(
+                                    R.string.error_unable_to_send_post,
+                                    it.error::class.qualifiedName,
+                                    it.error.message,
+                                ),
+                            )
                             .createAndShow(childFragmentManager, "ASDS")
                     }
                 }
@@ -289,8 +289,10 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     requireActivity().supportFragmentManager.setFragmentResult(
-                        REQUEST_KEY, bundleOf(
-                            REQUEST_KEY_RESULT to it.data)
+                        REQUEST_KEY,
+                        bundleOf(
+                            REQUEST_KEY_RESULT to it.data,
+                        ),
                     )
 
                     dismiss()
@@ -302,10 +304,13 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
                     AlertDialogFragment.Builder()
-                        .setMessage(getString(
-                            R.string.error_unable_to_send_post,
-                            it.error::class.qualifiedName,
-                            it.error.message))
+                        .setMessage(
+                            getString(
+                                R.string.error_unable_to_send_post,
+                                it.error::class.qualifiedName,
+                                it.error.message,
+                            ),
+                        )
                         .createAndShow(childFragmentManager, "ASDS")
                 }
                 is StatefulData.Loading -> {
@@ -325,10 +330,13 @@ class CreateOrEditPostFragment : BaseDialogFragment<FragmentCreateOrEditPostBind
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
                     AlertDialogFragment.Builder()
-                        .setMessage(getString(
-                            R.string.error_unable_to_send_post,
-                            it.error::class.qualifiedName,
-                            it.error.message))
+                        .setMessage(
+                            getString(
+                                R.string.error_unable_to_send_post,
+                                it.error::class.qualifiedName,
+                                it.error.message,
+                            ),
+                        )
                         .createAndShow(childFragmentManager, "ASDS")
                 }
                 is StatefulData.Loading -> {

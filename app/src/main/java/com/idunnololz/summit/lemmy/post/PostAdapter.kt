@@ -67,12 +67,12 @@ class PostsAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed class Item(
-        open val id: String
+        open val id: String,
     ) {
 
         data class HeaderItem(
             val postView: PostView,
-            var videoState: VideoState?
+            var videoState: VideoState?,
         ) : Item(postView.getUniqueKey())
 
         data class CommentItem(
@@ -91,7 +91,7 @@ class PostsAdapter(
             val isActionsExpanded: Boolean,
             val isHighlighted: Boolean,
         ) : Item(
-            "comment_${comment.comment.id}"
+            "comment_${comment.comment.id}",
         )
 
         data class PendingCommentItem(
@@ -105,7 +105,7 @@ class PostsAdapter(
             val view: PostViewModel.ListView.PendingCommentListView,
             val childrenCount: Int,
         ) : Item(
-            "pending_comment_${view.pendingCommentView.id}"
+            "pending_comment_${view.pendingCommentView.id}",
         )
 
         data class MoreCommentsItem(
@@ -114,16 +114,16 @@ class PostsAdapter(
             val depth: Int,
             val baseDepth: Int,
         ) : Item(
-            "more_comments_${parentId}"
+            "more_comments_$parentId",
         )
 
         class ProgressOrErrorItem(
-            val error: Throwable? = null
+            val error: Throwable? = null,
         ) : Item("wew_pls_no_progress")
 
         data class ViewAllComments(
-            val postId: PostId
-        ): Item("view_all_yo")
+            val postId: PostId,
+        ) : Item("view_all_yo")
 
         object FooterItem : Item("footer")
     }
@@ -161,7 +161,7 @@ class PostsAdapter(
             }
             field = value
 
-            for (i in 0.. items.lastIndex) {
+            for (i in 0..items.lastIndex) {
                 if (items[i] is HeaderItem) {
                     notifyItemChanged(i)
                 }
@@ -171,19 +171,21 @@ class PostsAdapter(
     override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
         is HeaderItem -> R.layout.post_header_item
         is CommentItem ->
-            if (item.isExpanded)
+            if (item.isExpanded) {
                 if (postAndCommentViewBuilder.hideCommentActions) {
                     R.layout.post_comment_expanded_compact_item
                 } else {
                     R.layout.post_comment_expanded_item
                 }
-            else
+            } else {
                 R.layout.post_comment_collapsed_item
+            }
         is PendingCommentItem ->
-            if (item.isExpanded)
+            if (item.isExpanded) {
                 R.layout.post_pending_comment_expanded_item
-            else
+            } else {
                 R.layout.post_pending_comment_collapsed_item
+            }
         is ProgressOrErrorItem -> R.layout.generic_loading_item
         is MoreCommentsItem -> R.layout.post_more_comments_item
         is FooterItem -> R.layout.generic_footer_item
@@ -203,11 +205,16 @@ class PostsAdapter(
                 CommentExpandedViewHolder.fromBinding(PostCommentExpandedCompactItemBinding.bind(v))
                     .apply {
                         headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                            R.drawable.baseline_arrow_upward_16, 0, 0, 0)
+                            R.drawable.baseline_arrow_upward_16,
+                            0,
+                            0,
+                            0,
+                        )
                         headerView.textView2.compoundDrawablePadding =
                             Utils.convertDpToPixel(4f).toInt()
                         headerView.textView2.updatePaddingRelative(
-                            start = Utils.convertDpToPixel(8f).toInt())
+                            start = Utils.convertDpToPixel(8f).toInt(),
+                        )
                     }
             R.layout.post_comment_collapsed_item ->
                 ViewBindingViewHolder(PostCommentCollapsedItemBinding.bind(v))
@@ -230,7 +237,7 @@ class PostsAdapter(
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
-        payloads: MutableList<Any>
+        payloads: MutableList<Any>,
     ) {
         when (val item = items[position]) {
             is HeaderItem -> {
@@ -422,7 +429,9 @@ class PostsAdapter(
 
                 postAndCommentViewBuilder.bindMoreCommentsItem(b, item.depth, item.baseDepth)
                 b.moreButton.text = context.resources.getQuantityString(
-                    R.plurals.replies_format, item.moreCount, item.moreCount
+                    R.plurals.replies_format,
+                    item.moreCount,
+                    item.moreCount,
                 )
 
                 b.moreButton.setOnClickListener {
@@ -435,7 +444,7 @@ class PostsAdapter(
             FooterItem -> {}
             is Item.ViewAllComments -> {
                 val b = holder.getBinding<ViewAllCommentsBinding>()
-                b.button.setOnClickListener { 
+                b.button.setOnClickListener {
                     onLoadPost(item.postId)
                 }
             }
@@ -508,9 +517,9 @@ class PostsAdapter(
                                 isUpdating = commentView.pendingCommentView != null,
                                 isDeleting = isDeleting,
                                 isActionsExpanded = actionExpandedComments.contains(
-                                    commentId
+                                    commentId,
                                 ),
-                                isHighlighted = rawData.selectedCommentId == commentId
+                                isHighlighted = rawData.selectedCommentId == commentId,
                             )
                         }
                         is PostViewModel.ListView.PendingCommentListView -> {
@@ -560,29 +569,30 @@ class PostsAdapter(
                 finalItems
             }
 
-        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return oldItems[oldItemPosition].id == newItems[newItemPosition].id
-            }
-
-            override fun getOldListSize(): Int = oldItems.size
-
-            override fun getNewListSize(): Int = newItems.size
-
-            override fun areContentsTheSame(
-                oldItemPosition: Int,
-                newItemPosition: Int
-            ): Boolean {
-                val oldItem = oldItems[oldItemPosition]
-                val newItem = newItems[newItemPosition]
-                return when (oldItem) {
-                    is HeaderItem ->
-                        oldItem.postView.post == (newItem as HeaderItem).postView.post
-                    else -> oldItem == newItem
+        val diff = DiffUtil.calculateDiff(
+            object : DiffUtil.Callback() {
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return oldItems[oldItemPosition].id == newItems[newItemPosition].id
                 }
-            }
 
-        })
+                override fun getOldListSize(): Int = oldItems.size
+
+                override fun getNewListSize(): Int = newItems.size
+
+                override fun areContentsTheSame(
+                    oldItemPosition: Int,
+                    newItemPosition: Int,
+                ): Boolean {
+                    val oldItem = oldItems[oldItemPosition]
+                    val newItem = newItems[newItemPosition]
+                    return when (oldItem) {
+                        is HeaderItem ->
+                            oldItem.postView.post == (newItem as HeaderItem).postView.post
+                        else -> oldItem == newItem
+                    }
+                }
+            },
+        )
         this.items = newItems
         diff.dispatchUpdatesTo(this)
         if (refreshHeader) {

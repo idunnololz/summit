@@ -34,7 +34,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -82,7 +82,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
                     updateLoginButtonState()
                     requireActivity().onBackPressedDispatcher.addCallback(
-                        viewLifecycleOwner, onBackPressedHandler)
+                        viewLifecycleOwner,
+                        onBackPressedHandler,
+                    )
                 }
             }
         }
@@ -127,8 +129,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                     ArrayAdapter(
                         context,
                         com.google.android.material.R.layout.m3_auto_complete_simple_item,
-                        DEFAULT_LEMMY_INSTANCES
-                    )
+                        DEFAULT_LEMMY_INSTANCES,
+                    ),
                 )
             }
 
@@ -203,8 +205,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 LoginViewModel.State.Login -> {
                     login.isEnabled =
                         !instance.editText?.text.isNullOrBlank() &&
-                                !username.editText?.text.isNullOrBlank() &&
-                                !password.editText?.text.isNullOrBlank()
+                        !username.editText?.text.isNullOrBlank() &&
+                        !password.editText?.text.isNullOrBlank()
                 }
                 is LoginViewModel.State.TwoFactorAuth -> {
                     login.isEnabled =

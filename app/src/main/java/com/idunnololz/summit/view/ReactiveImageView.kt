@@ -5,17 +5,13 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.RecordingCanvas
 import android.graphics.drawable.RippleDrawable
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
-import androidx.core.widget.ImageViewCompat
 import com.idunnololz.summit.R
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 
 class ReactiveImageView : AppCompatImageView {
     private val isRipple = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
@@ -33,7 +29,7 @@ class ReactiveImageView : AppCompatImageView {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     ) {
         init()
     }
@@ -47,7 +43,8 @@ class ReactiveImageView : AppCompatImageView {
         if (isRipple) {
             foreground = RippleDrawable(
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white97)),
-                null, null
+                null,
+                null,
             )
         }
     }

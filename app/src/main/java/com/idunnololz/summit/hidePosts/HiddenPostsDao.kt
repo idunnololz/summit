@@ -1,6 +1,5 @@
 package com.idunnololz.summit.hidePosts
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -19,8 +18,10 @@ interface HiddenPostsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHiddenPost(hiddenPostEntry: HiddenPostEntry): Long
 
-    @Query("DELETE FROM hidden_posts WHERE id IN (SELECT id FROM hidden_posts ORDER BY ts DESC " +
-            "LIMIT 10 OFFSET $HIDDEN_POSTS_LIMIT)")
+    @Query(
+        "DELETE FROM hidden_posts WHERE id IN (SELECT id FROM hidden_posts ORDER BY ts DESC " +
+            "LIMIT 10 OFFSET $HIDDEN_POSTS_LIMIT)",
+    )
     suspend fun pruneDb()
 
     @Query("SELECT count(*) FROM hidden_posts")

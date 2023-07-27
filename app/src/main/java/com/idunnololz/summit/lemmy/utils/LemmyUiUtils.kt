@@ -24,24 +24,24 @@ fun RecyclerView.setupDecoratorsForPostList(preferences: Preferences) {
         this.addItemDecoration(
             CustomDividerItemDecoration(
                 this.context,
-                DividerItemDecoration.VERTICAL
+                DividerItemDecoration.VERTICAL,
             ).apply {
                 setDrawable(
                     checkNotNull(
                         ContextCompat.getDrawable(
                             context,
-                            R.drawable.vertical_divider
-                        )
-                    )
+                            R.drawable.vertical_divider,
+                        ),
+                    ),
                 )
-            }
+            },
         )
     } else {
         this.addItemDecoration(
             VerticalSpaceItemDecoration(
                 this.context.getDimen(R.dimen.padding),
-                true
-            )
+                true,
+            ),
         )
     }
 }
@@ -69,19 +69,19 @@ fun Preferences.getPostSwipeActions(context: Context): List<LemmySwipeActionCall
         LemmySwipeActionCallback.SwipeAction(
             postGestureAction1,
             context.getDrawableCompat(postGestureAction1.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_red)
+            context.getColorCompat(R.color.style_red),
         ),
         LemmySwipeActionCallback.SwipeAction(
             postGestureAction2,
             context.getDrawableCompat(postGestureAction2.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_blue)
+            context.getColorCompat(R.color.style_blue),
         ),
         LemmySwipeActionCallback.SwipeAction(
             postGestureAction3,
             context.getDrawableCompat(postGestureAction3.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_amber)
+            context.getColorCompat(R.color.style_amber),
         ),
-    )
+    ).filter { it.id != PostGestureAction.None }
 }
 
 fun Preferences.getCommentSwipeActions(context: Context): List<LemmySwipeActionCallback.SwipeAction> {
@@ -105,17 +105,17 @@ fun Preferences.getCommentSwipeActions(context: Context): List<LemmySwipeActionC
         LemmySwipeActionCallback.SwipeAction(
             commentGestureAction1,
             context.getDrawableCompat(commentGestureAction1.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_red)
+            context.getColorCompat(R.color.style_red),
         ),
         LemmySwipeActionCallback.SwipeAction(
             commentGestureAction2,
             context.getDrawableCompat(commentGestureAction2.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_blue)
+            context.getColorCompat(R.color.style_blue),
         ),
         LemmySwipeActionCallback.SwipeAction(
             commentGestureAction3,
             context.getDrawableCompat(commentGestureAction3.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_amber)
+            context.getColorCompat(R.color.style_amber),
         ),
-    )
+    ).filter { it.id != CommentGestureAction.None }
 }

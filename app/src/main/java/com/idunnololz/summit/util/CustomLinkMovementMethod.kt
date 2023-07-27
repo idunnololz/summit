@@ -19,7 +19,6 @@ import io.noties.markwon.core.spans.LinkSpan
 import io.noties.markwon.ext.tables.TableRowSpan
 import io.noties.markwon.image.AsyncDrawableSpan
 
-
 class CustomLinkMovementMethod : LinkMovementMethod() {
 
     var onLinkClickListener: OnLinkClickListener? = null
@@ -85,12 +84,14 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                                 removeUrlHighlightColor(textView)
                                 if (clickableSpanUnderTouch != null) {
                                     dispatchUrlLongClick(
-                                        textView, clickableSpanUnderTouch, RectF(
+                                        textView,
+                                        clickableSpanUnderTouch,
+                                        RectF(
                                             event.x - Utils.convertDpToPixel(16f),
                                             event.y - Utils.convertDpToPixel(16f),
                                             event.x + Utils.convertDpToPixel(16f),
-                                            event.y + Utils.convertDpToPixel(16f)
-                                        )
+                                            event.y + Utils.convertDpToPixel(16f),
+                                        ),
                                     )
                                 }
                             }
@@ -104,12 +105,14 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                 if (!wasLongPressRegistered && touchStartedOverAClickableSpan && clickableSpanUnderTouch === clickableSpanUnderTouchOnActionDown) {
                     if (clickableSpanUnderTouch != null) {
                         dispatchUrlClick(
-                            textView, clickableSpanUnderTouch, RectF(
+                            textView,
+                            clickableSpanUnderTouch,
+                            RectF(
                                 event.x - Utils.convertDpToPixel(16f),
                                 event.y - Utils.convertDpToPixel(16f),
                                 event.x + Utils.convertDpToPixel(16f),
-                                event.y + Utils.convertDpToPixel(16f)
-                            )
+                                event.y + Utils.convertDpToPixel(16f),
+                            ),
                         )
                     }
                 }
@@ -159,21 +162,21 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
 
     private fun startTimerForRegisteringLongClick(
         textView: TextView,
-        longClickListener: LongPressTimer.OnTimerReachedListener?
+        longClickListener: LongPressTimer.OnTimerReachedListener?,
     ) {
         ongoingLongPressTimer = LongPressTimer().apply {
             setOnTimerReachedListener(longClickListener)
         }
         textView.postDelayed(
             ongoingLongPressTimer,
-            ViewConfiguration.getLongPressTimeout().toLong()
+            ViewConfiguration.getLongPressTimeout().toLong(),
         )
     }
 
     private fun dispatchUrlClick(
         textView: TextView,
         clickableSpan: Any,
-        bounds: RectF
+        bounds: RectF,
     ) {
         if (clickableSpan is DetailsClickableSpan) {
             clickableSpan.onClick(textView)
@@ -186,7 +189,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                     textView,
                     clickableSpanWithText.url,
                     clickableSpanWithText.text,
-                    bounds
+                    bounds,
                 ) ?: false
 
                 if (!handled) {
@@ -203,7 +206,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
     private fun dispatchUrlLongClick(
         textView: TextView,
         clickableSpan: Any,
-        bounds: RectF
+        bounds: RectF,
     ) {
         if (clickableSpan is ClickableSpan) {
             val clickableSpanWithText =
@@ -213,7 +216,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                     textView,
                     clickableSpanWithText.url,
                     clickableSpanWithText.text,
-                    bounds
+                    bounds,
                 ) ?: false
                 if (!handled) {
                     // Let Android handle this long click as a short-click.
@@ -225,7 +228,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                         textView,
                         clickableSpan.url,
                         clickableSpan.link,
-                        bounds
+                        bounds,
                     ) ?: false
                 } else {
                     false
@@ -250,7 +253,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         val text = textView.text as Spannable
         val highlightSpan =
             textView.getTag(R.id.bettermovementmethod_highlight_background_span)
-                    as? BackgroundColorSpan
+                as? BackgroundColorSpan
                 ?: return
         text.removeSpan(highlightSpan)
         Selection.removeSelection(text)
@@ -262,7 +265,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
     private fun highlightUrl(
         textView: TextView,
         clickableSpan: Any?,
-        text: Spannable
+        text: Spannable,
     ) {
         if (isUrlHighlighted) {
             return
@@ -289,7 +292,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
     private fun findClickableSpanUnderTouch(
         textView: TextView,
         text: Spannable,
-        event: MotionEvent
+        event: MotionEvent,
     ): Any? {
         // So we need to find the location in text where touch was made, regardless of whether the TextView
         // has scrollable text. That is, not the entire text is currently visible.
@@ -320,15 +323,19 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
 
             // Find a ClickableSpan that lies under the touched area.
             val clickableSpans: Array<ClickableSpan> = text.getSpans(
-                touchOffset, touchOffset,
-                ClickableSpan::class.java
+                touchOffset,
+                touchOffset,
+                ClickableSpan::class.java,
             )
             for (span in clickableSpans) {
                 return span
             }
 
             val drawableSpans = text.getSpans(
-                touchOffset, touchOffset, AsyncDrawableSpan::class.java)
+                touchOffset,
+                touchOffset,
+                AsyncDrawableSpan::class.java,
+            )
             for (span in drawableSpans) {
                 return span
             }
@@ -343,7 +350,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
     private fun findClickableSpanInTable(
         widget: TextView,
         buffer: Spannable,
-        event: MotionEvent
+        event: MotionEvent,
     ): Any? {
 //        // handle only action up (originally action down is used in order to handle selection,
 //        //  which tables do no have)
@@ -371,8 +378,9 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
             // line top as basis
             val rowY: Int = layout.getLineTop(line)
             val rowLine: Int = rowLayout.getLineForVertical(y - rowY)
-            val rowOffset: Int = rowLayout.getOffsetForHorizontal(rowLine,
-                (x % span.cellWidth()).toFloat()
+            val rowOffset: Int = rowLayout.getOffsetForHorizontal(
+                rowLine,
+                (x % span.cellWidth()).toFloat(),
             )
 
             val rowClickableTextSpans = (rowLayout.text as Spanned)
@@ -412,7 +420,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
     data class ClickableSpanWithText(
         val span: ClickableSpan,
         val text: String,
-        val url: String
+        val url: String,
     ) {
 
         companion object {
@@ -433,7 +441,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                         span.url
                     } else {
                         text
-                    }
+                    },
                 )
             }
         }

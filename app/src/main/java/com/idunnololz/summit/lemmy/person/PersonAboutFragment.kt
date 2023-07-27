@@ -18,7 +18,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -67,9 +67,11 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
         val personView = data.personView
 
         binding.postScore.text = PrettyPrintUtils.defaultDecimalFormat.format(
-            personView.counts.post_score)
+            personView.counts.post_score,
+        )
         binding.commentScore.text = PrettyPrintUtils.defaultDecimalFormat.format(
-            personView.counts.comment_score)
+            personView.counts.comment_score,
+        )
 
         LemmyTextHelper.bindText(
             binding.bio,
@@ -86,7 +88,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                     appBar = parentFragment.binding.appBar,
                     title = null,
                     url = url,
-                    mimeType = null
+                    mimeType = null,
                 )
             },
             onPageClick = {
@@ -105,7 +107,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                     getString(R.string.bot)
                 } else {
                     getString(R.string.normal)
-                }
+                },
             )
 
             val status =
@@ -113,7 +115,8 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                     if (personView.person.ban_expires != null) {
                         getString(
                             R.string.banned_until_format,
-                            dateStringToPretty(context, personView.person.ban_expires))
+                            dateStringToPretty(context, personView.person.ban_expires),
+                        )
                     } else {
                         getString(R.string.banned)
                     }

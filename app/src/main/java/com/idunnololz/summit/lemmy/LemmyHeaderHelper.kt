@@ -32,7 +32,7 @@ import com.idunnololz.summit.view.LemmyHeaderView
 import com.idunnololz.summit.view.RewardView
 
 class LemmyHeaderHelper(
-    private val context: Context
+    private val context: Context,
 ) {
 
     companion object {
@@ -71,7 +71,7 @@ class LemmyHeaderHelper(
                 RoundedBackgroundSpan(criticalWarningColor, emphasisColor),
                 s,
                 e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
             sb.appendSeparator()
         }
@@ -100,14 +100,14 @@ class LemmyHeaderHelper(
                 CenteredImageSpan(d),
                 s,
                 e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
             sb.appendSeparator()
         }
 
         sb.appendLink(
             postView.community.name,
-            LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
+            LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
         )
         sb.appendSeparator()
         dateStringToPretty(context, postView.post.updated ?: postView.post.published).let {
@@ -119,19 +119,20 @@ class LemmyHeaderHelper(
                 val s = sb.length
                 sb.appendLink(
                     postView.creator.name,
-                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name))
+                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
+                )
                 val e = sb.length
                 sb.setSpan(
                     ForegroundColorSpan(modColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 sb.setSpan(
                     StyleSpan(Typeface.BOLD),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
 //            } else if (listingItem.distinguished == "admin") {
 //                run {
@@ -155,13 +156,14 @@ class LemmyHeaderHelper(
                 val s = sb.length
                 sb.appendLink(
                     LemmyUtils.formatAuthor(postView.creator.name),
-                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name))
+                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
+                )
                 val e = sb.length
                 sb.setSpan(
                     ForegroundColorSpan(regularColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         }
@@ -200,7 +202,7 @@ class LemmyHeaderHelper(
                     textView: TextView,
                     url: String,
                     text: String,
-                    rect: RectF
+                    rect: RectF,
                 ): Boolean {
                     val pageRef = LinkResolver.parseUrl(url, instance)
 
@@ -249,19 +251,20 @@ class LemmyHeaderHelper(
                 val s = sb.length
                 sb.appendLink(
                     item.creator.name,
-                    LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name))
+                    LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name),
+                )
                 val e = sb.length
                 sb.setSpan(
                     ForegroundColorSpan(adminColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 sb.setSpan(
                     StyleSpan(Typeface.BOLD),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         } else {
@@ -269,14 +272,14 @@ class LemmyHeaderHelper(
             sb.appendLink(
                 text = item.creator.name,
                 url = LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name),
-                underline = false
+                underline = false,
             )
             val e = sb.length
             sb.setSpan(
                 ForegroundColorSpan(emphasisColor),
                 s,
                 e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
         }
 
@@ -293,14 +296,14 @@ class LemmyHeaderHelper(
                     CenteredImageSpan(d),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         }
 
         sb.append("  ")
         sb.append(
-            dateStringToPretty(context, item.comment.updated ?: item.comment.published)
+            dateStringToPretty(context, item.comment.updated ?: item.comment.published),
         )
 
 //        if (item.comment.distinguished) {
@@ -376,8 +379,8 @@ class LemmyHeaderHelper(
                 headerContainer.context.resources.getQuantityString(
                     R.plurals.point_count_format,
                     item.counts.score,
-                    LemmyUtils.abbrevNumber(item.counts.score.toLong())
-                )
+                    LemmyUtils.abbrevNumber(item.counts.score.toLong()),
+                ),
             )
 //            }
 
@@ -385,15 +388,16 @@ class LemmyHeaderHelper(
                 sb.appendSeparator()
                 sb.append(
                     headerContainer.context.resources.getQuantityString(
-                        R.plurals.children_count_format, childrenCount, childrenCount
-                    )
+                        R.plurals.children_count_format,
+                        childrenCount,
+                        childrenCount,
+                    ),
                 )
             }
         } else {
 //            appendAwards(headerContainer, item.allAwardings, sb)
         }
         headerContainer.setTextSecondPart(sb)
-
 
         val textView = headerContainer.getChildAt(0) as TextView
         textView.movementMethod = CustomLinkMovementMethod().apply {
@@ -403,7 +407,7 @@ class LemmyHeaderHelper(
                     textView: TextView,
                     url: String,
                     text: String,
-                    rect: RectF
+                    rect: RectF,
                 ): Boolean {
                     val pageRef = LinkResolver.parseUrl(url, instance)
 
@@ -433,13 +437,13 @@ class LemmyHeaderHelper(
                     ForegroundColorSpan(adminColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 sb.setSpan(
                     StyleSpan(Typeface.BOLD),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         } else {
@@ -448,7 +452,7 @@ class LemmyHeaderHelper(
 
         sb.appendSeparator()
         sb.append(
-            dateStringToPretty(context, item.private_message.updated ?: item.private_message.published)
+            dateStringToPretty(context, item.private_message.updated ?: item.private_message.published),
         )
         headerContainer.getFlairView().visibility = View.GONE
 
@@ -457,7 +461,6 @@ class LemmyHeaderHelper(
 
         headerContainer.setTextSecondPart(sb)
     }
-
 
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,
@@ -474,13 +477,13 @@ class LemmyHeaderHelper(
                     ForegroundColorSpan(adminColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 sb.setSpan(
                     StyleSpan(Typeface.BOLD),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         } else {
@@ -489,7 +492,7 @@ class LemmyHeaderHelper(
 
         sb.appendSeparator()
         sb.append(
-            dateStringToPretty(context, item.comment.updated ?: item.comment.published)
+            dateStringToPretty(context, item.comment.updated ?: item.comment.published),
         )
         headerContainer.getFlairView().visibility = View.GONE
 
@@ -498,7 +501,6 @@ class LemmyHeaderHelper(
 
         headerContainer.setTextSecondPart(sb)
     }
-
 
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,
@@ -515,13 +517,13 @@ class LemmyHeaderHelper(
                     ForegroundColorSpan(adminColor),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 sb.setSpan(
                     StyleSpan(Typeface.BOLD),
                     s,
                     e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         } else {
@@ -530,7 +532,7 @@ class LemmyHeaderHelper(
 
         sb.appendSeparator()
         sb.append(
-            dateStringToPretty(context, item.comment.updated ?: item.comment.published)
+            dateStringToPretty(context, item.comment.updated ?: item.comment.published),
         )
         headerContainer.getFlairView().visibility = View.GONE
 
@@ -549,6 +551,6 @@ inline fun SpannableStringBuilder.appendSeparator() {
         HorizontalDividerSpan(),
         s + 1,
         e - 1,
-        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
 }

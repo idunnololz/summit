@@ -12,8 +12,8 @@ import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -183,8 +183,7 @@ fun VoteUiHandler.bind(
                 }
                 Log.d(TAG, "Vote failed", e)
             }
-
-        }
+        },
     )
 }
 
@@ -193,22 +192,22 @@ sealed interface VotableRef {
     @JsonClass(generateAdapter = true)
     @TypeLabel("1")
     data class PostRef(
-        val postId: Int
+        val postId: Int,
     ) : VotableRef
 
     @JsonClass(generateAdapter = true)
     @TypeLabel("2")
     data class CommentRef(
-        val commentId: Int
+        val commentId: Int,
     ) : VotableRef
 }
 
 fun PostView.toVotableRef() =
     VotableRef.PostRef(
-        this.post.id
+        this.post.id,
     )
 
 fun CommentView.toVotableRef() =
     VotableRef.CommentRef(
-        this.comment.id
+        this.comment.id,
     )

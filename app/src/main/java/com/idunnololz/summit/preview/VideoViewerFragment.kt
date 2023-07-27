@@ -97,7 +97,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -122,17 +122,19 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 it.left,
                 it.top,
                 it.right,
-                it.bottom
+                it.bottom,
             )
         }
 
-        binding.playerView.setControllerVisibilityListener(ControllerVisibilityListener {
-            if (it == View.VISIBLE) {
-                parent.showSystemUI(animate = true)
-            } else {
-                parent.hideSystemUI()
-            }
-        })
+        binding.playerView.setControllerVisibilityListener(
+            ControllerVisibilityListener {
+                if (it == View.VISIBLE) {
+                    parent.showSystemUI(animate = true)
+                } else {
+                    parent.hideSystemUI()
+                }
+            },
+        )
 
         binding.playerView.findViewById<View>(androidx.media3.ui.R.id.exo_fullscreen).visibility = View.GONE
 
@@ -202,7 +204,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         context: Context,
         url: String,
         videoType: VideoType,
-        videoState: VideoState?
+        videoState: VideoState?,
     ) {
         when (videoType) {
             VideoType.UNKNOWN -> {
@@ -213,7 +215,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                             context,
                             url.replace(".gifv", ".mp4"),
                             VideoType.MP4,
-                            videoState
+                            videoState,
                         )
                     } else {
                         binding.loadingView.showErrorText(R.string.unsupported_video_type)
@@ -242,7 +244,6 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     }
 
     private fun setupMoreButton(context: Context, url: String, videoType: VideoType) {
-
         binding.playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
             PopupMenu(context, it).apply {
                 inflate(R.menu.video_menu)
@@ -250,7 +251,6 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.save -> {
-
                             AlertDialogFragment.Builder()
                                 .setMessage(R.string.coming_soon)
                                 .createAndShow(childFragmentManager, "asdf")

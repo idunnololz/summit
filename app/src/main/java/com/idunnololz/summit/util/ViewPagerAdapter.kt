@@ -35,16 +35,18 @@ class ViewPagerAdapter(
     private val items = ArrayList<PageItem>()
 
     init {
-        lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(
-                source: LifecycleOwner,
-                event: Lifecycle.Event,
-            ) {
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    source.lifecycle.removeObserver(this)
+        lifecycle.addObserver(
+            object : LifecycleEventObserver {
+                override fun onStateChanged(
+                    source: LifecycleOwner,
+                    event: Lifecycle.Event,
+                ) {
+                    if (event == Lifecycle.Event.ON_DESTROY) {
+                        source.lifecycle.removeObserver(this)
+                    }
                 }
-            }
-        })
+            },
+        )
     }
 
     override fun createFragment(position: Int): Fragment {

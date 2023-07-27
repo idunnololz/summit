@@ -18,7 +18,7 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -55,7 +55,7 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
                     val directions = SettingsAccountBlockListFragmentDirections
                         .actionSettingsAccountBlockListFragmentToSettingsUserBlockListFragment()
                     findNavController().navigateSafe(directions)
-                }
+                },
             )
         }
 
@@ -70,7 +70,7 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
                     val directions = SettingsAccountBlockListFragmentDirections
                         .actionSettingsAccountBlockListFragmentToSettingsCommunityBlockListFragment()
                     findNavController().navigateSafe(directions)
-                }
+                },
             )
         }
     }

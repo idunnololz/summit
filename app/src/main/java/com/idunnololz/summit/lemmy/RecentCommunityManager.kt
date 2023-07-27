@@ -34,14 +34,14 @@ class RecentCommunityManager @Inject constructor() {
     fun addRecentCommunity(communityRef: CommunityRef) {
         if (communityRef is CommunityRef.All ||
             communityRef is CommunityRef.Subscribed ||
-            communityRef is CommunityRef.Local) {
-
+            communityRef is CommunityRef.Local
+        ) {
             // These communities are always at the top anyways...
             return
         }
 
         val key = communityRef.getKey()
-        Log.d(TAG, "Add recent community: ${key}")
+        Log.d(TAG, "Add recent community: $key")
 
         val recents = getRecents()
 
@@ -64,9 +64,12 @@ class RecentCommunityManager @Inject constructor() {
         coroutineScope.launch(Dispatchers.Default) {
             // serialize
             PreferenceUtil.preferences.edit()
-                .putString(PREF_KEY_RECENT_COMMUNITIES, adapter.toJson(
-                    RecentCommunityData(resultsList)
-                ))
+                .putString(
+                    PREF_KEY_RECENT_COMMUNITIES,
+                    adapter.toJson(
+                        RecentCommunityData(resultsList),
+                    ),
+                )
                 .apply()
         }
     }
@@ -103,7 +106,7 @@ class RecentCommunityManager @Inject constructor() {
 
     @JsonClass(generateAdapter = true)
     data class CommunityHistoryEntry(
-        val communityRef: CommunityRef
+        val communityRef: CommunityRef,
     ) {
         val key: String
             get() = communityRef.getKey()
@@ -111,6 +114,6 @@ class RecentCommunityManager @Inject constructor() {
 
     @JsonClass(generateAdapter = true)
     data class RecentCommunityData(
-        val entries: List<CommunityHistoryEntry>
+        val entries: List<CommunityHistoryEntry>,
     )
 }

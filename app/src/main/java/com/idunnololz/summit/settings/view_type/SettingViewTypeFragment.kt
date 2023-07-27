@@ -20,9 +20,11 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingViewTypeBinding
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
+import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
@@ -40,8 +42,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingViewTypeFragment : BaseFragment<FragmentSettingViewTypeBinding>(),
-AlertDialogFragment.AlertDialogFragmentListener {
+class SettingViewTypeFragment :
+    BaseFragment<FragmentSettingViewTypeBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SettingViewTypeViewModel by viewModels()
 
@@ -54,7 +57,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -80,17 +83,17 @@ AlertDialogFragment.AlertDialogFragmentListener {
             supportActionBar?.title = context.getString(R.string.view_type)
         }
 
-        binding.root.viewTreeObserver.addOnPreDrawListener(object :
-            ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                binding.root.viewTreeObserver.removeOnPreDrawListener(this)
+        binding.root.viewTreeObserver.addOnPreDrawListener(
+            object :
+                ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    binding.root.viewTreeObserver.removeOnPreDrawListener(this)
 
-                setup()
-                return false
-            }
-
-        })
-
+                    setup()
+                    return false
+                }
+            },
+        )
     }
 
     private fun setup() {
@@ -107,20 +110,21 @@ AlertDialogFragment.AlertDialogFragmentListener {
                 .setPositiveButton(android.R.string.ok)
                 .setNegativeButton(R.string.cancel)
                 .createAndShow(childFragmentManager, "reset_view_to_default_styles")
-
         }
 
         TextOnlySettingItem(
             getString(R.string.base_view_type),
-            ""
+            "",
         ).bindTo(
             activity = parentActivity,
             b = binding.viewTypeSetting,
             choices = mapOf(
                 CommunityLayout.Compact to getString(R.string.compact),
                 CommunityLayout.List to getString(R.string.list),
+                CommunityLayout.LargeList to getString(R.string.large_list),
                 CommunityLayout.Card to getString(R.string.card),
                 CommunityLayout.Card2 to getString(R.string.card2),
+                CommunityLayout.Card3 to getString(R.string.card2),
                 CommunityLayout.Full to getString(R.string.full),
             ),
             getCurrentChoice = {
@@ -132,7 +136,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                 viewModel.onLayoutChanged()
 
                 updateRendering()
-            }
+            },
         )
 
         bindPostUiSettings()
@@ -148,6 +152,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             getString(R.string.font_size),
             0.2f,
             3f,
+            0.1f,
         ).bindTo(
             binding.textScalingSetting,
             { viewModel.currentPostUiConfig.textSizeMultiplier },
@@ -156,7 +161,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     viewModel.currentPostUiConfig.updateTextSizeMultiplier(it)
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             null,
@@ -170,7 +175,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     viewModel.currentPostUiConfig.copy(preferImagesAtEnd = it)
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             null,
@@ -184,7 +189,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     viewModel.currentPostUiConfig.copy(preferFullSizeImages = it)
 
                 updateRendering()
-            }
+            },
         )
         OnOffSettingItem(
             null,
@@ -198,7 +203,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     viewModel.currentPostUiConfig.copy(preferTitleText = it)
 
                 updateRendering()
-            }
+            },
         )
     }
 
@@ -221,7 +226,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     binding.demoViewContainer.viewTreeObserver.removeOnPreDrawListener(this)
                     return true
                 }
-            }
+            },
         )
 
         postListViewBuilder.postUiConfig = viewModel.currentPostUiConfig
@@ -232,23 +237,31 @@ AlertDialogFragment.AlertDialogFragmentListener {
         val h = when (preferences.getPostsLayout()) {
             CommunityLayout.Compact ->
                 ListingItemViewHolder.fromBinding(
-                    ListingItemCompactBinding.inflate(inflater, binding.demoViewContainer, true)
+                    ListingItemCompactBinding.inflate(inflater, binding.demoViewContainer, true),
                 )
             CommunityLayout.List ->
                 ListingItemViewHolder.fromBinding(
-                    ListingItemListBinding.inflate(inflater, binding.demoViewContainer, false)
+                    ListingItemListBinding.inflate(inflater, binding.demoViewContainer, false),
+                )
+            CommunityLayout.LargeList ->
+                ListingItemViewHolder.fromBinding(
+                    ListingItemLargeListBinding.inflate(inflater, binding.demoViewContainer, false),
                 )
             CommunityLayout.Card ->
                 ListingItemViewHolder.fromBinding(
-                    ListingItemCardBinding.inflate(inflater, binding.demoViewContainer, false)
+                    ListingItemCardBinding.inflate(inflater, binding.demoViewContainer, false),
                 )
             CommunityLayout.Card2 ->
                 ListingItemViewHolder.fromBinding(
-                    ListingItemCard2Binding.inflate(inflater, binding.demoViewContainer, false)
+                    ListingItemCard2Binding.inflate(inflater, binding.demoViewContainer, false),
+                )
+            CommunityLayout.Card3 ->
+                ListingItemViewHolder.fromBinding(
+                    ListingItemCard3Binding.inflate(inflater, binding.demoViewContainer, false),
                 )
             CommunityLayout.Full ->
                 ListingItemViewHolder.fromBinding(
-                    ListingItemFullBinding.inflate(inflater, binding.demoViewContainer, false)
+                    ListingItemFullBinding.inflate(inflater, binding.demoViewContainer, false),
                 )
         }
 
@@ -283,7 +296,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             onSignInRequired = {},
             onInstanceMismatch = { _, _ -> },
             onHighlightComplete = {},
-            onLinkLongClick = { _, _ -> }
+            onLinkLongClick = { _, _ -> },
         )
     }
 
@@ -291,7 +304,6 @@ AlertDialogFragment.AlertDialogFragmentListener {
         if (tag == "reset_view_to_default_styles") {
             viewModel.resetPostUiConfig()
         }
-
     }
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {

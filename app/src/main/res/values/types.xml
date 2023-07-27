@@ -57,13 +57,13 @@
     <style name="TextAppearance.App.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
     </style>
     <style name="TextAppearance.App.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textColor">?attr/textColorNormal</item>
     </style>
     <style name="TextAppearance.App.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
-        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textColor">?attr/textColorNormal</item>
     </style>
     <style name="TextAppearance.App.BodySmall" parent="TextAppearance.Material3.BodySmall">
-        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textColor">?attr/textColorNormal</item>
     </style>
     <style name="TextAppearance.App.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
     </style>

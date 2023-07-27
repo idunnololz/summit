@@ -2,10 +2,10 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver.OnPreDrawListener
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.setFragmentResultListener
@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
-import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.CommentView
@@ -31,6 +31,7 @@ import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
@@ -38,22 +39,21 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.getLocalizedName
+import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.lemmy.CommentsSortOrder
-import com.idunnololz.summit.lemmy.getLocalizedName
-import com.idunnololz.summit.lemmy.idToCommentsSortOrder
-import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
-import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -61,8 +61,6 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showBottomMenuForLink
@@ -74,7 +72,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PostFragment : BaseFragment<FragmentPostBinding>(),
+class PostFragment :
+    BaseFragment<FragmentPostBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener,
     SignInNavigator {
 
@@ -109,6 +108,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     @Inject
     lateinit var preferences: Preferences
 
+    private var swipeActionCallback: LemmySwipeActionCallback? = null
+    private var itemTouchHelper: ItemTouchHelper? = null
+
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
             addItem(R.id.sort_order_hot, R.string.sort_order_hot)
@@ -119,7 +121,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
             setOnMenuItemClickListener { menuItem ->
                 viewModel.setCommentsSortOrder(
-                    idToCommentsSortOrder(menuItem.id) ?: CommentsSortOrder.Hot)
+                    idToCommentsSortOrder(menuItem.id) ?: CommentsSortOrder.Hot,
+                )
             }
         }
     }
@@ -142,10 +145,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         requireActivity().supportFragmentManager.setFragmentResultListener(
             CreateOrEditPostFragment.REQUEST_KEY,
-            this
+            this,
         ) { _, bundle ->
             val result = bundle.getParcelableCompat<PostView>(
-                CreateOrEditPostFragment.REQUEST_KEY_RESULT)
+                CreateOrEditPostFragment.REQUEST_KEY_RESULT,
+            )
 
             if (result != null) {
                 viewModel.fetchPostData(args.postOrCommentRef(), force = true)
@@ -155,11 +159,14 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         if (!args.isSinglePage) {
             requireMainActivity().onBackPressedDispatcher
-                .addCallback(this, object : OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        goBack()
-                    }
-                })
+                .addCallback(
+                    this,
+                    object : OnBackPressedCallback(true) {
+                        override fun handleOnBackPressed() {
+                            goBack()
+                        }
+                    },
+                )
         } else {
             // do things if this is a single page
         }
@@ -184,9 +191,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-
         setBinding(FragmentPostBinding.inflate(inflater, container, false))
 
         return binding.root
@@ -197,7 +203,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         val context = requireContext()
         if (adapter == null) {
-
             adapter = PostsAdapter(
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
                 context,
@@ -221,8 +226,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             getString(
                                 R.string.error_account_instance_mismatch,
                                 accountInstance,
-                                apiInstance
-                            )
+                                apiInstance,
+                            ),
                         )
                         .createAndShow(childFragmentManager, "aa")
                 },
@@ -236,13 +241,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     AddOrEditCommentFragment().apply {
                         arguments = postOrComment.fold({
                             AddOrEditCommentFragmentArgs(
-                                args.instance, null, it, null
+                                args.instance,
+                                null,
+                                it,
+                                null,
                             )
                         }, {
                             AddOrEditCommentFragmentArgs(
-                                args.instance, it, null, null
+                                args.instance,
+                                it,
+                                null,
+                                null,
                             )
-                        }).toBundle()
+                        },).toBundle()
                     }.show(childFragmentManager, "asdf")
                 },
                 onImageClick = { postOrCommentView, view, url ->
@@ -255,10 +266,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             },
                             {
                                 null
-                            }
+                            },
                         ),
                         url = url,
-                        mimeType = null
+                        mimeType = null,
                     )
                 },
                 onVideoClick = { url, videoType, state ->
@@ -294,19 +305,19 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         installOnActionResultHandler(actionsViewModel, binding.coordinatorLayout)
 
-        binding.recyclerView.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                if (isBindingAvailable()) {
-                    binding.recyclerView.viewTreeObserver.removeOnPreDrawListener(this)
+        runAfterLayout {
+            adapter?.contentMaxWidth = binding.recyclerView.width
 
-                    adapter?.contentMaxWidth = binding.recyclerView.width
+            setup()
+        }
+    }
 
-                    setup()
-                }
+    override fun onDestroyView() {
+        Log.d(TAG, "onDestroyView()")
 
-                return false
-            }
-        })
+        itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
+
+        super.onDestroyView()
     }
 
     private fun setup() {
@@ -325,7 +336,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
         with(binding.toolbar) {
             setNavigationIcon(
-                com.google.android.material.R.drawable.ic_arrow_back_black_24)
+                com.google.android.material.R.drawable.ic_arrow_back_black_24,
+            )
             setNavigationOnClickListener {
                 if (args.isSinglePage) {
                     findNavController().navigateUp()
@@ -343,7 +355,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             action = Intent.ACTION_SEND
                             putExtra(
                                 Intent.EXTRA_TEXT,
-                                LinkUtils.postIdToLink(viewModel.apiInstance, args.id)
+                                LinkUtils.postIdToLink(viewModel.apiInstance, args.id),
                             )
                             type = "text/plain"
                         }
@@ -385,7 +397,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                     null,
                     null,
                     false,
-                ))
+                ),
+            )
             onMainListingItemRetrieved(post)
         } ?: binding.loadingView.showProgressBar()
 
@@ -423,7 +436,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                             if (pos >= 0) {
                                 (binding.recyclerView.layoutManager as? LinearLayoutManager)
                                     ?.scrollToPositionWithOffset(
-                                        pos, (requireMainActivity().lastInsets.topInset + Utils.convertDpToPixel(56f)).toInt()
+                                        pos,
+                                        (requireMainActivity().lastInsets.topInset + Utils.convertDpToPixel(56f)).toInt(),
                                     )
                                 adapter.highlightComment(newlyPostedCommentId)
 
@@ -453,7 +467,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         ErrorDialogFragment.show(
                             getString(R.string.error_unable_to_delete_post),
                             it.error,
-                            childFragmentManager
+                            childFragmentManager,
                         )
                     }
                 }
@@ -480,7 +494,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
             historyManager.recordVisit(
                 jsonUrl = url,
                 saveReason = HistorySaveReason.LOADING,
-                post = args.post
+                post = args.post,
             )
         }
 
@@ -490,8 +504,30 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
         binding.recyclerView.setupForPostAndComments(preferences)
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
-        if (preferences.useGestureActions) {
-            ItemTouchHelper(LemmySwipeActionCallback(
+        if (!hasConsumedJumpToComments && args.jumpToComments) {
+            hasConsumedJumpToComments = true
+            (binding.recyclerView.layoutManager as LinearLayoutManager)
+                .scrollToPositionWithOffset(1, (Utils.convertDpToPixel(48f)).toInt())
+        }
+
+        viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {
+            binding.toolbar.title =
+                viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+        }
+
+        binding.root.doOnPreDraw {
+            adapter.contentMaxWidth = binding.recyclerView.width
+        }
+    }
+
+    private fun attachGestureHandlerToRecyclerViewIfNeeded() {
+        if (!isBindingAvailable()) return
+        if (!preferences.useGestureActions) return
+
+        val context = requireContext()
+
+        if (itemTouchHelper == null) {
+            swipeActionCallback = LemmySwipeActionCallback(
                 context,
                 binding.recyclerView,
                 onActionSelected = { action, vh ->
@@ -520,54 +556,35 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                         CommentGestureAction.Reply -> {
                             AddOrEditCommentFragment().apply {
                                 arguments = AddOrEditCommentFragmentArgs(
-                                    args.instance, commentView, null, null
+                                    args.instance,
+                                    commentView,
+                                    null,
+                                    null,
                                 ).toBundle()
                             }.show(childFragmentManager, "asdf")
                         }
 
                         CommentGestureAction.CollapseOrExpand -> {
-                            adapter.toggleSection(vh.bindingAdapterPosition)
+                            adapter?.toggleSection(vh.bindingAdapterPosition)
                         }
                     }
-                }
-            ).apply {
-                actions = listOf(
-                    LemmySwipeActionCallback.SwipeAction(
-                        R.id.swipe_action_upvote,
-                        context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)!!.mutate(),
-                        context.getColorCompat(R.color.style_red)
-                    ),
-                    LemmySwipeActionCallback.SwipeAction(
-                        R.id.swipe_action_bookmark,
-                        context.getDrawableCompat(R.drawable.baseline_bookmark_add_24)!!.mutate(),
-                        context.getColorCompat(R.color.style_amber)
-                    ),
-                    LemmySwipeActionCallback.SwipeAction(
-                        R.id.swipe_action_reply,
-                        context.getDrawableCompat(R.drawable.baseline_reply_24)!!.mutate(),
-                        context.getColorCompat(R.color.style_blue)
-                    )
-                )
-                postOnlyActions = preferences.getPostSwipeActions(context)
-
-                updateCommentSwipeActions()
-            }).attachToRecyclerView(binding.recyclerView)
+                },
+                preferences.commentGestureSize,
+            )
+            itemTouchHelper = ItemTouchHelper(requireNotNull(swipeActionCallback))
         }
 
-        if (!hasConsumedJumpToComments && args.jumpToComments) {
-            hasConsumedJumpToComments = true
-            (binding.recyclerView.layoutManager as LinearLayoutManager)
-                .scrollToPositionWithOffset(1, (Utils.convertDpToPixel(48f)).toInt())
+        swipeActionCallback?.apply {
+            actions = preferences.getCommentSwipeActions(context)
+            gestureSize = preferences.commentGestureSize
+            postOnlyActions = preferences.getPostSwipeActions(context)
+            postOnlyGestureSize = preferences.postGestureSize
+
+            updateCommentSwipeActions()
         }
 
-        viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {
-            binding.toolbar.title =
-                viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
-        }
-
-        binding.root.doOnPreDraw {
-            adapter.contentMaxWidth = binding.recyclerView.width
-        }
+        itemTouchHelper?.attachToRecyclerView(null)
+        itemTouchHelper?.attachToRecyclerView(binding.recyclerView)
     }
 
     private fun LemmySwipeActionCallback.updateCommentSwipeActions() {
@@ -599,7 +616,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
 
                 AddOrEditCommentFragment().apply {
                     arguments = AddOrEditCommentFragmentArgs(
-                        viewModel.apiInstance, null, postView, null,
+                        viewModel.apiInstance,
+                        null,
+                        postView,
+                        null,
                     ).toBundle()
                 }.show(childFragmentManager, "asdf")
             }
@@ -623,6 +643,12 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 hideBottomNav(animate = true)
                 lockUiOpenness = true
             }
+        }
+
+        runAfterLayout {
+            adapter?.contentMaxWidth = binding.recyclerView.width
+
+            attachGestureHandlerToRecyclerViewIfNeeded()
         }
     }
 
@@ -652,7 +678,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 AddOrEditCommentFragment().apply {
                     arguments =
                         AddOrEditCommentFragmentArgs(
-                            args.instance, null, postView.post, null)
+                            args.instance,
+                            null,
+                            postView.post,
+                            null,
+                        )
                             .toBundle()
                 }.show(childFragmentManager, "asdf")
             }
@@ -661,7 +691,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(),
                 AddOrEditCommentFragment().apply {
                     arguments =
                         AddOrEditCommentFragmentArgs(
-                            args.instance, null, postView.post, null)
+                            args.instance,
+                            null,
+                            postView.post,
+                            null,
+                        )
                             .toBundle()
                 }.show(childFragmentManager, "asdf")
             }

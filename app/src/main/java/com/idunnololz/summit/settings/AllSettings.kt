@@ -16,63 +16,69 @@ class MainSettings @Inject constructor(
     val settingTheme = BasicSettingItem(
         R.drawable.baseline_palette_24,
         context.getString(R.string.theme),
-        context.getString(R.string.theme_settings_desc)
+        context.getString(R.string.theme_settings_desc),
     )
     val settingViewType = BasicSettingItem(
         R.drawable.baseline_view_agenda_24,
         context.getString(R.string.view_type),
-        context.getString(R.string.view_type_settings_desc)
+        context.getString(R.string.view_type_settings_desc),
     )
     val settingPostAndComment = BasicSettingItem(
         R.drawable.baseline_mode_comment_24,
         context.getString(R.string.post_and_comments),
-        context.getString(R.string.post_and_comments_settings_desc)
+        context.getString(R.string.post_and_comments_settings_desc),
     )
     val settingLemmyWeb = BasicSettingItem(
         R.drawable.ic_lemmy_24,
         context.getString(R.string.lemmy_web_preferences),
-        context.getString(R.string.lemmy_web_preferences_desc)
+        context.getString(R.string.lemmy_web_preferences_desc),
     )
     val settingGestures = BasicSettingItem(
         R.drawable.baseline_gesture_24,
         context.getString(R.string.gestures),
-        context.getString(R.string.gestures_desc)
+        context.getString(R.string.gestures_desc),
     )
     val settingHistory = BasicSettingItem(
         R.drawable.baseline_history_24,
         context.getString(R.string.history),
-        context.getString(R.string.history_setting_desc)
+        context.getString(R.string.history_setting_desc),
     )
     val settingCache = BasicSettingItem(
         R.drawable.baseline_cached_24,
         context.getString(R.string.cache),
-        context.getString(R.string.cache_info_and_preferences)
+        context.getString(R.string.cache_info_and_preferences),
     )
     val settingHiddenPosts = BasicSettingItem(
         R.drawable.baseline_hide_24,
         context.getString(R.string.hidden_posts),
-        context.getString(R.string.hidden_posts_desc)
+        context.getString(R.string.hidden_posts_desc),
     )
     val settingPostList = BasicSettingItem(
         R.drawable.baseline_pages_24,
         context.getString(R.string.post_list),
-        context.getString(R.string.setting_post_list_desc)
+        context.getString(R.string.setting_post_list_desc),
     )
     val settingAbout = BasicSettingItem(
         R.drawable.outline_info_24,
         context.getString(R.string.about_summit),
-        context.getString(R.string.about_summit_desc)
+        context.getString(R.string.about_summit_desc),
     )
     val settingSummitCommunity = BasicSettingItem(
         R.drawable.ic_logo_mono_24,
         context.getString(R.string.c_summit),
-        context.getString(R.string.summit_community_desc)
+        context.getString(R.string.summit_community_desc),
     )
 
     val commentListSettings = BasicSettingItem(
         R.drawable.baseline_comment_24,
         context.getString(R.string.comment_list),
         context.getString(R.string.comment_list_desc),
+    )
+
+    val patreonSettings = BasicSettingItem(
+        R.drawable.baseline_attach_money_24,
+        context.getString(R.string.patreon_supporters),
+        context.getString(R.string.patreon_supporters_desc),
     )
 }
 
@@ -89,23 +95,23 @@ class LemmyWebSettings @Inject constructor(
 
     val displayNameSetting = TextValueSettingItem(
         title = context.getString(R.string.display_name),
-        supportsRichText = false
+        supportsRichText = false,
     )
 
     val bioSetting = TextValueSettingItem(
         title = context.getString(R.string.biography),
-        supportsRichText = true
+        supportsRichText = true,
     )
 
     val emailSetting = TextValueSettingItem(
         title = context.getString(R.string.email),
-        supportsRichText = false
+        supportsRichText = false,
     )
 
     val matrixSetting = TextValueSettingItem(
         title = context.getString(R.string.matrix_user),
         supportsRichText = false,
-        hint = "@user:example.com"
+        hint = "@user:example.com",
     )
 
     val avatarSetting = ImageValueSettingItem(
@@ -124,7 +130,7 @@ class LemmyWebSettings @Inject constructor(
         null,
         context.getString(R.string.default_sort_type),
         null,
-        makeCommunitySortOrderChoices(context)
+        makeCommunitySortOrderChoices(context),
     )
 
     val showNsfwSetting = OnOffSettingItem(
@@ -162,7 +168,6 @@ class LemmyWebSettings @Inject constructor(
         context.getString(R.string.account_block_settings),
         context.getString(R.string.account_block_settings_desc),
     )
-
 }
 
 @Singleton
@@ -207,6 +212,12 @@ class GestureSettings @Inject constructor(
                 null,
                 R.drawable.baseline_bookmark_add_24,
             ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostGestureAction.None,
+                context.getString(R.string.none),
+                null,
+                R.drawable.baseline_none_24,
+            ),
         )
     private val commentGestureActionOptions =
         listOf(
@@ -240,8 +251,13 @@ class GestureSettings @Inject constructor(
                 null,
                 R.drawable.baseline_unfold_less_24,
             ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentGestureAction.None,
+                context.getString(R.string.none),
+                null,
+                R.drawable.baseline_none_24,
+            ),
         )
-
 
     val postGestureAction1 = RadioGroupSettingItem(
         null,
@@ -249,21 +265,24 @@ class GestureSettings @Inject constructor(
         null,
         postGestureActionOptions,
     )
-
     val postGestureAction2 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_2),
         null,
         postGestureActionOptions,
     )
-
     val postGestureAction3 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_3),
         null,
         postGestureActionOptions,
     )
-
+    val postGestureSize = SliderSettingItem(
+        context.getString(R.string.post_gesture_size),
+        0f,
+        1f,
+        0.01f,
+    )
 
     val commentGestureAction1 = RadioGroupSettingItem(
         null,
@@ -271,19 +290,23 @@ class GestureSettings @Inject constructor(
         null,
         commentGestureActionOptions,
     )
-
     val commentGestureAction2 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_2),
         null,
         commentGestureActionOptions,
     )
-
     val commentGestureAction3 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_3),
         null,
         commentGestureActionOptions,
+    )
+    val commentGestureSize = SliderSettingItem(
+        context.getString(R.string.post_gesture_size),
+        0f,
+        1f,
+        0.01f,
     )
 }
 
@@ -296,12 +319,18 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.default_posts_sort_order),
         null,
         makeCommunitySortOrderChoices(context) +
-                RadioGroupSettingItem.RadioGroupOption(
-                    R.id.community_sort_order_default,
-                    context.getString(R.string._default),
-                    null,
-                    null,
-                ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.community_sort_order_default,
+                context.getString(R.string._default),
+                null,
+                null,
+            ),
+    )
+
+    val viewImageOnSingleTap = OnOffSettingItem(
+        null,
+        context.getString(R.string.view_image_on_single_tap),
+        context.getString(R.string.view_image_on_single_tap_desc),
     )
 }
 
@@ -384,8 +413,34 @@ class PostAndCommentsSettings @Inject constructor(
         context.getString(R.string.tap_comment_to_collapse),
         context.getString(R.string.tap_comment_to_collapse_desc),
     )
+
+    val alwaysShowLinkBelowPost = OnOffSettingItem(
+        null,
+        context.getString(R.string.always_show_link_below_post),
+        context.getString(R.string.always_show_link_below_post_desc),
+    )
 }
 
+@Singleton
+class ThemeSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
+    val blackTheme = OnOffSettingItem(
+        null,
+        context.getString(R.string.black_theme),
+        context.getString(R.string.black_theme_desc),
+    )
+
+    val fontSize = TextOnlySettingItem(
+        context.getString(R.string.font_size),
+        "",
+    )
+
+    val fontColor = TextOnlySettingItem(
+        context.getString(R.string.font_color),
+        "",
+    )
+}
 
 fun makeCommunitySortOrderChoices(context: Context) =
     listOf(

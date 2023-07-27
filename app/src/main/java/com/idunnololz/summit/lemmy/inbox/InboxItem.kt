@@ -33,7 +33,7 @@ sealed interface InboxItem : Parcelable {
     val isRead: Boolean
 
     @Parcelize
-    data class ReplyInboxItem (
+    data class ReplyInboxItem(
         override val id: Int,
         override val authorId: PersonId,
         override val authorName: String,
@@ -50,7 +50,7 @@ sealed interface InboxItem : Parcelable {
         override val isDeleted: Boolean,
         override val isRemoved: Boolean,
         override val isRead: Boolean,
-    ): InboxItem, CommentBackedItem {
+    ) : InboxItem, CommentBackedItem {
 
         constructor(reply: CommentReplyView) : this(
             reply.comment_reply.id,
@@ -72,11 +72,11 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String =
-            "ReplyInboxItem { content = ${content} }"
+            "ReplyInboxItem { content = $content }"
     }
 
     @Parcelize
-    data class MentionInboxItem (
+    data class MentionInboxItem(
         override val id: Int,
         override val authorId: PersonId,
         override val authorName: String,
@@ -93,7 +93,7 @@ sealed interface InboxItem : Parcelable {
         override val isDeleted: Boolean,
         override val isRemoved: Boolean,
         override val isRead: Boolean,
-    ): InboxItem, CommentBackedItem {
+    ) : InboxItem, CommentBackedItem {
 
         constructor(mention: PersonMentionView) : this(
             mention.person_mention.id,
@@ -115,11 +115,11 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String =
-            "MentionInboxItem { content = ${content} }"
+            "MentionInboxItem { content = $content }"
     }
 
     @Parcelize
-    data class MessageInboxItem (
+    data class MessageInboxItem(
         override val id: Int,
         override val authorId: PersonId,
         override val authorName: String,
@@ -132,7 +132,7 @@ sealed interface InboxItem : Parcelable {
         override val isDeleted: Boolean,
         override val isRemoved: Boolean,
         override val isRead: Boolean,
-    ): InboxItem {
+    ) : InboxItem {
 
         constructor(message: PrivateMessageView) : this(
             message.private_message.id,
@@ -142,8 +142,10 @@ sealed interface InboxItem : Parcelable {
             message.creator.name,
             message.private_message.content,
             message.private_message.updated ?: message.private_message.published,
-            dateStringToTs(message.private_message.updated
-                ?: message.private_message.published),
+            dateStringToTs(
+                message.private_message.updated
+                    ?: message.private_message.published,
+            ),
             null,
             message.private_message.deleted,
             isRemoved = false,
@@ -151,7 +153,7 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String =
-            "MessageInboxItem { content = ${content} }"
+            "MessageInboxItem { content = $content }"
     }
 
     val commentId: Int?

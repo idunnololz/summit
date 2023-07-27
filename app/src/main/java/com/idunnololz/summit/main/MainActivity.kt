@@ -34,9 +34,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.color.DynamicColors
 import com.google.android.material.navigation.NavigationBarView
-import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -56,7 +54,6 @@ import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.login.LoginFragment
-import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
@@ -64,6 +61,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
@@ -201,7 +199,7 @@ class MainActivity : BaseActivity() {
                         false
                     }
                 }
-            }
+            },
         )
     }
 
@@ -256,13 +254,13 @@ class MainActivity : BaseActivity() {
     }
 
     fun registerOnNavigationItemReselectedListener(
-        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener
+        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
     ) {
         onNavigationItemReselectedListeners.add(onNavigationItemReselectedListener)
     }
 
     fun unregisterOnNavigationItemReselectedListener(
-        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener
+        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
     ) {
         onNavigationItemReselectedListeners.remove(onNavigationItemReselectedListener)
     }
@@ -291,7 +289,7 @@ class MainActivity : BaseActivity() {
 
             // Move toolbar below status bar
             binding.appBar.layoutParams = (binding.appBar.layoutParams as MarginLayoutParams).apply {
-                //topMargin = insets.systemWindowInsetTop
+                // topMargin = insets.systemWindowInsetTop
                 leftMargin = leftInset
                 rightMargin = rightInset
             }
@@ -489,7 +487,7 @@ class MainActivity : BaseActivity() {
 
     fun launchPage(page: PageRef) {
         val isMainFragment = binding.bottomNavigationView.selectedItemId == R.id.mainFragment &&
-                currentNavController?.currentDestination?.id == R.id.mainFragment
+            currentNavController?.currentDestination?.id == R.id.mainFragment
 
         fun handleWithMainFragment() {
             if (binding.bottomNavigationView.selectedItemId != R.id.mainFragment) {
@@ -516,8 +514,8 @@ class MainActivity : BaseActivity() {
                         page.instance,
                         page.id,
                         null,
-                        isSinglePage = true
-                    ).toBundle()
+                        isSinglePage = true,
+                    ).toBundle(),
                 )
             }
             is CommentRef -> {
@@ -528,16 +526,16 @@ class MainActivity : BaseActivity() {
                         id = 0,
                         commentId = page.id,
                         currentCommunity = null,
-                        isSinglePage = true
-                    ).toBundle()
+                        isSinglePage = true,
+                    ).toBundle(),
                 )
             }
             is PersonRef -> {
                 currentNavController?.navigate(
                     R.id.personTabbedFragment2,
                     PersonTabbedFragmentArgs(
-                        page
-                    ).toBundle()
+                        page,
+                    ).toBundle(),
                 )
             }
         }
@@ -548,7 +546,7 @@ class MainActivity : BaseActivity() {
             override fun run() {
                 val navHostFragment =
                     supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-                            as? NavHostFragment
+                        as? NavHostFragment
                 val currentFragment = navHostFragment
                     ?.childFragmentManager
                     ?.fragments
@@ -597,7 +595,7 @@ class MainActivity : BaseActivity() {
         title: CharSequence,
         showUp: Boolean,
         showSpinner: Boolean = false,
-        animateActionBarIn: Boolean = true
+        animateActionBarIn: Boolean = true,
     ) {
         val ab = supportActionBar
         if (ab != null) {
@@ -630,9 +628,10 @@ class MainActivity : BaseActivity() {
         headerOffset.value = verticalOffset + appBarLayout.height
 
         val percentShown = abs(lastToolbarAppBarOffset) / binding.appBar.height
-        if (!animatingBottomNavView)
+        if (!animatingBottomNavView) {
             bottomNavViewOffset.value =
                 (percentShown * binding.bottomNavigationView.height).toInt()
+        }
     }
     fun showActionBar() {
         setSupportActionBar(binding.toolbar)
@@ -643,8 +642,8 @@ class MainActivity : BaseActivity() {
         binding.toolbar.updateLayoutParams<AppBarLayout.LayoutParams> {
             scrollFlags =
                 AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
-                        AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
-                        AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
+                AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
+                AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
         }
 //        val supportActionBar = supportActionBar ?: return
 //        if (supportActionBar.isShowing) return
@@ -685,7 +684,7 @@ class MainActivity : BaseActivity() {
             ?: viewModel.communitySelectorControllerFactory.create(
                 context = this,
                 viewModel = viewModel,
-                viewLifecycleOwner = this
+                viewLifecycleOwner = this,
             ).also {
                 it.inflate(binding.bottomSheetContainer)
                 it.setCommunities(viewModel.communities.value)
@@ -723,7 +722,8 @@ class MainActivity : BaseActivity() {
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
         // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+        window.decorView.systemUiVisibility = (
+            View.SYSTEM_UI_FLAG_IMMERSIVE
                 // Set the content to appear under the system bars so that the
                 // content doesn't resize when the system bars hide and show.
                 or SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -731,18 +731,23 @@ class MainActivity : BaseActivity() {
                 or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 // Hide the nav bar and status bar
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+            )
     }
 
     // Shows the system bars by removing all the flags
     // except for the ones that make the content appear under the system bars.
     fun showSystemUI(animate: Boolean) {
-        window.decorView.systemUiVisibility = (SYSTEM_UI_FLAG_LAYOUT_STABLE
+        window.decorView.systemUiVisibility = (
+            SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or if (resources.getBoolean(R.bool.isLightTheme)) {
-            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        } else 0)
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                } else {
+                    0
+                }
+            )
     }
 
     fun insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
@@ -769,7 +774,6 @@ class MainActivity : BaseActivity() {
             }
         }
     }
-
 
     fun insetViewExceptTopAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
@@ -851,7 +855,6 @@ class MainActivity : BaseActivity() {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
 
-
             rootView.updateLayoutParams<MarginLayoutParams> {
                 bottomMargin = getBottomNavHeight() + additionalPaddingBottom
                 leftMargin = insets.leftInset
@@ -859,7 +862,6 @@ class MainActivity : BaseActivity() {
             }
         }
     }
-
 
     fun insetViewAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
         insetsChangedLiveData.observe(lifecycleOwner) {
@@ -889,7 +891,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun setupForFragment(t: KClass<*>, animate: Boolean) {
-        Log.d("MainActivity", "setupForFragment(): ${t}")
+        Log.d("MainActivity", "setupForFragment(): $t")
 
         if (binding.root.height == 0) {
             binding.root.viewTreeObserver.addOnPreDrawListener(
@@ -901,7 +903,7 @@ class MainActivity : BaseActivity() {
 
                         return false
                     }
-                }
+                },
             )
 
             return
@@ -1024,7 +1026,9 @@ class MainActivity : BaseActivity() {
                 sharedElements += Pair.create(appBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME)
             }
             sharedElements += Pair.create(
-                binding.bottomNavigationView, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME)
+                binding.bottomNavigationView,
+                Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME,
+            )
 
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this,

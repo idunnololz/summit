@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy
 
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object LinkResolver {
@@ -32,13 +31,13 @@ object LinkResolver {
                 val (community, host) = url.substring(1).split("@", limit = 2)
                 return "https://$host/c/$community"
             }
-            return "https://${currentInstance}/c/${url.substring(1)}"
+            return "https://$currentInstance/c/${url.substring(1)}"
         } else if (url.startsWith("@")) {
             if (url.count { c -> c == '@' } == 2) {
                 val (user, host) = url.substring(1).split("@", limit = 2)
                 return "https://$host/u/$user"
             }
-            return "https://${currentInstance}/u/${url.substring(1)}"
+            return "https://$currentInstance/u/${url.substring(1)}"
         }
         return null
     }
@@ -108,7 +107,7 @@ object LinkResolver {
             else -> {
                 if (mustHandle) {
                     FirebaseCrashlytics.getInstance().recordException(
-                        RuntimeException("Unrecognized url format: $url")
+                        RuntimeException("Unrecognized url format: $url"),
                     )
                     return defaultResult
                 } else {

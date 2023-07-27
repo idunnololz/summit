@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
-import com.idunnololz.summit.api.dto.PersonId
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
@@ -19,7 +18,7 @@ sealed interface PersonRef : Parcelable, PageRef {
          * This should be the instance of the actual person.
          */
         override val instance: String,
-    ): PersonRef
+    ) : PersonRef
 
     val fullName: String
         get() =

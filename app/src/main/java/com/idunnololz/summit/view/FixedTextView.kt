@@ -1,10 +1,7 @@
 package com.idunnololz.summit.view
 
 import android.content.Context
-import android.graphics.Rect
-import android.os.Build
 import android.util.AttributeSet
-import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatTextView
 
 class FixedTextView : AppCompatTextView {
@@ -14,7 +11,7 @@ class FixedTextView : AppCompatTextView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     override fun performLongClick(x: Float, y: Float): Boolean {

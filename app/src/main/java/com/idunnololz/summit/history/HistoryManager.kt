@@ -1,20 +1,16 @@
 package com.idunnololz.summit.history
 
 import android.content.Context
-import android.util.Log
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.db.MainDatabase
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.user.TabCommunityState
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -37,6 +33,7 @@ class HistoryManager @Inject constructor(
     }
 
     private val coroutineScope = coroutineScopeFactory.create()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dbContext = Dispatchers.IO.limitedParallelism(1)
 
@@ -66,7 +63,7 @@ class HistoryManager @Inject constructor(
                     url = jsonUrl,
                     shortDesc = post?.post?.name ?: "",
                     ts = ts,
-                    extras = ""
+                    extras = "",
                 )
 
                 recordHistoryEntry(newEntry)
@@ -78,7 +75,7 @@ class HistoryManager @Inject constructor(
         tabId: Long,
         saveReason: HistorySaveReason,
         state: CommunityViewState,
-        shortDesc: String
+        shortDesc: String,
     ) {
         coroutineScope.launch {
             withContext(dbContext) {
@@ -91,7 +88,7 @@ class HistoryManager @Inject constructor(
                     shortDesc = shortDesc,
                     ts = ts,
                     extras = moshi.adapter(TabCommunityState::class.java)
-                        .toJson(TabCommunityState(tabId = tabId, viewState = state))
+                        .toJson(TabCommunityState(tabId = tabId, viewState = state)),
                 )
                 recordHistoryEntry(historyEntry)
             }

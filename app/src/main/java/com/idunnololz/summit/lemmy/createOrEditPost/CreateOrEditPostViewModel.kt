@@ -5,13 +5,10 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
-import arrow.core.right
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
-import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -43,7 +40,8 @@ class CreateOrEditPostViewModel @Inject constructor(
         viewModelScope.launch {
             val communityIdResult =
                 apiClient.fetchCommunityWithRetry(
-                    Either.Right(communityRef.fullName), force = false
+                    Either.Right(communityRef.fullName),
+                    force = false,
                 )
                     .fold(
                         {
@@ -51,7 +49,7 @@ class CreateOrEditPostViewModel @Inject constructor(
                         },
                         {
                             Result.failure(it)
-                        }
+                        },
                     )
 
             if (communityIdResult.isFailure) {
@@ -69,7 +67,7 @@ class CreateOrEditPostViewModel @Inject constructor(
                 body = body.ifBlank { null },
                 url = url.ifBlank { null },
                 isNsfw = isNsfw,
-                communityId = communityIdResult.getOrThrow()
+                communityId = communityIdResult.getOrThrow(),
             )
 
             result
@@ -134,7 +132,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     private fun uploadImageInternal(
         instance: String,
         uri: Uri,
-        imageLiveData: StatefulLiveData<UploadImageResult>
+        imageLiveData: StatefulLiveData<UploadImageResult>,
     ) {
         imageLiveData.setIsLoading()
 

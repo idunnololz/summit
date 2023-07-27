@@ -1,8 +1,18 @@
 package com.idunnololz.summit.util
 
-import android.animation.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
@@ -14,7 +24,6 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.transition.Transition
 import androidx.transition.TransitionValues
-
 
 /**
  * Transitions a TextView from one font size to another. This does not
@@ -41,7 +50,7 @@ class TextResize : Transition {
      */
     constructor(context: Context, attrs: AttributeSet) : super(
         context,
-        attrs
+        attrs,
     ) {
         addTarget(TextView::class.java)
     }
@@ -71,8 +80,9 @@ class TextResize : Transition {
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun createAnimator(
-        sceneRoot: ViewGroup, startValues: TransitionValues?,
-        endValues: TransitionValues?
+        sceneRoot: ViewGroup,
+        startValues: TransitionValues?,
+        endValues: TransitionValues?,
     ): Animator? {
         if (startValues == null || endValues == null) {
             return null
@@ -125,8 +135,14 @@ class TextResize : Transition {
         // Create the drawable that will be animated in the TextView's overlay.
         // Ensure that it is showing the start state now.
         val drawable = SwitchBitmapDrawable(
-            textView, startData.gravity,
-            startBitmap, startFontSize, startWidth, endBitmap, endFontSize, endWidth
+            textView,
+            startData.gravity,
+            startBitmap,
+            startFontSize,
+            startWidth,
+            endBitmap,
+            endFontSize,
+            endWidth,
         )
         textView.overlay.add(drawable)
 
@@ -134,22 +150,22 @@ class TextResize : Transition {
         val leftProp = PropertyValuesHolder.ofFloat(
             "left",
             startData.paddingLeft.toFloat(),
-            endData.paddingLeft.toFloat()
+            endData.paddingLeft.toFloat(),
         )
         val topProp = PropertyValuesHolder.ofFloat(
             "top",
             startData.paddingTop.toFloat(),
-            endData.paddingTop.toFloat()
+            endData.paddingTop.toFloat(),
         )
         val rightProp = PropertyValuesHolder.ofFloat(
             "right",
             startData.width - startData.paddingRight.toFloat(),
-            endData.width - endData.paddingRight.toFloat()
+            endData.width - endData.paddingRight.toFloat(),
         )
         val bottomProp = PropertyValuesHolder.ofFloat(
             "bottom",
             startData.height - startData.paddingBottom.toFloat(),
-            endData.height - endData.paddingBottom.toFloat()
+            endData.height - endData.paddingBottom.toFloat(),
         )
         val fontSizeProp =
             PropertyValuesHolder.ofFloat("fontSize", startFontSize, endFontSize)
@@ -157,16 +173,27 @@ class TextResize : Transition {
         animator = if (startData.textColor != endData.textColor) {
             val textColorProp = PropertyValuesHolder.ofObject(
                 "textColor",
-                ArgbEvaluator(), startData.textColor, endData.textColor
+                ArgbEvaluator(),
+                startData.textColor,
+                endData.textColor,
             )
             ObjectAnimator.ofPropertyValuesHolder(
                 drawable,
-                leftProp, topProp, rightProp, bottomProp, fontSizeProp, textColorProp
+                leftProp,
+                topProp,
+                rightProp,
+                bottomProp,
+                fontSizeProp,
+                textColorProp,
             )
         } else {
             ObjectAnimator.ofPropertyValuesHolder(
                 drawable,
-                leftProp, topProp, rightProp, bottomProp, fontSizeProp
+                leftProp,
+                topProp,
+                rightProp,
+                bottomProp,
+                fontSizeProp,
             )
         }
         val finalFontSize = endFontSize
@@ -182,7 +209,7 @@ class TextResize : Transition {
             override fun onAnimationPause(animation: Animator) {
                 textView.setTextSize(
                     TypedValue.COMPLEX_UNIT_PX,
-                    drawable.fontSize
+                    drawable.fontSize,
                 )
                 val paddingLeft = Math.round(drawable.getLeft())
                 val paddingTop = Math.round(drawable.getTop())
@@ -190,14 +217,16 @@ class TextResize : Transition {
                 val paddingRight = Math.round(
                     interpolate(
                         startData.paddingRight.toFloat(),
-                        endData.paddingRight.toFloat(), fraction
-                    )
+                        endData.paddingRight.toFloat(),
+                        fraction,
+                    ),
                 )
                 val paddingBottom = Math.round(
                     interpolate(
                         startData.paddingBottom.toFloat(),
-                        endData.paddingBottom.toFloat(), fraction
-                    )
+                        endData.paddingBottom.toFloat(),
+                        fraction,
+                    ),
                 )
                 textView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
                 textView.setTextColor(drawable.textColor)
@@ -206,8 +235,10 @@ class TextResize : Transition {
             override fun onAnimationResume(animation: Animator) {
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, finalFontSize)
                 textView.setPadding(
-                    endData.paddingLeft, endData.paddingTop,
-                    endData.paddingRight, endData.paddingBottom
+                    endData.paddingLeft,
+                    endData.paddingTop,
+                    endData.paddingRight,
+                    endData.paddingBottom,
                 )
                 textView.setTextColor(endData.textColor)
             }
@@ -222,9 +253,14 @@ class TextResize : Transition {
      * at the appropriate progress.
      */
     private class SwitchBitmapDrawable(
-        private val view: TextView, gravity: Int,
-        startBitmap: Bitmap?, startFontSize: Float, startWidth: Float,
-        endBitmap: Bitmap?, endFontSize: Float, endWidth: Float
+        private val view: TextView,
+        gravity: Int,
+        startBitmap: Bitmap?,
+        startFontSize: Float,
+        startWidth: Float,
+        endBitmap: Bitmap?,
+        endFontSize: Float,
+        endWidth: Float,
     ) :
         Drawable() {
         private val horizontalGravity: Int
@@ -358,12 +394,18 @@ class TextResize : Transition {
                 // draw start bitmap
                 val scale = expectedWidth / startWidth
                 val tx = getTranslationPoint(
-                    horizontalGravity, left, right,
-                    startBitmap!!.width.toFloat(), scale
+                    horizontalGravity,
+                    left,
+                    right,
+                    startBitmap!!.width.toFloat(),
+                    scale,
                 )
                 val ty = getTranslationPoint(
-                    verticalGravity, top, bottom,
-                    startBitmap.height.toFloat(), scale
+                    verticalGravity,
+                    top,
+                    bottom,
+                    startBitmap.height.toFloat(),
+                    scale,
                 )
                 canvas.translate(tx, ty)
                 canvas.scale(scale, scale)
@@ -372,12 +414,18 @@ class TextResize : Transition {
                 // draw end bitmap
                 val scale = expectedWidth / endWidth
                 val tx = getTranslationPoint(
-                    horizontalGravity, left, right,
-                    endBitmap!!.width.toFloat(), scale
+                    horizontalGravity,
+                    left,
+                    right,
+                    endBitmap!!.width.toFloat(),
+                    scale,
                 )
                 val ty = getTranslationPoint(
-                    verticalGravity, top, bottom,
-                    endBitmap.height.toFloat(), scale
+                    verticalGravity,
+                    top,
+                    bottom,
+                    endBitmap.height.toFloat(),
+                    scale,
                 )
                 canvas.translate(tx, ty)
                 canvas.scale(scale, scale)
@@ -396,8 +444,11 @@ class TextResize : Transition {
         }
 
         private fun getTranslationPoint(
-            gravity: Int, start: Float, end: Float, dim: Float,
-            scale: Float
+            gravity: Int,
+            start: Float,
+            end: Float,
+            dim: Float,
+            scale: Float,
         ): Float {
             return when (gravity) {
                 Gravity.CENTER_HORIZONTAL, Gravity.CENTER_VERTICAL -> (start + end - dim * scale) / 2f
@@ -453,31 +504,31 @@ class TextResize : Transition {
         private val PROPERTIES =
             arrayOf( // We only care about FONT_SIZE. If anything else changes, we don't
                 // want this transition to be called to create an Animator.
-                FONT_SIZE
+                FONT_SIZE,
             )
 
         private fun setTextViewData(
             view: TextView,
             data: TextResizeData?,
-            fontSize: Float
+            fontSize: Float,
         ) {
             view.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
             view.setPadding(
                 data!!.paddingLeft,
                 data.paddingTop,
                 data.paddingRight,
-                data.paddingBottom
+                data.paddingBottom,
             )
             view.right = view.left + data.width
             view.bottom = view.top + data.height
             view.setTextColor(data.textColor)
             val widthSpec = View.MeasureSpec.makeMeasureSpec(
                 view.width,
-                View.MeasureSpec.EXACTLY
+                View.MeasureSpec.EXACTLY,
             )
             val heightSpec = View.MeasureSpec.makeMeasureSpec(
                 view.height,
-                View.MeasureSpec.EXACTLY
+                View.MeasureSpec.EXACTLY,
             )
             view.measure(widthSpec, heightSpec)
             view.layout(view.left, view.top, view.right, view.bottom)
@@ -497,7 +548,7 @@ class TextResize : Transition {
             val canvas = Canvas(bitmap)
             canvas.translate(
                 -textView.paddingLeft.toFloat(),
-                -textView.paddingTop.toFloat()
+                -textView.paddingTop.toFloat(),
             )
             textView.draw(canvas)
             textView.background = background
@@ -507,7 +558,7 @@ class TextResize : Transition {
         private fun interpolate(
             start: Float,
             end: Float,
-            fraction: Float
+            fraction: Float,
         ): Float {
             return start + fraction * (end - start)
         }

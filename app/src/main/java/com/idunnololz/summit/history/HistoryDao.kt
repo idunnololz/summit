@@ -43,7 +43,6 @@ interface HistoryDao {
     @Query("SELECT id, url, shortDesc, ts, type, reason FROM history WHERE shortDesc LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' ORDER BY ts DESC LIMIT 1000")
     suspend fun query(query: String): List<LiteHistoryEntry>
 
-
     @Transaction
     open suspend fun insertEntryMergeWithPreviousIfSame(newEntry: HistoryEntry) {
         val lastEntry = getLastHistoryEntryWithType(newEntry.type)
@@ -61,7 +60,7 @@ interface HistoryDao {
                             Log.d(TAG, "Using copy of last entry...")
                             lastEntry.copy(
                                 ts = newEntry.ts,
-                                shortDesc = newEntry.shortDesc
+                                shortDesc = newEntry.shortDesc,
                             )
                         } else {
                             newEntry
@@ -80,7 +79,7 @@ interface HistoryDao {
                             lastEntry.copy(
                                 ts = newEntry.ts,
                                 shortDesc = newEntry.shortDesc,
-                                extras = newEntry.extras
+                                extras = newEntry.extras,
                             )
                         } else {
                             newEntry

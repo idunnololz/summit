@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.LemmyHeaderViewBinding
 
 class LemmyHeaderView : LinearLayout {
@@ -25,7 +24,7 @@ class LemmyHeaderView : LinearLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     init {

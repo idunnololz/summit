@@ -33,13 +33,14 @@ object StringSearchUtils {
         for (i in 0..s1.length) {
             var lastValue = i
             for (j in 0..s2.length) {
-                if (i == 0)
+                if (i == 0) {
                     costs[j] = j
-                else {
+                } else {
                     if (j > 0) {
                         var newValue = costs[j - 1]
-                        if (s1[i - 1] != s2[j - 1])
+                        if (s1[i - 1] != s2[j - 1]) {
                             newValue = newValue.coerceAtMost(lastValue).coerceAtMost(costs[j]) + 1
+                        }
                         costs[j - 1] = lastValue
                         lastValue = newValue
                     }

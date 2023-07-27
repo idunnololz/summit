@@ -17,7 +17,6 @@ import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.util.BottomMenu
 
-
 fun BasicSettingItem.bindTo(
     b: BasicSettingItemBinding,
     onValueChanged: () -> Unit,
@@ -80,18 +79,25 @@ fun SliderSettingItem.bindTo(
     b.slider.valueFrom = this.minValue
     b.slider.valueTo = this.maxValue
 
-    b.slider.value = getCurrentValue()
-    stepSize?.let {
-        b.slider.stepSize = it
+    val stepSize = stepSize
+    if (stepSize != null) {
+        b.slider.stepSize = stepSize
+        b.slider.value =
+            ((getCurrentValue() / stepSize).toInt() * b.slider.stepSize)
+                .coerceIn(minValue, maxValue)
+    } else {
+        b.slider.value = getCurrentValue().coerceIn(minValue, maxValue)
     }
 
-    b.slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
-        override fun onStartTrackingTouch(slider: Slider) {}
+    b.slider.addOnSliderTouchListener(
+        object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {}
 
-        override fun onStopTrackingTouch(slider: Slider) {
-            onValueChanged(slider.value)
-        }
-    })
+            override fun onStopTrackingTouch(slider: Slider) {
+                onValueChanged(slider.value)
+            }
+        },
+    )
 }
 
 fun <T> TextOnlySettingItem.bindTo(

@@ -8,15 +8,8 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
-import com.idunnololz.summit.preferences.ThemeManager
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -36,7 +29,7 @@ abstract class BaseActivity : AppCompatActivity() {
             runOnUiThread {
                 try {
                     f()
-                } catch (e: IllegalStateException) {/* meh */
+                } catch (e: IllegalStateException) { /* meh */
                 }
             }
         }

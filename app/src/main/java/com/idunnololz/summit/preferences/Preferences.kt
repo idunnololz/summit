@@ -12,14 +12,17 @@ import com.idunnololz.summit.lemmy.postListView.PostInListUiConfig
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
@@ -28,6 +31,8 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
@@ -73,7 +78,8 @@ class Preferences @Inject constructor(
         prefs.edit()
             .putString(
                 PreferenceUtil.KEY_DEFAULT_PAGE,
-                moshi.adapter(CommunityRef::class.java).toJson(communityRef))
+                moshi.adapter(CommunityRef::class.java).toJson(communityRef),
+            )
             .apply()
     }
 
@@ -81,7 +87,7 @@ class Preferences @Inject constructor(
         try {
             CommunityLayout.valueOf(
                 PreferenceUtil.preferences
-                    .getString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, null) ?: ""
+                    .getString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, null) ?: "",
             )
         } catch (e: IllegalArgumentException) {
             CommunityLayout.List
@@ -117,10 +123,14 @@ class Preferences @Inject constructor(
                 PreferenceUtil.KEY_POST_UI_CONFIG_COMPACT
             CommunityLayout.List ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_LIST
+            CommunityLayout.LargeList ->
+                PreferenceUtil.KEY_POST_UI_CONFIG_LARGE_LIST
             CommunityLayout.Card ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_CARD
             CommunityLayout.Card2 ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_CARD2
+            CommunityLayout.Card3 ->
+                PreferenceUtil.KEY_POST_UI_CONFIG_CARD3
             CommunityLayout.Full ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_FULL
         }
@@ -198,6 +208,12 @@ class Preferences @Inject constructor(
             prefs.edit().putInt(KEY_POST_GESTURE_ACTION_3, value).apply()
         }
 
+    var postGestureSize: Float
+        get() = prefs.getFloat(KEY_POST_GESTURE_SIZE, 0.5f)
+        set(value) {
+            prefs.edit().putFloat(KEY_POST_GESTURE_SIZE, value).apply()
+        }
+
     var commentGestureAction1: Int
         get() = prefs.getInt(KEY_COMMENT_GESTURE_ACTION_1, CommentGestureAction.Upvote)
         set(value) {
@@ -214,6 +230,12 @@ class Preferences @Inject constructor(
         get() = prefs.getInt(KEY_COMMENT_GESTURE_ACTION_3, CommentGestureAction.Reply)
         set(value) {
             prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_3, value).apply()
+        }
+
+    var commentGestureSize: Float
+        get() = prefs.getFloat(KEY_COMMENT_GESTURE_SIZE, 0.5f)
+        set(value) {
+            prefs.edit().putFloat(KEY_COMMENT_GESTURE_SIZE, value).apply()
         }
 
     var commentThreadStyle: CommentThreadStyleId
@@ -260,6 +282,12 @@ class Preferences @Inject constructor(
             prefs.edit().putInt(KEY_GLOBAL_FONT_SIZE, value).apply()
         }
 
+    var globalFontColor: Int
+        get() = prefs.getInt(KEY_GLOBAL_FONT_COLOR, GlobalFontColorId.Calm)
+        set(value) {
+            prefs.edit().putInt(KEY_GLOBAL_FONT_COLOR, value).apply()
+        }
+
     var defaultCommunitySortOrder: CommunitySortOrder?
         get() = moshi.fromJsonSafe(prefs.getString(KEY_DEFAULT_COMMUNITY_SORT_ORDER, null))
         set(value) {
@@ -272,6 +300,22 @@ class Preferences @Inject constructor(
             prefs.edit().putString(KEY_DEFAULT_COMMENTS_SORT_ORDER, moshi.toJsonSafe(value)).apply()
         }
 
+    var alwaysShowLinkButtonBelowPost: Boolean
+        get() = prefs.getBoolean(KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST, value)
+                .apply()
+        }
+
+    var postListViewImageOnSingleTap: Boolean
+        get() = prefs.getBoolean(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP, value)
+                .apply()
+        }
+
     fun reset(key: String) {
         prefs.edit().remove(key).apply()
     }
@@ -281,7 +325,7 @@ class Preferences @Inject constructor(
             val json = this.getString(key, null)
                 ?: return null
             moshi.adapter(T::class.java).fromJson(
-                json
+                json,
             )
         } catch (e: Exception) {
             Log.e(TAG, "", e)

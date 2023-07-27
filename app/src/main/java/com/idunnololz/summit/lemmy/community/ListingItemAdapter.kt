@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.community
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +12,11 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
+import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.databinding.MainFooterItemBinding
@@ -49,7 +50,7 @@ class ListingItemAdapter(
         post: PostView,
         jumpToComments: Boolean,
         reveal: Boolean,
-        videoState: VideoState?
+        videoState: VideoState?,
     ) -> Unit,
     private val onShowMoreActions: (PostView) -> Unit,
     private val onPostRead: (PostView) -> Unit,
@@ -73,10 +74,12 @@ class ListingItemAdapter(
 
     var layout: CommunityLayout = CommunityLayout.List
         set(value) {
-            field = value
+            if (value != field) {
+                field = value
 
-            @Suppress("NotifyDataSetChanged")
-            notifyDataSetChanged()
+                @Suppress("NotifyDataSetChanged")
+                notifyDataSetChanged()
+            }
         }
 
     var contentMaxWidth: Int = 0
@@ -90,8 +93,10 @@ class ListingItemAdapter(
         is Item.PostItem -> when (layout) {
             CommunityLayout.Compact -> R.layout.listing_item_compact
             CommunityLayout.List -> R.layout.listing_item_list
+            CommunityLayout.LargeList -> R.layout.listing_item_large_list
             CommunityLayout.Card -> R.layout.listing_item_card
             CommunityLayout.Card2 -> R.layout.listing_item_card2
+            CommunityLayout.Card3 -> R.layout.listing_item_card3
             CommunityLayout.Full -> R.layout.listing_item_full
         }
         is Item.FooterItem -> R.layout.main_footer_item
@@ -107,10 +112,14 @@ class ListingItemAdapter(
                 ListingItemViewHolder.fromBinding(ListingItemCompactBinding.bind(v))
             R.layout.listing_item_list ->
                 ListingItemViewHolder.fromBinding(ListingItemListBinding.bind(v))
+            R.layout.listing_item_large_list ->
+                ListingItemViewHolder.fromBinding(ListingItemLargeListBinding.bind(v))
             R.layout.listing_item_card ->
                 ListingItemViewHolder.fromBinding(ListingItemCardBinding.bind(v))
             R.layout.listing_item_card2 ->
                 ListingItemViewHolder.fromBinding(ListingItemCard2Binding.bind(v))
+            R.layout.listing_item_card3 ->
+                ListingItemViewHolder.fromBinding(ListingItemCard3Binding.bind(v))
             R.layout.listing_item_full ->
                 ListingItemViewHolder.fromBinding(ListingItemFullBinding.bind(v))
             R.layout.main_footer_item -> ViewBindingViewHolder(MainFooterItemBinding.bind(v))
@@ -127,7 +136,7 @@ class ListingItemAdapter(
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
-        payloads: MutableList<Any>
+        payloads: MutableList<Any>,
     ) {
         when (val item = items[position]) {
             is Item.PostItem -> {
@@ -135,8 +144,8 @@ class ListingItemAdapter(
                     super.onBindViewHolder(holder, position, payloads)
                 } else {
                     val h: ListingItemViewHolder = holder as ListingItemViewHolder
-                    val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
-                            || !blurNsfwPosts
+                    val isRevealed = revealedItems.contains(item.postView.getUniqueKey()) ||
+                        !blurNsfwPosts
                     val isActionsExpanded = item.isActionExpanded
                     val isExpanded = item.isExpanded
 
@@ -170,7 +179,7 @@ class ListingItemAdapter(
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch = onInstanceMismatch,
                         onHighlightComplete = {
-                              postListEngine.clearHighlight()
+                            postListEngine.clearHighlight()
                         },
                         onLinkLongClick = onLinkLongClick,
                     )
@@ -212,8 +221,8 @@ class ListingItemAdapter(
             }
             is Item.PostItem -> {
                 val h: ListingItemViewHolder = holder as ListingItemViewHolder
-                val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
-                        || !blurNsfwPosts
+                val isRevealed = revealedItems.contains(item.postView.getUniqueKey()) ||
+                    !blurNsfwPosts
                 val isActionsExpanded = item.isActionExpanded
                 val isExpanded = item.isExpanded
 
@@ -276,7 +285,7 @@ class ListingItemAdapter(
 
         if (holder is ListingItemViewHolder) {
             postListViewBuilder.recycle(
-                holder
+                holder,
             )
 
             if (markPostsAsReadOnScroll) {
@@ -308,7 +317,7 @@ class ListingItemAdapter(
     override fun getItemCount(): Int = items.size
 
     fun onItemsChanged(
-        animate: Boolean = true
+        animate: Boolean = true,
     ) {
         refreshItems(animate)
     }
@@ -335,49 +344,51 @@ class ListingItemAdapter(
         val newItems = postListEngine.items
         val oldItems = items
 
-        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem = oldItems[oldItemPosition]
-                val newItem = newItems[newItemPosition]
+        val diff = DiffUtil.calculateDiff(
+            object : DiffUtil.Callback() {
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    val oldItem = oldItems[oldItemPosition]
+                    val newItem = newItems[newItemPosition]
 
-                return oldItem::class == newItem::class && when (oldItem) {
-                    is Item.FooterItem -> true
-                    is Item.PostItem ->
-                        oldItem.postView.getUniqueKey() ==
+                    return oldItem::class == newItem::class && when (oldItem) {
+                        is Item.FooterItem -> true
+                        is Item.PostItem ->
+                            oldItem.postView.getUniqueKey() ==
                                 (newItem as Item.PostItem).postView.getUniqueKey()
-                    is Item.AutoLoadItem ->
-                        oldItem.pageToLoad ==
+                        is Item.AutoLoadItem ->
+                            oldItem.pageToLoad ==
                                 (newItem as Item.AutoLoadItem).pageToLoad
 
-                    Item.EndItem -> true
-                    is Item.ErrorItem ->
-                        oldItem.pageToLoad ==
+                        Item.EndItem -> true
+                        is Item.ErrorItem ->
+                            oldItem.pageToLoad ==
                                 (newItem as Item.ErrorItem).pageToLoad
+                    }
                 }
-            }
 
-            override fun getOldListSize(): Int = oldItems.size
+                override fun getOldListSize(): Int = oldItems.size
 
-            override fun getNewListSize(): Int = newItems.size
+                override fun getNewListSize(): Int = newItems.size
 
-            override fun areContentsTheSame(
-                oldItemPosition: Int,
-                newItemPosition: Int
-            ): Boolean {
-                val oldItem = oldItems[oldItemPosition]
-                val newItem = newItems[newItemPosition]
+                override fun areContentsTheSame(
+                    oldItemPosition: Int,
+                    newItemPosition: Int,
+                ): Boolean {
+                    val oldItem = oldItems[oldItemPosition]
+                    val newItem = newItems[newItemPosition]
 
-                return oldItem == newItem
-            }
-
-            override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-                return if (animate) {
-                    null
-                } else {
-                    Unit
+                    return oldItem == newItem
                 }
-            }
-        })
+
+                override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+                    return if (animate) {
+                        null
+                    } else {
+                        Unit
+                    }
+                }
+            },
+        )
         this.items = newItems
         diff.dispatchUpdatesTo(this)
     }

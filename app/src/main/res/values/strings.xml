@@ -430,6 +430,23 @@
     <string name="default_comments_sort_order">Default comments sort order</string>
     <string name="comment_list">Comment list</string>
     <string name="comment_list_desc">Customize the comment list of posts</string>
+    <string name="none">None</string>
+    <string name="post_gesture_size">Post gesture size</string>
+    <string name="share_source_link">Share source link</string>
+    <string name="always_show_link_below_post">Always show link below post</string>
+    <string name="always_show_link_below_post_desc">If enabled, a link button is always shown at the bottom of the post.</string>
+    <string name="special_thanks_to_the_following_patrons">Special thanks to the following patrons for this update</string>
+    <string name="view_my_patreon">View my Patreon</string>
+    <string name="patreon_supporters">Patreon supporters</string>
+    <string name="patreon_supporters_desc">Thank you to all supporters!</string>
+    <string name="community_hint">community</string>
+    <string name="view_image_on_single_tap">View image on single tap</string>
+    <string name="view_image_on_single_tap_desc">If enabled, tapping on the thumbnail will open the image in the image viewer. If disabled, long pressing and image will open the image in the image viewer instead.</string>
+    <string name="card3">Card3</string>
+    <string name="large_list">Large list</string>
+    <string name="font_color">Font color</string>
+    <string name="calm">Calm</string>
+    <string name="high_contrast">High contrast</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

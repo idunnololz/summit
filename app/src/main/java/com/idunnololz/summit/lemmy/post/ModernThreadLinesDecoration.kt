@@ -88,7 +88,7 @@ class ModernThreadLinesDecoration(
 
             val totalDepth = threadLinesData.depth - threadLinesData.baseDepth
             val indent = (totalDepth.toFloat() - 1f) * distanceBetweenLinesUnit *
-                    threadLinesData.indentationPerLevel
+                threadLinesData.indentationPerLevel
             val x = view.left + indent + startingPadding + (linePaint.strokeWidth / 2)
 
             if (totalDepth > 0) {
@@ -101,7 +101,7 @@ class ModernThreadLinesDecoration(
                     view.top.toFloat() + translationY + lineMargin,
                     x + translationX,
                     view.bottom.toFloat() + translationY - lineMargin,
-                    linePaint
+                    linePaint,
                 )
             }
 
@@ -118,11 +118,9 @@ class ModernThreadLinesDecoration(
                     y,
                     end,
                     y,
-                    dividerPaint
+                    dividerPaint,
                 )
             }
-
-
         }
     }
 }

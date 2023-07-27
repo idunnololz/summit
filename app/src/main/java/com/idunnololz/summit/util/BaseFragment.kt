@@ -43,7 +43,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     protected fun scheduleStartPostponedTransition(
         view: View,
-        onStartPostponedEnterTransition: (() -> Unit)? = null
+        onStartPostponedEnterTransition: (() -> Unit)? = null,
     ) {
         view.viewTreeObserver.addOnPreDrawListener(
             object : ViewTreeObserver.OnPreDrawListener {
@@ -53,11 +53,12 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
                     onStartPostponedEnterTransition?.invoke()
                     return true
                 }
-            })
+            },
+        )
     }
 
     fun runAfterLayout(
-        callback: () -> Unit
+        callback: () -> Unit,
     ) {
         if (!isBindingAvailable()) return
 

@@ -36,6 +36,5 @@ fun Context.getDimen(@DimenRes dimen: Int): Int {
 fun Context.getColorCompat(@ColorRes color: Int): Int =
     ContextCompat.getColor(this, color)
 
-
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable? =
     AppCompatResources.getDrawable(this, drawableRes)

@@ -20,7 +20,7 @@ data class PostInListUiConfig(
     fun updateTextSizeMultiplier(it: Float): PostInListUiConfig =
         this.copy(
             textSizeMultiplier = it,
-            fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it)
+            fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
         )
 }
 
@@ -41,7 +41,7 @@ data class PostUiConfig(
     fun updateTextSizeMultiplier(it: Float): PostUiConfig =
         this.copy(
             textSizeMultiplier = it,
-            fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it)
+            fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
         )
 }
 
@@ -80,22 +80,31 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig =
             PostInListUiConfig(
                 imageWidthPercent = 0.2f,
                 headerTextSizeSp = 12f,
-                footerTextSizeSp = 12f
+                footerTextSizeSp = 12f,
             )
         CommunityLayout.List ->
             PostInListUiConfig(
-                imageWidthPercent = 0.2f
+                imageWidthPercent = 0.2f,
+            )
+        CommunityLayout.LargeList ->
+            PostInListUiConfig(
+                imageWidthPercent = 1f,
             )
         CommunityLayout.Card ->
             PostInListUiConfig(
-                imageWidthPercent = 1f
+                imageWidthPercent = 1f,
             )
         CommunityLayout.Card2 ->
             PostInListUiConfig(
-                imageWidthPercent = 1f
+                imageWidthPercent = 1f,
+            )
+        CommunityLayout.Card3 ->
+            PostInListUiConfig(
+                titleTextSizeSp = 16f,
+                imageWidthPercent = 1f,
             )
         CommunityLayout.Full ->
             PostInListUiConfig(
-                imageWidthPercent = 0.2f
+                imageWidthPercent = 0.2f,
             )
     }

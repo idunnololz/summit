@@ -32,7 +32,7 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -79,11 +79,11 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
                         .make(
                             binding.coordinatorLayout,
                             getString(R.string.removed_hidden_posts_format, count.toString()),
-                            Snackbar.LENGTH_LONG
+                            Snackbar.LENGTH_LONG,
                         )
                         .show()
                 }
-            }
+            },
         )
     }
 }

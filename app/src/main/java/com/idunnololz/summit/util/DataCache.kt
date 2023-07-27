@@ -3,9 +3,8 @@ package com.idunnololz.summit.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
-import androidx.annotation.RequiresApi
 import android.util.Log
-
+import androidx.annotation.RequiresApi
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream

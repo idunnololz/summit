@@ -28,7 +28,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -46,7 +46,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
             instance = args.instance,
             onImageClick = {},
             onPageClick = {},
-            onLinkLongClick = { _, _ -> })
-
+            onLinkLongClick = { _, _ -> },
+        )
     }
 }

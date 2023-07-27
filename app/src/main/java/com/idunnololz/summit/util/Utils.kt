@@ -44,7 +44,6 @@ import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext
 
-
 object Utils {
     private val TAG = Utils::class.java.simpleName
     const val EMAIL_FEEDBACK = "feedback@idunnololz.com"
@@ -55,7 +54,7 @@ object Utils {
 
     val gson: Gson by lazy {
         GsonBuilder()
-            //.registerTypeAdapter(RedditObject::class.java, RedditObjectSerializer())
+            // .registerTypeAdapter(RedditObject::class.java, RedditObjectSerializer())
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create()
     }
@@ -87,7 +86,7 @@ object Utils {
         return redistributeColor(
             255 * amount + r,
             255 * amount + g,
-            255 * amount + b
+            255 * amount + b,
         )
     }
 
@@ -131,14 +130,16 @@ object Utils {
     private fun createEmailOnlyChooserIntent(
         context: Context,
         source: Intent,
-        chooserTitle: CharSequence
+        chooserTitle: CharSequence,
     ): Intent {
         val intents = Stack<Intent>()
         val i = Intent(
-            Intent.ACTION_SENDTO, Uri.fromParts(
+            Intent.ACTION_SENDTO,
+            Uri.fromParts(
                 "mailto",
-                "info@domain.com", null
-            )
+                "info@domain.com",
+                null,
+            ),
         )
         val activities = context.packageManager
             .queryIntentActivities(i, 0)
@@ -152,11 +153,11 @@ object Utils {
         return if (!intents.isEmpty()) {
             val chooserIntent = Intent.createChooser(
                 intents.removeAt(0),
-                chooserTitle
+                chooserTitle,
             )
             chooserIntent.putExtra(
                 Intent.EXTRA_INITIAL_INTENTS,
-                intents.toTypedArray<Parcelable>()
+                intents.toTypedArray<Parcelable>(),
             )
 
             chooserIntent
@@ -171,22 +172,21 @@ object Utils {
                 .getPackageInfo(context.packageName, 0).versionName
 
             val footer = "LoL Catalyst v" +
-                    versionName +
-                    "\nOS v" +
-                    Build.VERSION.RELEASE +
-                    "\nDevice " +
-                    Build.MODEL +
-                    "\n\nFeedback: \n"
+                versionName +
+                "\nOS v" +
+                Build.VERSION.RELEASE +
+                "\nDevice " +
+                Build.MODEL +
+                "\n\nFeedback: \n"
 
             val i = Intent(Intent.ACTION_SEND)
             i.type = "*/*"
-            //i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(crashLogFile));
+            // i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(crashLogFile));
             i.putExtra(Intent.EXTRA_EMAIL, arrayOf(EMAIL_FEEDBACK))
             i.putExtra(Intent.EXTRA_SUBJECT, "LoL Catalyst feedback")
             i.putExtra(Intent.EXTRA_TEXT, footer)
 
             context.startActivity(Utils.createEmailOnlyChooserIntent(context, i, "Send via email"))
-
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e(TAG, "", e)
         }
@@ -200,7 +200,7 @@ object Utils {
 
     private fun startSlideUpAnimation(
         viewToAnimate: View,
-        startDelay: Int
+        startDelay: Int,
     ): ViewPropertyAnimator {
         viewToAnimate.alpha = 0f
         viewToAnimate.translationY = convertDpToPixel(100f)
@@ -210,9 +210,11 @@ object Utils {
     }
 
     fun isLightColor(color: Int): Boolean {
-        val darkness = 1 - (0.299 * Color.red(color)
-                + 0.587 * Color.green(color)
-                + 0.114 * Color.blue(color)) / 255
+        val darkness = 1 - (
+            0.299 * Color.red(color) +
+                0.587 * Color.green(color) +
+                0.114 * Color.blue(color)
+            ) / 255
         return darkness < 0.5
     }
 
@@ -276,7 +278,9 @@ object Utils {
         // navigation bar at the bottom
         return if (appUsableSize.y < realScreenSize.y) {
             realScreenSize.y - appUsableSize.y
-        } else 0
+        } else {
+            0
+        }
 
         // navigation bar is not present
     }
@@ -300,9 +304,8 @@ object Utils {
             try {
                 size.x = Display::class.java.getMethod("getRawWidth").invoke(display) as Int
                 size.y = Display::class.java.getMethod("getRawHeight").invoke(display) as Int
-            } catch (e: Exception) {/* do nothing */
+            } catch (e: Exception) { /* do nothing */
             }
-
         }
 
         return size
@@ -313,10 +316,11 @@ object Utils {
 
         var length: Long = 0
         for (file in files) {
-            length += if (file.isFile)
+            length += if (file.isFile) {
                 file.length()
-            else
+            } else {
                 folderSize(file)
+            }
         }
         return length
     }
@@ -327,9 +331,8 @@ object Utils {
             if (dir.isDirectory) {
                 deleteDir(dir)
             }
-        } catch (e: Exception) {/* Do nothing */
+        } catch (e: Exception) { /* Do nothing */
         }
-
     }
 
     fun deleteDir(dir: File?): Boolean {
@@ -361,10 +364,12 @@ object Utils {
 
                 val file = File(targetDirectory, ze.name)
                 val dir = if (ze.isDirectory) file else file.parentFile
-                if (!dir.isDirectory && !dir.mkdirs())
+                if (!dir.isDirectory && !dir.mkdirs()) {
                     throw FileNotFoundException("Failed to ensure directory: " + dir.absolutePath)
-                if (ze.isDirectory)
+                }
+                if (ze.isDirectory) {
                     continue
+                }
                 FileOutputStream(file).use { fout ->
                     while (true) {
                         val count = zis.read(buffer)
@@ -463,7 +468,6 @@ object Utils {
         }
     }
 
-
     fun openExternalLink(context: Context, url: String) {
         try {
             val intent = CustomTabsIntent.Builder()
@@ -484,18 +488,17 @@ object Utils {
             activity.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("market://details?id=$appPackageName")
-                )
+                    Uri.parse("market://details?id=$appPackageName"),
+                ),
             )
         } catch (anfe: android.content.ActivityNotFoundException) {
             activity.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-                )
+                    Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"),
+                ),
             )
         }
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -670,7 +673,7 @@ object Utils {
     fun fromHtml(
         source: String?,
         imageGetter: Html.ImageGetter?,
-        tagHandler: Html.TagHandler?
+        tagHandler: Html.TagHandler?,
     ): Spanned {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY, imageGetter, tagHandler)
@@ -716,7 +719,9 @@ object Utils {
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         return if (resourceId > 0) {
             resources.getDimensionPixelSize(resourceId)
-        } else 0
+        } else {
+            0
+        }
     }
 
     fun copyToClipboard(context: Context, toCopy: String) {
@@ -742,22 +747,22 @@ object Utils {
         // to taken back to our application, we need to add following flags to intent.
         goToMarket.addFlags(
             Intent.FLAG_ACTIVITY_NO_HISTORY or
-                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
-                    Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK,
         )
         try {
             activity.startActivity(goToMarket)
         } catch (e: ActivityNotFoundException) {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("http://play.google.com/store/apps/details?id=${activity.packageName}")
+                Uri.parse("http://play.google.com/store/apps/details?id=${activity.packageName}"),
             )
             activity.startActivity(intent)
         }
     }
 
     fun hashSha256(text: String): String {
-        val HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+        val HEX_ARRAY = "0123456789ABCDEF".toCharArray()
         fun ByteArray.toHex(): String {
             val hexChars = CharArray(size * 2)
             for (j in 0 until size) {
@@ -777,7 +782,7 @@ object Utils {
     fun safeLaunchExternalIntentWithErrorDialog(
         context: Context,
         fm: androidx.fragment.app.FragmentManager?,
-        intent: Intent
+        intent: Intent,
     ) {
         try {
             context.startActivity(intent)
@@ -787,8 +792,8 @@ object Utils {
                 .setMessage(
                     context.getString(
                         R.string.error_external_activity_not_found,
-                        intent.type
-                    )
+                        intent.type,
+                    ),
                 )
                 .setPositiveButton(android.R.string.ok)
                 .createAndShow(fm, "asdf")
@@ -825,19 +830,20 @@ object Utils {
                 display,
                 configurationsList[i],
                 EGL10.EGL_MAX_PBUFFER_WIDTH,
-                textureSize
-            );
+                textureSize,
+            )
 
             // Keep track of the maximum texture size
-            if (maximumTextureSize < textureSize[0])
-                maximumTextureSize = textureSize[0];
+            if (maximumTextureSize < textureSize[0]) {
+                maximumTextureSize = textureSize[0]
+            }
         }
 
         // Release
-        egl.eglTerminate(display);
+        egl.eglTerminate(display)
 
         // Return largest texture size found, or default
-        return Math.max(maximumTextureSize, IMAGE_MAX_BITMAP_DIMENSION);
+        return Math.max(maximumTextureSize, IMAGE_MAX_BITMAP_DIMENSION)
     }
 
     fun isUiThread(): Boolean = Looper.getMainLooper().getThread() == Thread.currentThread()
@@ -880,7 +886,6 @@ object Utils {
         return "${nf.format(totalBytes)} $suffix"
     }
 
-
     // convert a data class to a map
     fun <T> T.serializeToMap(): Map<String, String> {
         return convert()
@@ -895,7 +900,6 @@ object Utils {
         )
     }
 }
-
 
 /**
  * Throws an [java.lang.IllegalArgumentException] if called on a thread other than the main
@@ -914,7 +918,6 @@ fun convertSpToPixel(sp: Float): Float {
 fun Context.isLightTheme(): Boolean =
     resources.getBoolean(R.bool.isLightTheme)
 
-
 private const val EMAIL_FEEDBACK = "feedback@idunnololz.com"
 fun startFeedbackIntent(context: Context) {
     try {
@@ -922,8 +925,8 @@ fun startFeedbackIntent(context: Context) {
             .getPackageInfo(context.packageName, 0).versionName
 
         val footer = "Summit for Lemmy v" +
-                versionName +
-                "\n\nFeedback: \n"
+            versionName +
+            "\n\nFeedback: \n"
 
         val address = EMAIL_FEEDBACK
         val subject = "LoL Catalyst feedback"

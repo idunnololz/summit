@@ -11,7 +11,6 @@ import com.idunnololz.summit.offline.OfflineManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 sealed class Item {
     data class PostItem(
         val postView: PostView,
@@ -88,7 +87,7 @@ class PostListEngine(
         get() = pages.lastOrNull()?.pageIndex
 
     fun tryRestore() {
-        Log.d(TAG, "Attempting to restore. Using keys ${key}, ${secondaryKey}")
+        Log.d(TAG, "Attempting to restore. Using keys $key, $secondaryKey")
         val cachedPages = offlineManager.getPages(key, secondaryKey)
 
         cachedPages?.let {
@@ -164,10 +163,12 @@ class PostListEngine(
                 items.add(Item.EndItem)
             }
         } else {
-            items.add(Item.FooterItem(
-                hasMore = lastPage.hasMore,
-                hasLess = lastPage.pageIndex != 0,
-            ))
+            items.add(
+                Item.FooterItem(
+                    hasMore = lastPage.hasMore,
+                    hasLess = lastPage.pageIndex != 0,
+                ),
+            )
         }
 
         _items = items
@@ -204,7 +205,7 @@ class PostListEngine(
     fun highlight(postToHighlight: PostRef): Int {
         this.postToHighlight = postToHighlight
         this.postToHighlightForever = null
-        return  _items.indexOfFirst {
+        return _items.indexOfFirst {
             when (it) {
                 is Item.FooterItem -> false
                 is Item.AutoLoadItem -> false

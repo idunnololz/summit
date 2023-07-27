@@ -1,16 +1,16 @@
 package com.idunnololz.summit.scrape
 
 import android.os.Process
-import androidx.annotation.StringRes
 import android.util.Log
+import androidx.annotation.StringRes
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.WEBSITE_ERROR
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.NETWORK_ERROR
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.NETWORK_TIMEOUT_ERROR
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.PAGE_NOT_FOUND
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.SERVICE_UNAVAILABLE_ERROR
+import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.WEBSITE_ERROR
 import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.IDataCache
@@ -127,7 +127,7 @@ class WebsiteAdapterLoader {
         url: String,
         cacheKey: String?,
         cacheLifetimeMs: Long = defaultCacheLifetimeMs,
-        handleStatusCodes: Boolean = false
+        handleStatusCodes: Boolean = false,
     ): WebsiteAdapterLoader {
         toLoad.add(ToLoad(adapter, url, cacheKey, cacheLifetimeMs, handleStatusCodes))
         return this
@@ -207,7 +207,7 @@ class WebsiteAdapterLoader {
                             requireNotNull(dataCache.getCachedData(tl.key)),
                             true /*fromCache*/,
                             false/*isStale*/,
-                            dataCache.getCachedDate(tl.key)
+                            dataCache.getCachedDate(tl.key),
                         )
                         if (tl.adapter.error == WebsiteAdapter.NO_ERROR) {
                             iterator.remove()
@@ -220,7 +220,7 @@ class WebsiteAdapterLoader {
                             requireNotNull(dataCache.getCachedData(tl.key)),
                             true /*fromCache*/,
                             true /*isStale*/,
-                            dataCache.getCachedDate(tl.key)
+                            dataCache.getCachedDate(tl.key),
                         )
                         if (tl.adapter.error == WebsiteAdapter.NO_ERROR) {
                             iterator.remove()
@@ -279,14 +279,15 @@ class WebsiteAdapterLoader {
                                 val successfulResponse = response.isSuccessful
 
                                 synchronized(lock) {
-                                    if (successfulResponse || tl.handleStatusCodes)
+                                    if (successfulResponse || tl.handleStatusCodes) {
                                         success = true
-                                    else {
+                                    } else {
                                         val ex = HttpStatusException(
-                                            "Status not 200 on first try. Status="
-                                                    + response.code + ", URL="
-                                                    + request.url.toString(),
-                                            response.code, request.url.toString()
+                                            "Status not 200 on first try. Status=" +
+                                                response.code + ", URL=" +
+                                                request.url.toString(),
+                                            response.code,
+                                            request.url.toString(),
                                         )
                                         FirebaseCrashlytics.getInstance()
                                             .setCustomKey(KEY_URL, tl.url)
@@ -294,7 +295,7 @@ class WebsiteAdapterLoader {
 
                                         Log.d(
                                             TAG,
-                                            "Error accessing url: " + tl.url + ". Response not 200 but: " + response.code
+                                            "Error accessing url: " + tl.url + ". Response not 200 but: " + response.code,
                                         )
 
                                         tl.adapter.setError(
@@ -303,13 +304,14 @@ class WebsiteAdapterLoader {
                                                     WebsiteAdapter.SERVICE_UNAVAILABLE_ERROR
                                                 }
                                                 HttpURLConnection.HTTP_NOT_FOUND,
-                                                HttpURLConnection.HTTP_FORBIDDEN -> {
+                                                HttpURLConnection.HTTP_FORBIDDEN,
+                                                -> {
                                                     WebsiteAdapter.PAGE_NOT_FOUND
                                                 }
                                                 else -> {
                                                     WebsiteAdapter.WEBSITE_ERROR
                                                 }
-                                            }
+                                            },
                                         )
                                         possibleResult = ""
                                     }
@@ -335,17 +337,17 @@ class WebsiteAdapterLoader {
                                         Log.d(TAG, "Response 1 response:          $response")
                                         Log.d(
                                             TAG,
-                                            "Response 1 cache response:    ${response.cacheResponse}"
+                                            "Response 1 cache response:    ${response.cacheResponse}",
                                         )
                                         Log.d(
                                             TAG,
-                                            "Response 1 network response:  ${response.networkResponse}"
+                                            "Response 1 network response:  ${response.networkResponse}",
                                         )
                                     }
 
                                     FirebaseCrashlytics.getInstance().setCustomKey(
                                         "TL",
-                                        tl.adapter.javaClass.canonicalName ?: ""
+                                        tl.adapter.javaClass.canonicalName ?: "",
                                     )
 
                                     // this line can take a while (this means dling...)
@@ -353,12 +355,12 @@ class WebsiteAdapterLoader {
                                 }
 
                                 // test russia ip block
-                                //possibleResult = " <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 ";
+                                // possibleResult = " <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 ";
 
                                 if (VERBOSE) {
                                     Log.d(
                                         TAG,
-                                        "Url: " + tl.url + " Took " + (System.nanoTime() - tl.ts) / 1000000 + "ms"
+                                        "Url: " + tl.url + " Took " + (System.nanoTime() - tl.ts) / 1000000 + "ms",
                                     )
                                 }
 
@@ -388,7 +390,6 @@ class WebsiteAdapterLoader {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 iterator.remove()
             }
-
         } // while (iterator)
 
         if (BuildConfig.DEBUG) {
@@ -419,7 +420,7 @@ class WebsiteAdapterLoader {
                                     result,
                                     false,
                                     false,
-                                    System.currentTimeMillis()
+                                    System.currentTimeMillis(),
                                 )
                             }
                             toLoad.removeAt(i)
@@ -432,8 +433,9 @@ class WebsiteAdapterLoader {
                     }
                     if (toLoad.size != 0) {
                         lock.wait()
-                    } else
+                    } else {
                         break
+                    }
                 }
             }
         } catch (e: InterruptedException) {
@@ -458,7 +460,7 @@ class WebsiteAdapterLoader {
         s: String,
         fromCache: Boolean,
         isStale: Boolean,
-        dateFetched: Long
+        dateFetched: Long,
     ) {
         tl.adapter.isStale = isStale
         tl.adapter.dateFetched = dateFetched
@@ -495,7 +497,7 @@ class WebsiteAdapterLoader {
     }
 
     fun setOnEachAdapterLoadedListener(
-        onEachAdapterLoadedListener: OnLoadedListener
+        onEachAdapterLoadedListener: OnLoadedListener,
     ): WebsiteAdapterLoader {
         this.onEachAdapterLoadedListener = onEachAdapterLoadedListener
         return this
@@ -519,7 +521,7 @@ class WebsiteAdapterLoader {
         val url: String,
         val key: String?,
         val cacheLifetime: Long,
-        val handleStatusCodes: Boolean
+        val handleStatusCodes: Boolean,
     ) {
         val ts: Long = System.nanoTime()
         internal var result: String? = null

@@ -15,9 +15,8 @@ import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.api.utils.fullName
-import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.appendSeparator
@@ -65,7 +64,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -120,7 +119,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         Snackbar.make(
                             binding.coordinatorLayout,
                             it.error.toErrorMessage(context),
-                            Snackbar.LENGTH_LONG
+                            Snackbar.LENGTH_LONG,
                         ).show()
                     }
                     is StatefulData.Loading -> {}
@@ -133,7 +132,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                             } else {
                                 getString(R.string.user_unblocked)
                             },
-                            Snackbar.LENGTH_LONG
+                            Snackbar.LENGTH_LONG,
                         ).show()
                     }
                 }
@@ -212,21 +211,20 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         val person = personData.personView.person
 
         val bottomMenu = BottomMenu(requireContext()).apply {
-
             addItemWithIcon(
                 id = R.id.block_user,
                 title = getString(R.string.block_this_user_format, person.name),
-                icon = R.drawable.baseline_person_off_24
+                icon = R.drawable.baseline_person_off_24,
             )
             addItemWithIcon(
                 id = R.id.unblock_user,
                 title = getString(R.string.unblock_this_user_format, person.name),
-                icon = R.drawable.baseline_person_24
+                icon = R.drawable.baseline_person_24,
             )
             addItemWithIcon(
                 id = R.id.message,
                 title = getString(R.string.send_message),
-                icon = R.drawable.baseline_message_24
+                icon = R.drawable.baseline_message_24,
             )
 
             setOnMenuItemClickListener {
@@ -294,7 +292,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         null,
                         args.personRef.fullName,
                         bannerUrl,
-                        null
+                        null,
                     )
                 }
                 offlineManager.fetchImage(root, bannerUrl) {
@@ -312,21 +310,30 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             name.text = displayName
             subtitle.text = data.personView.person.fullName
             subtitle2.text = buildSpannedString {
-                append(context.resources.getQuantityString(R.plurals.posts_format,
-                    data.personView.counts.post_count,
-                    defaultDecimalFormat.format(data.personView.counts.post_count)))
+                append(
+                    context.resources.getQuantityString(
+                        R.plurals.posts_format,
+                        data.personView.counts.post_count,
+                        defaultDecimalFormat.format(data.personView.counts.post_count),
+                    ),
+                )
 
                 appendSeparator()
 
-                append(context.resources.getQuantityString(R.plurals.comments_format,
-                    data.personView.counts.comment_count,
-                    defaultDecimalFormat.format(data.personView.counts.comment_count)))
+                append(
+                    context.resources.getQuantityString(
+                        R.plurals.comments_format,
+                        data.personView.counts.comment_count,
+                        defaultDecimalFormat.format(data.personView.counts.comment_count),
+                    ),
+                )
             }
 
             val dateTime = LocalDateTime.ofEpochSecond(
                 dateStringToTs(data.personView.person.published) / 1000,
                 0,
-                ZoneOffset.UTC)
+                ZoneOffset.UTC,
+            )
             val dateStr = dateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
             cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
             binding.cakeDate.visibility = View.VISIBLE

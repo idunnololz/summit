@@ -17,6 +17,6 @@ fun SpannableStringBuilder.appendLink(text: String, url: String, underline: Bool
         },
         start,
         end,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
 }

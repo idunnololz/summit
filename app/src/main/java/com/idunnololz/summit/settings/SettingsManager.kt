@@ -26,13 +26,13 @@ class SettingsManager @Inject constructor(
                 mainSettings.settingViewType,
                 mainSettings.settingPostAndComment,
                 mainSettings.settingGestures,
-            )
+            ),
         ),
         SubgroupItem(
             context.getString(R.string.account_settings),
             listOf(
                 mainSettings.settingLemmyWeb,
-            )
+            ),
         ),
         SubgroupItem(
             context.getString(R.string.systems),
@@ -42,8 +42,9 @@ class SettingsManager @Inject constructor(
 //                mainSettings.settingHistory,
                 mainSettings.settingAbout,
                 mainSettings.settingSummitCommunity,
-            )
-        )
+                mainSettings.patreonSettings,
+            ),
+        ),
     )
 
     fun getSettingsForMainPage() =

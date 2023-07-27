@@ -10,8 +10,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:animateLayoutChanges="true">
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -108,10 +107,13 @@
                     android:id="@+id/font_size"
                     layout="@layout/text_only_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/demo_view_card"/>
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/font_color"
+                    layout="@layout/text_only_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

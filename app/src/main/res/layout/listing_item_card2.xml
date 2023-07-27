@@ -81,11 +81,10 @@
 
         <ImageButton
             android:id="@+id/open_link_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="14dp"
-            android:src="@drawable/baseline_open_in_new_24"
-            android:scaleType="centerCrop"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="9dp"
+            android:src="@drawable/baseline_open_in_new_22"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintTop_toTopOf="@+id/commentButton"
             app:layout_constraintBottom_toBottomOf="@+id/commentButton"

@@ -1,4 +1,4 @@
-package com.idunnololz.summit.account_ui
+package com.idunnololz.summit.accountUi
 
 import android.content.Context
 import android.os.Bundle
@@ -50,7 +50,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -82,8 +82,9 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                 },
                 onPersonClick = {
                     requireMainActivity().launchPage(
-                        PersonRef.PersonRefByName(it.account.name, it.account.instance))
-                }
+                        PersonRef.PersonRefByName(it.account.name, it.account.instance),
+                    )
+                },
             )
 
             recyclerView.setHasFixedSize(false)
@@ -139,13 +140,13 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
 
         private sealed interface Item {
             data class CurrentAccountItem(
-                val accountView: AccountView
+                val accountView: AccountView,
             ) : Item
             data class AccountItem(
-                val accountView: AccountView
+                val accountView: AccountView,
             ) : Item
             data class AddAccountItem(
-                val hasAccounts: Boolean
+                val hasAccounts: Boolean,
             ) : Item
         }
 
@@ -157,10 +158,10 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                     old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
                 is Item.AddAccountItem -> true
             }
-        }).apply {
+        },).apply {
             addItemType(
                 clazz = Item.CurrentAccountItem::class,
-                inflateFn = CurrentAccountItemBinding::inflate
+                inflateFn = CurrentAccountItemBinding::inflate,
             ) { item, b, _ ->
                 b.image.load(item.accountView.profileImage)
                 b.name.text = item.accountView.account.name

@@ -1,33 +1,22 @@
 package com.idunnololz.summit.lemmy.comment
 
 import android.app.Activity
-import android.app.Dialog
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
-import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
-import androidx.core.view.MenuProvider
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
-import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
@@ -35,25 +24,26 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
-import java.lang.Integer.max
-import java.lang.Integer.min
 
 @AndroidEntryPoint
-class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
-    FullscreenDialogFragment, SignInNavigator, BackPressHandler {
+class AddOrEditCommentFragment :
+    BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
+    FullscreenDialogFragment,
+    SignInNavigator,
+    BackPressHandler {
 
     companion object {
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
         const val REQUEST_KEY_RESULT = "result"
+
+        private const val SIS_TEXT = "SIS_TEXT"
     }
 
     private val args by navArgs<AddOrEditCommentFragmentArgs>()
@@ -88,7 +78,6 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         super.onStart()
         val dialog = dialog
         if (dialog != null) {
-
             dialog.window?.let { window ->
                 WindowCompat.setDecorFitsSystemWindows(window, false)
             }
@@ -98,7 +87,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -120,7 +109,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
 
         viewModel.currentAccount.observe(viewLifecycleOwner) {
             if (it != null) {
-                setup(it)
+                setup(it, savedInstanceState)
 
                 requireActivity().invalidateOptionsMenu()
             }
@@ -139,7 +128,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     ErrorDialogFragment.show(
                         getString(R.string.error_unable_to_send_message),
                         it,
-                        childFragmentManager
+                        childFragmentManager,
                     )
                 }
         }
@@ -170,24 +159,26 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     if (personId != 0) {
                         viewModel.sendComment(
                             personId,
-                            binding.commentEditor.editText?.text.toString()
+                            binding.commentEditor.editText?.text.toString(),
                         )
                     } else if (inboxItem != null) {
                         viewModel.sendComment(
                             account,
                             args.instance,
                             inboxItem,
-                            binding.commentEditor.editText?.text.toString()
+                            binding.commentEditor.editText?.text.toString(),
                         )
                     } else {
                         viewModel.sendComment(
                             account,
-                            PostRef(args.instance,
+                            PostRef(
+                                args.instance,
                                 requireNotNull(
-                                    args.postView?.post?.id ?: args.commentView?.post?.id
+                                    args.postView?.post?.id ?: args.commentView?.post?.id,
                                 ) {
                                     "Both postView and commentView were null!"
-                                }),
+                                },
+                            ),
                             args.commentView?.comment?.id,
                             binding.commentEditor.editText?.text.toString(),
                         )
@@ -202,10 +193,12 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     }
 
                     viewModel.updateComment(
-                        PostRef(args.instance,
+                        PostRef(
+                            args.instance,
                             requireNotNull(args.editCommentView?.post?.id) {
                                 "editCommentView were null!"
-                            }),
+                            },
+                        ),
                         requireNotNull(args.editCommentView?.comment?.id),
                         binding.commentEditor.editText?.text.toString(),
                     )
@@ -216,7 +209,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
         }
     }
 
-    private fun setup(currentAccount: Account) {
+    private fun setup(currentAccount: Account, savedInstanceState: Bundle?) {
         if (!isBindingAvailable()) {
             return
         }
@@ -234,7 +227,9 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
             binding.scrollView.visibility = View.GONE
             binding.divider.visibility = View.GONE
 
-            commentEditor.editText?.setText(commentToEdit.comment.content)
+            if (savedInstanceState == null) {
+                commentEditor.editText?.setText(commentToEdit.comment.content)
+            }
         } else if (commentView != null) {
             binding.replyingTo.text = commentView.comment.content
         } else if (postView != null) {
@@ -298,7 +293,7 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     mainActivity = requireMainActivity(),
                     viewGroup = binding.coordinatorLayout,
                     expandFully = true,
-                    handleBackPress = false
+                    handleBackPress = false,
                 )
             },
             onPreviewClick = {
@@ -306,21 +301,24 @@ class AddOrEditCommentFragment : BaseDialogFragment<FragmentAddOrEditCommentBind
                     .apply {
                         arguments = PreviewCommentDialogFragmentArgs(
                             args.instance,
-                            commentEditor.editText?.text.toString()
+                            commentEditor.editText?.text.toString(),
                         ).toBundle()
                     }
                     .showAllowingStateLoss(childFragmentManager, "AA")
-            }
+            },
         )
         viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
                     AlertDialogFragment.Builder()
-                        .setMessage(getString(
-                            R.string.error_unable_to_send_post,
-                            it.error::class.qualifiedName,
-                            it.error.message))
+                        .setMessage(
+                            getString(
+                                R.string.error_unable_to_send_post,
+                                it.error::class.qualifiedName,
+                                it.error.message,
+                            ),
+                        )
                         .createAndShow(childFragmentManager, "ASDS")
                 }
                 is StatefulData.Loading -> {

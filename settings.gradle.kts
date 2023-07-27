@@ -1,7 +1,7 @@
 include(":app")
 include(":overlappingPane")
 
-rootProject.name="summit"
+rootProject.name = "summit"
 
 pluginManagement {
     repositories {

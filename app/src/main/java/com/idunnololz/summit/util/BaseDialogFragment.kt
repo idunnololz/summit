@@ -3,12 +3,12 @@ package com.idunnololz.summit.util
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import androidx.fragment.app.DialogFragment
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
@@ -32,9 +32,11 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     }
 
     fun runOnUiThread(r: () -> Unit) {
-        runOnUiThread(Runnable {
-            r()
-        })
+        runOnUiThread(
+            Runnable {
+                r()
+            },
+        )
     }
 
     fun runOnUiThread(r: Runnable) {
@@ -45,9 +47,9 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
                 try {
                     r.run()
-                } catch (e: IllegalStateException) {/* do nothing */
+                } catch (e: IllegalStateException) { /* do nothing */
                 }
-            })
+            },)
         }
     }
 
@@ -59,12 +61,10 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         val window = checkNotNull(dialog.window)
 
         if (isFullscreen) {
-
         } else {
             window.setBackgroundDrawableResource(R.drawable.dialog_background)
         }
     }
-
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (this is BackPressHandler) {
@@ -92,7 +92,9 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
     @CallSuper
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         MyLog.d(logTag, "Lifecycle: onCreateView()")
 

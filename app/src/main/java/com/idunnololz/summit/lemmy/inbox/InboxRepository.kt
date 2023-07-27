@@ -8,8 +8,6 @@ import com.idunnololz.summit.lemmy.inbox.repository.InboxSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
@@ -60,8 +58,11 @@ class InboxRepository @Inject constructor(
             }
 
             val result = inboxSource.getItem(itemIndex, force)
-            Log.d(TAG, "Setting next item to ${(result.getOrNull() ?: Unit)}. " +
-                    "Index: $itemIndex. Force: $force")
+            Log.d(
+                TAG,
+                "Setting next item to ${(result.getOrNull() ?: Unit)}. " +
+                    "Index: $itemIndex. Force: $force",
+            )
 
             val nextItem = result.also {
                 nextItem = it
@@ -91,7 +92,7 @@ class InboxRepository @Inject constructor(
     }
 
     private class InboxMultiDataSource(
-        private val sources: List<InboxSourceState<*>>
+        private val sources: List<InboxSourceState<*>>,
     ) {
 
         val allItems = mutableListOf<InboxItem>()
@@ -101,9 +102,10 @@ class InboxRepository @Inject constructor(
             pageType: InboxViewModel.PageType,
             force: Boolean,
         ): Result<PageResult<InboxItem>> {
-
-            Log.d(TAG,
-                "Page type: $pageType. Index: $pageIndex. Sources: ${sources.size}. Force: $force")
+            Log.d(
+                TAG,
+                "Page type: $pageType. Index: $pageIndex. Sources: ${sources.size}. Force: $force",
+            )
 
             if (force) {
                 allItems.clear()
@@ -133,8 +135,10 @@ class InboxRepository @Inject constructor(
                     break
                 }
 
-                Log.d(TAG,
-                    "Adding item ${nextItem.id} from source ${nextItem::class.java}")
+                Log.d(
+                    TAG,
+                    "Adding item ${nextItem.id} from source ${nextItem::class.java}",
+                )
 
                 allItems.add(nextItem)
 
@@ -148,7 +152,7 @@ class InboxRepository @Inject constructor(
                     allItems
                         .slice(startIndex until min(endIndex, allItems.size)),
                     hasMore = hasMore,
-                )
+                ),
             )
         }
 
@@ -177,29 +181,29 @@ class InboxRepository @Inject constructor(
     }
 
     private val repliesSource = InboxMultiDataSource(
-        listOf(InboxSourceState(repliesStatelessSource))
+        listOf(InboxSourceState(repliesStatelessSource)),
     )
     private val mentionsSource =
         InboxMultiDataSource(
-            listOf(InboxSourceState(mentionsStatelessSource))
+            listOf(InboxSourceState(mentionsStatelessSource)),
         )
     private val messagesSource =
         InboxMultiDataSource(
-            listOf(InboxSourceState(messagesStatelessSource))
+            listOf(InboxSourceState(messagesStatelessSource)),
         )
     private val allSources = InboxMultiDataSource(
         listOf(
             InboxSourceState(repliesStatelessSource),
             InboxSourceState(mentionsStatelessSource),
-            InboxSourceState(messagesStatelessSource)
-        )
+            InboxSourceState(messagesStatelessSource),
+        ),
     )
     private val unreadSources = InboxMultiDataSource(
         listOf(
             InboxSourceState(makeRepliesSource(unreadOnly = true)),
             InboxSourceState(makeMentionsSource(unreadOnly = true)),
-            InboxSourceState(makeMessagesSource(unreadOnly = true))
-        )
+            InboxSourceState(makeMessagesSource(unreadOnly = true)),
+        ),
     )
 
     suspend fun getPage(
@@ -207,7 +211,6 @@ class InboxRepository @Inject constructor(
         pageType: InboxViewModel.PageType,
         force: Boolean,
     ): Result<PageResult<InboxItem>> {
-
         val source = when (pageType) {
             InboxViewModel.PageType.Unread -> unreadSources
             InboxViewModel.PageType.All -> allSources
@@ -248,60 +251,60 @@ class InboxRepository @Inject constructor(
 
     private fun makeRepliesSource(unreadOnly: Boolean) = InboxSource(
         apiClient,
-        CommentSortType.New
+        CommentSortType.New,
     ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
         fetchReplies(
             sort = sortOrder,
             page = page,
             limit = limit,
             unreadOnly = unreadOnly,
-            force = force
+            force = force,
         ).fold(
             onSuccess = {
                 Result.success(it.map { InboxItem.ReplyInboxItem(it) })
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
     private fun makeMentionsSource(unreadOnly: Boolean) = InboxSource(
         apiClient,
-        CommentSortType.New
+        CommentSortType.New,
     ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
         fetchMentions(
             sort = sortOrder,
             page = page,
             limit = limit,
             unreadOnly = unreadOnly,
-            force = force
+            force = force,
         ).fold(
             onSuccess = {
                 Result.success(it.map { InboxItem.MentionInboxItem(it) })
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
     private fun makeMessagesSource(unreadOnly: Boolean) = InboxSource(
         apiClient,
-        Unit
+        Unit,
     ) { page: Int, _: Unit, limit: Int, force: Boolean ->
         fetchPrivateMessages(
             page = page,
             limit = limit,
             unreadOnly = unreadOnly,
-            force = force
+            force = force,
         ).fold(
             onSuccess = {
                 Result.success(it.map { InboxItem.MessageInboxItem(it) })
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -342,7 +345,7 @@ class InboxRepository @Inject constructor(
                     invalidate(InboxViewModel.PageType.Unread)
                 }
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -352,4 +355,3 @@ class InboxRepository @Inject constructor(
         }
     }
 }
-

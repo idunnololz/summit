@@ -2,10 +2,9 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
@@ -31,7 +30,7 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
             else -> {
                 ModernThreadLinesDecoration(context, preferences.hideCommentActions)
             }
-        }
+        },
     )
 }
 
@@ -55,7 +54,10 @@ fun BaseFragment<*>.showMoreCommentOptions(
         AddOrEditCommentFragment().apply {
             arguments =
                 AddOrEditCommentFragmentArgs(
-                    currentAccount.instance, null, null, it
+                    currentAccount.instance,
+                    null,
+                    null,
+                    it,
                 ).toBundle()
         }.show(childFragmentManager, "asdf")
     }
@@ -73,10 +75,9 @@ fun BaseFragment<*>.showMoreCommentOptions(
             .setExtra(EXTRA_COMMENT_ID, it.comment.id.toString())
             .createAndShow(
                 childFragmentManager,
-                CONFIRM_DELETE_COMMENT_TAG
+                CONFIRM_DELETE_COMMENT_TAG,
             )
     }
-
 
     val bottomMenu = BottomMenu(requireContext()).apply {
         setTitle(R.string.more_actions)
@@ -91,6 +92,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
             addItemWithIcon(R.id.save, R.string.save, R.drawable.baseline_bookmark_add_24)
         }
         addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
+        addItemWithIcon(
+            R.id.share_fediverse_link,
+            getString(R.string.share_source_link),
+            R.drawable.ic_fediverse_24,
+        )
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -109,7 +115,13 @@ fun BaseFragment<*>.showMoreCommentOptions(
                 R.id.share -> {
                     Utils.shareLink(
                         context,
-                        LinkUtils.getLinkForComment(instance, commentView.comment.id)
+                        LinkUtils.getLinkForComment(instance, commentView.comment.id),
+                    )
+                }
+                R.id.share_fediverse_link -> {
+                    Utils.shareLink(
+                        context,
+                        commentView.comment.ap_id,
                     )
                 }
             }

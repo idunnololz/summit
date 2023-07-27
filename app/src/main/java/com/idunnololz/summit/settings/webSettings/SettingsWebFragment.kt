@@ -33,7 +33,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingValueUpdateCallback,
+class SettingsWebFragment :
+    BaseFragment<FragmentSettingWebBinding>(),
+    SettingValueUpdateCallback,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SettingsWebViewModel by viewModels()
@@ -65,7 +67,7 @@ class SettingsWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVa
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -151,21 +153,23 @@ class SettingsWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVa
 
         viewModel.fetchAccountInfo()
 
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_setting_web, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.save -> {
-                        save()
-                        true
-                    }
-                    else -> false
+        addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.menu_setting_web, menu)
                 }
-            }
-        })
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.save -> {
+                            save()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+        )
     }
 
     private fun save() {
@@ -219,7 +223,7 @@ class SettingsWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVa
                                         }
                                     }
                                     .cameraOnly()
-                                    .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
+                                    .maxResultSize(1024, 1024, true)	// Final image resolution will be less than 1080 x 1080(Optional)
                                     .createIntent()
                                 launcher.launch(intent)
                             }
@@ -234,7 +238,7 @@ class SettingsWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVa
                                         }
                                     }
                                     .galleryOnly()
-                                    .maxResultSize(1024, 1024, true)	//Final image resolution will be less than 1080 x 1080(Optional)
+                                    .maxResultSize(1024, 1024, true)	// Final image resolution will be less than 1080 x 1080(Optional)
                                     .createIntent()
                                 launcher.launch(intent)
                             }
@@ -246,8 +250,7 @@ class SettingsWebFragment : BaseFragment<FragmentSettingWebBinding>(), SettingVa
                 }
 
                 getMainActivity()?.showBottomMenu(bottomMenu)
-
-            }
+            },
         ).apply {
             this.stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             this.defaultSettingValues = data.defaultValues

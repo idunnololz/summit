@@ -19,8 +19,8 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
 import com.idunnololz.summit.databinding.HistoryEntryItemBinding
 import com.idunnololz.summit.databinding.HistoryHeaderItemBinding
-import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -31,7 +31,8 @@ import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
+class HistoryFragment :
+    BaseFragment<FragmentHistoryBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -54,7 +55,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -86,7 +87,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
                 } else {
                     requireMainActivity().launchPage(pageRef)
                 }
-            }
+            },
         )
 
         requireMainActivity().apply {
@@ -151,41 +152,44 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
             viewModel.loadHistory(force = true)
         }
 
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_fragment_history, menu)
+        addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.menu_fragment_history, menu)
 
-                val searchView: SearchView = menu.findItem(R.id.search).actionView as SearchView
-                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        return true
-                    }
+                    val searchView: SearchView = menu.findItem(R.id.search).actionView as SearchView
+                    searchView.setOnQueryTextListener(
+                        object : SearchView.OnQueryTextListener {
+                            override fun onQueryTextSubmit(query: String?): Boolean {
+                                return true
+                            }
 
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        if (newText != null) {
-                            adapter.setQuery(newText)
-                            viewModel.query(newText)
-                        }
+                            override fun onQueryTextChange(newText: String?): Boolean {
+                                if (newText != null) {
+                                    adapter.setQuery(newText)
+                                    viewModel.query(newText)
+                                }
 
-                        return true
-                    }
-                })
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                when (menuItem.itemId) {
-                    R.id.search -> {
-                        true
-                    }
-                    R.id.clear_history -> {
-                        viewModel.clearHistory()
-                        true
-                    }
-                    else ->
-                        false
+                                return true
+                            }
+                        },
+                    )
                 }
 
-        })
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                    when (menuItem.itemId) {
+                        R.id.search -> {
+                            true
+                        }
+                        R.id.clear_history -> {
+                            viewModel.clearHistory()
+                            true
+                        }
+                        else ->
+                            false
+                    }
+            },
+        )
     }
 
     override fun onDestroyView() {
@@ -204,12 +208,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
             data class HistoryItem(
                 val sharableUrl: String,
                 val data: LiteHistoryEntry,
-                override val headerId: Int
+                override val headerId: Int,
             ) : Item
 
             data class HeaderItem(
                 override val headerId: Int,
-                val date: Date
+                val date: Date,
             ) : Item
         }
 
@@ -240,7 +244,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
                         old.date == (new as Item.HeaderItem).date
                     }
                 }
-            }
+            },
         ).apply {
             addItemType(Item.HeaderItem::class, HistoryHeaderItemBinding::inflate) { item, b, _ ->
                 b.title.text = dateFormatter.format(item.date)
@@ -256,7 +260,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
                 h.itemView.setOnClickListener {
                     onEntryClick(item.data)
                 }
-
             }
         }
 
@@ -312,11 +315,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
                         sharableUrl = LemmyUtils.convertRedditUrl(
                             it.url,
                             desiredFormat = "",
-                            sharable = true
+                            sharable = true,
                         ),
                         data = it,
-                        headerId = headerId
-                    )
+                        headerId = headerId,
+                    ),
                 )
             }
 
@@ -337,7 +340,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
-
     }
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {

@@ -17,11 +17,11 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
-import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.lemmy.CommentsSortOrder
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,6 +61,7 @@ class PostViewModel @Inject constructor(
     private var newlyPostedCommentId: CommentId? = null
 
     private val additionalLoadedCommentIds = mutableSetOf<CommentId>()
+
     /**
      * Comments that didn't load by default but were loaded by the user requesting additional comments
      */
@@ -69,7 +70,7 @@ class PostViewModel @Inject constructor(
     private val commentsFetcher = CommentsFetcher(lemmyApiClient, accountActionsManager)
 
     val commentsSortOrderLiveData = MutableLiveData(
-        preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top
+        preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top,
     )
 
     val postData = StatefulLiveData<PostData>()
@@ -89,7 +90,6 @@ class PostViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
     val apiInstance: String
@@ -99,7 +99,7 @@ class PostViewModel @Inject constructor(
         postOrCommentRef: Either<PostRef, CommentRef>,
         fetchPostData: Boolean = true,
         fetchCommentData: Boolean = true,
-        force: Boolean = false
+        force: Boolean = false,
     ) {
         lemmyApiClient.changeInstance(
             postOrCommentRef
@@ -109,8 +109,9 @@ class PostViewModel @Inject constructor(
                     },
                     {
                         it.instance
-                    }
-                ))
+                    },
+                ),
+        )
 
         this.postOrCommentRef = postOrCommentRef
         postData.setIsLoading()
@@ -126,7 +127,7 @@ class PostViewModel @Inject constructor(
                         },
                         {
                             lemmyApiClient.fetchPostWithRetry(Either.Right(it.id), force)
-                        }
+                        },
                     )
             } else {
                 Result.success(this@PostViewModel.postView)
@@ -142,7 +143,7 @@ class PostViewModel @Inject constructor(
                         },
                         {
                             commentsFetcher.fetchCommentsWithRetry(Either.Right(it.id), sortOrder, force)
-                        }
+                        },
                     )
             } else {
                 Result.success(this@PostViewModel.comments)
@@ -192,7 +193,7 @@ class PostViewModel @Inject constructor(
             updatePendingCommentsInternal(
                 postOrCommentRef = postOrCommentRef,
                 sortOrder = sortOrder,
-                resolveCompletedPendingComments = resolveCompletedPendingComments
+                resolveCompletedPendingComments = resolveCompletedPendingComments,
             )
 
             updateData()
@@ -213,7 +214,9 @@ class PostViewModel @Inject constructor(
             pendingComments?.forEach { pendingComment ->
                 if (pendingComment.complete) {
                     val result = commentsFetcher.fetchCommentsWithRetry(
-                        Either.Left(pendingComment.postRef.id), sortOrder, force = true
+                        Either.Left(pendingComment.postRef.id),
+                        sortOrder,
+                        force = true,
                     )
 
                     this@PostViewModel.comments = result.getOrNull()
@@ -279,7 +282,7 @@ class PostViewModel @Inject constructor(
                 newlyPostedCommentId = newlyPostedCommentId,
                 selectedCommentId = postOrCommentRef?.getOrNull()?.id,
                 isSingleComment = postOrCommentRef?.getOrNull() != null,
-            )
+            ),
         )
     }
 
@@ -310,7 +313,7 @@ class PostViewModel @Inject constructor(
     private suspend fun fetchMoreCommentsInternal(
         parentId: CommentId,
         sortOrder: CommentSortType,
-        force: Boolean = false
+        force: Boolean = false,
     ): Result<List<CommentView>> {
         val result = commentsFetcher.fetchCommentsWithRetry(
             Either.Right(parentId),
@@ -349,7 +352,7 @@ class PostViewModel @Inject constructor(
 
     sealed interface ListView {
         data class PostListView(
-            val post: PostView
+            val post: PostView,
         ) : ListView
 
         data class CommentListView(
@@ -370,7 +373,6 @@ class PostViewModel @Inject constructor(
             val moreCount: Int,
         ) : ListView
     }
-
 
     fun setCommentsSortOrder(sortOrder: CommentsSortOrder) {
         commentsSortOrderLiveData.value = sortOrder

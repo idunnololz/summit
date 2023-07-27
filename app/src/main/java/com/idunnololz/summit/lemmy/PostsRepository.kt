@@ -91,13 +91,12 @@ class PostsRepository @Inject constructor(
                 if (fullAccount != null) {
                     sortOrder =
                         preferences.defaultCommunitySortOrder
-                            ?:
-                            fullAccount
+                            ?: fullAccount
                                 .accountInfo
                                 .miscAccountInfo
                                 ?.defaultCommunitySortType
                                 ?.toSortOrder()
-                                ?: return@collect
+                            ?: return@collect
                 }
             }
         }
@@ -106,21 +105,21 @@ class PostsRepository @Inject constructor(
     suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> =
         updateStateMaintainingPosition({
             hideRead = true
-        }, anchors, maxPage)
+        }, anchors, maxPage,)
 
     suspend fun updateShowNsfwReadPosts(
         showNsfw: Boolean,
         anchors: Set<PostId>,
-        maxPage: Int
+        maxPage: Int,
     ): Result<PageResult> =
         updateStateMaintainingPosition({
             this.showNsfwPosts = showNsfw
-        }, anchors, maxPage)
+        }, anchors, maxPage,)
 
     suspend fun updateStateMaintainingPosition(
         performChanges: PostsRepository.() -> Unit,
         anchors: Set<PostId>,
-        maxPage: Int
+        maxPage: Int,
     ): Result<PageResult> {
         reset()
 
@@ -229,7 +228,6 @@ class PostsRepository @Inject constructor(
                 currentPageInternal++
             }
 
-
             if (!hasMore) {
                 endReached = true
                 break
@@ -245,8 +243,8 @@ class PostsRepository @Inject constructor(
                     },
                 pageIndex = pageIndex,
                 instance = apiClient.instance,
-                hasMore = hasMore
-            )
+                hasMore = hasMore,
+            ),
         )
     }
 
@@ -287,7 +285,8 @@ class PostsRepository @Inject constructor(
             }
 
             is CommunityRef.CommunityRefByName,
-            null -> {
+            null,
+            -> {
                 apiClient.defaultInstance()
             }
         }
@@ -303,12 +302,11 @@ class PostsRepository @Inject constructor(
         withContext(Dispatchers.Main) {
             val urlIterator = apiClient.apiClient.okHttpClient.cache?.urls() ?: return@withContext
             while (urlIterator.hasNext()) {
-
                 if (urlIterator.next().startsWith(
                         "https://${apiClient.instance}/api/v3/post/list",
-                        ignoreCase = true
-                    )) {
-
+                        ignoreCase = true,
+                    )
+                ) {
                     urlIterator.remove()
                 }
             }
@@ -363,7 +361,8 @@ class PostsRepository @Inject constructor(
                 if (newPosts.isNotEmpty()) {
                     if (newPosts.first().community.nsfw &&
                         communityRef is CommunityRef.CommunityRefByName &&
-                        !showNsfwPosts) {
+                        !showNsfwPosts
+                    ) {
                         return@fold Result.failure(LoadNsfwCommunityWhenNsfwDisabled())
                     }
                 }
@@ -381,7 +380,7 @@ class PostsRepository @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -389,7 +388,7 @@ class PostsRepository @Inject constructor(
         newPosts: List<PostView>,
         pageIndex: Int,
         hiddenPosts: Set<PostId>,
-        force: Boolean
+        force: Boolean,
     ) {
         for (post in newPosts) {
             val uniquePostKey = post.getUniqueKey()
@@ -448,7 +447,7 @@ class PostsRepository @Inject constructor(
 
         currentPageInternal = minPageInternal
 
-        Log.d(TAG, "Deleted pages ${minPageInternal} and beyond. Posts left: ${allPosts.size}")
+        Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allPosts.size}")
     }
 
     fun update(posts: List<PostView>): List<PostView> {
@@ -473,7 +472,6 @@ class PostsRepository @Inject constructor(
     )
 }
 
-class LoadNsfwCommunityWhenNsfwDisabled(): RuntimeException()
-class FilterTooAggressiveException(): RuntimeException()
-class ContentTypeFilterTooAggressiveException(): RuntimeException()
-
+class LoadNsfwCommunityWhenNsfwDisabled() : RuntimeException()
+class FilterTooAggressiveException() : RuntimeException()
+class ContentTypeFilterTooAggressiveException() : RuntimeException()

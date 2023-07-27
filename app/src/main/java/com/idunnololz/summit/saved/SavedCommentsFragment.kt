@@ -12,15 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
-import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSavedCommentsBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.person.PersonCommentsFragment
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
@@ -33,8 +32,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener, SignInNavigator {
+class SavedCommentsFragment :
+    BaseFragment<FragmentSavedCommentsBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener,
+    SignInNavigator {
 
     companion object {
         private const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
@@ -70,7 +71,8 @@ class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
                         getString(
                             R.string.error_account_instance_mismatch,
                             accountInstance,
-                            apiInstance)
+                            apiInstance,
+                        ),
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
@@ -84,11 +86,19 @@ class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
                 AddOrEditCommentFragment().apply {
                     arguments = postOrComment.fold({
                         AddOrEditCommentFragmentArgs(
-                            parentFragment.viewModel.instance, null, it, null)
+                            parentFragment.viewModel.instance,
+                            null,
+                            it,
+                            null,
+                        )
                     }, {
                         AddOrEditCommentFragmentArgs(
-                            parentFragment.viewModel.instance, it, null, null)
-                    }).toBundle()
+                            parentFragment.viewModel.instance,
+                            it,
+                            null,
+                            null,
+                        )
+                    },).toBundle()
                 }.show(childFragmentManager, "asdf")
             },
             onImageClick = { view, url ->
@@ -114,7 +124,7 @@ class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -173,14 +183,16 @@ class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
         with(binding) {
             recyclerView.layoutManager = layoutManager
 
-            binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    Log.d("HAHA", "asdsafsdfasdfsadf")
-                    super.onScrolled(recyclerView, dx, dy)
+            binding.recyclerView.addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        Log.d("HAHA", "asdsafsdfasdfsadf")
+                        super.onScrolled(recyclerView, dx, dy)
 
-                    checkIfFetchNeeded()
-                }
-            })
+                        checkIfFetchNeeded()
+                    }
+                },
+            )
 
             swipeRefreshLayout.setOnRefreshListener {
                 parentFragment.viewModel.fetchCommentPage(0, true)
@@ -205,17 +217,17 @@ class SavedCommentsFragment : BaseFragment<FragmentSavedCommentsBinding>(),
             recyclerView.addItemDecoration(
                 CustomDividerItemDecoration(
                     recyclerView.context,
-                    DividerItemDecoration.VERTICAL
+                    DividerItemDecoration.VERTICAL,
                 ).apply {
                     setDrawable(
                         checkNotNull(
                             ContextCompat.getDrawable(
                                 context,
-                                R.drawable.vertical_divider
-                            )
-                        )
+                                R.drawable.vertical_divider,
+                            ),
+                        ),
                     )
-                }
+                },
             )
         }
     }

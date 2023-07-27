@@ -12,7 +12,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class CommunityViewState(
     val communityState: CommunityState,
-    val pageScrollStates: List<CommunityViewModel.PageScrollState>
+    val pageScrollStates: List<CommunityViewModel.PageScrollState>,
 ) {
     companion object {
 
@@ -64,12 +64,12 @@ data class CommunityState(
 @JsonClass(generateAdapter = true)
 data class PageInfo(
     val pageIndex: Int,
-    var flags: Int
+    var flags: Int,
 )
 
 fun CommunityViewState.getShortDesc(context: Context): String =
     context.getString(
         R.string.subreddit_state_format,
         communityState.communityRef.getName(context),
-        (communityState.currentPageIndex + 1).toString()
+        (communityState.currentPageIndex + 1).toString(),
     )

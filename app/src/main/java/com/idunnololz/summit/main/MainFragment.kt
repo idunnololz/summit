@@ -34,11 +34,11 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
+import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneViewModel
-import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef
@@ -81,7 +81,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             } catch (e: Exception) { null }
     }
 
-
     private val args: MainFragmentArgs by navArgs()
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
@@ -93,8 +92,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
     @Inject
     lateinit var tabsManager: TabsManager
+
     @Inject
     lateinit var preferences: Preferences
 
@@ -135,7 +136,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
             if (currentNavController?.navigateUp() == false) {
                 if (!findNavController().navigateUp()) {
-
                     if (doubleBackToExitPressedOnce) {
                         getMainActivity()?.finish()
                         return
@@ -145,7 +145,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     Toast.makeText(
                         context,
                         context.getString(R.string.press_back_again_to_exit),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
 
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -164,10 +164,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
                 val currentFragment = getCurrentFragment()
 
-                Log.d(TAG, "currentFragment: ${currentFragment}")
+                Log.d(TAG, "currentFragment: $currentFragment")
 
                 if (!tab.isHomeTab &&
-                    currentFragment is CommunityFragment && currentFragment.isPristineFirstPage()) {
+                    currentFragment is CommunityFragment && currentFragment.isPristineFirstPage()
+                ) {
 
                     changeCommunity(tabsManager.getHomeTab())
                 } else {
@@ -182,15 +183,16 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         savedInstanceState?.getStringArrayList(SIS_FRAGMENT_TAGS)?.forEach {
             fragmentTags.add(it)
         }
-        requireActivity().onBackPressedDispatcher.addCallback(this,
-            onBackPressedCallback
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            onBackPressedCallback,
         )
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         postponeEnterTransition()
 
@@ -207,33 +209,36 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         ) { tabRef, resetTab: Boolean ->
             binding.rootView.closePanels()
 
-            binding.rootView.postDelayed(a@{
-                if (!isBindingAvailable()) return@a
+            binding.rootView.postDelayed(
+                a@{
+                    if (!isBindingAvailable()) return@a
 
-                val tab = tabsManager.getTab(tabRef)
+                    val tab = tabsManager.getTab(tabRef)
 
-                val selectedTabFragment = childFragmentManager.findFragmentByTag(getTagForTab(tab))
-                if (selectedTabFragment?.findNavController() == currentNavController) {
-                    if (resetTab) {
-                        resetCurrentTab(tab)
+                    val selectedTabFragment = childFragmentManager.findFragmentByTag(getTagForTab(tab))
+                    if (selectedTabFragment?.findNavController() == currentNavController) {
+                        if (resetTab) {
+                            resetCurrentTab(tab)
+                        }
+
+                        // otherwise do nothing because we are already on the right tab
+                    } else {
+                        if (resetTab) {
+                            removeNavHostFragment(childFragmentManager, getTagForTab(tab))
+                        }
+
+                        binding.rootView.post {
+                            changeCommunity(tab)
+                        }
                     }
-
-                    // otherwise do nothing because we are already on the right tab
-                } else {
-                    if (resetTab) {
-                        removeNavHostFragment(childFragmentManager, getTagForTab(tab))
-                    }
-
-                    binding.rootView.post {
-                        changeCommunity(tab)
-                    }
-                }
-            }, 300)
+                },
+                300,
+            )
         }
 
         val currentTab = requireNotNull(tabsManager.currentTab.value)
         firstFragmentTag = getTagForTab(
-            (tabsManager.getHomeTab() as TabsManager.Tab.UserCommunityTab).userCommunityItem.id
+            (tabsManager.getHomeTab() as TabsManager.Tab.UserCommunityTab).userCommunityItem.id,
         )
         Log.d(TAG, "First fragment tag is $firstFragmentTag")
 
@@ -244,7 +249,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 childFragmentManager.findFragmentByTag(getTagForTab(tab.id))?.let {
                     detachNavHostFragment(
                         childFragmentManager,
-                        it as NavHostFragment
+                        it as NavHostFragment,
                     )
                 }
             }
@@ -278,44 +283,47 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         }
 
         binding.rootView
-            .registerStartPanelStateListeners(object : OverlappingPanelsLayout.PanelStateListener {
-                override fun onPanelStateChange(panelState: PanelState) {
-                    Log.d(TAG, "panelState: ${panelState}")
-                    when (panelState) {
-                        PanelState.Closed -> {
-                            getMainActivity()?.setNavUiOpenness(0f)
+            .registerStartPanelStateListeners(
+                object : OverlappingPanelsLayout.PanelStateListener {
+                    override fun onPanelStateChange(panelState: PanelState) {
+                        Log.d(TAG, "panelState: $panelState")
+                        when (panelState) {
+                            PanelState.Closed -> {
+                                getMainActivity()?.setNavUiOpenness(0f)
 
-                            updatePaneBackPressHandler()
-                        }
-                        is PanelState.Closing -> {
-                            getMainActivity()?.setNavUiOpenness(panelState.progress)
-                        }
-                        PanelState.Opened -> {
-                            getMainActivity()?.setNavUiOpenness(100f)
-                            communitiesPaneController.onShown()
+                                updatePaneBackPressHandler()
+                            }
+                            is PanelState.Closing -> {
+                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                            }
+                            PanelState.Opened -> {
+                                getMainActivity()?.setNavUiOpenness(100f)
+                                communitiesPaneController.onShown()
 
-                            updatePaneBackPressHandler()
-                        }
-                        is PanelState.Opening -> {
-                            getMainActivity()?.setNavUiOpenness(panelState.progress)
+                                updatePaneBackPressHandler()
+                            }
+                            is PanelState.Opening -> {
+                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                            }
                         }
                     }
-                }
-            })
+                },
+            )
         binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
 
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {}
+        addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {}
 
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                val currentNavController = currentNavController
-                if (menuItem.itemId == android.R.id.home && currentNavController != null) {
-                    return currentNavController.navigateUp()
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    val currentNavController = currentNavController
+                    if (menuItem.itemId == android.R.id.home && currentNavController != null) {
+                        return currentNavController.navigateUp()
+                    }
+                    return false
                 }
-                return false
-            }
-
-        })
+            },
+        )
 
         requireMainActivity().apply {
             this.insetViewAutomaticallyByMargins(this, binding.startPanel.swipeRefreshLayout)
@@ -324,7 +332,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         lifecycleScope.launch {
             withContext(Dispatchers.Default) {
                 userCommunitiesManager.defaultCommunity.collect {
-
                 }
             }
         }
@@ -340,7 +347,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     CommunityFragmentArgs(
                         tab = tabsManager.currentTab.value,
                         page,
-                    ).toBundle()
+                    ).toBundle(),
                 )
             }
             is PostRef -> {
@@ -350,8 +357,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         page.instance,
                         page.id,
                         null,
-                        isSinglePage = true
-                    ).toBundle()
+                        isSinglePage = true,
+                    ).toBundle(),
                 )
             }
             is CommentRef -> {
@@ -362,16 +369,16 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         id = 0,
                         commentId = page.id,
                         currentCommunity = null,
-                        isSinglePage = true
-                    ).toBundle()
+                        isSinglePage = true,
+                    ).toBundle(),
                 )
             }
             is PersonRef -> {
                 currentNavController?.navigate(
                     R.id.personTabbedFragment,
                     PersonTabbedFragmentArgs(
-                        page
-                    ).toBundle()
+                        page,
+                    ).toBundle(),
                 )
             }
         }
@@ -389,12 +396,12 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     private var lastNavHostFragment: NavHostFragment? = null
     private fun changeCommunity(tab: TabsManager.Tab) {
         lastNavHostFragment?.navController?.removeOnDestinationChangedListener(
-            onDestinationChangedListener
+            onDestinationChangedListener,
         )
 
         val selectedNavHostFragment = updateAttachedFragment(tab)
         selectedNavHostFragment.navController.addOnDestinationChangedListener(
-            onDestinationChangedListener
+            onDestinationChangedListener,
         )
         attachNavHostFragment(childFragmentManager, selectedNavHostFragment, true)
         lastNavHostFragment = selectedNavHostFragment
@@ -413,20 +420,21 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         outState.putStringArrayList(
             SIS_FRAGMENT_TAGS,
-            arrayListOf<String>().apply { addAll(fragmentTags) })
+            arrayListOf<String>().apply { addAll(fragmentTags) },
+        )
     }
 
     override fun onResume() {
         super.onResume()
 
         requireMainActivity().registerOnNavigationItemReselectedListener(
-            onNavigationItemReselectedListener
+            onNavigationItemReselectedListener,
         )
     }
 
     override fun onPause() {
         requireMainActivity().unregisterOnNavigationItemReselectedListener(
-            onNavigationItemReselectedListener
+            onNavigationItemReselectedListener,
         )
 
         super.onPause()
@@ -454,8 +462,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             R.id.innerNavHostContainer,
             CommunityFragmentArgs(
                 tab = currentTab,
-                communityRef = communityRef
-            ).toBundle()
+                communityRef = communityRef,
+            ).toBundle(),
         )
 
         setCurrentNavController(selectedFragment.navController)
@@ -469,7 +477,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     androidx.navigation.ui.R.anim.nav_default_enter_anim,
                     androidx.navigation.ui.R.anim.nav_default_exit_anim,
                     androidx.navigation.ui.R.anim.nav_default_pop_enter_anim,
-                    androidx.navigation.ui.R.anim.nav_default_pop_exit_anim
+                    androidx.navigation.ui.R.anim.nav_default_pop_exit_anim,
                 )
                 .attach(selectedFragment)
                 .setPrimaryNavigationFragment(selectedFragment)
@@ -552,7 +560,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         fragmentTag: String,
         navGraphId: Int,
         containerId: Int,
-        startDestinationArgs: Bundle? = null
+        startDestinationArgs: Bundle? = null,
     ): NavHostFragment {
         fragmentTags.add(fragmentTag)
 
@@ -561,7 +569,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             fragmentTag,
             navGraphId,
             containerId,
-            startDestinationArgs
+            startDestinationArgs,
         )
     }
 
@@ -629,7 +637,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             CommunityFragmentArgs(
                 communityRef = tab.communityRef,
                 tab = tab,
-            ).toBundle()
+            ).toBundle(),
         )
     }
 }

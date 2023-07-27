@@ -18,9 +18,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.account_ui.PreAuthDialogFragment
-import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
+import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
@@ -66,7 +66,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNavigator,
+class CommunityFragment :
+    BaseFragment<FragmentCommunityBinding>(),
+    SignInNavigator,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -126,7 +128,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             setTitle(R.string.sort_by)
 
             setOnMenuItemClickListener { menuItem ->
-                when(menuItem.id) {
+                when (menuItem.id) {
                     R.id.sort_order_top ->
                         getMainActivity()?.showBottomMenu(getSortByTopMenu())
                     else ->
@@ -163,23 +165,29 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
     private val _layoutSelectorMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
-            addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_list_24)
+            addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_view_list_24)
+            addItemWithIcon(R.id.layout_large_list, R.string.large_list, R.drawable.baseline_view_list_24)
             addItemWithIcon(R.id.layout_compact, R.string.compact, R.drawable.baseline_list_24)
             addItemWithIcon(R.id.layout_card, R.string.card, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_card2, R.string.card2, R.drawable.baseline_article_24)
+            addItemWithIcon(R.id.layout_card3, R.string.card3, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
             setTitle(R.string.layout)
 
             setOnMenuItemClickListener { menuItem ->
-                when(menuItem.id) {
+                when (menuItem.id) {
                     R.id.layout_compact ->
                         preferences.setPostsLayout(CommunityLayout.Compact)
                     R.id.layout_list ->
                         preferences.setPostsLayout(CommunityLayout.List)
+                    R.id.layout_large_list ->
+                        preferences.setPostsLayout(CommunityLayout.LargeList)
                     R.id.layout_card ->
                         preferences.setPostsLayout(CommunityLayout.Card)
                     R.id.layout_card2 ->
                         preferences.setPostsLayout(CommunityLayout.Card2)
+                    R.id.layout_card3 ->
+                        preferences.setPostsLayout(CommunityLayout.Card3)
                     R.id.layout_full ->
                         preferences.setPostsLayout(CommunityLayout.Full)
                 }
@@ -222,9 +230,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     AlertDialogFragment.Builder()
                         .setTitle(R.string.error_account_instance_mismatch_title)
                         .setMessage(
-                            getString(R.string.error_account_instance_mismatch,
+                            getString(
+                                R.string.error_account_instance_mismatch,
                                 accountInstance,
-                                apiInstance)
+                                apiInstance,
+                            ),
                         )
                         .setNegativeButton(R.string.go_to_account_instance)
                         .createAndShow(childFragmentManager, "onInstanceMismatch")
@@ -235,8 +245,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         appBar = binding.customAppBar.root,
                         title = postView.post.name,
                         url = url,
-                        mimeType = null
+                        mimeType = null,
                     )
+                    viewModel.onPostRead(postView)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
@@ -251,11 +262,11 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         post,
                         jumpToComments,
                         reveal,
-                        videoState ->
+                        videoState, ->
 
                     viewPagerController?.openPost(
                         instance = instance,
-                        id =  id,
+                        id = id,
                         reveal = reveal,
                         post = post,
                         jumpToComments = jumpToComments,
@@ -294,16 +305,17 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
         requireActivity().supportFragmentManager.setFragmentResultListener(
             CreateOrEditPostFragment.REQUEST_KEY,
-            this
+            this,
         ) { _, bundle ->
             val result = bundle.getParcelableCompat<PostView>(
-                CreateOrEditPostFragment.REQUEST_KEY_RESULT)
+                CreateOrEditPostFragment.REQUEST_KEY_RESULT,
+            )
 
             if (result != null) {
                 viewModel.fetchCurrentPage(force = true)
                 viewPagerController?.openPost(
                     instance = result.instance,
-                    id =  result.post.id,
+                    id = result.post.id,
                     reveal = false,
                     post = result,
                     jumpToComments = false,
@@ -317,7 +329,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         postponeEnterTransition()
 
@@ -378,7 +390,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 },
                 onSortOrderClick = {
                     getMainActivity()?.showBottomMenu(getSortByMenu())
-                }
+                },
             )
         }
 
@@ -447,15 +459,20 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
         requireMainActivity().apply {
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner, binding.fabSnackbarCoordinatorLayout)
+                viewLifecycleOwner,
+                binding.fabSnackbarCoordinatorLayout,
+            )
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner, binding.recyclerView, binding.customAppBar.customActionBar.height)
+                viewLifecycleOwner,
+                binding.recyclerView,
+                binding.customAppBar.customActionBar.height,
+            )
         }
 
         val context = requireContext()
 
         (parentFragment?.parentFragment as? MainFragment)?.updateCommunityInfoPane(
-            requireNotNull(viewModel.currentCommunityRef.value)
+            requireNotNull(viewModel.currentCommunityRef.value),
         )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -474,18 +491,19 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         binding.recyclerView.layoutManager = layoutManager
 
         if (preferences.markPostsAsReadOnScroll) {
-            binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
+            binding.recyclerView.addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
 
-                    val range = layoutManager.findFirstCompletelyVisibleItemPosition()..
-                            layoutManager.findLastCompletelyVisibleItemPosition()
+                        val range = layoutManager.findFirstCompletelyVisibleItemPosition()..layoutManager.findLastCompletelyVisibleItemPosition()
 
-                    range.forEach {
-                        adapter?.seenItemPositions?.add(it)
+                        range.forEach {
+                            adapter?.seenItemPositions?.add(it)
+                        }
                     }
-                }
-            })
+                },
+            )
         }
 
         updateDecoratorAndGestureHandler(binding.recyclerView)
@@ -500,35 +518,37 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 }
         }
 
-        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+        binding.recyclerView.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-                val adapter = adapter ?: return
-                val firstPos = layoutManager.findFirstVisibleItemPosition()
-                val lastPos = layoutManager.findLastVisibleItemPosition()
-                (adapter.items.getOrNull(firstPos) as? Item.PostItem)
-                    ?.pageIndex
-                    ?.let { pageIndex ->
-                        if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
-                            // firstPos != 0 - ensures that the page is scrollable even
-                            viewModel.setPagePositionAtBottom(pageIndex)
-                        } else {
-                            val firstView = layoutManager.findViewByPosition(firstPos)
-                            viewModel.setPagePosition(pageIndex, firstPos, firstView?.top ?: 0)
+                    val adapter = adapter ?: return
+                    val firstPos = layoutManager.findFirstVisibleItemPosition()
+                    val lastPos = layoutManager.findLastVisibleItemPosition()
+                    (adapter.items.getOrNull(firstPos) as? Item.PostItem)
+                        ?.pageIndex
+                        ?.let { pageIndex ->
+                            if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
+                                // firstPos != 0 - ensures that the page is scrollable even
+                                viewModel.setPagePositionAtBottom(pageIndex)
+                            } else {
+                                val firstView = layoutManager.findViewByPosition(firstPos)
+                                viewModel.setPagePosition(pageIndex, firstPos, firstView?.top ?: 0)
+                            }
                         }
+
+                    if (viewModel.infinity) {
+                        fetchPageIfLoadItem(firstPos)
+                        fetchPageIfLoadItem(firstPos - 1)
+                        fetchPageIfLoadItem(lastPos)
+                        fetchPageIfLoadItem(lastPos + 1)
                     }
 
-                if (viewModel.infinity) {
-                    fetchPageIfLoadItem(firstPos)
-                    fetchPageIfLoadItem(firstPos - 1)
-                    fetchPageIfLoadItem(lastPos)
-                    fetchPageIfLoadItem(lastPos + 1)
+                    viewModel.postListEngine.updateViewingPosition(firstPos, lastPos)
                 }
-
-                viewModel.postListEngine.updateViewingPosition(firstPos, lastPos)
-            }
-        })
+            },
+        )
 
         binding.rootView.post {
             if (!isBindingAvailable()) return@post
@@ -577,7 +597,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                             val biggestPageIndex = viewModel.postListEngine.biggestPageIndex
                             if (biggestPageIndex != null && !viewModel.infinity) {
                                 val pagePosition = viewModel.getPagePosition(
-                                    biggestPageIndex
+                                    biggestPageIndex,
                                 )
                                 if (pagePosition.isAtBottom) {
                                     (binding.recyclerView.layoutManager as LinearLayoutManager)
@@ -586,7 +606,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                                     (binding.recyclerView.layoutManager as LinearLayoutManager)
                                         .scrollToPositionWithOffset(
                                             pagePosition.itemIndex,
-                                            pagePosition.offset
+                                            pagePosition.offset,
                                         )
                                 } else {
                                     binding.recyclerView.scrollToPosition(0)
@@ -656,7 +676,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         }
 
                         PostGestureAction.Reply -> {
-
                             viewPagerController?.openPost(
                                 instance = viewModel.apiInstance,
                                 id = postView.post.id,
@@ -669,7 +688,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
                             AddOrEditCommentFragment().apply {
                                 arguments = AddOrEditCommentFragmentArgs(
-                                    viewModel.apiInstance, null, postView, null,
+                                    viewModel.apiInstance,
+                                    null,
+                                    postView,
+                                    null,
                                 ).toBundle()
                             }.show(childFragmentManager, "asdf")
                         }
@@ -682,7 +704,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                             viewModel.onPostRead(postView, delayMs = 250)
                         }
                     }
-                }
+                },
+                preferences.postGestureSize,
             )
             itemTouchHelper = ItemTouchHelper(requireNotNull(swipeActionCallback))
         }
@@ -719,9 +742,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             } else {
                 viewModel.currentPageIndex.observe(viewLifecycleOwner) { currentPageIndex ->
                     Log.d(TAG, "Current page: $currentPageIndex")
-                        customAppBarController.setPageIndex(currentPageIndex) { pageIndex ->
-                            viewModel.fetchPage(pageIndex)
-                        }
+                    customAppBarController.setPageIndex(currentPageIndex) { pageIndex ->
+                        viewModel.fetchPage(pageIndex)
+                    }
 
                     onBackPressedHandler.isEnabled = currentPageIndex != 0
                 }
@@ -736,6 +759,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             onSelectedLayoutChanged()
 
             viewModel.recheckPreferences()
+        }
+
+        runAfterLayout {
+            adapter?.contentMaxWidth = binding.recyclerView.width
         }
     }
 
@@ -769,7 +796,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 tabId = 0,
                 saveReason = HistorySaveReason.LEAVE_SCREEN,
                 state = viewState,
-                shortDesc = viewState.getShortDesc(context)
+                shortDesc = viewState.getShortDesc(context),
             )
         }
     }
@@ -784,8 +811,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
 
     private fun restoreState(state: CommunityViewState?, reload: Boolean) {
         viewModel.restoreFromState(state ?: return)
-        if (reload)
+        if (reload) {
             viewModel.fetchCurrentPage()
+        }
     }
 
     private fun getSortByMenu(): BottomMenu {
@@ -840,10 +868,14 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                 _layoutSelectorMenu.setChecked(R.id.layout_compact)
             CommunityLayout.List ->
                 _layoutSelectorMenu.setChecked(R.id.layout_list)
+            CommunityLayout.LargeList ->
+                _layoutSelectorMenu.setChecked(R.id.layout_large_list)
             CommunityLayout.Card ->
                 _layoutSelectorMenu.setChecked(R.id.layout_card)
             CommunityLayout.Card2 ->
                 _layoutSelectorMenu.setChecked(R.id.layout_card2)
+            CommunityLayout.Card3 ->
+                _layoutSelectorMenu.setChecked(R.id.layout_card3)
             CommunityLayout.Full ->
                 _layoutSelectorMenu.setChecked(R.id.layout_full)
         }
@@ -860,7 +892,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
 
         val bottomMenu = BottomMenu(context).apply {
-
             val currentCommunity = viewModel.currentCommunityRef.value
             var communityName: String? = null
             when (currentCommunity) {
@@ -882,12 +913,12 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             addItemWithIcon(
                 id = R.id.community_info,
                 title = R.string.community_info,
-                icon = R.drawable.ic_subreddit_default
+                icon = R.drawable.ic_subreddit_default,
             )
             addItemWithIcon(
                 id = R.id.my_communities,
                 title = R.string.my_communities,
-                icon = R.drawable.baseline_subscriptions_24
+                icon = R.drawable.baseline_subscriptions_24,
             )
             addItemWithIcon(
                 id = R.id.browse_communities,
@@ -901,19 +932,18 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             )
 
             if (isCurrentPageDefault) {
-
             } else {
                 if (isBookmarked) {
                     addItemWithIcon(
                         id = R.id.toggle_bookmark,
                         title = R.string.remove_bookmark,
-                        icon = R.drawable.baseline_bookmark_remove_24
+                        icon = R.drawable.baseline_bookmark_remove_24,
                     )
                 } else {
                     addItemWithIcon(
                         id = R.id.toggle_bookmark,
                         title = R.string.bookmark_community,
-                        icon = R.drawable.baseline_bookmark_add_24
+                        icon = R.drawable.baseline_bookmark_add_24,
                     )
                 }
 
@@ -921,7 +951,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
             }
 
             setOnMenuItemClickListener { menuItem ->
-                when(menuItem.id) {
+                when (menuItem.id) {
                     R.id.create_post -> {
                         CreateOrEditPostFragment()
                             .apply {
@@ -937,7 +967,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                             action = Intent.ACTION_SEND
                             putExtra(
                                 Intent.EXTRA_TEXT,
-                                viewModel.getSharedLinkForCurrentPage()
+                                viewModel.getSharedLinkForCurrentPage(),
                             )
                             type = "text/plain"
                         }
@@ -948,8 +978,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                     R.id.hide_read -> {
                         val anchors = mutableSetOf<Int>()
                         val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-                            it.findFirstCompletelyVisibleItemPosition()..
-                                    (adapter?.items?.size ?: it.findLastVisibleItemPosition())
+                            it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
                         }
                         range?.mapNotNullTo(anchors) {
                             (adapter?.items?.getOrNull(it) as? Item.PostItem)?.postView?.post?.id
@@ -967,10 +996,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         Snackbar.make(
                             requireMainActivity().getSnackbarContainer(),
                             R.string.home_page_set,
-                            Snackbar.LENGTH_LONG
+                            Snackbar.LENGTH_LONG,
                         ).show()
                     }
-                    R.id.layout ->  {
+                    R.id.layout -> {
                         getMainActivity()?.showBottomMenu(getLayoutMenu())
                     }
 
@@ -988,7 +1017,8 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>(), SignInNaviga
                         } else {
                             userCommunitiesManager.addUserCommunity(
                                 currentCommunityRef,
-                                viewModel.postListEngine.getCommunityIcon())
+                                viewModel.postListEngine.getCommunityIcon(),
+                            )
                         }
                     }
                     R.id.browse_communities -> {

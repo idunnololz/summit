@@ -50,8 +50,11 @@ class SettingsWebViewModel @Inject constructor(
                     }
 
                     if (account == null) {
-                        accountData.postError(RuntimeException(
-                            "Unable to find account that matches the account info fetched."))
+                        accountData.postError(
+                            RuntimeException(
+                                "Unable to find account that matches the account info fetched.",
+                            ),
+                        )
                     } else {
                         updateValue(account, data)
                     }
@@ -63,14 +66,14 @@ class SettingsWebViewModel @Inject constructor(
     }
 
     fun save(
-        updatedValues: Map<Int, Any?>
+        updatedValues: Map<Int, Any?>,
     ) {
         val accountData = accountData.valueOrNull ?: return
         val myUser = accountData.accountInfo.my_user ?: return
         val localUser = myUser.local_user_view.local_user
         val person = myUser.local_user_view.person
 
-        var settings = //SaveUserSettings(auth = accountData.account.jwt)
+        var settings = // SaveUserSettings(auth = accountData.account.jwt)
             // We need to include all settings due to this server bug:
             // https://github.com/LemmyNet/lemmy-js-client/issues/144
             SaveUserSettings(
@@ -119,31 +122,32 @@ class SettingsWebViewModel @Inject constructor(
                 lemmyWebSettings.defaultSortType.id -> {
                     val order = value as Int? ?: continue
                     settings = settings.copy(
-                        default_sort_type = idToSortOrder(order)?.toApiSortOrder())
+                        default_sort_type = idToSortOrder(order)?.toApiSortOrder(),
+                    )
                 }
                 lemmyWebSettings.showNsfwSetting.id -> {
                     settings = settings.copy(
-                        show_nsfw = value as Boolean?
+                        show_nsfw = value as Boolean?,
                     )
                 }
                 lemmyWebSettings.showReadPostsSetting.id -> {
                     settings = settings.copy(
-                        show_read_posts = value as Boolean?
+                        show_read_posts = value as Boolean?,
                     )
                 }
                 lemmyWebSettings.botAccountSetting.id -> {
                     settings = settings.copy(
-                        bot_account = value as Boolean?
+                        bot_account = value as Boolean?,
                     )
                 }
                 lemmyWebSettings.showBotAccountsSetting.id -> {
                     settings = settings.copy(
-                        show_bot_accounts = value as Boolean?
+                        show_bot_accounts = value as Boolean?,
                     )
                 }
                 lemmyWebSettings.sendNotificationsToEmailSetting.id -> {
                     settings = settings.copy(
-                        send_notifications_to_email = value as Boolean?
+                        send_notifications_to_email = value as Boolean?,
                     )
                 }
                 else -> {
@@ -206,8 +210,8 @@ class SettingsWebViewModel @Inject constructor(
                     lemmyWebSettings.showBotAccountsSetting.id to localUser.show_bot_accounts,
                     lemmyWebSettings.sendNotificationsToEmailSetting.id to localUser.send_notifications_to_email,
                     lemmyWebSettings.blockSettings.id to Unit,
-                )
-            )
+                ),
+            ),
         )
     }
 

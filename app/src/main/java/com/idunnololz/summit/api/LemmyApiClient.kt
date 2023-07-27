@@ -77,7 +77,7 @@ import javax.inject.Inject
 const val COMMENTS_DEPTH_MAX = 6
 
 class LemmyApiClient @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
 
     companion object {
@@ -158,7 +158,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -171,7 +171,7 @@ class LemmyApiClient @Inject constructor(
             GetPost(id = it, auth = account?.jwt)
         }, {
             GetPost(comment_id = it, auth = account?.jwt)
-        })
+        },)
 
         return retrofitErrorHandler {
             if (force) {
@@ -185,7 +185,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -197,7 +197,7 @@ class LemmyApiClient @Inject constructor(
         val form = MarkPostAsRead(
             post_id = postId,
             read = read,
-            auth = account.jwt
+            auth = account.jwt,
         )
 
         return retrofitErrorHandler {
@@ -208,7 +208,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -246,7 +246,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -256,7 +256,6 @@ class LemmyApiClient @Inject constructor(
         limit: Int? = null,
         force: Boolean,
     ): Result<List<CommentView>> {
-
         val commentsForm =
             GetComments(
                 max_depth = 1,
@@ -285,7 +284,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -295,7 +294,6 @@ class LemmyApiClient @Inject constructor(
         sort: CommentSortType,
         force: Boolean,
     ): Result<List<CommentView>> {
-
         val commentsForm = id.fold({
             GetComments(
                 max_depth = COMMENTS_DEPTH_MAX,
@@ -312,7 +310,7 @@ class LemmyApiClient @Inject constructor(
                 sort = sort,
                 auth = account?.jwt,
             )
-        })
+        },)
 
         return retrofitErrorHandler {
             if (force) {
@@ -332,7 +330,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -362,7 +360,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -375,7 +373,7 @@ class LemmyApiClient @Inject constructor(
             GetCommunity(id = id, auth = account?.jwt)
         }, { name ->
             GetCommunity(name = name, auth = account?.jwt)
-        })
+        },)
 
         return retrofitErrorHandler {
             if (force) {
@@ -389,7 +387,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -424,7 +422,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -450,7 +448,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -478,7 +476,7 @@ class LemmyApiClient @Inject constructor(
                 onFailure = {
                     changeInstance(originalInstance)
                     Result.failure(it)
-                }
+                },
             )
     }
 
@@ -501,13 +499,13 @@ class LemmyApiClient @Inject constructor(
                 },
                 onFailure = {
                     Result.failure(it)
-                }
+                },
             )
     }
 
     suspend fun fetchUnreadCount(
         force: Boolean,
-        account: Account
+        account: Account,
     ): Result<GetUnreadCountResponse> {
         val form = GetUnreadCount(account.jwt)
 
@@ -523,7 +521,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -532,7 +530,6 @@ class LemmyApiClient @Inject constructor(
         score: Int,
         account: Account,
     ): Result<PostView> = retry {
-
         val form = CreatePostLike(
             post_id = postId,
             score = score,
@@ -546,7 +543,7 @@ class LemmyApiClient @Inject constructor(
                 },
                 onFailure = {
                     Result.failure(it)
-                }
+                },
             )
     }
 
@@ -555,7 +552,6 @@ class LemmyApiClient @Inject constructor(
         score: Int,
         account: Account,
     ): Result<CommentView> = retry {
-
         val form = CreateCommentLike(
             comment_id = commentId,
             score = score,
@@ -569,7 +565,7 @@ class LemmyApiClient @Inject constructor(
                 },
                 onFailure = {
                     Result.failure(it)
-                }
+                },
             )
     }
 
@@ -578,7 +574,6 @@ class LemmyApiClient @Inject constructor(
         follow: Boolean,
         account: Account,
     ): Result<CommunityView> = retry {
-
         val form = FollowCommunity(
             community_id = communityId,
             follow = follow,
@@ -592,7 +587,7 @@ class LemmyApiClient @Inject constructor(
                 },
                 onFailure = {
                     Result.failure(it)
-                }
+                },
             )
     }
 
@@ -600,7 +595,7 @@ class LemmyApiClient @Inject constructor(
         account: Account,
         content: String,
         postId: PostId,
-        parentId: CommentId?
+        parentId: CommentId?,
     ): Result<CommentView> {
         val form = CreateComment(
             auth = account.jwt,
@@ -617,14 +612,14 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
     suspend fun editComment(
         account: Account,
         content: String,
-        commentId: CommentId
+        commentId: CommentId,
     ): Result<CommentView> {
         val form = EditComment(
             auth = account.jwt,
@@ -640,13 +635,13 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
     suspend fun deleteComment(
         account: Account,
-        commentId: CommentId
+        commentId: CommentId,
     ): Result<CommentView> {
         val form = DeleteComment(
             auth = account.jwt,
@@ -662,7 +657,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -680,7 +675,7 @@ class LemmyApiClient @Inject constructor(
             url = url,
             body = body,
             nsfw = isNsfw,
-            auth = account.jwt
+            auth = account.jwt,
         )
 
         return retrofitErrorHandler {
@@ -691,7 +686,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -709,7 +704,7 @@ class LemmyApiClient @Inject constructor(
             url = url,
             body = body,
             nsfw = isNsfw,
-            auth = account.jwt
+            auth = account.jwt,
         )
 
         return retrofitErrorHandler {
@@ -720,7 +715,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -739,14 +734,14 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
     suspend fun uploadImage(
         account: Account,
         fileName: String,
-        imageIs: InputStream
+        imageIs: InputStream,
     ): Result<UploadImageResult> {
         val part = MultipartBody.Part.createFormData(
             "images[]",
@@ -765,7 +760,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -788,7 +783,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -811,7 +806,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -843,7 +838,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -856,7 +851,11 @@ class LemmyApiClient @Inject constructor(
         force: Boolean,
     ): Result<List<CommentReplyView>> {
         val form = GetReplies(
-            sort = sort, page = page, limit = limit, unread_only = unreadOnly, auth = account.jwt
+            sort = sort,
+            page = page,
+            limit = limit,
+            unread_only = unreadOnly,
+            auth = account.jwt,
         )
 
         return retrofitErrorHandler {
@@ -871,7 +870,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -884,7 +883,11 @@ class LemmyApiClient @Inject constructor(
         force: Boolean,
     ): Result<List<PersonMentionView>> {
         val form = GetPersonMentions(
-            sort, page, limit, unreadOnly, account.jwt
+            sort,
+            page,
+            limit,
+            unreadOnly,
+            account.jwt,
         )
 
         return retrofitErrorHandler {
@@ -899,7 +902,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -911,7 +914,10 @@ class LemmyApiClient @Inject constructor(
         force: Boolean,
     ): Result<List<PrivateMessageView>> {
         val form = GetPrivateMessages(
-            unreadOnly, page, limit, account.jwt
+            unreadOnly,
+            page,
+            limit,
+            account.jwt,
         )
 
         return retrofitErrorHandler {
@@ -926,7 +932,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -938,7 +944,7 @@ class LemmyApiClient @Inject constructor(
         val form = MarkCommentReplyAsRead(
             id,
             read,
-            account.jwt
+            account.jwt,
         )
         return retrofitErrorHandler {
             api.markCommentReplyAsRead(form)
@@ -948,7 +954,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -960,7 +966,7 @@ class LemmyApiClient @Inject constructor(
         val form = MarkPersonMentionAsRead(
             id,
             read,
-            account.jwt
+            account.jwt,
         )
         return retrofitErrorHandler {
             api.markPersonMentionAsRead(form)
@@ -970,7 +976,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -982,7 +988,7 @@ class LemmyApiClient @Inject constructor(
         val form = MarkPrivateMessageAsRead(
             id,
             read,
-            account.jwt
+            account.jwt,
         )
         return retrofitErrorHandler {
             api.markPrivateMessageAsRead(form)
@@ -992,7 +998,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -1014,7 +1020,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -1033,7 +1039,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -1052,7 +1058,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -1065,7 +1071,7 @@ class LemmyApiClient @Inject constructor(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -1073,7 +1079,7 @@ class LemmyApiClient @Inject constructor(
         get() = api.instance
 
     private suspend fun <T> retrofitErrorHandler(
-        call: suspend () -> Call<T>
+        call: suspend () -> Call<T>,
     ): Result<T> {
         val res = try {
             withContext(Dispatchers.IO) {
@@ -1125,7 +1131,7 @@ class LemmyApiClient @Inject constructor(
                 return Result.failure(NotAuthenticatedException())
             }
 
-            Log.e("ApiError", "Code: ${errorCode} Error message: ${errMsg}", RuntimeException())
+            Log.e("ApiError", "Code: $errorCode Error message: $errMsg", RuntimeException())
 
             if (errMsg?.contains("timeout", ignoreCase = true) == true) {
                 return Result.failure(ServerTimeoutException(errorCode))
@@ -1137,5 +1143,5 @@ class LemmyApiClient @Inject constructor(
 }
 
 class UploadImageResult(
-    val url: String
+    val url: String,
 )

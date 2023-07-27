@@ -3,7 +3,6 @@ package com.idunnololz.summit.view
 import android.content.Context
 import android.text.Spannable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatTextView
 
@@ -13,7 +12,7 @@ class LinkifyTextView : AppCompatTextView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {

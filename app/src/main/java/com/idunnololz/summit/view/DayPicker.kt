@@ -30,7 +30,7 @@ class DayPicker : ConstraintLayout {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     init {
@@ -47,7 +47,7 @@ class DayPicker : ConstraintLayout {
             findViewById(R.id.day4),
             findViewById(R.id.day5),
             findViewById(R.id.day6),
-            findViewById(R.id.day7)
+            findViewById(R.id.day7),
         )
         refreshView()
     }
@@ -60,7 +60,7 @@ class DayPicker : ConstraintLayout {
             DAY_WEDNESDAY,
             DAY_THURSDAY,
             DAY_FRIDAY,
-            DAY_SATURDAY
+            DAY_SATURDAY,
         )
         dayViews.zip(days).forEach { (v, d) ->
             v.text = when (d) {

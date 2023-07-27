@@ -20,7 +20,7 @@ data class CommentNodeData(
 )
 
 class CommentTreeBuilder(
-    private val accountManager: AccountManager
+    private val accountManager: AccountManager,
 ) {
 
     suspend fun buildCommentsTreeListView(
@@ -38,8 +38,11 @@ class CommentTreeBuilder(
             comments?.minOfOrNull { it.getDepth() } ?: 0
         }
 
-        Log.d(TAG, "Score: ${comments?.firstOrNull()?.counts?.score} " +
-                "Depth: ${firstComment?.getDepth()} First comment: ${firstComment?.content}. ")
+        Log.d(
+            TAG,
+            "Score: ${comments?.firstOrNull()?.counts?.score} " +
+                "Depth: ${firstComment?.getDepth()} First comment: ${firstComment?.content}. ",
+        )
 
         val topNodes = mutableListOf<CommentNodeData>()
         comments?.forEach { comment ->
@@ -47,7 +50,7 @@ class CommentTreeBuilder(
             val node = CommentNodeData(
                 commentView = PostViewModel.ListView.CommentListView(
                     comment,
-                    pendingCommentView = idToPendingComments[comment.comment.id]
+                    pendingCommentView = idToPendingComments[comment.comment.id],
                 ),
                 depth = depth,
             )
@@ -58,7 +61,7 @@ class CommentTreeBuilder(
             val node = CommentNodeData(
                 commentView = PostViewModel.ListView.CommentListView(
                     comment,
-                    pendingCommentView = idToPendingComments[comment.comment.id]
+                    pendingCommentView = idToPendingComments[comment.comment.id],
                 ),
                 depth = depth,
             )
@@ -94,7 +97,7 @@ class CommentTreeBuilder(
                 val commentView = originalComment?.commentView
                 if (originalComment != null && commentView is PostViewModel.ListView.CommentListView) {
                     originalComment.commentView = commentView.copy(
-                        pendingCommentView = pendingComment
+                        pendingCommentView = pendingComment,
                     )
                 }
             } else if (pendingComment.parentId == null) {
@@ -103,11 +106,11 @@ class CommentTreeBuilder(
                     CommentNodeData(
                         commentView = PostViewModel.ListView.PendingCommentListView(
                             pendingComment,
-                            author = accountManager.getAccountById(pendingComment.accountId)?.name
+                            author = accountManager.getAccountById(pendingComment.accountId)?.name,
                         ),
                         children = mutableListOf(),
                         depth = 0,
-                    )
+                    ),
                 )
             } else {
                 val parent = map[pendingComment.parentId]
@@ -118,16 +121,14 @@ class CommentTreeBuilder(
                         CommentNodeData(
                             commentView = PostViewModel.ListView.PendingCommentListView(
                                 pendingComment,
-                                author = accountManager.getAccountById(pendingComment.accountId)?.name
+                                author = accountManager.getAccountById(pendingComment.accountId)?.name,
                             ),
                             children = mutableListOf(),
                             depth = it.depth + 1,
-                        )
+                        ),
                     )
                 }
-
             }
-
         }
 
         return topNodes
@@ -167,10 +168,10 @@ class CommentTreeBuilder(
                         PostViewModel.ListView.MoreCommentsItem(
                             cv.comment.comment.id,
                             node.depth + 1,
-                            expectedCount - childrenCount
+                            expectedCount - childrenCount,
                         ),
                         node.depth + 1,
-                    )
+                    ),
                 )
             }
         }
@@ -197,10 +198,10 @@ class CommentTreeBuilder(
                     PostViewModel.ListView.MoreCommentsItem(
                         null,
                         0,
-                        expectedCount - childrenCount
+                        expectedCount - childrenCount,
                     ),
                     0,
-                )
+                ),
             )
         }
     }
@@ -221,7 +222,6 @@ fun List<CommentNodeData>.flatten(): MutableList<CommentNodeData> {
     val result = mutableListOf<CommentNodeData>()
 
     fun CommentNodeData.flattenRecursive() {
-
         result.add(this)
 
         when (val commentView = this.commentView) {

@@ -1,7 +1,5 @@
 package com.idunnololz.summit.actions
 
-import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,7 +10,7 @@ class SavedManager @Inject constructor() {
 
     enum class SavedState {
         NoChange,
-        Changed
+        Changed,
     }
 
     val onPostSaveChange = MutableStateFlow(SavedState.NoChange)

@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingHistoryBinding
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -23,7 +21,7 @@ class SettingHistoryFragment : BaseFragment<FragmentSettingHistoryBinding>() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 

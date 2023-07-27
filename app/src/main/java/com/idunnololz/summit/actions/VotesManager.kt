@@ -1,14 +1,13 @@
 package com.idunnololz.summit.actions
 
 import android.content.Context
-import android.util.Log
 import com.idunnololz.summit.lemmy.utils.VotableRef
 
 class VotesManager(
-    private val context: Context
+    private val context: Context,
 ) {
-    companion object {
 
+    companion object {
         const val NO_INFO = 0x100000
     }
 
@@ -26,12 +25,10 @@ class VotesManager(
     }
 
     fun setVote(key: VotableRef, like: Int) {
-        Log.d("HAHA", "setVote: $key $like")
         votes[key] = like
     }
 
     fun setVoteIfNoneSet(key: VotableRef, like: Int) {
-        Log.d("HAHA", "setVoteIfNoneSet: $key $like")
         votes.getOrPut(key) { like }
     }
 
@@ -54,7 +51,6 @@ class VotesManager(
     }
 
     fun reset() {
-        Log.d("HAHA", "reset")
         votes.clear()
         pendingVotes.clear()
         scores.clear()

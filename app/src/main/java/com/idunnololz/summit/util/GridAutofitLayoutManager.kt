@@ -29,7 +29,7 @@ class GridAutofitLayoutManager : GridLayoutManager {
         context: Context,
         columnWidth: Int,
         orientation: Int,
-        reverseLayout: Boolean
+        reverseLayout: Boolean,
     ) : super(context, 1, orientation, reverseLayout) {
         setColumnWidth(checkedColumnWidth(context, columnWidth))
     }
@@ -40,8 +40,9 @@ class GridAutofitLayoutManager : GridLayoutManager {
             to static constant on top, but we need context to convert it to dp, so can't really
             do so. */
             TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 48f,
-                context.resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP,
+                48f,
+                context.resources.displayMetrics,
             ).toInt()
         } else {
             columnWidth

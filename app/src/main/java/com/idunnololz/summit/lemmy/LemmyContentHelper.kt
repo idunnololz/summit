@@ -22,8 +22,8 @@ import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getPreviewInfo
 import com.idunnololz.summit.api.utils.getThumbnailPreviewInfo
 import com.idunnololz.summit.api.utils.getThumbnailUrl
@@ -52,7 +52,7 @@ class LemmyContentHelper(
     private val context: Context,
     private val offlineManager: OfflineManager,
     private val exoPlayerManager: ExoPlayerManager,
-    private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
+    private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>(),
 ) {
 
     companion object {
@@ -70,7 +70,7 @@ class LemmyContentHelper(
 
     private var textSizeMultiplier: Float = config.textSizeMultiplier
     var globalFontSizeMultiplier: Float = 1f
-
+    var alwaysShowLinkBelowPost: Boolean = false
 
     /**
      * @param lazyUpdate If true, content will not be refreshed. Only non content related things will be setup (eg. removed post warning)
@@ -113,12 +113,14 @@ class LemmyContentHelper(
 
         @Suppress("UNCHECKED_CAST")
         fun <T : View> getView(@LayoutRes resId: Int): T =
-            (viewRecycler.getRecycledView(resId)
-                ?: inflater.inflate(
-                    resId,
-                    fullContentContainerView,
-                    false
-                ))
+            (
+                viewRecycler.getRecycledView(resId)
+                    ?: inflater.inflate(
+                        resId,
+                        fullContentContainerView,
+                        false,
+                    )
+                )
                 .also {
                     it.setTag(R.id.view_type, resId)
                     fullContentContainerView.addView(it)
@@ -150,13 +152,12 @@ class LemmyContentHelper(
 
                 textView.text = context.getString(
                     R.string.locked_post_message,
-                    postView.community.name
+                    postView.community.name,
                 )
 
                 // workaround a cardview bug
                 cardView.setContentPadding(0, 0, 0, 0)
             }
-
 
             if (postView.post.removed) {
                 val postRemovedView = getView<View>(R.layout.full_content_post_removed_view)
@@ -226,7 +227,7 @@ class LemmyContentHelper(
                                     offlineManager.setImageSizeHint(
                                         imageUrl,
                                         d.bitmap.width,
-                                        d.bitmap.height
+                                        d.bitmap.height,
                                     )
                                     Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
                                 }
@@ -319,8 +320,8 @@ class LemmyContentHelper(
                 } else if (ContentUtils.isUrlImage(url)) {
                     onImageClickListener(url)
                 } else if (uri.path?.endsWith(".gifv") == true ||
-                    uri.path?.endsWith(".mp4") == true) {
-
+                    uri.path?.endsWith(".mp4") == true
+                ) {
                     onVideoClickListener(url, VideoType.UNKNOWN, customPlayerView?.getVideoState())
                 } else if (uri.host == "gfycat.com") {
                     val keyLowerCase = uri.path?.substring(1)?.split("-")?.get(0) ?: ""
@@ -330,9 +331,10 @@ class LemmyContentHelper(
                         val key =
                             url.substring(startIndex, startIndex + keyLowerCase.length)
                         onVideoClickListener(
-                            "https://thumbs.gfycat.com/${key}-mobile.mp4",
+                            "https://thumbs.gfycat.com/$key-mobile.mp4",
                             VideoType.UNKNOWN,
-                            customPlayerView?.getVideoState())
+                            customPlayerView?.getVideoState(),
+                        )
                     } else {
                         Utils.openExternalLink(context, url)
                     }
@@ -372,31 +374,36 @@ class LemmyContentHelper(
 
             fun fetchFullImage() {
                 loadingView?.showProgressBar()
-                offlineManager.fetchImageWithError(rootView, imageUrl, b@{
-                    loadingView?.hideAll(animate = false)
-                    offlineManager.calculateImageMaxSizeIfNeeded(it)
-                    offlineManager.getMaxImageSizeHint(it, tempSize)
+                offlineManager.fetchImageWithError(
+                    rootView,
+                    imageUrl,
+                    b@{
+                        loadingView?.hideAll(animate = false)
+                        offlineManager.calculateImageMaxSizeIfNeeded(it)
+                        offlineManager.getMaxImageSizeHint(it, tempSize)
 
-                    fullImageView.load(it) {
-                        allowHardware(false)
+                        fullImageView.load(it) {
+                            allowHardware(false)
 
-                        listener { _, result ->
-                            val d = result.drawable
-                            if (d is BitmapDrawable) {
-                                offlineManager.setImageSizeHint(
-                                    imageUrl,
-                                    d.bitmap.width,
-                                    d.bitmap.height
-                                )
-                                Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
+                            listener { _, result ->
+                                val d = result.drawable
+                                if (d is BitmapDrawable) {
+                                    offlineManager.setImageSizeHint(
+                                        imageUrl,
+                                        d.bitmap.width,
+                                        d.bitmap.height,
+                                    )
+                                    Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
 
-                                updateLayoutParams()
+                                    updateLayoutParams()
+                                }
                             }
                         }
-                    }
-                }, {
-                    loadingView?.showDefaultErrorMessageFor(it)
-                })
+                    },
+                    {
+                        loadingView?.showDefaultErrorMessageFor(it)
+                    },
+                )
             }
 
             updateLayoutParams()
@@ -413,7 +420,8 @@ class LemmyContentHelper(
         }
 
         if (!lazyUpdate) {
-            when (val postType = postView.getType()) {
+            val postType = postView.getType()
+            when (postType) {
                 PostType.Image -> {
                     insertAndLoadFullImage(requireNotNull(targetPostView.post.url))
                 }
@@ -434,24 +442,24 @@ class LemmyContentHelper(
                         val bestSize = LemmyUtils.calculateBestVideoSize(
                             context,
                             videoInfo,
-                            availableH = videoViewMaxHeight
+                            availableH = videoViewMaxHeight,
                         )
                         if (bestSize.y > 0) {
                             containerView.layoutParams = containerView.layoutParams.apply {
-                                //width = bestSize.x
+                                // width = bestSize.x
                                 height = bestSize.y
                             }
                             playerView.layoutParams = playerView.layoutParams.apply {
-                                //width = bestSize.x
+                                // width = bestSize.x
                                 height = bestSize.y
                             }
                         } else {
                             containerView.layoutParams = containerView.layoutParams.apply {
-                                //width = bestSize.x
+                                // width = bestSize.x
                                 height = LayoutParams.WRAP_CONTENT
                             }
                             playerView.layoutParams = playerView.layoutParams.apply {
-                                //width = bestSize.x
+                                // width = bestSize.x
                                 height = LayoutParams.WRAP_CONTENT
                             }
                         }
@@ -482,7 +490,7 @@ class LemmyContentHelper(
                                 videoType,
                                 customPlayerView?.getVideoState()?.let {
                                     it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
-                                }
+                                },
                             )
                         }
 //                        playerView.s
@@ -494,7 +502,7 @@ class LemmyContentHelper(
                             exoPlayerManager.getPlayerForUrl(
                                 videoInfo.videoUrl,
                                 videoType,
-                                videoState = videoState
+                                videoState = videoState,
                             )
                     } else {
                         playerView.visibility = View.GONE
@@ -529,11 +537,14 @@ class LemmyContentHelper(
                 }
             }
 
-            if (targetPostView.post.embed_video_url != null) {
-                appendUiForExternalOrInternalUrl(targetPostView.post.embed_video_url )
-            } else if (targetPostView.post.url != null &&
-                targetPostView.post.thumbnail_url != targetPostView.post.url) {
-                appendUiForExternalOrInternalUrl(targetPostView.post.url)
+            if (alwaysShowLinkBelowPost || postType == PostType.Link || postType == PostType.Text) {
+                if (targetPostView.post.embed_video_url != null) {
+                    appendUiForExternalOrInternalUrl(targetPostView.post.embed_video_url)
+                } else if (targetPostView.post.url != null &&
+                    targetPostView.post.thumbnail_url != targetPostView.post.url
+                ) {
+                    appendUiForExternalOrInternalUrl(targetPostView.post.url)
+                }
             }
         }
 
@@ -541,12 +552,12 @@ class LemmyContentHelper(
     }
 
     fun recycleFullContent(
-        fullContentContainerView: ViewGroup
+        fullContentContainerView: ViewGroup,
     ): RecycledState = getState(fullContentContainerView, recycle = true)
 
     fun getState(
         fullContentContainerView: ViewGroup,
-        recycle: Boolean = false
+        recycle: Boolean = false,
     ): RecycledState {
         assertMainThread()
 

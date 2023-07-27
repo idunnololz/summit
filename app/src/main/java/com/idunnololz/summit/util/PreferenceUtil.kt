@@ -2,7 +2,6 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.content.SharedPreferences
-
 import java.util.HashSet
 import java.util.StringTokenizer
 
@@ -31,7 +30,6 @@ object PreferenceUtil {
      * Value representing the next time to check if disabled_ads is still purchased.
      */
     const val NEXT_PURCHASE_SYNC = "next_purchase_sync"
-
 
     const val NEXT_UPDATE_CHECK = "next_update_check"
 
@@ -71,8 +69,10 @@ object PreferenceUtil {
     const val KEY_SUBREDDIT_LAYOUT = "KEY_SUBREDDIT_LAYOUT"
     const val KEY_POST_UI_CONFIG_COMPACT = "KEY_POST_UI_CONFIG_COMPACT"
     const val KEY_POST_UI_CONFIG_LIST = "KEY_POST_UI_CONFIG_LIST"
+    const val KEY_POST_UI_CONFIG_LARGE_LIST = "KEY_POST_UI_CONFIG_LARGE_LIST"
     const val KEY_POST_UI_CONFIG_CARD = "KEY_POST_UI_CONFIG_CARD"
     const val KEY_POST_UI_CONFIG_CARD2 = "KEY_POST_UI_CONFIG_CARD2"
+    const val KEY_POST_UI_CONFIG_CARD3 = "KEY_POST_UI_CONFIG_CARD3"
     const val KEY_POST_UI_CONFIG_FULL = "KEY_POST_UI_CONFIG_FULL"
 
     const val KEY_BASE_THEME = "KEY_BASE_THEME"
@@ -95,10 +95,12 @@ object PreferenceUtil {
     const val KEY_POST_GESTURE_ACTION_1 = "KEY_POST_GESTURE_ACTION_1"
     const val KEY_POST_GESTURE_ACTION_2 = "KEY_POST_GESTURE_ACTION_2"
     const val KEY_POST_GESTURE_ACTION_3 = "KEY_POST_GESTURE_ACTION_3"
+    const val KEY_POST_GESTURE_SIZE = "KEY_POST_GESTURE_SIZE"
 
     const val KEY_COMMENT_GESTURE_ACTION_1 = "KEY_COMMENT_GESTURE_ACTION_1"
     const val KEY_COMMENT_GESTURE_ACTION_2 = "KEY_COMMENT_GESTURE_ACTION_2"
     const val KEY_COMMENT_GESTURE_ACTION_3 = "KEY_COMMENT_GESTURE_ACTION_3"
+    const val KEY_COMMENT_GESTURE_SIZE = "KEY_COMMENT_GESTURE_SIZE"
 
     const val KEY_BLUR_NSFW_POSTS = "KEY_BLUR_NSFW_POSTS"
 
@@ -109,9 +111,13 @@ object PreferenceUtil {
     const val KEY_SHOW_NSFW_POSTS = "KEY_SHOW_NSFW_POSTS"
 
     const val KEY_GLOBAL_FONT_SIZE = "KEY_GLOBAL_FONT_SIZE"
+    const val KEY_GLOBAL_FONT_COLOR = "KEY_GLOBAL_FONT_COLOR"
 
     const val KEY_DEFAULT_COMMUNITY_SORT_ORDER = "KEY_DEFAULT_COMMUNITY_SORT_ORDER"
     const val KEY_DEFAULT_COMMENTS_SORT_ORDER = "KEY_DEFAULT_COMMUNITY_SORT_ORDER"
+
+    const val KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST = "KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST"
+    const val KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP = "KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP"
 
     private const val KEY_OFFLINE_STORAGE_CAP_BYTES = "KEY_OFFLINE_STORAGE_CAP_BYTES"
     private const val KEY_VIDEO_PLAYER_ROTATION_LOCKED = "KEY_VIDEO_PLAYER_ROTATION_LOCKED"
@@ -136,7 +142,7 @@ object PreferenceUtil {
     fun getArray(
         prefs: SharedPreferences,
         arrayName: String,
-        defaultArr: IntArray
+        defaultArr: IntArray,
     ): IntArray {
         val size = prefs.getInt(arrayName + "_size", -1)
         if (size == -1) return defaultArr

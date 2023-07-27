@@ -5,14 +5,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
-import androidx.core.view.GestureDetectorCompat
-import androidx.core.view.ScaleGestureDetectorCompat
 import android.util.AttributeSet
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.ScaleGestureDetectorCompat
 import kotlin.math.max
 import kotlin.math.min
 
@@ -75,94 +75,101 @@ class GalleryImageView : AppCompatImageView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     init {
         scaleDetector =
-            ScaleGestureDetector(context, object : ScaleGestureDetector.OnScaleGestureListener {
+            ScaleGestureDetector(
+                context,
+                object : ScaleGestureDetector.OnScaleGestureListener {
 
-                override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-                    zoomGestureOngoing = true
-                    return true
+                    override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                        zoomGestureOngoing = true
+                        return true
+                    }
+
+                    override fun onScaleEnd(detector: ScaleGestureDetector) {
+                        zoomGestureOngoing = false
+                    }
+
+                    override fun onScale(detector: ScaleGestureDetector): Boolean {
+                        detector.let {
+                            zoomInToAbs(
+                                detector.focusX / curZoom - offX,
+                                detector.focusY / curZoom - offY,
+                                curZoom * detector.scaleFactor,
+                            )
+                        }
+                        return true
+                    }
+                },
+            )
+        ScaleGestureDetectorCompat.setQuickScaleEnabled(scaleDetector, false)
+
+        detector = GestureDetectorCompat(
+            context,
+            object : GestureDetector.OnGestureListener {
+                override fun onShowPress(e: MotionEvent) {
                 }
 
-                override fun onScaleEnd(detector: ScaleGestureDetector) {
-                    zoomGestureOngoing = false
+                override fun onSingleTapUp(e: MotionEvent): Boolean {
+                    return false
                 }
 
-                override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    detector.let {
-                        zoomInToAbs(
-                            detector.focusX / curZoom - offX,
-                            detector.focusY / curZoom - offY,
-                            curZoom * detector.scaleFactor
-                        )
+                override fun onDown(e: MotionEvent): Boolean {
+                    return false
+                }
+
+                override fun onFling(
+                    e1: MotionEvent,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float,
+                ): Boolean {
+                    return false
+                }
+
+                override fun onScroll(
+                    e1: MotionEvent,
+                    e2: MotionEvent,
+                    distanceX: Float,
+                    distanceY: Float,
+                ): Boolean {
+                    if (scrollByAndCommit(distanceX, distanceY)) {
+                        return true
+                    } else if (curZoom > minZoom - 0.01 && curZoom <= minZoom + 0.01) {
+                        updateOverScrollBy(distanceX, distanceY)
+                        return false
+                    } else {
+                        return false
+                    }
+                }
+
+                override fun onLongPress(e: MotionEvent) {
+                }
+            },
+        )
+
+        detector.setOnDoubleTapListener(
+            object : GestureDetector.OnDoubleTapListener {
+                override fun onDoubleTap(e: MotionEvent): Boolean {
+                    e.let {
+                        zoomInToAnimated(it.x, it.y)
                     }
                     return true
                 }
-            })
-        ScaleGestureDetectorCompat.setQuickScaleEnabled(scaleDetector, false)
 
-        detector = GestureDetectorCompat(context, object : GestureDetector.OnGestureListener {
-            override fun onShowPress(e: MotionEvent) {
-            }
-
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
-                return false
-            }
-
-            override fun onDown(e: MotionEvent): Boolean {
-                return false
-            }
-
-            override fun onFling(
-                e1: MotionEvent,
-                e2: MotionEvent,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
-                return false
-            }
-
-            override fun onScroll(
-                e1: MotionEvent,
-                e2: MotionEvent,
-                distanceX: Float,
-                distanceY: Float
-            ): Boolean {
-                if (scrollByAndCommit(distanceX, distanceY)) {
+                override fun onDoubleTapEvent(e: MotionEvent): Boolean {
                     return true
-                } else if (curZoom > minZoom - 0.01 && curZoom <= minZoom + 0.01) {
-                    updateOverScrollBy(distanceX, distanceY)
-                    return false
-                } else {
-                    return false
                 }
-            }
 
-            override fun onLongPress(e: MotionEvent) {
-            }
-        })
-
-        detector.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                e.let {
-                    zoomInToAnimated(it.x, it.y)
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    callback?.togggleUi()
+                    return true
                 }
-                return true
-            }
-
-            override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-                return true
-            }
-
-            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                callback?.togggleUi()
-                return true
-            }
-
-        })
+            },
+        )
 
         scaleType = ScaleType.MATRIX
     }
@@ -302,7 +309,7 @@ class GalleryImageView : AppCompatImageView {
         // 5. Finally scaled offset to absolute offset.
         scrollToAbsolute(
             -(-offX * prevZoom + absX / imageW * diffW) / curZoom,
-            -(-offY * prevZoom + absY / imageH * diffH) / curZoom
+            -(-offY * prevZoom + absY / imageH * diffH) / curZoom,
         )
 
         Log.d(TAG, "zoom: $curZoom")
@@ -313,7 +320,7 @@ class GalleryImageView : AppCompatImageView {
     fun scrollByAndCommit(deltaX: Float, deltaY: Float): Boolean {
         val result = scrollByAbsolute(
             deltaX / curZoom,
-            deltaY / curZoom
+            deltaY / curZoom,
         )
         if (result) {
             updateMatrix()

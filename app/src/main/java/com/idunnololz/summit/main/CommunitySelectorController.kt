@@ -35,10 +35,10 @@ import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBin
 import com.idunnololz.summit.databinding.CommunitySelectorViewBinding
 import com.idunnololz.summit.databinding.DummyTopItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
 import com.idunnololz.summit.util.ext.runAfterLayout
@@ -54,7 +54,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 typealias CommunitySelectedListener =
-        ((controller: CommunitySelectorController, communityRef: CommunityRef) -> Unit)
+    ((controller: CommunitySelectorController, communityRef: CommunityRef) -> Unit)
 
 class CommunitySelectorController @AssistedInject constructor(
     @Assisted private val context: Context,
@@ -81,6 +81,7 @@ class CommunitySelectorController @AssistedInject constructor(
     private lateinit var binding: CommunitySelectorViewBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: EditText
+    private lateinit var clearButton: View
 
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
@@ -118,6 +119,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
         recyclerView = binding.recyclerView
         searchView = binding.searchView
+        clearButton = binding.clear
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -132,34 +134,41 @@ class CommunitySelectorController @AssistedInject constructor(
             bottomSheetBehavior = it
         }
 
-        searchView.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                val tokens = searchView.text.toString().split("@")
-                val communityName = tokens.getOrNull(0) ?: return@OnKeyListener true
-                val instance = tokens.getOrNull(1)
-                    ?: lemmyApiClient.instance
+        searchView.setOnKeyListener(
+            View.OnKeyListener { _, keyCode, event ->
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                    val tokens = searchView.text.toString().split("@")
+                    val communityName = tokens.getOrNull(0) ?: return@OnKeyListener true
+                    val instance = tokens.getOrNull(1)
+                        ?: lemmyApiClient.instance
 
-                onCommunitySelectedListener?.invoke(
-                    this@CommunitySelectorController,
-                    CommunityRef.CommunityRefByName(communityName, instance)
-                )
-                searchView.setText("")
-                return@OnKeyListener true
-            }
-            false
-        })
+                    onCommunitySelectedListener?.invoke(
+                        this@CommunitySelectorController,
+                        CommunityRef.CommunityRefByName(communityName, instance),
+                    )
+                    searchView.setText("")
+                    return@OnKeyListener true
+                }
+                false
+            },
+        )
 
-        searchView.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
+        searchView.addTextChangedListener(
+            object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {}
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                adapter.setQuery(s?.toString())
-                doQueryAsync(s)
-                recyclerView.scrollToPosition(0)
-            }
-        })
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    adapter.setQuery(s?.toString())
+                    doQueryAsync(s)
+                    recyclerView.scrollToPosition(0)
+                }
+            },
+        )
+        clearButton.setOnClickListener {
+            searchView.setText("")
+        }
     }
 
     private fun doQueryAsync(query: CharSequence?) {
@@ -181,6 +190,10 @@ class CommunitySelectorController @AssistedInject constructor(
     }
 
     fun show(container: ViewGroup, activity: MainActivity, lifecycleOwner: LifecycleOwner) {
+        if (rootView?.parent != null) {
+            return
+        }
+
         container.addView(rootView)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.scrollToPosition(0)
@@ -251,7 +264,7 @@ class CommunitySelectorController @AssistedInject constructor(
     }
 
     private sealed class Item(
-        val id: String
+        val id: String,
     ) {
         object TopItem : Item("#always_the_top")
 
@@ -265,11 +278,11 @@ class CommunitySelectorController @AssistedInject constructor(
 
         class GroupHeaderItem(
             val text: String,
-            val stillLoading: Boolean = false
+            val stillLoading: Boolean = false,
         ) : Item(text)
 
         class NoResultsItem(
-            val text: String
+            val text: String,
         ) : Item(text)
 
         class CommunityChildItem(
@@ -286,7 +299,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
         class RecentChildItem(
             val text: String,
-            val communityRef: CommunityRef
+            val communityRef: CommunityRef,
         ) : Item("r:${communityRef.getKey()}")
     }
 
@@ -304,7 +317,7 @@ class CommunitySelectorController @AssistedInject constructor(
             areItemsTheSame = { old, new ->
                 old.id == new.id
             },
-            areContentsTheSame = {old, new ->
+            areContentsTheSame = { old, new ->
                 when (old) {
                     is Item.TopItem -> true
                     is Item.GroupHeaderItem ->
@@ -315,15 +328,15 @@ class CommunitySelectorController @AssistedInject constructor(
                     is Item.RecentChildItem -> true
                     is Item.CurrentCommunity -> old == new
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.TopItem::class,
-                inflateFn = DummyTopItemBinding::inflate
+                inflateFn = DummyTopItemBinding::inflate,
             ) { _, _, _ -> }
             addItemType(
                 clazz = Item.CurrentCommunity::class,
-                inflateFn = CommunitySelectorCurrentCommunityItemBinding::inflate
+                inflateFn = CommunitySelectorCurrentCommunityItemBinding::inflate,
             ) { item, b, _ ->
 
                 when (item.communityRef) {
@@ -416,7 +429,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
             addItemType(
                 clazz = Item.GroupHeaderItem::class,
-                inflateFn = CommunitySelectorGroupItemBinding::inflate
+                inflateFn = CommunitySelectorGroupItemBinding::inflate,
             ) { item, b, _ ->
                 b.titleTextView.text = item.text
 
@@ -429,7 +442,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
             addItemType(
                 clazz = Item.CommunityChildItem::class,
-                inflateFn = CommunitySelectorCommunityItemBinding::inflate
+                inflateFn = CommunitySelectorCommunityItemBinding::inflate,
             ) { item, b, h ->
                 val community = item.community
 
@@ -443,30 +456,32 @@ class CommunitySelectorController @AssistedInject constructor(
 
                 @Suppress("SetTextI18n")
                 b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
-                        "(${item.community.community.instance})"
+                    "(${item.community.community.instance})"
 
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
                         this@CommunitySelectorController,
-                        community.community.toCommunityRef()
+                        community.community.toCommunityRef(),
                     )
                 }
             }
             addItemType(
                 clazz = Item.StaticChildItem::class,
-                inflateFn = CommunitySelectorStaticCommunityItemBinding::inflate
+                inflateFn = CommunitySelectorStaticCommunityItemBinding::inflate,
             ) { item, b, h ->
                 b.icon.setImageResource(item.iconResId)
                 b.textView.text = item.text
 
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
-                        this@CommunitySelectorController, item.communityRef)
+                        this@CommunitySelectorController,
+                        item.communityRef,
+                    )
                 }
             }
             addItemType(
                 clazz = Item.RecentChildItem::class,
-                inflateFn = CommunitySelectorStaticCommunityItemBinding::inflate
+                inflateFn = CommunitySelectorStaticCommunityItemBinding::inflate,
             ) { item, b, h ->
                 b.icon.setImageResource(0)
                 b.icon.visibility = View.GONE
@@ -474,12 +489,14 @@ class CommunitySelectorController @AssistedInject constructor(
                 b.textView.text = item.text
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
-                        this@CommunitySelectorController, item.communityRef)
+                        this@CommunitySelectorController,
+                        item.communityRef,
+                    )
                 }
             }
             addItemType(
                 clazz = Item.NoResultsItem::class,
-                inflateFn = CommunitySelectorNoResultsItemBinding::inflate
+                inflateFn = CommunitySelectorNoResultsItemBinding::inflate,
             ) { item, b, _ ->
                 b.text.text = item.text
             }
@@ -504,13 +521,16 @@ class CommunitySelectorController @AssistedInject constructor(
 
         private fun refreshItems(cb: () -> Unit) {
             fun makeRecentItems(query: String?): List<Item> =
-                if (!query.isNullOrBlank()) listOf()
-                else arrayListOf<Item>().apply {
-                    val recents = recentCommunityManager.getRecentCommunities()
-                    if (recents.isNotEmpty()) {
-                        add(Item.GroupHeaderItem(context.getString(R.string.recents)))
-                        recents.forEach {
-                            add(Item.RecentChildItem(it.key, it.communityRef))
+                if (!query.isNullOrBlank()) {
+                    listOf()
+                } else {
+                    arrayListOf<Item>().apply {
+                        val recents = recentCommunityManager.getRecentCommunities()
+                        if (recents.isNotEmpty()) {
+                            add(Item.GroupHeaderItem(context.getString(R.string.recents)))
+                            recents.forEach {
+                                add(Item.RecentChildItem(it.key, it.communityRef))
+                            }
                         }
                     }
                 }
@@ -528,45 +548,55 @@ class CommunitySelectorController @AssistedInject constructor(
                 currentCommunityRef?.let {
                     when (currentCommunityData) {
                         is StatefulData.Error ->
-                            newItems.add(Item.CurrentCommunity(
-                                communityRef = it,
-                                siteResponse = null,
-                                communityView = null,
-                                isLoading = false,
-                                error = currentCommunityData.error,
-                            ))
+                            newItems.add(
+                                Item.CurrentCommunity(
+                                    communityRef = it,
+                                    siteResponse = null,
+                                    communityView = null,
+                                    isLoading = false,
+                                    error = currentCommunityData.error,
+                                ),
+                            )
                         is StatefulData.Loading ->
-                            newItems.add(Item.CurrentCommunity(
-                                communityRef = it,
-                                siteResponse = null,
-                                communityView = null,
-                                isLoading = true,
-                                error = null,
-                            ))
+                            newItems.add(
+                                Item.CurrentCommunity(
+                                    communityRef = it,
+                                    siteResponse = null,
+                                    communityView = null,
+                                    isLoading = true,
+                                    error = null,
+                                ),
+                            )
                         is StatefulData.NotStarted ->
-                            newItems.add(Item.CurrentCommunity(
-                                communityRef = it,
-                                siteResponse = null,
-                                communityView = null,
-                                isLoading = false,
-                                error = null,
-                            ))
+                            newItems.add(
+                                Item.CurrentCommunity(
+                                    communityRef = it,
+                                    siteResponse = null,
+                                    communityView = null,
+                                    isLoading = false,
+                                    error = null,
+                                ),
+                            )
                         is StatefulData.Success ->
-                            newItems.add(Item.CurrentCommunity(
-                                communityRef = it,
-                                siteResponse = currentCommunityData.data.leftOrNull(),
-                                communityView = currentCommunityData.data.getOrNull(),
-                                isLoading = false,
-                                error = null,
-                            ))
+                            newItems.add(
+                                Item.CurrentCommunity(
+                                    communityRef = it,
+                                    siteResponse = currentCommunityData.data.leftOrNull(),
+                                    communityView = currentCommunityData.data.getOrNull(),
+                                    isLoading = false,
+                                    error = null,
+                                ),
+                            )
                         null ->
-                            newItems.add(Item.CurrentCommunity(
-                                communityRef = it,
-                                siteResponse = null,
-                                communityView = null,
-                                isLoading = false,
-                                error = null,
-                            ))
+                            newItems.add(
+                                Item.CurrentCommunity(
+                                    communityRef = it,
+                                    siteResponse = null,
+                                    communityView = null,
+                                    isLoading = false,
+                                    error = null,
+                                ),
+                            )
                     }
                 }
 
@@ -576,7 +606,7 @@ class CommunitySelectorController @AssistedInject constructor(
                         context.getString(R.string.all),
                         R.drawable.ic_subreddit_all,
                         CommunityRef.All(),
-                    )
+                    ),
                 )
 
                 val account = accountManager.currentAccount.value
@@ -586,14 +616,14 @@ class CommunitySelectorController @AssistedInject constructor(
                             context.getString(R.string.subscribed),
                             R.drawable.baseline_dynamic_feed_24,
                             CommunityRef.Subscribed(null),
-                        )
+                        ),
                     )
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.local),
                             R.drawable.ic_subreddit_home,
                             CommunityRef.Local(null),
-                        )
+                        ),
                     )
                 } else {
                     newItems.addAll(
@@ -613,7 +643,7 @@ class CommunitySelectorController @AssistedInject constructor(
                                 R.drawable.ic_subreddit_home,
                                 CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
                             ),
-                        )
+                        ),
                     )
                 }
 
@@ -630,13 +660,13 @@ class CommunitySelectorController @AssistedInject constructor(
                         Item.CommunityChildItem(
                             text = it.community.name,
                             community = it,
-                            monthlyActiveUsers = it.counts.users_active_month
+                            monthlyActiveUsers = it.counts.users_active_month,
                         ).also {
                             communityRefs.add(
                                 CommunityRef.CommunityRefByName(
                                     name = it.community.community.name,
-                                    instance = it.community.community.instance
-                                )
+                                    instance = it.community.community.instance,
+                                ),
                             )
                         }
                     }
@@ -650,17 +680,19 @@ class CommunitySelectorController @AssistedInject constructor(
                 }
 
                 val serverQueryItems = serverQueryResults
-                    .map { Item.CommunityChildItem(
-                        text = it.community.name,
-                        community = it,
-                        monthlyActiveUsers = it.counts.users_active_month
-                    ) }
+                    .map {
+                        Item.CommunityChildItem(
+                            text = it.community.name,
+                            community = it,
+                            monthlyActiveUsers = it.counts.users_active_month,
+                        )
+                    }
                     .filter {
                         !communityRefs.contains(
                             CommunityRef.CommunityRefByName(
                                 it.community.community.name,
                                 it.community.community.instance,
-                            )
+                            ),
                         ) && it.community.community.name.contains(query, ignoreCase = true)
                     }
 
@@ -669,8 +701,8 @@ class CommunitySelectorController @AssistedInject constructor(
                 newItems.add(
                     Item.GroupHeaderItem(
                         context.getString(R.string.server_results),
-                        serverResultsInProgress
-                    )
+                        serverResultsInProgress,
+                    ),
                 )
 
                 if (serverQueryItems.isNotEmpty() || serverResultsInProgress) {
@@ -721,6 +753,5 @@ class CommunitySelectorController @AssistedInject constructor(
 
             refreshItems(cb)
         }
-
     }
 }

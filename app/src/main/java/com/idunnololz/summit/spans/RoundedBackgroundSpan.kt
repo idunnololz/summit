@@ -10,7 +10,7 @@ import kotlin.math.roundToInt
 
 class RoundedBackgroundSpan(
     private var backgroundColor: Int,
-    private var textColor: Int
+    private var textColor: Int,
 ) : ReplacementSpan() {
     companion object {
         private val CORNER_RADIUS = Utils.convertDpToPixel(3f)
@@ -26,20 +26,20 @@ class RoundedBackgroundSpan(
         top: Int,
         y: Int,
         bottom: Int,
-        paint: Paint
+        paint: Paint,
     ) {
         val rect = RectF(
             x,
             top.toFloat(),
             x + measureText(paint, text, start, end) + startEndPadding * 2,
-            bottom.toFloat()
+            bottom.toFloat(),
         )
         paint.color = backgroundColor
         canvas.drawRoundRect(
             rect,
             CORNER_RADIUS,
             CORNER_RADIUS,
-            paint
+            paint,
         )
         paint.color = textColor
         canvas.drawText(text, start, end, x + startEndPadding, y.toFloat(), paint)
@@ -50,14 +50,14 @@ class RoundedBackgroundSpan(
         text: CharSequence?,
         start: Int,
         end: Int,
-        fm: FontMetricsInt?
+        fm: FontMetricsInt?,
     ): Int = (paint.measureText(text, start, end) + startEndPadding * 2).roundToInt()
 
     private fun measureText(
         paint: Paint,
         text: CharSequence,
         start: Int,
-        end: Int
+        end: Int,
     ): Float {
         return paint.measureText(text, start, end)
     }

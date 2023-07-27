@@ -14,7 +14,6 @@ import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.scrape.LoaderException
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
-import com.idunnololz.summit.view.LoadingView
 
 private const val TAG = "ErrorUtils"
 

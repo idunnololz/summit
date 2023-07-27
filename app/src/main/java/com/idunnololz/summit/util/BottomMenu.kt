@@ -151,7 +151,6 @@ class BottomMenu(private val context: Context) {
             if (expandFully) {
                 skipCollapsed = true
             }
-                
         }.also {
             bottomSheetBehavior = it
         }
@@ -194,7 +193,7 @@ class BottomMenu(private val context: Context) {
                     }
                 },
             )
-        }, 100)
+        }, 100,)
 
         if (handleBackPress) {
             mainActivity.onBackPressedDispatcher.addCallback(mainActivity, onBackPressedCallback)
@@ -216,12 +215,12 @@ class BottomMenu(private val context: Context) {
 
     private sealed interface Item {
         data class TitleItem(
-            val title: String?
-        ): Item
+            val title: String?,
+        ) : Item
 
         data class MenuItemItem(
-            val menuItem: MenuItem
-        ): Item
+            val menuItem: MenuItem,
+        ) : Item
 
         object FooterItem : Item
     }
@@ -236,7 +235,7 @@ class BottomMenu(private val context: Context) {
                         old.menuItem.id == (new as Item.MenuItemItem).menuItem.id
                     is Item.TitleItem -> true
                 }
-            }
+            },
         ).apply {
             addItemType(Item.TitleItem::class, MenuItemTitleBinding::inflate) { item, b, _ ->
                 b.title.text = item.title

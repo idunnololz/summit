@@ -4,12 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import android.view.animation.DecelerateInterpolator
-import android.widget.Scroller
 import androidx.viewpager.widget.ViewPager
-import java.lang.reflect.Field
 import kotlin.math.abs
-
 
 class CustomScrollViewPager : ViewPager {
 
@@ -29,13 +25,11 @@ class CustomScrollViewPager : ViewPager {
         val configuration = ViewConfiguration.get(context)
         touchSlop = configuration.scaledPagingTouchSlop
     }
-    
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return if (enabled) {
-
             val action: Int = event.action
             when (action and MotionEvent.ACTION_MASK) {
-
                 MotionEvent.ACTION_MOVE -> {
                     val pointerIndex: Int = event.findPointerIndex(activePointerId)
                     if (pointerIndex == -1) {
@@ -78,14 +72,15 @@ class CustomScrollViewPager : ViewPager {
                 // especially with multi touch
             }
             false
-        } else false
+        } else {
+            false
+        }
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
         return if (enabled) {
             val action: Int = event.action
             when (action and MotionEvent.ACTION_MASK) {
-
                 MotionEvent.ACTION_MOVE -> {
                     val pointerIndex: Int = event.findPointerIndex(activePointerId)
                     if (pointerIndex == -1) {
@@ -121,7 +116,9 @@ class CustomScrollViewPager : ViewPager {
                 }
             }
             super.onInterceptTouchEvent(event)
-        } else false
+        } else {
+            false
+        }
     }
 
     fun setPagingEnabled(enabled: Boolean) {

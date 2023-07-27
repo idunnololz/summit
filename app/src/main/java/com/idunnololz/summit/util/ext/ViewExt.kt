@@ -9,7 +9,7 @@ import androidx.core.view.ViewCompat
 
 fun View.drawToBitmap(
     backgroundColor: Int = Color.TRANSPARENT,
-    config: Bitmap.Config = Bitmap.Config.ARGB_8888
+    config: Bitmap.Config = Bitmap.Config.ARGB_8888,
 ): Bitmap {
     if (!ViewCompat.isLaidOut(this)) {
         throw IllegalStateException("View needs to be laid out before calling drawToBitmap()")
@@ -36,6 +36,6 @@ fun View.runAfterLayout(callback: () -> Unit) {
                 callback()
                 return true
             }
-        }
+        },
     )
 }

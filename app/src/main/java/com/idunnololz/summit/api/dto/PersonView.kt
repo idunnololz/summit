@@ -7,4 +7,4 @@ import kotlinx.parcelize.Parcelize
 data class PersonView(
     val person: Person,
     val counts: PersonAggregates,
-): Parcelable
+) : Parcelable

@@ -9,15 +9,11 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account_ui.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.account_ui.SignInNavigator
+import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
+import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.databinding.TabbedFragmentSavedBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.community.ViewPagerController
-import com.idunnololz.summit.lemmy.person.PersonAboutFragment
-import com.idunnololz.summit.lemmy.person.PersonCommentsFragment
-import com.idunnololz.summit.lemmy.person.PersonPostsFragment
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
@@ -38,7 +34,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -126,7 +122,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
                 },
                 onSaveCommentChanged = {
                     viewModel.onSaveCommentChanged(it)
-                }
+                },
             )
         }
     }

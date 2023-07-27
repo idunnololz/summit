@@ -28,7 +28,8 @@ object LemmyUtils {
     fun abbrevNumber(number: Long): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val formatter = CompactDecimalFormat.getInstance(
-                Locale.getDefault(), CompactDecimalFormat.CompactStyle.SHORT
+                Locale.getDefault(),
+                CompactDecimalFormat.CompactStyle.SHORT,
             )
 
             formatter.format(number)
@@ -41,9 +42,9 @@ object LemmyUtils {
         context: Context,
         redditVideo: VideoSizeHint,
         availableW: Int = Utils.getScreenWidth(context) - context.resources.getDimensionPixelOffset(
-            R.dimen.padding_half
+            R.dimen.padding_half,
         ) * 2,
-        availableH: Int = Utils.getScreenHeight(context)
+        availableH: Int = Utils.getScreenHeight(context),
     ): Point {
         val w = redditVideo.width
         val h = redditVideo.height
@@ -63,7 +64,7 @@ object LemmyUtils {
         imageWidth: Int,
         imageHeight: Int,
         availableW: Int = Utils.getScreenWidth(context),
-        availableH: Int = Utils.getScreenHeight(context)
+        availableH: Int = Utils.getScreenHeight(context),
     ): Size {
         if (availableW > imageWidth && availableH > imageHeight) {
             return Size(imageWidth, imageHeight)
@@ -90,7 +91,7 @@ object LemmyUtils {
         context: Context,
         previewInfo: PreviewInfo?,
         rootView: View,
-        imageView: ImageView
+        imageView: ImageView,
     ) {
         previewInfo ?: return
         val width = previewInfo.width
@@ -99,7 +100,7 @@ object LemmyUtils {
 
         rootView.measure(
             View.MeasureSpec.makeMeasureSpec(screenSize.x, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(screenSize.y, View.MeasureSpec.AT_MOST)
+            View.MeasureSpec.makeMeasureSpec(screenSize.y, View.MeasureSpec.AT_MOST),
         )
         if (width != 0 && height != 0) {
             val thumbnailHeight = (imageView.measuredWidth * (height.toDouble() / width)).toInt()
@@ -135,7 +136,7 @@ object LemmyUtils {
     fun openRedditUrl(context: Context, url: String) {
         context.startActivity(
             Intent(context, MainActivity::class.java)
-                .setData(Uri.parse(url))
+                .setData(Uri.parse(url)),
         )
     }
 
@@ -143,11 +144,11 @@ object LemmyUtils {
         isUriReddit(Uri.parse(url))
 
     fun isUriReddit(uri: Uri): Boolean =
-        uri.host == "www.reddit.com"
-                || uri.host == "reddit.com"
-                || uri.host == "oauth.reddit.com"
-                || uri.host == "redd.it"
-                || uri.host == "amp.reddit.com"
+        uri.host == "www.reddit.com" ||
+            uri.host == "reddit.com" ||
+            uri.host == "oauth.reddit.com" ||
+            uri.host == "redd.it" ||
+            uri.host == "amp.reddit.com"
 
     fun isUrlRedirect(url: String): Boolean =
         isUriRedirect(Uri.parse(url))

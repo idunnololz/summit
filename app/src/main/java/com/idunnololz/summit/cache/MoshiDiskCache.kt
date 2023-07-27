@@ -8,7 +8,7 @@ import java.io.File
 class MoshiDiskCache(
     val moshi: Moshi,
     private val cache: SimpleDiskCache,
-): IDataCache by cache {
+) : IDataCache by cache {
 
     companion object {
         const val TAG = "MoshiDiskCache"
@@ -21,7 +21,7 @@ class MoshiDiskCache(
         ) =
             MoshiDiskCache(
                 moshi,
-                SimpleDiskCache(dir, appVersion, maxSize)
+                SimpleDiskCache(dir, appVersion, maxSize),
             )
     }
 

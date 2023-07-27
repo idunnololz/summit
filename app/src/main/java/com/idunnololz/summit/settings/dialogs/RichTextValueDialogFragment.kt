@@ -1,21 +1,16 @@
 package com.idunnololz.summit.settings.dialogs
 
 import android.app.Activity
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import com.github.drjacky.imagepicker.ImagePicker
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentRichTextValueBinding
-import com.idunnololz.summit.databinding.DialogFragmentTextValueBinding
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentViewModel
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
@@ -27,7 +22,8 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextValueBinding>(),
+class RichTextValueDialogFragment :
+    BaseDialogFragment<DialogFragmentRichTextValueBinding>(),
     BackPressHandler {
 
     companion object {
@@ -75,7 +71,7 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -142,7 +138,7 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
                         mainActivity = requireMainActivity(),
                         viewGroup = binding.coordinatorLayout,
                         expandFully = true,
-                        handleBackPress = false
+                        handleBackPress = false,
                     )
                 },
                 onPreviewClick = {
@@ -150,11 +146,11 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
                         .apply {
                             arguments = PreviewCommentDialogFragmentArgs(
                                 viewModel.instance,
-                                textEditor.text.toString()
+                                textEditor.text.toString(),
                             ).toBundle()
                         }
                         .showAllowingStateLoss(childFragmentManager, "AA")
-                }
+                },
             )
 
             viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
@@ -162,10 +158,13 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
                     is StatefulData.Error -> {
                         loadingView.hideAll()
                         AlertDialogFragment.Builder()
-                            .setMessage(getString(
-                                R.string.error_unable_to_send_post,
-                                it.error::class.qualifiedName,
-                                it.error.message))
+                            .setMessage(
+                                getString(
+                                    R.string.error_unable_to_send_post,
+                                    it.error::class.qualifiedName,
+                                    it.error.message,
+                                ),
+                            )
                             .createAndShow(childFragmentManager, "ASDS")
                     }
                     is StatefulData.Loading -> {
