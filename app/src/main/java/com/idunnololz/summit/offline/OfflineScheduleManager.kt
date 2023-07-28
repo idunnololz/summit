@@ -43,7 +43,7 @@ class OfflineScheduleManager(
                 context,
                 OFFLINE_DOWNLOAD_REQUEST_CODE,
                 getOfflineIntent(),
-                PendingIntent.FLAG_NO_CREATE,
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
             )
             if (olderIntent == null) {
                 Log.d(TAG, "There were no pending intents registered. Registering a new one...")
@@ -76,7 +76,7 @@ class OfflineScheduleManager(
             context,
             OFFLINE_DOWNLOAD_REQUEST_CODE,
             getOfflineIntent(),
-            0,
+            PendingIntent.FLAG_IMMUTABLE,
         )
 
         // Cancel any existing alarms
