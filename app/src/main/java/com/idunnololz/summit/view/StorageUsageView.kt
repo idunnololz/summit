@@ -70,7 +70,7 @@ class StorageUsageView : ConstraintLayout {
         offsetDescendantRectToMyCoords(placeholder, offsetViewBounds)
 
         val y: Float = offsetViewBounds.top.toFloat()
-        val totalSize = storageUsageItems.sumByDouble { it.sizeInBytes.toDouble() }
+        val totalSize = storageUsageItems.sumOf { it.sizeInBytes.toDouble() }
         var x: Float = offsetViewBounds.left.toFloat()
 
         canvas.drawRect(offsetViewBounds, borderPaint)

@@ -27,6 +27,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -641,6 +643,9 @@ object Utils {
             val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.hideSoftInputFromWindow(currentFocus.windowToken, 0)
         }
+
+        WindowInsetsControllerCompat(activity.window, activity.window.decorView)
+            .hide(WindowInsetsCompat.Type.ime())
     }
 
     fun permute(arr: List<Int>): MutableList<MutableList<Int>> {

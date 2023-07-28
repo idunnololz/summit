@@ -16,7 +16,6 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.ThemeSettings
 import com.idunnololz.summit.settings.ui.bindTo
 import com.idunnololz.summit.settings.ui.bindToMultiView
@@ -146,6 +145,15 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                         preferences.setUseMaterialYou(false)
                     }
                 },
+            )
+
+            themeSettings.colorScheme.bindTo(
+                binding.colorScheme,
+                { preferences.colorScheme },
+                {
+                    ColorSchemePickerDialogFragment()
+                        .show(childFragmentManager, "asdaa")
+                }
             )
 
             themeSettings.blackTheme.bindTo(

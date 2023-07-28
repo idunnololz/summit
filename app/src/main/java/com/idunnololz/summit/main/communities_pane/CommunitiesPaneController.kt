@@ -4,12 +4,14 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import coil.load
+import com.google.android.material.textfield.TextInputLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BookmarkHeaderItemBinding
 import com.idunnololz.summit.databinding.BookmarkedCommunityHeaderItemBinding
@@ -78,6 +80,12 @@ class CommunitiesPaneController @AssistedInject constructor(
             viewModel.loadCommunities()
         }
 
+        binding.titleEditText.addTextChangedListener {
+            adapter.filter(it?.toString()) {
+                binding.recyclerView.scrollToPosition(0)
+            }
+        }
+
         viewModel.communities.observe(viewLifecycleOwner) {
             if (it != null) {
                 adapter.data = it
@@ -140,6 +148,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             ) : Item
         }
 
+        private var filter: String? = null
         var currentTab: TabsManager.Tab? = null
             set(value) {
                 field = value
@@ -307,65 +316,155 @@ class CommunitiesPaneController @AssistedInject constructor(
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
 
-        private fun refreshItems() {
+        private fun refreshItems(cb: (() -> Unit)? = null) {
             val data = data ?: return
+            val filter = filter
 
             val newItems = mutableListOf<Item>()
-            newItems.add(Item.BookmarkHeaderItem)
 
-            for (userCommunity in data.userCommunities) {
-                val isSelected = currentTab?.hasTabId(userCommunity.id) ?: false
-                val tab = userCommunity.toTab()
+            if (filter.isNullOrBlank()) {
+                newItems.add(Item.BookmarkHeaderItem)
 
-                val tabStateItem = data.tabsState[tab]?.let {
-                    if (it.currentCommunity == userCommunity.communityRef) {
-                        null
-                    } else {
-                        Item.TabStateItem(
-                            "tabid:${userCommunity.id}",
-                            tab,
-                            it,
-                            isSelected,
+                for (userCommunity in data.userCommunities) {
+                    val isSelected = currentTab?.hasTabId(userCommunity.id) ?: false
+                    val tab = userCommunity.toTab()
+
+                    val tabStateItem = data.tabsState[tab]?.let {
+                        if (it.currentCommunity == userCommunity.communityRef) {
+                            null
+                        } else {
+                            Item.TabStateItem(
+                                "tabid:${userCommunity.id}",
+                                tab,
+                                it,
+                                isSelected,
+                            )
+                        }
+                    }
+
+                    if (userCommunity.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
+                        newItems += Item.HomeCommunityItem(
+                            communityRef = userCommunity.communityRef,
+                            userCommunityItem = userCommunity,
+                            isSelected = isSelected && tabStateItem == null,
+                            resetTabOnClick = tabStateItem != null,
                         )
+                    } else {
+                        newItems += Item.BookmarkedCommunityItem(
+                            communityRef = userCommunity.communityRef,
+                            iconUrl = userCommunity.iconUrl,
+                            userCommunityItem = userCommunity,
+                            isSelected = isSelected && tabStateItem == null,
+                            resetTabOnClick = tabStateItem != null,
+                        )
+                    }
+
+                    if (tabStateItem != null) {
+                        newItems += tabStateItem
                     }
                 }
 
-                if (userCommunity.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
-                    newItems += Item.HomeCommunityItem(
-                        communityRef = userCommunity.communityRef,
-                        userCommunityItem = userCommunity,
-                        isSelected = isSelected && tabStateItem == null,
-                        resetTabOnClick = tabStateItem != null,
-                    )
+                newItems.add(
+                    Item.SubscriptionHeaderItem(
+                        data.accountInfoUpdateState is StatefulData.Loading,
+                    ),
+                )
+                if (data.subscriptionCommunities.isNotEmpty()) {
+                    for (subscriptionCommunity in data.subscriptionCommunities) {
+                        val isSelected = currentTab
+                            ?.isSubscribedCommunity(subscriptionCommunity.toCommunityRef())
+                            ?: false
+                        val tab = subscriptionCommunity.toCommunityRef().toTab()
+
+                        val tabStateItem = data.tabsState[tab]?.let {
+                            if (it.currentCommunity == subscriptionCommunity.toCommunityRef()) {
+                                null
+                            } else {
+                                Item.TabStateItem(
+                                    subscriptionCommunity.name,
+                                    tab,
+                                    tabState = it,
+                                    isSelected = isSelected,
+                                )
+                            }
+                        }
+
+                        newItems += Item.SubscribedCommunityItem(
+                            communityRef = subscriptionCommunity.toCommunityRef(),
+                            iconUrl = subscriptionCommunity.icon,
+                            isSelected = isSelected && tabStateItem == null,
+                            resetTabOnClick = tabStateItem != null,
+                        )
+                        if (tabStateItem != null) {
+                            newItems += tabStateItem
+                        }
+                    }
                 } else {
-                    newItems += Item.BookmarkedCommunityItem(
-                        communityRef = userCommunity.communityRef,
-                        iconUrl = userCommunity.iconUrl,
-                        userCommunityItem = userCommunity,
-                        isSelected = isSelected && tabStateItem == null,
-                        resetTabOnClick = tabStateItem != null,
-                    )
+                    newItems.add(Item.NoSubscriptionsItem)
                 }
+            } else {
+                for (userCommunity in data.userCommunities) {
+                    val isSelected = currentTab?.hasTabId(userCommunity.id) ?: false
+                    val tab = userCommunity.toTab()
+                    val tabState = data.tabsState[tab]
+                    val tabStateName = tabState?.currentCommunity?.getName(context)
 
-                if (tabStateItem != null) {
-                    newItems += tabStateItem
+                    if (tabStateName?.contains(filter, ignoreCase = true) != true &&
+                        !userCommunity.communityRef.getName(context).contains(filter, ignoreCase = true)) {
+                        continue
+                    }
+
+                    val tabStateItem = tabState?.let {
+                        if (it.currentCommunity == userCommunity.communityRef) {
+                            null
+                        } else {
+                            Item.TabStateItem(
+                                "tabid:${userCommunity.id}",
+                                tab,
+                                it,
+                                isSelected,
+                            )
+                        }
+                    }
+
+                    if (userCommunity.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
+                        newItems += Item.HomeCommunityItem(
+                            communityRef = userCommunity.communityRef,
+                            userCommunityItem = userCommunity,
+                            isSelected = isSelected && tabStateItem == null,
+                            resetTabOnClick = tabStateItem != null,
+                        )
+                    } else {
+                        newItems += Item.BookmarkedCommunityItem(
+                            communityRef = userCommunity.communityRef,
+                            iconUrl = userCommunity.iconUrl,
+                            userCommunityItem = userCommunity,
+                            isSelected = isSelected && tabStateItem == null,
+                            resetTabOnClick = tabStateItem != null,
+                        )
+                    }
+
+                    if (tabStateItem != null) {
+                        newItems += tabStateItem
+                    }
                 }
-            }
-
-            newItems.add(
-                Item.SubscriptionHeaderItem(
-                    data.accountInfoUpdateState is StatefulData.Loading,
-                ),
-            )
-            if (data.subscriptionCommunities.isNotEmpty()) {
                 for (subscriptionCommunity in data.subscriptionCommunities) {
+                    val communityRef = subscriptionCommunity.toCommunityRef()
                     val isSelected = currentTab
-                        ?.isSubscribedCommunity(subscriptionCommunity.toCommunityRef())
+                        ?.isSubscribedCommunity(communityRef)
                         ?: false
-                    val tab = subscriptionCommunity.toCommunityRef().toTab()
+                    val tab = communityRef.toTab()
+                    val tabState = data.tabsState[tab]
+                    val tabStateName = tabState?.currentCommunity?.getName(context)
 
-                    val tabStateItem = data.tabsState[tab]?.let {
-                        if (it.currentCommunity == subscriptionCommunity.toCommunityRef()) {
+
+                    if (tabStateName?.contains(filter, ignoreCase = true) != true &&
+                        !communityRef.getName(context).contains(filter, ignoreCase = true)) {
+                        continue
+                    }
+
+                    val tabStateItem = tabState?.let {
+                        if (it.currentCommunity == communityRef) {
                             null
                         } else {
                             Item.TabStateItem(
@@ -378,7 +477,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                     }
 
                     newItems += Item.SubscribedCommunityItem(
-                        communityRef = subscriptionCommunity.toCommunityRef(),
+                        communityRef = communityRef,
                         iconUrl = subscriptionCommunity.icon,
                         isSelected = isSelected && tabStateItem == null,
                         resetTabOnClick = tabStateItem != null,
@@ -387,11 +486,15 @@ class CommunitiesPaneController @AssistedInject constructor(
                         newItems += tabStateItem
                     }
                 }
-            } else {
-                newItems.add(Item.NoSubscriptionsItem)
             }
 
-            adapterHelper.setItems(newItems, this)
+            adapterHelper.setItems(newItems, this, cb)
+        }
+
+        fun filter(f: String?, cb: () -> Unit) {
+            filter = f
+
+            refreshItems(cb)
         }
     }
 }

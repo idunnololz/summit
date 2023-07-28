@@ -58,6 +58,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -454,7 +455,11 @@ class CommunityFragment :
     }
 
     private fun onReady() {
+        if (!isBindingAvailable()) return
+
         val view = binding.root
+        val context = requireContext()
+
         checkNotNull(view.findNavController())
 
         requireMainActivity().apply {
@@ -465,11 +470,9 @@ class CommunityFragment :
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
                 binding.recyclerView,
-                binding.customAppBar.customActionBar.height,
+                context.getDimen(R.dimen.footer_spacer_height),
             )
         }
-
-        val context = requireContext()
 
         (parentFragment?.parentFragment as? MainFragment)?.updateCommunityInfoPane(
             requireNotNull(viewModel.currentCommunityRef.value),

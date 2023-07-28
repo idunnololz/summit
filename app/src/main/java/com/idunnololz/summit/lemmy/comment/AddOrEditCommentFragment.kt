@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.github.drjacky.imagepicker.ImagePicker
@@ -29,6 +30,7 @@ import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 
@@ -72,6 +74,14 @@ class AddOrEditCommentFragment :
         super.onCreate(savedInstanceState)
 
         setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+
+        childFragmentManager.setFragmentResultListener(AddLinkDialogFragment.REQUEST_KEY, this) { key, bundle ->
+            val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
+                AddLinkDialogFragment.REQUEST_KEY_RESULT)
+            if (result != null) {
+                textFormatterHelper.onLinkAdded(result.text, result.url)
+            }
+        }
     }
 
     override fun onStart() {
@@ -295,6 +305,10 @@ class AddOrEditCommentFragment :
                     expandFully = true,
                     handleBackPress = false,
                 )
+            },
+            onAddLinkClick = {
+                AddLinkDialogFragment()
+                    .showAllowingStateLoss(childFragmentManager, "asdf")
             },
             onPreviewClick = {
                 PreviewCommentDialogFragment()

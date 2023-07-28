@@ -330,7 +330,7 @@ class PostFragment :
         val context = requireContext()
 
         requireMainActivity().apply {
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.swipeRefreshLayout)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
         }
 

@@ -404,7 +404,7 @@
     <string name="show_video_posts">Show video posts</string>
     <string name="show_text_posts">Show text posts</string>
     <string name="error_content_type_filter_too_aggressive">Your content type filters are too aggressive for this community/instance. Please relax your content type filters or choose a different community/instance.</string>
-    <string name="card2">Card2</string>
+    <string name="card2">Card 2</string>
 
     <string name="elapsed_time_just_now">now</string>
     <string name="elapsed_time_a_minute_ago">1m</string>
@@ -442,11 +442,18 @@
     <string name="community_hint">community</string>
     <string name="view_image_on_single_tap">View image on single tap</string>
     <string name="view_image_on_single_tap_desc">If enabled, tapping on the thumbnail will open the image in the image viewer. If disabled, long pressing and image will open the image in the image viewer instead.</string>
-    <string name="card3">Card3</string>
+    <string name="card3">Card 3</string>
     <string name="large_list">Large list</string>
     <string name="font_color">Font color</string>
     <string name="calm">Calm</string>
     <string name="high_contrast">High contrast</string>
+    <string name="color_scheme">Color scheme</string>
+    <string name="blue">Blue</string>
+    <string name="choose_a_color_scheme">Choose a color scheme</string>
+    <string name="red">Red</string>
+    <string name="insert_link">Insert link</string>
+    <string name="text">Text</string>
+    <string name="link">Link</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

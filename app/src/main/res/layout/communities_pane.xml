@@ -6,11 +6,87 @@
     android:layout_height="match_parent"
     android:background="@color/colorSurface">
 
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/subreddit_filter_bg"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        app:hintEnabled="false"
+        app:startIconDrawable="@drawable/baseline_search_18"
+        app:startIconMinSize="44dp"
+        app:endIconMinSize="44dp"
+        app:endIconMode="clear_text">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/title_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="no"
+            android:background="@null"
+            android:paddingHorizontal="@dimen/padding"
+            android:paddingVertical="@dimen/padding_half"
+            android:textIsSelectable="true"
+            android:scrollbars="vertical"
+            android:textAppearance="?textAppearanceBodyMedium"
+            android:inputType="textMultiLine|textCapSentences"
+            android:hint="@string/filter"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/search_bar"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:background="@drawable/subreddit_filter_bg"-->
+<!--        android:layout_marginTop="@dimen/padding"-->
+<!--        android:layout_marginHorizontal="@dimen/padding"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent">-->
+
+
+<!--        <com.idunnololz.summit.view.PrefixedEditText-->
+<!--            android:id="@+id/search_view"-->
+<!--            android:layout_weight="1"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:maxLines="1"-->
+<!--            android:inputType="text"-->
+<!--            android:textAppearance="?textAppearanceBodyMedium"-->
+<!--            android:background="@null"-->
+<!--            android:gravity="center_vertical"-->
+<!--            android:hint="@string/community_hint"-->
+<!--            android:paddingVertical="12dp"-->
+<!--            android:paddingHorizontal="@dimen/padding"-->
+<!--            app:prefix="c/"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent" />-->
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/clear"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:padding="10dp"-->
+<!--            android:layout_marginEnd="@dimen/padding_quarter"-->
+<!--            android:src="@drawable/baseline_close_18"-->
+<!--            android:background="?selectableItemBackgroundBorderless"-->
+<!--            app:tint="?colorControlNormal"/>-->
+<!--    </LinearLayout>-->
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

@@ -26,6 +26,7 @@ class TextFormatterHelper {
         textFormatToolbarBinding: TextFormatToolbarBinding,
         editText: EditText,
         onChooseImageClick: (() -> Unit)? = null,
+        onAddLinkClick: (() -> Unit)? = null,
         onPreviewClick: () -> Unit,
     ) {
         this.editText = editText
@@ -78,6 +79,9 @@ class TextFormatterHelper {
                     startText = "> ",
                     endText = "",
                 )
+            }
+            link.setOnClickListener {
+                onAddLinkClick?.invoke()
             }
             bulletedList.setOnClickListener {
                 editText.wrapTextAtCursor(
@@ -150,5 +154,9 @@ class TextFormatterHelper {
 
     fun onImageUploaded(url: String) {
         editText?.replaceTextAtCursor("![]($url)")
+    }
+
+    fun onLinkAdded(text: String, url: String) {
+        editText?.replaceTextAtCursor("[$text]($url)")
     }
 }

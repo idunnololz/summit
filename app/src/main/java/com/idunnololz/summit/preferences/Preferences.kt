@@ -15,6 +15,7 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COLOR_SCHEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
@@ -313,6 +314,14 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP, value)
+                .apply()
+        }
+
+    var colorScheme: ColorSchemeId
+        get() = prefs.getInt(KEY_COLOR_SCHEME, ColorSchemes.Default)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_COLOR_SCHEME, value)
                 .apply()
         }
 

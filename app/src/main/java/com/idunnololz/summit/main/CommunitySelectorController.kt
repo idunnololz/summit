@@ -81,7 +81,6 @@ class CommunitySelectorController @AssistedInject constructor(
     private lateinit var binding: CommunitySelectorViewBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: EditText
-    private lateinit var clearButton: View
 
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
@@ -119,7 +118,6 @@ class CommunitySelectorController @AssistedInject constructor(
 
         recyclerView = binding.recyclerView
         searchView = binding.searchView
-        clearButton = binding.clear
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -160,15 +158,13 @@ class CommunitySelectorController @AssistedInject constructor(
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    adapter.setQuery(s?.toString())
+                    adapter.setQuery(s?.toString()) {
+                        recyclerView.scrollToPosition(0)
+                    }
                     doQueryAsync(s)
-                    recyclerView.scrollToPosition(0)
                 }
             },
         )
-        clearButton.setOnClickListener {
-            searchView.setText("")
-        }
     }
 
     private fun doQueryAsync(query: CharSequence?) {
@@ -717,10 +713,10 @@ class CommunitySelectorController @AssistedInject constructor(
             adapterHelper.setItems(newItems, this, cb)
         }
 
-        fun setQuery(query: String?) {
+        fun setQuery(query: String?, cb: () -> Unit) {
             this.query = query
 
-            refreshItems({})
+            refreshItems(cb)
         }
 
         fun setData(newData: List<CommunityView>) {

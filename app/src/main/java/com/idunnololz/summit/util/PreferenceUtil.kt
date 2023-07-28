@@ -124,6 +124,8 @@ object PreferenceUtil {
 
     const val KEY_COMMENT_THREAD_STYLE = "KEY_COMMENT_THREAD_STYLE"
 
+    const val KEY_COLOR_SCHEME = "KEY_COLOR_SCHEME"
+
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {
             preferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE)

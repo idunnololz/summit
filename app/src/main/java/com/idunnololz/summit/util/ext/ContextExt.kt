@@ -1,5 +1,7 @@
 package com.idunnololz.summit.util.ext
 
+import android.content.ClipDescription
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
@@ -38,3 +40,26 @@ fun Context.getColorCompat(@ColorRes color: Int): Int =
 
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable? =
     AppCompatResources.getDrawable(this, drawableRes)
+
+
+
+fun Context.getPlainTextFromClipboard(): String? {
+    val context = this
+    val clipboard: ClipboardManager? =
+        context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+
+    // If it does contain data, decide if you can handle the data.
+    if (clipboard != null) {
+        if (!clipboard.hasPrimaryClip()) {
+        } else if (
+            clipboard.primaryClipDescription
+                ?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) == false
+        ) {
+            // since the clipboard has data but it is not plain text
+        } else {
+            return clipboard.primaryClip?.getItemAt(0)?.text?.toString()
+        }
+    }
+
+    return null
+}

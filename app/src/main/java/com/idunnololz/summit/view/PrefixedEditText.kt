@@ -8,7 +8,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.res.use
 import com.idunnololz.summit.R
 
-class PrefixedEditText : AppCompatEditText {
+class PrefixedEditText : com.google.android.material.textfield.TextInputEditText {
     var originalLeftPadding = -1f
 
     private var prefix: String? = null

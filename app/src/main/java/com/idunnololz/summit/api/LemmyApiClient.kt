@@ -64,12 +64,14 @@ import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import java.io.InputStream
+import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
@@ -1079,10 +1081,10 @@ class LemmyApiClient @Inject constructor(
         get() = api.instance
 
     private suspend fun <T> retrofitErrorHandler(
-        call: suspend () -> Call<T>,
+        call: () -> Call<T>,
     ): Result<T> {
         val res = try {
-            withContext(Dispatchers.IO) {
+            runInterruptible(Dispatchers.IO) {
                 call().execute()
             }
         } catch (e: Exception) {
@@ -1094,6 +1096,9 @@ class LemmyApiClient @Inject constructor(
             }
             if (e is CancellationException) {
                 throw e
+            }
+            if (e is InterruptedIOException) {
+                return Result.failure(e)
             }
             Log.e(TAG, "Exception fetching url", e)
             return Result.failure(e)

@@ -84,6 +84,17 @@
         app:tint="?colorControlNormal"/>
 
     <ImageView
+        android:id="@+id/link"
+        android:src="@drawable/baseline_link_24"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:contentDescription="@string/insert_link"
+        android:background="?selectableItemBackgroundBorderless"
+        android:layout_gravity="center_vertical"
+        app:tint="?colorControlNormal"/>
+
+    <ImageView
         android:id="@+id/bulleted_list"
         android:src="@drawable/baseline_format_list_bulleted_24"
         android:layout_width="48dp"
