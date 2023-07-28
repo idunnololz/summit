@@ -100,6 +100,16 @@ class ThemeManager @Inject constructor(
             // do nothing
         }
 
+        when (preferences.colorScheme) {
+            ColorSchemes.Blue -> {
+                activity.theme.applyStyle(R.style.ThemeBlueOverlay, true)
+            }
+            ColorSchemes.Red -> {
+                activity.theme.applyStyle(R.style.ThemeRedOverlay, true)
+            }
+            else -> { /* do nothing */ }
+        }
+
         when (preferences.globalFontColor) {
             GlobalFontColorId.Calm ->
                 activity.theme.applyStyle(R.style.TextColor, true)

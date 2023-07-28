@@ -124,7 +124,7 @@ class SettingViewTypeFragment :
                 CommunityLayout.LargeList to getString(R.string.large_list),
                 CommunityLayout.Card to getString(R.string.card),
                 CommunityLayout.Card2 to getString(R.string.card2),
-                CommunityLayout.Card3 to getString(R.string.card2),
+                CommunityLayout.Card3 to getString(R.string.card3),
                 CommunityLayout.Full to getString(R.string.full),
             ),
             getCurrentChoice = {

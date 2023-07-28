@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
@@ -17,6 +18,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
+import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
@@ -78,7 +80,6 @@ class PostListViewBuilder @Inject constructor(
     private val paddingHalf = context.getDimen(R.dimen.padding_half)
 
     private val voteUiHandler = accountActionsManager.voteUiHandler
-    private var postImageWidth: Int = (Utils.getScreenWidth(context) * postUiConfig.imageWidthPercent).toInt()
     private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
     private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
 
@@ -91,7 +92,6 @@ class PostListViewBuilder @Inject constructor(
     private fun onPostUiConfigUpdated() {
         lemmyContentHelper.config = postUiConfig.fullContentConfig
 
-        postImageWidth = (Utils.getScreenWidth(context) * postUiConfig.imageWidthPercent).toInt()
         textSizeMultiplier = postUiConfig.textSizeMultiplier
 
         globalFontSizeMultiplier =
@@ -257,19 +257,6 @@ class PostListViewBuilder @Inject constructor(
                             this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
-
-                    is ListingItemLargeListBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.topToTop = ConstraintLayout.LayoutParams.UNSET
-                            this.topToBottom = rb.bottomBarrier.id
-                            this.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.bottomMargin = context.getDimen(R.dimen.padding)
-                            this.topMargin = 0
-                        }
-                        rb.headerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                        }
-                    }
                 }
             }
 
@@ -289,6 +276,12 @@ class PostListViewBuilder @Inject constructor(
                             this.dimensionRatio = null
                         }
                     }
+                    is ListingItemCard3Binding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = null
+                        }
+                    }
+
                     is ListingItemLargeListBinding -> {
                         rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             this.dimensionRatio = null
@@ -307,6 +300,11 @@ class PostListViewBuilder @Inject constructor(
                             this.dimensionRatio = "H,16:9"
                         }
                     }
+                    is ListingItemCard3Binding -> {
+                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            this.dimensionRatio = "H,16:9"
+                        }
+                    }
                     is ListingItemLargeListBinding -> {
                         rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             this.dimensionRatio = "H,16:9"
@@ -317,6 +315,28 @@ class PostListViewBuilder @Inject constructor(
 
             holder.state.preferFullSizeImages = postUiConfig.preferFullSizeImages
         }
+
+        val finalContentMaxWidth =
+            when (val rb = rawBinding) {
+                is ListingItemCardBinding -> {
+                    val lp = rb.root.layoutParams as MarginLayoutParams
+                    contentMaxWidth - lp.marginStart - lp.marginEnd
+                }
+                is ListingItemCard2Binding -> {
+                    val lp = rb.root.layoutParams as MarginLayoutParams
+                    contentMaxWidth - lp.marginStart - lp.marginEnd
+                }
+                is ListingItemCard3Binding -> {
+                    val lp = rb.root.layoutParams as MarginLayoutParams
+                    contentMaxWidth - lp.marginStart - lp.marginEnd
+                }
+                is ListingItemLargeListBinding -> {
+                    val lp = rb.image.layoutParams as MarginLayoutParams
+                    contentMaxWidth - lp.marginStart - lp.marginEnd
+                }
+                else -> contentMaxWidth
+            }
+        val postImageWidth = (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
 
         fun onItemClick() {
             val videoState = if (fullContentContainerView == null) {
@@ -621,7 +641,9 @@ class PostListViewBuilder @Inject constructor(
             onShowMoreOptions(postView)
         }
 
-        if (rawBinding is ListingItemCardBinding || rawBinding is ListingItemCard2Binding) {
+        if (rawBinding is ListingItemCardBinding ||
+            rawBinding is ListingItemCard2Binding ||
+            rawBinding is ListingItemCard3Binding) {
             postView.post.url?.let { url ->
                 openLinkButton?.visibility = View.VISIBLE
                 openLinkButton?.setOnClickListener {

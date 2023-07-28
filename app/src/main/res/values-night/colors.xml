@@ -27,6 +27,8 @@
     <color name="colorSurface">#202225</color>
     <color name="colorSurfaceDarker">#111213</color>
 
+    <color name="card_background_color">#202225</color>
+
     <color name="ucrop_color_toolbar" tools:ignore="MissingDefaultResource">@color/colorBackground</color>
     <color name="ucrop_color_widget_background" tools:ignore="MissingDefaultResource">@color/colorSurface</color>
     <color name="ucrop_color_toolbar_widget" tools:ignore="MissingDefaultResource">@color/colorOnSurface</color>

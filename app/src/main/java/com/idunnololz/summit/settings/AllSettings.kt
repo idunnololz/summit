@@ -2,6 +2,7 @@ package com.idunnololz.summit.settings
 
 import android.content.Context
 import com.idunnololz.summit.R
+import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.PostGestureAction
@@ -425,6 +426,33 @@ class PostAndCommentsSettings @Inject constructor(
 class ThemeSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
+
+    val colorScheme = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.color_scheme),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.Default,
+                context.getString(R.string._default),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.Blue,
+                context.getString(R.string.blue),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.Red,
+                context.getString(R.string.red),
+                null,
+                null,
+            ),
+        ),
+    )
+
     val blackTheme = OnOffSettingItem(
         null,
         context.getString(R.string.black_theme),

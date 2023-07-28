@@ -20,8 +20,8 @@ import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,10 +50,6 @@ class PostViewModel @Inject constructor(
     private val lemmyApiClient = lemmyApiClientFactory.create()
 
     private var postOrCommentRef: Either<PostRef, CommentRef>? = null
-
-    private var loader: WebsiteAdapterLoader? = null
-
-    private var commentLoaders = ArrayList<WebsiteAdapterLoader>()
 
     private var postView: PostView? = null
     private var comments: List<CommentView>? = null
@@ -163,6 +159,9 @@ class PostViewModel @Inject constructor(
 
             if (post != null) {
                 postReadManager.markPostAsReadLocal(apiInstance, post.post.id, read = true)
+                if (force) {
+                    accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
+                }
             }
 
             if (post == null || comments == null) {
@@ -330,16 +329,6 @@ class PostViewModel @Inject constructor(
         }
 
         return result
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        loader?.destroy()
-
-        for (l in commentLoaders) {
-            l.destroy()
-        }
     }
 
     data class PostData(

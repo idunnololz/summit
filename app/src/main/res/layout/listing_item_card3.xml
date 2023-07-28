@@ -41,7 +41,6 @@
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:layout_marginTop="@dimen/padding"
-            style="@style/CardImageView"
             app:layout_constraintHeight_min="200dp"
             app:layout_constraintHeight_max="1000dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -74,7 +73,7 @@
             style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/padding_half"
+            android:layout_marginStart="@dimen/padding_quarter"
             app:icon="@drawable/baseline_comment_18"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/headerView"/>

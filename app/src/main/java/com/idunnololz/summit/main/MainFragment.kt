@@ -46,6 +46,7 @@ import com.idunnololz.summit.tabs.isHomeTab
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.removeNavHostFragment
@@ -289,7 +290,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         Log.d(TAG, "panelState: $panelState")
                         when (panelState) {
                             PanelState.Closed -> {
-                                getMainActivity()?.setNavUiOpenness(0f)
+                                getMainActivity()?.let {
+                                    it.setNavUiOpenness(0f)
+                                    Utils.hideKeyboard(it)
+                                }
 
                                 updatePaneBackPressHandler()
                             }
@@ -326,7 +330,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         )
 
         requireMainActivity().apply {
-            this.insetViewAutomaticallyByMargins(this, binding.startPanel.swipeRefreshLayout)
+            this.insetViewAutomaticallyByPadding(this, binding.startPanel.root)
+//            this.insetViewExceptBottomAutomaticallyByMargins(this, binding.startPanel.title)
+//            this.insetViewExceptTopAutomaticallyByMargins(this, binding.startPanel.swipeRefreshLayout)
         }
 
         lifecycleScope.launch {
