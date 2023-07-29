@@ -378,10 +378,11 @@ class PostViewModel @Inject constructor(
     fun toggleCommentNavControls() {
         if (commentNavControlsState.value == null) {
             commentNavControlsState.value = CommentNavControlsState(
-                preferences.commentsNavigationFabOffX, preferences.commentsNavigationFabOffY)
+                preferences.commentsNavigationFabOffX,
+                preferences.commentsNavigationFabOffY,
+            )
         } else {
             commentNavControlsState.value = null
         }
     }
 }
-

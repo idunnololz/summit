@@ -76,7 +76,6 @@ class ColorSchemePickerDialogFragment :
                 preferences.colorScheme = it
                 preferences.setUseMaterialYou(false)
 
-
                 themeManager.onThemeOverlayChanged()
                 themeManager.applyThemeFromPreferences()
             }
@@ -104,11 +103,11 @@ class ColorSchemePickerDialogFragment :
                     is Item.ColorSchemeItem ->
                         old.colorSchemeId == (new as Item.ColorSchemeItem).colorSchemeId
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.ColorSchemeItem::class,
-                inflateFn = ColorSchemeItemBinding::inflate
+                inflateFn = ColorSchemeItemBinding::inflate,
             ) { item, b, h ->
                 b.title.text = item.name
                 b.color1.background = ColorDrawable(item.primaryColor)

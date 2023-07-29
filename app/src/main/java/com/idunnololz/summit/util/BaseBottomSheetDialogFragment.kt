@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

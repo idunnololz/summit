@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
-import androidx.work.impl.utils.PreferenceUtils
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
@@ -76,7 +75,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class PostFragment :
@@ -400,7 +398,7 @@ class PostFragment :
                         if (postView != null) {
                             showMorePostOptions(viewModel.apiInstance, postView, actionsViewModel, childFragmentManager)
                         }
-                    }
+                    },
                 )
             } else {
                 commentNavViewController?.hide()

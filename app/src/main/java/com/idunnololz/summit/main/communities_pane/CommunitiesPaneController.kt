@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import coil.load
-import com.google.android.material.textfield.TextInputLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BookmarkHeaderItemBinding
 import com.idunnololz.summit.databinding.BookmarkedCommunityHeaderItemBinding
@@ -410,7 +409,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                     val tabStateName = tabState?.currentCommunity?.getName(context)
 
                     if (tabStateName?.contains(filter, ignoreCase = true) != true &&
-                        !userCommunity.communityRef.getName(context).contains(filter, ignoreCase = true)) {
+                        !userCommunity.communityRef.getName(context).contains(filter, ignoreCase = true)
+                    ) {
                         continue
                     }
 
@@ -457,9 +457,9 @@ class CommunitiesPaneController @AssistedInject constructor(
                     val tabState = data.tabsState[tab]
                     val tabStateName = tabState?.currentCommunity?.getName(context)
 
-
                     if (tabStateName?.contains(filter, ignoreCase = true) != true &&
-                        !communityRef.getName(context).contains(filter, ignoreCase = true)) {
+                        !communityRef.getName(context).contains(filter, ignoreCase = true)
+                    ) {
                         continue
                     }
 

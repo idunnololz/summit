@@ -153,7 +153,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 {
                     ColorSchemePickerDialogFragment()
                         .show(childFragmentManager, "asdaa")
-                }
+                },
             )
 
             themeSettings.blackTheme.bindTo(
@@ -188,7 +188,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 b = binding.fontColor,
                 choices = mapOf(
                     GlobalFontColorId.Calm to getString(R.string.calm),
-                    GlobalFontColorId.HighContrast to getString(R.string.high_contrast)
+                    GlobalFontColorId.HighContrast to getString(R.string.high_contrast),
                 ),
                 getCurrentChoice = {
                     preferences.globalFontColor

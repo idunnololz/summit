@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.res.use
 import com.idunnololz.summit.R
 

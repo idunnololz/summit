@@ -1,6 +1,5 @@
 package com.idunnololz.summit.util
 
-import android.transition.AutoTransition
 import android.transition.ChangeBounds
 import android.transition.ChangeClipBounds
 import android.transition.ChangeImageTransform
