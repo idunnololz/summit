@@ -254,6 +254,14 @@ class SettingsPostListFragment :
                 preferences.postListViewImageOnSingleTap = it
             },
         )
+
+        postListSettings.compatibilityMode.bindTo(
+            binding.compatibilityMode,
+            { preferences.compatibilityMode },
+            {
+                preferences.compatibilityMode = it
+            }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

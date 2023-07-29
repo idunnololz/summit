@@ -130,6 +130,8 @@ object PreferenceUtil {
     const val KEY_COMMENTS_NAVIGATION_FAB_OFF_X = "KEY_COMMENTS_NAVIGATION_FAB_OFF_X"
     const val KEY_COMMENTS_NAVIGATION_FAB_OFF_Y = "KEY_COMMENTS_NAVIGATION_FAB_OFF_Y"
 
+    const val KEY_COMPATIBILITY_MODE = "KEY_COMPATIBILITY_MODE"
+
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {
             preferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE)

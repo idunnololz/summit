@@ -18,7 +18,7 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 62
+        versionCode = 63
         versionName = "1.0.0"
 
         ksp {

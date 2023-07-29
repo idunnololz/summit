@@ -27,6 +27,7 @@ import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
@@ -53,6 +54,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
     @Inject
     lateinit var offlineManager: OfflineManager
+    @Inject
+    lateinit var preferences: Preferences
 
     val viewModel: PersonTabbedViewModel by viewModels()
     var viewPagerController: ViewPagerController? = null
@@ -144,6 +147,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 childFragmentManager,
                 viewModel,
                 true,
+                compatibilityMode = preferences.compatibilityMode,
             ) {
                 if (it == 0) {
                     val lastSelectedPost = viewModel.lastSelectedPost

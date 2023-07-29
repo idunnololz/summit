@@ -17,12 +17,14 @@ import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNavigator {
@@ -30,6 +32,9 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
     val viewModel: SavedViewModel by viewModels()
     val actionsViewModel: MoreActionsViewModel by viewModels()
     var viewPagerController: ViewPagerController? = null
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,6 +100,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
                 childFragmentManager,
                 viewModel,
                 true,
+                compatibilityMode = preferences.compatibilityMode,
             ) {
                 if (it == 0) {
                     val lastSelectedPost = viewModel.lastSelectedPost

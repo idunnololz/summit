@@ -333,6 +333,12 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.view_image_on_single_tap),
         context.getString(R.string.view_image_on_single_tap_desc),
     )
+
+    val compatibilityMode = OnOffSettingItem(
+        null,
+        context.getString(R.string.compatibility_mode),
+        context.getString(R.string.compatibility_mode_desc),
+    )
 }
 
 @Singleton
