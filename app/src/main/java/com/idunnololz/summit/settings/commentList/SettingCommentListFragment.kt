@@ -75,6 +75,12 @@ class SettingCommentListFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+
+        commentListSettings.relayStyleNavigation.bindTo(
+            binding.relayStyleNavigation,
+            { preferences.commentsNavigationFab },
+            { preferences.commentsNavigationFab = it }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

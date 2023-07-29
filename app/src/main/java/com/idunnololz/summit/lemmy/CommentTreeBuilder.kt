@@ -4,6 +4,7 @@ import android.util.Log
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.api.dto.Comment
+import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getDepth
@@ -216,6 +217,23 @@ class CommentTreeBuilder(
             null
         }
     }
+}
+
+fun CommentNodeData.isChildComment(commentId: Long): Boolean {
+    return when (val commentView = commentView) {
+        is PostViewModel.ListView.CommentListView -> {
+            commentView.comment.comment.id.toLong() == commentId
+        }
+        is PostViewModel.ListView.MoreCommentsItem -> {
+            false
+        }
+        is PostViewModel.ListView.PendingCommentListView -> {
+            commentView.pendingCommentView.id == commentId
+        }
+        is PostViewModel.ListView.PostListView -> {
+            false
+        }
+    } || children.any { it.isChildComment(commentId) }
 }
 
 fun List<CommentNodeData>.flatten(): MutableList<CommentNodeData> {

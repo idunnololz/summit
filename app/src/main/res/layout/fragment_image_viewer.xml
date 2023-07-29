@@ -44,6 +44,18 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/dummy_app_bar"
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:background="?backgroundColor">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/dummy_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"/>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBar"

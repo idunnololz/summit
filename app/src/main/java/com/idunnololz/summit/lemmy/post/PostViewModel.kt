@@ -14,6 +14,7 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.lemmy.CommentNavControlsState
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
@@ -70,6 +71,7 @@ class PostViewModel @Inject constructor(
     )
 
     val postData = StatefulLiveData<PostData>()
+    val commentNavControlsState = MutableLiveData<CommentNavControlsState?>()
 
     init {
         commentsSortOrderLiveData.observeForever {
@@ -372,4 +374,14 @@ class PostViewModel @Inject constructor(
             accountActionsManager.deleteComment(postRef, commentId)
         }
     }
+
+    fun toggleCommentNavControls() {
+        if (commentNavControlsState.value == null) {
+            commentNavControlsState.value = CommentNavControlsState(
+                preferences.commentsNavigationFabOffX, preferences.commentsNavigationFabOffY)
+        } else {
+            commentNavControlsState.value = null
+        }
+    }
 }
+

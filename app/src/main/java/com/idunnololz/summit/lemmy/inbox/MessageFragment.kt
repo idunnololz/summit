@@ -442,10 +442,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 },
                 onPostMoreClick = {
                     getMainActivity()?.showBottomMenu(getPostMoreMenu(it))
-                    showMorePostOptions(viewModel.apiInstance, it, actionsViewModel)
+                    showMorePostOptions(viewModel.apiInstance, it, actionsViewModel, childFragmentManager)
                 },
                 onCommentMoreClick = {
-                    showMoreCommentOptions(viewModel.apiInstance, it, actionsViewModel)
+                    showMoreCommentOptions(viewModel.apiInstance, it, actionsViewModel, childFragmentManager)
                 },
                 onFetchComments = {
                     val postId = when (val inboxItem = args.inboxItem) {

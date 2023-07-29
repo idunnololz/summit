@@ -32,6 +32,7 @@ sealed class Item {
     data class ErrorItem(val error: Throwable, val pageToLoad: Int) : Item()
 
     object EndItem : Item()
+    object FooterSpacerItem : Item()
 }
 
 class PostListEngine(
@@ -159,8 +160,10 @@ class PostListEngine(
                 // add nothing!
             } else if (lastPage.hasMore) {
                 items.add(Item.AutoLoadItem(lastPage.pageIndex + 1))
+                items += Item.FooterSpacerItem
             } else {
                 items.add(Item.EndItem)
+                items += Item.FooterSpacerItem
             }
         } else {
             items.add(
@@ -169,6 +172,8 @@ class PostListEngine(
                     hasLess = lastPage.pageIndex != 0,
                 ),
             )
+
+            items += Item.FooterSpacerItem
         }
 
         _items = items
@@ -210,6 +215,7 @@ class PostListEngine(
                 is Item.FooterItem -> false
                 is Item.AutoLoadItem -> false
                 Item.EndItem -> false
+                Item.FooterSpacerItem -> false
                 is Item.ErrorItem -> false
                 is Item.PostItem ->
                     it.postView.post.id == postToHighlight.id
@@ -225,6 +231,7 @@ class PostListEngine(
                 is Item.FooterItem -> false
                 is Item.AutoLoadItem -> false
                 Item.EndItem -> false
+                Item.FooterSpacerItem -> false
                 is Item.ErrorItem -> false
                 is Item.PostItem ->
                     it.postView.post.id == postToHighlight.id

@@ -102,7 +102,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                 )
             },
             onShowMoreActions = {
-                showMorePostOptions(parentFragment.viewModel.instance, it, parentFragment.actionsViewModel)
+                showMorePostOptions(parentFragment.viewModel.instance, it, parentFragment.actionsViewModel, childFragmentManager)
             },
             onPostRead = { postView ->
 //                viewModel.onPostRead(postView)

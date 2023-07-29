@@ -276,7 +276,12 @@ class CommunityFragment :
                     )
                 },
                 onShowMoreActions = {
-                    showMorePostOptions(viewModel.apiInstance, it, actionsViewModel)
+                    showMorePostOptions(
+                        instance = viewModel.apiInstance,
+                        postView = it,
+                        actionsViewModel = actionsViewModel,
+                        fragmentManager = childFragmentManager
+                    )
                 },
                 onPostRead = { postView ->
                     viewModel.onPostRead(postView)
@@ -395,7 +400,7 @@ class CommunityFragment :
             )
         }
 
-        view.doOnPreDraw {
+        runAfterLayout {
             adapter?.contentMaxWidth = binding.recyclerView.measuredWidth
             adapter?.contentPreferredHeight = binding.recyclerView.measuredHeight
         }
@@ -470,7 +475,6 @@ class CommunityFragment :
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
                 binding.recyclerView,
-                context.getDimen(R.dimen.footer_spacer_height),
             )
         }
 

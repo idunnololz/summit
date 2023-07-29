@@ -16,6 +16,9 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BEL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLOR_SCHEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_X
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_Y
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
@@ -41,6 +44,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.fromJsonSafe
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
@@ -322,6 +326,30 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putInt(KEY_COLOR_SCHEME, value)
+                .apply()
+        }
+
+    var commentsNavigationFab: Boolean
+        get() = prefs.getBoolean(KEY_COMMENTS_NAVIGATION_FAB, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_COMMENTS_NAVIGATION_FAB, value)
+                .apply()
+        }
+
+    var commentsNavigationFabOffX: Int
+        get() = prefs.getInt(KEY_COMMENTS_NAVIGATION_FAB_OFF_X, 0)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_COMMENTS_NAVIGATION_FAB_OFF_X, value)
+                .apply()
+        }
+
+    var commentsNavigationFabOffY: Int
+        get() = prefs.getInt(KEY_COMMENTS_NAVIGATION_FAB_OFF_Y, -Utils.convertDpToPixel(24f).toInt())
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_COMMENTS_NAVIGATION_FAB_OFF_Y, value)
                 .apply()
         }
 

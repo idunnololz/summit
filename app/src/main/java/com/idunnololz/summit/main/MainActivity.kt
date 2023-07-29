@@ -65,6 +65,7 @@ import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -775,7 +776,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun insetViewExceptTopAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
+    fun insetViewExceptTopAutomaticallyByPadding(
+        lifecycleOwner: LifecycleOwner,
+        rootView: View,
+        additionalPaddingBottom: Int = 0,
+    ) {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
 
@@ -783,7 +788,7 @@ class MainActivity : BaseActivity() {
                 insets.leftInset,
                 0,
                 insets.rightInset,
-                insets.bottomInset,
+                insets.bottomInset + additionalPaddingBottom,
             )
         }
     }
@@ -1023,11 +1028,11 @@ class MainActivity : BaseActivity() {
             val sharedElements = mutableListOf<Pair<View, String>>()
             sharedElements += Pair.create(sharedElement, transitionName)
             if (appBar != null) {
-                sharedElements += Pair.create(appBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME)
+                sharedElements += Pair.create(appBar, SharedElementNames.AppBar)
             }
             sharedElements += Pair.create(
                 binding.bottomNavigationView,
-                Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME,
+                SharedElementNames.NavBar,
             )
 
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(

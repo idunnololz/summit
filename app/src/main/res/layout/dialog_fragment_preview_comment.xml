@@ -21,24 +21,33 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_half"
-        android:layout_marginBottom="@dimen/padding_half"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
+        android:layout_marginBottom="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/padding"
         style="?attr/materialCardViewElevatedStyle"
         app:cardBackgroundColor="@color/colorSurfaceDarker"
         app:cardCornerRadius="24dp"
+        app:layout_constrainedHeight="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <TextView
-            android:id="@+id/preview_content"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?textAppearanceBodyMedium"
-            android:gravity="start"
-            android:padding="@dimen/padding"/>
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay">
+
+            <TextView
+                android:id="@+id/preview_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:gravity="start"
+                android:padding="@dimen/padding"/>
+        </androidx.core.widget.NestedScrollView>
+
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
