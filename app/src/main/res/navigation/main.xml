@@ -161,4 +161,8 @@
     </fragment>
     <action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
     <include app:graph="@navigation/settings"/>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.idunnololz.summit.lemmy.search.SearchTabbedFragment"
+        android:label="SearchTabbedFragment" />
 </navigation>

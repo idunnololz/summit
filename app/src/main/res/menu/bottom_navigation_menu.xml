@@ -8,6 +8,10 @@
         android:id="@+id/savedFragment"
         android:icon="@drawable/baseline_bookmark_24"
         android:title="@string/saved" />
+<!--    <item-->
+<!--        android:id="@+id/searchFragment"-->
+<!--        android:icon="@drawable/baseline_search_24"-->
+<!--        android:title="@string/search" />-->
     <item
         android:id="@+id/historyFragment"
         android:icon="@drawable/baseline_history_24"

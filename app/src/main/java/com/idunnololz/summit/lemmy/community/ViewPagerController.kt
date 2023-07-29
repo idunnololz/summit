@@ -36,6 +36,7 @@ class ViewPagerController(
     private val childFragmentManager: FragmentManager,
     private val viewModel: PostViewPagerViewModel,
     private val lockPanes: Boolean = false,
+    private val compatibilityMode: Boolean = false,
     private val onPageSelected: (Int) -> Unit,
 ) {
 
@@ -100,7 +101,9 @@ class ViewPagerController(
                 }
             },
         )
-        viewPager.setPageTransformer(false, DepthPageTransformer())
+        if (!compatibilityMode) {
+            viewPager.setPageTransformer(false, DepthPageTransformer())
+        }
         try {
             val mScroller: Field = ViewPager::class.java.getDeclaredField("mScroller")
             mScroller.isAccessible = true

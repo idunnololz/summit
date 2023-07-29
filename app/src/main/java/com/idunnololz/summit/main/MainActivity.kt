@@ -1039,7 +1039,6 @@ class MainActivity : BaseActivity() {
                 *sharedElements.toTypedArray(),
             )
             startActivity(intent, options.toBundle())
-//            startActivity(intent)
         } else {
             startActivity(intent)
         }

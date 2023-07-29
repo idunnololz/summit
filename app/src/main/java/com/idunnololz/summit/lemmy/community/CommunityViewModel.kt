@@ -123,6 +123,8 @@ class CommunityViewModel @Inject constructor(
             object : AccountManager.OnAccountChangedListener {
                 override suspend fun onAccountChanged(newAccount: Account?) {
                     postsRepository.reset()
+
+                    onCommunityOrInstanceChange()
                 }
             },
         )
@@ -368,6 +370,10 @@ class CommunityViewModel @Inject constructor(
 
         postListEngine.tryRestore()
 
+        onCommunityOrInstanceChange()
+    }
+
+    private fun onCommunityOrInstanceChange() {
         hiddenPostObserverJob?.cancel()
         hiddenPostObserverJob = viewModelScope.launch {
             Log.d(TAG, "Hidden posts changed. Refreshing!")

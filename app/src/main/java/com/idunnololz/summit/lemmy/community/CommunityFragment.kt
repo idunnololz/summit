@@ -95,6 +95,9 @@ class CommunityFragment :
     @Inject
     lateinit var postListViewBuilder: PostListViewBuilder
 
+    @Inject
+    lateinit var preferences: Preferences
+
     private var viewPagerController: ViewPagerController? = null
 
     private var isCustomAppBarExpandedPercent = 0f
@@ -195,8 +198,6 @@ class CommunityFragment :
         }
     }
 
-    @Inject
-    lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -418,6 +419,7 @@ class CommunityFragment :
             binding.viewPager,
             childFragmentManager,
             viewModel,
+            compatibilityMode = preferences.compatibilityMode,
         ) {
             if (it == 0) {
                 val lastSelectedPost = viewModel.lastSelectedPost
