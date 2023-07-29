@@ -12,7 +12,6 @@ import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
-import android.view.Window
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.annotation.StringRes

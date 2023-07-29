@@ -643,7 +643,8 @@ class PostListViewBuilder @Inject constructor(
 
         if (rawBinding is ListingItemCardBinding ||
             rawBinding is ListingItemCard2Binding ||
-            rawBinding is ListingItemCard3Binding) {
+            rawBinding is ListingItemCard3Binding
+        ) {
             postView.post.url?.let { url ->
                 openLinkButton?.visibility = View.VISIBLE
                 openLinkButton?.setOnClickListener {

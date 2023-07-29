@@ -115,7 +115,7 @@ class PersonCommentsFragment :
                     instance = parentFragment.viewModel.instance,
                     commentView = it,
                     actionsViewModel = actionsViewModel,
-                    fragmentManager = childFragmentManager
+                    fragmentManager = childFragmentManager,
                 )
             },
             onLinkLongClick = { url, text ->

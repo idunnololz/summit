@@ -79,7 +79,7 @@ class SettingCommentListFragment :
         commentListSettings.relayStyleNavigation.bindTo(
             binding.relayStyleNavigation,
             { preferences.commentsNavigationFab },
-            { preferences.commentsNavigationFab = it }
+            { preferences.commentsNavigationFab = it },
         )
     }
 

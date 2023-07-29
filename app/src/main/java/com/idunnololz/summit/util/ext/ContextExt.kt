@@ -41,8 +41,6 @@ fun Context.getColorCompat(@ColorRes color: Int): Int =
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable? =
     AppCompatResources.getDrawable(this, drawableRes)
 
-
-
 fun Context.getPlainTextFromClipboard(): String? {
     val context = this
     val clipboard: ClipboardManager? =

@@ -4,7 +4,6 @@ import android.util.Log
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.api.dto.Comment
-import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getDepth

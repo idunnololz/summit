@@ -77,7 +77,8 @@ class AddOrEditCommentFragment :
 
         childFragmentManager.setFragmentResultListener(AddLinkDialogFragment.REQUEST_KEY, this) { key, bundle ->
             val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
-                AddLinkDialogFragment.REQUEST_KEY_RESULT)
+                AddLinkDialogFragment.REQUEST_KEY_RESULT,
+            )
             if (result != null) {
                 textFormatterHelper.onLinkAdded(result.text, result.url)
             }

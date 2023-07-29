@@ -8,7 +8,6 @@ import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewConfiguration
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
@@ -18,7 +17,6 @@ import com.idunnololz.summit.lemmy.CommentNavControlsState
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getDrawableCompat
-
 
 class CommentNavViewController(
     private val parentView: ViewGroup,
@@ -103,7 +101,6 @@ class CommentNavViewController(
                 return@a gestureDetector.onTouchEvent(event)
             }
 
-
             parentView.requestDisallowInterceptTouchEvent(true)
 
             when (event.actionMasked) {
@@ -178,7 +175,6 @@ class CommentNavViewController(
         }
 
         statButton.post {
-
             (statButton as? FloatingActionButton)?.show()
             (prevButton as? FloatingActionButton)?.show()
             (nextButton as? FloatingActionButton)?.show()

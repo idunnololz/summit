@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -58,7 +57,6 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -280,7 +278,7 @@ class CommunityFragment :
                         instance = viewModel.apiInstance,
                         postView = it,
                         actionsViewModel = actionsViewModel,
-                        fragmentManager = childFragmentManager
+                        fragmentManager = childFragmentManager,
                     )
                 },
                 onPostRead = { postView ->

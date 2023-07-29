@@ -379,7 +379,7 @@ class CommentListSettings @Inject constructor(
     val relayStyleNavigation = OnOffSettingItem(
         null,
         context.getString(R.string.relay_style_navigation),
-        context.getString(R.string.relay_style_navigation_desc)
+        context.getString(R.string.relay_style_navigation_desc),
     )
 }
 

@@ -1,22 +1,16 @@
 package com.idunnololz.summit.lemmy.comment
 
-import android.content.ClipData
-import android.content.ClipDescription.MIMETYPE_TEXT_PLAIN
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import com.idunnololz.summit.databinding.DialogFragmentAddLinkBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.getPlainTextFromClipboard
 import kotlinx.parcelize.Parcelize
-
 
 class AddLinkDialogFragment : BaseDialogFragment<DialogFragmentAddLinkBinding>() {
 
@@ -29,8 +23,7 @@ class AddLinkDialogFragment : BaseDialogFragment<DialogFragmentAddLinkBinding>()
     data class AddLinkResult(
         val text: String,
         val url: String,
-    ): Parcelable
-
+    ) : Parcelable
 
     override fun onStart() {
         super.onStart()
