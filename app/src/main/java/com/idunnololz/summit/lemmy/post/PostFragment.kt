@@ -15,7 +15,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
+import androidx.work.impl.utils.PreferenceUtils
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
@@ -58,9 +61,12 @@ import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getDimen
+import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showBottomMenuForLink
@@ -70,6 +76,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class PostFragment :
@@ -110,6 +117,7 @@ class PostFragment :
 
     private var swipeActionCallback: LemmySwipeActionCallback? = null
     private var itemTouchHelper: ItemTouchHelper? = null
+    private var commentNavViewController: CommentNavViewController? = null
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -131,6 +139,8 @@ class PostFragment :
         super.onCreate(savedInstanceState)
 
         val context = requireContext()
+
+        PreferenceUtil.preferences.edit().remove(PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_Y).apply()
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
@@ -239,21 +249,24 @@ class PostFragment :
                     }
 
                     AddOrEditCommentFragment().apply {
-                        arguments = postOrComment.fold({
-                            AddOrEditCommentFragmentArgs(
-                                args.instance,
-                                null,
-                                it,
-                                null,
-                            )
-                        }, {
-                            AddOrEditCommentFragmentArgs(
-                                args.instance,
-                                it,
-                                null,
-                                null,
-                            )
-                        },).toBundle()
+                        arguments = postOrComment.fold(
+                            {
+                                AddOrEditCommentFragmentArgs(
+                                    args.instance,
+                                    null,
+                                    it,
+                                    null,
+                                )
+                            },
+                            {
+                                AddOrEditCommentFragmentArgs(
+                                    args.instance,
+                                    it,
+                                    null,
+                                    null,
+                                )
+                            },
+                        ).toBundle()
                     }.show(childFragmentManager, "asdf")
                 },
                 onImageClick = { postOrCommentView, view, url ->
@@ -280,12 +293,12 @@ class PostFragment :
                 },
                 onPostMoreClick = { postView ->
                     actionsViewModel.let {
-                        showMorePostOptions(viewModel.apiInstance, postView, it)
+                        showMorePostOptions(viewModel.apiInstance, postView, it, childFragmentManager)
                     }
                 },
                 onCommentMoreClick = { commentView ->
                     actionsViewModel.let {
-                        showMoreCommentOptions(viewModel.apiInstance, commentView, it)
+                        showMoreCommentOptions(viewModel.apiInstance, commentView, it, childFragmentManager)
                     }
                 },
                 onFetchComments = {
@@ -310,6 +323,90 @@ class PostFragment :
 
             setup()
         }
+
+        if (preferences.commentsNavigationFab) {
+            binding.fab.show()
+            binding.fab.setOnClickListener {
+                viewModel.toggleCommentNavControls()
+            }
+        } else {
+            binding.fab.hide()
+        }
+
+        commentNavViewController = CommentNavViewController(
+            binding.fabSnackbarCoordinatorLayout,
+            preferences,
+        )
+        val smoothScroller: SmoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+
+            override fun calculateDtToFit(
+                viewStart: Int,
+                viewEnd: Int,
+                boxStart: Int,
+                boxEnd: Int,
+                snapPreference: Int,
+            ): Int {
+                return boxStart - viewStart + (getMainActivity()?.lastInsets?.topInset ?: 0)
+            }
+        }
+        viewModel.commentNavControlsState.observe(viewLifecycleOwner) {
+            if (!preferences.commentsNavigationFab) {
+                return@observe
+            }
+
+            if (it != null) {
+                binding.fab.setImageDrawable(context.getDrawableCompat(R.drawable.baseline_close_24))
+                commentNavViewController?.show(
+                    it,
+                    onNextClick = {
+                        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+                            var curPos = it.findFirstCompletelyVisibleItemPosition()
+
+                            if (curPos == -1) {
+                                curPos = it.findFirstVisibleItemPosition()
+                            }
+
+                            val pos = adapter
+                                ?.getNextTopLevelCommentPosition(curPos)
+                            if (pos != null) {
+                                smoothScroller.targetPosition = pos
+                                it.startSmoothScroll(smoothScroller)
+                            }
+                        }
+                    },
+                    onPrevClick = {
+                        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+                            var curPos = it.findFirstCompletelyVisibleItemPosition()
+
+                            if (curPos == -1) {
+                                curPos = it.findFirstVisibleItemPosition()
+                            }
+
+                            val pos = adapter
+                                ?.getPrevTopLevelCommentPosition(curPos)
+                            if (pos != null) {
+                                smoothScroller.targetPosition = pos
+                                it.startSmoothScroll(smoothScroller)
+                            }
+                        }
+                    },
+                    onMoreClick = {
+                        val data = viewModel.postData.valueOrNull
+                        val postView = data?.postView?.post ?: args.post
+
+                        if (postView != null) {
+                            showMorePostOptions(viewModel.apiInstance, postView, actionsViewModel, childFragmentManager)
+                        }
+                    }
+                )
+            } else {
+                commentNavViewController?.hide()
+                binding.fab.setImageDrawable(context.getDrawableCompat(R.drawable.outline_navigation_24))
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -330,8 +427,13 @@ class PostFragment :
         val context = requireContext()
 
         requireMainActivity().apply {
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.swipeRefreshLayout)
+            insetViewExceptTopAutomaticallyByPadding(
+                lifecycleOwner = viewLifecycleOwner,
+                rootView = binding.recyclerView,
+                additionalPaddingBottom = context.getDimen(R.dimen.footer_spacer_height),
+            )
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.fabSnackbarCoordinatorLayout)
         }
 
         with(binding.toolbar) {

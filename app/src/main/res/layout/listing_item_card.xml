@@ -40,7 +40,7 @@
             android:id="@+id/headerView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_half"
+            android:layout_marginTop="12dp"
             android:paddingStart="@dimen/reddit_content_horizontal_padding"
             android:paddingEnd="@dimen/reddit_content_horizontal_padding"
             android:fadingEdge="horizontal"

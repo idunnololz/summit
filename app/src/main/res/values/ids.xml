@@ -82,4 +82,6 @@
     <item name="share_fediverse_link" type="id" />
     <item name="layout_card3" type="id" />
     <item name="layout_large_list" type="id" />
+    <item name="relay_style_navigation" type="id" />
+    <item name="view_source" type="id" />
 </resources>

@@ -111,7 +111,12 @@ class PersonCommentsFragment :
                 parentFragment.viewModel.fetchPage(it, false)
             },
             onCommentMoreClick = {
-                showMoreCommentOptions(parentFragment.viewModel.instance, it, actionsViewModel)
+                showMoreCommentOptions(
+                    instance = parentFragment.viewModel.instance,
+                    commentView = it,
+                    actionsViewModel = actionsViewModel,
+                    fragmentManager = childFragmentManager
+                )
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)

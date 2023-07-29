@@ -160,6 +160,20 @@ class ColorSchemePickerDialogFragment :
                     context.getColorCompat(R.color.theme_red_md_theme_light_secondary),
                     context.getColorCompat(R.color.theme_red_md_theme_light_tertiary),
                 ),
+                Item.ColorSchemeItem(
+                    ColorSchemes.TalhaPurple,
+                    context.getString(R.string.talha_e_purple),
+                    context.getColorCompat(R.color.theme_talha_e_purple_md_theme_light_primary),
+                    context.getColorCompat(R.color.theme_talha_e_purple_md_theme_light_secondary),
+                    context.getColorCompat(R.color.theme_talha_e_purple_md_theme_light_tertiary),
+                ),
+                Item.ColorSchemeItem(
+                    ColorSchemes.TalhaGreen,
+                    context.getString(R.string.talha_e_green),
+                    context.getColorCompat(R.color.theme_talha_e_green_md_theme_light_primary),
+                    context.getColorCompat(R.color.theme_talha_e_green_md_theme_light_secondary),
+                    context.getColorCompat(R.color.theme_talha_e_green_md_theme_light_tertiary),
+                ),
             )
 
             adapterHelper.setItems(newItems, this)

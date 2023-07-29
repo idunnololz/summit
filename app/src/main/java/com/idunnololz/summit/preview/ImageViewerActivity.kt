@@ -103,8 +103,8 @@ class ImageViewerActivity : BaseActivity() {
 
         setupActionBar(args.title, true)
 
-        binding.appBar.transitionName = Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME
-        binding.bottomNavigationView.transitionName = Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME
+        binding.dummyAppBar.transitionName = SharedElementNames.AppBar
+        binding.bottomNavigationView.transitionName = SharedElementNames.NavBar
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { _, insets ->
             val insetsCompat = WindowInsetsCompat(insets)
@@ -138,12 +138,18 @@ class ImageViewerActivity : BaseActivity() {
 
         window.enterTransition = Fade(Fade.IN).apply {
             duration = 200
+            excludeTarget(R.id.dummyImageView, true)
+            excludeTarget(R.id.imageView, true)
         }
         window.exitTransition = Fade(Fade.OUT).apply {
             duration = 200
+            excludeTarget(R.id.dummyImageView, true)
+            excludeTarget(R.id.imageView, true)
         }
         window.returnTransition = Fade(Fade.OUT).apply {
             duration = 200
+            excludeTarget(R.id.dummyImageView, true)
+            excludeTarget(R.id.imageView, true)
         }
         window.sharedElementEnterTransition = SharedElementTransition()
         window.sharedElementReturnTransition = SharedElementTransition()
@@ -164,6 +170,26 @@ class ImageViewerActivity : BaseActivity() {
                         binding.dummyImageView.visibility = View.GONE
                         binding.imageView.visibility = View.VISIBLE
                     }
+                }
+
+                override fun onTransitionCancel(p0: Transition?) {
+                }
+
+                override fun onTransitionPause(p0: Transition?) {
+                }
+
+                override fun onTransitionResume(p0: Transition?) {
+                }
+            },
+        )
+        window.sharedElementExitTransition.addListener(
+            object : Transition.TransitionListener {
+                override fun onTransitionStart(p0: Transition?) {
+                    binding.appBar.animate()
+                        .translationY(-200f)
+                }
+
+                override fun onTransitionEnd(p0: Transition?) {
                 }
 
                 override fun onTransitionCancel(p0: Transition?) {

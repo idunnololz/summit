@@ -126,6 +126,10 @@ object PreferenceUtil {
 
     const val KEY_COLOR_SCHEME = "KEY_COLOR_SCHEME"
 
+    const val KEY_COMMENTS_NAVIGATION_FAB = "KEY_COMMENTS_NAVIGATION_FAB"
+    const val KEY_COMMENTS_NAVIGATION_FAB_OFF_X = "KEY_COMMENTS_NAVIGATION_FAB_OFF_X"
+    const val KEY_COMMENTS_NAVIGATION_FAB_OFF_Y = "KEY_COMMENTS_NAVIGATION_FAB_OFF_Y"
+
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {
             preferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE)

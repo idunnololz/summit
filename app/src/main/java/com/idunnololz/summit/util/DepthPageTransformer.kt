@@ -11,17 +11,17 @@ class DepthPageTransformer : ViewPager.PageTransformer {
         view.apply {
             val pageWidth = width
             when {
-                position < -1 -> { // [-Infinity,-1)
+                position < -1f -> { // [-Infinity,-1)
                     // This page is way off-screen to the left.
                     alpha = 0f
 //                    translationX = pageWidth * -position
                 }
-                position <= 0 -> { // [-1,0]
+                position <= 0f -> { // [-1,0]
                     // Use the default slide transition when moving to the left page
                     alpha = 1f + (position * 0.66f)
                     translationX = pageWidth * -position
                 }
-                position <= 1 -> { // (0,1]
+                position <= 1f -> { // (0,1]
                     // Fade the page out.
                     alpha = 1f
 

@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.postAndCommentView
 
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
@@ -8,6 +9,8 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.preferences.CommentsThreadStyle
@@ -17,6 +20,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.clearItemDecorations
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
 const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
 const val EXTRA_COMMENT_ID = "EXTRA_COMMENT_ID"
@@ -38,6 +42,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
     instance: String,
     commentView: CommentView,
     actionsViewModel: MoreActionsViewModel,
+    fragmentManager: FragmentManager,
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
 
@@ -97,6 +102,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
             getString(R.string.share_source_link),
             R.drawable.ic_fediverse_24,
         )
+        addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -123,6 +129,17 @@ fun BaseFragment<*>.showMoreCommentOptions(
                         context,
                         commentView.comment.ap_id,
                     )
+                }
+                R.id.view_source -> {
+                    PreviewCommentDialogFragment()
+                        .apply {
+                            arguments = PreviewCommentDialogFragmentArgs(
+                                "",
+                                commentView.comment.content,
+                                true,
+                            ).toBundle()
+                        }
+                        .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
             }
         }

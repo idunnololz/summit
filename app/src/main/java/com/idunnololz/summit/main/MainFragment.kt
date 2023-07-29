@@ -195,8 +195,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        postponeEnterTransition()
-
         setBinding(FragmentMainBinding.inflate(inflater, container, false))
         return binding.root
     }
@@ -266,10 +264,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             it.run()
         }
         deferredNavigationRequests.clear()
-
-        binding.rootView.post {
-            startPostponedEnterTransition()
-        }
 
         fun updatePaneBackPressHandler() {
             if (!isBindingAvailable()) return

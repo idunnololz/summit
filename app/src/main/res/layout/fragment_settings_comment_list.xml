@@ -34,9 +34,16 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/footer_spacer_height"
                 android:clipToPadding="false">
+
                 <include
                     android:id="@+id/default_comments_sort_order"
                     layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/relay_style_navigation"
+                    layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

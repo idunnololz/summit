@@ -50,8 +50,10 @@ class ViewPagerController(
 
     private val viewPagerAdapter = viewModel.viewPagerAdapter
     private var activeOpenPostJob: Job? = null
+    private var activeClosePostJob: Job? = null
 
-    private val scroller: FixedSpeedScroller = FixedSpeedScroller(viewPager.context, DecelerateInterpolator())
+    private val scroller: FixedSpeedScroller =
+        FixedSpeedScroller(viewPager.context, DecelerateInterpolator())
 
     fun init() {
         viewPager.adapter = viewPagerAdapter
@@ -157,7 +159,25 @@ class ViewPagerController(
     }
 
     fun closePost(fragment: Fragment) {
-        viewPager.setCurrentItem(0, true)
+        if (activeClosePostJob != null) {
+            Log.d(TAG, "Ignoring closePost() because it occurred too fast.")
+            return
+        }
+
+        activeClosePostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
+            viewPager.setPagingEnabled(false)
+
+            viewPager.setCurrentItem(0, true)
+
+            viewPager.postDelayed({
+                viewPager.setPagingEnabled(true)
+            }, scroller.duration.toLong(),)
+
+            withContext(Dispatchers.IO) {
+                delay(250)
+            }
+            activeClosePostJob = null
+        }
     }
 
     fun onPageSelected() {

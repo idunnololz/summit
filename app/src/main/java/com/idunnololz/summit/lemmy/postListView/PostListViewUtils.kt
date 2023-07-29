@@ -1,9 +1,12 @@
 package com.idunnololz.summit.lemmy.postListView
 
+import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.util.BaseFragment
@@ -16,6 +19,7 @@ fun BaseFragment<*>.showMorePostOptions(
     instance: String,
     postView: PostView,
     actionsViewModel: MoreActionsViewModel,
+    fragmentManager: FragmentManager,
 ) {
     if (!isBindingAvailable()) {
         return
@@ -73,6 +77,7 @@ fun BaseFragment<*>.showMorePostOptions(
             getString(R.string.block_this_user_format, postView.creator.name),
             R.drawable.baseline_person_off_24,
         )
+        addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -116,6 +121,23 @@ fun BaseFragment<*>.showMorePostOptions(
                         context = context,
                         link = postView.post.ap_id,
                     )
+                }
+                R.id.view_source -> {
+                    PreviewCommentDialogFragment()
+                        .apply {
+                            arguments = PreviewCommentDialogFragmentArgs(
+                                "",
+                                buildString {
+                                    appendLine("Title:")
+                                    appendLine(postView.post.name)
+                                    appendLine("")
+                                    appendLine("Body:")
+                                    appendLine(postView.post.body ?: "")
+                                },
+                                true,
+                            ).toBundle()
+                        }
+                        .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
             }
         }

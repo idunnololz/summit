@@ -454,6 +454,12 @@
     <string name="insert_link">Insert link</string>
     <string name="text">Text</string>
     <string name="link">Link</string>
+    <string name="relay_style_navigation">Relay style navigation</string>
+    <string name="relay_style_navigation_desc">Adds a button to the post/comments screen that allow you to jump to the next or previous post.</string>
+    <string name="talha_e_purple">Talha E.\'s Purple</string>
+    <string name="talha_e_green">Talha E.\'s Green</string>
+    <string name="comment_gesture_size">Comment gesture size</string>
+    <string name="view_source">View source</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

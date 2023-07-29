@@ -37,4 +37,19 @@
             android:name="filterToEdit"
             app:argType="com.idunnololz.summit.filterLists.FilterEntry" />
     </dialog>
+    <dialog
+        android:id="@+id/previewCommentDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment"
+        android:label="PreviewCommentDialogFragment" >
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="content"
+            app:argType="string" />
+        <argument
+            android:name="show_raw"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </dialog>
 </navigation>

@@ -106,6 +106,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                     instance = parentFragment.viewModel.instance,
                     postView = it,
                     actionsViewModel = parentFragment.actionsViewModel,
+                    fragmentManager = childFragmentManager
                 )
             },
             onPostRead = { postView ->

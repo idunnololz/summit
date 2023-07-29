@@ -304,7 +304,7 @@ class GestureSettings @Inject constructor(
         commentGestureActionOptions,
     )
     val commentGestureSize = SliderSettingItem(
-        context.getString(R.string.post_gesture_size),
+        context.getString(R.string.comment_gesture_size),
         0f,
         1f,
         0.01f,
@@ -375,6 +375,11 @@ class CommentListSettings @Inject constructor(
                 null,
             ),
         ),
+    )
+    val relayStyleNavigation = OnOffSettingItem(
+        null,
+        context.getString(R.string.relay_style_navigation),
+        context.getString(R.string.relay_style_navigation_desc)
     )
 }
 
@@ -447,6 +452,24 @@ class ThemeSettings @Inject constructor(
             RadioGroupSettingItem.RadioGroupOption(
                 ColorSchemes.Red,
                 context.getString(R.string.red),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.Blue,
+                context.getString(R.string.blue),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.TalhaPurple,
+                context.getString(R.string.talha_e_purple),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.TalhaGreen,
+                context.getString(R.string.talha_e_green),
                 null,
                 null,
             ),

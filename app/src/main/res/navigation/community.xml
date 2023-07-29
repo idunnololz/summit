@@ -134,17 +134,6 @@
             android:defaultValue="0" />
     </fragment>
     <dialog
-        android:id="@+id/previewCommentDialogFragment"
-        android:name="com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment"
-        android:label="PreviewCommentDialogFragment" >
-        <argument
-            android:name="instance"
-            app:argType="string" />
-        <argument
-            android:name="content"
-            app:argType="string" />
-    </dialog>
-    <dialog
         android:id="@+id/createOrEditPostFragment"
         android:name="com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment"
         android:label="CreateOrEditPostFragment" >

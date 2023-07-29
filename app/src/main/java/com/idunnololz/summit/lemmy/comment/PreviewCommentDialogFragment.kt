@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.comment
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,13 +41,19 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        LemmyTextHelper.bindText(
-            textView = binding.previewContent,
-            text = args.content,
-            instance = args.instance,
-            onImageClick = {},
-            onPageClick = {},
-            onLinkLongClick = { _, _ -> },
-        )
+        if (args.showRaw) {
+            binding.previewContent.text = args.content
+            binding.previewContent.setTextIsSelectable(true)
+            binding.previewContent.typeface = Typeface.MONOSPACE
+        } else {
+            LemmyTextHelper.bindText(
+                textView = binding.previewContent,
+                text = args.content,
+                instance = args.instance,
+                onImageClick = {},
+                onPageClick = {},
+                onLinkLongClick = { _, _ -> },
+            )
+        }
     }
 }

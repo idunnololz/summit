@@ -119,8 +119,6 @@ class SettingGesturesFragment :
             { preferences.postGestureSize },
             {
                 preferences.postGestureSize = it
-
-                updateRendering()
             },
         )
 
@@ -155,8 +153,6 @@ class SettingGesturesFragment :
             { preferences.commentGestureSize },
             {
                 preferences.commentGestureSize = it
-
-                updateRendering()
             },
         )
     }

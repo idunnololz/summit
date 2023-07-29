@@ -146,6 +146,9 @@ class PostsAdapter(
     private var highlightedComment: CommentId = -1
     private var highlightedCommentForever: CommentId = -1
 
+    private var topLevelCommentIndices = listOf<Int>()
+    private var absolutionPositionToTopLevelCommentPosition = listOf<Int>()
+
     var isLoaded: Boolean = false
     var error: Throwable? = null
         set(value) {
@@ -480,6 +483,9 @@ class PostsAdapter(
         val rawData = rawData
         val oldItems = items
 
+        val topLevelCommentIndices = mutableListOf<Int>()
+        val absolutionPositionToTopLevelCommentPosition = mutableListOf<Int>()
+
         val newItems =
             if (error == null) {
                 rawData ?: return
@@ -489,30 +495,43 @@ class PostsAdapter(
                 val postView = rawData.postView
                 if (postView != null) {
                     finalItems += HeaderItem(postView.post, videoState)
+                    absolutionPositionToTopLevelCommentPosition += -1
 
                     if (rawData.isSingleComment) {
                         finalItems += Item.ViewAllComments(postView.post.post.id)
+                        absolutionPositionToTopLevelCommentPosition += -1
                     }
                 }
 
-                rawData.commentTree.flatten().forEach {
-                    when (val commentView = it.commentView) {
+                val commentItems = rawData.commentTree.flatten()
+                var lastTopLevelCommentPosition = -1
+
+                for (commentItem in commentItems) {
+                    var depth = -1
+
+                    when (val commentView = commentItem.commentView) {
                         is PostViewModel.ListView.CommentListView -> {
                             val commentId = commentView.comment.comment.id
                             val isDeleting =
                                 commentView.pendingCommentView?.isActionDelete == true
+                            depth = commentView.comment.getDepth()
+
+                            if (depth == 0) {
+                                lastTopLevelCommentPosition++
+                            }
+
                             finalItems += CommentItem(
                                 commentId = commentId,
                                 content =
                                 commentView.pendingCommentView?.content
                                     ?: commentView.comment.comment.content,
                                 comment = commentView.comment,
-                                depth = commentView.comment.getDepth(),
+                                depth = depth,
                                 baseDepth = 0,
                                 isExpanded = !commentView.isCollapsed,
                                 isPending = false,
                                 view = commentView,
-                                childrenCount = it.children.size,
+                                childrenCount = commentItem.children.size,
                                 isPostLocked = commentView.comment.post.locked,
                                 isUpdating = commentView.pendingCommentView != null,
                                 isDeleting = isDeleting,
@@ -521,34 +540,48 @@ class PostsAdapter(
                                 ),
                                 isHighlighted = rawData.selectedCommentId == commentId,
                             )
+                            absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
                         is PostViewModel.ListView.PendingCommentListView -> {
+                            depth = commentItem.depth
+                            if (depth == 0) {
+                                lastTopLevelCommentPosition++
+                            }
                             finalItems += PendingCommentItem(
                                 commentId = commentView.pendingCommentView.commentId,
                                 content = commentView.pendingCommentView.content,
                                 author = commentView.author,
-                                depth = it.depth,
+                                depth = depth,
                                 baseDepth = 0,
                                 isExpanded = !commentView.isCollapsed,
                                 isPending = false,
                                 view = commentView,
-                                childrenCount = it.children.size,
+                                childrenCount = commentItem.children.size,
                             )
+                            absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
                         is PostViewModel.ListView.PostListView -> {
                             // should never happen
                         }
-
                         is PostViewModel.ListView.MoreCommentsItem -> {
                             if (commentView.parentCommentId != null) {
+                                depth = commentItem.depth
+                                if (depth == 0) {
+                                    lastTopLevelCommentPosition++
+                                }
                                 finalItems += MoreCommentsItem(
                                     parentId = commentView.parentCommentId,
                                     moreCount = commentView.moreCount,
-                                    depth = it.depth,
+                                    depth = depth,
                                     baseDepth = 0,
                                 )
+                                absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                             }
                         }
+                    }
+
+                    if (depth == 0) {
+                        topLevelCommentIndices += finalItems.lastIndex
                     }
                 }
 
@@ -598,6 +631,9 @@ class PostsAdapter(
         if (refreshHeader) {
             notifyItemChanged(0, Unit)
         }
+
+        this.topLevelCommentIndices = topLevelCommentIndices
+        this.absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
     }
 
     fun getPositionOfComment(commentId: CommentId): Int =
@@ -612,6 +648,28 @@ class PostsAdapter(
                 is Item.ViewAllComments -> false
             }
         }
+
+    fun getPrevTopLevelCommentPosition(position: Int): Int? {
+        val topLevelPosition = absolutionPositionToTopLevelCommentPosition.getOrNull(position)
+            ?: if (position in 0 until itemCount) {
+                return 0
+            } else {
+                return null
+            }
+
+        val curP = topLevelCommentIndices.getOrNull(topLevelPosition)
+        if (position == curP) {
+            return topLevelCommentIndices.getOrNull(topLevelPosition - 1) ?: 0
+        } else {
+            return curP
+        }
+    }
+
+    fun getNextTopLevelCommentPosition(position: Int): Int? {
+        val topLevelPosition = absolutionPositionToTopLevelCommentPosition.getOrNull(position)
+            ?: return null
+        return topLevelCommentIndices.getOrNull(topLevelPosition + 1)
+    }
 
     fun setStartingData(data: PostViewModel.PostData) {
         rawData = data
