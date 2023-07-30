@@ -162,7 +162,13 @@ class CommentTreeBuilder(
                 }
             }
 
-            if (childrenCount < expectedCount) {
+            // At time of writing there is no way to detect number of removed comments
+            // A comment can say 3 children but only 2 children exist
+            // In this state, we have no idea if there is 1 more child that can be fetched or
+            // if the missing comment has been deleted
+            //
+            // Jerboa just checks if the children is empty to differentiate so we'll do that too.
+            if (childrenCount < expectedCount && node.children.isEmpty()) {
                 node.children.add(
                     CommentNodeData(
                         PostViewModel.ListView.MoreCommentsItem(

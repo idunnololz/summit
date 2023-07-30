@@ -81,17 +81,6 @@ object Utils {
         return px / (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 
-    fun lightenColor(color: Int, amount: Float): Int {
-        val r = Color.red(color)
-        val g = Color.green(color)
-        val b = Color.blue(color)
-        return redistributeColor(
-            255 * amount + r,
-            255 * amount + g,
-            255 * amount + b,
-        )
-    }
-
     private fun redistributeColor(r: Float, g: Float, b: Float): Int {
         val threshold = 255.999f
         val max = Math.max(Math.max(r, g), b)
@@ -200,26 +189,6 @@ object Utils {
         return netInfo != null && netInfo.isConnectedOrConnecting
     }
 
-    private fun startSlideUpAnimation(
-        viewToAnimate: View,
-        startDelay: Int,
-    ): ViewPropertyAnimator {
-        viewToAnimate.alpha = 0f
-        viewToAnimate.translationY = convertDpToPixel(100f)
-        return viewToAnimate.animate().translationY(0f).alpha(1f)
-            .setStartDelay(startDelay.toLong())
-            .setDuration(ANIMATION_DURATION_MS)
-    }
-
-    fun isLightColor(color: Int): Boolean {
-        val darkness = 1 - (
-            0.299 * Color.red(color) +
-                0.587 * Color.green(color) +
-                0.114 * Color.blue(color)
-            ) / 255
-        return darkness < 0.5
-    }
-
     @Suppress("SuspiciousEqualsCombination")
     fun equals(a: Any?, b: Any): Boolean {
         return a === b || a != null && a == b
@@ -252,79 +221,6 @@ object Utils {
         val toolBarHeight = ta.getDimensionPixelSize(0, -1)
         ta.recycle()
         return toolBarHeight
-    }
-
-    fun toIntList(perks: IntArray): List<Int> {
-        val list = ArrayList<Int>()
-        for (p in perks) {
-            list.add(p)
-        }
-        return list
-    }
-
-    fun setupRootViewForToolbarAndTabLayout(rootView: View) {
-        val lp = rootView.layoutParams as ViewGroup.MarginLayoutParams
-        lp.topMargin = (convertDpToPixel(48f) + getToolbarHeight(rootView.context)).toInt()
-        rootView.requestLayout()
-    }
-
-    fun getNavigationBarInset(context: Context): Int {
-        val appUsableSize = getAppUsableScreenSize(context)
-        val realScreenSize = getRealScreenSize(context)
-
-        // navigation bar on the right
-        if (appUsableSize.x < realScreenSize.x) {
-            return 0
-        }
-
-        // navigation bar at the bottom
-        return if (appUsableSize.y < realScreenSize.y) {
-            realScreenSize.y - appUsableSize.y
-        } else {
-            0
-        }
-
-        // navigation bar is not present
-    }
-
-    private fun getAppUsableScreenSize(context: Context): Point {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display = windowManager.defaultDisplay
-        val size = Point()
-        display.getSize(size)
-        return size
-    }
-
-    private fun getRealScreenSize(context: Context): Point {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display = windowManager.defaultDisplay
-        val size = Point()
-
-        if (Build.VERSION.SDK_INT >= 17) {
-            display.getRealSize(size)
-        } else {
-            try {
-                size.x = Display::class.java.getMethod("getRawWidth").invoke(display) as Int
-                size.y = Display::class.java.getMethod("getRawHeight").invoke(display) as Int
-            } catch (e: Exception) { /* do nothing */
-            }
-        }
-
-        return size
-    }
-
-    fun folderSize(directory: File): Long {
-        val files = directory.listFiles() ?: return 0
-
-        var length: Long = 0
-        for (file in files) {
-            length += if (file.isFile) {
-                file.length()
-            } else {
-                folderSize(file)
-            }
-        }
-        return length
     }
 
     fun wipeCacheDir() {
@@ -454,13 +350,6 @@ object Utils {
         return String(output)
     }
 
-    fun convertSecondsToHMmSs(seconds: Long): String {
-        val s = seconds % 60
-        val m = seconds / 60 % 60
-        val h = seconds / (60 * 60) % 24
-        return String.format(Locale.US, "%d:%02d:%02d", h, m, s)
-    }
-
     fun safeLaunchExternalIntent(context: Context, intent: Intent): Boolean {
         return try {
             context.startActivity(intent)
@@ -551,25 +440,6 @@ object Utils {
         return sb.delete(0, trimStart).delete(spannable.length - trimEnd, spannable.length)
     }
 
-    fun triggerRebirth(context: Context) {
-        val packageManager = context.packageManager
-        val intent = packageManager.getLaunchIntentForPackage(context.packageName)
-        triggerRebirth(context, intent!!)
-    }
-
-    fun triggerRebirth(context: Context, intent: Intent) {
-        val componentName = intent.component
-        val mainIntent = Intent.makeRestartActivityTask(componentName)
-        mainIntent.putExtras(intent)
-        context.startActivity(mainIntent)
-
-        if (context is Activity) {
-            context.overridePendingTransition(0, 0)
-        }
-
-        System.exit(0)
-    }
-
     fun getScreenSize(context: Context): Point {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
@@ -598,39 +468,6 @@ object Utils {
         return size.y
     }
 
-    /**
-     * Converts a version string to a comparable long for easy version comparing. Only supports
-     * version strings of the form "<0 - 999>.<0 - 999>.<0 - 999>"
-     */
-    fun getVersionId(version: String): Long {
-        val multipliers = longArrayOf((1000 * 1000).toLong(), 1000, 1)
-
-        val toks = version.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        var newVersionId = 0L
-        for ((i, s) in toks.withIndex()) {
-            newVersionId += Utils.parseFirstInteger(s) * multipliers[i]
-        }
-        return newVersionId
-    }
-
-    fun bundleToString(bundle: Bundle?): String? {
-        if (bundle == null) {
-            return null
-        }
-        val sb = StringBuilder("Bundle {")
-        for (key in bundle.keySet()) {
-            sb.append(key)
-            sb.append(":")
-            sb.append(bundle.get(key))
-            sb.append(",")
-        }
-        if (bundle.keySet().size != 0) {
-            sb.setLength(sb.length - 1)
-        }
-        sb.append("}")
-        return sb.toString()
-    }
-
     fun hideKeyboard(activity: Activity?) {
         if (activity == null) {
             return
@@ -648,23 +485,6 @@ object Utils {
             .hide(WindowInsetsCompat.Type.ime())
     }
 
-    fun permute(arr: List<Int>): MutableList<MutableList<Int>> {
-        fun permute(arr: List<Int>, k: Int, results: MutableList<MutableList<Int>>) {
-            for (i in k until arr.size) {
-                java.util.Collections.swap(arr, i, k)
-                permute(arr, k + 1, results)
-                java.util.Collections.swap(arr, k, i)
-            }
-            if (k == arr.size - 1) {
-                results.add(ArrayList(arr))
-            }
-        }
-
-        val result = ArrayList<MutableList<Int>>()
-        permute(arr, 0, result)
-        return result
-    }
-
     fun fromHtml(source: String?): Spanned {
         if (source == null) return SpannableString("")
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -672,19 +492,6 @@ object Utils {
         } else {
             @Suppress("DEPRECATION")
             Html.fromHtml(source)
-        }
-    }
-
-    fun fromHtml(
-        source: String?,
-        imageGetter: Html.ImageGetter?,
-        tagHandler: Html.TagHandler?,
-    ): Spanned {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY, imageGetter, tagHandler)
-        } else {
-            @Suppress("DEPRECATION")
-            Html.fromHtml(source, imageGetter, tagHandler)
         }
     }
 
@@ -717,16 +524,6 @@ object Utils {
         val systemLocale = Resources.getSystem().getConfiguration().locale
 
         return systemLocale.language == Locale.ENGLISH.language || appLocale.language == Locale.ENGLISH.language
-    }
-
-    fun getStatusBarHeight(context: Context): Int {
-        val resources = context.resources
-        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        return if (resourceId > 0) {
-            resources.getDimensionPixelSize(resourceId)
-        } else {
-            0
-        }
     }
 
     fun copyToClipboard(context: Context, toCopy: String) {
@@ -851,8 +648,6 @@ object Utils {
         return Math.max(maximumTextureSize, IMAGE_MAX_BITMAP_DIMENSION)
     }
 
-    fun isUiThread(): Boolean = Looper.getMainLooper().getThread() == Thread.currentThread()
-
     fun getSizeOfFile(file: File): Long {
         val toCount = LinkedList<File>()
         toCount.push(file)
@@ -934,7 +729,7 @@ fun startFeedbackIntent(context: Context) {
             "\n\nFeedback: \n"
 
         val address = EMAIL_FEEDBACK
-        val subject = "LoL Catalyst feedback"
+        val subject = "Summit feedback"
 
         val i = Intent(Intent.ACTION_SENDTO)
         // i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(crashLogFile));

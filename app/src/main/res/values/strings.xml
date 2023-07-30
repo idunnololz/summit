@@ -462,6 +462,8 @@
     <string name="view_source">View source</string>
     <string name="compatibility_mode">Compatibility mode</string>
     <string name="compatibility_mode_desc">May fix some bugs with loading posts on certain devices</string>
+    <string name="talha_e_pink">Talha E.\'s Pink</string>
+    <string name="peachie">Peachie</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

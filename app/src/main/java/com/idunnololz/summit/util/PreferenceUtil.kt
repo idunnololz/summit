@@ -16,8 +16,6 @@ object PreferenceUtil {
     const val OFFLINE_MODE_ON = 1
     const val OFFLINE_MODE_OFF = 2
 
-    const val DEFAULT_CHAMPION_ITEM_SIZE = 68
-
     const val KEY_DEFAULT_PAGE = "KEY_DEFAULT_PAGE"
     const val KEY_DEFAULT_PAGE_THUMBNAIL_SIGNATURE = "KEY_DEFAULT_PAGE_THUMBNAIL_SIGNATURE"
     const val KEY_THEME = "theme"
@@ -57,6 +55,16 @@ object PreferenceUtil {
     const val KEY_STATE_TOKEN = "aaaa_eeee"
 
     const val KEY_USER_ID = "user_id"
+
+
+    /**
+     * START OF DEPRECATED KEYS
+     */
+    const val KEY_COMPATIBILITY_MODE = "KEY_COMPATIBILITY_MODE"
+
+    /**
+     * END OF DEPRECATED KEYS
+     */
 
     /**
      * Scheduling options
@@ -129,8 +137,7 @@ object PreferenceUtil {
     const val KEY_COMMENTS_NAVIGATION_FAB = "KEY_COMMENTS_NAVIGATION_FAB"
     const val KEY_COMMENTS_NAVIGATION_FAB_OFF_X = "KEY_COMMENTS_NAVIGATION_FAB_OFF_X"
     const val KEY_COMMENTS_NAVIGATION_FAB_OFF_Y = "KEY_COMMENTS_NAVIGATION_FAB_OFF_Y"
-
-    const val KEY_COMPATIBILITY_MODE = "KEY_COMPATIBILITY_MODE"
+    const val KEY_COMPATIBILITY_MODE2 = "KEY_COMPATIBILITY_MODE2"
 
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {

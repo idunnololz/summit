@@ -24,7 +24,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
-import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
@@ -355,10 +355,10 @@ class Preferences @Inject constructor(
         }
 
     var compatibilityMode: Boolean
-        get() = prefs.getBoolean(KEY_COMPATIBILITY_MODE, false)
+        get() = prefs.getBoolean(KEY_COMPATIBILITY_MODE2, false)
         set(value) {
             prefs.edit()
-                .putBoolean(KEY_COMPATIBILITY_MODE, value)
+                .putBoolean(KEY_COMPATIBILITY_MODE2, value)
                 .apply()
         }
 
