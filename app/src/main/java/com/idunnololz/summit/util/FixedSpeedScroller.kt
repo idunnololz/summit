@@ -5,7 +5,7 @@ import android.view.animation.Interpolator
 import android.widget.Scroller
 
 class FixedSpeedScroller : Scroller {
-    private val mDuration = 300
+    private val mDuration = 250
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, interpolator: Interpolator?) : super(context, interpolator) {}

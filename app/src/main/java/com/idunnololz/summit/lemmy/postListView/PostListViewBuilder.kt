@@ -375,7 +375,7 @@ class PostListViewBuilder @Inject constructor(
             }
 
             fun loadAndShowImage() {
-                image ?: return
+                val image = image ?: return
 
                 val thumbnailImageUrl = if (thumbnailUrl != null &&
                     ContentUtils.isUrlImage(thumbnailUrl)
@@ -405,7 +405,7 @@ class PostListViewBuilder @Inject constructor(
                 image.visibility = View.VISIBLE
                 iconImage?.visibility = View.GONE
 
-                image.load(R.drawable.thumbnail_placeholder) {
+                image.load(R.drawable.thumbnail_placeholder_16_9) {
                     if (image is ShapeableImageView) {
                         allowHardware(false)
                     }
@@ -419,7 +419,8 @@ class PostListViewBuilder @Inject constructor(
                         if (image is ShapeableImageView) {
                             allowHardware(false)
                         }
-                        fallback(R.drawable.thumbnail_placeholder)
+                        fallback(R.drawable.thumbnail_placeholder_16_9)
+                        placeholder(R.drawable.thumbnail_placeholder_16_9)
 
                         if (!isRevealed && postView.post.nsfw) {
                             val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)

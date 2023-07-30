@@ -12,6 +12,7 @@ import coil.Coil
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.transition.CrossfadeTransition
 import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.*
@@ -170,6 +171,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         Coil.setImageLoader(
             ImageLoader.Builder(context)
+                .transitionFactory(CrossfadeTransition.Factory())
                 .crossfade(IMAGE_LOAD_CROSS_FADE_DURATION_MS.toInt())
                 .okHttpClient(Client.get())
                 .components {

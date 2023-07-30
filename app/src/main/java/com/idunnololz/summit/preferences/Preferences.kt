@@ -358,7 +358,7 @@ class Preferences @Inject constructor(
         get() = prefs.getBoolean(KEY_COMPATIBILITY_MODE, false)
         set(value) {
             prefs.edit()
-                .putBoolean(KEY_COMPATIBILITY_MODE, true)
+                .putBoolean(KEY_COMPATIBILITY_MODE, value)
                 .apply()
         }
 
