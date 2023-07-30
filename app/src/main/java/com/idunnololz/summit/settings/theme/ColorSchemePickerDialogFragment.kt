@@ -78,6 +78,8 @@ class ColorSchemePickerDialogFragment :
 
                 themeManager.onThemeOverlayChanged()
                 themeManager.applyThemeFromPreferences()
+
+                dismiss()
             }
         }
     }
@@ -172,6 +174,20 @@ class ColorSchemePickerDialogFragment :
                     context.getColorCompat(R.color.theme_talha_e_green_md_theme_light_primary),
                     context.getColorCompat(R.color.theme_talha_e_green_md_theme_light_secondary),
                     context.getColorCompat(R.color.theme_talha_e_green_md_theme_light_tertiary),
+                ),
+                Item.ColorSchemeItem(
+                    ColorSchemes.TalhaPink,
+                    context.getString(R.string.talha_e_pink),
+                    context.getColorCompat(R.color.theme_talha_e_pink_md_theme_light_primary),
+                    context.getColorCompat(R.color.theme_talha_e_pink_md_theme_light_secondary),
+                    context.getColorCompat(R.color.theme_talha_e_pink_md_theme_light_tertiary),
+                ),
+                Item.ColorSchemeItem(
+                    ColorSchemes.Peachie,
+                    context.getString(R.string.peachie),
+                    context.getColorCompat(R.color.theme_peachie_md_theme_light_primary),
+                    context.getColorCompat(R.color.theme_peachie_md_theme_light_secondary),
+                    context.getColorCompat(R.color.theme_peachie_md_theme_light_tertiary),
                 ),
             )
 

@@ -113,6 +113,12 @@ class ThemeManager @Inject constructor(
             ColorSchemes.TalhaGreen -> {
                 activity.theme.applyStyle(R.style.ThemeTalhaEGreenOverlay, true)
             }
+            ColorSchemes.TalhaPink -> {
+                activity.theme.applyStyle(R.style.ThemeTalhaEPinkOverlay, true)
+            }
+            ColorSchemes.Peachie -> {
+                activity.theme.applyStyle(R.style.ThemePeachieOverlay, true)
+            }
             else -> { /* do nothing */ }
         }
 

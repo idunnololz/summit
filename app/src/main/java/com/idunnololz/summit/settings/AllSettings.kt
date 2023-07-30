@@ -479,6 +479,18 @@ class ThemeSettings @Inject constructor(
                 null,
                 null,
             ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.TalhaPink,
+                context.getString(R.string.talha_e_pink),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.Peachie,
+                context.getString(R.string.peachie),
+                null,
+                null,
+            ),
         ),
     )
 
