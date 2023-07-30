@@ -14,7 +14,7 @@
     <dimen name="reddit_content_horizontal_padding">16dp</dimen>
     <dimen name="reddit_content_horizontal_padding_for_downvote">14dp</dimen>
 
-    <dimen name="fastscroll__handle_corner">0dp</dimen>
+    <dimen name="fastscroll__handle_corner">4dp</dimen>
     <dimen name="fastscroll__handle_height">48dp</dimen>
     <dimen name="fastscroll__handle_clickable_width">24dp</dimen>
     <dimen name="thread_line_total_size">16dp</dimen>

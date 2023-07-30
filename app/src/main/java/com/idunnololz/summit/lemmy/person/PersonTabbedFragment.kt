@@ -308,7 +308,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 }
             }
             profileIcon.load(data.personView.person.avatar) {
-                fallback(R.drawable.thumbnail_placeholder)
+                fallback(R.drawable.thumbnail_placeholder_square)
                 allowHardware(false)
             }
             name.text = displayName
