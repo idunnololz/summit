@@ -52,4 +52,12 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </dialog>
+    <fragment
+        android:id="@+id/searchResultsFragment"
+        android:name="com.idunnololz.summit.lemmy.search.SearchResultsFragment"
+        android:label="SearchResultsFragment" >
+        <argument
+            android:name="searchType"
+            app:argType="com.idunnololz.summit.api.dto.SearchType" />
+    </fragment>
 </navigation>

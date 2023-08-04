@@ -14,6 +14,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
+import com.idunnololz.summit.databinding.SearchResultPostItemBinding
 import com.idunnololz.summit.view.LemmyHeaderView
 
 class ListingItemViewHolder(
@@ -47,6 +48,27 @@ class ListingItemViewHolder(
 
     companion object {
         fun fromBinding(binding: ListingItemListBinding) =
+            ListingItemViewHolder(
+                rawBinding = binding,
+                root = binding.root,
+                headerContainer = binding.headerContainer,
+                image = binding.image,
+                title = binding.title,
+                commentText = binding.commentButton,
+                commentButton = binding.commentButton,
+                upvoteCount = binding.upvoteCount,
+                upvoteButton = binding.upvoteButton,
+                downvoteButton = binding.downvoteButton,
+                linkTypeImage = binding.linkTypeImage,
+                iconImage = binding.iconImage,
+                openLinkButton = null,
+                fullContentContainerView = binding.fullContent,
+                highlightBg = binding.highlightBg,
+                layoutShowsFullContent = false,
+                createCommentButton = null,
+            )
+
+        fun fromBinding(binding: SearchResultPostItemBinding) =
             ListingItemViewHolder(
                 rawBinding = binding,
                 root = binding.root,

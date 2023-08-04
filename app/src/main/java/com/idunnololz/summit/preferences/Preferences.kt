@@ -30,6 +30,8 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -359,6 +361,22 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_COMPATIBILITY_MODE, value)
+                .apply()
+        }
+
+    var hidePostScores: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_POST_SCORES, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_HIDE_POST_SCORES, value)
+                .apply()
+        }
+
+    var hideCommentScores: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_COMMENT_SCORES, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_HIDE_COMMENT_SCORES, value)
                 .apply()
         }
 

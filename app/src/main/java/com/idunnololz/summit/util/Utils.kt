@@ -470,10 +470,15 @@ object Utils {
         }
     }
 
-    fun openExternalLink(context: Context, url: String) {
+    fun openExternalLink(context: Context, url: String, openNewIncognitoTab: Boolean = false) {
         try {
             val intent = CustomTabsIntent.Builder()
                 .build()
+
+            if (openNewIncognitoTab) {
+                intent.intent.putExtra("com.google.android.apps.chrome.EXTRA_OPEN_NEW_INCOGNITO_TAB", true)
+            }
+
             intent.launchUrl(context, Uri.parse(url))
         } catch (e: ActivityNotFoundException) {
             val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -644,8 +649,8 @@ object Utils {
             imm?.hideSoftInputFromWindow(currentFocus.windowToken, 0)
         }
 
-        WindowInsetsControllerCompat(activity.window, activity.window.decorView)
-            .hide(WindowInsetsCompat.Type.ime())
+//        WindowInsetsControllerCompat(activity.window, activity.window.decorView)
+//            .hide(WindowInsetsCompat.Type.ime())
     }
 
     fun permute(arr: List<Int>): MutableList<MutableList<Int>> {

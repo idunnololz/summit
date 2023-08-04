@@ -462,6 +462,12 @@
     <string name="view_source">View source</string>
     <string name="compatibility_mode">Compatibility mode</string>
     <string name="compatibility_mode_desc">May fix some bugs with loading posts on certain devices</string>
+    <string name="urls">Urls</string>
+    <string name="hide_post_scores">Hide post scores</string>
+    <string name="hide_comment_scores">Hide comment scores</string>
+    <string name="open_in_incognito">Open in incognito</string>
+    <string name="community">Community</string>
+    <string name="person">Person</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 64
-        versionName = "1.0.1"
+        versionCode = 65
+        versionName = "1.0.2"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -131,6 +131,7 @@ dependencies {
 
     implementation("com.github.Commit451.coil-transformations:transformations:2.0.2")
     implementation("com.github.Drjacky:ImagePicker:2.3.22")
+    implementation("info.debatty:java-string-similarity:2.0.0")
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

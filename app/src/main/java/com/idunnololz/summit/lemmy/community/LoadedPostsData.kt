@@ -20,4 +20,6 @@ data class LoadedPostsData(
 @JsonClass(generateAdapter = true)
 data class PostLoadError(
     val errorCode: Int,
+    val errorMessage: String,
+    val isRetryable: Boolean,
 ) : Parcelable

@@ -116,6 +116,13 @@ class SettingsPostListFragment :
                 updateRendering()
             },
         )
+        postListSettings.hidePostScores.bindTo(
+            binding.hidePostScores,
+            { preferences.hidePostScores },
+            {
+                preferences.hidePostScores = it
+            },
+        )
         postListSettings.defaultCommunitySortOrder.bindTo(
             binding.defaultCommunitySortOrder,
             {

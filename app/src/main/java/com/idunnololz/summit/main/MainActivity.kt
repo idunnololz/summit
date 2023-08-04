@@ -215,8 +215,6 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        Log.d("HAHA", "onDestroy")
-
         ExoPlayerManager.destroyAll()
     }
 

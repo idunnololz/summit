@@ -403,6 +403,7 @@ class LemmyApiClient @Inject constructor(
         query: String,
         limit: Int? = null,
         creatorId: Int? = null,
+        force: Boolean,
     ): Result<SearchResponse> {
         val form = Search(
             q = query,
@@ -417,7 +418,13 @@ class LemmyApiClient @Inject constructor(
             auth = account?.jwt,
         )
 
-        return retrofitErrorHandler { api.search(form = form.serializeToMap()) }.fold(
+        return retrofitErrorHandler {
+            if (force) {
+                api.searchNoCache(form = form.serializeToMap())
+            } else {
+                api.search(form = form.serializeToMap())
+            }
+        }.fold(
             onSuccess = {
                 Result.success(it)
             },

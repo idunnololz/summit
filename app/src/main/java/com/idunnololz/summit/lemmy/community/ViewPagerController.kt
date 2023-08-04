@@ -1,5 +1,7 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +14,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.discord.panels.OverlappingPanelsLayout
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -28,6 +31,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 import java.lang.reflect.Field
 
 class ViewPagerController(
@@ -126,6 +130,34 @@ class ViewPagerController(
         reveal: Boolean = false,
         videoState: VideoState? = null,
     ) {
+        openPostInternal(PostFragmentArgs(
+            instance = instance,
+            id = id,
+            reveal = reveal,
+            post = post,
+            jumpToComments = jumpToComments,
+            currentCommunity = currentCommunity,
+            videoState = videoState,
+        ).toBundle(), PostRef(instance, id))
+    }
+
+    fun openComment(instance: String, commentId: CommentId) {
+        openPostInternal(
+            PostFragmentArgs(
+                instance = instance,
+                id = 0,
+                commentId = commentId,
+                currentCommunity = null,
+                isSinglePage = false,
+            ).toBundle()
+        )
+    }
+
+    private fun openPostInternal(
+        args: Bundle,
+        postRef: PostRef? = null
+    ) {
+
         if (activeOpenPostJob != null) {
             Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
             return
@@ -134,15 +166,7 @@ class ViewPagerController(
         activeOpenPostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
             val fragment = PostFragment()
                 .apply {
-                    arguments = PostFragmentArgs(
-                        instance = instance,
-                        id = id,
-                        reveal = reveal,
-                        post = post,
-                        jumpToComments = jumpToComments,
-                        currentCommunity = currentCommunity,
-                        videoState = videoState,
-                    ).toBundle()
+                    arguments = args
                 }
 
             childFragmentManager.commit(allowStateLoss = true) {
@@ -152,7 +176,7 @@ class ViewPagerController(
             onPostOpen()
             animatePagerTransition(true)
 
-            viewModel.lastSelectedPost = PostRef(instance, id)
+            viewModel.lastSelectedPost = postRef
 
             withContext(Dispatchers.IO) {
                 delay(250)
@@ -244,6 +268,19 @@ class ViewPagerController(
                 1 -> container.getChildAt(1)
                 else -> error("ASDF")
             }
+
+        override fun saveState(): Parcelable {
+            return Bundle().apply {
+                putInt("count", count)
+            }
+        }
+
+        override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
+            val bundle = state as? Bundle ?: return
+
+            count = bundle.getInt("count", 1)
+            notifyDataSetChanged()
+        }
     }
 
     private fun animatePagerTransition(forward: Boolean) {

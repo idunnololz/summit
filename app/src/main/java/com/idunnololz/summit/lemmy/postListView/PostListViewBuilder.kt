@@ -1,10 +1,12 @@
 package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
@@ -83,6 +85,11 @@ class PostListViewBuilder @Inject constructor(
     private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
     private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
 
+    private val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
+    private val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
+    private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
+    private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
+
     private val tempSize = Size()
 
     init {
@@ -137,7 +144,7 @@ class PostListViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
-        onLinkLongClick: (url: String, text: String) -> Unit,
+        onLinkLongClick: (url: String, text: String?) -> Unit,
     ) = with(holder) {
         if (holder.state.preferTitleText != postUiConfig.preferTitleText) {
             if (postUiConfig.preferTitleText) {
@@ -614,7 +621,29 @@ class PostListViewBuilder @Inject constructor(
             upvoteButton,
             downvoteButton,
             upvoteCount,
-            null,
+            {
+                if (rawBinding is ListingItemCompactBinding) {
+                    if (it > 0) {
+                        upvoteCount.setTextColor(upvoteColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            upvoteCount,
+                            ColorStateList.valueOf(upvoteColor),
+                        )
+                    } else if (it == 0) {
+                        upvoteCount.setTextColor(unimportantTextColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            upvoteCount,
+                            ColorStateList.valueOf(unimportantTextColor),
+                        )
+                    } else {
+                        upvoteCount.setTextColor(downvoteColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            upvoteCount,
+                            ColorStateList.valueOf(downvoteColor),
+                        )
+                    }
+                }
+            },
             onSignInRequired = onSignInRequired,
             onInstanceMismatch,
         )

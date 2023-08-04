@@ -132,6 +132,9 @@ object PreferenceUtil {
 
     const val KEY_COMPATIBILITY_MODE = "KEY_COMPATIBILITY_MODE"
 
+    const val KEY_HIDE_POST_SCORES = "KEY_HIDE_POST_SCORES"
+    const val KEY_HIDE_COMMENT_SCORES = "KEY_HIDE_COMMENT_SCORES"
+
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {
             preferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE)

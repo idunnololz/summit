@@ -117,14 +117,21 @@ object LinkUtils {
         "https://$instance/comment/$commentId"
 }
 
-fun MainActivity.showBottomMenuForLink(url: String, text: String) {
+fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
     val context = this
 
     BottomMenu(context).apply {
         setTitle(R.string.link_actions)
         addItemWithIcon(R.id.copy_link, R.string.copy_link_address, R.drawable.baseline_content_copy_24)
-        addItemWithIcon(R.id.copy_link_text, R.string.copy_link_text, R.drawable.baseline_content_copy_24)
+        if (text != null) {
+            addItemWithIcon(
+                R.id.copy_link_text,
+                R.string.copy_link_text,
+                R.drawable.baseline_content_copy_24
+            )
+        }
         addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
+        addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -132,10 +139,13 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String) {
                     Utils.copyToClipboard(context, url)
                 }
                 R.id.copy_link_text -> {
-                    Utils.copyToClipboard(context, text)
+                    Utils.copyToClipboard(context, requireNotNull(text))
                 }
                 R.id.share_link -> {
                     Utils.shareLink(context, url)
+                }
+                R.id.open_link_incognito -> {
+                    Utils.openExternalLink(context, url, openNewIncognitoTab = true)
                 }
             }
         }
