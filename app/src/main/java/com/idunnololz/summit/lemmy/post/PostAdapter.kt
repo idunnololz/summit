@@ -16,7 +16,7 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.api.utils.getUniqueKey
-import com.idunnololz.summit.databinding.GenericFooterItemBinding
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
@@ -50,6 +50,7 @@ class PostsAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val instance: String,
     private val revealAll: Boolean,
+    private val useFooter: Boolean,
     private val currentAccountId: Int?,
     private val videoState: VideoState?,
     private val onRefreshClickCb: () -> Unit,
@@ -63,7 +64,7 @@ class PostsAdapter(
     private val onCommentMoreClick: (CommentView) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
-    private val onLinkLongClick: (url: String, text: String) -> Unit,
+    private val onLinkLongClick: (url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed class Item(
@@ -191,7 +192,7 @@ class PostsAdapter(
             }
         is ProgressOrErrorItem -> R.layout.generic_loading_item
         is MoreCommentsItem -> R.layout.post_more_comments_item
-        is FooterItem -> R.layout.generic_footer_item
+        is FooterItem -> R.layout.generic_space_footer_item
         is Item.ViewAllComments -> R.layout.view_all_comments
     }
 
@@ -229,8 +230,8 @@ class PostsAdapter(
                 ViewBindingViewHolder(PostMoreCommentsItemBinding.bind(v))
             R.layout.generic_loading_item ->
                 ViewBindingViewHolder(GenericLoadingItemBinding.bind(v))
-            R.layout.generic_footer_item ->
-                ViewBindingViewHolder(GenericFooterItemBinding.bind(v))
+            R.layout.generic_space_footer_item ->
+                ViewBindingViewHolder(GenericSpaceFooterItemBinding.bind(v))
             R.layout.view_all_comments ->
                 ViewBindingViewHolder(ViewAllCommentsBinding.bind(v))
             else -> throw RuntimeException("ViewType: $viewType")
@@ -589,7 +590,9 @@ class PostsAdapter(
                     finalItems += listOf(ProgressOrErrorItem())
                 }
 
-                finalItems += FooterItem
+                if (useFooter) {
+                    finalItems += FooterItem
+                }
 
                 finalItems
             } else {

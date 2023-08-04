@@ -26,6 +26,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
+import com.idunnololz.summit.preferences.Preferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -39,21 +40,22 @@ class AccountActionsManager @Inject constructor(
     private val pendingActionsManager: PendingActionsManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val postReadManager: PostReadManager,
+    private val preferences: Preferences,
 ) {
 
     companion object {
         private const val TAG = "AccountActionsManager"
     }
 
-    private val votesManager = VotesManager(context)
+    private val votesManager = VotesManager(context, preferences)
     private val pendingCommentsManager = PendingCommentsManager()
     private var nextId: Long = 1
 
     interface Registration {
-        fun voteCurrent(score: Int, totalScore: Int)
-        fun voteSuccess(newScore: Int, totalScore: Int)
-        fun votePending(pendingScore: Int, totalScore: Int)
-        fun voteFailed(score: Int, totalScore: Int, e: Throwable)
+        fun voteCurrent(score: Int, totalScore: Int?)
+        fun voteSuccess(newScore: Int, totalScore: Int?)
+        fun votePending(pendingScore: Int, totalScore: Int?)
+        fun voteFailed(score: Int, totalScore: Int?, e: Throwable)
     }
 
     class VoteHandlerRegistration(
@@ -132,7 +134,7 @@ class AccountActionsManager @Inject constructor(
             Log.d(TAG, "Binding vote handler - $ref")
 
             scoreView.text = LemmyUtils.abbrevNumber(
-                votesManager.getScore(ref)?.toLong() ?: currentScore.toLong(),
+                votesManager.getScore(ref)?.toLong()
             )
 
             lifecycleOwner.lifecycle.addObserver(

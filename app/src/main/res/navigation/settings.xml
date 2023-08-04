@@ -154,7 +154,7 @@
         android:label="SettingThemeFragment" />
     <fragment
         android:id="@+id/settingPostAndCommentsFragment"
-        android:name="com.idunnololz.summit.settings.post_and_comments.SettingPostAndCommentsFragment"
+        android:name="com.idunnololz.summit.settings.postAndComments.SettingPostAndCommentsFragment"
         android:label="SettingPostAndCommentsFragment" />
     <fragment
         android:id="@+id/settingsContentFragment"

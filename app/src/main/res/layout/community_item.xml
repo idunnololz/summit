@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?selectableItemBackground">
+
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:text="@string/community"
+        android:drawablePadding="@dimen/padding_half"
+        android:textColor="@color/colorTextFaint"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:textAppearance="?textAppearanceLabelMedium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:drawableStartCompat="@drawable/ic_community_14"
+        app:drawableTint="@color/style_amber" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
+        android:textAppearance="?textAppearanceTitleMedium"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toBottomOf="@+id/type"
+        app:layout_constraintBottom_toTopOf="@+id/instance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/icon"/>
+
+    <TextView
+        android:id="@+id/instance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintEnd_toStartOf="@+id/icon"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/monthly_actives"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_quarter"
+        android:layout_marginEnd="@dimen/padding"
+        android:textAppearance="?textAppearanceBodySmall"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintBaseline_toBaselineOf="@+id/title"
+        app:layout_constraintStart_toEndOf="@+id/title"
+        app:layout_constraintEnd_toStartOf="@+id/icon"/>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        style="@style/RoundImageView"
+        android:id="@+id/icon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:border_color="@color/colorOnSurface"
+        app:border_width="1dp"
+        app:fill_color="@color/style_blue"
+        app:layout_constraintTop_toTopOf="@+id/title"
+        app:layout_constraintBottom_toBottomOf="@+id/instance"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

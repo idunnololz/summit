@@ -1,5 +1,6 @@
 package com.idunnololz.summit.saved
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -22,6 +23,7 @@ import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -31,6 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SavedViewModel @Inject constructor(
+    private val context: Application,
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
@@ -163,7 +166,11 @@ class SavedViewModel @Inject constructor(
                                 apiClient.instance,
                                 pageIndex,
                                 false,
-                                error = PostLoadError(0),
+                                error = PostLoadError(
+                                    errorCode = 0,
+                                    errorMessage = it.toErrorMessage(context),
+                                    isRetryable = true
+                                ),
                             ),
                         )
                         postListEngine.createItems()

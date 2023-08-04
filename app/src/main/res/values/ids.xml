@@ -84,4 +84,5 @@
     <item name="layout_large_list" type="id" />
     <item name="relay_style_navigation" type="id" />
     <item name="view_source" type="id" />
+    <item name="open_link_incognito" type="id" />
 </resources>

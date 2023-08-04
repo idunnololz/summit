@@ -50,6 +50,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.removeNavHostFragment
+import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -64,6 +65,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         private val TAG = MainFragment::class.java.canonicalName
 
         private const val SIS_FRAGMENT_TAGS = "SIS_FRAGMENT_TAGS"
+        private const val SIS_CURRENT_TAB = "SIS_CURRENT_TAB"
 
         fun getTagForTab(tabId: Long): String = "innerFragment:$tabId"
         fun getTagForTab(communityRef: CommunityRef): String = "innerFragment:$communityRef"
@@ -183,6 +185,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         savedInstanceState?.getStringArrayList(SIS_FRAGMENT_TAGS)?.forEach {
             fragmentTags.add(it)
+        }
+        savedInstanceState?.getParcelableCompat<TabsManager.Tab>(SIS_CURRENT_TAB)?.let {
+            Log.d(TAG, "restoring tab to ${it.communityRef}")
+            tabsManager.updateCurrentTabNow(it)
         }
         requireActivity().onBackPressedDispatcher.addCallback(
             this,
@@ -422,6 +428,12 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             SIS_FRAGMENT_TAGS,
             arrayListOf<String>().apply { addAll(fragmentTags) },
         )
+        tabsManager.currentTab.value?.let {
+            outState.putParcelable(
+                SIS_CURRENT_TAB,
+                it
+            )
+        }
     }
 
     override fun onResume() {

@@ -25,7 +25,10 @@ object LemmyUtils {
 
     fun formatAuthor(author: String): String = "u/%s".format(author)
 
-    fun abbrevNumber(number: Long): String {
+    fun abbrevNumber(number: Long?): String {
+        if (number == null) {
+            return "⬤"
+        }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val formatter = CompactDecimalFormat.getInstance(
                 Locale.getDefault(),

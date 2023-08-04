@@ -96,7 +96,7 @@ class LemmyContentHelper(
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
-        onLinkLongClick: (url: String, text: String) -> Unit,
+        onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
         assertMainThread()
         if (!lazyUpdate) {
@@ -104,11 +104,7 @@ class LemmyContentHelper(
         }
 
         val context = rootView.context
-//        val targetListingItem = if (listingItem.crosspostParent != null) {
-//            listingItem.crosspostParentList?.first() ?: listingItem
-//        } else {
-//            listingItem
-//        }
+        // Handles crossposts
         val targetPostView = postView
 
         @Suppress("UNCHECKED_CAST")
@@ -244,6 +240,10 @@ class LemmyContentHelper(
                         this.height = thumbnailMaxHeight
                     }
                 }
+                fullImageView.setOnLongClickListener {
+                    onLinkLongClick(imageUrl, null)
+                    true
+                }
 
                 fetchFullImage()
             } else {
@@ -293,6 +293,10 @@ class LemmyContentHelper(
                     imageView.transitionName = fullImageViewTransitionName
                     imageView.setOnClickListener {
                         onFullImageViewClickListener(it, previewInfo.getUrl())
+                    }
+                    imageView.setOnLongClickListener {
+                        onLinkLongClick(previewInfo.getUrl(), null)
+                        true
                     }
                 }
             } else {
@@ -345,7 +349,7 @@ class LemmyContentHelper(
                 }
             }
             externalContentView.setOnLongClickListener {
-                onLinkLongClick(url, url)
+                onLinkLongClick(url, null)
                 true
             }
         }
@@ -356,6 +360,10 @@ class LemmyContentHelper(
                 fullContentImageView.findViewById<LoadingView>(R.id.loadingView)
 
             fullImageView.load(null)
+            fullImageView.setOnLongClickListener {
+                onLinkLongClick(imageUrl, null)
+                true
+            }
 
             fun updateLayoutParams() {
                 offlineManager.getImageSizeHint(imageUrl, tempSize)

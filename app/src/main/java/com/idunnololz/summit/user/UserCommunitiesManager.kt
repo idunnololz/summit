@@ -6,6 +6,7 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.tabs.isHomeTab
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -92,7 +93,9 @@ class UserCommunitiesManager @Inject constructor(
     }
 
     fun removeCommunity(communityRef: CommunityRef) {
-        val item = userCommunityItems.firstOrNull { it.communityRef == communityRef } ?: return
+        val item = userCommunityItems.firstOrNull {
+            it.communityRef == communityRef && !it.isHomeTab
+        } ?: return
 
         coroutineScope.launch {
             removeCommunityInternal(item)
@@ -117,7 +120,7 @@ class UserCommunitiesManager @Inject constructor(
     }
 
     fun isCommunityBookmarked(communityRef: CommunityRef): Boolean =
-        userCommunityItems.any { it.communityRef == communityRef }
+        userCommunityItems.any { it.communityRef == communityRef && !it.isHomeTab }
 
     private suspend fun addCommunityOrUpdateInternal(
         communityItem: UserCommunityItem,
