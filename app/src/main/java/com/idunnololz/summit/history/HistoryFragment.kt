@@ -94,12 +94,6 @@ class HistoryFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setupActionBar(
-                getString(R.string.history),
-                showUp = false,
-                animateActionBarIn = false,
-            )
-
             setSupportActionBar(binding.toolbar)
 
             supportActionBar?.setDisplayShowHomeEnabled(true)

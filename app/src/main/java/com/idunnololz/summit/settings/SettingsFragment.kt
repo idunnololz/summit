@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +15,8 @@ import com.google.android.material.appbar.AppBarLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,14 +27,19 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     private val args by navArgs<SettingsFragmentArgs>()
 
     @Inject
-    lateinit var settingsManager: SettingsManager
-
-    @Inject
     lateinit var mainSettings: MainSettings
+
+    private val viewModel: SettingsViewModel by viewModels()
 
     private var adapter: SettingItemsAdapter? = null
 
     private var handledLink = false
+
+    private val searchViewBackPressedHandler = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            viewModel.showSearch.value = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +60,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner, searchViewBackPressedHandler)
+
         val context = requireContext()
 
         requireMainActivity().apply {
@@ -57,16 +70,16 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.collapsingToolbarLayout)
+            insetViewAutomaticallyByMargins(viewLifecycleOwner, binding.searchContainer)
 
             setSupportActionBar(binding.searchBar)
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = context.getString(R.string.settings)
-            supportActionBar?.hide()
 
-            binding.searchBar.updateLayoutParams<AppBarLayout.LayoutParams> {
-                scrollFlags = 0
+            binding.searchBar.setOnClickListener {
+                viewModel.showSearch.value = true
             }
         }
 
@@ -164,11 +177,54 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 )
             }
             recyclerView.adapter = adapter?.apply {
-                this.data = settingsManager.getSettingsForMainPage()
+                this.firstTitleHasTopMargin = false
+                this.setData(mainSettings.allSettings)
+            }
+
+            viewModel.showSearch.observe(viewLifecycleOwner) {
+                if (it) {
+                    showSearch()
+                } else {
+                    hideSearch()
+                }
+            }
+            viewModel.searchResults.observe(viewLifecycleOwner) {
+                if (searchResultsRecyclerView.adapter == null) {
+                    setupSearchRecyclerView()
+                }
+
+                (searchResultsRecyclerView.adapter as? SettingItemsAdapter)?.setData(it) {
+                    binding.recyclerView.scrollToPosition(0)
+                }
+            }
+
+            searchEditText.addTextChangedListener {
+                viewModel.query(it?.toString())
             }
         }
 
         handleLinkIfNeeded()
+        hideSearch(animate = false)
+    }
+
+    private fun setupSearchRecyclerView() {
+        if (!isBindingAvailable()) {
+            return
+        }
+
+        val context = requireContext()
+
+        binding.searchResultsRecyclerView.apply {
+            adapter = SettingItemsAdapter(
+                context = context,
+                onSettingClick = {
+                    true
+                },
+                fragmentManager = childFragmentManager
+            )
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+        }
     }
 
     private fun handleLinkIfNeeded() {
@@ -190,5 +246,36 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         val directions = SettingsFragmentDirections
             .actionSettingsFragmentToSettingWebFragment()
         findNavController().navigateSafe(directions)
+    }
+
+    private fun showSearch() {
+        if (!isBindingAvailable()) return
+
+        binding.searchContainer.visibility = View.VISIBLE
+        binding.searchContainer.alpha = 0f
+        binding.searchContainer.animate()
+            .alpha(1f)
+        binding.searchEditText.requestFocus()
+        binding.root.findFocus()?.focusAndShowKeyboard()
+
+        searchViewBackPressedHandler.isEnabled = true
+    }
+
+    private fun hideSearch(animate: Boolean = true) {
+        Utils.hideKeyboard(requireMainActivity())
+
+        if (animate) {
+            binding.searchContainer.animate()
+                .alpha(0f)
+                .withEndAction {
+                    binding.searchContainer.visibility = View.GONE
+                    binding.searchContainer.alpha = 1f
+                }
+        } else {
+            binding.searchContainer.visibility = View.GONE
+            binding.searchContainer.alpha = 1f
+        }
+
+        searchViewBackPressedHandler.isEnabled = false
     }
 }

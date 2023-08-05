@@ -179,22 +179,7 @@ class SettingsWebViewModel @Inject constructor(
             AccountData(
                 data,
                 account,
-                listOf(
-                    lemmyWebSettings.instanceSetting,
-                    lemmyWebSettings.displayNameSetting,
-                    lemmyWebSettings.bioSetting,
-                    lemmyWebSettings.emailSetting,
-                    lemmyWebSettings.matrixSetting,
-                    lemmyWebSettings.avatarSetting,
-                    lemmyWebSettings.bannerSetting,
-                    lemmyWebSettings.defaultSortType,
-                    lemmyWebSettings.showNsfwSetting,
-                    lemmyWebSettings.showReadPostsSetting,
-                    lemmyWebSettings.botAccountSetting,
-                    lemmyWebSettings.showBotAccountsSetting,
-                    lemmyWebSettings.sendNotificationsToEmailSetting,
-                    lemmyWebSettings.blockSettings,
-                ),
+                lemmyWebSettings.allSettings,
                 mapOf(
                     lemmyWebSettings.instanceSetting.id to account.instance,
                     lemmyWebSettings.displayNameSetting.id to person.name,

@@ -15,9 +15,9 @@
             android:id="@+id/collapsing_toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:scrimVisibleHeightTrigger="0dp"
+            app:statusBarScrim="?backgroundColor"
+            app:contentScrim="?backgroundColor"
             app:titleEnabled="false"
-            app:contentScrim="?android:colorBackground"
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,7 +41,6 @@
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-
         <com.google.android.material.search.SearchBar
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
@@ -59,6 +58,55 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="@dimen/footer_spacer_height"/>
-
     </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/search_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?backgroundColor"
+        android:orientation="vertical">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/search_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/subreddit_filter_bg"
+            android:layout_marginHorizontal="@dimen/padding"
+            android:layout_marginTop="@dimen/padding"
+            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:hintEnabled="false"
+            app:startIconDrawable="@drawable/baseline_search_18"
+            app:startIconMinSize="48dp"
+            app:endIconMinSize="48dp"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/search_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="no"
+                android:background="@null"
+                android:paddingHorizontal="@dimen/padding"
+                android:paddingVertical="@dimen/padding_half"
+                android:textIsSelectable="true"
+                android:scrollbars="vertical"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:hint="@string/search"
+                android:imeOptions="actionSearch"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_results_recycler_view"
+            android:layout_marginTop="@dimen/padding"
+            android:layout_width="match_parent"
+            android:paddingBottom="@dimen/footer_spacer_height"
+            android:clipToPadding="false"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

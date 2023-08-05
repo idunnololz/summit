@@ -8,20 +8,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.core.text.buildSpannedString
+import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
 import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingOnOffBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
+import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
 import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
 import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
@@ -46,6 +50,7 @@ class SettingItemsAdapter(
 
         data class TitleItem(
             override val settingItem: SubgroupItem,
+            val hasTopMargin: Boolean,
         ) : Item
 
         data class RadioGroupItem(
@@ -62,14 +67,15 @@ class SettingItemsAdapter(
             override val settingItem: ImageValueSettingItem,
             val value: String?,
         ) : Item
+
+        data class SliderItem(
+            override val settingItem: SliderSettingItem,
+            val value: Float?,
+        ) : Item
     }
 
     var data: List<SettingItem> = listOf()
-        set(value) {
-            field = value
-
-            refreshItems()
-        }
+        private set
 
     var defaultSettingValues: Map<Int, Any?> = mapOf()
         set(value) {
@@ -77,6 +83,9 @@ class SettingItemsAdapter(
 
             refreshItems()
         }
+
+    var firstTitleHasTopMargin: Boolean = true
+
     private val _updatedSettingValues = mutableMapOf<Int, Any?>()
     val updatedSettingValues: Map<Int, Any?>
         get() = _updatedSettingValues
@@ -98,7 +107,9 @@ class SettingItemsAdapter(
                     MultipleChoiceDialogFragment.newInstance(settingItem)
                         .showAllowingStateLoss(fragmentManager, "aaaaaaa")
                 }
-                is SliderSettingItem -> TODO()
+                is SliderSettingItem -> {
+                    updateSettingValue(settingItem.id, (it as Slider).value)
+                }
                 is SubgroupItem -> TODO()
                 is TextOnlySettingItem -> TODO()
                 is TextValueSettingItem -> {
@@ -141,6 +152,12 @@ class SettingItemsAdapter(
             val settingItem = item.settingItem
 
             b.title.text = settingItem.title
+
+            if (item.hasTopMargin) {
+                b.title.updatePadding(top = context.getDimen(R.dimen.padding_two))
+            } else {
+                b.title.updatePadding(top = context.getDimen(R.dimen.padding_half))
+            }
         }
         addItemType(Item.TextValueItem::class, SettingTextValueBinding::inflate) { item, b, h ->
             val settingItem = item.settingItem
@@ -210,6 +227,12 @@ class SettingItemsAdapter(
             b.root.tag = settingItem
             b.root.setOnClickListener(onSettingClickListener)
         }
+        addItemType(Item.SliderItem::class, SliderSettingItemBinding::inflate) { item, b, h ->
+            val settingItem = item.settingItem
+
+            b.root.tag = settingItem
+            settingItem.bindTo(b, { item.value ?: settingItem.minValue }, { onSettingClickListener })
+        }
     }
 
     init {
@@ -228,14 +251,14 @@ class SettingItemsAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
         adapterHelper.onBindViewHolder(holder, position)
 
-    private fun refreshItems() {
+    private fun refreshItems(onItemsUpdated: () -> Unit = {}) {
         val newItems = mutableListOf<Item>()
 
         data.forEach {
             addRecursive(it, newItems)
         }
 
-        adapterHelper.setItems(newItems, this)
+        adapterHelper.setItems(newItems, this, onItemsUpdated)
     }
 
     private fun getCurrentValue(key: Int): Any? =
@@ -250,7 +273,10 @@ class SettingItemsAdapter(
     private fun addRecursive(settingItem: SettingItem, out: MutableList<Item>) {
         when (settingItem) {
             is SubgroupItem -> {
-                out.add(Item.TitleItem(settingItem))
+                out.add(Item.TitleItem(
+                    settingItem,
+                    firstTitleHasTopMargin || out.isNotEmpty()
+                ))
                 settingItem.settings.forEach {
                     addRecursive(it, out)
                 }
@@ -266,7 +292,11 @@ class SettingItemsAdapter(
 
                 out.add(Item.RadioGroupItem(settingItem, value as Int?))
             }
-            is SliderSettingItem -> TODO()
+            is SliderSettingItem -> {
+                val value = getCurrentValue(settingItem.id)
+
+                out.add(Item.SliderItem(settingItem, value as Float?))
+            }
             is TextOnlySettingItem -> TODO()
             is TextValueSettingItem -> {
                 val value = getCurrentValue(settingItem.id)
@@ -302,5 +332,13 @@ class SettingItemsAdapter(
         _updatedSettingValues.clear()
         defaultSettingValues = newDefaults
         settingsChanged?.invoke()
+    }
+
+    fun setData(data: List<SettingItem>, onItemsUpdated: () -> Unit = {}) {
+        this.data = data
+
+        refreshItems {
+            onItemsUpdated()
+        }
     }
 }

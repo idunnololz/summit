@@ -254,7 +254,7 @@ class SettingsWebFragment :
         ).apply {
             this.stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             this.defaultSettingValues = data.defaultValues
-            this.data = data.settings
+            this.setData(data.settings)
 
             this.settingsChanged = {
                 backPressHandler.isEnabled = this.updatedSettingValues.isNotEmpty()

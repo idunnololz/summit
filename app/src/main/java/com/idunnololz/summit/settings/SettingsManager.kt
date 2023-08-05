@@ -10,52 +10,12 @@ import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class SettingsManager @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val mainSettings: MainSettings,
-) {
-
-    private val mainSettingItems = listOf(
-        SubgroupItem(
-            context.getString(R.string.look_and_feel),
-            listOf(
-                mainSettings.settingTheme,
-                mainSettings.settingPostList,
-                mainSettings.commentListSettings,
-                mainSettings.settingViewType,
-                mainSettings.settingPostAndComment,
-                mainSettings.settingGestures,
-            ),
-        ),
-        SubgroupItem(
-            context.getString(R.string.account_settings),
-            listOf(
-                mainSettings.settingLemmyWeb,
-            ),
-        ),
-        SubgroupItem(
-            context.getString(R.string.systems),
-            listOf(
-                mainSettings.settingCache,
-                mainSettings.settingHiddenPosts,
-//                mainSettings.settingHistory,
-                mainSettings.settingAbout,
-                mainSettings.settingSummitCommunity,
-                mainSettings.patreonSettings,
-            ),
-        ),
-    )
-
-    fun getSettingsForMainPage() =
-        mainSettingItems
-}
-
 var nextId = 1
 
 sealed class SettingItem : Parcelable {
     val id: Int = nextId++
     abstract val title: String
+    abstract val description: String?
     open val isEnabled: Boolean = true
 }
 
@@ -63,19 +23,21 @@ sealed class SettingItem : Parcelable {
 data class SubgroupItem(
     override val title: String,
     val settings: List<SettingItem>,
-) : SettingItem()
+) : SettingItem() {
+    override val description: String? = null
+}
 
 @Parcelize
 data class BasicSettingItem(
     @DrawableRes val icon: Int?,
     override val title: String,
-    val description: String?,
+    override val description: String?,
 ) : SettingItem()
 
 @Parcelize
 data class TextOnlySettingItem(
     override val title: String,
-    val description: String?,
+    override val description: String?,
 ) : SettingItem()
 
 @Parcelize
@@ -84,7 +46,9 @@ data class TextValueSettingItem(
     val supportsRichText: Boolean,
     override val isEnabled: Boolean = true,
     val hint: String? = null,
-) : SettingItem()
+) : SettingItem() {
+    override val description: String? = null
+}
 
 @Parcelize
 data class SliderSettingItem(
@@ -92,20 +56,22 @@ data class SliderSettingItem(
     val minValue: Float,
     val maxValue: Float,
     val stepSize: Float? = null,
-) : SettingItem()
+) : SettingItem() {
+    override val description: String? = null
+}
 
 @Parcelize
 data class OnOffSettingItem(
     @DrawableRes val icon: Int?,
     override val title: String,
-    val description: String?,
+    override val description: String?,
 ) : SettingItem()
 
 @Parcelize
 data class RadioGroupSettingItem(
     @DrawableRes val icon: Int?,
     override val title: String,
-    val description: String?,
+    override val description: String?,
     val options: List<RadioGroupOption>,
 ) : SettingItem() {
     @Parcelize
@@ -120,6 +86,6 @@ data class RadioGroupSettingItem(
 @Parcelize
 data class ImageValueSettingItem(
     override val title: String,
-    val description: String?,
+    override val description: String?,
     val isSquare: Boolean,
 ) : SettingItem()
