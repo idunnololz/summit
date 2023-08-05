@@ -11,7 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
-import com.idunnololz.summit.databinding.GenericFooterItemBinding
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
@@ -56,7 +56,7 @@ class ListingItemAdapter(
     private val onShowMoreActions: (PostView) -> Unit,
     private val onPostRead: (PostView) -> Unit,
     private val onLoadPage: (Int) -> Unit,
-    private val onLinkLongClick: (url: String, text: String) -> Unit,
+    private val onLinkLongClick: (url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val inflater = LayoutInflater.from(context)
@@ -113,7 +113,7 @@ class ListingItemAdapter(
         is Item.FooterItem -> R.layout.main_footer_item
         is Item.AutoLoadItem -> R.layout.auto_load_item
         Item.EndItem -> R.layout.post_list_end_item
-        Item.FooterSpacerItem -> R.layout.generic_footer_item
+        Item.FooterSpacerItem -> R.layout.generic_space_footer_item
         is Item.ErrorItem -> R.layout.loading_view_item
     }
 
@@ -141,7 +141,8 @@ class ListingItemAdapter(
                 ViewBindingViewHolder(PostListEndItemBinding.bind(v))
             R.layout.loading_view_item ->
                 ViewBindingViewHolder(LoadingViewItemBinding.bind(v))
-            R.layout.generic_footer_item -> ViewBindingViewHolder(GenericFooterItemBinding.bind(v))
+            R.layout.generic_space_footer_item ->
+                ViewBindingViewHolder(GenericSpaceFooterItemBinding.bind(v))
             else -> throw RuntimeException("Unknown view type: $viewType")
         }
     }
@@ -285,7 +286,7 @@ class ListingItemAdapter(
             Item.EndItem -> {}
             is Item.ErrorItem -> {
                 val b = holder.getBinding<LoadingViewItemBinding>()
-                b.loadingView.showDefaultErrorMessageFor(item.error)
+                b.loadingView.showErrorWithRetry(item.message)
                 b.loadingView.setOnRefreshClickListener {
                     onLoadPage(item.pageToLoad)
                 }

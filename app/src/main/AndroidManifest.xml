@@ -54,6 +54,13 @@
                 <data android:host="sopuli.xyz" />
                 <data android:host="szmer.info" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
         </activity>
         <activity
             android:configChanges="layoutDirection|locale"
@@ -93,5 +100,11 @@
                 tools:node="remove" />
 
         </provider>
+
+        <provider
+            android:name="com.idunnololz.summit.search.SuggestionProvider"
+            android:authorities="com.idunnololz.summit.search.SuggestionProvider"
+            android:exported="false"
+            android:enabled="true" />
     </application>
 </manifest>

@@ -215,6 +215,7 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int? = null,
         creatorId: Int? = null,
         account: Account? = accountForInstance(),
+        force: Boolean = false,
     ): Result<SearchResponse> =
         apiClient.search(
             account = account,
@@ -226,6 +227,7 @@ class AccountAwareLemmyClient @Inject constructor(
             page = page,
             limit = limit,
             query = query,
+            force = force,
         )
             .autoSignOut(account)
 

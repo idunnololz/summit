@@ -81,6 +81,13 @@ class SettingCommentListFragment :
             { preferences.commentsNavigationFab },
             { preferences.commentsNavigationFab = it },
         )
+        commentListSettings.hideCommentScores.bindTo(
+            binding.hideCommentScores,
+            { preferences.hideCommentScores },
+            {
+                preferences.hideCommentScores = it
+            },
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

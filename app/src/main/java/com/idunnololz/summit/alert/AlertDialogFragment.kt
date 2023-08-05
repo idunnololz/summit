@@ -120,7 +120,8 @@ class AlertDialogFragment : DialogFragment() {
             isCancelable = false
         }
 
-        if (message is Int) {
+        if (message == null) {
+        } else if (message is Int) {
             builder.setMessage(message)
         } else {
             builder.setMessage(message as CharSequence)

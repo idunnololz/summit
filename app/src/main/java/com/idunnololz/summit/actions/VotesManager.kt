@@ -2,9 +2,11 @@ package com.idunnololz.summit.actions
 
 import android.content.Context
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.preferences.Preferences
 
 class VotesManager(
     private val context: Context,
+    private val preferences: Preferences,
 ) {
 
     companion object {
@@ -39,8 +41,23 @@ class VotesManager(
         scores[key] = count
     }
 
-    fun getScore(key: VotableRef) =
-        scores[key]
+    fun getScore(key: VotableRef, force: Boolean = false) =
+        when (key) {
+            is VotableRef.CommentRef -> {
+                if (!force && preferences.hideCommentScores) {
+                    null
+                } else {
+                    scores[key]
+                }
+            }
+            is VotableRef.PostRef -> {
+                if (!force && preferences.hidePostScores) {
+                    null
+                } else {
+                    scores[key]
+                }
+            }
+        }
 
     fun setScoreIfNoneSet(key: VotableRef, score: Int) {
         scores.getOrPut(key) { score }

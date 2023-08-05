@@ -12,10 +12,26 @@
         app:iconTint="?attr/colorControlNormal" />
 
     <item
+        android:id="@+id/share"
+        android:title="@string/share"
+        android:icon="@drawable/baseline_share_24"
+        android:orderInCategory="200"
+        app:showAsAction="ifRoom"
+        app:iconTint="?attr/colorControlNormal" />
+
+    <item
+        android:id="@+id/copy_link"
+        android:title="@string/copy_link_address"
+        android:icon="@drawable/baseline_content_copy_24"
+        android:orderInCategory="300"
+        app:showAsAction="ifRoom"
+        app:iconTint="?attr/colorControlNormal" />
+
+    <item
         android:id="@+id/openInBrowser"
         android:title="@string/open_in_browser"
         android:icon="@drawable/baseline_open_in_new_24"
-        android:orderInCategory="200"
+        android:orderInCategory="400"
         app:showAsAction="ifRoom"
         app:iconTint="?attr/colorControlNormal" />
 

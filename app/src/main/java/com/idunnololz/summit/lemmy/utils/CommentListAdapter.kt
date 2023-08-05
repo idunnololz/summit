@@ -43,6 +43,7 @@ class CommentListAdapter(
     private val onLoadPage: (Int) -> Unit,
     private val onImageClick: (View?, String) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
+    private val onCommentClick: (CommentRef) -> Unit,
     private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
     private val onCommentMoreClick: (CommentView) -> Unit,
     private val onSignInRequired: () -> Unit,
@@ -181,7 +182,7 @@ class CommentListAdapter(
                 onCommentMoreClick(item.commentView)
             }
             b.root.setOnClickListener {
-                onPageClick(CommentRef(item.instance, item.commentView.comment.id))
+                onCommentClick(CommentRef(item.instance, item.commentView.comment.id))
             }
             b.root.setOnLongClickListener {
                 onCommentMoreClick(item.commentView)

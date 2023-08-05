@@ -1,4 +1,4 @@
-package com.idunnololz.summit.settings.post_and_comments
+package com.idunnololz.summit.settings.postAndComments
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

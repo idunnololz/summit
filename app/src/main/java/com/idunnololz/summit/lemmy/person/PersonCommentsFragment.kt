@@ -107,6 +107,12 @@ class PersonCommentsFragment :
             onPageClick = {
                 getMainActivity()?.launchPage(it)
             },
+            onCommentClick = {
+                parentFragment.viewPagerController?.openComment(
+                    it.instance,
+                    it.id,
+                )
+            },
             onLoadPage = {
                 parentFragment.viewModel.fetchPage(it, false)
             },
@@ -191,7 +197,6 @@ class PersonCommentsFragment :
             binding.recyclerView.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        Log.d("HAHA", "asdsafsdfasdfsadf")
                         super.onScrolled(recyclerView, dx, dy)
 
                         checkIfFetchNeeded()
