@@ -2,7 +2,9 @@ package com.idunnololz.summit.lemmy.search
 
 import android.app.SearchManager
 import android.app.SearchableInfo
+import android.content.ContentResolver
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.provider.SearchRecentSuggestions
 import android.util.Log
@@ -21,31 +23,50 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
+import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
+import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.showSortTypeMenu
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.search.SuggestionProvider
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
+class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private const val TAG = "SearchTabbedFragment"
+
+        private const val ARG_SUGGESTION_TO_DELETE = "ARG_SUGGESTION_TO_DELETE"
     }
 
     private val args by navArgs<SearchTabbedFragmentArgs>()
@@ -53,6 +74,8 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
     val viewModel: SearchViewModel by viewModels()
     val actionsViewModel: MoreActionsViewModel by viewModels()
     var viewPagerController: ViewPagerController? = null
+
+    private var searchSuggestionsAdapter: CustomSearchSuggestionsAdapter? = null
 
     @Inject
     lateinit var preferences: Preferences
@@ -83,13 +106,12 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        requireActivity().onBackPressedDispatcher.addCallback(
-//            viewLifecycleOwner, queryBackPressHandler)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner, searchViewBackPressedHandler)
 
         val context = requireContext()
 
+        viewModel.setSortType(args.sortType)
         if (args.query.isNotBlank()) {
             binding.searchEditText.setText(args.query)
             performSearch()
@@ -200,6 +222,8 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
                 viewModel.viewModelScope,
             )
 
+            this@SearchTabbedFragment.searchSuggestionsAdapter = searchSuggestionsAdapter
+
             searchSuggestionsRecyclerView.setHasFixedSize(false)
             searchSuggestionsRecyclerView.adapter = searchSuggestionsAdapter
             searchSuggestionsRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -211,6 +235,15 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
                     override fun onSuggestionSelected(query: String) {
                         searchEditText.setText(query)
                         launchSearch()
+                    }
+
+                    override fun onSuggestionLongClicked(query: String) {
+                        AlertDialogFragment.Builder()
+                            .setTitle(R.string.delete_suggest)
+                            .setPositiveButton(android.R.string.ok)
+                            .setNegativeButton(android.R.string.cancel)
+                            .setExtra(ARG_SUGGESTION_TO_DELETE, query)
+                            .createAndShow(childFragmentManager, "asdf")
                     }
                 },
             )
@@ -258,8 +291,57 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
                 hideSearch(animate = false)
             }
 
-            fab.hide()
+            fab.setOnClickListener {
+                showMoreOptions()
+            }
         }
+    }
+
+    private fun showMoreOptions() {
+        if (!isBindingAvailable()) {
+            return
+        }
+
+        val context = requireContext()
+
+        val bottomMenu = BottomMenu(context).apply {
+            setTitle(R.string.more_actions)
+
+            addItemWithIcon(
+                R.id.sort_order,
+                getString(R.string.sort_order),
+                R.drawable.baseline_sort_24,
+            )
+
+            addItemWithIcon(
+                R.id.clear_search_history,
+                getString(R.string.clear_search_history),
+                R.drawable.baseline_delete_24,
+            )
+
+            setOnMenuItemClickListener {
+                when (it.id) {
+                    R.id.sort_order -> {
+                        showSortTypeMenu(
+                            getCurrentSortType = {
+                                viewModel.currentSortTypeFlow.value.toSortOrder()
+                            },
+                            onSortOrderSelected = {
+                                viewModel.setSortType(it.toApiSortOrder())
+                            }
+                        )
+                    }
+                    R.id.clear_search_history -> {
+                        val adapter = binding.searchSuggestionsRecyclerView.adapter as?
+                            CustomSearchSuggestionsAdapter
+
+                        adapter?.clearSuggestions()
+                    }
+                }
+            }
+        }
+
+        getMainActivity()?.showBottomMenu(bottomMenu)
     }
 
     private fun showSearch() {
@@ -281,7 +363,10 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
         val query = binding.searchEditText.text
         val queryString = query?.toString() ?: ""
 
-        val directions = SearchTabbedFragmentDirections.actionSearchFragmentSelf(queryString)
+        val directions = SearchTabbedFragmentDirections.actionSearchFragmentSelf(
+            queryString,
+            viewModel.currentSortTypeFlow.value
+        )
         findNavController().navigateSafe(directions)
     }
 
@@ -351,5 +436,37 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
 
     fun closePost(postFragment: PostFragment) {
         viewPagerController?.closePost(postFragment)
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        val context = context ?: return
+
+        val suggestionToDelete = dialog.getExtra(ARG_SUGGESTION_TO_DELETE)
+        if (suggestionToDelete != null) {
+            val searchManager = context?.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
+            val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(
+                requireActivity().componentName,
+            )
+            val searchable = searchableInfo ?: return
+            val authority = searchable.suggestAuthority ?: return
+
+            val uriBuilder = Uri.Builder()
+                .scheme(ContentResolver.SCHEME_CONTENT)
+                .authority(authority)
+                .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+                .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+                .appendEncodedPath("suggestions")
+
+            val uri = uriBuilder.build()
+
+            // finally, make the query
+            context.contentResolver.delete(
+                uri, "query = '$suggestionToDelete'", null)
+
+            searchSuggestionsAdapter?.refreshSuggestions()
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 }

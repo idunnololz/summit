@@ -125,13 +125,32 @@ class CustomSearchSuggestionsAdapter(
         return context.contentResolver.query(uri, null, selection, selArgs, null)
     }
 
+    fun clearSuggestions() {
+        val searchable = searchableInfo ?: return
+        val authority = searchable.suggestAuthority ?: return
+
+        val uriBuilder = Uri.Builder()
+            .scheme(ContentResolver.SCHEME_CONTENT)
+            .authority(authority)
+            .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+            .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+            .appendEncodedPath("suggestions")
+
+        val uri = uriBuilder.build()
+
+        // finally, make the query
+        context.contentResolver.delete(uri, null, null)
+
+        refreshSuggestions()
+    }
+
     fun setQuery(query: String) {
         this.query = query
 
         refreshSuggestions()
     }
 
-    private fun refreshSuggestions() {
+    fun refreshSuggestions() {
         refreshSuggestionsJob?.cancel()
         refreshSuggestionsJob = coroutineScope.launch {
             val seen = mutableSetOf<String>()
@@ -234,6 +253,10 @@ class CustomSearchSuggestionsAdapter(
                 h.itemView.setOnClickListener {
                     listener?.onSuggestionSelected(s)
                 }
+                h.itemView.setOnLongClickListener {
+                    listener?.onSuggestionLongClicked(s)
+                    true
+                }
             }
         }
     }
@@ -252,5 +275,6 @@ class CustomSearchSuggestionsAdapter(
     interface OnSuggestionListener {
         fun onSuggestionsChanged(newSuggestions: List<String>)
         fun onSuggestionSelected(query: String)
+        fun onSuggestionLongClicked(query: String)
     }
 }

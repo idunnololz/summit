@@ -139,6 +139,7 @@ class QueryEngine(
     val currentState = MutableStateFlow<StatefulData<Unit>>(StatefulData.NotStarted())
 
     private var currentQuery: String = ""
+    private var currentSortType: SortType = SortType.Active
     private var currentInstance: String = apiClient.instance
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -166,9 +167,19 @@ class QueryEngine(
 
         reset()
 
-        if (query.isNotBlank()) {
-            performQuery(0, force = false)
+        performQuery(0, force = false)
+    }
+
+    fun setSortType(sortType: SortType) {
+        if (currentSortType == sortType) {
+            return
         }
+
+        currentSortType = sortType
+
+        reset()
+
+        performQuery(0, force = false)
     }
 
     fun setInstance(instance: String) {
@@ -183,6 +194,11 @@ class QueryEngine(
     }
 
     fun performQuery(pageIndex: Int, force: Boolean) {
+        val currentQuery = currentQuery
+
+        if (currentQuery.isBlank()) {
+            return
+        }
         coroutineScope.launch {
             currentState.value = StatefulData.Loading()
             generateItems()
@@ -191,12 +207,11 @@ class QueryEngine(
                 reset()
             }
 
-            val currentQuery = currentQuery
             apiClient
                 .search(
                     null,
                     null,
-                    SortType.Active,
+                    currentSortType,
                     ListingType.All,
                     type,
                     pageIndex.toLemmyPageIndex(),
@@ -223,24 +238,29 @@ class QueryEngine(
                                 SearchResultView.UserResultView(it, false)
                             }
 
-                            val sortedItems = items.sortedBy {
-                                when (it) {
-                                    is SearchResultView.CommentResultView ->
-                                        trigram.distance(it.commentView.comment.content, currentQuery)
-                                    is SearchResultView.CommunityResultView -> {
-                                        trigram.distance(
-                                            it.communityView.community.name,
-                                            currentQuery
-                                        )
+                            val sortedItems =
+                                if (currentSortType == SortType.Active) {
+                                    items.sortedBy {
+                                        when (it) {
+                                            is SearchResultView.CommentResultView ->
+                                                trigram.distance(it.commentView.comment.content, currentQuery)
+                                            is SearchResultView.CommunityResultView -> {
+                                                trigram.distance(
+                                                    it.communityView.community.name,
+                                                    currentQuery
+                                                )
+                                            }
+                                            is SearchResultView.PostResultView -> {
+                                                val toMatch = it.postView.post.name + " " + it.postView.post.body
+                                                trigram.distance(toMatch, currentQuery)
+                                            }
+                                            is SearchResultView.UserResultView ->
+                                                trigram.distance(it.personView.person.name, currentQuery)
+                                        }
                                     }
-                                    is SearchResultView.PostResultView -> {
-                                        val toMatch = it.postView.post.name + " " + it.postView.post.body
-                                        trigram.distance(toMatch, currentQuery)
-                                    }
-                                    is SearchResultView.UserResultView ->
-                                        trigram.distance(it.personView.person.name, currentQuery)
+                                } else {
+                                    items
                                 }
-                            }
 
 
                             QueryResultsPage.AllResultsPage(
@@ -251,32 +271,51 @@ class QueryEngine(
                         }
                         SearchType.Comments ->
                             QueryResultsPage.CommentResultsPage(
-                                it.comments.sortedBy {
-                                    trigram.distance(it.comment.content, currentQuery)
+                                if (currentSortType == SortType.Active) {
+                                    it.comments.sortedBy {
+                                        trigram.distance(it.comment.content, currentQuery)
+                                    }
+                                } else {
+                                    it.comments
                                 },
                                 pageIndex,
                                 it.comments.size >= MAX_QUERY_PAGE_LIMIT,
                             )
                         SearchType.Posts ->
                             QueryResultsPage.PostResultsPage(
-                                it.posts.sortedBy {
-                                    trigram.distance(it.post.name + " " + it.post.body, currentQuery)
+                                if (currentSortType == SortType.Active) {
+                                    it.posts.sortedBy {
+                                        trigram.distance(
+                                            it.post.name + " " + it.post.body,
+                                            currentQuery
+                                        )
+                                    }
+                                } else {
+                                   it.posts
                                 },
                                 pageIndex,
                                 it.posts.size >= MAX_QUERY_PAGE_LIMIT,
                             )
                         SearchType.Communities ->
                             QueryResultsPage.CommunityResultsPage(
-                                it.communities.sortedBy {
-                                    trigram.distance(it.community.fullName, currentQuery)
+                                if (currentSortType == SortType.Active) {
+                                    it.communities.sortedBy {
+                                        trigram.distance(it.community.fullName, currentQuery)
+                                    }
+                                } else {
+                                    it.communities
                                 },
                                 pageIndex,
                                 it.communities.size >= MAX_QUERY_PAGE_LIMIT,
                             )
                         SearchType.Users ->
                             QueryResultsPage.UserResultsPage(
-                                it.users.sortedBy {
-                                    trigram.distance(it.person.name, currentQuery)
+                                if (currentSortType == SortType.Active) {
+                                    it.users.sortedBy {
+                                        trigram.distance(it.person.name, currentQuery)
+                                    }
+                                } else {
+                                    it.users
                                 },
                                 pageIndex,
                                 it.users.size >= MAX_QUERY_PAGE_LIMIT,
@@ -297,18 +336,23 @@ class QueryEngine(
                                 SearchResultView.UserResultView(it, true)
                             }
 
-                            val sortedItems = items.sortedBy {
-                                when (it) {
-                                    is SearchResultView.CommentResultView ->
-                                        trigram.distance(it.commentView.comment.ap_id, currentQuery)
-                                    is SearchResultView.CommunityResultView ->
-                                        trigram.distance(it.communityView.community.actor_id, currentQuery)
-                                    is SearchResultView.PostResultView ->
-                                        trigram.distance(it.postView.post.ap_id, currentQuery)
-                                    is SearchResultView.UserResultView ->
-                                        trigram.distance(it.personView.person.actor_id, currentQuery)
+                            val sortedItems =
+                                if (currentSortType == SortType.Active) {
+                                    items.sortedBy { view ->
+                                        when (view) {
+                                            is SearchResultView.CommentResultView ->
+                                                trigram.distance(view.commentView.comment.ap_id, currentQuery)
+                                            is SearchResultView.CommunityResultView ->
+                                                trigram.distance(view.communityView.community.actor_id, currentQuery)
+                                            is SearchResultView.PostResultView ->
+                                                trigram.distance(view.postView.post.ap_id, currentQuery)
+                                            is SearchResultView.UserResultView ->
+                                                trigram.distance(view.personView.person.actor_id, currentQuery)
+                                        }
+                                    }
+                                } else {
+                                    items
                                 }
-                            }
 
                             QueryResultsPage.UrlResultsPage(
                                 sortedItems,
