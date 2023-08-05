@@ -464,6 +464,16 @@
     <string name="compatibility_mode_desc">May fix some bugs with loading posts on certain devices</string>
     <string name="talha_e_pink">Talha E.\'s Pink</string>
     <string name="peachie">Peachie</string>
+    <string name="urls">Urls</string>
+    <string name="hide_post_scores">Hide post scores</string>
+    <string name="hide_comment_scores">Hide comment scores</string>
+    <string name="open_in_incognito">Open in incognito</string>
+    <string name="community">Community</string>
+    <string name="person">Person</string>
+    <string name="post">Post</string>
+    <string name="sort_order">Sort order</string>
+    <string name="clear_search_history">Clear search history</string>
+    <string name="delete_suggest">Delete suggestion?</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

@@ -66,6 +66,14 @@ class TabsManager @Inject constructor(
         currentTab.postValue(tab)
     }
 
+    fun updateCurrentTabNow(tab: Tab) {
+        currentTab.value?.let {
+            previousTabs.add(it)
+        }
+
+        currentTab.value = tab
+    }
+
     fun getHomeTab(): Tab =
         userCommunitiesManager.getHomeItem().toTab()
 
@@ -120,8 +128,12 @@ val TabsManager.Tab.isHomeTab: Boolean
     get() = when (this) {
         is TabsManager.Tab.SubscribedCommunityTab -> false
         is TabsManager.Tab.UserCommunityTab ->
-            this.userCommunityItem.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID
+            this.userCommunityItem.isHomeTab
     }
+
+val UserCommunityItem.isHomeTab: Boolean
+    get() =
+        this.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID
 
 fun TabsManager.Tab.hasTabId(id: Long): Boolean =
     when (this) {

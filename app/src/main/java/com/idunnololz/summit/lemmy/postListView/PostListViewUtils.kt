@@ -5,6 +5,8 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
@@ -29,6 +31,13 @@ fun BaseFragment<*>.showMorePostOptions(
 
     val bottomMenu = BottomMenu(context).apply {
         setTitle(R.string.more_actions)
+
+
+        addItemWithIcon(
+            R.id.action_add_comment,
+            getString(R.string.add_comment),
+            R.drawable.baseline_add_comment_24,
+        )
 
         if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.value?.id) {
             addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
@@ -81,6 +90,17 @@ fun BaseFragment<*>.showMorePostOptions(
 
         setOnMenuItemClickListener {
             when (it.id) {
+                R.id.action_add_comment -> {
+                    AddOrEditCommentFragment().apply {
+                        arguments =
+                            AddOrEditCommentFragmentArgs(
+                                instance,
+                                null,
+                                postView,
+                                null,
+                            ).toBundle()
+                    }.show(childFragmentManager, "asdf")
+                }
                 R.id.edit_post -> {
                     CreateOrEditPostFragment()
                         .apply {

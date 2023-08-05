@@ -292,6 +292,10 @@ interface LemmyApi {
     @GET("search")
     fun search(@QueryMap form: Map<String, String>): Call<SearchResponse>
 
+    @GET("search")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun searchNoCache(@QueryMap form: Map<String, String>): Call<SearchResponse>
+
     /**
      * Fetch metadata for any given site.
      */

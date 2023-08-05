@@ -49,6 +49,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
@@ -193,6 +194,9 @@ class PostFragment :
             is SavedTabbedFragment -> {
                 fragment.closePost(this@PostFragment)
             }
+            is SearchTabbedFragment -> {
+                fragment.closePost(this@PostFragment)
+            }
         }
     }
 
@@ -218,6 +222,7 @@ class PostFragment :
                 this,
                 args.instance,
                 args.reveal,
+                useFooter = false,
                 accountManager.currentAccount.value?.id,
                 args.videoState,
                 onRefreshClickCb = {
@@ -317,18 +322,30 @@ class PostFragment :
         installOnActionResultHandler(actionsViewModel, binding.coordinatorLayout)
 
         runAfterLayout {
+            if (!isBindingAvailable()) return@runAfterLayout
+
             adapter?.contentMaxWidth = binding.recyclerView.width
 
             setup()
         }
 
         if (preferences.commentsNavigationFab) {
+            binding.fab.setImageResource(R.drawable.outline_navigation_24)
             binding.fab.show()
             binding.fab.setOnClickListener {
                 viewModel.toggleCommentNavControls()
             }
         } else {
-            binding.fab.hide()
+            binding.fab.setImageResource(R.drawable.baseline_more_horiz_24)
+            binding.fab.show()
+            binding.fab.setOnClickListener {
+                val data = viewModel.postData.valueOrNull
+                val postView = data?.postView?.post ?: args.post
+
+                if (postView != null) {
+                    showMorePostOptions(viewModel.apiInstance, postView, actionsViewModel, childFragmentManager)
+                }
+            }
         }
 
         commentNavViewController = CommentNavViewController(

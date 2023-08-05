@@ -80,7 +80,7 @@ class MessageViewModel @Inject constructor(
             commentContext.postValue(
                 CommentContext(
                     requireNotNull(postResult.getOrNull()),
-                    tree.first(),
+                    tree.firstOrNull(),
                 ),
             )
         }
@@ -88,6 +88,6 @@ class MessageViewModel @Inject constructor(
 
     data class CommentContext(
         val post: PostView,
-        val commentTree: CommentNodeData,
+        val commentTree: CommentNodeData?,
     )
 }

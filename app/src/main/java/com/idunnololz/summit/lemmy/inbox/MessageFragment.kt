@@ -385,6 +385,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 lifecycleOwner = viewLifecycleOwner,
                 instance = args.instance,
                 revealAll = false,
+                useFooter = false,
                 currentAccountId = viewModel.accountManager.currentAccount.value?.id,
                 videoState = null,
                 onRefreshClickCb = {
@@ -480,7 +481,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             adapter.setData(
                 PostViewModel.PostData(
                     PostViewModel.ListView.PostListView(data.post),
-                    listOf(data.commentTree),
+                    listOfNotNull(data.commentTree),
                     null,
                     null,
                     false,

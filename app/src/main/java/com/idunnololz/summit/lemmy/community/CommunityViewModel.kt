@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.app.Application
 import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -33,6 +34,7 @@ import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
+import com.idunnololz.summit.util.toErrorMessage
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +48,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
+    private val context: Application,
     private val postsRepository: PostsRepository,
     private val recentCommunityManager: RecentCommunityManager,
     private val accountManager: AccountManager,
@@ -98,6 +101,7 @@ class CommunityViewModel @Inject constructor(
 
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
     val currentAccount = MutableLiveData<AccountView?>(null)
+    val resetScrollEvent = MutableLiveData<Unit>() // INFINITY ONLY
 
     private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
 
@@ -130,15 +134,6 @@ class CommunityViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            accountInfoManager.currentFullAccountOnChange
-                .collect {
-                    withContext(Dispatchers.Main) {
-                        reset()
-                    }
-                }
-        }
-
-        viewModelScope.launch {
             userCommunitiesManager.defaultCommunity
                 .collect {
                     defaultCommunity.postValue(it)
@@ -168,15 +163,16 @@ class CommunityViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            accountInfoManager.currentFullAccountOnChange.collect {
+            accountManager.currentAccountOnChange.collect {
                 withContext(Dispatchers.Main) {
                     postListEngine.clearPages()
                     postListEngine.createItems()
                     pagePositions.clear()
 
                     loadedPostsData.setValue(PostUpdateInfo())
+                    resetScrollEvent.value = Unit
                 }
-                fetchInitialPage()
+                fetchInitialPage(force = true, clearPagesOnSuccess = true)
             }
         }
 
@@ -247,11 +243,11 @@ class CommunityViewModel @Inject constructor(
         fetchPageInternal(pageIndex, force = force, clearPagesOnSuccess)
     }
 
-    fun fetchInitialPage() {
+    fun fetchInitialPage(force: Boolean = false, clearPagesOnSuccess: Boolean = false) {
         if (postListEngine.infinity) {
-            fetchPage(0)
+            fetchPage(0, force, clearPagesOnSuccess)
         } else {
-            fetchCurrentPage()
+            fetchCurrentPage(force, clearPagesOnSuccess)
         }
     }
 
@@ -334,7 +330,11 @@ class CommunityViewModel @Inject constructor(
                             instance = postsRepository.apiInstance,
                             pageIndex = pageToFetch,
                             hasMore = true,
-                            error = PostLoadError(0),
+                            error = PostLoadError(
+                                errorCode = 0,
+                                errorMessage = it.toErrorMessage(context),
+                                isRetryable = true,
+                            ),
                         ),
                     )
                     postListEngine.createItems()

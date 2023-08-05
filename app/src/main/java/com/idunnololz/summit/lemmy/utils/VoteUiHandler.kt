@@ -154,24 +154,24 @@ fun VoteUiHandler.bind(
         downVoteView,
         scoreView,
         object : AccountActionsManager.Registration {
-            override fun voteCurrent(score: Int, totalScore: Int) {
+            override fun voteCurrent(score: Int, totalScore: Int?) {
                 update(score)
-                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
             }
 
-            override fun voteSuccess(newScore: Int, totalScore: Int) {
+            override fun voteSuccess(newScore: Int, totalScore: Int?) {
                 update(newScore)
-                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
             }
 
-            override fun votePending(pendingScore: Int, totalScore: Int) {
+            override fun votePending(pendingScore: Int, totalScore: Int?) {
                 update(pendingScore)
-                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
             }
 
-            override fun voteFailed(score: Int, totalScore: Int, e: Throwable) {
+            override fun voteFailed(score: Int, totalScore: Int?, e: Throwable) {
                 update(score)
-                scoreView.text = LemmyUtils.abbrevNumber(totalScore.toLong())
+                scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
 
                 if (e is NotAuthenticatedException) {
                     onSignInRequired()

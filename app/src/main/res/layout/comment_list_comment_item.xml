@@ -7,6 +7,24 @@
     android:background="?selectableItemBackground">
 
     <TextView
+        android:id="@+id/type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:text="@string/comment"
+        android:drawablePadding="@dimen/padding_half"
+        android:textColor="@color/colorTextFaint"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:textAppearance="?textAppearanceLabelMedium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:drawableStartCompat="@drawable/outline_mode_comment_16"
+        app:drawableTint="@color/style_blue" />
+
+    <TextView
         android:id="@+id/post_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -14,7 +32,7 @@
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/type"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.idunnololz.summit.view.LemmyHeaderView
@@ -114,5 +132,4 @@
         app:layout_constraintTop_toTopOf="@+id/commentButton"
         app:layout_constraintBottom_toBottomOf="@+id/commentButton"
         app:layout_constraintEnd_toEndOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

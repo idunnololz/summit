@@ -111,8 +111,6 @@ class CommentNavViewController(
                     val deltaX = event.rawX - startX
                     val deltaY = event.rawY - startY
 
-                    Log.d("HAHA", "dx: $deltaX dy: $deltaY sx: $startX sy: $startY")
-
                     statButton.translationX = deltaX + offsetX
                     statButton.translationY = deltaY + offsetY
                 }

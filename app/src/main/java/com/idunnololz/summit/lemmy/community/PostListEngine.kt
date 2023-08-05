@@ -29,7 +29,7 @@ sealed class Item {
 
     data class AutoLoadItem(val pageToLoad: Int) : Item()
 
-    data class ErrorItem(val error: Throwable, val pageToLoad: Int) : Item()
+    data class ErrorItem(val message: String, val pageToLoad: Int) : Item()
 
     object EndItem : Item()
     object FooterSpacerItem : Item()
@@ -135,7 +135,7 @@ class PostListEngine(
         }
         for (page in pages) {
             if (page.error != null) {
-                items.add(Item.ErrorItem(RuntimeException(), page.pageIndex))
+                items.add(Item.ErrorItem(page.error.errorMessage, page.pageIndex))
             } else {
                 page.posts
                     .mapTo(items) {

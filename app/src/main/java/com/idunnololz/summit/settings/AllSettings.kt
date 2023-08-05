@@ -339,6 +339,12 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.compatibility_mode),
         context.getString(R.string.compatibility_mode_desc),
     )
+
+    val hidePostScores = OnOffSettingItem(
+        null,
+        context.getString(R.string.hide_post_scores),
+        null,
+    )
 }
 
 @Singleton
@@ -386,6 +392,11 @@ class CommentListSettings @Inject constructor(
         null,
         context.getString(R.string.relay_style_navigation),
         context.getString(R.string.relay_style_navigation_desc),
+    )
+    val hideCommentScores = OnOffSettingItem(
+        null,
+        context.getString(R.string.hide_comment_scores),
+        null,
     )
 }
 

@@ -299,6 +299,14 @@ class ImageViewerActivity : BaseActivity() {
                             }
                             true
                         }
+                        R.id.share -> {
+                            Utils.shareLink(this@ImageViewerActivity, args.url)
+                            true
+                        }
+                        R.id.copy_link -> {
+                            Utils.copyToClipboard(this@ImageViewerActivity, args.url)
+                            true
+                        }
                         R.id.openInBrowser -> {
                             Utils.openExternalLink(context, args.url)
                             true

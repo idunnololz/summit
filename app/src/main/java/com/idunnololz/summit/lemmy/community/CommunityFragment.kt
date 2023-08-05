@@ -62,6 +62,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.RuntimeException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -135,6 +136,9 @@ class CommunityFragment :
                         getMainActivity()?.showBottomMenu(getSortByTopMenu())
                     else ->
                         idToSortOrder(menuItem.id)?.let {
+                            if (preferences.infinity) {
+                                shouldScrollToTopAfterFresh = true
+                            }
                             viewModel.setSortOrder(it)
                         }
                 }
@@ -159,6 +163,9 @@ class CommunityFragment :
 
             setOnMenuItemClickListener { menuItem ->
                 idToSortOrder(menuItem.id)?.let {
+                    if (preferences.infinity) {
+                        shouldScrollToTopAfterFresh = true
+                    }
                     viewModel.setSortOrder(it)
                 }
             }
@@ -359,6 +366,11 @@ class CommunityFragment :
         }
         viewModel.sortOrder.observe(viewLifecycleOwner) {
             lemmyAppBarController.setSortOrder(it)
+        }
+        viewModel.resetScrollEvent.observe(viewLifecycleOwner) {
+            if (preferences.infinity) {
+                shouldScrollToTopAfterFresh = true
+            }
         }
 
         installOnActionResultHandler(
@@ -940,21 +952,21 @@ class CommunityFragment :
 
             if (isCurrentPageDefault) {
             } else {
-                if (isBookmarked) {
-                    addItemWithIcon(
-                        id = R.id.toggle_bookmark,
-                        title = R.string.remove_bookmark,
-                        icon = R.drawable.baseline_bookmark_remove_24,
-                    )
-                } else {
-                    addItemWithIcon(
-                        id = R.id.toggle_bookmark,
-                        title = R.string.bookmark_community,
-                        icon = R.drawable.baseline_bookmark_add_24,
-                    )
-                }
-
                 addItemWithIcon(R.id.set_as_default, R.string.set_as_home_page, R.drawable.baseline_home_24)
+            }
+
+            if (isBookmarked) {
+                addItemWithIcon(
+                    id = R.id.toggle_bookmark,
+                    title = R.string.remove_bookmark,
+                    icon = R.drawable.baseline_bookmark_remove_24,
+                )
+            } else {
+                addItemWithIcon(
+                    id = R.id.toggle_bookmark,
+                    title = R.string.bookmark_community,
+                    icon = R.drawable.baseline_bookmark_add_24,
+                )
             }
 
             setOnMenuItemClickListener { menuItem ->
