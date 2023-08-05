@@ -172,5 +172,9 @@
             android:name="query"
             app:argType="string"
             android:defaultValue='' />
+        <argument
+            android:name="sortType"
+            app:argType="com.idunnololz.summit.api.dto.SortType"
+            android:defaultValue="Active" />
     </fragment>
 </navigation>

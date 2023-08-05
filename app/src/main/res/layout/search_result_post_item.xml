@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding"
-        android:text="@string/community"
+        android:text="@string/post"
         android:drawablePadding="@dimen/padding_half"
         android:textColor="@color/colorTextFaint"
         android:gravity="center_vertical"

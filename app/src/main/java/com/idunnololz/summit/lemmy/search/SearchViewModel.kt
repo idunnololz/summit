@@ -5,11 +5,13 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.SearchType
+import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.ViewPagerController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,6 +36,7 @@ class SearchViewModel @Inject constructor(
 
     val currentQueryFlow = MutableStateFlow<String>("")
     val currentQueryLiveData = currentQueryFlow.asLiveData()
+    val currentSortTypeFlow = MutableStateFlow<SortType>(SortType.Active)
 
     init {
         queryEnginesByType[SearchType.All] = QueryEngine(
@@ -72,6 +75,11 @@ class SearchViewModel @Inject constructor(
                 queryEnginesByType[currentType]?.setQuery(it)
             }
         }
+        viewModelScope.launch {
+            currentSortTypeFlow.collect {
+                queryEnginesByType[currentType]?.setSortType(it)
+            }
+        }
     }
 
     fun updateCurrentQuery(query: String) {
@@ -84,6 +92,13 @@ class SearchViewModel @Inject constructor(
         currentType = type
 
         queryEnginesByType[currentType]?.setQuery(currentQueryFlow.value)
+        queryEnginesByType[currentType]?.setSortType(currentSortTypeFlow.value)
+    }
+
+    fun setSortType(type: SortType) {
+        viewModelScope.launch {
+            currentSortTypeFlow.value = type
+        }
     }
 
     fun loadPage(pageIndex: Int, force: Boolean = false) {
