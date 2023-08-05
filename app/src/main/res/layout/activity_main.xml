@@ -34,20 +34,6 @@
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </LinearLayout>
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBar"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/transparent">
-
-            </com.google.android.material.appbar.MaterialToolbar>
-        </com.google.android.material.appbar.AppBarLayout>
-
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/snackbarContainer"
             android:layout_width="match_parent"

@@ -11,6 +11,7 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingAboutBinding
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.AboutSettings
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.ui.bindTo
@@ -26,6 +27,9 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var aboutSettings: AboutSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,17 +64,9 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
     }
 
     private fun updateRendering() {
-        BasicSettingItem(
-            null,
-            getString(R.string.build_version, BuildConfig.VERSION_NAME),
-            getString(R.string.version_code, BuildConfig.VERSION_CODE.toString()),
-        ).bindTo(binding.version, {})
+        aboutSettings.version.bindTo(binding.version, {})
 
-        BasicSettingItem(
-            null,
-            getString(R.string.view_on_the_play_store),
-            null,
-        ).bindTo(binding.playStoreListing) {
+        aboutSettings.googlePlayLink.bindTo(binding.playStoreListing) {
             try {
                 startActivity(
                     Intent(

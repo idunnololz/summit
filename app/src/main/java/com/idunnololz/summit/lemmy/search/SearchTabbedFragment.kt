@@ -357,6 +357,24 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
         searchViewBackPressedHandler.isEnabled = true
     }
 
+    private fun hideSearch(animate: Boolean = true) {
+        Utils.hideKeyboard(requireMainActivity())
+
+        if (animate) {
+            binding.searchContainer.animate()
+                .alpha(0f)
+                .withEndAction {
+                    binding.searchContainer.visibility = View.GONE
+                    binding.searchContainer.alpha = 1f
+                }
+        } else {
+            binding.searchContainer.visibility = View.GONE
+            binding.searchContainer.alpha = 1f
+        }
+
+        searchViewBackPressedHandler.isEnabled = false
+    }
+
     private fun launchSearch() {
         if (!isBindingAvailable()) return
 
@@ -383,24 +401,6 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
         hideSearch()
 
         viewModel.updateCurrentQuery(queryString)
-    }
-
-    private fun hideSearch(animate: Boolean = true) {
-        Utils.hideKeyboard(requireMainActivity())
-
-        if (animate) {
-            binding.searchContainer.animate()
-                .alpha(0f)
-                .withEndAction {
-                    binding.searchContainer.visibility = View.GONE
-                    binding.searchContainer.alpha = 1f
-                }
-        } else {
-            binding.searchContainer.visibility = View.GONE
-            binding.searchContainer.alpha = 1f
-        }
-
-        searchViewBackPressedHandler.isEnabled = false
     }
 
     private fun saveSuggestion(query: String) {

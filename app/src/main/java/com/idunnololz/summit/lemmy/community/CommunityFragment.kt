@@ -424,7 +424,8 @@ class CommunityFragment :
             showOverflowMenu()
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedHandler)
+        requireActivity().onBackPressedDispatcher
+            .addCallback(viewLifecycleOwner, onBackPressedHandler)
 
         viewPagerController = ViewPagerController(
             this,

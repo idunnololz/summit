@@ -139,10 +139,7 @@ class MainActivity : BaseActivity() {
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
 
-        setupActionBar()
         registerInsetsHandler()
-
-        hideActionBar(animate = true)
 
         fun updateBottomTranslationY() {
             binding.bottomNavigationView.translationY = bottomNavY
@@ -285,14 +282,6 @@ class MainActivity : BaseActivity() {
 
             Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
 
-            // Move toolbar below status bar
-            binding.appBar.layoutParams = (binding.appBar.layoutParams as MarginLayoutParams).apply {
-                // topMargin = insets.systemWindowInsetTop
-                leftMargin = leftInset
-                rightMargin = rightInset
-            }
-            binding.appBar.updatePadding(top = topInset)
-
             binding.bottomNavigationView.layoutParams =
                 (binding.bottomNavigationView.layoutParams as MarginLayoutParams).apply {
                     leftMargin = leftInset
@@ -387,22 +376,6 @@ class MainActivity : BaseActivity() {
     fun setNavUiOpenness(progress: Float) {
         if (lockUiOpenness) return
         bottomNavViewAnimationOffset.value = binding.bottomNavigationView.height * progress
-    }
-
-    var lastScrollFlagsToolbar: Int = 0
-    fun fixToolbar() {
-        binding.toolbar.layoutParams =
-            (binding.toolbar.layoutParams as AppBarLayout.LayoutParams).apply {
-                lastScrollFlagsToolbar = scrollFlags
-                scrollFlags = 0
-            }
-    }
-
-    fun unfixToolbar() {
-        binding.toolbar.layoutParams =
-            (binding.toolbar.layoutParams as AppBarLayout.LayoutParams).apply {
-                scrollFlags = lastScrollFlagsToolbar
-            }
     }
 
     fun showBottomNav(supportOpenness: Boolean = false) {
@@ -574,109 +547,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setupActionBar() {
-        setSupportActionBar(binding.toolbar)
-
-        val actionBar = supportActionBar
-        actionBar?.setDisplayShowHomeEnabled(true)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-
-        toolbarTextView = Utils.getToolbarTextView(binding.toolbar)
-    }
-
-    fun setupActionBar(@StringRes title: Int, showUp: Boolean) {
-        setupActionBar(getString(title), showUp, showSpinner = false, animateActionBarIn = true)
-    }
-
-    @JvmOverloads
-    fun setupActionBar(
-        title: CharSequence,
-        showUp: Boolean,
-        showSpinner: Boolean = false,
-        animateActionBarIn: Boolean = true,
-    ) {
-        val ab = supportActionBar
-        if (ab != null) {
-            if (showSpinner) {
-                ab.setDisplayShowTitleEnabled(false)
-            } else {
-                ab.setDisplayShowTitleEnabled(true)
-                ab.title = title
-            }
-        }
-        // undo any alpha changes. See EsportsTeamFragment.
-        toolbarTextView?.alpha = 1f
-        if (animateActionBarIn) {
-            showActionBar()
-        }
-
-        if (showUp) {
-            ab?.setDisplayHomeAsUpEnabled(true)
-            ab?.setDisplayShowHomeEnabled(true)
-        } else {
-            ab?.setDisplayHomeAsUpEnabled(false)
-            ab?.setDisplayShowHomeEnabled(false)
-        }
-    }
-
-    private val onOffsetChangedListener = AppBarLayout.OnOffsetChangedListener {
-            appBarLayout, verticalOffset ->
-
-        lastToolbarAppBarOffset = verticalOffset.toFloat()
-        headerOffset.value = verticalOffset + appBarLayout.height
-
-        val percentShown = abs(lastToolbarAppBarOffset) / binding.appBar.height
-        if (!animatingBottomNavView) {
-            bottomNavViewOffset.value =
-                (percentShown * binding.bottomNavigationView.height).toInt()
-        }
-    }
-    fun showActionBar() {
-        setSupportActionBar(binding.toolbar)
-
-        hideActionBar(animate = true, false)
-        unfixToolbar()
-
-        binding.toolbar.updateLayoutParams<AppBarLayout.LayoutParams> {
-            scrollFlags =
-                AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
-                AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS or
-                AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
-        }
-//        val supportActionBar = supportActionBar ?: return
-//        if (supportActionBar.isShowing) return
-        binding.appBar.visibility = View.VISIBLE
-        if (ViewCompat.isLaidOut(binding.appBar)) {
-            binding.appBar.animate().translationY(0f)
-        } else {
-            binding.appBar.translationY = 0f
-        }
-//        supportActionBar.show()
-    }
-
-    fun enableScrollingBottomNavByActionBar() {
-        binding.appBar.addOnOffsetChangedListener(onOffsetChangedListener)
-    }
-
-    fun hideActionBar(animate: Boolean, hideToolbar: Boolean = true) {
-        binding.appBar.removeOnOffsetChangedListener(onOffsetChangedListener)
-        if (hideToolbar) {
-            fixToolbar()
-//            val supportActionBar = supportActionBar ?: return
-//            if (!supportActionBar.isShowing) {
-//                return
-//            }
-            if (ViewCompat.isLaidOut(binding.appBar)) {
-                binding.appBar.animate().translationY((-binding.appBar.height).toFloat())
-            } else {
-                binding.appBar.visibility = View.INVISIBLE
-            }
-//            supportActionBar.hide()
-        }
-
-        updateToolbarHeight()
-    }
-
     private fun createOrGetSubredditSelectorController(): CommunitySelectorController =
         communitySelectorController
             ?: viewModel.communitySelectorControllerFactory.create(
@@ -704,16 +574,6 @@ class MainActivity : BaseActivity() {
         communitySelectorController.show(binding.bottomSheetContainer, this, this)
 
         return communitySelectorController
-    }
-
-    private fun updateToolbarHeight() {
-        if (toolbarHeight == 0) {
-            toolbarHeight = binding.toolbar.height
-            if (toolbarHeight == 0) {
-                binding.toolbar.measure(0, 0)
-                toolbarHeight = binding.toolbar.measuredHeight
-            }
-        }
     }
 
     fun hideSystemUI() {
@@ -913,73 +773,61 @@ class MainActivity : BaseActivity() {
 
         when (t) {
             CommunityFragment::class -> {
-                hideActionBar(animate)
                 enableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
             }
             PostFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
                 showNotificationBarBg()
             }
             VideoViewerFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
                 hideNotificationBarBg()
             }
             ImageViewerActivity::class -> {
-                showActionBar()
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
                 hideNotificationBarBg()
             }
             SettingCacheFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
             }
             HistoryFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
             }
             LoginFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
             }
             SettingsFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
                 hideNotificationBarBg()
             }
             PersonTabbedFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
             }
             CommunityInfoFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
             }
             SavedTabbedFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()
             }
             InboxTabbedFragment::class -> {
-                hideActionBar(animate)
                 disableBottomNavViewScrolling()
                 showBottomNav(supportOpenness = true)
                 showNotificationBarBg()
@@ -990,7 +838,6 @@ class MainActivity : BaseActivity() {
     }
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
-    fun getToolbarHeight() = binding.toolbar.layoutParams.height
     fun getBottomNavHeight() = binding.bottomNavigationView.height
 
     fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.settings
 
 import android.content.Context
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
@@ -10,10 +11,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface SearchableSettings {
+    val allSettings: List<SettingItem>
+}
+
 @Singleton
 class MainSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
     val settingTheme = BasicSettingItem(
         R.drawable.baseline_palette_24,
         context.getString(R.string.theme),
@@ -81,12 +86,43 @@ class MainSettings @Inject constructor(
         context.getString(R.string.patreon_supporters),
         context.getString(R.string.patreon_supporters_desc),
     )
+
+    override val allSettings = listOf(
+        SubgroupItem(
+            context.getString(R.string.look_and_feel),
+            listOf(
+                settingTheme,
+                settingPostList,
+                commentListSettings,
+                settingViewType,
+                settingPostAndComment,
+                settingGestures,
+            ),
+        ),
+        SubgroupItem(
+            context.getString(R.string.account_settings),
+            listOf(
+                settingLemmyWeb,
+            ),
+        ),
+        SubgroupItem(
+            context.getString(R.string.systems),
+            listOf(
+                settingCache,
+                settingHiddenPosts,
+//                mainSettings.settingHistory,
+                settingAbout,
+                settingSummitCommunity,
+                patreonSettings,
+            ),
+        ),
+    )
 }
 
 @Singleton
 class LemmyWebSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
 
     val instanceSetting = TextValueSettingItem(
         title = context.getString(R.string.instance),
@@ -169,12 +205,28 @@ class LemmyWebSettings @Inject constructor(
         context.getString(R.string.account_block_settings),
         context.getString(R.string.account_block_settings_desc),
     )
+    override val allSettings: List<SettingItem> = listOf(
+        instanceSetting,
+        displayNameSetting,
+        bioSetting,
+        emailSetting,
+        matrixSetting,
+        avatarSetting,
+        bannerSetting,
+        defaultSortType,
+        showNsfwSetting,
+        showReadPostsSetting,
+        botAccountSetting,
+        showBotAccountsSetting,
+        sendNotificationsToEmailSetting,
+        blockSettings
+    )
 }
 
 @Singleton
 class GestureSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
     private val postGestureActionOptions =
         listOf(
             RadioGroupSettingItem.RadioGroupOption(
@@ -309,12 +361,23 @@ class GestureSettings @Inject constructor(
         1f,
         0.01f,
     )
+    override val allSettings: List<SettingItem> = listOf(
+        postGestureAction1,
+        postGestureAction2,
+        postGestureAction3,
+        postGestureSize,
+
+        commentGestureAction1,
+        commentGestureAction2,
+        commentGestureAction3,
+        commentGestureSize,
+    )
 }
 
 @Singleton
 class PostListSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
     val defaultCommunitySortOrder = RadioGroupSettingItem(
         null,
         context.getString(R.string.default_posts_sort_order),
@@ -345,12 +408,16 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.hide_post_scores),
         null,
     )
+    override val allSettings: List<SettingItem> = listOf(
+        defaultCommunitySortOrder,
+        viewImageOnSingleTap,
+    )
 }
 
 @Singleton
 class CommentListSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
     val defaultCommentsSortOrder = RadioGroupSettingItem(
         null,
         context.getString(R.string.default_comments_sort_order),
@@ -397,6 +464,10 @@ class CommentListSettings @Inject constructor(
         null,
         context.getString(R.string.hide_comment_scores),
         null,
+    )
+    override val allSettings: List<SettingItem> = listOf(
+        relayStyleNavigation,
+        hideCommentScores,
     )
 }
 
@@ -519,6 +590,38 @@ class ThemeSettings @Inject constructor(
     val fontColor = TextOnlySettingItem(
         context.getString(R.string.font_color),
         "",
+    )
+}
+
+@Singleton
+class AboutSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
+    val version = BasicSettingItem(
+        null,
+        context.getString(R.string.build_version, BuildConfig.VERSION_NAME),
+        context.getString(R.string.version_code, BuildConfig.VERSION_CODE.toString()),
+    )
+    val googlePlayLink = BasicSettingItem(
+        null,
+        context.getString(R.string.view_on_the_play_store),
+        null,
+    )
+}
+
+class AllSettings @Inject constructor(
+    val mainSettings: MainSettings,
+    val lemmyWebSettings: LemmyWebSettings,
+    val gestureSettings: GestureSettings,
+    val postListSettings: PostListSettings,
+    val commentListSettings: CommentListSettings,
+) {
+    val allSearchableSettings: List<SearchableSettings> = listOf(
+        mainSettings,
+        lemmyWebSettings,
+        gestureSettings,
+        postListSettings,
+        commentListSettings,
     )
 }
 
