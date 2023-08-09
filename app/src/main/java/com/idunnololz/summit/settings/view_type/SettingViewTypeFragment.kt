@@ -33,6 +33,7 @@ import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.OnOffSettingItem
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
@@ -85,7 +86,7 @@ class SettingViewTypeFragment :
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.view_type)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         binding.root.viewTreeObserver.addOnPreDrawListener(

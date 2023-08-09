@@ -114,6 +114,7 @@ class CommunityViewModel @Inject constructor(
     val sortOrder = postsRepository.sortOrderFlow.asLiveData()
 
     private var hiddenPostObserverJob: Job? = null
+    private var fetchPageJob: Job? = null
 
     init {
         isHideReadEnabled.value?.let {
@@ -126,6 +127,8 @@ class CommunityViewModel @Inject constructor(
         accountManager.addOnAccountChangedListener(
             object : AccountManager.OnAccountChangedListener {
                 override suspend fun onAccountChanged(newAccount: Account?) {
+                    fetchPageJob?.cancel()
+
                     postsRepository.reset()
 
                     onCommunityOrInstanceChange()
@@ -296,7 +299,7 @@ class CommunityViewModel @Inject constructor(
 
         loadedPostsData.setIsLoading()
 
-        viewModelScope.launch {
+        fetchPageJob = viewModelScope.launch {
             val result = postsRepository.getPage(
                 pageToFetch,
                 force,
