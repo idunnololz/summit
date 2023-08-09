@@ -126,7 +126,18 @@
             app:popExitAnim="@anim/slide_out"/>
         <action
             android:id="@+id/action_settingsFragment_to_patreonFragment"
-            app:destination="@id/patreonFragment" />
+            app:destination="@id/patreonFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingMiscFragment"
+            app:destination="@id/settingMiscFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -198,4 +209,8 @@
         android:id="@+id/patreonFragment"
         android:name="com.idunnololz.summit.settings.patreon.PatreonFragment"
         android:label="PatreonFragment" />
+    <fragment
+        android:id="@+id/settingMiscFragment"
+        android:name="com.idunnololz.summit.settings.misc.SettingMiscFragment"
+        android:label="SettingMiscFragment" />
 </navigation>

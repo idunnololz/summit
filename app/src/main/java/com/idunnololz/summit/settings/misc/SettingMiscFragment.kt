@@ -1,4 +1,4 @@
-package com.idunnololz.summit.settings.hiddenPosts
+package com.idunnololz.summit.settings.misc
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,12 +8,16 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingHiddenPostsBinding
+import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.BasicSettingItem
+import com.idunnololz.summit.settings.HiddenPostsSettings
+import com.idunnololz.summit.settings.MiscSettings
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,13 +25,16 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBinding>() {
+class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>() {
 
     @Inject
     lateinit var preferences: Preferences
 
     @Inject
     lateinit var hiddenPostsManager: HiddenPostsManager
+
+    @Inject
+    lateinit var settings: MiscSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +43,7 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingHiddenPostsBinding.inflate(inflater, container, false))
+        setBinding(FragmentSettingMiscBinding.inflate(inflater, container, false))
 
         return binding.root
     }
@@ -55,35 +62,20 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.hidden_posts)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         updateRendering()
     }
 
     private fun updateRendering() {
-        BasicSettingItem(
-            null,
-            getString(R.string.reset_hidden_posts),
-            null,
-        ).bindTo(
-            b = binding.resetHiddenPosts,
-            onValueChanged = {
-                lifecycleScope.launch {
-                    val count = withContext(Dispatchers.Default) {
-                        hiddenPostsManager.getHiddenPostsCount()
-                    }
-                    hiddenPostsManager.clearHiddenPosts()
-
-                    Snackbar
-                        .make(
-                            binding.coordinatorLayout,
-                            getString(R.string.removed_hidden_posts_format, count.toString()),
-                            Snackbar.LENGTH_LONG,
-                        )
-                        .show()
-                }
-            },
+        settings.openLinksInExternalBrowser.bindTo(
+            b = binding.openLinksInApp,
+            { preferences.openLinksInApp },
+            {
+                preferences.openLinksInApp = it
+                Utils.openExternalLinksInBrowser = preferences.openLinksInApp
+            }
         )
     }
 }

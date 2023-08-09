@@ -14,13 +14,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class CustomSearchSuggestionsAdapter(
     private val context: Context,
@@ -219,7 +219,7 @@ class CustomSearchSuggestionsAdapter(
             ): Boolean {
                 return oldItems[oldItemPosition] == newItems[newItemPosition]
             }
-        })
+        },)
         items = newItems
         diff.dispatchUpdatesTo(this)
     }

@@ -35,23 +35,6 @@ class ColorSchemePickerDialogFragment :
     @Inject
     lateinit var themeManager: ThemeManager
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-//    }
-
-//    override fun onStart() {
-//        super.onStart()
-//        val dialog = dialog
-//        if (dialog != null) {
-//            dialog.window?.let { window ->
-//                window.setBackgroundDrawable(null)
-//                WindowCompat.setDecorFitsSystemWindows(window, false)
-//            }
-//        }
-//    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

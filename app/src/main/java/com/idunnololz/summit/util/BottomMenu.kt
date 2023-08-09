@@ -271,10 +271,10 @@ class BottomMenu(private val context: Context) {
 
                 if (menuItem.id == checked) {
                     b.title.setTextColor(checkedTextColor)
-                    b.title.setTypeface(null, Typeface.BOLD)
+                    b.title.setTypeface(b.title.typeface, Typeface.BOLD)
                 } else {
                     b.title.setTextColor(defaultTextColor)
-                    b.title.setTypeface(null, Typeface.NORMAL)
+                    b.title.setTypeface(b.title.typeface, Typeface.NORMAL)
                 }
 
                 val icon = menuItem.icon

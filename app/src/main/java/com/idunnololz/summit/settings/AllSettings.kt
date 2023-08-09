@@ -6,19 +6,58 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.CommentsThreadStyle
+import com.idunnololz.summit.preferences.FontId
+import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.reflect.KClass
 
-interface SearchableSettings {
+sealed interface SearchableSettings {
     val allSettings: List<SettingItem>
+    val parents: List<KClass<out SearchableSettings>>
+}
+
+object SettingPath {
+    fun KClass<out SearchableSettings>.getPageName(context: Context): String {
+        return when (this) {
+            AboutSettings::class ->
+                context.getString(R.string.about_summit)
+            CacheSettings::class ->
+                context.getString(R.string.cache)
+            CommentListSettings::class ->
+                context.getString(R.string.comment_list)
+            GestureSettings::class ->
+                context.getString(R.string.gestures)
+            HiddenPostsSettings::class ->
+                context.getString(R.string.hidden_posts)
+            LemmyWebSettings::class ->
+                context.getString(R.string.lemmy_web_preferences)
+            MainSettings::class ->
+                context.getString(R.string.settings)
+            PostAndCommentsSettings::class ->
+                context.getString(R.string.post_and_comments)
+            PostListSettings::class ->
+                context.getString(R.string.post_list)
+            ThemeSettings::class ->
+                context.getString(R.string.theme)
+            MiscSettings::class ->
+                context.getString(R.string.misc)
+            else -> error("asdf")
+        }
+    }
+
+    fun SearchableSettings.getPageName(context: Context): String =
+        this::class.getPageName(context)
 }
 
 @Singleton
 class MainSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf()
+
     val settingTheme = BasicSettingItem(
         R.drawable.baseline_palette_24,
         context.getString(R.string.theme),
@@ -86,6 +125,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.patreon_supporters),
         context.getString(R.string.patreon_supporters_desc),
     )
+    val miscSettings = BasicSettingItem(
+        R.drawable.baseline_miscellaneous_services_24,
+        context.getString(R.string.misc),
+        context.getString(R.string.misc_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -97,6 +141,7 @@ class MainSettings @Inject constructor(
                 settingViewType,
                 settingPostAndComment,
                 settingGestures,
+                miscSettings,
             ),
         ),
         SubgroupItem(
@@ -123,6 +168,9 @@ class MainSettings @Inject constructor(
 class LemmyWebSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
 
     val instanceSetting = TextValueSettingItem(
         title = context.getString(R.string.instance),
@@ -219,7 +267,7 @@ class LemmyWebSettings @Inject constructor(
         botAccountSetting,
         showBotAccountsSetting,
         sendNotificationsToEmailSetting,
-        blockSettings
+        blockSettings,
     )
 }
 
@@ -227,6 +275,9 @@ class LemmyWebSettings @Inject constructor(
 class GestureSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
     private val postGestureActionOptions =
         listOf(
             RadioGroupSettingItem.RadioGroupOption(
@@ -312,6 +363,11 @@ class GestureSettings @Inject constructor(
             ),
         )
 
+    val useGestureActions = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_gesture_actions),
+        context.getString(R.string.use_gesture_actions_desc),
+    )
     val postGestureAction1 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_1),
@@ -378,6 +434,24 @@ class GestureSettings @Inject constructor(
 class PostListSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+    val infinity = OnOffSettingItem(
+        null,
+        context.getString(R.string.infinity),
+        context.getString(R.string.no_your_limits),
+    )
+    val markPostsAsReadOnScroll = OnOffSettingItem(
+        null,
+        context.getString(R.string.mark_posts_as_read_on_scroll),
+        context.getString(R.string.mark_posts_as_read_on_scroll_desc),
+    )
+    val blurNsfwPosts = OnOffSettingItem(
+        null,
+        context.getString(R.string.blur_nsfw_posts),
+        null,
+    )
     val defaultCommunitySortOrder = RadioGroupSettingItem(
         null,
         context.getString(R.string.default_posts_sort_order),
@@ -408,9 +482,69 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.hide_post_scores),
         null,
     )
+    val keywordFilters = BasicSettingItem(
+        null,
+        context.getString(R.string.keyword_filters),
+        context.getString(R.string.keyword_filters_desc),
+    )
+    val instanceFilters = BasicSettingItem(
+        null,
+        context.getString(R.string.instance_filters),
+        context.getString(R.string.instance_filters_desc),
+    )
+    val communityFilters = BasicSettingItem(
+        null,
+        context.getString(R.string.community_filters),
+        context.getString(R.string.community_filters_desc),
+    )
+    val userFilters = BasicSettingItem(
+        null,
+        context.getString(R.string.user_filters),
+        context.getString(R.string.user_filters_desc),
+    )
+    val showLinkPosts = OnOffSettingItem(
+        R.drawable.baseline_link_24,
+        context.getString(R.string.show_link_posts),
+        null,
+    )
+    val showImagePosts = OnOffSettingItem(
+        R.drawable.baseline_image_24,
+        context.getString(R.string.show_image_posts),
+        null,
+    )
+    val showVideoPosts = OnOffSettingItem(
+        R.drawable.baseline_videocam_24,
+        context.getString(R.string.show_video_posts),
+        null,
+    )
+    val showTextPosts = OnOffSettingItem(
+        R.drawable.baseline_text_fields_24,
+        context.getString(R.string.show_text_posts),
+        null,
+    )
+    val showNsfwPosts = OnOffSettingItem(
+        R.drawable.ic_nsfw_24,
+        context.getString(R.string.show_nsfw_posts),
+        null,
+    )
+
     override val allSettings: List<SettingItem> = listOf(
+        infinity,
+        markPostsAsReadOnScroll,
+        blurNsfwPosts,
         defaultCommunitySortOrder,
         viewImageOnSingleTap,
+        compatibilityMode,
+        hidePostScores,
+        keywordFilters,
+        instanceFilters,
+        communityFilters,
+        userFilters,
+        showLinkPosts,
+        showImagePosts,
+        showVideoPosts,
+        showTextPosts,
+        showNsfwPosts,
     )
 }
 
@@ -418,6 +552,9 @@ class PostListSettings @Inject constructor(
 class CommentListSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
     val defaultCommentsSortOrder = RadioGroupSettingItem(
         null,
         context.getString(R.string.default_comments_sort_order),
@@ -465,16 +602,64 @@ class CommentListSettings @Inject constructor(
         context.getString(R.string.hide_comment_scores),
         null,
     )
+    val useVolumeButtonNavigation = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_volume_button_navigation),
+        context.getString(R.string.use_volume_button_navigation_desc),
+    )
+    val collapseChildCommentsByDefault = OnOffSettingItem(
+        null,
+        context.getString(R.string.collapse_child_comments),
+        context.getString(R.string.collapse_child_comments_desc),
+    )
     override val allSettings: List<SettingItem> = listOf(
+        defaultCommentsSortOrder,
         relayStyleNavigation,
         hideCommentScores,
+        useVolumeButtonNavigation,
     )
 }
 
 @Singleton
 class PostAndCommentsSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    val resetPostStyles = BasicSettingItem(
+        null,
+        context.getString(R.string.reset_post_styles),
+        null,
+    )
+
+    val resetCommentStyles = BasicSettingItem(
+        null,
+        context.getString(R.string.reset_comment_styles),
+        null,
+    )
+
+    val postFontSize = SliderSettingItem(
+        context.getString(R.string.font_size),
+        0.2f,
+        3f,
+        0.1f,
+    )
+
+    val commentFontSize = SliderSettingItem(
+        context.getString(R.string.font_size),
+        0.2f,
+        3f,
+        0.1f,
+    )
+
+    val commentIndentationLevel = SliderSettingItem(
+        context.getString(R.string.indentation_per_level),
+        0f,
+        32f,
+        stepSize = 1f,
+    )
 
     val showCommentActions = OnOffSettingItem(
         null,
@@ -513,12 +698,59 @@ class PostAndCommentsSettings @Inject constructor(
         context.getString(R.string.always_show_link_below_post),
         context.getString(R.string.always_show_link_below_post_desc),
     )
+
+    override val allSettings: List<SettingItem> = listOf(
+        resetPostStyles,
+        resetCommentStyles,
+        postFontSize,
+        commentFontSize,
+        commentIndentationLevel,
+        showCommentActions,
+        commentsThreadStyle,
+        tapCommentToCollapse,
+        alwaysShowLinkBelowPost,
+    )
 }
 
 @Singleton
 class ThemeSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    val baseTheme = RadioGroupSettingItem(
+        0,
+        context.getString(R.string.base_theme),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.setting_option_use_system,
+                context.getString(R.string.use_system_theme),
+                null,
+                R.drawable.baseline_auto_awesome_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.setting_option_light_theme,
+                context.getString(R.string.light_theme),
+                null,
+                R.drawable.baseline_light_mode_24,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.setting_option_dark_theme,
+                context.getString(R.string.dark_theme),
+                null,
+                R.drawable.baseline_dark_mode_24,
+            ),
+        ),
+    )
+
+    val materialYou = OnOffSettingItem(
+        null,
+        context.getString(R.string.material_you),
+        context.getString(R.string.personalized_theming_based_on_your_wallpaper),
+    )
 
     val colorScheme = RadioGroupSettingItem(
         null,
@@ -582,6 +814,38 @@ class ThemeSettings @Inject constructor(
         context.getString(R.string.black_theme_desc),
     )
 
+    val font = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.font),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                FontIds.Default,
+                context.getString(R.string._default),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                FontIds.Roboto,
+                context.getString(R.string.roboto),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                FontIds.RobotoSerif,
+                context.getString(R.string.roboto_serif),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                FontIds.OpenSans,
+                context.getString(R.string.open_sans),
+                null,
+                null,
+            ),
+        ),
+    )
+
     val fontSize = TextOnlySettingItem(
         context.getString(R.string.font_size),
         "",
@@ -591,12 +855,92 @@ class ThemeSettings @Inject constructor(
         context.getString(R.string.font_color),
         "",
     )
+
+    val upvoteColor = ColorSettingItem(
+        null,
+        context.getString(R.string.upvote_color),
+        context.getString(R.string.updoot_color),
+    )
+
+    val downvoteColor = ColorSettingItem(
+        null,
+        context.getString(R.string.downvote_color),
+        context.getString(R.string.downdoot_color),
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        baseTheme,
+        colorScheme,
+        blackTheme,
+        font,
+        fontSize,
+        fontColor,
+        upvoteColor,
+        downvoteColor,
+    )
+}
+
+@Singleton
+class ViewTypeSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val baseViewType = TextOnlySettingItem(
+        context.getString(R.string.base_view_type),
+        "",
+    )
+
+    val fontSize = SliderSettingItem(
+        context.getString(R.string.font_size),
+        0.2f,
+        3f,
+        0.1f,
+    )
+
+    val preferImageAtEnd = OnOffSettingItem(
+        null,
+        context.getString(R.string.prefer_image_at_the_end),
+        null,
+    )
+
+    val preferFullImage = OnOffSettingItem(
+        null,
+        context.getString(R.string.prefer_full_size_image),
+        null,
+    )
+
+    val preferTitleText = OnOffSettingItem(
+        null,
+        context.getString(R.string.prefer_title_text),
+        null,
+    )
+
+    val contentMaxLines =
+        TextOnlySettingItem(
+            context.getString(R.string.full_content_max_lines),
+            "",
+        )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        baseViewType,
+        fontSize,
+        preferImageAtEnd,
+        preferFullImage,
+        preferTitleText,
+    )
 }
 
 @Singleton
 class AboutSettings @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
     val version = BasicSettingItem(
         null,
         context.getString(R.string.build_version, BuildConfig.VERSION_NAME),
@@ -607,14 +951,82 @@ class AboutSettings @Inject constructor(
         context.getString(R.string.view_on_the_play_store),
         null,
     )
+    val giveFeedback = BasicSettingItem(
+        null,
+        context.getString(R.string.give_feedback),
+        context.getString(R.string.give_feedback_desc),
+    )
+    override val allSettings: List<SettingItem> = listOf(
+        version,
+        googlePlayLink,
+        giveFeedback,
+    )
+}
+
+@Singleton
+class CacheSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+    val clearCache = BasicSettingItem(
+        null,
+        context.getString(R.string.clear_media_cache),
+        null,
+    )
+    override val allSettings: List<SettingItem> = listOf(
+        clearCache,
+    )
+}
+
+@Singleton
+class HiddenPostsSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+    val resetHiddenPosts = BasicSettingItem(
+        null,
+        context.getString(R.string.reset_hidden_posts),
+        null,
+    )
+    override val allSettings: List<SettingItem> = listOf(
+        resetHiddenPosts,
+    )
+}
+
+@Singleton
+class MiscSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+    val openLinksInExternalBrowser = OnOffSettingItem(
+        null,
+        context.getString(R.string.open_links_in_external_browser),
+        context.getString(R.string.open_links_in_external_browser_desc),
+    )
+    override val allSettings: List<SettingItem> = listOf(
+        openLinksInExternalBrowser,
+    )
 }
 
 class AllSettings @Inject constructor(
-    val mainSettings: MainSettings,
-    val lemmyWebSettings: LemmyWebSettings,
-    val gestureSettings: GestureSettings,
-    val postListSettings: PostListSettings,
-    val commentListSettings: CommentListSettings,
+    private val mainSettings: MainSettings,
+    private val lemmyWebSettings: LemmyWebSettings,
+    private val gestureSettings: GestureSettings,
+    private val postListSettings: PostListSettings,
+    private val commentListSettings: CommentListSettings,
+    private val aboutSettings: AboutSettings,
+    private val cacheSettings: CacheSettings,
+    private val hiddenPostsSettings: HiddenPostsSettings,
+    private val postAndCommentsSettings: PostAndCommentsSettings,
+    private val themeSettings: ThemeSettings,
+    private val viewTypeSettings: ViewTypeSettings,
+    private val miscSettings: MiscSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -622,7 +1034,26 @@ class AllSettings @Inject constructor(
         gestureSettings,
         postListSettings,
         commentListSettings,
+        aboutSettings,
+        cacheSettings,
+        hiddenPostsSettings,
+        postAndCommentsSettings,
+        themeSettings,
+        viewTypeSettings,
+        miscSettings,
     )
+
+    init {
+        val classes: MutableSet<KClass<*>> =
+            SearchableSettings::class.sealedSubclasses.toMutableSet()
+        allSearchableSettings.forEach {
+            classes.remove(it::class)
+        }
+
+        assert(classes.isEmpty()) {
+            "Some setting pages not added: $classes"
+        }
+    }
 }
 
 fun makeCommunitySortOrderChoices(context: Context) =

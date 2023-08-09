@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -14,7 +15,6 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -30,7 +30,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
@@ -64,8 +63,8 @@ import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
@@ -74,7 +73,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.reflect.KClass
 
@@ -111,6 +109,8 @@ class MainActivity : BaseActivity() {
     private var currentNavController: NavController? = null
 
     private var showNotificationBarBg: Boolean = true
+
+    val keyPressRegistrationManager = KeyPressRegistrationManager()
 
     val insetsChangedLiveData = MutableLiveData<Int>()
 
@@ -229,6 +229,14 @@ class MainActivity : BaseActivity() {
     override fun onSupportNavigateUp(): Boolean =
         currentNavController?.navigateUp() ?: false
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val handled = keyPressRegistrationManager.onKeyDown(keyCode, event)
+        if (handled) {
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     private fun setupBottomNavigationBar() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -312,6 +320,8 @@ class MainActivity : BaseActivity() {
             }
 
             insetsChangedLiveData.postValue(0)
+
+            currentBottomMenu?.setInsets(lastInsets.topInset, lastInsets.bottomInset)
 
             WindowInsetsCompat.CONSUMED
         }

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -89,6 +90,7 @@ class LemmyContentHelper(
         fullContentContainerView: ViewGroup,
         lazyUpdate: Boolean = false,
         videoState: VideoState? = null,
+        contentMaxLines: Int = -1,
 
         onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
@@ -528,9 +530,17 @@ class LemmyContentHelper(
                 val content = postView.post.body
                 val fullTextView = getView<View>(R.layout.full_content_text_view)
                 val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
-                bodyTextView.visibility = View.VISIBLE
 
+                bodyTextView.visibility = View.VISIBLE
                 bodyTextView.textSize = config.bodyTextSizeSp.toTextSize()
+
+                if (contentMaxLines > 0) {
+                    bodyTextView.ellipsize = TextUtils.TruncateAt.END
+                    bodyTextView.maxLines = contentMaxLines
+                    bodyTextView.setHorizontallyScrolling(false)
+                } else {
+                    bodyTextView.maxLines = Integer.MAX_VALUE
+                }
 
                 LemmyTextHelper.bindText(
                     textView = bodyTextView,

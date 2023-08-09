@@ -151,13 +151,26 @@ class InboxViewModel @Inject constructor(
             inboxRepository.markAsRead(inboxItem, read)
                 .onSuccess {
                     if (!read) {
-                        fetchInbox()
+                        fetchInbox(force = true)
                     }
                     markAsReadResult.postValue(Unit)
                 }
                 .onFailure {
-                    fetchInbox()
+                    fetchInbox(force = true)
                     markAsReadResult.postError(it)
+                }
+        }
+    }
+
+    fun markAllAsRead() {
+        markAsReadResult.setIsLoading()
+        viewModelScope.launch {
+            apiClient.markAllAsRead()
+                .onSuccess {
+                    fetchInbox(force = true)
+                }
+                .onFailure {
+                    fetchInbox(force = true)
                 }
         }
     }

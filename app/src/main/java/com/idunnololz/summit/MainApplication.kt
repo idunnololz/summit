@@ -15,13 +15,23 @@ import coil.decode.ImageDecoderDecoder
 import coil.transition.CrossfadeTransition
 import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.preferences.ThemeManager
-import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
+import com.idunnololz.summit.util.Client
+import com.idunnololz.summit.util.DataCache
+import com.idunnololz.summit.util.DataFiles
+import com.idunnololz.summit.util.LocaleHelper
+import com.idunnololz.summit.util.NotificationHelper
+import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
-import java.util.*
+import io.github.inflationx.calligraphy3.CalligraphyConfig
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor
+import io.github.inflationx.viewpump.ViewPump
+import java.util.Locale
 import javax.inject.Inject
+
 
 @HiltAndroidApp
 class MainApplication : Application(), androidx.work.Configuration.Provider {
@@ -187,6 +197,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
         hiltEntryPoint.themeManager().applyThemeFromPreferences()
+        Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInApp
     }
 
     override fun getWorkManagerConfiguration(): androidx.work.Configuration {

@@ -33,6 +33,9 @@ interface VoteUiHandler {
         registration: AccountActionsManager.Registration,
     )
     fun unbindVoteUi(scoreView: View)
+
+    val upvoteColor: Int
+    val downvoteColor: Int
 }
 
 fun VoteUiHandler.bind(
@@ -129,10 +132,11 @@ fun VoteUiHandler.bind(
     val context = scoreView.context
     fun update(score: Int) {
         if (score < 0) {
-            upVoteView?.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
-            downVoteView?.setColorFilter(ContextCompat.getColor(context, R.color.downvoteColor))
+            upVoteView?.setColorFilter(
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+            downVoteView?.setColorFilter(downvoteColor)
         } else if (score > 0) {
-            upVoteView?.setColorFilter(ContextCompat.getColor(context, R.color.upvoteColor))
+            upVoteView?.setColorFilter(upvoteColor)
             downVoteView?.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
         } else {
             upVoteView?.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))

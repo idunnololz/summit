@@ -84,9 +84,10 @@ class PostListViewBuilder @Inject constructor(
     private val voteUiHandler = accountActionsManager.voteUiHandler
     private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
     private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
+    private var contentMaxLines: Int = postUiConfig.contentMaxLines
 
-    private val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
-    private val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
+    private val upvoteColor = preferences.upvoteColor
+    private val downvoteColor = preferences.downvoteColor
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
     private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
 
@@ -98,8 +99,8 @@ class PostListViewBuilder @Inject constructor(
 
     private fun onPostUiConfigUpdated() {
         lemmyContentHelper.config = postUiConfig.fullContentConfig
-
         textSizeMultiplier = postUiConfig.textSizeMultiplier
+        contentMaxLines = postUiConfig.contentMaxLines
 
         globalFontSizeMultiplier =
             GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
@@ -483,6 +484,7 @@ class PostListViewBuilder @Inject constructor(
                     instance = instance,
                     rootView = itemView,
                     fullContentContainerView = fullContentContainerView,
+                    contentMaxLines = contentMaxLines,
                     onFullImageViewClickListener = { v, url ->
                         onImageClick(postView, v, url)
                     },

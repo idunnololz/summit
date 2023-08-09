@@ -52,6 +52,7 @@ class MessageViewModel @Inject constructor(
                     .fetchCommentsWithRetry(
                         Either.Right(topCommentId),
                         CommentSortType.Top,
+                        null,
                         force,
                     )
             }

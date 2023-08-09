@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +40,7 @@ import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.VerticalSpaceItemDecoration
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -117,9 +120,8 @@ class InboxFragment :
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
+            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPane)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-            insetViewExceptTopAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.recyclerView)
         }
 
         viewModel.pageType.observe(viewLifecycleOwner) {
@@ -187,12 +189,6 @@ class InboxFragment :
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.addItemDecoration(
-            VerticalSpaceItemDecoration(
-                verticalSpaceHeight = context.getDimen(R.dimen.padding_half),
-                hasStartAndEndSpace = false,
-            ),
-        )
         binding.recyclerView.addOnScrollListener(
             object : OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -210,6 +206,24 @@ class InboxFragment :
                 }
             },
         )
+        binding.recyclerView.addItemDecoration(
+            CustomDividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL,
+            ).apply {
+                setDrawable(
+                    checkNotNull(
+                        ContextCompat.getDrawable(
+                            context,
+                            R.drawable.vertical_divider,
+                        ),
+                    ),
+                )
+            },
+        )
+        binding.fab.setOnClickListener {
+            viewModel.markAllAsRead()
+        }
         ItemTouchHelper(
             InboxSwipeToActionCallback(
                 context,

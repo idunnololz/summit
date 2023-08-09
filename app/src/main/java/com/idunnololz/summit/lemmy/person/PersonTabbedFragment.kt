@@ -54,6 +54,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
     @Inject
     lateinit var preferences: Preferences
 

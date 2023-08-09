@@ -116,8 +116,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
     val voteUiHandler = accountActionsManager.voteUiHandler
 
-    private val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
-    private val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
+    private val upvoteColor = preferences.upvoteColor
+    private val downvoteColor = preferences.downvoteColor
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
     private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
 
@@ -393,6 +393,10 @@ class PostAndCommentViewBuilder @Inject constructor(
             } else {
                 binding.root.setOnClickListener {
                     toggleActionsExpanded()
+                }
+                binding.root.setOnLongClickListener {
+                    toggleActionsExpanded()
+                    true
                 }
             }
         }

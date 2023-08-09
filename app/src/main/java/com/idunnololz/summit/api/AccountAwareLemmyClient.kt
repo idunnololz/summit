@@ -12,6 +12,7 @@ import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.GetRepliesResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListingType
@@ -161,9 +162,10 @@ class AccountAwareLemmyClient @Inject constructor(
         id: Either<PostId, CommentId>,
         sort: CommentSortType,
         force: Boolean,
+        maxDepth: Int? = null,
         account: Account? = accountForInstance(),
     ): Result<List<CommentView>> = retry {
-        apiClient.fetchComments(account, id, sort, force)
+        apiClient.fetchComments(account, id, sort, maxDepth, force)
             .autoSignOut(account)
     }
 
@@ -437,6 +439,16 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.markPrivateMessageAsRead(id, read, account)
+                .autoSignOut(account)
+        }
+
+    suspend fun markAllAsRead(
+        account: Account? = accountForInstance(),
+    ): Result<GetRepliesResponse> =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.markAllAsRead(account)
                 .autoSignOut(account)
         }
 

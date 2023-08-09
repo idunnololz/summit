@@ -11,10 +11,11 @@ import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.CommentListSettings
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,7 +58,7 @@ class SettingCommentListFragment :
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.comment_list)
+            supportActionBar?.title = commentListSettings.getPageName(context)
         }
 
         updateRendering()
@@ -80,6 +81,16 @@ class SettingCommentListFragment :
             binding.relayStyleNavigation,
             { preferences.commentsNavigationFab },
             { preferences.commentsNavigationFab = it },
+        )
+        commentListSettings.useVolumeButtonNavigation.bindTo(
+            binding.useVolumeButtonNavigation,
+            { preferences.useVolumeButtonNavigation },
+            { preferences.useVolumeButtonNavigation = it }
+        )
+        commentListSettings.collapseChildCommentsByDefault.bindTo(
+            binding.collapseChildCommentsByDefault,
+            { preferences.collapseChildCommentsByDefault },
+            { preferences.collapseChildCommentsByDefault = it }
         )
         commentListSettings.hideCommentScores.bindTo(
             binding.hideCommentScores,

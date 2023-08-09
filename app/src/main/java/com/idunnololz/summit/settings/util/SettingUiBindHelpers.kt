@@ -1,21 +1,26 @@
-package com.idunnololz.summit.settings.ui
+package com.idunnololz.summit.settings.util
 
 import android.view.View
 import com.google.android.material.slider.Slider
+import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
 import com.idunnololz.summit.databinding.OnOffSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupTitleSettingItemBinding
+import com.idunnololz.summit.databinding.SettingColorItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.settings.BasicSettingItem
+import com.idunnololz.summit.settings.ColorSettingItem
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.util.BottomMenu
+import com.skydoves.colorpickerview.ColorPickerDialog
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
 fun BasicSettingItem.bindTo(
     b: BasicSettingItemBinding,
@@ -61,13 +66,18 @@ fun OnOffSettingItem.bindTo(
     } else {
         b.desc.visibility = View.GONE
     }
-    b.switchView.isChecked = getCurrentValue()
 
+    // Unbind previous binding
+    b.switchView.setOnCheckedChangeListener(null)
+    b.switchView.isChecked = getCurrentValue()
     b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
         onValueChanged(newValue)
 
         b.switchView.isChecked = getCurrentValue()
     }
+
+    // Prevent auto state restoration since multiple checkboxes can have the same id
+    b.switchView.isSaveEnabled = false
 }
 
 fun SliderSettingItem.bindTo(
@@ -98,6 +108,9 @@ fun SliderSettingItem.bindTo(
             }
         },
     )
+
+    // Prevent auto state restoration since multiple checkboxes can have the same id
+    b.slider.isSaveEnabled = false
 }
 
 fun <T> TextOnlySettingItem.bindTo(
@@ -191,4 +204,63 @@ fun RadioGroupSettingItem.bindToMultiView(
             updateChecked()
         }
     }
+}
+
+fun ColorSettingItem.bindTo(
+    b: SettingColorItemBinding,
+    getCurrentValue: () -> Int,
+    onValueChanged: (Int) -> Unit,
+    defaultValue: (() -> Int)? = null,
+) {
+    val context = b.title.context
+
+    if (this.icon == null) {
+        b.icon.visibility = View.GONE
+    } else {
+        b.icon.setImageResource(this.icon)
+        b.icon.visibility = View.VISIBLE
+    }
+
+    b.title.text = this.title
+
+    if (this.description == null) {
+        b.desc.visibility = View.GONE
+    } else {
+        b.desc.text = description
+        b.desc.visibility = View.VISIBLE
+    }
+
+    b.colorInner.setBackgroundColor(getCurrentValue())
+
+    b.root.setOnClickListener {
+        ColorPickerDialog.Builder(context)
+            .setTitle(title)
+            .setPositiveButton(
+                context.getString(android.R.string.ok),
+                ColorEnvelopeListener { envelope, _ ->
+                    onValueChanged(envelope.color)
+
+                    b.colorInner.setBackgroundColor(getCurrentValue())
+                },
+            )
+            .setNegativeButton(
+                context.getString(android.R.string.cancel),
+            ) { dialogInterface, i -> dialogInterface.dismiss() }
+            .attachAlphaSlideBar(true) // the default value is true.
+            .attachBrightnessSlideBar(true) // the default value is true.
+            .setBottomSpace(12) // set a bottom space between the last slidebar and buttons.
+            .apply {
+                if (defaultValue != null) {
+                    setNeutralButton(context.getString(R.string.reset_to_default)) { dialogInterface, i ->
+                        dialogInterface.dismiss()
+
+                        onValueChanged(defaultValue())
+
+                        b.colorInner.setBackgroundColor(getCurrentValue())
+                    }
+                }
+            }
+            .show()
+    }
+
 }

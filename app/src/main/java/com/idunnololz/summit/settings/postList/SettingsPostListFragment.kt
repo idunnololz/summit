@@ -13,14 +13,13 @@ import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.BasicSettingItem
-import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.PostListSettings
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -36,7 +35,7 @@ class SettingsPostListFragment :
     lateinit var preferences: Preferences
 
     @Inject
-    lateinit var postListSettings: PostListSettings
+    lateinit var settings: PostListSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,62 +67,42 @@ class SettingsPostListFragment :
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.post_list)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         updateRendering()
     }
 
     private fun updateRendering() {
-        val context = requireContext()
-
-        OnOffSettingItem(
-            null,
-            getString(R.string.infinity),
-            getString(R.string.no_your_limits),
-        ).bindTo(
+        settings.infinity.bindTo(
             binding.infinity,
             { preferences.infinity },
             {
                 preferences.infinity = it
-
-                updateRendering()
             },
         )
-        OnOffSettingItem(
-            null,
-            getString(R.string.mark_posts_as_read_on_scroll),
-            getString(R.string.mark_posts_as_read_on_scroll_desc),
-        ).bindTo(
+        settings.markPostsAsReadOnScroll.bindTo(
             binding.markPostsAsReadOnScroll,
             { preferences.markPostsAsReadOnScroll },
             {
                 preferences.markPostsAsReadOnScroll = it
-
-                updateRendering()
             },
         )
-        OnOffSettingItem(
-            null,
-            getString(R.string.blur_nsfw_posts),
-            null,
-        ).bindTo(
+        settings.blurNsfwPosts.bindTo(
             binding.blurNsfwPosts,
             { preferences.blurNsfwPosts },
             {
                 preferences.blurNsfwPosts = it
-
-                updateRendering()
             },
         )
-        postListSettings.hidePostScores.bindTo(
+        settings.hidePostScores.bindTo(
             binding.hidePostScores,
             { preferences.hidePostScores },
             {
                 preferences.hidePostScores = it
             },
         )
-        postListSettings.defaultCommunitySortOrder.bindTo(
+        settings.defaultCommunitySortOrder.bindTo(
             binding.defaultCommunitySortOrder,
             {
                 preferences.defaultCommunitySortOrder?.toApiSortOrder()?.toId()
@@ -135,11 +114,7 @@ class SettingsPostListFragment :
             },
         )
 
-        BasicSettingItem(
-            null,
-            getString(R.string.keyword_filters),
-            getString(R.string.keyword_filters_desc),
-        ).bindTo(binding.keywordFilters) {
+        settings.keywordFilters.bindTo(binding.keywordFilters) {
             val direction = SettingsPostListFragmentDirections
                 .actionSettingsContentFragmentToSettingsFilterListFragment(
                     ContentTypes.PostListType,
@@ -148,11 +123,7 @@ class SettingsPostListFragment :
                 )
             findNavController().navigateSafe(direction)
         }
-        BasicSettingItem(
-            null,
-            getString(R.string.instance_filters),
-            getString(R.string.instance_filters_desc),
-        ).bindTo(binding.instanceFilters) {
+        settings.instanceFilters.bindTo(binding.instanceFilters) {
             val direction = SettingsPostListFragmentDirections
                 .actionSettingsContentFragmentToSettingsFilterListFragment(
                     ContentTypes.PostListType,
@@ -161,11 +132,7 @@ class SettingsPostListFragment :
                 )
             findNavController().navigateSafe(direction)
         }
-        BasicSettingItem(
-            null,
-            getString(R.string.community_filters),
-            getString(R.string.community_filters_desc),
-        ).bindTo(binding.communityFilters) {
+        settings.communityFilters.bindTo(binding.communityFilters) {
             val direction = SettingsPostListFragmentDirections
                 .actionSettingsContentFragmentToSettingsFilterListFragment(
                     ContentTypes.PostListType,
@@ -174,11 +141,7 @@ class SettingsPostListFragment :
                 )
             findNavController().navigateSafe(direction)
         }
-        BasicSettingItem(
-            null,
-            getString(R.string.user_filters),
-            getString(R.string.user_filters_desc),
-        ).bindTo(binding.userFilters) {
+        settings.userFilters.bindTo(binding.userFilters) {
             val direction = SettingsPostListFragmentDirections
                 .actionSettingsContentFragmentToSettingsFilterListFragment(
                     ContentTypes.PostListType,
@@ -188,73 +151,43 @@ class SettingsPostListFragment :
             findNavController().navigateSafe(direction)
         }
 
-        OnOffSettingItem(
-            R.drawable.baseline_link_24,
-            getString(R.string.show_link_posts),
-            null,
-        ).bindTo(
+        settings.showLinkPosts.bindTo(
             binding.showLinkPosts,
             { preferences.showLinkPosts },
             {
                 preferences.showLinkPosts = it
-
-                updateRendering()
             },
         )
-        OnOffSettingItem(
-            R.drawable.baseline_image_24,
-            getString(R.string.show_image_posts),
-            null,
-        ).bindTo(
+        settings.showImagePosts.bindTo(
             binding.showImagePosts,
             { preferences.showImagePosts },
             {
                 preferences.showImagePosts = it
-
-                updateRendering()
             },
         )
-        OnOffSettingItem(
-            R.drawable.baseline_videocam_24,
-            getString(R.string.show_video_posts),
-            null,
-        ).bindTo(
+        settings.showVideoPosts.bindTo(
             binding.showVideoPosts,
             { preferences.showVideoPosts },
             {
                 preferences.showVideoPosts = it
-
-                updateRendering()
             },
         )
-        OnOffSettingItem(
-            R.drawable.baseline_text_fields_24,
-            getString(R.string.show_text_posts),
-            null,
-        ).bindTo(
+        settings.showTextPosts.bindTo(
             binding.showTextPosts,
             { preferences.showTextPosts },
             {
                 preferences.showTextPosts = it
-
-                updateRendering()
             },
         )
-        OnOffSettingItem(
-            R.drawable.ic_nsfw_24,
-            getString(R.string.show_nsfw_posts),
-            null,
-        ).bindTo(
+        settings.showNsfwPosts.bindTo(
             binding.showNsfwPosts,
             { preferences.showNsfwPosts },
             {
                 preferences.showNsfwPosts = it
-
-                updateRendering()
             },
         )
 
-        postListSettings.viewImageOnSingleTap.bindTo(
+        settings.viewImageOnSingleTap.bindTo(
             binding.viewImageOnSingleTap,
             { preferences.postListViewImageOnSingleTap },
             {
@@ -262,18 +195,18 @@ class SettingsPostListFragment :
             },
         )
 
-        postListSettings.compatibilityMode.bindTo(
+        settings.compatibilityMode.bindTo(
             binding.compatibilityMode,
             { preferences.compatibilityMode },
             {
                 preferences.compatibilityMode = it
-            }
+            },
         )
     }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {
-            postListSettings.defaultCommunitySortOrder.id -> {
+            settings.defaultCommunitySortOrder.id -> {
                 preferences.defaultCommunitySortOrder = idToSortOrder(value as Int)
             }
         }

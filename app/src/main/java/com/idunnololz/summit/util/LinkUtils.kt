@@ -127,10 +127,11 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
             addItemWithIcon(
                 R.id.copy_link_text,
                 R.string.copy_link_text,
-                R.drawable.baseline_content_copy_24
+                R.drawable.baseline_content_copy_24,
             )
         }
         addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
+        addItemWithIcon(R.id.open_in_browser, R.string.open_in_browser, R.drawable.baseline_public_24)
         addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
 
         setOnMenuItemClickListener {
@@ -143,6 +144,9 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
                 }
                 R.id.share_link -> {
                     Utils.shareLink(context, url)
+                }
+                R.id.open_in_browser -> {
+                    Utils.openExternalLink(context, url)
                 }
                 R.id.open_link_incognito -> {
                     Utils.openExternalLink(context, url, openNewIncognitoTab = true)

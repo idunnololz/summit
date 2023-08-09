@@ -134,7 +134,7 @@ class AccountActionsManager @Inject constructor(
             Log.d(TAG, "Binding vote handler - $ref")
 
             scoreView.text = LemmyUtils.abbrevNumber(
-                votesManager.getScore(ref)?.toLong()
+                votesManager.getScore(ref)?.toLong(),
             )
 
             lifecycleOwner.lifecycle.addObserver(
@@ -158,6 +158,11 @@ class AccountActionsManager @Inject constructor(
                 unregisterVoteHandler(existingRegId as Long)
             }
         }
+
+        override val upvoteColor: Int
+            get() = preferences.upvoteColor
+        override val downvoteColor: Int
+            get() = preferences.downvoteColor
     }
 
     private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {

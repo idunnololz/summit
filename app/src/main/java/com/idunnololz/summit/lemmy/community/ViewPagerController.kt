@@ -31,7 +31,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.parcelize.Parcelize
 import java.lang.reflect.Field
 
 class ViewPagerController(
@@ -130,15 +129,18 @@ class ViewPagerController(
         reveal: Boolean = false,
         videoState: VideoState? = null,
     ) {
-        openPostInternal(PostFragmentArgs(
-            instance = instance,
-            id = id,
-            reveal = reveal,
-            post = post,
-            jumpToComments = jumpToComments,
-            currentCommunity = currentCommunity,
-            videoState = videoState,
-        ).toBundle(), PostRef(instance, id))
+        openPostInternal(
+            PostFragmentArgs(
+                instance = instance,
+                id = id,
+                reveal = reveal,
+                post = post,
+                jumpToComments = jumpToComments,
+                currentCommunity = currentCommunity,
+                videoState = videoState,
+            ).toBundle(),
+            PostRef(instance, id),
+        )
     }
 
     fun openComment(instance: String, commentId: CommentId) {
@@ -149,15 +151,14 @@ class ViewPagerController(
                 commentId = commentId,
                 currentCommunity = null,
                 isSinglePage = false,
-            ).toBundle()
+            ).toBundle(),
         )
     }
 
     private fun openPostInternal(
         args: Bundle,
-        postRef: PostRef? = null
+        postRef: PostRef? = null,
     ) {
-
         if (activeOpenPostJob != null) {
             Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
             return

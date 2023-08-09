@@ -51,7 +51,11 @@ class InboxSwipeToActionCallback(
         recyclerView: RecyclerView,
         viewHolder: ViewHolder,
     ): Int {
-        return makeMovementFlags(0, ItemTouchHelper.LEFT)
+        return if (viewHolder.isSwipeEnabled()) {
+            makeMovementFlags(0, ItemTouchHelper.LEFT)
+        } else {
+            0
+        }
     }
 
     override fun onMove(

@@ -84,7 +84,10 @@ class PostViewModel @Inject constructor(
             accountActionsManager.onCommentActionChanged.collect {
                 val postOrCommentRef = postOrCommentRef
                 if (postOrCommentRef != null) {
-                    updatePendingComments(postOrCommentRef, resolveCompletedPendingComments = true)
+                    updatePendingComments(
+                        postOrCommentRef = postOrCommentRef,
+                        resolveCompletedPendingComments = true,
+                    )
                 }
             }
         }
@@ -92,6 +95,13 @@ class PostViewModel @Inject constructor(
 
     val apiInstance: String
         get() = lemmyApiClient.instance
+
+    private val maxDepth: Int?
+        get() = if (preferences.collapseChildCommentsByDefault) {
+            1
+        } else {
+            null
+        }
 
     fun fetchPostData(
         postOrCommentRef: Either<PostRef, CommentRef>,
@@ -137,10 +147,19 @@ class PostViewModel @Inject constructor(
                 postOrCommentRef
                     .fold(
                         {
-                            commentsFetcher.fetchCommentsWithRetry(Either.Left(it.id), sortOrder, force)
+                            commentsFetcher.fetchCommentsWithRetry(
+                                id = Either.Left(it.id),
+                                sort = sortOrder,
+                                maxDepth = maxDepth,
+                                force = force,)
                         },
                         {
-                            commentsFetcher.fetchCommentsWithRetry(Either.Right(it.id), sortOrder, force)
+                            commentsFetcher.fetchCommentsWithRetry(
+                                id = Either.Right(it.id),
+                                sort = sortOrder,
+                                maxDepth = maxDepth,
+                                force = force
+                            )
                         },
                     )
             } else {
@@ -214,9 +233,14 @@ class PostViewModel @Inject constructor(
         if (resolveCompletedPendingComments) {
             pendingComments?.forEach { pendingComment ->
                 if (pendingComment.complete) {
+                    // Looks like commits on the server is async. Refreshing a comment immediately
+                    // after we post it may not get us the latest value.
+                    delay(300)
+
                     val result = commentsFetcher.fetchCommentsWithRetry(
                         Either.Left(pendingComment.postRef.id),
                         sortOrder,
+                        maxDepth = null,
                         force = true,
                     )
 
@@ -319,6 +343,7 @@ class PostViewModel @Inject constructor(
         val result = commentsFetcher.fetchCommentsWithRetry(
             Either.Right(parentId),
             sortOrder,
+            maxDepth = null,
             force,
         )
 

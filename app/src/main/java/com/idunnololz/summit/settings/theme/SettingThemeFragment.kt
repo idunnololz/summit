@@ -9,19 +9,23 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingThemeBinding
 import com.idunnololz.summit.preferences.BaseTheme
+import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.GlobalFontColorId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
-import com.idunnololz.summit.settings.OnOffSettingItem
-import com.idunnololz.summit.settings.RadioGroupSettingItem
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.ThemeSettings
-import com.idunnololz.summit.settings.ui.bindTo
-import com.idunnololz.summit.settings.ui.bindToMultiView
+import com.idunnololz.summit.settings.util.bindTo
+import com.idunnololz.summit.settings.util.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.skydoves.colorpickerview.ColorPickerDialog
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
@@ -33,7 +37,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
     lateinit var themeManager: ThemeManager
 
     @Inject
-    lateinit var themeSettings: ThemeSettings
+    lateinit var settings: ThemeSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,35 +75,11 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.theme)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         with(binding) {
-            RadioGroupSettingItem(
-                0,
-                getString(R.string.base_theme),
-                null,
-                listOf(
-                    RadioGroupSettingItem.RadioGroupOption(
-                        R.id.setting_option_use_system,
-                        getString(R.string.use_system_theme),
-                        null,
-                        R.drawable.baseline_auto_awesome_24,
-                    ),
-                    RadioGroupSettingItem.RadioGroupOption(
-                        R.id.setting_option_light_theme,
-                        getString(R.string.light_theme),
-                        null,
-                        R.drawable.baseline_light_mode_24,
-                    ),
-                    RadioGroupSettingItem.RadioGroupOption(
-                        R.id.setting_option_dark_theme,
-                        getString(R.string.dark_theme),
-                        null,
-                        R.drawable.baseline_dark_mode_24,
-                    ),
-                ),
-            ).bindToMultiView(
+            settings.baseTheme.bindToMultiView(
                 baseThemeSetting,
                 listOf(this.option1, this.option2, this.option3),
                 {
@@ -125,16 +105,14 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
             )
 
-            OnOffSettingItem(
-                null,
-                getString(R.string.material_you),
-                getString(R.string.personalized_theming_based_on_your_wallpaper),
-            ).bindTo(
+            binding.themeConfiguration.title.text = getString(R.string.theme_config)
+            settings.materialYou.bindTo(
                 binding.useMaterialYou,
                 { preferences.isUseMaterialYou() },
                 {
                     if (DynamicColors.isDynamicColorAvailable()) {
                         preferences.setUseMaterialYou(it)
+                        preferences.colorScheme = ColorSchemes.Default
                         themeManager.applyThemeFromPreferences()
                     } else if (it) {
                         AlertDialogFragment.Builder()
@@ -147,7 +125,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
             )
 
-            themeSettings.colorScheme.bindTo(
+            settings.colorScheme.bindTo(
                 binding.colorScheme,
                 { preferences.colorScheme },
                 {
@@ -156,7 +134,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
             )
 
-            themeSettings.blackTheme.bindTo(
+            binding.darkThemeSettings.title.text = getString(R.string.dark_theme_settings)
+            settings.blackTheme.bindTo(
                 binding.useBlackTheme,
                 { preferences.isBlackTheme() },
                 {
@@ -165,7 +144,36 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
             )
 
-            themeSettings.fontSize.bindTo(
+            binding.fontStyle.title.text = getString(R.string.font_style)
+
+            settings.font.bindTo(
+                binding.font,
+                { preferences.globalFont },
+                onSettingClick = {
+                    FontPickerDialogFragment()
+                        .show(childFragmentManager, "FontPickerDialogFragment")
+                },
+            )
+
+//            settings.font.bindTo(
+//                activity = parentActivity,
+//                b = binding.fontSize,
+//                choices = mapOf(
+//                    com.idunnololz.summit.preferences.GlobalFontSizeId.Small to getString(com.idunnololz.summit.R.string.small),
+//                    com.idunnololz.summit.preferences.GlobalFontSizeId.Normal to getString(com.idunnololz.summit.R.string.normal),
+//                    com.idunnololz.summit.preferences.GlobalFontSizeId.Large to getString(com.idunnololz.summit.R.string.large),
+//                    com.idunnololz.summit.preferences.GlobalFontSizeId.ExtraLarge to getString(com.idunnololz.summit.R.string.extra_large),
+//                ),
+//                getCurrentChoice = {
+//                    preferences.globalFontSize
+//                },
+//                onChoiceSelected = {
+//                    preferences.globalFontSize = it
+//                    themeManager.onThemeOverlayChanged()
+//                },
+//            )
+
+            settings.fontSize.bindTo(
                 activity = parentActivity,
                 b = binding.fontSize,
                 choices = mapOf(
@@ -183,7 +191,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
             )
 
-            themeSettings.fontColor.bindTo(
+            settings.fontColor.bindTo(
                 activity = parentActivity,
                 b = binding.fontColor,
                 choices = mapOf(
@@ -197,6 +205,24 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     preferences.globalFontColor = it
                     themeManager.onThemeOverlayChanged()
                 },
+            )
+
+            binding.misc.title.text = getString(R.string.misc)
+            settings.upvoteColor.bindTo(
+                binding.upvoteColor,
+                { preferences.upvoteColor },
+                {
+                    preferences.upvoteColor = it
+                },
+                { context.getColorCompat(R.color.upvoteColor) }
+            )
+            settings.downvoteColor.bindTo(
+                binding.downvoteColor,
+                { preferences.downvoteColor },
+                {
+                    preferences.upvoteColor = it
+                },
+                { context.getColorCompat(R.color.downvoteColor) }
             )
         }
     }

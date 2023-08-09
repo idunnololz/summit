@@ -26,18 +26,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
-import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
-import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.community.ViewPagerController
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
-import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
@@ -48,19 +39,17 @@ import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.search.SuggestionProvider
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
-class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
+class SearchTabbedFragment :
+    BaseFragment<FragmentSearchBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -107,7 +96,9 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner, searchViewBackPressedHandler)
+            viewLifecycleOwner,
+            searchViewBackPressedHandler,
+        )
 
         val context = requireContext()
 
@@ -120,7 +111,8 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
         requireMainActivity().apply {
             setupForFragment<SavedTabbedFragment>()
 
-            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayoutContainer)
+            insetViewAutomaticallyByPaddingAndNavUi(
+                viewLifecycleOwner, binding.coordinatorLayoutContainer)
         }
 
         with(binding) {
@@ -166,7 +158,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
                         val tabName = adapter?.getTitleForPosition(position)
                         Log.d(
                             TAG,
-                            "onPageSelected: $position (${tabName})",
+                            "onPageSelected: $position ($tabName)",
                         )
 
                         val searchType = allTabs[position]
@@ -328,7 +320,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
                             },
                             onSortOrderSelected = {
                                 viewModel.setSortType(it.toApiSortOrder())
-                            }
+                            },
                         )
                     }
                     R.id.clear_search_history -> {
@@ -383,7 +375,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
 
         val directions = SearchTabbedFragmentDirections.actionSearchFragmentSelf(
             queryString,
-            viewModel.currentSortTypeFlow.value
+            viewModel.currentSortTypeFlow.value,
         )
         findNavController().navigateSafe(directions)
     }
@@ -430,8 +422,10 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
     }
 
     private fun updateQueryBackHandler() {
-        queryBackPressHandler.isEnabled = !(binding.searchEditText.text.isNullOrBlank() &&
-                binding.searchEditTextDummy.text.isNullOrBlank())
+        queryBackPressHandler.isEnabled = !(
+            binding.searchEditText.text.isNullOrBlank() &&
+                binding.searchEditTextDummy.text.isNullOrBlank()
+            )
     }
 
     fun closePost(postFragment: PostFragment) {
@@ -461,7 +455,10 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
 
             // finally, make the query
             context.contentResolver.delete(
-                uri, "query = '$suggestionToDelete'", null)
+                uri,
+                "query = '$suggestionToDelete'",
+                null,
+            )
 
             searchSuggestionsAdapter?.refreshSuggestions()
         }

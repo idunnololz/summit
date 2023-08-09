@@ -1,23 +1,29 @@
 package com.idunnololz.summit.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.appbar.AppBarLayout
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
+import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -41,10 +47,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,7 +63,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner, searchViewBackPressedHandler)
+            viewLifecycleOwner,
+            searchViewBackPressedHandler,
+        )
 
         val context = requireContext()
 
@@ -70,7 +74,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.collapsingToolbarLayout)
-            insetViewAutomaticallyByMargins(viewLifecycleOwner, binding.searchContainer)
+            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
 
             setSupportActionBar(binding.searchBar)
 
@@ -91,7 +95,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 adapter = SettingItemsAdapter(
                     context = context,
                     onSettingClick = {
-                        when (it) {
+                        when (it.id) {
                             mainSettings.settingViewType.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingViewTypeFragment()
@@ -170,6 +174,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 findNavController().navigateSafe(directions)
                                 true
                             }
+                            mainSettings.miscSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingMiscFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
                             else -> false
                         }
                     },
@@ -193,8 +203,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                     setupSearchRecyclerView()
                 }
 
-                (searchResultsRecyclerView.adapter as? SettingItemsAdapter)?.setData(it) {
-                    binding.recyclerView.scrollToPosition(0)
+                (searchResultsRecyclerView.adapter as? SearchResultAdapter)?.setData(it) {
+                    searchResultsRecyclerView.scrollToPosition(0)
                 }
             }
 
@@ -215,12 +225,75 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         val context = requireContext()
 
         binding.searchResultsRecyclerView.apply {
-            adapter = SettingItemsAdapter(
+            adapter = SearchResultAdapter(
                 context = context,
-                onSettingClick = {
+                onResultClick = {
+                    when (viewModel.searchIdToPage[it.id]) {
+                        is CommentListSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingCommentListFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is GestureSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingGesturesFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is LemmyWebSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingWebFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is MainSettings -> {
+                            hideSearch()
+                        }
+                        is PostListSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingsContentFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is AboutSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingAboutFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is CacheSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingCacheFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is HiddenPostsSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingHiddenPostsFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is PostAndCommentsSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingPostAndCommentsFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is ThemeSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingThemeFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is ViewTypeSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingViewTypeFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is MiscSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingMiscFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+
+                        null -> {
+                            // do nothing
+                        }
+                    }
                     true
                 },
-                fragmentManager = childFragmentManager
             )
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
@@ -277,5 +350,112 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         }
 
         searchViewBackPressedHandler.isEnabled = false
+    }
+
+    private class SearchResultAdapter(
+        private val context: Context,
+        private val onResultClick: (SettingItem) -> Boolean,
+    ) : Adapter<ViewHolder>() {
+
+        sealed interface Item {
+
+            data class SearchResultItem(
+                val settingItem: SettingItem,
+                val page: SearchableSettings,
+            ) : Item
+        }
+
+        var data: List<SettingsViewModel.SettingSearchResultItem> = listOf()
+            private set
+
+        var defaultSettingValues: Map<Int, Any?> = mapOf()
+            set(value) {
+                field = value
+
+                refreshItems()
+            }
+
+        var firstTitleHasTopMargin: Boolean = true
+
+        private val _updatedSettingValues = mutableMapOf<Int, Any?>()
+
+        var settingsChanged: (() -> Unit)? = null
+
+        private val adapterHelper = AdapterHelper<Item>(
+            areItemsTheSame = { old, new ->
+                old::class == new::class && when (old) {
+                    is Item.SearchResultItem ->
+                        old.settingItem.id == (new as Item.SearchResultItem).settingItem.id
+                }
+            },
+        ).apply {
+            addItemType(
+                clazz = Item.SearchResultItem::class,
+                inflateFn = SettingSearchResultItemBinding::inflate,
+            ) { item, b, h ->
+                val settingItem = item.settingItem
+
+                b.title.text = settingItem.title
+                if (settingItem.description == null) {
+                    b.desc.text =
+                        (item.page.parents + listOf(item.page::class))
+                            .joinToString(" > ") {
+                                it.getPageName(context)
+                            }
+                } else {
+                    b.desc.text = settingItem.description
+                }
+
+                b.root.setOnClickListener {
+                    onResultClick(settingItem)
+                }
+            }
+        }
+
+        init {
+            refreshItems()
+        }
+
+        override fun getItemViewType(position: Int): Int =
+            adapterHelper.getItemViewType(position)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+            adapterHelper.onCreateViewHolder(parent, viewType)
+
+        override fun getItemCount(): Int =
+            adapterHelper.itemCount
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+            adapterHelper.onBindViewHolder(holder, position)
+
+        private fun refreshItems(onItemsUpdated: () -> Unit = {}) {
+            val newItems = mutableListOf<Item>()
+
+            data.mapTo(newItems) {
+                Item.SearchResultItem(
+                    it.settingItem,
+                    it.page,
+                )
+            }
+
+            adapterHelper.setItems(newItems, this, onItemsUpdated)
+        }
+
+        private fun getCurrentValue(key: Int): Any? =
+            if (_updatedSettingValues.contains(key)) {
+                _updatedSettingValues[key]
+            } else if (defaultSettingValues.contains(key)) {
+                defaultSettingValues[key]
+            } else {
+                null
+            }
+
+        fun setData(data: List<SettingsViewModel.SettingSearchResultItem>, onItemsUpdated: () -> Unit = {}) {
+            this.data = data
+
+            refreshItems {
+                onItemsUpdated()
+            }
+        }
     }
 }

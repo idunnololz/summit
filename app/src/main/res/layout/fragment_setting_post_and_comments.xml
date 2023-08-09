@@ -76,28 +76,17 @@
                     android:id="@+id/text_scaling_setting1"
                     layout="@layout/slider_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/section_title"/>
+                    android:layout_height="wrap_content"/>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting1"/>
+                    android:layout_height="wrap_content"/>
 
-                <TextView
+                <include
                     android:id="@+id/reset_post_styles"
+                    layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/padding"
-                    android:background="?selectableItemBackground"
-                    android:text="@string/reset_post_styles"
-                    android:textAppearance="?textAppearanceTitleMedium"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting1"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    android:layout_height="wrap_content"/>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
@@ -119,19 +108,13 @@
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
                     android:paddingTop="@dimen/padding_two"
-                    style="@style/SettingHeaderStyle"
-                    app:layout_constraintTop_toBottomOf="@+id/reset_post_styles"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    style="@style/SettingHeaderStyle"/>
 
                 <include
                     android:id="@+id/text_scaling_setting2"
                     layout="@layout/slider_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/section_title2"/>
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/indentation_per_level"
@@ -146,13 +129,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <TextView
+                <include
                     android:id="@+id/reset_comment_styles"
+                    layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding"
-                    android:background="?selectableItemBackground"
-                    android:text="@string/reset_comment_styles"
                     android:textAppearance="?textAppearanceTitleMedium"/>
 
                 <com.google.android.material.divider.MaterialDivider
