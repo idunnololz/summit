@@ -33,6 +33,7 @@ import com.idunnololz.summit.api.dto.GetPost
 import com.idunnololz.summit.api.dto.GetPosts
 import com.idunnololz.summit.api.dto.GetPrivateMessages
 import com.idunnololz.summit.api.dto.GetReplies
+import com.idunnololz.summit.api.dto.GetRepliesResponse
 import com.idunnololz.summit.api.dto.GetSite
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCount
@@ -40,6 +41,7 @@ import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListCommunities
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.Login
+import com.idunnololz.summit.api.dto.MarkAllAsRead
 import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.MarkPostAsRead
@@ -293,11 +295,12 @@ class LemmyApiClient @Inject constructor(
         account: Account?,
         id: Either<PostId, CommentId>,
         sort: CommentSortType,
-        force: Boolean,
+        maxDepth: Int?,
+        force: Boolean = false,
     ): Result<List<CommentView>> {
         val commentsForm = id.fold({
             GetComments(
-                max_depth = COMMENTS_DEPTH_MAX,
+                max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
                 type_ = ListingType.All,
                 post_id = it,
                 sort = sort,
@@ -305,7 +308,7 @@ class LemmyApiClient @Inject constructor(
             )
         }, {
             GetComments(
-                max_depth = COMMENTS_DEPTH_MAX,
+                max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
                 type_ = ListingType.All,
                 parent_id = it,
                 sort = sort,
@@ -1003,6 +1006,24 @@ class LemmyApiClient @Inject constructor(
         }.fold(
             onSuccess = {
                 Result.success(it.private_message_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun markAllAsRead(
+        account: Account,
+    ): Result<GetRepliesResponse> {
+        val form = MarkAllAsRead(
+            account.jwt,
+        )
+        return retrofitErrorHandler {
+            api.markAllAsRead(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it)
             },
             onFailure = {
                 Result.failure(it)

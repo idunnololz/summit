@@ -48,6 +48,18 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/use_volume_button_navigation"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/collapse_child_comments_by_default"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/hide_comment_scores"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"

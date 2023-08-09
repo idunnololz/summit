@@ -9,7 +9,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsAccountBlockListBinding
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
 

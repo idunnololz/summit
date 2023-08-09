@@ -31,7 +31,7 @@ object LocaleHelper {
         }
     }
 
-    fun setLocale(base: Context): Context? {
+    fun setLocale(base: Context): Context {
         val locale = getLocaleFromPreferences(base)
 
         if (locale == null) return base

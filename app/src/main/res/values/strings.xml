@@ -474,6 +474,25 @@
     <string name="sort_order">Sort order</string>
     <string name="clear_search_history">Clear search history</string>
     <string name="delete_suggest">Delete suggestion?</string>
+    <string name="font">Font</string>
+    <string name="roboto">Roboto</string>
+    <string name="roboto_serif">Roboto Serif</string>
+    <string name="open_sans">Open Sans</string>
+    <string name="misc">Misc</string>
+    <string name="upvote_color">Upvote color</string>
+    <string name="updoot_color">Updoot color</string>
+    <string name="downvote_color">Downvote color</string>
+    <string name="downdoot_color">Downdoot color</string>
+    <string name="use_volume_button_navigation">Use volume button navigation</string>
+    <string name="use_volume_button_navigation_desc">While on the post screen, use the volume buttons to move to the next/previous comment.</string>
+    <string name="collapse_child_comments">Collapse child comments</string>
+    <string name="collapse_child_comments_desc">Only show top level comments for posts by default</string>
+    <string name="reset_to_default">Reset to default</string>
+    <string name="full_content_max_lines">Full content max lines</string>
+    <string name="no_limit">No limit</string>
+    <string name="open_links_in_external_browser">Open links in external browser</string>
+    <string name="open_links_in_external_browser_desc">Links will open in the browser instead of in the app.</string>
+    <string name="misc_desc">Miscellaneous settings</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

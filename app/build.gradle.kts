@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 66
-        versionName = "1.0.3"
+        versionCode = 67
+        versionName = "1.0.4"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -55,6 +55,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":overlappingPane"))
 
+    implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.appcompat)
     implementation(libs.core)
@@ -132,6 +133,9 @@ dependencies {
     implementation("com.github.Commit451.coil-transformations:transformations:2.0.2")
     implementation("com.github.Drjacky:ImagePicker:2.3.22")
     implementation("info.debatty:java-string-similarity:2.0.0")
+    implementation("io.github.inflationx:calligraphy3:3.1.1")
+    implementation("io.github.inflationx:viewpump:2.0.3")
+    implementation("com.github.skydoves:colorpickerview:2.2.4")
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

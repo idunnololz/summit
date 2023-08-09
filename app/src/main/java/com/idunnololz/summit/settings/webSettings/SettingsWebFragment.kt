@@ -22,6 +22,7 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingWebBinding
 import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.util.BaseFragment
@@ -90,7 +91,7 @@ class SettingsWebFragment :
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.lemmy_web_preferences)
+            supportActionBar?.title = lemmyWebSettings.getPageName(context)
 
             onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressHandler)
         }
@@ -190,7 +191,7 @@ class SettingsWebFragment :
         val adapter = SettingItemsAdapter(
             context = context,
             onSettingClick = {
-                when (it) {
+                when (it.id) {
                     lemmyWebSettings.blockSettings.id -> {
                         val direction = SettingsWebFragmentDirections
                             .actionSettingWebFragmentToSettingsAccountBlockListFragment()

@@ -16,9 +16,10 @@ class CommentsFetcher(
     suspend fun fetchCommentsWithRetry(
         id: Either<PostId, CommentId>,
         sort: CommentSortType,
+        maxDepth: Int?,
         force: Boolean,
     ): Result<List<CommentView>> =
-        apiClient.fetchCommentsWithRetry(id, sort, force)
+        apiClient.fetchCommentsWithRetry(id, sort, maxDepth = maxDepth, force = force)
             .onSuccess {
                 if (force) {
                     it.forEach {

@@ -1,5 +1,6 @@
 package com.idunnololz.summit
 
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -9,4 +10,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 interface AppEntryPoint {
     fun themeManager(): ThemeManager
+    fun preferences(): Preferences
 }

@@ -32,7 +32,6 @@ fun BaseFragment<*>.showMorePostOptions(
     val bottomMenu = BottomMenu(context).apply {
         setTitle(R.string.more_actions)
 
-
         addItemWithIcon(
             R.id.action_add_comment,
             getString(R.string.add_comment),

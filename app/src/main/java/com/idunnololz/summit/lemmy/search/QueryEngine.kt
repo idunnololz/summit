@@ -12,7 +12,6 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
-import info.debatty.java.stringsimilarity.Levenshtein
 import info.debatty.java.stringsimilarity.NGram
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -247,7 +246,7 @@ class QueryEngine(
                                             is SearchResultView.CommunityResultView -> {
                                                 trigram.distance(
                                                     it.communityView.community.name,
-                                                    currentQuery
+                                                    currentQuery,
                                                 )
                                             }
                                             is SearchResultView.PostResultView -> {
@@ -261,7 +260,6 @@ class QueryEngine(
                                 } else {
                                     items
                                 }
-
 
                             QueryResultsPage.AllResultsPage(
                                 sortedItems,
@@ -287,11 +285,11 @@ class QueryEngine(
                                     it.posts.sortedBy {
                                         trigram.distance(
                                             it.post.name + " " + it.post.body,
-                                            currentQuery
+                                            currentQuery,
                                         )
                                     }
                                 } else {
-                                   it.posts
+                                    it.posts
                                 },
                                 pageIndex,
                                 it.posts.size >= MAX_QUERY_PAGE_LIMIT,
@@ -393,7 +391,7 @@ class QueryEngine(
             } else {
                 _items = listOf(
                     Item.EndItem,
-                    Item.FooterSpacerItem
+                    Item.FooterSpacerItem,
                 )
             }
 
@@ -478,11 +476,9 @@ class QueryEngine(
         pages = listOf()
     }
 
-
     private fun Int.toLemmyPageIndex() =
         this + 1 // lemmy pages are 1 indexed
 
     fun getItems() =
         _items
-
 }

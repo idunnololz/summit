@@ -36,6 +36,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
@@ -69,6 +70,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
     @Inject
     lateinit var accountManager: AccountManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -217,8 +221,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }.show(childFragmentManager, "asdf")
         }
 
-        val upvoteColor = ContextCompat.getColor(context, R.color.upvoteColor)
-        val downvoteColor = ContextCompat.getColor(context, R.color.downvoteColor)
+        val upvoteColor = preferences.upvoteColor
+        val downvoteColor = preferences.downvoteColor
         val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
         when (inboxItem) {
             is CommentBackedItem -> {

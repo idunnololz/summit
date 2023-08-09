@@ -40,14 +40,11 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
-                <TextView
-                    android:id="@+id/clear_cache_media"
-                    android:layout_width="0dp"
+                <include
+                    android:id="@+id/clear_media_cache"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding"
-                    android:background="?selectableItemBackground"
-                    android:text="@string/clear_media_cache"
-                    android:textAppearance="?textAppearanceTitleMedium"
                     android:layout_marginTop="@dimen/padding"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/storage_usage_view"

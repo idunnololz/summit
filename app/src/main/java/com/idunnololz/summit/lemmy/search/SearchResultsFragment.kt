@@ -38,9 +38,7 @@ import com.idunnololz.summit.databinding.CommentListEndItemBinding
 import com.idunnololz.summit.databinding.CommunityItemBinding
 import com.idunnololz.summit.databinding.FragmentSearchResultsBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
-import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
-import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
 import com.idunnololz.summit.databinding.UserItemBinding
 import com.idunnololz.summit.lemmy.CommentRef
@@ -60,20 +58,15 @@ import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.lemmy.utils.CommentListAdapter
 import com.idunnololz.summit.lemmy.utils.bind
-import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.VerticalSpaceItemDecoration
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
@@ -93,8 +86,10 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
     @Inject
     lateinit var postListViewBuilder: PostListViewBuilder
+
     @Inject
     lateinit var accountManager: AccountManager
 
@@ -192,6 +187,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         .show(childFragmentManager, "asdf")
                 },
                 onInstanceMismatch = { accountInstance, apiInstance ->
+                    if (!isBindingAvailable()) return@SearchResultAdapter
+
                     AlertDialogFragment.Builder()
                         .setTitle(R.string.error_account_instance_mismatch_title)
                         .setMessage(
@@ -234,7 +231,6 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             ).apply {
                 stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
-
 
             fun fetchPageIfLoadItem(position: Int) {
                 (adapter?.data?.getOrNull(position) as? Item.AutoLoadItem)
@@ -307,10 +303,13 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     ?.currentState
                     ?.collect {
                         withContext(Dispatchers.Main) {
+                            if (!isBindingAvailable()) return@withContext
+
                             when (it) {
                                 is StatefulData.Error,
                                 is StatefulData.NotStarted,
-                                is StatefulData.Success -> {
+                                is StatefulData.Success,
+                                -> {
                                     binding.loadingView.hideAll()
                                     binding.swipeRefreshLayout.isRefreshing = false
                                 }
@@ -377,7 +376,6 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         var contentPreferredHeight: Int = 0
         val alwaysRenderAsUnread = true
 
-
         /**
          * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
          */
@@ -403,16 +401,17 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     is Item.ErrorItem ->
                         old.pageToLoad == (new as Item.ErrorItem).pageToLoad
                     Item.EndItem,
-                    Item.FooterSpacerItem -> true
+                    Item.FooterSpacerItem,
+                    -> true
                 }
-            }
+            },
         ).apply {
             addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { item, b, h ->
                 b.loadingView.showProgressBar()
             }
             addItemType(
                 clazz = Item.CommentItem::class,
-                inflateFn = CommentListCommentItemBinding::inflate
+                inflateFn = CommentListCommentItemBinding::inflate,
             ) { item, b, _ ->
                 val post = item.commentView.post
                 b.postInfo.text = buildSpannedString {
@@ -595,7 +594,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             addItemType(Item.EndItem::class, CommentListEndItemBinding::inflate) { _, _, _ -> }
             addItemType(
                 clazz = Item.FooterSpacerItem::class,
-                inflateFn = GenericSpaceFooterItemBinding::inflate
+                inflateFn = GenericSpaceFooterItemBinding::inflate,
             ) { _, _, _ -> }
         }
 
@@ -605,7 +604,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int  =
+        override fun getItemCount(): Int =
             adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
@@ -619,6 +618,5 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private fun refreshItems(cb: () -> Unit) {
             adapterHelper.setItems(data, this, cb)
         }
-
     }
 }

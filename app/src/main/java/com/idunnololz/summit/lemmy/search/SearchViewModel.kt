@@ -22,7 +22,7 @@ class SearchViewModel @Inject constructor(
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
-         private const val MAX_QUERY_PAGE_LIMIT = 20
+        private const val MAX_QUERY_PAGE_LIMIT = 20
     }
 
     val instance: String

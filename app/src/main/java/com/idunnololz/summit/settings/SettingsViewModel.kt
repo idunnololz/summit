@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val searchableSettings: Lazy<AllSettings>
+    private val searchableSettings: Lazy<AllSettings>,
 ) : ViewModel() {
 
     val showSearch = MutableLiveData<Boolean>()
@@ -22,7 +22,8 @@ class SettingsViewModel @Inject constructor(
     private var currentQuery = MutableStateFlow("")
     private val trigram = NGram(3)
 
-    val searchResults = MutableLiveData<List<SettingItem>>()
+    val searchResults = MutableLiveData<List<SettingSearchResultItem>>()
+    var searchIdToPage: Map<Int, SearchableSettings> = mapOf()
 
     init {
         viewModelScope.launch {
@@ -42,20 +43,23 @@ class SettingsViewModel @Inject constructor(
         val allSettings = searchableSettings.get().allSearchableSettings
         val query = currentQuery.value
 
-        val results = mutableListOf<SettingItem>()
+        val results = mutableListOf<SettingSearchResultItem>()
+        val settingIdToSettingPage = mutableMapOf<Int, SearchableSettings>()
 
-        allSettings.forEach {
-            it.allSettings.forEach {
-                recursiveSearch(it, query, results)
+        allSettings.forEach { page ->
+            page.allSettings.forEach {
+                recursiveSearch(it, query, page, results, settingIdToSettingPage)
             }
         }
 
         results.sortBy {
             trigram.distance(
-                it.title + (it.description ?: ""),
-                query
+                it.settingItem.title + (it.settingItem.description ?: ""),
+                query,
             )
         }
+
+        searchIdToPage = settingIdToSettingPage
 
         withContext(Dispatchers.Main) {
             searchResults.value = results
@@ -65,8 +69,22 @@ class SettingsViewModel @Inject constructor(
     private fun recursiveSearch(
         settingItem: SettingItem,
         query: String,
-        result: MutableList<SettingItem>,
+        settingPage: SearchableSettings,
+        result: MutableList<SettingSearchResultItem>,
+        settingIdToSettingPage: MutableMap<Int, SearchableSettings>,
     ) {
+        fun addItem() {
+            if (settingItem.title.contains(query, ignoreCase = true) ||
+                settingItem.description?.contains(query, ignoreCase = true) == true
+            ) {
+                result += SettingSearchResultItem(
+                    settingItem,
+                    settingPage,
+                )
+            }
+            settingIdToSettingPage[settingItem.id] = settingPage
+        }
+
         when (settingItem) {
             is BasicSettingItem,
             is ImageValueSettingItem,
@@ -74,22 +92,23 @@ class SettingsViewModel @Inject constructor(
             is RadioGroupSettingItem,
             is SliderSettingItem,
             is TextOnlySettingItem,
-            is TextValueSettingItem -> {
-                if (settingItem.title.contains(query, ignoreCase = true) ||
-                    settingItem.description?.contains(query, ignoreCase = true) == true) {
-                    result += settingItem
-                }
+            is TextValueSettingItem,
+            is ColorSettingItem
+            -> {
+                addItem()
             }
             is SubgroupItem -> {
-                if (settingItem.title.contains(query, ignoreCase = true) ||
-                    settingItem.description?.contains(query, ignoreCase = true) == true) {
-                    result += settingItem
-                }
+                addItem()
 
                 settingItem.settings.forEach {
-                    recursiveSearch(it, query, result)
+                    recursiveSearch(it, query, settingPage, result, settingIdToSettingPage)
                 }
             }
         }
     }
+
+    data class SettingSearchResultItem(
+        val settingItem: SettingItem,
+        val page: SearchableSettings,
+    )
 }

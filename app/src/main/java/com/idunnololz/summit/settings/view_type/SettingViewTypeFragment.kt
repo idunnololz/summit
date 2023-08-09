@@ -29,13 +29,15 @@ import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.ViewTypeSettings
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils.ANIMATION_DURATION_MS
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,6 +55,9 @@ class SettingViewTypeFragment :
 
     @Inject
     lateinit var postListViewBuilder: PostListViewBuilder
+
+    @Inject
+    lateinit var settings: ViewTypeSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,10 +117,7 @@ class SettingViewTypeFragment :
                 .createAndShow(childFragmentManager, "reset_view_to_default_styles")
         }
 
-        TextOnlySettingItem(
-            getString(R.string.base_view_type),
-            "",
-        ).bindTo(
+        settings.baseViewType.bindTo(
             activity = parentActivity,
             b = binding.viewTypeSetting,
             choices = mapOf(
@@ -148,12 +150,7 @@ class SettingViewTypeFragment :
     }
 
     private fun bindPostUiSettings() {
-        SliderSettingItem(
-            getString(R.string.font_size),
-            0.2f,
-            3f,
-            0.1f,
-        ).bindTo(
+        settings.fontSize.bindTo(
             binding.textScalingSetting,
             { viewModel.currentPostUiConfig.textSizeMultiplier },
             {
@@ -163,11 +160,7 @@ class SettingViewTypeFragment :
                 updateRendering()
             },
         )
-        OnOffSettingItem(
-            null,
-            getString(R.string.prefer_image_at_the_end),
-            null,
-        ).bindTo(
+        settings.preferImageAtEnd.bindTo(
             binding.preferImageAtTheEnd,
             { viewModel.currentPostUiConfig.preferImagesAtEnd },
             {
@@ -177,11 +170,7 @@ class SettingViewTypeFragment :
                 updateRendering()
             },
         )
-        OnOffSettingItem(
-            null,
-            getString(R.string.prefer_full_size_image),
-            null,
-        ).bindTo(
+        settings.preferFullImage.bindTo(
             binding.preferFullSizeImage,
             { viewModel.currentPostUiConfig.preferFullSizeImages },
             {
@@ -191,16 +180,37 @@ class SettingViewTypeFragment :
                 updateRendering()
             },
         )
-        OnOffSettingItem(
-            null,
-            getString(R.string.prefer_title_text),
-            null,
-        ).bindTo(
+        settings.preferTitleText.bindTo(
             binding.preferTitleText,
             { viewModel.currentPostUiConfig.preferTitleText },
             {
                 viewModel.currentPostUiConfig =
                     viewModel.currentPostUiConfig.copy(preferTitleText = it)
+
+                updateRendering()
+            },
+        )
+        settings.contentMaxLines.bindTo(
+            requireMainActivity(),
+            binding.contentMaxLines,
+            choices = mapOf(
+                -1 to getString(R.string.no_limit),
+                1 to "1",
+                2 to "2",
+                3 to "3",
+                4 to "4",
+                5 to "5",
+                6 to "6",
+                7 to "7",
+                8 to "8",
+                9 to "9",
+            ),
+            getCurrentChoice = {
+                viewModel.currentPostUiConfig.contentMaxLines
+            },
+            onChoiceSelected = {
+                viewModel.currentPostUiConfig =
+                    viewModel.currentPostUiConfig.copy(contentMaxLines = it)
 
                 updateRendering()
             },

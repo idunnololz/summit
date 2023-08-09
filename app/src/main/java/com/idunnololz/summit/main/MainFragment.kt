@@ -431,7 +431,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         tabsManager.currentTab.value?.let {
             outState.putParcelable(
                 SIS_CURRENT_TAB,
-                it
+                it,
             )
         }
     }

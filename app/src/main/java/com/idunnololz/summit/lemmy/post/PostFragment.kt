@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.post
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,6 +61,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.SharedElementTransition
@@ -117,6 +119,7 @@ class PostFragment :
     private var swipeActionCallback: LemmySwipeActionCallback? = null
     private var itemTouchHelper: ItemTouchHelper? = null
     private var commentNavViewController: CommentNavViewController? = null
+    private var smoothScroller: SmoothScroller? = null
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -352,7 +355,7 @@ class PostFragment :
             binding.fabSnackbarCoordinatorLayout,
             preferences,
         )
-        val smoothScroller: SmoothScroller = object : LinearSmoothScroller(context) {
+        smoothScroller = object : LinearSmoothScroller(context) {
             override fun getVerticalSnapPreference(): Int {
                 return SNAP_TO_START
             }
@@ -377,36 +380,10 @@ class PostFragment :
                 commentNavViewController?.show(
                     it,
                     onNextClick = {
-                        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-                            var curPos = it.findFirstCompletelyVisibleItemPosition()
-
-                            if (curPos == -1) {
-                                curPos = it.findFirstVisibleItemPosition()
-                            }
-
-                            val pos = adapter
-                                ?.getNextTopLevelCommentPosition(curPos)
-                            if (pos != null) {
-                                smoothScroller.targetPosition = pos
-                                it.startSmoothScroll(smoothScroller)
-                            }
-                        }
+                      goToNextComment()
                     },
                     onPrevClick = {
-                        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-                            var curPos = it.findFirstCompletelyVisibleItemPosition()
-
-                            if (curPos == -1) {
-                                curPos = it.findFirstVisibleItemPosition()
-                            }
-
-                            val pos = adapter
-                                ?.getPrevTopLevelCommentPosition(curPos)
-                            if (pos != null) {
-                                smoothScroller.targetPosition = pos
-                                it.startSmoothScroll(smoothScroller)
-                            }
-                        }
+                      goToPreviousComment()
                     },
                     onMoreClick = {
                         val data = viewModel.postData.valueOrNull
@@ -420,6 +397,61 @@ class PostFragment :
             } else {
                 commentNavViewController?.hide()
                 binding.fab.setImageDrawable(context.getDrawableCompat(R.drawable.outline_navigation_24))
+            }
+        }
+
+        if (preferences.useVolumeButtonNavigation) {
+            requireMainActivity().keyPressRegistrationManager.register(
+                viewLifecycleOwner,
+                object : KeyPressRegistrationManager.OnKeyPressHandler {
+                    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+                        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                            goToNextComment()
+
+                            return true
+                        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                            goToPreviousComment()
+
+                            return true
+                        }
+
+                        return false
+                    }
+                }
+            )
+        }
+    }
+
+    private fun goToNextComment() {
+        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+            var curPos = it.findFirstCompletelyVisibleItemPosition()
+
+            if (curPos == -1) {
+                curPos = it.findFirstVisibleItemPosition()
+            }
+
+            val pos = adapter
+                ?.getNextTopLevelCommentPosition(curPos)
+            if (pos != null) {
+                smoothScroller?.targetPosition = pos
+                it.startSmoothScroll(smoothScroller)
+            }
+        }
+    }
+
+    private fun goToPreviousComment() {
+        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+            var curPos = it.findFirstCompletelyVisibleItemPosition()
+
+            if (curPos == -1) {
+                curPos = it.findFirstVisibleItemPosition()
+            }
+
+            val pos = adapter
+                ?.getPrevTopLevelCommentPosition(curPos)
+            if (pos != null) {
+                smoothScroller?.targetPosition = pos
+                it.startSmoothScroll(smoothScroller)
             }
         }
     }

@@ -62,7 +62,6 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.RuntimeException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -204,7 +203,6 @@ class CommunityFragment :
             }
         }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -412,6 +410,8 @@ class CommunityFragment :
         }
 
         runAfterLayout {
+            if (!isBindingAvailable()) return@runAfterLayout
+
             adapter?.contentMaxWidth = binding.recyclerView.measuredWidth
             adapter?.contentPreferredHeight = binding.recyclerView.measuredHeight
         }

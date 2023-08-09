@@ -7,6 +7,7 @@ import java.util.StringTokenizer
 
 object PreferenceUtil {
 
+    var usingCustomFont: Boolean = false
     lateinit var preferences: SharedPreferences
         private set
 
@@ -55,7 +56,6 @@ object PreferenceUtil {
     const val KEY_STATE_TOKEN = "aaaa_eeee"
 
     const val KEY_USER_ID = "user_id"
-
 
     /**
      * START OF DEPRECATED KEYS
@@ -135,12 +135,21 @@ object PreferenceUtil {
     const val KEY_COLOR_SCHEME = "KEY_COLOR_SCHEME"
 
     const val KEY_COMMENTS_NAVIGATION_FAB = "KEY_COMMENTS_NAVIGATION_FAB"
+    const val KEY_USE_VOLUME_BUTTON_NAVIGATION = "KEY_USE_VOLUME_BUTTON_NAVIGATION"
     const val KEY_COMMENTS_NAVIGATION_FAB_OFF_X = "KEY_COMMENTS_NAVIGATION_FAB_OFF_X"
     const val KEY_COMMENTS_NAVIGATION_FAB_OFF_Y = "KEY_COMMENTS_NAVIGATION_FAB_OFF_Y"
     const val KEY_COMPATIBILITY_MODE2 = "KEY_COMPATIBILITY_MODE2"
 
     const val KEY_HIDE_POST_SCORES = "KEY_HIDE_POST_SCORES"
     const val KEY_HIDE_COMMENT_SCORES = "KEY_HIDE_COMMENT_SCORES"
+    const val KEY_GLOBAL_FONT = "KEY_GLOBAL_FONT"
+
+    const val KEY_UPVOTE_COLOR = "KEY_UPVOTE_COLOR"
+    const val KEY_DOWNVOTE_COLOR = "KEY_DOWNVOTE_COLOR"
+
+    const val KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT = "KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT"
+
+    const val KEY_OPEN_LINKS_IN_APP = "KEY_OPEN_LINKS_IN_APP"
 
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {

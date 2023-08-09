@@ -1,19 +1,14 @@
 package com.idunnololz.summit.settings
 
-import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
-import com.idunnololz.summit.R
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.parcelize.Parcelize
-import javax.inject.Inject
-import javax.inject.Singleton
 
 var nextId = 1
 
 sealed class SettingItem : Parcelable {
-    val id: Int = nextId++
+    open val id: Int = nextId++
     abstract val title: String
     abstract val description: String?
     open val isEnabled: Boolean = true
@@ -62,6 +57,13 @@ data class SliderSettingItem(
 
 @Parcelize
 data class OnOffSettingItem(
+    @DrawableRes val icon: Int?,
+    override val title: String,
+    override val description: String?,
+) : SettingItem()
+
+@Parcelize
+data class ColorSettingItem(
     @DrawableRes val icon: Int?,
     override val title: String,
     override val description: String?,

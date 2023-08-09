@@ -16,15 +16,15 @@
         app:tint="?colorControlNormal" />
 
     <TextView
-        android:layout_gravity="center_vertical"
         android:id="@+id/title"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:maxLines="1"
         android:ellipsize="end"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTextTitle"
-        android:textAppearance="?attr/textAppearanceBodyMedium"/>
+        android:textAppearance="?textAppearanceBodyMedium"/>
 
     <Space
         android:layout_width="16dp"

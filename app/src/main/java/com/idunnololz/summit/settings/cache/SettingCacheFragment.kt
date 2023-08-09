@@ -9,7 +9,10 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentCacheBinding
 import com.idunnololz.summit.offline.OfflineDownloadProgressListener
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.settings.CacheSettings
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.view.StorageUsageItem
@@ -23,6 +26,9 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var cacheSettings: CacheSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,7 +60,7 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.cache)
+            supportActionBar?.title = cacheSettings.getPageName(context)
         }
 
 //        doStandardOfflineButton.setOnClickListener {
@@ -70,7 +76,7 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
 //            OfflineManager.instance.deleteOfflineImages()
 //        }
 
-        binding.clearCacheMedia.setOnClickListener {
+        cacheSettings.clearCache.bindTo(binding.clearMediaCache) {
             offlineManager.clearOfflineData()
 
             refreshUi()

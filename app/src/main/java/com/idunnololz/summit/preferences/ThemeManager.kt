@@ -11,8 +11,12 @@ import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.BaseActivity
+import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.isLightTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.inflationx.calligraphy3.CalligraphyConfig
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor
+import io.github.inflationx.viewpump.ViewPump
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +36,7 @@ class ThemeManager @Inject constructor(
 
     val useMaterialYou = MutableStateFlow<Boolean>(preferences.isUseMaterialYou())
     val themeOverlayChanged = MutableSharedFlow<Unit>()
+    val useCustomFont = MutableStateFlow<Boolean>(preferences.globalFont != 0)
 
     var isLightTheme =
         when (preferences.getBaseTheme()) {
@@ -51,6 +56,23 @@ class ThemeManager @Inject constructor(
     }
 
     fun applyThemeFromPreferences() {
+        val fontAsset = preferences.globalFont.toFontAsset()
+        fontAsset?.let {
+            ViewPump.init(
+                ViewPump.builder()
+                    .addInterceptor(
+                        CalligraphyInterceptor(
+                            CalligraphyConfig.Builder()
+                                .setDefaultFontPath(it)
+                                .build(),
+                        ),
+                    )
+                    .build(),
+            )
+        } ?: run {
+            ViewPump.init(null)
+        }
+
         val themeValue = when (preferences.getBaseTheme()) {
             BaseTheme.UseSystem -> MODE_NIGHT_FOLLOW_SYSTEM
             BaseTheme.Light -> MODE_NIGHT_NO
@@ -63,6 +85,8 @@ class ThemeManager @Inject constructor(
 
         coroutineScope.launch {
             useMaterialYou.emit(preferences.isUseMaterialYou())
+            useCustomFont.emit(preferences.globalFont != 0)
+            PreferenceUtil.usingCustomFont = useCustomFont.value
         }
     }
 

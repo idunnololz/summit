@@ -32,11 +32,11 @@ import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.PostAndCommentsSettings
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -84,7 +84,7 @@ class SettingPostAndCommentsFragment :
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.post_and_comments)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         binding.root.viewTreeObserver.addOnPreDrawListener(
@@ -113,7 +113,7 @@ class SettingPostAndCommentsFragment :
 
         val context = requireContext()
 
-        binding.resetPostStyles.setOnClickListener {
+        settings.resetPostStyles.bindTo(binding.resetPostStyles) {
             AlertDialogFragment.Builder()
                 .setMessage(R.string.reset_view_to_default_styles)
                 .setPositiveButton(android.R.string.ok)
@@ -121,7 +121,7 @@ class SettingPostAndCommentsFragment :
                 .createAndShow(childFragmentManager, "reset_post_to_default_styles")
         }
 
-        binding.resetCommentStyles.setOnClickListener {
+        settings.resetCommentStyles.bindTo(binding.resetCommentStyles) {
             AlertDialogFragment.Builder()
                 .setMessage(R.string.reset_view_to_default_styles)
                 .setPositiveButton(android.R.string.ok)
@@ -142,12 +142,7 @@ class SettingPostAndCommentsFragment :
     }
 
     private fun bindPostUiSettings() {
-        SliderSettingItem(
-            getString(R.string.font_size),
-            0.2f,
-            3f,
-            0.1f,
-        ).bindTo(
+        settings.postFontSize.bindTo(
             binding.textScalingSetting1,
             { viewModel.currentPostAndCommentUiConfig.postUiConfig.textSizeMultiplier },
             {
@@ -161,12 +156,7 @@ class SettingPostAndCommentsFragment :
                 updateRendering()
             },
         )
-        SliderSettingItem(
-            getString(R.string.font_size),
-            0.2f,
-            3f,
-            0.1f,
-        ).bindTo(
+        settings.commentFontSize.bindTo(
             binding.textScalingSetting2,
             { viewModel.currentPostAndCommentUiConfig.commentUiConfig.textSizeMultiplier },
             {
@@ -180,12 +170,7 @@ class SettingPostAndCommentsFragment :
                 updateRendering()
             },
         )
-        SliderSettingItem(
-            getString(R.string.indentation_per_level),
-            0f,
-            32f,
-            stepSize = 1f,
-        ).bindTo(
+        settings.commentIndentationLevel.bindTo(
             binding.indentationPerLevel,
             { viewModel.currentPostAndCommentUiConfig.commentUiConfig.indentationPerLevelDp.toFloat() },
             {

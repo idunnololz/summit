@@ -87,4 +87,5 @@
     <item name="open_link_incognito" type="id" />
     <item name="sort_order" type="id"/>
     <item name="clear_search_history" type="id" />
+    <item name="open_in_browser" type="id" />
 </resources>

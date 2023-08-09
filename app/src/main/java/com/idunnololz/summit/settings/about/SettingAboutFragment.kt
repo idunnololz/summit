@@ -7,14 +7,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingAboutBinding
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.AboutSettings
-import com.idunnololz.summit.settings.BasicSettingItem
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.startFeedbackIntent
@@ -57,7 +56,7 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.about_summit)
+            supportActionBar?.title = aboutSettings.getPageName(context)
         }
 
         updateRendering()
@@ -84,11 +83,7 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
             }
         }
 
-        BasicSettingItem(
-            null,
-            getString(R.string.give_feedback),
-            getString(R.string.give_feedback_desc),
-        ).bindTo(binding.giveFeedback) {
+        aboutSettings.giveFeedback.bindTo(binding.giveFeedback) {
             val bottomMenu = BottomMenu(requireContext()).apply {
                 setTitle(R.string.give_feedback)
                 addItemWithIcon(R.id.summit_community, R.string.through_the_community, R.drawable.ic_logo_mono_24)

@@ -24,14 +24,14 @@ import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
 import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
 class SettingItemsAdapter(
     private val context: Context,
-    private val onSettingClick: (Int) -> Boolean,
+    private val onSettingClick: (SettingItem) -> Boolean,
     private val fragmentManager: FragmentManager,
     private val onImagePickerClick: ((ImageValueSettingItem) -> Unit)? = null,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -72,6 +72,11 @@ class SettingItemsAdapter(
             override val settingItem: SliderSettingItem,
             val value: Float?,
         ) : Item
+
+        data class ColorItem(
+            override val settingItem: ColorSettingItem,
+            @IdRes val value: Int?,
+        ) : Item
     }
 
     var data: List<SettingItem> = listOf()
@@ -94,7 +99,7 @@ class SettingItemsAdapter(
 
     private val onSettingClickListener = View.OnClickListener {
         val settingItem = it.tag as SettingItem
-        val handled = onSettingClick(settingItem.id)
+        val handled = onSettingClick(settingItem)
         val value = getCurrentValue(settingItem.id)
 
         if (!handled) {
@@ -130,6 +135,9 @@ class SettingItemsAdapter(
                 }
                 is ImageValueSettingItem -> {
                     onImagePickerClick?.invoke(settingItem)
+                }
+                is ColorSettingItem -> {
+
                 }
             }
         }
@@ -273,10 +281,12 @@ class SettingItemsAdapter(
     private fun addRecursive(settingItem: SettingItem, out: MutableList<Item>) {
         when (settingItem) {
             is SubgroupItem -> {
-                out.add(Item.TitleItem(
-                    settingItem,
-                    firstTitleHasTopMargin || out.isNotEmpty()
-                ))
+                out.add(
+                    Item.TitleItem(
+                        settingItem,
+                        firstTitleHasTopMargin || out.isNotEmpty(),
+                    ),
+                )
                 settingItem.settings.forEach {
                     addRecursive(it, out)
                 }
@@ -307,6 +317,11 @@ class SettingItemsAdapter(
                 val value = getCurrentValue(settingItem.id)
 
                 out.add(Item.ImageValueItem(settingItem, value as String?))
+            }
+            is ColorSettingItem -> {
+                val value = getCurrentValue(settingItem.id)
+
+                out.add(Item.ColorItem(settingItem, value as Int?))
             }
         }
     }

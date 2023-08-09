@@ -4,17 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingGesturesBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.GestureSettings
-import com.idunnololz.summit.settings.OnOffSettingItem
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.ui.bindTo
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,18 +63,14 @@ class SettingGesturesFragment :
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.gestures)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         updateRendering()
     }
 
     private fun updateRendering() {
-        OnOffSettingItem(
-            null,
-            getString(R.string.use_gesture_actions),
-            getString(R.string.use_gesture_actions_desc),
-        ).bindTo(
+        settings.useGestureActions.bindTo(
             binding.gestureActions,
             { preferences.useGestureActions },
             {

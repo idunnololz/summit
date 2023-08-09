@@ -3,6 +3,7 @@ package com.idunnololz.summit.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -15,6 +16,7 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLOR_SCHEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_X
@@ -27,6 +29,8 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
@@ -34,6 +38,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
+import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
@@ -46,9 +51,12 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.fromJsonSafe
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -181,7 +189,7 @@ class Preferences @Inject constructor(
         }
 
     var hideCommentActions: Boolean
-        get() = prefs.getBoolean(KEY_HIDE_COMMENT_ACTIONS, false)
+        get() = prefs.getBoolean(KEY_HIDE_COMMENT_ACTIONS, true)
         set(value) {
             prefs.edit().putBoolean(KEY_HIDE_COMMENT_ACTIONS, value).apply()
         }
@@ -339,6 +347,20 @@ class Preferences @Inject constructor(
                 .putBoolean(KEY_COMMENTS_NAVIGATION_FAB, value)
                 .apply()
         }
+    var useVolumeButtonNavigation: Boolean
+        get() = prefs.getBoolean(KEY_USE_VOLUME_BUTTON_NAVIGATION, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_VOLUME_BUTTON_NAVIGATION, value)
+                .apply()
+        }
+    var collapseChildCommentsByDefault: Boolean
+        get() = prefs.getBoolean(KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT, value)
+                .apply()
+        }
 
     var commentsNavigationFabOffX: Int
         get() = prefs.getInt(KEY_COMMENTS_NAVIGATION_FAB_OFF_X, 0)
@@ -373,10 +395,50 @@ class Preferences @Inject constructor(
         }
 
     var hideCommentScores: Boolean
-        get() = prefs.getBoolean(KEY_HIDE_COMMENT_SCORES, false)
+        get() = try {
+            // Accidentally set this to an int once...
+            prefs.getBoolean(KEY_HIDE_COMMENT_SCORES, false)
+        } catch (e: Exception) {
+            false
+        }
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_HIDE_COMMENT_SCORES, value)
+                .apply()
+        }
+
+    var globalFont: Int
+        get() = prefs.getInt(KEY_GLOBAL_FONT, FontIds.Default)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_GLOBAL_FONT, value)
+                .apply()
+        }
+
+    var upvoteColor: Int
+        get() = prefs.getInt(KEY_UPVOTE_COLOR, context.getColorCompat(R.color.upvoteColor))
+        set(value) {
+            prefs.edit()
+                .apply {
+                    putInt(KEY_UPVOTE_COLOR, value)
+                }
+                .apply()
+        }
+    var downvoteColor: Int
+        get() = prefs.getInt(KEY_DOWNVOTE_COLOR, context.getColorCompat(R.color.downvoteColor))
+        set(value) {
+            prefs.edit()
+                .apply {
+                    putInt(KEY_DOWNVOTE_COLOR, value)
+                }
+                .apply()
+        }
+
+    var openLinksInApp: Boolean
+        get() = prefs.getBoolean(KEY_OPEN_LINKS_IN_APP, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_OPEN_LINKS_IN_APP, value)
                 .apply()
         }
 

@@ -7,8 +7,6 @@ import android.text.Spanned
 import android.text.style.URLSpan
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.idunnololz.summit.R
-import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.util.CustomUrlSpan
 import com.idunnololz.summit.util.Utils
