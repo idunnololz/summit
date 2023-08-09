@@ -44,7 +44,9 @@ object SettingPath {
                 context.getString(R.string.theme)
             MiscSettings::class ->
                 context.getString(R.string.misc)
-            else -> error("asdf")
+            ViewTypeSettings::class ->
+                context.getString(R.string.view_type)
+            else -> error("No name for ${this}")
         }
     }
 

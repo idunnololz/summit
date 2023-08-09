@@ -220,7 +220,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 binding.downvoteColor,
                 { preferences.downvoteColor },
                 {
-                    preferences.upvoteColor = it
+                    preferences.downvoteColor = it
                 },
                 { context.getColorCompat(R.color.downvoteColor) }
             )
