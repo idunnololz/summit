@@ -104,6 +104,21 @@ class LemmyHeaderHelper(
             )
             sb.appendSeparator()
         }
+        if (postView.post.locked) {
+            val d = Utils.tint(context, R.drawable.outline_lock_24, R.color.style_amber)
+            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            d.setBounds(0, 0, size, size)
+            val s = sb.length
+            sb.append("  ")
+            val e = sb.length
+            sb.setSpan(
+                CenteredImageSpan(d),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.appendSeparator()
+        }
 
         sb.appendLink(
             postView.community.name,
@@ -270,7 +285,7 @@ class LemmyHeaderHelper(
         } else {
             val s = sb.length
             sb.appendLink(
-                text = item.creator.name,
+                text = item.creator.name.trim(),
                 url = LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name),
                 underline = false,
             )

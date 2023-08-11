@@ -299,12 +299,22 @@ class PostFragment :
                 },
                 onPostMoreClick = { postView ->
                     actionsViewModel.let {
-                        showMorePostOptions(viewModel.apiInstance, postView, it, childFragmentManager)
+                        showMorePostOptions(
+                            instance = viewModel.apiInstance,
+                            postView = postView,
+                            actionsViewModel = it,
+                            fragmentManager = childFragmentManager
+                        )
                     }
                 },
                 onCommentMoreClick = { commentView ->
                     actionsViewModel.let {
-                        showMoreCommentOptions(viewModel.apiInstance, commentView, it, childFragmentManager)
+                        showMoreCommentOptions(
+                            instance = viewModel.apiInstance,
+                            commentView = commentView,
+                            actionsViewModel = it,
+                            fragmentManager = childFragmentManager
+                        )
                     }
                 },
                 onFetchComments = {
@@ -322,7 +332,17 @@ class PostFragment :
             }
         }
 
-        installOnActionResultHandler(actionsViewModel, binding.coordinatorLayout)
+        installOnActionResultHandler(
+            actionsViewModel = actionsViewModel,
+            snackbarContainer = binding.coordinatorLayout,
+            onPostUpdated = {
+                viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+                (parentFragment as? CommunityFragment)?.onPostUpdated()
+            },
+            onCommentUpdated = {
+                viewModel.fetchMoreComments(it, 1, true)
+            },
+        )
 
         runAfterLayout {
             if (!isBindingAvailable()) return@runAfterLayout
@@ -606,29 +626,6 @@ class PostFragment :
             }
         }
 
-        actionsViewModel.deletePostResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    if (it.error is ClientApiException && it.error.errorCode == 404) {
-                        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
-                        (parentFragment as? CommunityFragment)?.onPostUpdated()
-                    } else {
-                        ErrorDialogFragment.show(
-                            getString(R.string.error_unable_to_delete_post),
-                            it.error,
-                            childFragmentManager,
-                        )
-                    }
-                }
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    viewModel.fetchPostData(args.postOrCommentRef(), force = true)
-                    (parentFragment as? CommunityFragment)?.onPostUpdated()
-                }
-            }
-        }
-
         if (viewModel.postData.valueOrNull == null) {
             lifecycleScope.launch(Dispatchers.Default) {
                 delay(400)
@@ -666,6 +663,30 @@ class PostFragment :
 
         binding.root.doOnPreDraw {
             adapter.contentMaxWidth = binding.recyclerView.width
+        }
+    }
+
+    private fun handlePostActionStateChanged(state: StatefulData<MoreActionsViewModel.PostAction>) {
+        when (state) {
+            is StatefulData.Error -> {
+                if (state.error is ClientApiException && state.error.errorCode == 404) {
+                    viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+                    (parentFragment as? CommunityFragment)?.onPostUpdated()
+                } else {
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_delete_post),
+                        state.error,
+                        childFragmentManager,
+                    )
+                }
+            }
+
+            is StatefulData.Loading -> {}
+            is StatefulData.NotStarted -> {}
+            is StatefulData.Success -> {
+                viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+                (parentFragment as? CommunityFragment)?.onPostUpdated()
+            }
         }
     }
 

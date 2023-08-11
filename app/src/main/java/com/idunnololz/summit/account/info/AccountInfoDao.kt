@@ -36,6 +36,10 @@ data class MiscAccountInfo(
     val avatar: String? = null,
     val defaultCommunitySortType: SortType? = null,
     val showReadPosts: Boolean? = null,
+    /**
+     * List of community ids that this account is the mod of.
+     */
+    val modCommunityIds: List<Int>? = null,
 )
 
 @JsonClass(generateAdapter = true)

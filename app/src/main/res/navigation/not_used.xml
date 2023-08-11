@@ -60,4 +60,34 @@
             android:name="searchType"
             app:argType="com.idunnololz.summit.api.dto.SearchType" />
     </fragment>
+    <dialog
+        android:id="@+id/banUserDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.mod.BanUserDialogFragment"
+        android:label="BanUserDialogFragment" >
+        <argument
+            android:name="communityId"
+            app:argType="integer" />
+        <argument
+            android:name="personId"
+            app:argType="integer" />
+        <argument android:name="accountId"
+            app:argType="integer" />
+    </dialog>
+    <dialog
+        android:id="@+id/modActionsDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment"
+        android:label="ModActionsDialogFragment" >
+        <argument
+            android:name="communityId"
+            app:argType="integer" />
+        <argument
+            android:name="commentId"
+            app:argType="integer" />
+        <argument
+            android:name="postId"
+            app:argType="integer" />
+        <argument
+            android:name="personId"
+            app:argType="integer" />
+    </dialog>
 </navigation>

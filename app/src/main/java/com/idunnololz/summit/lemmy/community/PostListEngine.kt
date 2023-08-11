@@ -313,6 +313,25 @@ class PostListEngine(
         secondaryKey = key
     }
 
+    fun updatePost(newPost: PostView) {
+        val postId = newPost.post.id
+        val pages = _pages.value?.toMutableList() ?: return
+        for ((index, page) in pages.withIndex()) {
+            if (page.posts.any { it.post.id == postId }) {
+                pages[index] = page.copy(
+                    posts = page.posts.map {
+                        if (it.post.id == postId) {
+                            newPost
+                        } else {
+                            it
+                        }
+                    }
+                )
+            }
+        }
+        _pages.value = pages
+    }
+
     fun removePost(id: PostId) {
         val pages = _pages.value?.toMutableList() ?: return
         for ((index, page) in pages.withIndex()) {

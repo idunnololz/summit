@@ -11,6 +11,10 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.mod.BanUserDialogFragment
+import com.idunnololz.summit.lemmy.mod.BanUserDialogFragmentArgs
+import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
@@ -41,6 +45,25 @@ fun BaseFragment<*>.showMorePostOptions(
         if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.value?.id) {
             addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
             addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
+        }
+
+        val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
+        if (fullAccount
+            ?.accountInfo
+            ?.miscAccountInfo
+            ?.modCommunityIds
+            ?.contains(postView.community.id) == true
+            ) {
+
+            addDivider()
+
+            addItemWithIcon(
+                id = R.id.mod_tools,
+                title = R.string.mod_tools,
+                icon = R.drawable.outline_shield_24
+            )
+
+            addDivider()
         }
 
         addItemWithIcon(
@@ -76,6 +99,12 @@ fun BaseFragment<*>.showMorePostOptions(
         )
 
         addItemWithIcon(
+            R.id.community_info,
+            getString(R.string.community_info),
+            R.drawable.ic_community_24,
+        )
+
+        addItemWithIcon(
             R.id.block_community,
             getString(R.string.block_this_community_format, postView.community.name),
             R.drawable.baseline_block_24,
@@ -93,10 +122,10 @@ fun BaseFragment<*>.showMorePostOptions(
                     AddOrEditCommentFragment().apply {
                         arguments =
                             AddOrEditCommentFragmentArgs(
-                                instance,
-                                null,
-                                postView,
-                                null,
+                                instance = instance,
+                                commentView = null,
+                                postView = postView,
+                                editCommentView = null,
                             ).toBundle()
                     }.show(childFragmentManager, "asdf")
                 }
@@ -112,7 +141,7 @@ fun BaseFragment<*>.showMorePostOptions(
                         .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
                 }
                 R.id.delete -> {
-                    actionsViewModel.deletePost(postView.post)
+                    actionsViewModel.deletePost(postView.post.id)
                 }
                 R.id.hide_post -> {
                     actionsViewModel.hidePost(postView.post.id)
@@ -122,6 +151,9 @@ fun BaseFragment<*>.showMorePostOptions(
                 }
                 R.id.remove_from_saved -> {
                     actionsViewModel.savePost(postView.post.id, save = false)
+                }
+                R.id.community_info -> {
+                    getMainActivity()?.showCommunityInfo(postView.community.toCommunityRef())
                 }
                 R.id.block_community -> {
                     actionsViewModel.blockCommunity(postView.community.id)
@@ -149,18 +181,24 @@ fun BaseFragment<*>.showMorePostOptions(
                                 buildString {
                                     appendLine("Title:")
                                     appendLine(postView.post.name)
-                                    appendLine("")
+                                    appendLine()
                                     appendLine("Body:")
                                     appendLine(postView.post.body ?: "")
+                                    appendLine()
+                                    appendLine("Url:")
+                                    appendLine(postView.post.url ?: "")
                                 },
                                 true,
                             ).toBundle()
                         }
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
+                R.id.mod_tools -> {
+                    ModActionsDialogFragment.show(postView, childFragmentManager)
+                }
             }
         }
     }
 
-    getMainActivity()?.showBottomMenu(bottomMenu)
+    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
 }

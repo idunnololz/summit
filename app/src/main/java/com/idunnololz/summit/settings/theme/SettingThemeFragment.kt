@@ -8,6 +8,7 @@ import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingThemeBinding
+import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preferences.BaseTheme
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.GlobalFontColorId
@@ -38,6 +39,9 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
     @Inject
     lateinit var settings: ThemeSettings
+
+    @Inject
+    lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -213,6 +217,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 { preferences.upvoteColor },
                 {
                     preferences.upvoteColor = it
+
+                    postAndCommentViewBuilder.onPreferencesChanged()
                 },
                 { context.getColorCompat(R.color.upvoteColor) }
             )
@@ -221,6 +227,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 { preferences.downvoteColor },
                 {
                     preferences.downvoteColor = it
+
+                    postAndCommentViewBuilder.onPreferencesChanged()
                 },
                 { context.getColorCompat(R.color.downvoteColor) }
             )

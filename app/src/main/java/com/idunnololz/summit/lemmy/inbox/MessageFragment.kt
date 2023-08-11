@@ -361,7 +361,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
                     }
                     R.id.delete -> {
-                        actionsViewModel.deletePost(postView.post)
+                        actionsViewModel.deletePost(postView.post.id)
                     }
                     R.id.block_community -> {
                         actionsViewModel.blockCommunity(postView.community.id)
