@@ -374,6 +374,9 @@ class CommunityFragment :
         installOnActionResultHandler(
             actionsViewModel = actionsViewModel,
             snackbarContainer = binding.fabSnackbarCoordinatorLayout,
+            onPostUpdated = {
+                viewModel.updatePost(it)
+            }
         )
 
         requireMainActivity().apply {

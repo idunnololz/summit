@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
@@ -16,6 +17,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PostReadManager
+import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -62,6 +64,7 @@ class CommunityViewModel @Inject constructor(
     private val offlineManager: OfflineManager,
     private val hiddenPostsManager: HiddenPostsManager,
     private val tabsManager: TabsManager,
+    private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -128,6 +131,7 @@ class CommunityViewModel @Inject constructor(
             object : AccountManager.OnAccountChangedListener {
                 override suspend fun onAccountChanged(newAccount: Account?) {
                     fetchPageJob?.cancel()
+                    fetchingPages.clear()
 
                     postsRepository.reset()
 
@@ -489,6 +493,20 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             postsRepository.resetCacheForCommunity()
             fetchCurrentPage()
+        }
+    }
+
+    fun updatePost(postId: PostId) {
+        viewModelScope.launch {
+            apiClient.fetchPostWithRetry(Either.Left(postId), true)
+                .onSuccess {
+                    postListEngine.updatePost(it)
+                    postListEngine.createItems()
+                    loadedPostsData.postValue(PostUpdateInfo())
+                }
+                .onFailure {
+                    // do nothing...
+                }
         }
     }
 

@@ -37,9 +37,11 @@
         android:id="@+id/topHotspot"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
+        android:layout_marginStart="-16dp"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
-        app:layout_constraintStart_toEndOf="@+id/headerView"
+        app:layout_constraintStart_toEndOf="@+id/startGuideLine"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -55,7 +57,7 @@
 
     <com.idunnololz.summit.view.LemmyHeaderView
         android:id="@+id/headerView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fadingEdge="horizontal"
         android:requiresFadingEdge="horizontal"
@@ -122,6 +124,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="@dimen/padding_quarter"
+        android:layout_marginStart="-8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

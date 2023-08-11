@@ -11,6 +11,9 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
+import com.idunnololz.summit.lemmy.mod.BanUserDialogFragment
+import com.idunnololz.summit.lemmy.mod.BanUserDialogFragmentArgs
+import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.preferences.CommentsThreadStyle
@@ -87,6 +90,8 @@ fun BaseFragment<*>.showMoreCommentOptions(
     val bottomMenu = BottomMenu(requireContext()).apply {
         setTitle(R.string.more_actions)
 
+        addItemWithIcon(R.id.reply, R.string.reply, R.drawable.baseline_reply_24)
+
         if (commentView.creator.id == currentAccount?.id) {
             addItemWithIcon(R.id.edit_comment, R.string.edit_comment, R.drawable.baseline_edit_24)
             addItemWithIcon(R.id.delete_comment, R.string.delete_comment, R.drawable.baseline_delete_24)
@@ -96,6 +101,25 @@ fun BaseFragment<*>.showMoreCommentOptions(
         } else {
             addItemWithIcon(R.id.save, R.string.save, R.drawable.baseline_bookmark_add_24)
         }
+
+        val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
+        if (fullAccount
+                ?.accountInfo
+                ?.miscAccountInfo
+                ?.modCommunityIds
+                ?.contains(commentView.community.id) == true
+        ) {
+            addDivider()
+
+            addItemWithIcon(
+                id = R.id.mod_tools,
+                title = R.string.mod_tools,
+                icon = R.drawable.outline_shield_24
+            )
+
+            addDivider()
+        }
+
         addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
         addItemWithIcon(
             R.id.share_fediverse_link,
@@ -141,10 +165,23 @@ fun BaseFragment<*>.showMoreCommentOptions(
                         }
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
+                R.id.mod_tools -> {
+                    ModActionsDialogFragment.show(commentView, childFragmentManager)
+                }
+                R.id.reply -> {
+                    AddOrEditCommentFragment().apply {
+                        arguments = AddOrEditCommentFragmentArgs(
+                            instance = instance,
+                            commentView = commentView,
+                            postView = null,
+                            editCommentView = null,
+                        ).toBundle()
+                    }.show(childFragmentManager, "asdf")
+                }
             }
         }
     }
-    getMainActivity()?.showBottomMenu(bottomMenu)
+    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
 
     return bottomMenu
 }

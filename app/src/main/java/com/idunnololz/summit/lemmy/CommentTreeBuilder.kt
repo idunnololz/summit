@@ -29,6 +29,7 @@ class CommentTreeBuilder(
         parentComment: Boolean,
         pendingComments: List<PendingCommentView>?,
         supplementaryComments: Map<Int, CommentView>,
+        removedCommentIds: Set<Int>,
     ): List<CommentNodeData> {
         val map = LinkedHashMap<Number, CommentNodeData>()
         val firstComment = comments?.firstOrNull()?.comment
@@ -51,6 +52,7 @@ class CommentTreeBuilder(
                 commentView = PostViewModel.ListView.CommentListView(
                     comment,
                     pendingCommentView = idToPendingComments[comment.comment.id],
+                    isRemoved = removedCommentIds.contains(comment.comment.id),
                 ),
                 depth = depth,
             )
@@ -62,6 +64,7 @@ class CommentTreeBuilder(
                 commentView = PostViewModel.ListView.CommentListView(
                     comment,
                     pendingCommentView = idToPendingComments[comment.comment.id],
+                    isRemoved = removedCommentIds.contains(comment.comment.id),
                 ),
                 depth = depth,
             )

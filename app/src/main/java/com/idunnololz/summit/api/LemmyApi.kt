@@ -6,6 +6,10 @@ import android.net.NetworkInfo
 import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient.Companion.API_VERSION
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
+import com.idunnololz.summit.api.dto.AddModToCommunity
+import com.idunnololz.summit.api.dto.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.BanFromCommunity
+import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockCommunityResponse
 import com.idunnololz.summit.api.dto.BlockPerson
@@ -22,8 +26,10 @@ import com.idunnololz.summit.api.dto.CreatePostReport
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeletePost
+import com.idunnololz.summit.api.dto.DistinguishComment
 import com.idunnololz.summit.api.dto.EditComment
 import com.idunnololz.summit.api.dto.EditPost
+import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetCommentsResponse
 import com.idunnololz.summit.api.dto.GetCommunityResponse
@@ -36,6 +42,7 @@ import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
 import com.idunnololz.summit.api.dto.LoginResponse
 import com.idunnololz.summit.api.dto.MarkAllAsRead
@@ -43,12 +50,15 @@ import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.MarkPostAsRead
 import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
+import com.idunnololz.summit.api.dto.ModAdd
 import com.idunnololz.summit.api.dto.PersonMentionResponse
 import com.idunnololz.summit.api.dto.PictrsImages
 import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostResponse
 import com.idunnololz.summit.api.dto.PrivateMessageResponse
 import com.idunnololz.summit.api.dto.PrivateMessagesResponse
+import com.idunnololz.summit.api.dto.RemoveComment
+import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
@@ -166,6 +176,12 @@ interface LemmyApi {
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getCommentsNoCache(@QueryMap form: Map<String, String>): Call<GetCommentsResponse>
 
+    @POST("comment/distinguish")
+    fun distinguishComment(@Body form: DistinguishComment): Call<CommentResponse>
+    @POST("comment/remove")
+    fun removeComment(@Body form: RemoveComment): Call<CommentResponse>
+
+
     /**
      * Get / fetch a community.
      */
@@ -268,6 +284,11 @@ interface LemmyApi {
     @POST("community/follow")
     fun followCommunity(@Body form: FollowCommunity): Call<CommunityResponse>
 
+    @POST("community/ban_user")
+    fun banUserFromCommunity(@Body banUser: BanFromCommunity): Call<BanFromCommunityResponse>
+    @POST("community/mod")
+    fun modUser(@Body modUser: AddModToCommunity): Call<AddModToCommunityResponse>
+
     /**
      * Create a post.
      */
@@ -285,6 +306,15 @@ interface LemmyApi {
      */
     @POST("post/delete")
     fun deletePost(@Body form: DeletePost): Call<PostResponse>
+
+    @POST("post/feature")
+    fun featurePost(@Body form: FeaturePost): Call<PostResponse>
+
+    @POST("post/lock")
+    fun lockPost(@Body form: LockPost): Call<PostResponse>
+
+    @POST("post/remove")
+    fun removePost(@Body form: RemovePost): Call<PostResponse>
 
     /**
      * Search lemmy.
@@ -342,6 +372,8 @@ interface LemmyApi {
         @Header("Cookie") token: String,
         @Part filePart: MultipartBody.Part,
     ): Call<PictrsImages>
+
+
 
     companion object {
 

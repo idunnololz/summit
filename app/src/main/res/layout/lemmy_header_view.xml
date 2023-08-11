@@ -12,6 +12,8 @@
         android:textColor="@color/colorTextFaint"
         android:gravity="start"
         android:textAppearance="?textAppearanceBodySmall"
+        android:maxLines="1"
+        android:singleLine="true"
         tools:text="Hello" />
 
     <com.idunnololz.summit.view.FlairView

@@ -9,4 +9,5 @@
         android:right="2dp"
         android:bottom="2dp" />
     <solid android:color="@color/style_amber10" />
+    <corners android:radius="16dp" />
 </shape>

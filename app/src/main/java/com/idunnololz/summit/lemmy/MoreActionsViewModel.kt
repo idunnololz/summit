@@ -2,8 +2,10 @@ package com.idunnololz.summit.lemmy
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
@@ -12,6 +14,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.Post
+import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -26,19 +29,43 @@ import javax.inject.Inject
 class MoreActionsViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     val accountManager: AccountManager,
+    val accountInfoManager: AccountInfoManager,
     val accountActionsManager: AccountActionsManager,
     private val hiddenPostsManager: HiddenPostsManager,
     private val savedManager: SavedManager,
 ) : ViewModel() {
 
+    enum class PostActionType {
+        DeletePost,
+        SavePost,
+        FeaturePost,
+        LockPost,
+        RemovePost,
+    }
+
+    data class PostAction(
+        val actionType: PostActionType,
+        val state: StatefulLiveData<PostView> = StatefulLiveData(),
+    )
+
+    val currentAccount: Account?
+        get() = apiClient.accountForInstance()
     val apiInstance: String
         get() = apiClient.instance
 
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<BlockPersonResult>()
-    val deletePostResult = StatefulLiveData<PostView>()
-    val savePostResult = StatefulLiveData<PostView>()
     val saveCommentResult = StatefulLiveData<CommentView>()
+    val banUserResult = StatefulLiveData<Unit>()
+    val modUserResult = StatefulLiveData<Unit>()
+    val distinguishCommentResult = StatefulLiveData<Unit>()
+    val removeCommentResult = StatefulLiveData<Unit>()
+
+    val deletePostAction = PostAction(actionType = PostActionType.DeletePost)
+    val savePostAction = PostAction(actionType = PostActionType.SavePost)
+    val featurePostAction = PostAction(actionType = PostActionType.FeaturePost)
+    val lockPostAction = PostAction(actionType = PostActionType.LockPost)
+    val removePostAction = PostAction(actionType = PostActionType.RemovePost)
 
     private var currentPageInstance: String? = null
 
@@ -68,15 +95,61 @@ class MoreActionsViewModel @Inject constructor(
         }
     }
 
-    fun deletePost(post: Post) {
+    fun deletePost(postId: PostId) {
+        deletePostAction.state.setIsLoading()
         viewModelScope.launch {
-            ensureRightInstance { apiClient.deletePost(post.id) }
+            ensureRightInstance { apiClient.deletePost(postId) }
                 .onSuccess {
-                    deletePostResult.postValue(it)
+                    deletePostAction.state.postValue(it)
                 }
                 .onFailure {
-                    deletePostResult.postError(it)
+                    deletePostAction.state.postError(it)
                 }
+        }
+    }
+
+    fun featurePost(postId: PostId, feature: Boolean) {
+        featurePostAction.state.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.featurePost(postId, feature, PostFeatureType.Community)
+                    .onSuccess {
+                        featurePostAction.state.postValue(it)
+                    }
+                    .onFailure {
+                        featurePostAction.state.postError(it)
+                    }
+            }
+        }
+    }
+
+    fun removePost(postId: PostId, remove: Boolean) {
+        removePostAction.state.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.removePost(postId, remove, null)
+                    .onSuccess {
+                        removePostAction.state.postValue(it)
+                    }
+                    .onFailure {
+                        removePostAction.state.postError(it)
+                    }
+            }
+        }
+    }
+
+    fun lockPost(postId: PostId, lock: Boolean) {
+        lockPostAction.state.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.lockPost(postId, lock)
+                    .onSuccess {
+                        lockPostAction.state.postValue(it)
+                    }
+                    .onFailure {
+                        lockPostAction.state.postError(it)
+                    }
+            }
         }
     }
 
@@ -119,14 +192,15 @@ class MoreActionsViewModel @Inject constructor(
     }
 
     fun savePost(id: PostId, save: Boolean) {
+        savePostAction.state.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance { apiClient.savePost(id, save) }
                 .onSuccess {
-                    savePostResult.postValue(it)
+                    savePostAction.state.postValue(it)
                     savedManager.onPostSaveChanged()
                 }
                 .onFailure {
-                    savePostResult.postError(it)
+                    savePostAction.state.postError(it)
                 }
         }
     }
@@ -158,6 +232,94 @@ class MoreActionsViewModel @Inject constructor(
                 delay(delayMs)
             }
             accountActionsManager.markPostAsRead(apiClient.instance, postView.post.id, read = true)
+        }
+    }
+
+    fun banUser(
+        communityId: CommunityId,
+        personId: PersonId,
+        ban: Boolean,
+        removeData: Boolean,
+        reason: String?,
+        expiresDays: Int?,
+    ) {
+        banUserResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.banUserFromCommunity(
+                    communityId,
+                    personId,
+                    ban,
+                    removeData,
+                    reason,
+                    expiresDays,
+                )
+            }
+                .onSuccess {
+                    banUserResult.postValue(Unit)
+                }
+                .onFailure {
+                    banUserResult.postError(it)
+                }
+        }
+    }
+
+    fun mod(communityId: Int, personId: Int, mod: Boolean) {
+        modUserResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.modUser(
+                    communityId,
+                    personId,
+                    mod,
+                )
+            }
+                .onSuccess {
+                    modUserResult.postValue(Unit)
+                }
+                .onFailure {
+                    modUserResult.postError(it)
+                }
+        }
+    }
+
+    fun distinguishComment(
+        commentId: CommentId,
+        distinguish: Boolean,
+    ) {
+        distinguishCommentResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.distinguishComment(
+                    commentId,
+                    distinguish,
+                )
+            }
+                .onSuccess {
+                    distinguishCommentResult.postValue(Unit)
+                }
+                .onFailure {
+                    distinguishCommentResult.postError(it)
+                }
+        }
+    }
+
+    fun removeComment(commentId: Int, remove: Boolean) {
+        removeCommentResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.removeComment(
+                    commentId,
+                    remove,
+                    null,
+                )
+            }
+                .onSuccess {
+                    removeCommentResult.postValue(Unit)
+                }
+                .onFailure {
+                    removeCommentResult.postError(it)
+                }
         }
     }
 

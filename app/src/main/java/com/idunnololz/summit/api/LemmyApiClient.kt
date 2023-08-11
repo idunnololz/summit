@@ -4,11 +4,16 @@ import android.content.Context
 import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.api.dto.AddModToCommunity
+import com.idunnololz.summit.api.dto.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.BanFromCommunity
+import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
 import com.idunnololz.summit.api.dto.CommentReplyView
+import com.idunnololz.summit.api.dto.CommentResponse
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
@@ -20,8 +25,10 @@ import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeletePost
+import com.idunnololz.summit.api.dto.DistinguishComment
 import com.idunnololz.summit.api.dto.EditComment
 import com.idunnololz.summit.api.dto.EditPost
+import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetComments
 import com.idunnololz.summit.api.dto.GetCommunity
@@ -40,6 +47,7 @@ import com.idunnololz.summit.api.dto.GetUnreadCount
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListCommunities
 import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
 import com.idunnololz.summit.api.dto.MarkAllAsRead
 import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
@@ -50,10 +58,13 @@ import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionId
 import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PersonView
+import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.api.dto.RemoveComment
+import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
@@ -66,6 +77,7 @@ import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runInterruptible
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -225,7 +237,7 @@ class LemmyApiClient @Inject constructor(
             GetPosts(
                 community_id = null,
                 community_name = null,
-                sort = null,
+                sort = SortType.New,
                 type_ = ListingType.All,
                 page = page,
                 limit = limit,
@@ -264,7 +276,7 @@ class LemmyApiClient @Inject constructor(
                 max_depth = 1,
                 type_ = ListingType.All,
                 post_id = null,
-                sort = null,
+                sort = CommentSortType.New,
                 saved_only = true,
                 auth = account?.jwt,
             )
@@ -602,6 +614,94 @@ class LemmyApiClient @Inject constructor(
             )
     }
 
+    suspend fun banUserFromCommunity(
+        communityId: CommunityId,
+        personId: PersonId,
+        ban: Boolean,
+        removeData: Boolean,
+        reason: String?,
+        expiresDays: Int?,
+        account: Account,
+    ): Result<BanFromCommunityResponse> {
+        val form = BanFromCommunity(
+            communityId,
+            personId,
+            ban,
+            removeData,
+            reason,
+            expiresDays,
+            account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.banUserFromCommunity(form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun modUser(
+        communityId: CommunityId,
+        personId: PersonId,
+        add: Boolean,
+        account: Account,
+    ): Result<AddModToCommunityResponse> {
+        val form = AddModToCommunity(
+            communityId,
+            personId,
+            add,
+            account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.modUser(form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun distinguishComment(
+        commentId: CommentId,
+        distinguish: Boolean,
+        account: Account,
+    ): Result<CommentResponse> {
+        val form = DistinguishComment(
+            commentId,
+            distinguish,
+            account.jwt
+        )
+
+        return retrofitErrorHandler {
+            api.distinguishComment(form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun removeComment(
+        commentId: CommentId,
+        remove: Boolean,
+        reason: String?,
+        account: Account,
+    ): Result<CommentResponse> {
+        val form = RemoveComment(
+            commentId,
+            remove,
+            reason,
+            account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.removeComment(form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
     suspend fun createComment(
         account: Account,
         content: String,
@@ -618,12 +718,8 @@ class LemmyApiClient @Inject constructor(
         return retrofitErrorHandler {
             api.createComment(form)
         }.fold(
-            onSuccess = {
-                Result.success(it.comment_view)
-            },
-            onFailure = {
-                Result.failure(it)
-            },
+            onSuccess = { Result.success(it.comment_view) },
+            onFailure = { Result.failure(it) },
         )
     }
 
@@ -746,6 +842,71 @@ class LemmyApiClient @Inject constructor(
             onFailure = {
                 Result.failure(it)
             },
+        )
+    }
+
+    suspend fun featurePost(
+        account: Account,
+        id: PostId,
+        featured: Boolean,
+        featureType: PostFeatureType,
+    ): Result<PostView> {
+        val form = FeaturePost(
+            post_id = id,
+            featured = featured,
+            feature_type = featureType,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.featurePost(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it.post_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun lockPost(
+        account: Account,
+        id: PostId,
+        locked: Boolean,
+    ): Result<PostView> {
+        val form = LockPost(
+            post_id = id,
+            locked = locked,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.lockPost(form)
+        }.fold(
+            onSuccess = { Result.success(it.post_view) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun removePost(
+        account: Account,
+        id: PostId,
+        reason: String?,
+        removed: Boolean,
+    ): Result<PostView> {
+        val form = RemovePost(
+            post_id = id,
+            removed = removed,
+            reason = reason,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.removePost(form)
+        }.fold(
+            onSuccess = { Result.success(it.post_view) },
+            onFailure = { Result.failure(it) },
         )
     }
 

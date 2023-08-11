@@ -89,6 +89,7 @@ class PostsAdapter(
             val isPostLocked: Boolean,
             val isUpdating: Boolean,
             val isDeleting: Boolean,
+            val isRemoved: Boolean,
             val isActionsExpanded: Boolean,
             val isHighlighted: Boolean,
         ) : Item(
@@ -328,6 +329,7 @@ class PostsAdapter(
                         item.depth,
                         item.comment,
                         item.isDeleting,
+                        item.isRemoved,
                         item.content,
                         instance,
                         item.isPostLocked,
@@ -536,6 +538,7 @@ class PostsAdapter(
                                 isPostLocked = commentView.comment.post.locked,
                                 isUpdating = commentView.pendingCommentView != null,
                                 isDeleting = isDeleting,
+                                isRemoved = commentView.isRemoved,
                                 isActionsExpanded = actionExpandedComments.contains(
                                     commentId,
                                 ),

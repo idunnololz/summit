@@ -21,11 +21,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BottomMenuBinding
 import com.idunnololz.summit.databinding.MenuItemBinding
+import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+
 
 class BottomMenu(private val context: Context) {
 
@@ -35,11 +37,10 @@ class BottomMenu(private val context: Context) {
         private val TAG = BottomMenu::class.java.simpleName
     }
 
-    private val menuItems = ArrayList<MenuItem>()
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var adapter: BottomMenuAdapter? = null
+    private val adapter: BottomMenuAdapter = BottomMenuAdapter(context)
     private var checked: Int? = null
-    private var onMenuItemClickListener: ((menuItem: MenuItem) -> Unit)? = null
+    private var onMenuItemClickListener: ((menuItem: MenuItem.ActionItem) -> Unit)? = null
     private var title: String? = null
 
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
@@ -48,11 +49,6 @@ class BottomMenu(private val context: Context) {
 
     private var topInset = MutableLiveData(0)
     private var bottomInset = MutableLiveData(0)
-
-    private val checkedTextColor = context.getColorFromAttribute(
-        com.google.android.material.R.attr.colorPrimary,
-    )
-    private val defaultTextColor = ContextCompat.getColor(context, R.color.colorTextTitle)
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -71,19 +67,19 @@ class BottomMenu(private val context: Context) {
     }
 
     fun addItem(@IdRes id: Int, @StringRes title: Int) {
-        menuItems.add(MenuItem(id, context.getString(title)))
+        adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title)))
     }
 
     fun addItem(@IdRes id: Int, title: String) {
-        menuItems.add(MenuItem(id, title))
+        adapter.menuItems.add(MenuItem.ActionItem(id, title))
     }
 
     fun addItem(@IdRes id: Int, @StringRes title: Int, @DrawableRes checkIcon: Int) {
-        menuItems.add(MenuItem(id, context.getString(title), checkIcon = checkIcon))
+        adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title), checkIcon = checkIcon))
     }
 
     fun addItem(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
-        menuItems.add(MenuItem(id, title, checkIcon = icon))
+        adapter.menuItems.add(MenuItem.ActionItem(id, title, checkIcon = icon))
     }
 
     fun addItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
@@ -91,16 +87,20 @@ class BottomMenu(private val context: Context) {
     }
 
     fun addItemWithIcon(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
-        menuItems.add(MenuItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
+        adapter.menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
     }
 
-    fun itemsCount() = menuItems.size
+    fun addDivider() {
+        adapter.addDividerIfNeeded()
+    }
+
+    fun itemsCount() = adapter.menuItems.size
 
     fun setChecked(@IdRes checked: Int) {
         this.checked = checked
     }
 
-    fun setOnMenuItemClickListener(onMenuItemClickListener: (menuItem: MenuItem) -> Unit) {
+    fun setOnMenuItemClickListener(onMenuItemClickListener: (menuItem: MenuItem.ActionItem) -> Unit) {
         this.onMenuItemClickListener = onMenuItemClickListener
     }
 
@@ -111,9 +111,12 @@ class BottomMenu(private val context: Context) {
         handleBackPress: Boolean = true,
     ) {
         parent = viewGroup
-        adapter = BottomMenuAdapter().apply {
-            refreshItems()
-        }
+
+        adapter.title = title
+        adapter.checked = checked
+        adapter.onMenuItemClickListener = onMenuItemClickListener
+
+        adapter.refreshItems()
 
         val binding = BottomMenuBinding.inflate(inflater, viewGroup, false)
 
@@ -154,6 +157,7 @@ class BottomMenu(private val context: Context) {
         }.also {
             bottomSheetBehavior = it
         }
+        adapter.bottomSheetBehavior = bottomSheetBehavior
 
         bottomInset.observeForever {
             recyclerView.updatePadding(bottom = it)
@@ -164,36 +168,39 @@ class BottomMenu(private val context: Context) {
             }
         }
 
-        rootView.postDelayed({
-            if (expandFully) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            }
+        rootView.postDelayed(
+            {
+                if (expandFully) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                } else {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                }
 
-            bottomSheetBehavior.addBottomSheetCallback(
-                object : BottomSheetBehavior.BottomSheetCallback() {
-                    override fun onStateChanged(bottomSheet1: View, newState: Int) {
-                        if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                            parent = null
-                            onBackPressedCallback.remove()
-                            viewGroup.removeView(rootView)
-                            viewGroup.removeView(overlay)
+                bottomSheetBehavior.addBottomSheetCallback(
+                    object : BottomSheetBehavior.BottomSheetCallback() {
+                        override fun onStateChanged(bottomSheet1: View, newState: Int) {
+                            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                                parent = null
+                                onBackPressedCallback.remove()
+                                viewGroup.removeView(rootView)
+                                viewGroup.removeView(overlay)
 
-                            onClose?.invoke()
+                                onClose?.invoke()
+                            }
                         }
-                    }
 
-                    override fun onSlide(bottomSheet1: View, slideOffset: Float) {
-                        if (java.lang.Float.isNaN(slideOffset)) {
-                            overlay.alpha = 1f
-                        } else {
-                            overlay.alpha = 1 + slideOffset
+                        override fun onSlide(bottomSheet1: View, slideOffset: Float) {
+                            if (java.lang.Float.isNaN(slideOffset)) {
+                                overlay.alpha = 1f
+                            } else {
+                                overlay.alpha = 1 + slideOffset
+                            }
                         }
-                    }
-                },
-            )
-        }, 100,)
+                    },
+                )
+            },
+            100,
+        )
 
         if (handleBackPress) {
             mainActivity.onBackPressedDispatcher.addCallback(mainActivity, onBackPressedCallback)
@@ -219,13 +226,28 @@ class BottomMenu(private val context: Context) {
         ) : Item
 
         data class MenuItemItem(
-            val menuItem: MenuItem,
+            val menuItem: MenuItem.ActionItem,
         ) : Item
+
+        object DividerItem : Item
 
         object FooterItem : Item
     }
 
-    private inner class BottomMenuAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    class BottomMenuAdapter(
+        private val context: Context,
+        var title: String? = null,
+        var checked: Int? = null,
+        val menuItems: MutableList<MenuItem> = ArrayList<MenuItem>(),
+        var onMenuItemClickListener: ((menuItem: MenuItem.ActionItem) -> Unit)? = null,
+        var bottomSheetBehavior: BottomSheetBehavior<*>? = null,
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+
+        private val checkedTextColor = context.getColorFromAttribute(
+            com.google.android.material.R.attr.colorPrimary,
+        )
+        private val defaultTextColor = ContextCompat.getColor(context, R.color.colorTextTitle)
 
         private val adapterHelper = AdapterHelper<Item> (
             areItemsTheSame = { old, new ->
@@ -234,6 +256,7 @@ class BottomMenu(private val context: Context) {
                     is Item.MenuItemItem ->
                         old.menuItem.id == (new as Item.MenuItemItem).menuItem.id
                     is Item.TitleItem -> true
+                    Item.DividerItem -> true
                 }
             },
         ).apply {
@@ -242,6 +265,8 @@ class BottomMenu(private val context: Context) {
                 if (item.title == null) {
                     b.title.visibility = View.GONE
                 }
+            }
+            addItemType(Item.DividerItem::class, MenuItemDividerBinding::inflate) { item, b, _ ->
             }
             addItemType(Item.MenuItemItem::class, MenuItemBinding::inflate) { item, b, _ ->
                 val menuItem = item.menuItem
@@ -299,16 +324,53 @@ class BottomMenu(private val context: Context) {
             addItemType(Item.FooterItem::class, MenuItemFooterBinding::inflate) { _, _, _ -> }
         }
 
-        fun refreshItems() {
+
+        fun addItem(@IdRes id: Int, @StringRes title: Int) {
+            menuItems.add(MenuItem.ActionItem(id, context.getString(title)))
+        }
+
+        fun addItem(@IdRes id: Int, title: String) {
+            menuItems.add(MenuItem.ActionItem(id, title))
+        }
+
+        fun addItem(@IdRes id: Int, @StringRes title: Int, @DrawableRes checkIcon: Int) {
+            menuItems.add(MenuItem.ActionItem(id, context.getString(title), checkIcon = checkIcon))
+        }
+
+        fun addItem(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
+            menuItems.add(MenuItem.ActionItem(id, title, checkIcon = icon))
+        }
+
+        fun addItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
+            addItemWithIcon(id, context.getString(title), icon)
+        }
+
+        fun addItemWithIcon(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
+            menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
+        }
+
+        fun addDividerIfNeeded() {
+            if (menuItems.lastOrNull() != MenuItem.DividerItem) {
+                menuItems.add(MenuItem.DividerItem)
+            }
+        }
+
+        fun refreshItems(cb: () -> Unit = {}) {
             val newItems = mutableListOf<Item>()
 
             newItems.add(Item.TitleItem(title))
             menuItems.forEach {
-                newItems.add(Item.MenuItemItem(it))
+                when (it) {
+                    is MenuItem.ActionItem ->
+                        newItems.add(Item.MenuItemItem(it))
+
+                    MenuItem.DividerItem ->
+                        newItems.add(Item.DividerItem)
+                }
             }
             newItems.add(Item.FooterItem)
 
-            adapterHelper.setItems(newItems, this)
+            adapterHelper.setItems(newItems, this, cb)
         }
 
         override fun getItemViewType(position: Int): Int =
@@ -323,12 +385,15 @@ class BottomMenu(private val context: Context) {
         override fun getItemCount(): Int = adapterHelper.itemCount
     }
 
-    class MenuItem(
-        @IdRes val id: Int,
-        val title: String,
-        val icon: MenuIcon? = null,
-        @DrawableRes val checkIcon: Int = 0,
-    )
+    sealed interface MenuItem {
+        class ActionItem(
+            @IdRes val id: Int,
+            val title: String,
+            val icon: MenuIcon? = null,
+            @DrawableRes val checkIcon: Int = 0,
+        ): MenuItem
+        object DividerItem : MenuItem
+    }
 
     sealed interface MenuIcon {
         data class ResourceIcon(

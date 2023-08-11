@@ -4,8 +4,13 @@ import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.api.dto.AddModToCommunity
+import com.idunnololz.summit.api.dto.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.BanFromCommunity
+import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
+import com.idunnololz.summit.api.dto.CommentResponse
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
@@ -19,6 +24,7 @@ import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionId
 import com.idunnololz.summit.api.dto.PersonMentionView
+import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
@@ -257,6 +263,86 @@ class AccountAwareLemmyClient @Inject constructor(
         }
     }
 
+    suspend fun banUserFromCommunity(
+        communityId: CommunityId,
+        personId: PersonId,
+        ban: Boolean,
+        removeData: Boolean,
+        reason: String?,
+        expiresDays: Int?,
+        account: Account? = accountForInstance(),
+    ): Result<BanFromCommunityResponse> =
+        if (account != null) {
+            apiClient
+                .banUserFromCommunity(
+                    communityId = communityId,
+                    personId = personId,
+                    ban = ban,
+                    removeData = removeData,
+                    reason = reason,
+                    expiresDays = expiresDays,
+                    account = account
+                )
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+
+    suspend fun modUser(
+        communityId: CommunityId,
+        personId: PersonId,
+        add: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<AddModToCommunityResponse> =
+        if (account != null) {
+            apiClient
+                .modUser(
+                    communityId = communityId,
+                    personId = personId,
+                    add = add,
+                    account = account
+                )
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+
+    suspend fun distinguishComment(
+        commentId: CommentId,
+        distinguish: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<CommentResponse> =
+        if (account != null) {
+            apiClient
+                .distinguishComment(
+                    commentId = commentId,
+                    distinguish = distinguish,
+                    account = account
+                )
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+
+    suspend fun removeComment(
+        commentId: CommentId,
+        remove: Boolean,
+        reason: String?,
+        account: Account? = accountForInstance(),
+    ): Result<CommentResponse> =
+        if (account != null) {
+            apiClient
+                .removeComment(
+                    commentId = commentId,
+                    remove = remove,
+                    reason = reason,
+                    account = account
+                )
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+
     suspend fun login(
         instance: String,
         username: String,
@@ -292,6 +378,47 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.deletePost(account, id)
+                .autoSignOut(account)
+        }
+    }
+
+    suspend fun featurePost(
+        id: PostId,
+        featured: Boolean,
+        featureType: PostFeatureType,
+        account: Account? = accountForInstance(),
+    ): Result<PostView> {
+        return if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.featurePost(account, id, featured, featureType)
+                .autoSignOut(account)
+        }
+    }
+
+    suspend fun lockPost(
+        id: PostId,
+        locked: Boolean,
+        account: Account? = accountForInstance(),
+    ): Result<PostView> {
+        return if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.lockPost(account, id, locked)
+                .autoSignOut(account)
+        }
+    }
+
+    suspend fun removePost(
+        id: PostId,
+        remove: Boolean,
+        reason: String?,
+        account: Account? = accountForInstance(),
+    ): Result<PostView> {
+        return if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.removePost(account, id, reason, remove)
                 .autoSignOut(account)
         }
     }
@@ -506,7 +633,7 @@ class AccountAwareLemmyClient @Inject constructor(
     /**
      * @return [Account] if the current account matches this instance. Null otherwise.
      */
-    private fun accountForInstance(): Account? {
+    fun accountForInstance(): Account? {
         val instance = instance
         val currentAccount = currentAccount ?: return null
 

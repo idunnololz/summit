@@ -88,4 +88,20 @@
     <item name="sort_order" type="id"/>
     <item name="clear_search_history" type="id" />
     <item name="open_in_browser" type="id" />
+    <item name="feature_post" type="id" />
+    <item name="remove_feature_post" type="id" />
+    <item name="unlock_post" type="id" />
+    <item name="lock_post" type="id" />
+    <item name="add_post" type="id" />
+    <item name="undo_remove_post" type="id" />
+    <item name="remove_post" type="id" />
+    <item name="undo_ban" type="id" />
+    <item name="ban" type="id" />
+    <item name="mod_tools" type="id" />
+    <item name="unmod" type="id" />
+    <item name="mod" type="id" />
+    <item name="undo_remove_comment" type="id" />
+    <item name="remove_comment" type="id" />
+    <item name="feature_comment" type="id" />
+    <item name="remove_feature_comment" type="id" />
 </resources>

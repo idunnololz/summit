@@ -116,8 +116,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
     val voteUiHandler = accountActionsManager.voteUiHandler
 
-    private val upvoteColor = preferences.upvoteColor
-    private val downvoteColor = preferences.downvoteColor
+    private var upvoteColor = preferences.upvoteColor
+    private var downvoteColor = preferences.downvoteColor
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
     private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
 
@@ -136,6 +136,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         globalFontSizeMultiplier = GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
         lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
         lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
+
+        upvoteColor = preferences.upvoteColor
+        downvoteColor = preferences.downvoteColor
     }
 
     fun bindPostView(
@@ -236,6 +239,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         depth: Int,
         commentView: CommentView,
         isDeleting: Boolean,
+        isRemoved: Boolean,
         content: String,
         instance: String,
         isPostLocked: Boolean,
@@ -297,7 +301,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 append(context.getString(R.string.deleted_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
             }
-        } else if (commentView.comment.removed) {
+        } else if (commentView.comment.removed || isRemoved) {
             text.text = buildSpannedString {
                 append(context.getString(R.string.removed_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)

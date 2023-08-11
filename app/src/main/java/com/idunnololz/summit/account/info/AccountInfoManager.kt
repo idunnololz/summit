@@ -10,6 +10,8 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -153,6 +155,7 @@ class AccountInfoManager @Inject constructor(
                 response.my_user?.local_user_view?.person?.avatar,
                 response.my_user?.local_user_view?.local_user?.default_sort_type,
                 response.my_user?.local_user_view?.local_user?.show_read_posts,
+                response.my_user?.moderates?.map { it.community.id },
             ),
         )
         currentFullAccount.emit(

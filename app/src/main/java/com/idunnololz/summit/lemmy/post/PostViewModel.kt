@@ -58,6 +58,7 @@ class PostViewModel @Inject constructor(
     private var newlyPostedCommentId: CommentId? = null
 
     private val additionalLoadedCommentIds = mutableSetOf<CommentId>()
+    private val removedCommentIds = mutableSetOf<CommentId>()
 
     /**
      * Comments that didn't load by default but were loaded by the user requesting additional comments
@@ -169,7 +170,7 @@ class PostViewModel @Inject constructor(
 
             if (force) {
                 additionalLoadedCommentIds.forEach {
-                    fetchMoreCommentsInternal(it, sortOrder, force)
+                    fetchMoreCommentsInternal(it, sortOrder, null, force)
                 }
             }
 
@@ -303,6 +304,7 @@ class PostViewModel @Inject constructor(
                     parentComment = true,
                     pendingComments,
                     supplementaryComments,
+                    removedCommentIds,
                 ),
                 newlyPostedCommentId = newlyPostedCommentId,
                 selectedCommentId = postOrCommentRef?.getOrNull()?.id,
@@ -311,12 +313,12 @@ class PostViewModel @Inject constructor(
         )
     }
 
-    fun fetchMoreComments(parentId: CommentId?, force: Boolean = false) {
+    fun fetchMoreComments(parentId: CommentId?, depth: Int? = null, force: Boolean = false) {
         val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
         viewModelScope.launch {
             if (parentId != null) {
-                fetchMoreCommentsInternal(parentId, sortOrder, force)
+                fetchMoreCommentsInternal(parentId, sortOrder, depth, force)
             } else {
                 // TODO maybe?
             }
@@ -338,18 +340,24 @@ class PostViewModel @Inject constructor(
     private suspend fun fetchMoreCommentsInternal(
         parentId: CommentId,
         sortOrder: CommentSortType,
+        depth: Int? = null,
         force: Boolean = false,
     ): Result<List<CommentView>> {
         val result = commentsFetcher.fetchCommentsWithRetry(
             Either.Right(parentId),
             sortOrder,
-            maxDepth = null,
+            maxDepth = depth,
             force,
         )
 
         additionalLoadedCommentIds.add(parentId)
 
         result.onSuccess { comments ->
+            if (comments.isEmpty()) {
+                removedCommentIds.add(parentId)
+            } else {
+                removedCommentIds.remove(parentId)
+            }
             comments.forEach {
                 supplementaryComments[it.comment.id] = it
             }
@@ -375,6 +383,7 @@ class PostViewModel @Inject constructor(
             val comment: CommentView,
             val pendingCommentView: PendingCommentView? = null,
             var isCollapsed: Boolean = false,
+            var isRemoved: Boolean = false,
         ) : ListView
 
         data class PendingCommentListView(
