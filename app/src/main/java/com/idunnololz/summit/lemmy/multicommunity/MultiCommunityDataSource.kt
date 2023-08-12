@@ -13,10 +13,13 @@ import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.inbox.InboxRepository
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MultiCommunityDataSource(
-    private val sources: List<LemmyListSource<PostView, SortType>>
+    private val instance: String,
+    private val sources: List<LemmyListSource<PostView, SortType>>,
 ) {
 
     companion object {
@@ -27,7 +30,8 @@ class MultiCommunityDataSource(
         private val apiClient: AccountAwareLemmyClient,
     ) {
         fun create(
-            communities: List<CommunityRef.CommunityRefByName>
+            instance: String,
+            communities: List<CommunityRef.CommunityRefByName>,
         ): MultiCommunityDataSource {
             val sources = communities.map { communityRef ->
                 LemmyListSource<PostView, SortType>(
@@ -47,7 +51,7 @@ class MultiCommunityDataSource(
                 )
             }
 
-            return MultiCommunityDataSource(sources)
+            return MultiCommunityDataSource(instance, sources)
         }
     }
 
@@ -60,6 +64,8 @@ class MultiCommunityDataSource(
 
     private var pagesCache = mutableListOf<Page>()
 
+    private val pagesContext = Dispatchers.Default.limitedParallelism(1)
+
     /**
      * @return true if there might be more posts to fetch
      */
@@ -68,18 +74,34 @@ class MultiCommunityDataSource(
         sortType: SortType,
         listingType: ListingType,
         force: Boolean,
-    ) {
-        var hasMore = true
+    ): Result<Page> = withContext(pagesContext) a@{
+        while (pagesCache.size <= pageIndex) {
+            if (pagesCache.lastOrNull()?.hasMore == false) {
+                return@a Result.failure(EndReachedException())
+            }
 
+            val nextPageResult = fetchNextPage()
+
+            if (nextPageResult.isSuccess) {
+                pagesCache.add(nextPageResult.getOrThrow())
+            } else {
+                return@a Result.failure(requireNotNull(nextPageResult.exceptionOrNull()))
+            }
+        }
+
+        return@a Result.success(pagesCache[pageIndex])
+    }
+
+    private suspend fun fetchNextPage(): Result<Page> = withContext(pagesContext) a@{
+        var hasMore = true
         val pageItems = mutableListOf<PostView>()
 
         while(true) {
-
             val results = sources.map { it.peekNextItem() }
             val error = results.firstOrNull { it.isFailure }
 
             if (error != null) {
-//                return Result.failure(requireNotNull(error.exceptionOrNull()))
+                return@a Result.failure(requireNotNull(error.exceptionOrNull()))
             }
             val nextSource = sources.maxBy {
                 it.peekNextItem().getOrThrow()?.counts?.score ?: 0
@@ -120,6 +142,21 @@ class MultiCommunityDataSource(
 
             // increment the max item
             nextSource.next()
+
+            if (pageItems.size >= LemmyListSource.PAGE_SIZE) {
+                break
+            }
         }
+
+        return@a Result.success(
+            Page(
+                pageItems,
+                pagesCache.size,
+                instance,
+                hasMore,
+            )
+        )
     }
+
+    class EndReachedException : Exception()
 }
