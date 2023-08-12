@@ -72,7 +72,7 @@ open class LemmyListSource<T, O>(
     companion object {
         private const val TAG = "InboxSource"
 
-        private const val PAGE_SIZE = 20
+        const val PAGE_SIZE = 20
     }
 
     data class ObjectData<T>(
