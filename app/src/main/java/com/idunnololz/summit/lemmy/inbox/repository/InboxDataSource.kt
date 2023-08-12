@@ -88,16 +88,30 @@ open class LemmyListSource<T, O>(
 
     protected val allObjects = mutableListOf<ObjectData<T>>()
     private val seenObjects = mutableSetOf<Int>()
+    private val invalidatedPages = mutableSetOf<Int>()
 
     private var currentPageInternal = 1
+    private var currentItemIndex = 0
 
     private var endReached = false
 
     var sortOrder: O = defaultSortOrder
         set(value) {
+            if (field == value) {
+                return
+            }
+
             field = value
             reset()
         }
+
+    suspend fun peekNextItem(): Result<T?> {
+        return getItem(currentItemIndex, force = false)
+    }
+
+    fun next() {
+        currentItemIndex++
+    }
 
     suspend fun getItem(index: Int, force: Boolean): Result<T?> {
         if (index < allObjects.size && !force) {
@@ -115,12 +129,17 @@ open class LemmyListSource<T, O>(
         )
     }
 
-    suspend fun getPage(pageIndex: Int, force: Boolean = false, deleteCacheOnForce: Boolean = true): Result<PageResult<T>> {
+    private suspend fun getPage(
+        pageIndex: Int,
+        force: Boolean = false,
+        deleteCacheOnForce: Boolean = true,
+    ): Result<PageResult<T>> {
         Log.d(TAG, "getPage(): $pageIndex force: $force")
         val startIndex = pageIndex * PAGE_SIZE
         val endIndex = startIndex + PAGE_SIZE
+        val finalForce = invalidatedPages.contains(pageIndex) || force
 
-        if (force && deleteCacheOnForce) {
+        if (finalForce && deleteCacheOnForce) {
             deleteCache(startIndex, endIndex)
         }
 
@@ -137,7 +156,7 @@ open class LemmyListSource<T, O>(
             }
 
             val hasMoreResult = retry {
-                fetchPage(currentPageInternal, sortOrder, PAGE_SIZE, force)
+                fetchPage(currentPageInternal, sortOrder, PAGE_SIZE, finalForce)
             }
 
             if (hasMoreResult.isFailure) {
@@ -152,6 +171,8 @@ open class LemmyListSource<T, O>(
                 break
             }
         }
+
+        invalidatedPages.remove(pageIndex)
 
         return Result.success(
             PageResult(
@@ -177,8 +198,16 @@ open class LemmyListSource<T, O>(
         Log.d(TAG, "Force = true. Clearing data. Remaining: ${allObjects.size}")
     }
 
+    fun invalidate() {
+        for (i in 1..currentPageInternal) {
+            invalidatedPages.add(i)
+        }
+        reset()
+    }
+
     fun reset() {
         currentPageInternal = 1
+        currentItemIndex = 0
 
         allObjects.clear()
         seenObjects.clear()
