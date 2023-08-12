@@ -11,12 +11,18 @@ import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
 import com.idunnololz.summit.lemmy.FilterTooAggressiveException
 import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.PostsRepository
+import com.idunnololz.summit.lemmy.inbox.InboxRepository
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import javax.inject.Inject
 
 class MultiCommunityDataSource(
     private val sources: List<LemmyListSource<PostView, SortType>>
 ) {
+
+    companion object {
+        private const val TAG = "MultiCommunityDataSource"
+    }
+
     class Factory @Inject constructor(
         private val apiClient: AccountAwareLemmyClient,
     ) {
@@ -45,6 +51,15 @@ class MultiCommunityDataSource(
         }
     }
 
+    data class Page(
+        val posts: List<PostView>,
+        val pageIndex: Int,
+        val instance: String,
+        val hasMore: Boolean,
+    )
+
+    private var pagesCache = mutableListOf<Page>()
+
     /**
      * @return true if there might be more posts to fetch
      */
@@ -53,46 +68,58 @@ class MultiCommunityDataSource(
         sortType: SortType,
         listingType: ListingType,
         force: Boolean,
-    ): Result<Boolean> {
-        for (source in sources) {
-            source.sortOrder
-        }
-        val newPosts =
-            apiClient.fetchPosts(
-                communityIdOrName = communityIdOrName,
-                sortType = sortType,
-                listingType = listingType,
-                page = pageIndex,
-                limit = 20,
-                force = force,
+    ) {
+        var hasMore = true
+
+        val pageItems = mutableListOf<PostView>()
+
+        while(true) {
+
+            val results = sources.map { it.peekNextItem() }
+            val error = results.firstOrNull { it.isFailure }
+
+            if (error != null) {
+//                return Result.failure(requireNotNull(error.exceptionOrNull()))
+            }
+            val nextSource = sources.maxBy {
+                it.peekNextItem().getOrThrow()?.counts?.score ?: 0
+//            when (sortType) {
+//                SortType.Active ->
+//                SortType.Hot -> TODO()
+//                SortType.New -> TODO()
+//                SortType.Old -> TODO()
+//                SortType.TopDay -> TODO()
+//                SortType.TopWeek -> TODO()
+//                SortType.TopMonth -> TODO()
+//                SortType.TopYear -> TODO()
+//                SortType.TopAll -> TODO()
+//                SortType.MostComments -> TODO()
+//                SortType.NewComments -> TODO()
+//                SortType.TopHour -> TODO()
+//                SortType.TopSixHour -> TODO()
+//                SortType.TopTwelveHour -> TODO()
+//                SortType.TopThreeMonths -> TODO()
+//                SortType.TopSixMonths -> TODO()
+//                SortType.TopNineMonths -> TODO()
+//            }
+            }
+            val nextItem = nextSource.peekNextItem().getOrNull()
+
+            if (nextItem == null) {
+                // no more items!
+                hasMore = false
+                break
+            }
+
+            Log.d(
+                TAG,
+                "Adding item ${nextItem.post.id} from source ${nextItem::class.java}",
             )
-        val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
 
-        return newPosts.fold(
-            onSuccess = { newPosts ->
-                if (newPosts.isNotEmpty()) {
-                    if (newPosts.first().community.nsfw &&
-                        communityRef is CommunityRef.CommunityRefByName &&
-                        !showNsfwPosts
-                    ) {
-                        return@fold Result.failure(LoadNsfwCommunityWhenNsfwDisabled())
-                    }
-                }
+            pageItems.add(nextItem)
 
-                Log.d(PostsRepository.TAG, "Fetched ${newPosts.size} posts.")
-                addPosts(newPosts, pageIndex, hiddenPosts, force)
-
-                if (consecutiveFilteredPostsByFilter > 20) {
-                    Result.failure(FilterTooAggressiveException())
-                } else if (consecutiveFilteredPostsByType > 20) {
-                    Result.failure(ContentTypeFilterTooAggressiveException())
-                } else {
-                    Result.success(newPosts.isNotEmpty())
-                }
-            },
-            onFailure = {
-                Result.failure(it)
-            },
-        )
+            // increment the max item
+            nextSource.next()
+        }
     }
 }
