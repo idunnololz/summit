@@ -138,9 +138,8 @@ open class LemmyListSource<T, O>(
         Log.d(TAG, "getPage(): $pageIndex force: $force")
         val startIndex = pageIndex * pageSize
         val endIndex = startIndex + pageSize
-        val finalForce = invalidatedPages.contains(pageIndex) || force
 
-        if (finalForce && deleteCacheOnForce) {
+        if (force && deleteCacheOnForce) {
             deleteCache(startIndex, endIndex)
         }
 
@@ -157,6 +156,7 @@ open class LemmyListSource<T, O>(
             }
 
             val hasMoreResult = retry {
+                val finalForce = invalidatedPages.contains(currentPageInternal) || force
                 fetchPage(currentPageInternal, sortOrder, pageSize, finalForce)
             }
 
