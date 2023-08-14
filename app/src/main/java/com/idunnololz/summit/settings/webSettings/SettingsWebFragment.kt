@@ -50,7 +50,7 @@ class SettingsWebFragment :
         override fun handleOnBackPressed() {
             AlertDialogFragment.Builder()
                 .setTitle(R.string.error_unsaved_changes)
-                .setMessage(R.string.error_unsaved_changes_desc)
+                .setMessage(R.string.error_web_settings_unsaved_changes_desc)
                 .setPositiveButton(R.string.save)
                 .setNegativeButton(R.string.discard_saves)
                 .createAndShow(childFragmentManager, "unsaved_changes")
