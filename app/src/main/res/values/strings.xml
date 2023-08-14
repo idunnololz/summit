@@ -270,7 +270,7 @@
     <string name="bot_account">Bot account</string>
     <string name="show_bot_accounts">Show bot accounts</string>
     <string name="error_unsaved_changes">Unsaved changes</string>
-    <string name="error_unsaved_changes_desc">You have unsaved changes. Web preferences must be saved to the server in order for them to take effect.</string>
+    <string name="error_web_settings_unsaved_changes_desc">You have unsaved changes. Web preferences must be saved to the server in order for them to take effect.</string>
     <string name="discard_saves">Discard changes</string>
     <string name="send_notifications_to_email">Send notifications to email</string>
     <string name="hide_read">Hide read</string>
@@ -541,6 +541,8 @@
     <string name="multi_community_icon">Multi-community icon</string>
     <string name="no_icons">No icons</string>
     <string name="error_cannot_share_multi_community">Multi-communities cannot be shared. Multi-communities are purely client-sided.</string>
+    <string name="error_multi_community_limit_reached">There are too many communities selected for this multi-community. The maximum number of communities per multi-community is %1$s.</string>
+    <string name="error_multi_community_unsaved_changes">You will lose your changes if you proceed. Do you want to continue?</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

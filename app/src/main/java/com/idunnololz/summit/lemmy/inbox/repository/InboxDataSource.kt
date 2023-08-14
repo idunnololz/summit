@@ -71,7 +71,7 @@ open class LemmyListSource<T, O>(
 ) {
 
     companion object {
-        private const val TAG = "InboxSource"
+        private const val TAG = "LemmyListSource"
 
         const val DEFAULT_PAGE_SIZE = 20
     }

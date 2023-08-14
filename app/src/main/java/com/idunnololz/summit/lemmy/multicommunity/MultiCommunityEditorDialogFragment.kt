@@ -28,6 +28,7 @@ import com.idunnololz.summit.databinding.MultiCommunityIconSelectorBinding
 import com.idunnololz.summit.databinding.MultiCommunitySelectedCommunitiesItemBinding
 import com.idunnololz.summit.databinding.MultiCommunitySelectedCommunityBinding
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -50,7 +51,8 @@ import javax.inject.Inject
 class MultiCommunityEditorDialogFragment :
     BaseDialogFragment<DialogFragmentMultiCommunityEditorBinding>(),
     FullscreenDialogFragment,
-    BackPressHandler {
+    BackPressHandler,
+AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "MultiCommunityEditorDialogFragment_req_key"
@@ -164,6 +166,11 @@ class MultiCommunityEditorDialogFragment :
                             return@setOnMenuItemClickListener true
                         }
 
+                        if (selectedCommunities.size > MULTI_COMMUNITY_DATA_SOURCE_LIMIT) {
+                            showTooManyCommunitiesMessage()
+                            return@setOnMenuItemClickListener true
+                        }
+
                         val ref = CommunityRef.MultiCommunity(
                             viewModel.communityName.value ?: "",
                             viewModel.selectedIcon.value,
@@ -195,7 +202,10 @@ class MultiCommunityEditorDialogFragment :
                 viewModel.doQuery(query)
             }
 
-            adapter = CommunityAdapter(context, offlineManager)
+            adapter = CommunityAdapter(context, offlineManager,
+                onTooManyCommunities = {
+                    showTooManyCommunitiesMessage()
+                })
             resultsRecyclerView.adapter = adapter
             resultsRecyclerView.setHasFixedSize(true)
             resultsRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -268,11 +278,32 @@ class MultiCommunityEditorDialogFragment :
         updateAdapter()
     }
 
+    private fun showTooManyCommunitiesMessage() {
+        AlertDialogFragment.Builder()
+            .setMessage(getString(
+                R.string.error_multi_community_limit_reached,
+                MULTI_COMMUNITY_DATA_SOURCE_LIMIT.toString()))
+            .createAndShow(childFragmentManager, "asdfss")
+    }
+
     override fun onBackPressed(): Boolean {
         if (viewModel.showSearch.value == true) {
             viewModel.showSearch.value = false
             return true
         }
+
+        if (viewModel.communityName.value != args.multiCommunity.name ||
+            viewModel.selectedIcon.value != args.multiCommunity.icon ||
+            viewModel.selectedCommunitiesFlow.value != args.multiCommunity.communities) {
+            AlertDialogFragment.Builder()
+                .setTitle(R.string.error_unsaved_changes)
+                .setMessage(R.string.error_multi_community_unsaved_changes)
+                .setPositiveButton(R.string.proceed_anyways)
+                .setNegativeButton(R.string.cancel)
+                .createAndShow(childFragmentManager, "UnsavedChanges")
+            return true
+        }
+
 
         try {
             dismiss()
@@ -280,6 +311,15 @@ class MultiCommunityEditorDialogFragment :
             // do nothing... very rare
         }
         return true
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        if (tag == "UnsavedChanges") {
+            dismiss()
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 
     private fun showSearch() {

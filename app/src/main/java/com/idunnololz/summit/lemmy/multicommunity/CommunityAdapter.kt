@@ -14,6 +14,7 @@ import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityI
 import com.idunnololz.summit.databinding.CommunitySelectorSelectedCommunityItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -21,6 +22,7 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 class CommunityAdapter(
     private val context: Context,
     private val offlineManager: OfflineManager,
+    private val onTooManyCommunities: (Int) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed interface Item {
@@ -137,7 +139,11 @@ class CommunityAdapter(
         if (selectedCommunities.contains(ref)) {
             selectedCommunities.remove(ref)
         } else {
-            selectedCommunities.add(ref)
+            if (selectedCommunities.size == MULTI_COMMUNITY_DATA_SOURCE_LIMIT) {
+                onTooManyCommunities(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
+            } else {
+                selectedCommunities.add(ref)
+            }
         }
 
         refreshItems {  }

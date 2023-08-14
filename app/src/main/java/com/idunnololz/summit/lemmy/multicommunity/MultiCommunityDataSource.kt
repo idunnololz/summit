@@ -11,6 +11,7 @@ import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.util.dateStringToTs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -23,6 +24,11 @@ class MultiCommunityDataSource(
         private const val TAG = "MultiCommunityDataSource"
 
         private const val DEFAULT_PAGE_SIZE = 10
+
+        /**
+         * Maximum number of communities that can be added into one multi-community.
+         */
+        const val MULTI_COMMUNITY_DATA_SOURCE_LIMIT = 30
     }
 
     class Factory @Inject constructor(
@@ -49,7 +55,7 @@ class MultiCommunityDataSource(
                     },
                     DEFAULT_PAGE_SIZE
                 )
-            }
+            }.take(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
 
             return MultiCommunityDataSource(instance, sources)
         }
@@ -71,14 +77,22 @@ class MultiCommunityDataSource(
         sortType: SortType?,
         page: Int,
         force: Boolean,
-    ): Result<List<PostView>> {
+    ): Result<List<PostView>> = withContext(Dispatchers.Default) {
         if (force) {
             reset()
         }
 
         setSortType(sortType)
 
-        return fetchPage(
+        // prefetch if needed
+        val prefetchJobs = sources.map {
+            async { it.peekNextItem() }
+        }
+        prefetchJobs.forEach {
+            it.await()
+        }
+
+        fetchPage(
             page,
         ).fold(
             onSuccess = {
