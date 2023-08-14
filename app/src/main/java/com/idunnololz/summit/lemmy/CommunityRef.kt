@@ -77,12 +77,22 @@ sealed interface CommunityRef : PageRef, Parcelable {
         val instance: String?,
     ) : CommunityRef
 
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("6")
+    data class MultiCommunity(
+        val name: String,
+        val icon: String?,
+        val communities: List<CommunityRefByName>
+    ) : CommunityRef
+
     fun getName(context: Context): String =
         when (this) {
             is Local -> context.getString(R.string.local)
             is All -> context.getString(R.string.all)
             is CommunityRefByName -> this.name
             is Subscribed -> context.getString(R.string.subscribed)
+            is MultiCommunity -> this.name
         }
 
     fun getKey(): String =
@@ -106,6 +116,8 @@ sealed interface CommunityRef : PageRef, Parcelable {
                 } else {
                     "subscribed"
                 }
+            is MultiCommunity ->
+                "multicommunity@${this.name}"
         }
 }
 

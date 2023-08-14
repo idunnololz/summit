@@ -160,6 +160,8 @@ class MainActivityViewModel @Inject constructor(
                 is CommunityRef.Subscribed -> {
                     Either.Left(apiClient.fetchSiteWithRetry(force))
                 }
+                is CommunityRef.MultiCommunity ->
+                    Either.Left(Result.failure(RuntimeException()))
             }
 
             result

@@ -14,6 +14,7 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
@@ -439,6 +440,13 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_OPEN_LINKS_IN_APP, value)
+                .apply()
+        }
+    var autoLinkPhoneNumbers: Boolean
+        get() = prefs.getBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, value)
                 .apply()
         }
 

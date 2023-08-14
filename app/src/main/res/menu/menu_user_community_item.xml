@@ -8,4 +8,11 @@
         android:orderInCategory="100"
         android:icon="@drawable/baseline_delete_24"
         app:iconTint="?attr/colorControlNormal"/>
+
+    <item
+        android:id="@+id/edit"
+        android:title="@string/edit"
+        android:orderInCategory="200"
+        android:icon="@drawable/baseline_edit_24"
+        app:iconTint="?attr/colorControlNormal"/>
 </menu>

@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.constraintlayout.widget.Barrier
@@ -146,569 +147,608 @@ class PostListViewBuilder @Inject constructor(
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
-    ) = with(holder) {
-        if (holder.state.preferTitleText != postUiConfig.preferTitleText) {
-            if (postUiConfig.preferTitleText) {
-                when (val rb = rawBinding) {
-                    is ListingItemListBinding -> {
-                        TextViewCompat.setTextAppearance(
-                            rb.title,
-                            context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceTitleMedium,
-                            ),
-                        )
+    ) {
+        val url = postView.post.url
+        val thumbnailUrl = postView.post.thumbnail_url
+        with(holder) {
+            if (holder.state.preferTitleText != postUiConfig.preferTitleText) {
+                if (postUiConfig.preferTitleText) {
+                    when (val rb = rawBinding) {
+                        is ListingItemListBinding -> {
+                            TextViewCompat.setTextAppearance(
+                                rb.title,
+                                context.getResIdFromAttribute(
+                                    com.google.android.material.R.attr.textAppearanceTitleMedium,
+                                ),
+                            )
+                        }
+                        is ListingItemCompactBinding -> {
+                            TextViewCompat.setTextAppearance(
+                                rb.title,
+                                context.getResIdFromAttribute(
+                                    com.google.android.material.R.attr.textAppearanceTitleMedium,
+                                ),
+                            )
+                        }
                     }
-                    is ListingItemCompactBinding -> {
-                        TextViewCompat.setTextAppearance(
-                            rb.title,
-                            context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceTitleMedium,
-                            ),
-                        )
+                } else {
+                    when (val rb = rawBinding) {
+                        is ListingItemListBinding -> {
+                            TextViewCompat.setTextAppearance(
+                                rb.title,
+                                context.getResIdFromAttribute(
+                                    com.google.android.material.R.attr.textAppearanceBodyMedium,
+                                ),
+                            )
+                        }
+                        is ListingItemCompactBinding -> {
+                            TextViewCompat.setTextAppearance(
+                                rb.title,
+                                context.getResIdFromAttribute(
+                                    com.google.android.material.R.attr.textAppearanceBodyMedium,
+                                ),
+                            )
+                        }
                     }
                 }
-            } else {
-                when (val rb = rawBinding) {
-                    is ListingItemListBinding -> {
-                        TextViewCompat.setTextAppearance(
-                            rb.title,
-                            context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceBodyMedium,
-                            ),
-                        )
-                    }
-                    is ListingItemCompactBinding -> {
-                        TextViewCompat.setTextAppearance(
-                            rb.title,
-                            context.getResIdFromAttribute(
-                                com.google.android.material.R.attr.textAppearanceBodyMedium,
-                            ),
-                        )
-                    }
-                }
+
+                holder.state.preferTitleText = postUiConfig.preferTitleText
             }
 
-            holder.state.preferTitleText = postUiConfig.preferTitleText
-        }
+            scaleTextSizes()
 
-        scaleTextSizes()
+            if (holder.state.preferImagesAtEnd != postUiConfig.preferImagesAtEnd) {
+                if (postUiConfig.preferImagesAtEnd) {
+                    when (val rb = rawBinding) {
+                        is ListingItemListBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                                this.marginEnd = padding
+                            }
+                            rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                                this.marginEnd = padding
+                            }
+                            rb.iconGoneSpacer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                            }
+                            rb.leftBarrier.type = Barrier.START
+                            rb.title.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.endToStart = rb.leftBarrier.id
+                                this.marginStart = padding
+                                this.marginEnd = paddingHalf
+                            }
+                        }
 
-        if (holder.state.preferImagesAtEnd != postUiConfig.preferImagesAtEnd) {
-            if (postUiConfig.preferImagesAtEnd) {
-                when (val rb = rawBinding) {
-                    is ListingItemListBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.startToStart = ConstraintLayout.LayoutParams.UNSET
-                            this.marginEnd = padding
+                        is ListingItemCompactBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                                this.marginEnd = padding
+                            }
+                            rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                                this.marginEnd = padding
+                            }
+                            rb.iconGoneSpacer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                            }
+                            rb.leftBarrier.type = Barrier.START
+                            rb.headerContainer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.endToStart = rb.leftBarrier.id
+                                this.marginStart = padding
+                                this.marginEnd = paddingHalf
+                            }
+                            rb.title.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.endToStart = rb.leftBarrier.id
+                                this.marginStart = padding
+                                this.marginEnd = paddingHalf
+                            }
+                            rb.commentText.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.endToStart = rb.leftBarrier.id
+                                this.marginStart = padding
+                                this.marginEnd = paddingHalf
+                            }
                         }
-                        rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.startToStart = ConstraintLayout.LayoutParams.UNSET
-                            this.marginEnd = padding
-                        }
-                        rb.iconGoneSpacer.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.startToStart = ConstraintLayout.LayoutParams.UNSET
-                        }
-                        rb.leftBarrier.type = Barrier.START
-                        rb.title.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.endToStart = rb.leftBarrier.id
-                            this.marginStart = padding
-                            this.marginEnd = paddingHalf
-                        }
-                    }
 
-                    is ListingItemCompactBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.startToStart = ConstraintLayout.LayoutParams.UNSET
-                            this.marginEnd = padding
-                        }
-                        rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.startToStart = ConstraintLayout.LayoutParams.UNSET
-                            this.marginEnd = padding
-                        }
-                        rb.iconGoneSpacer.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.startToStart = ConstraintLayout.LayoutParams.UNSET
-                        }
-                        rb.leftBarrier.type = Barrier.START
-                        rb.headerContainer.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.endToStart = rb.leftBarrier.id
-                            this.marginStart = padding
-                            this.marginEnd = paddingHalf
-                        }
-                        rb.title.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.endToStart = rb.leftBarrier.id
-                            this.marginStart = padding
-                            this.marginEnd = paddingHalf
-                        }
-                        rb.commentText.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                            this.endToStart = rb.leftBarrier.id
-                            this.marginStart = padding
-                            this.marginEnd = paddingHalf
-                        }
-                    }
-
-                    is ListingItemCardBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.topToTop = ConstraintLayout.LayoutParams.UNSET
-                            this.topToBottom = rb.bottomBarrier.id
-                        }
-                        rb.headerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                        is ListingItemCardBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.topToTop = ConstraintLayout.LayoutParams.UNSET
+                                this.topToBottom = rb.bottomBarrier.id
+                            }
+                            rb.headerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                            }
                         }
                     }
                 }
+
+                holder.state.preferImagesAtEnd = postUiConfig.preferImagesAtEnd
             }
 
-            holder.state.preferImagesAtEnd = postUiConfig.preferImagesAtEnd
-        }
+            if (holder.state.preferFullSizeImages != postUiConfig.preferFullSizeImages) {
+                if (postUiConfig.preferFullSizeImages) {
+                    when (val rb = rawBinding) {
+                        is ListingItemCardBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = null
+                            }
+                        }
+                        is ListingItemCard2Binding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = null
+                            }
+                        }
+                        is ListingItemCard3Binding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = null
+                            }
+                        }
 
-        if (holder.state.preferFullSizeImages != postUiConfig.preferFullSizeImages) {
-            if (postUiConfig.preferFullSizeImages) {
+                        is ListingItemLargeListBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = null
+                            }
+                        }
+                    }
+                } else {
+                    when (val rb = rawBinding) {
+                        is ListingItemCardBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = "H,16:9"
+                            }
+                        }
+                        is ListingItemCard2Binding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = "H,16:9"
+                            }
+                        }
+                        is ListingItemCard3Binding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = "H,16:9"
+                            }
+                        }
+                        is ListingItemLargeListBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.dimensionRatio = "H,16:9"
+                            }
+                        }
+                    }
+                }
+
+                holder.state.preferFullSizeImages = postUiConfig.preferFullSizeImages
+            }
+
+            val finalContentMaxWidth =
                 when (val rb = rawBinding) {
                     is ListingItemCardBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = null
-                        }
+                        val lp = rb.root.layoutParams as MarginLayoutParams
+                        contentMaxWidth - lp.marginStart - lp.marginEnd
                     }
                     is ListingItemCard2Binding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = null
-                        }
+                        val lp = rb.root.layoutParams as MarginLayoutParams
+                        contentMaxWidth - lp.marginStart - lp.marginEnd
                     }
                     is ListingItemCard3Binding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = null
-                        }
-                    }
-
-                    is ListingItemLargeListBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = null
-                        }
-                    }
-                }
-            } else {
-                when (val rb = rawBinding) {
-                    is ListingItemCardBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = "H,16:9"
-                        }
-                    }
-                    is ListingItemCard2Binding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = "H,16:9"
-                        }
-                    }
-                    is ListingItemCard3Binding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = "H,16:9"
-                        }
+                        val lp = rb.root.layoutParams as MarginLayoutParams
+                        contentMaxWidth - lp.marginStart - lp.marginEnd
                     }
                     is ListingItemLargeListBinding -> {
-                        rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            this.dimensionRatio = "H,16:9"
+                        val lp = rb.image.layoutParams as MarginLayoutParams
+                        contentMaxWidth - lp.marginStart - lp.marginEnd
+                    }
+                    else -> contentMaxWidth
+                }
+            val postImageWidth = (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
+
+            fun onItemClick() {
+                val videoState = if (fullContentContainerView == null) {
+                    null
+                } else {
+                    lemmyContentHelper.getState(fullContentContainerView).videoState?.let {
+                        it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
+                    }
+                }
+                onItemClick(
+                    instance,
+                    postView.post.id,
+                    postView.community.toCommunityRef(),
+                    postView,
+                    false,
+                    isRevealed,
+                    videoState,
+                )
+            }
+
+            val postType = postView.getType()
+            if (updateContent) {
+                lemmyHeaderHelper.populateHeaderSpan(
+                    headerContainer = headerContainer,
+                    postView = postView,
+                    instance = instance,
+                    onPageClick = onPageClick,
+                    onLinkLongClick = onLinkLongClick,
+                )
+
+
+                fun showDefaultImage() {
+                    image?.visibility = View.GONE
+                    iconImage?.visibility = View.VISIBLE
+                    iconImage?.setImageResource(R.drawable.baseline_article_24)
+                }
+
+                fun loadAndShowImage() {
+                    val image = image ?: return
+
+                    val thumbnailImageUrl = if (thumbnailUrl != null &&
+                        ContentUtils.isUrlImage(thumbnailUrl)
+                    ) {
+                        thumbnailUrl
+                    } else {
+                        null
+                    }
+
+                    val imageUrl = thumbnailImageUrl ?: url
+
+                    if (imageUrl == "default") {
+                        showDefaultImage()
+                        return
+                    }
+
+                    if (imageUrl.isNullOrBlank()) {
+                        image.visibility = View.GONE
+                        return
+                    }
+
+                    if (!ContentUtils.isUrlImage(imageUrl)) {
+                        image.visibility = View.GONE
+                        return
+                    }
+
+                    image.visibility = View.VISIBLE
+                    iconImage?.visibility = View.GONE
+
+                    image.load(R.drawable.thumbnail_placeholder_16_9) {
+                        if (image is ShapeableImageView) {
+                            allowHardware(false)
+                        }
+                    }
+
+                    offlineManager.fetchImageWithError(itemView, imageUrl, {
+                        offlineManager.calculateImageMaxSizeIfNeeded(it)
+                        offlineManager.getMaxImageSizeHint(it, tempSize)
+
+                        image.load(it) {
+                            if (image is ShapeableImageView) {
+                                allowHardware(false)
+                            }
+                            fallback(R.drawable.thumbnail_placeholder_16_9)
+                            placeholder(R.drawable.thumbnail_placeholder_16_9)
+
+                            if (!isRevealed && postView.post.nsfw) {
+                                val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+
+                                transformations(BlurTransformation(context, sampling = sampling))
+                            }
+                        }
+                    }, {
+                        image.visibility = View.GONE
+                    },)
+                    image.transitionName = "image_$absoluteAdapterPosition"
+                    image.setOnClickListener {
+                        if (fullContentContainerView != null) {
+                            if (singleTapToViewImage) {
+                                onImageClick(postView, image, imageUrl)
+                            } else {
+                                toggleItem(postView)
+                            }
+                        } else {
+                            if (url != null && (postType == PostType.Text || postType == PostType.Link)) {
+                                Utils.openExternalLink(context, url)
+                            } else {
+                                onImageClick(postView, image, imageUrl)
+                            }
+                        }
+                    }
+
+                    if (fullContentContainerView != null) {
+                        image.setOnLongClickListener {
+                            if (singleTapToViewImage) {
+                                toggleItem(postView)
+                            } else {
+                                onImageClick(postView, image, imageUrl)
+                            }
+                            true
+                        }
+                    } else {
+                        image.setOnLongClickListener {
+                            onImageClick(postView, image, imageUrl)
+                            true
                         }
                     }
                 }
+
+                linkTypeImage?.visibility = View.GONE
+                iconImage?.visibility = View.GONE
+                iconImage?.setOnClickListener(null)
+                iconImage?.isClickable = false
+                image?.setOnClickListener(null)
+                image?.isClickable = false
+
+                fun showFullContent() {
+                    fullContentContainerView ?: return
+
+                    lemmyContentHelper.setupFullContent(
+                        reveal = isRevealed,
+                        tempSize = tempSize,
+                        videoViewMaxHeight = contentPreferredHeight,
+                        contentMaxWidth = contentMaxWidth,
+                        fullImageViewTransitionName = "full_image_$absoluteAdapterPosition",
+                        postView = postView,
+                        instance = instance,
+                        rootView = itemView,
+                        fullContentContainerView = fullContentContainerView,
+                        contentMaxLines = contentMaxLines,
+                        onFullImageViewClickListener = { v, url ->
+                            onImageClick(postView, v, url)
+                        },
+                        onImageClickListener = {
+                            onImageClick(postView, null, it)
+                        },
+                        onVideoClickListener = onVideoClick,
+                        onItemClickListener = {
+                            onItemClick()
+                        },
+                        onRevealContentClickedFn = {
+                            onRevealContentClickedFn()
+                        },
+                        onLemmyUrlClick = onPageClick,
+                        onLinkLongClick = onLinkLongClick,
+                    )
+                }
+
+                when (postType) {
+                    PostType.Image -> {
+                        loadAndShowImage()
+
+                        if (isExpanded) {
+                            showFullContent()
+                        }
+                    }
+
+                    PostType.Video -> {
+                        loadAndShowImage()
+
+                        iconImage?.visibility = View.VISIBLE
+                        iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_24)
+                        iconImage?.setOnClickListener {
+                            if (fullContentContainerView != null) {
+                                toggleItem(postView)
+                            } else {
+                                onItemClick()
+                            }
+                        }
+
+                        if (isExpanded) {
+                            showFullContent()
+                        }
+                    }
+
+                    PostType.Link,
+                    PostType.Text,
+                    -> {
+                        if (thumbnailUrl == null) {
+                            image?.visibility = View.GONE
+
+                            // see if this text post has additional content
+                            val hasAdditionalContent =
+                                !postView.post.body.isNullOrBlank() ||
+                                    !url.isNullOrBlank()
+
+                            if (hasAdditionalContent) {
+                                showDefaultImage()
+                                iconImage?.setOnClickListener {
+                                    if (fullContentContainerView != null) {
+                                        toggleItem(postView)
+                                    } else {
+                                        onItemClick()
+                                    }
+                                }
+                            }
+                        } else {
+                            loadAndShowImage()
+                        }
+
+                        if (isExpanded) {
+                            showFullContent()
+                        }
+
+                        linkTypeImage?.visibility = View.GONE
+                        linkTypeImage?.setImageResource(R.drawable.baseline_open_in_new_24)
+                    }
+                }
+
+                image?.updateLayoutParams {
+                    width = postImageWidth
+                }
+                iconImage?.updateLayoutParams {
+                    width = postImageWidth
+                }
+
+                if (layoutShowsFullContent) {
+                    showFullContent()
+                }
             }
 
-            holder.state.preferFullSizeImages = postUiConfig.preferFullSizeImages
-        }
-
-        val finalContentMaxWidth =
-            when (val rb = rawBinding) {
-                is ListingItemCardBinding -> {
-                    val lp = rb.root.layoutParams as MarginLayoutParams
-                    contentMaxWidth - lp.marginStart - lp.marginEnd
-                }
-                is ListingItemCard2Binding -> {
-                    val lp = rb.root.layoutParams as MarginLayoutParams
-                    contentMaxWidth - lp.marginStart - lp.marginEnd
-                }
-                is ListingItemCard3Binding -> {
-                    val lp = rb.root.layoutParams as MarginLayoutParams
-                    contentMaxWidth - lp.marginStart - lp.marginEnd
-                }
-                is ListingItemLargeListBinding -> {
-                    val lp = rb.image.layoutParams as MarginLayoutParams
-                    contentMaxWidth - lp.marginStart - lp.marginEnd
-                }
-                else -> contentMaxWidth
-            }
-        val postImageWidth = (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
-
-        fun onItemClick() {
-            val videoState = if (fullContentContainerView == null) {
-                null
-            } else {
-                lemmyContentHelper.getState(fullContentContainerView).videoState?.let {
-                    it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
-                }
-            }
-            onItemClick(
+            LemmyTextHelper.bindText(
+                title,
+                postView.post.name,
                 instance,
-                postView.post.id,
-                postView.community.toCommunityRef(),
-                postView,
-                false,
-                isRevealed,
-                videoState,
-            )
-        }
-
-        if (updateContent) {
-            lemmyHeaderHelper.populateHeaderSpan(
-                headerContainer = headerContainer,
-                postView = postView,
-                instance = instance,
+                onImageClick = {
+                    onImageClick(postView, null, it)
+                },
                 onPageClick = onPageClick,
                 onLinkLongClick = onLinkLongClick,
             )
 
-            val thumbnailUrl = postView.post.thumbnail_url
-
-            fun showDefaultImage() {
-                image?.visibility = View.GONE
-                iconImage?.visibility = View.VISIBLE
-                iconImage?.setImageResource(R.drawable.baseline_article_24)
+            if (postView.read && !alwaysRenderAsUnread) {
+                if (themeManager.isLightTheme) {
+                    title.alpha = 0.41f
+                } else {
+                    title.alpha = 0.66f
+                }
+            } else {
+                title.alpha = 1f
             }
 
-            fun loadAndShowImage() {
-                val image = image ?: return
+            commentText.text =
+                LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
 
-                val thumbnailImageUrl = if (thumbnailUrl != null &&
-                    ContentUtils.isUrlImage(thumbnailUrl)
-                ) {
-                    thumbnailUrl
-                } else {
-                    null
-                }
+            itemView.setOnClickListener {
+                onItemClick()
+            }
+            commentButton?.setOnClickListener {
+                onItemClick(
+                    instance,
+                    postView.post.id,
+                    postView.community.toCommunityRef(),
+                    postView,
+                    true,
+                    isRevealed,
+                    null,
+                )
+            }
+            commentButton?.isEnabled = !postView.post.locked
 
-                val url = thumbnailImageUrl ?: postView.post.url
-
-                if (url == "default") {
-                    showDefaultImage()
-                    return
-                }
-
-                if (url.isNullOrBlank()) {
-                    image.visibility = View.GONE
-                    return
-                }
-
-                if (!ContentUtils.isUrlImage(url)) {
-                    image.visibility = View.GONE
-                    return
-                }
-
-                image.visibility = View.VISIBLE
-                iconImage?.visibility = View.GONE
-
-                image.load(R.drawable.thumbnail_placeholder_16_9) {
-                    if (image is ShapeableImageView) {
-                        allowHardware(false)
-                    }
-                }
-
-                offlineManager.fetchImageWithError(itemView, url, {
-                    offlineManager.calculateImageMaxSizeIfNeeded(it)
-                    offlineManager.getMaxImageSizeHint(it, tempSize)
-
-                    image.load(it) {
-                        if (image is ShapeableImageView) {
-                            allowHardware(false)
-                        }
-                        fallback(R.drawable.thumbnail_placeholder_16_9)
-                        placeholder(R.drawable.thumbnail_placeholder_16_9)
-
-                        if (!isRevealed && postView.post.nsfw) {
-                            val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-
-                            transformations(BlurTransformation(context, sampling = sampling))
-                        }
-                    }
-                }, {
-                    image.visibility = View.GONE
-                },)
-                image.transitionName = "image_$absoluteAdapterPosition"
-                image.setOnClickListener {
-                    if (fullContentContainerView != null) {
-                        if (singleTapToViewImage) {
-                            onImageClick(postView, image, url)
+            voteUiHandler.bind(
+                viewLifecycleOwner,
+                instance,
+                postView,
+                upvoteButton,
+                downvoteButton,
+                upvoteCount,
+                {
+                    if (rawBinding is ListingItemCompactBinding) {
+                        if (it > 0) {
+                            upvoteCount.setTextColor(upvoteColor)
+                            TextViewCompat.setCompoundDrawableTintList(
+                                upvoteCount,
+                                ColorStateList.valueOf(upvoteColor),
+                            )
+                        } else if (it == 0) {
+                            upvoteCount.setTextColor(unimportantTextColor)
+                            TextViewCompat.setCompoundDrawableTintList(
+                                upvoteCount,
+                                ColorStateList.valueOf(unimportantTextColor),
+                            )
                         } else {
-                            toggleItem(postView)
+                            upvoteCount.setTextColor(downvoteColor)
+                            TextViewCompat.setCompoundDrawableTintList(
+                                upvoteCount,
+                                ColorStateList.valueOf(downvoteColor),
+                            )
+                        }
+                    }
+                },
+                onSignInRequired = onSignInRequired,
+                onInstanceMismatch,
+            )
+
+            if (highlightForever) {
+                highlightBg.visibility = View.VISIBLE
+                highlightBg.alpha = 1f
+            } else if (highlight) {
+                highlightBg.visibility = View.VISIBLE
+                highlightBg.animate()
+                    .alpha(0f)
+                    .apply {
+                        duration = 350
+                    }
+                    .withEndAction {
+                        highlightBg.visibility = View.GONE
+
+                        onHighlightComplete()
+                    }
+            } else {
+                highlightBg.visibility = View.GONE
+            }
+
+            moreButton?.setOnClickListener {
+                onShowMoreOptions(postView)
+            }
+
+            if (rawBinding is ListingItemCardBinding ||
+                rawBinding is ListingItemCard2Binding ||
+                rawBinding is ListingItemCard3Binding ||
+                rawBinding is ListingItemLargeListBinding
+            ) {
+                if (url == null) {
+                    openLinkButton?.visibility = View.GONE
+                    linkText?.visibility = View.GONE
+                    linkIcon?.visibility = View.GONE
+                    linkOverlay?.visibility = View.GONE
+                } else {
+                    if ((postType == PostType.Link || postType == PostType.Text) && thumbnailUrl != null) {
+                        openLinkButton?.visibility = View.GONE
+                        linkText?.visibility = View.VISIBLE
+                        linkIcon?.visibility = View.VISIBLE
+                        linkOverlay?.visibility = View.VISIBLE
+
+                        val t = Uri.parse(url).host ?: url
+                        linkText?.text = t
+                        linkOverlay?.setOnClickListener {
+                            Utils.openExternalLink(context, url)
+                        }
+                        linkOverlay?.setOnLongClickListener {
+                            onLinkLongClick(url, t)
+                            true
                         }
                     } else {
-                        onImageClick(postView, image, url)
+                        openLinkButton?.visibility = View.VISIBLE
+                        linkText?.visibility = View.GONE
+                        linkIcon?.visibility = View.GONE
+                        linkOverlay?.visibility = View.GONE
+                        openLinkButton?.setOnClickListener {
+                            Utils.openExternalLink(context, url)
+                        }
                     }
                 }
+            } else {
+                openLinkButton?.visibility = View.GONE
+            }
+            when (val rb = rawBinding) {
+                is ListingItemCompactBinding -> {
+                    if (isActionsExpanded) {
+                        upvoteButton?.visibility = View.VISIBLE
+                        downvoteButton?.visibility = View.VISIBLE
+                        createCommentButton?.visibility = View.VISIBLE
+                        moreButton?.visibility = View.VISIBLE
+                    } else {
+                        upvoteButton?.visibility = View.GONE
+                        downvoteButton?.visibility = View.GONE
+                        createCommentButton?.visibility = View.GONE
+                        moreButton?.visibility = View.GONE
+                    }
 
-                if (fullContentContainerView != null) {
-                    image.setOnLongClickListener {
-                        if (singleTapToViewImage) {
-                            toggleItem(postView)
-                        } else {
-                            onImageClick(postView, image, url)
-                        }
+                    rb.root.setOnLongClickListener {
+                        toggleActions(postView)
                         true
                     }
                 }
-            }
-
-            linkTypeImage?.visibility = View.GONE
-            iconImage?.visibility = View.GONE
-            iconImage?.setOnClickListener(null)
-            iconImage?.isClickable = false
-            image?.setOnClickListener(null)
-            image?.isClickable = false
-
-            fun showFullContent() {
-                fullContentContainerView ?: return
-
-                lemmyContentHelper.setupFullContent(
-                    reveal = isRevealed,
-                    tempSize = tempSize,
-                    videoViewMaxHeight = contentPreferredHeight,
-                    contentMaxWidth = contentMaxWidth,
-                    fullImageViewTransitionName = "full_image_$absoluteAdapterPosition",
-                    postView = postView,
-                    instance = instance,
-                    rootView = itemView,
-                    fullContentContainerView = fullContentContainerView,
-                    contentMaxLines = contentMaxLines,
-                    onFullImageViewClickListener = { v, url ->
-                        onImageClick(postView, v, url)
-                    },
-                    onImageClickListener = {
-                        onImageClick(postView, null, it)
-                    },
-                    onVideoClickListener = onVideoClick,
-                    onItemClickListener = {
-                        onItemClick()
-                    },
-                    onRevealContentClickedFn = {
-                        onRevealContentClickedFn()
-                    },
-                    onLemmyUrlClick = onPageClick,
-                    onLinkLongClick = onLinkLongClick,
-                )
-            }
-
-            when (postView.getType()) {
-                PostType.Image -> {
-                    loadAndShowImage()
-
-                    if (isExpanded) {
-                        showFullContent()
+                else -> {
+                    rb.root.setOnLongClickListener {
+                        onShowMoreOptions(postView)
+                        true
                     }
-                }
-
-                PostType.Video -> {
-                    loadAndShowImage()
-
-                    iconImage?.visibility = View.VISIBLE
-                    iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_24)
-                    iconImage?.setOnClickListener {
-                        if (fullContentContainerView != null) {
-                            toggleItem(postView)
-                        } else {
-                            onItemClick()
-                        }
-                    }
-
-                    if (isExpanded) {
-                        showFullContent()
-                    }
-                }
-
-                PostType.Link,
-                PostType.Text,
-                -> {
-                    if (thumbnailUrl == null) {
-                        image?.visibility = View.GONE
-
-                        // see if this text post has additional content
-                        val hasAdditionalContent =
-                            !postView.post.body.isNullOrBlank() ||
-                                !postView.post.url.isNullOrBlank()
-
-                        if (hasAdditionalContent) {
-                            showDefaultImage()
-                            iconImage?.setOnClickListener {
-                                if (fullContentContainerView != null) {
-                                    toggleItem(postView)
-                                } else {
-                                    onItemClick()
-                                }
-                            }
-                        }
-                    } else {
-                        loadAndShowImage()
-                    }
-
-                    if (isExpanded) {
-                        showFullContent()
-                    }
-
-                    linkTypeImage?.visibility = View.GONE
-                    linkTypeImage?.setImageResource(R.drawable.baseline_open_in_new_24)
-                }
-            }
-
-            image?.updateLayoutParams {
-                width = postImageWidth
-            }
-            iconImage?.updateLayoutParams {
-                width = postImageWidth
-            }
-
-            if (layoutShowsFullContent) {
-                showFullContent()
-            }
-        }
-
-        LemmyTextHelper.bindText(
-            title,
-            postView.post.name,
-            instance,
-            onImageClick = {
-                onImageClick(postView, null, it)
-            },
-            onPageClick = onPageClick,
-            onLinkLongClick = onLinkLongClick,
-        )
-
-        if (postView.read && !alwaysRenderAsUnread) {
-            if (themeManager.isLightTheme) {
-                title.alpha = 0.41f
-            } else {
-                title.alpha = 0.66f
-            }
-        } else {
-            title.alpha = 1f
-        }
-
-        commentText.text =
-            LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
-
-        itemView.setOnClickListener {
-            onItemClick()
-        }
-        commentButton?.setOnClickListener {
-            onItemClick(
-                instance,
-                postView.post.id,
-                postView.community.toCommunityRef(),
-                postView,
-                true,
-                isRevealed,
-                null,
-            )
-        }
-        commentButton?.isEnabled = !postView.post.locked
-
-        voteUiHandler.bind(
-            viewLifecycleOwner,
-            instance,
-            postView,
-            upvoteButton,
-            downvoteButton,
-            upvoteCount,
-            {
-                if (rawBinding is ListingItemCompactBinding) {
-                    if (it > 0) {
-                        upvoteCount.setTextColor(upvoteColor)
-                        TextViewCompat.setCompoundDrawableTintList(
-                            upvoteCount,
-                            ColorStateList.valueOf(upvoteColor),
-                        )
-                    } else if (it == 0) {
-                        upvoteCount.setTextColor(unimportantTextColor)
-                        TextViewCompat.setCompoundDrawableTintList(
-                            upvoteCount,
-                            ColorStateList.valueOf(unimportantTextColor),
-                        )
-                    } else {
-                        upvoteCount.setTextColor(downvoteColor)
-                        TextViewCompat.setCompoundDrawableTintList(
-                            upvoteCount,
-                            ColorStateList.valueOf(downvoteColor),
-                        )
-                    }
-                }
-            },
-            onSignInRequired = onSignInRequired,
-            onInstanceMismatch,
-        )
-
-        if (highlightForever) {
-            highlightBg.visibility = View.VISIBLE
-            highlightBg.alpha = 1f
-        } else if (highlight) {
-            highlightBg.visibility = View.VISIBLE
-            highlightBg.animate()
-                .alpha(0f)
-                .apply {
-                    duration = 350
-                }
-                .withEndAction {
-                    highlightBg.visibility = View.GONE
-
-                    onHighlightComplete()
-                }
-        } else {
-            highlightBg.visibility = View.GONE
-        }
-
-        moreButton?.setOnClickListener {
-            onShowMoreOptions(postView)
-        }
-
-        if (rawBinding is ListingItemCardBinding ||
-            rawBinding is ListingItemCard2Binding ||
-            rawBinding is ListingItemCard3Binding
-        ) {
-            postView.post.url?.let { url ->
-                openLinkButton?.visibility = View.VISIBLE
-                openLinkButton?.setOnClickListener {
-                    Utils.openExternalLink(context, url)
-                }
-            }
-        } else {
-            openLinkButton?.visibility = View.GONE
-        }
-        when (val rb = rawBinding) {
-            is ListingItemCompactBinding -> {
-                if (isActionsExpanded) {
-                    upvoteButton?.visibility = View.VISIBLE
-                    downvoteButton?.visibility = View.VISIBLE
-                    createCommentButton?.visibility = View.VISIBLE
-                    moreButton?.visibility = View.VISIBLE
-                } else {
-                    upvoteButton?.visibility = View.GONE
-                    downvoteButton?.visibility = View.GONE
-                    createCommentButton?.visibility = View.GONE
-                    moreButton?.visibility = View.GONE
-                }
-
-                rb.root.setOnLongClickListener {
-                    toggleActions(postView)
-                    true
-                }
-            }
-            else -> {
-                rb.root.setOnLongClickListener {
-                    onShowMoreOptions(postView)
-                    true
                 }
             }
         }

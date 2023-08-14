@@ -17,6 +17,7 @@ import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.RuntimeException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,6 +41,11 @@ class CommunityInfoViewModel @Inject constructor(
     private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
         siteOrCommunity.setIsLoading()
         viewModelScope.launch {
+            if (communityRef is CommunityRef.MultiCommunity) {
+                siteOrCommunity.postError(RuntimeException())
+                return@launch
+            }
+
             val result = when (communityRef) {
                 is CommunityRef.All -> {
                     Either.Left(apiClient.fetchSiteWithRetry(force))
@@ -53,6 +59,7 @@ class CommunityInfoViewModel @Inject constructor(
                 is CommunityRef.Subscribed -> {
                     Either.Left(apiClient.fetchSiteWithRetry(force))
                 }
+                is CommunityRef.MultiCommunity -> error("unreachable code")
             }
 
             result

@@ -155,7 +155,7 @@ class PostFragment :
 //            }
         }
 
-        requireActivity().supportFragmentManager.setFragmentResultListener(
+        childFragmentManager.setFragmentResultListener(
             CreateOrEditPostFragment.REQUEST_KEY,
             this,
         ) { _, bundle ->

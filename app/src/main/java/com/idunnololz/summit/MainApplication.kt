@@ -13,6 +13,7 @@ import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.transition.CrossfadeTransition
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
@@ -198,6 +199,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
         hiltEntryPoint.themeManager().applyThemeFromPreferences()
         Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInApp
+        LemmyTextHelper.autoLinkPhoneNumbers = hiltEntryPoint.preferences().autoLinkPhoneNumbers
     }
 
     override fun getWorkManagerConfiguration(): androidx.work.Configuration {

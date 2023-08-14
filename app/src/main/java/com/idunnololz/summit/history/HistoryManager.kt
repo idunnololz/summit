@@ -4,6 +4,7 @@ import android.content.Context
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.user.TabCommunityState
@@ -79,6 +80,11 @@ class HistoryManager @Inject constructor(
     ) {
         coroutineScope.launch {
             withContext(dbContext) {
+                if (state.communityState.communityRef is CommunityRef.MultiCommunity) {
+                    // Multi-communities are purely client sided so we cannot record history for them.
+                    return@withContext
+                }
+
                 val ts = System.currentTimeMillis()
                 val historyEntry = HistoryEntry(
                     id = 0,

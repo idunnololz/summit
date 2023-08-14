@@ -17,6 +17,7 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
@@ -39,6 +40,9 @@ class PostsRepository @Inject constructor(
     private val hiddenPostsManager: HiddenPostsManager,
     private val contentFiltersManager: ContentFiltersManager,
     private val preferences: Preferences,
+
+    private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
+    private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -54,6 +58,11 @@ class PostsRepository @Inject constructor(
     private val coroutineScope = coroutineScopeFactory.create()
     private val allPostsContext = Dispatchers.IO.limitedParallelism(1)
 
+    private var currentDataSource: PostsDataSource = singlePostsDataSourceFactory.create(
+        communityName = null,
+        listingType = ListingType.All,
+    )
+
     private var allPosts = mutableListOf<PostData>()
     private var seenPosts = mutableSetOf<String>()
 
@@ -61,7 +70,7 @@ class PostsRepository @Inject constructor(
 
     private var endReached = false
 
-    private var currentPageInternal = 1
+    private var currentPageInternal = 0
     var hideRead = false
 
     var showLinkPosts = true
@@ -166,7 +175,7 @@ class PostsRepository @Inject constructor(
             val minPageInternal = allPosts
                 .slice(startIndex until min(endIndex, allPosts.size))
                 .map { it.postPageIndexInternal }
-                .minOrNull() ?: 1
+                .minOrNull() ?: 0
 
             deleteFromPage(minPageInternal)
             endReached = false
@@ -185,40 +194,11 @@ class PostsRepository @Inject constructor(
             }
 
             val hasMoreResult = retry {
-                when (communityRef) {
-                    is CommunityRef.All ->
-                        fetchPage(
-                            pageIndex = currentPageInternal,
-                            communityIdOrName = null,
-                            sortType = sortOrder.toApiSortOrder(),
-                            listingType = ListingType.All,
-                            force = force,
-                        )
-                    is CommunityRef.Local ->
-                        fetchPage(
-                            pageIndex = currentPageInternal,
-                            communityIdOrName = null,
-                            sortType = sortOrder.toApiSortOrder(),
-                            listingType = ListingType.Local,
-                            force = force,
-                        )
-                    is CommunityRef.CommunityRefByName ->
-                        fetchPage(
-                            pageIndex = currentPageInternal,
-                            communityIdOrName = Either.Right(communityRef.getServerId()),
-                            sortType = sortOrder.toApiSortOrder(),
-                            listingType = ListingType.All,
-                            force = force,
-                        )
-                    is CommunityRef.Subscribed ->
-                        fetchPage(
-                            pageIndex = currentPageInternal,
-                            communityIdOrName = null,
-                            sortType = sortOrder.toApiSortOrder(),
-                            listingType = ListingType.Subscribed,
-                            force = force,
-                        )
-                }
+                fetchPage(
+                    pageIndex = currentPageInternal,
+                    sortType = sortOrder.toApiSortOrder(),
+                    force = force,
+                )
             }
 
             if (hasMoreResult.isFailure) {
@@ -255,6 +235,8 @@ class PostsRepository @Inject constructor(
                 is CommunityRef.CommunityRefByName -> communityRef.instance ?: apiClient.instance
                 is CommunityRef.Local -> apiClient.instance
                 is CommunityRef.Subscribed -> communityRef.instance ?: apiClient.instance
+                is CommunityRef.MultiCommunity ->
+                    communityRef.communities.firstOrNull()?.instance ?: apiClient.instance
             }
 
     val apiInstance: String
@@ -265,6 +247,11 @@ class PostsRepository @Inject constructor(
 
         when (communityRef) {
             is CommunityRef.Local -> {
+                currentDataSource = singlePostsDataSourceFactory.create(
+                    communityName = null,
+                    listingType = ListingType.Local,
+                )
+
                 if (communityRef.instance != null) {
                     apiClient.changeInstance(communityRef.instance)
                 } else {
@@ -273,6 +260,11 @@ class PostsRepository @Inject constructor(
             }
 
             is CommunityRef.All -> {
+                currentDataSource = singlePostsDataSourceFactory.create(
+                    communityName = null,
+                    listingType = ListingType.All,
+                )
+
                 if (communityRef.instance != null) {
                     apiClient.changeInstance(communityRef.instance)
                 } else {
@@ -281,12 +273,37 @@ class PostsRepository @Inject constructor(
             }
 
             is CommunityRef.Subscribed -> {
+                currentDataSource = singlePostsDataSourceFactory.create(
+                    communityName = null,
+                    listingType = ListingType.Subscribed,
+                )
+
                 apiClient.defaultInstance()
             }
 
-            is CommunityRef.CommunityRefByName,
+            is CommunityRef.CommunityRefByName -> {
+                currentDataSource = singlePostsDataSourceFactory.create(
+                    communityName = communityRef.getServerId(),
+                    listingType = ListingType.All,
+                )
+
+                apiClient.defaultInstance()
+            }
+            is CommunityRef.MultiCommunity -> {
+                apiClient.defaultInstance()
+
+                currentDataSource = multiCommunityDataSourceFactory.create(
+                    apiClient.instance,
+                    communityRef.communities
+                )
+            }
             null,
             -> {
+                currentDataSource = singlePostsDataSourceFactory.create(
+                    communityName = null,
+                    listingType = ListingType.All,
+                )
+
                 apiClient.defaultInstance()
             }
         }
@@ -314,7 +331,7 @@ class PostsRepository @Inject constructor(
     }
 
     fun reset() {
-        currentPageInternal = 1
+        currentPageInternal = 0
         endReached = false
 
         allPosts = mutableListOf()
@@ -340,20 +357,10 @@ class PostsRepository @Inject constructor(
      */
     private suspend fun fetchPage(
         pageIndex: Int,
-        communityIdOrName: Either<Int, String>? = null,
         sortType: SortType,
-        listingType: ListingType,
         force: Boolean,
     ): Result<Boolean> {
-        val newPosts =
-            apiClient.fetchPosts(
-                communityIdOrName = communityIdOrName,
-                sortType = sortType,
-                listingType = listingType,
-                page = pageIndex,
-                limit = 20,
-                force = force,
-            )
+        val newPosts = currentDataSource.fetchPosts(sortType, pageIndex, force)
         val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
 
         return newPosts.fold(

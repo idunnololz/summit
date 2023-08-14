@@ -360,6 +360,11 @@ class CommunitySelectorController @AssistedInject constructor(
                             b.instance.text = it
                         }
                     }
+
+                    is CommunityRef.MultiCommunity -> {
+                        b.communityName.text = item.communityRef.name
+                        b.instance.text = context.getString(R.string.multicommunity)
+                    }
                 }
 
                 b.moreInfo.visibility = View.GONE
@@ -414,6 +419,8 @@ class CommunitySelectorController @AssistedInject constructor(
                             }
                         }
                         b.moreInfo.visibility = View.VISIBLE
+                    } else if (item.communityRef is CommunityRef.MultiCommunity) {
+                        icon = item.communityRef.icon
                     }
                 }
 
@@ -541,58 +548,75 @@ class CommunitySelectorController @AssistedInject constructor(
 
             if (!isQueryActive) {
                 val currentCommunityData = currentCommunityData
-                currentCommunityRef?.let {
-                    when (currentCommunityData) {
-                        is StatefulData.Error ->
-                            newItems.add(
-                                Item.CurrentCommunity(
-                                    communityRef = it,
-                                    siteResponse = null,
-                                    communityView = null,
-                                    isLoading = false,
-                                    error = currentCommunityData.error,
-                                ),
-                            )
-                        is StatefulData.Loading ->
-                            newItems.add(
-                                Item.CurrentCommunity(
-                                    communityRef = it,
-                                    siteResponse = null,
-                                    communityView = null,
-                                    isLoading = true,
-                                    error = null,
-                                ),
-                            )
-                        is StatefulData.NotStarted ->
-                            newItems.add(
-                                Item.CurrentCommunity(
-                                    communityRef = it,
-                                    siteResponse = null,
-                                    communityView = null,
-                                    isLoading = false,
-                                    error = null,
-                                ),
-                            )
-                        is StatefulData.Success ->
-                            newItems.add(
-                                Item.CurrentCommunity(
-                                    communityRef = it,
-                                    siteResponse = currentCommunityData.data.leftOrNull(),
-                                    communityView = currentCommunityData.data.getOrNull(),
-                                    isLoading = false,
-                                    error = null,
-                                ),
-                            )
-                        null ->
-                            newItems.add(
-                                Item.CurrentCommunity(
-                                    communityRef = it,
-                                    siteResponse = null,
-                                    communityView = null,
-                                    isLoading = false,
-                                    error = null,
-                                ),
-                            )
+                val currentCommunityRef = currentCommunityRef
+                if (currentCommunityRef is CommunityRef.MultiCommunity) {
+                    newItems.add(
+                        Item.CurrentCommunity(
+                            communityRef = currentCommunityRef,
+                            siteResponse = null,
+                            communityView = null,
+                            isLoading = false,
+                            error = null,
+                        ),
+                    )
+                } else {
+                    currentCommunityRef?.let {
+                        when (currentCommunityData) {
+                            is StatefulData.Error ->
+                                newItems.add(
+                                    Item.CurrentCommunity(
+                                        communityRef = it,
+                                        siteResponse = null,
+                                        communityView = null,
+                                        isLoading = false,
+                                        error = currentCommunityData.error,
+                                    ),
+                                )
+
+                            is StatefulData.Loading ->
+                                newItems.add(
+                                    Item.CurrentCommunity(
+                                        communityRef = it,
+                                        siteResponse = null,
+                                        communityView = null,
+                                        isLoading = true,
+                                        error = null,
+                                    ),
+                                )
+
+                            is StatefulData.NotStarted ->
+                                newItems.add(
+                                    Item.CurrentCommunity(
+                                        communityRef = it,
+                                        siteResponse = null,
+                                        communityView = null,
+                                        isLoading = false,
+                                        error = null,
+                                    ),
+                                )
+
+                            is StatefulData.Success ->
+                                newItems.add(
+                                    Item.CurrentCommunity(
+                                        communityRef = it,
+                                        siteResponse = currentCommunityData.data.leftOrNull(),
+                                        communityView = currentCommunityData.data.getOrNull(),
+                                        isLoading = false,
+                                        error = null,
+                                    ),
+                                )
+
+                            null ->
+                                newItems.add(
+                                    Item.CurrentCommunity(
+                                        communityRef = it,
+                                        siteResponse = null,
+                                        communityView = null,
+                                        isLoading = false,
+                                        error = null,
+                                    ),
+                                )
+                        }
                     }
                 }
 

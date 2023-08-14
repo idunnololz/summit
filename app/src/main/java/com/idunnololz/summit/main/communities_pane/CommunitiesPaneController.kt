@@ -20,6 +20,7 @@ import com.idunnololz.summit.databinding.HomeCommunityItemBinding
 import com.idunnololz.summit.databinding.NoSubscriptionsItemBinding
 import com.idunnololz.summit.databinding.TabStateItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.tabs.TabsManager
@@ -47,6 +48,7 @@ class CommunitiesPaneController @AssistedInject constructor(
     @Assisted private val binding: CommunitiesPaneBinding,
     @Assisted private val viewLifecycleOwner: LifecycleOwner,
     @Assisted private val onCommunitySelected: OnCommunitySelected,
+    @Assisted private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
 ) {
 
     @AssistedFactory
@@ -56,6 +58,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             binding: CommunitiesPaneBinding,
             viewLifecycleOwner: LifecycleOwner,
             onCommunitySelected: OnCommunitySelected,
+            onEditMultiCommunity: (UserCommunityItem) -> Unit,
         ): CommunitiesPaneController
     }
 
@@ -72,6 +75,9 @@ class CommunitiesPaneController @AssistedInject constructor(
             onDeleteUserCommunity = { id ->
                 viewModel.deleteUserCommunity(id)
             },
+            onEditMultiCommunity = { ref ->
+                onEditMultiCommunity(ref)
+            }
         )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -111,7 +117,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         private val tabsManager: TabsManager,
         private val onCommunitySelected: OnCommunitySelected,
         private val onDeleteUserCommunity: (Long) -> Unit,
-    ) : Adapter<ViewHolder>() {
+        private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
+        ) : Adapter<ViewHolder>() {
 
         private sealed interface Item {
             object BookmarkHeaderItem : Item
@@ -227,6 +234,14 @@ class CommunitiesPaneController @AssistedInject constructor(
                         b.icon.load(it)
                     }
                 }
+
+                if (item.communityRef is CommunityRef.MultiCommunity) {
+                    b.typeIcon.visibility = View.VISIBLE
+                    b.typeIcon.setImageResource(R.drawable.baseline_dynamic_feed_24)
+                } else {
+                    b.typeIcon.visibility = View.GONE
+                }
+
                 b.textView.text = item.communityRef.getName(context)
                 b.root.setOnClickListener {
                     onCommunitySelected(Either.Left(item.userCommunityItem), item.resetTabOnClick)
@@ -235,10 +250,20 @@ class CommunitiesPaneController @AssistedInject constructor(
                     PopupMenu(context, it).apply {
                         inflate(R.menu.menu_user_community_item)
 
+                        val multiCommunity = item.communityRef as? CommunityRef.MultiCommunity
+
+                        menu.findItem(R.id.edit).isVisible = multiCommunity != null
+
                         setOnMenuItemClickListener {
                             when (it.itemId) {
                                 R.id.delete -> {
                                     onDeleteUserCommunity(item.userCommunityItem.id)
+                                    true
+                                }
+                                R.id.edit -> {
+                                    if (multiCommunity != null) {
+                                        onEditMultiCommunity(item.userCommunityItem)
+                                    }
                                     true
                                 }
                                 else -> false

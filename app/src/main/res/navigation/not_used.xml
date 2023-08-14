@@ -90,4 +90,16 @@
             android:name="personId"
             app:argType="integer" />
     </dialog>
+    <dialog
+        android:id="@+id/multiCommunityEditorDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment"
+        android:label="MultiCommunityEditorDialogFragment" >
+        <argument
+            android:name="multiCommunity"
+            app:argType="com.idunnololz.summit.lemmy.CommunityRef$MultiCommunity" />
+        <argument
+            android:name="dbId"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </dialog>
 </navigation>
