@@ -10,6 +10,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingHiddenPostsBinding
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.HiddenPostsSettings
 import com.idunnololz.summit.settings.MiscSettings
@@ -69,12 +70,28 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>() {
     }
 
     private fun updateRendering() {
+        if (!isBindingAvailable()) {
+            return
+        }
+
+        val context = requireContext()
+
         settings.openLinksInExternalBrowser.bindTo(
             b = binding.openLinksInApp,
             { preferences.openLinksInApp },
             {
                 preferences.openLinksInApp = it
                 Utils.openExternalLinksInBrowser = preferences.openLinksInApp
+            }
+        )
+        settings.autoLinkPhoneNumbers.bindTo(
+            binding.autoLinkPhoneNumbers,
+            { preferences.autoLinkPhoneNumbers },
+            {
+                preferences.autoLinkPhoneNumbers = it
+
+                LemmyTextHelper.autoLinkPhoneNumbers = it
+                LemmyTextHelper.resetMarkwon(context)
             }
         )
     }

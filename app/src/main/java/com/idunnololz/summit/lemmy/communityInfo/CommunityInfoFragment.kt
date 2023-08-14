@@ -145,6 +145,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is CommunityRef.All,
                 is CommunityRef.Local,
                 is CommunityRef.Subscribed,
+                is CommunityRef.MultiCommunity,
                 -> {
                     subscribe.visibility = View.GONE
                 }

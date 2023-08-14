@@ -102,7 +102,7 @@ open class LemmyListSource<T, O>(
             }
 
             field = value
-            reset()
+            invalidate()
         }
 
     suspend fun peekNextItem(): Result<T?> {

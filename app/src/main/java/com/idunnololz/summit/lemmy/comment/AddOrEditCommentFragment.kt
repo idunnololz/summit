@@ -115,7 +115,6 @@ class AddOrEditCommentFragment :
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomBar)
-            insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.coordinatorLayout)
         }
 
         viewModel.currentAccount.observe(viewLifecycleOwner) {

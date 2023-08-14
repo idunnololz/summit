@@ -40,6 +40,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -313,26 +314,41 @@ class CommunityFragment :
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
 
-        requireActivity().supportFragmentManager.setFragmentResultListener(
-            CreateOrEditPostFragment.REQUEST_KEY,
-            this,
-        ) { _, bundle ->
-            val result = bundle.getParcelableCompat<PostView>(
-                CreateOrEditPostFragment.REQUEST_KEY_RESULT,
-            )
-
-            if (result != null) {
-                viewModel.fetchCurrentPage(force = true)
-                viewPagerController?.openPost(
-                    instance = result.instance,
-                    id = result.post.id,
-                    reveal = false,
-                    post = result,
-                    jumpToComments = false,
-                    currentCommunity = args.communityRef,
-                    videoState = null,
+        with(childFragmentManager) {
+            setFragmentResultListener(
+                CreateOrEditPostFragment.REQUEST_KEY,
+                this@CommunityFragment,
+            ) { _, bundle ->
+                val result = bundle.getParcelableCompat<PostView>(
+                    CreateOrEditPostFragment.REQUEST_KEY_RESULT,
                 )
+
+                if (result != null) {
+                    viewModel.fetchCurrentPage(force = true)
+                    viewPagerController?.openPost(
+                        instance = result.instance,
+                        id = result.post.id,
+                        reveal = false,
+                        post = result,
+                        jumpToComments = false,
+                        currentCommunity = args.communityRef,
+                        videoState = null,
+                    )
+                }
             }
+
+//            setFragmentResultListener(
+//                MultiCommunityEditorDialogFragment.REQUEST_KEY,
+//                this@CommunityFragment,
+//            ) { _, bundle ->
+//                val result = bundle.getParcelableCompat<CommunityRef.MultiCommunity>(
+//                    MultiCommunityEditorDialogFragment.REQUEST_KEY_RESULT,
+//                )
+//
+//                if (result != null) {
+//                    userCommunitiesManager.addUserCommunity(result, null)
+//                }
+//            }
         }
     }
 
@@ -925,6 +941,7 @@ class CommunityFragment :
                 }
                 is CommunityRef.Local -> {}
                 is CommunityRef.Subscribed -> {}
+                is CommunityRef.MultiCommunity -> {}
                 null -> {}
             }
 
@@ -947,6 +964,11 @@ class CommunityFragment :
                 id = R.id.browse_communities,
                 title = R.string.browse_communities,
                 icon = R.drawable.baseline_dashboard_24,
+            )
+            addItemWithIcon(
+                id = R.id.create_multi_community,
+                title = R.string.create_multi_community,
+                icon = R.drawable.baseline_dynamic_feed_24,
             )
             addItemWithIcon(
                 id = R.id.settings,
@@ -1049,6 +1071,16 @@ class CommunityFragment :
                     }
                     R.id.settings -> {
                         requireMainActivity().openSettings()
+                    }
+                    R.id.create_multi_community -> {
+                        MultiCommunityEditorDialogFragment.show(
+                            childFragmentManager,
+                            CommunityRef.MultiCommunity(
+                                getString(R.string.default_multi_community_name),
+                                null,
+                                listOf()
+                            )
+                        )
                     }
                 }
             }

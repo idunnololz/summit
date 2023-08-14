@@ -40,7 +40,7 @@
 
     <color name="colorLink">#0079d3</color>
 
-    <color name="colorOverlay">@color/black50</color>
+    <color name="colorOverlay">@color/black70</color>
 
     <color name="appBarBackground">@color/colorBackground</color>
 

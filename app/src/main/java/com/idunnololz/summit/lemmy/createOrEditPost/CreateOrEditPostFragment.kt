@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.github.drjacky.imagepicker.ImagePicker
@@ -303,7 +304,7 @@ class CreateOrEditPostFragment :
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
-                    requireActivity().supportFragmentManager.setFragmentResult(
+                    setFragmentResult(
                         REQUEST_KEY,
                         bundleOf(
                             REQUEST_KEY_RESULT to it.data,

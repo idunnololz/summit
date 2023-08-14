@@ -28,6 +28,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <ImageView
+        android:id="@+id/type_icon"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:visibility="gone"
+        android:background="@color/colorSurface"
+        app:layout_constraintEnd_toEndOf="@+id/icon"
+        app:layout_constraintBottom_toBottomOf="@+id/icon"
+        app:tint="?colorControlNormal" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"

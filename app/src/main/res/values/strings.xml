@@ -526,6 +526,20 @@
     <string name="error_unable_to_remove_comment">Unable to remove/add comment.</string>
     <string name="feature_comment">Feature comment</string>
     <string name="remove_feature_comment">Remove feature comment</string>
+    <string name="multicommunity">Multi-community</string>
+    <string name="create_multi_community">Create multi-community</string>
+    <string name="multi_community_editor">Multi-community editor</string>
+    <string name="default_multi_community_name">My multi-community</string>
+    <string name="multi_community_name">Multi-community name</string>
+    <string name="choose_communities">Choose communities</string>
+    <string name="selected_communities">Selected communities</string>
+    <string name="error_no_communities_selected">No communities selected</string>
+    <string name="error_no_communities_selected_desc">Please select at least one community to create a multi-community.</string>
+    <string name="edit">Edit</string>
+    <string name="auto_convert_phone_numbers_to_links">Auto-convert phone numbers to links</string>
+    <string name="no_communities_selected">No communities selected</string>
+    <string name="multi_community_icon">Multi-community icon</string>
+    <string name="no_icons">No icons</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

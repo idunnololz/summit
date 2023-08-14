@@ -104,4 +104,5 @@
     <item name="remove_comment" type="id" />
     <item name="feature_comment" type="id" />
     <item name="remove_feature_comment" type="id" />
+    <item name="create_multi_community" type="id" />
 </resources>

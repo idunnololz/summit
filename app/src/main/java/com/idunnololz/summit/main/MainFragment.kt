@@ -35,6 +35,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
@@ -43,6 +44,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef
 import com.idunnololz.summit.tabs.isHomeTab
+import com.idunnololz.summit.tabs.toTab
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
@@ -172,7 +174,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 if (!tab.isHomeTab &&
                     currentFragment is CommunityFragment && currentFragment.isPristineFirstPage()
                 ) {
-
                     changeCommunity(tabsManager.getHomeTab())
                 } else {
                     resetCurrentTab(tab)
@@ -211,35 +212,44 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         communitiesPaneController = communitiesPaneViewModel.createController(
             binding.startPanel,
             viewLifecycleOwner,
-        ) { tabRef, resetTab: Boolean ->
-            binding.rootView.closePanels()
+            onCommunitySelected =
+            { tabRef, resetTab: Boolean ->
+                binding.rootView.closePanels()
 
-            binding.rootView.postDelayed(
-                a@{
-                    if (!isBindingAvailable()) return@a
+                binding.rootView.postDelayed(
+                    a@{
+                        if (!isBindingAvailable()) return@a
 
-                    val tab = tabsManager.getTab(tabRef)
+                        val tab = tabsManager.getTab(tabRef)
 
-                    val selectedTabFragment = childFragmentManager.findFragmentByTag(getTagForTab(tab))
-                    if (selectedTabFragment?.findNavController() == currentNavController) {
-                        if (resetTab) {
-                            resetCurrentTab(tab)
+                        val selectedTabFragment = childFragmentManager.findFragmentByTag(getTagForTab(tab))
+                        if (selectedTabFragment?.findNavController() == currentNavController) {
+                            if (resetTab) {
+                                resetCurrentTab(tab)
+                            }
+
+                            // otherwise do nothing because we are already on the right tab
+                        } else {
+                            if (resetTab) {
+                                removeNavHostFragment(childFragmentManager, getTagForTab(tab))
+                            }
+
+                            binding.rootView.post {
+                                changeCommunity(tab)
+                            }
                         }
-
-                        // otherwise do nothing because we are already on the right tab
-                    } else {
-                        if (resetTab) {
-                            removeNavHostFragment(childFragmentManager, getTagForTab(tab))
-                        }
-
-                        binding.rootView.post {
-                            changeCommunity(tab)
-                        }
-                    }
-                },
-                300,
-            )
-        }
+                    },
+                    300,
+                )
+            },
+            onEditMultiCommunity = {
+                MultiCommunityEditorDialogFragment.show(
+                    fragmentManager = childFragmentManager,
+                    multiCommunity = it.communityRef as CommunityRef.MultiCommunity,
+                    dbId = it.id
+                )
+            }
+        )
 
         val currentTab = requireNotNull(tabsManager.currentTab.value)
         firstFragmentTag = getTagForTab(
@@ -264,6 +274,22 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             it.contentIfNotHandled ?: return@observe
 
             purgeUnusedFragments()
+        }
+        viewModel.userCommunitiesUpdated.observe(viewLifecycleOwner) {
+            val userCommunityItem = it.contentIfNotHandled ?: return@observe
+            val tab = userCommunityItem.toTab()
+            val currentTab = tabsManager.currentTab.value
+            val isCurrentTabUpdated =
+                (currentTab as? TabsManager.Tab.UserCommunityTab)?.userCommunityItem?.id ==
+                    userCommunityItem.id
+
+            if (isCurrentTabUpdated) {
+                resetCurrentTab(tab)
+            } else {
+                try {
+                    purgeFragments(listOf(getTagForTab(tab)))
+                } catch (e: Exception) {}
+            }
         }
 
         ArrayList(deferredNavigationRequests).forEach {

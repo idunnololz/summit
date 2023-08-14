@@ -47,6 +47,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragment
@@ -61,6 +62,7 @@ import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.user.TabCommunityState
+import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
@@ -124,6 +126,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var themeManager: ThemeManager
+
+    @Inject
+    lateinit var userCommunitiesManager: UserCommunitiesManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -576,8 +581,20 @@ class MainActivity : BaseActivity() {
         viewModel.communities.value.let {
             communitySelectorController.setCommunities(it)
             communitySelectorController.setCurrentCommunity(currentCommunityRef)
-            communitySelectorController.onCommunityInfoClick = {
-                showCommunityInfo(it)
+            communitySelectorController.onCommunityInfoClick = { ref ->
+                if (ref is CommunityRef.MultiCommunity) {
+                    val userCommunityItem = userCommunitiesManager.getAllUserCommunities()
+                        .firstOrNull { it.communityRef == ref }
+                    if (userCommunityItem != null) {
+                        MultiCommunityEditorDialogFragment.show(
+                            supportFragmentManager,
+                            userCommunityItem.communityRef as CommunityRef.MultiCommunity,
+                            userCommunityItem.id,
+                        )
+                    }
+                } else {
+                    showCommunityInfo(ref)
+                }
             }
         }
 

@@ -7,12 +7,9 @@ import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
-import com.idunnololz.summit.lemmy.FilterTooAggressiveException
-import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
-import com.idunnololz.summit.lemmy.PostsRepository
-import com.idunnololz.summit.lemmy.inbox.InboxRepository
+import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import com.idunnololz.summit.util.dateStringToTs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -20,7 +17,7 @@ import javax.inject.Inject
 class MultiCommunityDataSource(
     private val instance: String,
     private val sources: List<LemmyListSource<PostView, SortType>>,
-) {
+): PostsDataSource {
 
     companion object {
         private const val TAG = "MultiCommunityDataSource"
@@ -40,7 +37,7 @@ class MultiCommunityDataSource(
                     SortType.Active,
                     { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
                         this.fetchPosts(
-                            Either.Right(communityRef.name),
+                            Either.Right(communityRef.getServerId()),
                             sortOrder,
                             ListingType.All,
                             page,
@@ -63,12 +60,40 @@ class MultiCommunityDataSource(
     )
 
     private var pagesCache = mutableListOf<Page>()
+    private var sortType: SortType? = null
 
     private val pagesContext = Dispatchers.Default.limitedParallelism(1)
 
-    /**
-     * @return true if there might be more posts to fetch
-     */
+    override suspend fun fetchPosts(
+        sortType: SortType?,
+        page: Int,
+        force: Boolean,
+        ): Result<List<PostView>> {
+        if (force) {
+            reset()
+        }
+
+        setSortType(sortType)
+
+        return fetchPage(
+            page,
+            sortType ?: SortType.Active,
+            ListingType.All,
+            force,
+        ).fold(
+            onSuccess = {
+                Result.success(it.posts)
+            },
+            onFailure = {
+                if (it is EndReachedException) {
+                    Result.success(listOf())
+                } else {
+                    Result.failure(it)
+                }
+            }
+        )
+    }
+
     private suspend fun fetchPage(
         pageIndex: Int,
         sortType: SortType,
@@ -104,26 +129,34 @@ class MultiCommunityDataSource(
                 return@a Result.failure(requireNotNull(error.exceptionOrNull()))
             }
             val nextSource = sources.maxBy {
-                it.peekNextItem().getOrThrow()?.counts?.score ?: 0
-//            when (sortType) {
-//                SortType.Active ->
-//                SortType.Hot -> TODO()
-//                SortType.New -> TODO()
-//                SortType.Old -> TODO()
-//                SortType.TopDay -> TODO()
-//                SortType.TopWeek -> TODO()
-//                SortType.TopMonth -> TODO()
-//                SortType.TopYear -> TODO()
-//                SortType.TopAll -> TODO()
-//                SortType.MostComments -> TODO()
-//                SortType.NewComments -> TODO()
-//                SortType.TopHour -> TODO()
-//                SortType.TopSixHour -> TODO()
-//                SortType.TopTwelveHour -> TODO()
-//                SortType.TopThreeMonths -> TODO()
-//                SortType.TopSixMonths -> TODO()
-//                SortType.TopNineMonths -> TODO()
-//            }
+                val postView = it.peekNextItem().getOrThrow() ?: return@maxBy 0L
+
+                if (postView.post.featured_local || postView.post.featured_community) {
+                    return@maxBy Long.MAX_VALUE
+                }
+
+                when (sortType) {
+                    SortType.Active -> postView.counts.hot_rank_active?.toLong() ?: 0L
+                    SortType.Hot -> postView.counts.hot_rank?.toLong() ?: 0L
+                    SortType.New -> dateStringToTs(postView.counts.published)
+                    SortType.Old -> -dateStringToTs(postView.counts.published)
+                    SortType.MostComments -> postView.counts.comments.toLong()
+                    SortType.NewComments -> postView.counts.newest_comment_time.let {
+                        dateStringToTs(it)
+                    }
+                    SortType.TopDay,
+                    SortType.TopWeek,
+                    SortType.TopMonth,
+                    SortType.TopYear,
+                    SortType.TopAll,
+                    SortType.TopHour,
+                    SortType.TopSixHour,
+                    SortType.TopTwelveHour,
+                    SortType.TopThreeMonths,
+                    SortType.TopSixMonths,
+                    SortType.TopNineMonths -> postView.counts.score.toLong()
+                    else -> postView.counts.score.toLong()
+                }
             }
             val nextItem = nextSource.peekNextItem().getOrNull()
 
@@ -156,6 +189,26 @@ class MultiCommunityDataSource(
                 hasMore,
             )
         )
+    }
+
+    private fun setSortType(sortType: SortType?) {
+        if (this.sortType == sortType) {
+            return
+        }
+
+        this.sortType = sortType
+        sources.forEach {
+            it.invalidate()
+            it.sortOrder = sortType ?: SortType.Active
+        }
+        reset()
+    }
+
+    private fun reset() {
+        sources.forEach {
+            it.invalidate()
+        }
+        pagesCache.clear()
     }
 
     class EndReachedException : Exception()

@@ -1329,6 +1329,10 @@ class LemmyApiClient @Inject constructor(
             if (errMsg?.contains("timeout", ignoreCase = true) == true) {
                 return Result.failure(ServerTimeoutException(errorCode))
             }
+            if (errMsg?.contains("the database system is not yet accepting connections", ignoreCase = true) == true) {
+                // this is a 4xx error but it should be a 5xx error because it's server sided and retry-able
+                return Result.failure(ServerApiException(503))
+            }
 
             return Result.failure(ClientApiException(errMsg, errorCode))
         }

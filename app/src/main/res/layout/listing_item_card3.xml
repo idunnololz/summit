@@ -48,6 +48,36 @@
             app:layout_constraintTop_toBottomOf="@+id/title"
             />
 
+        <View
+            android:id="@+id/link_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/link_overlay2"
+            app:layout_constraintTop_toTopOf="@+id/link_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/image"
+            app:layout_constraintStart_toStartOf="@+id/image"
+            app:layout_constraintEnd_toEndOf="@+id/image"/>
+
+        <TextView
+            android:id="@+id/link_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding"
+            app:layout_constraintStart_toStartOf="@+id/image"
+            app:layout_constraintTop_toTopOf="@+id/link_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/link_icon"
+            app:layout_constraintEnd_toStartOf="@+id/link_icon"/>
+
+        <ImageView
+            android:id="@+id/link_icon"
+            android:layout_width="42dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@drawable/baseline_open_in_new_18"
+            app:layout_constraintBottom_toBottomOf="@+id/image"
+            app:layout_constraintEnd_toEndOf="@+id/image"
+            app:tint="?colorControlNormal" />
+
         <HorizontalScrollView
             android:id="@+id/headerView"
             android:layout_width="0dp"

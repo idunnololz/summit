@@ -81,6 +81,9 @@ class LemmyAppBarController(
         if (isHome) {
             communityTextView.isChipIconVisible = true
             communityTextView.setChipIconResource(R.drawable.baseline_home_18)
+        } else if (currentCommunity is CommunityRef.MultiCommunity) {
+            communityTextView.isChipIconVisible = true
+            communityTextView.setChipIconResource(R.drawable.baseline_dynamic_feed_24)
         } else {
             communityTextView.isChipIconVisible = false
         }

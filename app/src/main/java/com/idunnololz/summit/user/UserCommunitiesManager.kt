@@ -50,6 +50,7 @@ class UserCommunitiesManager @Inject constructor(
     private var nextAvailableSortId: Long = 1
 
     val userCommunitiesChangedFlow = MutableSharedFlow<Unit>()
+    val userCommunitiesUpdatedFlow = MutableSharedFlow<UserCommunityItem>()
     val defaultCommunity = MutableStateFlow(preferences.getDefaultPage())
 
     init {
@@ -81,14 +82,17 @@ class UserCommunitiesManager @Inject constructor(
         idToUserCommunity[id]
     }
 
-    fun addUserCommunity(communityRef: CommunityRef, icon: String?) {
-        val item = UserCommunityItem(communityRef = communityRef, iconUrl = icon)
+    fun addUserCommunity(communityRef: CommunityRef, icon: String?, dbId: Long = 0L) {
+        val item = UserCommunityItem(communityRef = communityRef, iconUrl = icon, id = dbId)
 
         coroutineScope.launch {
             withContext(dbContext) {
                 addCommunityOrUpdateInternal(item)
             }
             userCommunitiesChangedFlow.emit(Unit)
+            if (item.id != 0L) {
+                userCommunitiesUpdatedFlow.emit(item)
+            }
         }
     }
 

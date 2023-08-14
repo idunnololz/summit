@@ -36,6 +36,9 @@ class ListingItemViewHolder(
     val layoutShowsFullContent: Boolean,
     val createCommentButton: View?,
     val moreButton: View? = null,
+    val linkText: TextView? = null,
+    val linkIcon: View? = null,
+    val linkOverlay: View? = null,
 ) : RecyclerView.ViewHolder(root) {
 
     data class State(
@@ -108,6 +111,10 @@ class ListingItemViewHolder(
                 highlightBg = binding.highlightBg,
                 layoutShowsFullContent = false,
                 createCommentButton = null,
+                moreButton = null,
+                linkText = binding.linkText,
+                linkIcon = binding.linkIcon,
+                linkOverlay = binding.linkOverlay,
             )
 
         fun fromBinding(binding: ListingItemCardBinding) =
@@ -129,6 +136,10 @@ class ListingItemViewHolder(
                 highlightBg = binding.highlightBg,
                 layoutShowsFullContent = false,
                 createCommentButton = null,
+                moreButton = null,
+                linkText = binding.linkText,
+                linkIcon = binding.linkIcon,
+                linkOverlay = binding.linkOverlay,
             )
 
         fun fromBinding(binding: ListingItemCard2Binding) =
@@ -150,6 +161,10 @@ class ListingItemViewHolder(
                 highlightBg = binding.highlightBg,
                 layoutShowsFullContent = false,
                 createCommentButton = null,
+                moreButton = null,
+                linkText = binding.linkText,
+                linkIcon = binding.linkIcon,
+                linkOverlay = binding.linkOverlay,
             )
 
         fun fromBinding(binding: ListingItemCard3Binding) =
@@ -171,6 +186,10 @@ class ListingItemViewHolder(
                 highlightBg = binding.highlightBg,
                 layoutShowsFullContent = false,
                 createCommentButton = null,
+                moreButton = null,
+                linkText = binding.linkText,
+                linkIcon = binding.linkIcon,
+                linkOverlay = binding.linkOverlay,
             )
 
         fun fromBinding(binding: ListingItemFullBinding) =

@@ -150,6 +150,7 @@ object PreferenceUtil {
     const val KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT = "KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT"
 
     const val KEY_OPEN_LINKS_IN_APP = "KEY_OPEN_LINKS_IN_APP"
+    const val KEY_AUTO_LINK_PHONE_NUMBERS = "KEY_AUTO_LINK_PHONE_NUMBERS"
 
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {

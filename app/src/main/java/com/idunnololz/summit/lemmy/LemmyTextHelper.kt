@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.graphics.RectF
 import android.text.SpannableStringBuilder
+import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView
 import com.idunnololz.summit.R
@@ -31,6 +32,10 @@ import java.util.regex.Pattern
 object LemmyTextHelper {
 
     private const val TAG = "LemmyTextHelper"
+
+    private var markwon: Markwon? = null
+
+    var autoLinkPhoneNumbers: Boolean = true
 
     fun bindText(
         textView: TextView,
@@ -64,7 +69,7 @@ object LemmyTextHelper {
     }
 
     private fun bindLemmyText(textView: TextView, text: String, instance: String) {
-        createMarkwon(textView.context, instance).let {
+        getMarkwon(textView.context).let {
             val spanned = SpannableStringBuilder(it.toMarkdown(text))
             postProcessDetails(spanned, textView)
 
@@ -78,7 +83,6 @@ object LemmyTextHelper {
 
     private class LemmyPlugin(
         private val context: Context,
-        private val instance: String,
     ) : AbstractMarkwonPlugin() {
 
         /**
@@ -162,12 +166,29 @@ object LemmyTextHelper {
         }
     }
 
-    private fun createMarkwon(context: Context, instance: String): Markwon =
+    fun resetMarkwon(context: Context) {
+        markwon = createMarkwon(context)
+    }
+
+    private fun getMarkwon(context: Context) =
+        markwon ?: createMarkwon(context).also {
+            markwon = it
+        }
+
+    private fun createMarkwon(context: Context): Markwon =
         Markwon.builder(context)
             .usePlugin(CoilImagesPlugin.create(context))
-            .usePlugin(LinkifyPlugin.create())
+            .usePlugin(
+                LinkifyPlugin.create(
+                    if (autoLinkPhoneNumbers) {
+                        Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS or Linkify.WEB_URLS
+                    } else {
+                        Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS
+                   },
+                ),
+            )
             .usePlugin(TablePlugin.create(context))
-            .usePlugin(LemmyPlugin(context, instance))
+            .usePlugin(LemmyPlugin(context))
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(HtmlPlugin.create())
             .usePlugin(

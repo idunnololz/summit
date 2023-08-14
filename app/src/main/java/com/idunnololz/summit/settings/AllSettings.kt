@@ -1011,8 +1011,14 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.open_links_in_external_browser),
         context.getString(R.string.open_links_in_external_browser_desc),
     )
+    val autoLinkPhoneNumbers = OnOffSettingItem(
+        null,
+        context.getString(R.string.auto_convert_phone_numbers_to_links),
+        null,
+    )
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
+        autoLinkPhoneNumbers,
     )
 }
 
