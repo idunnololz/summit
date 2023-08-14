@@ -199,7 +199,7 @@ class CommunitySelectorController @AssistedInject constructor(
         activity.insetViewExceptTopAutomaticallyByMargins(lifecycleOwner, recyclerView)
         activity.insetViewExceptBottomAutomaticallyByPadding(lifecycleOwner, binding.coordinatorLayout)
 
-        activity.onBackPressedDispatcher.addCallback(onBackPressedHandler)
+        activity.onBackPressedDispatcher.addCallback(lifecycleOwner, onBackPressedHandler)
 
         bottomSheetBehavior?.addBottomSheetCallback(
             object : BottomSheetBehavior.BottomSheetCallback() {

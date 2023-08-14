@@ -24,6 +24,7 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -33,6 +34,7 @@ import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
 import com.idunnololz.summit.lemmy.FilterTooAggressiveException
 import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.MultiCommunityException
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
@@ -1008,17 +1010,23 @@ class CommunityFragment :
                             .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
                     }
                     R.id.share -> {
-                        val sendIntent: Intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(
-                                Intent.EXTRA_TEXT,
-                                viewModel.getSharedLinkForCurrentPage(),
-                            )
-                            type = "text/plain"
-                        }
+                        try {
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    viewModel.getSharedLinkForCurrentPage(),
+                                )
+                                type = "text/plain"
+                            }
 
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-                        startActivity(shareIntent)
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            startActivity(shareIntent)
+                        } catch (e: MultiCommunityException) {
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.error_cannot_share_multi_community)
+                                .createAndShow(childFragmentManager, "sdafx")
+                        }
                     }
                     R.id.hide_read -> {
                         val anchors = mutableSetOf<Int>()
