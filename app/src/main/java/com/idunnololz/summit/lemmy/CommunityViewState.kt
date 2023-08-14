@@ -49,7 +49,7 @@ fun CommunityRef.toUri(apiInstance: String): Uri {
         is CommunityRef.Local -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Local"
         is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
         is CommunityRef.Subscribed -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Subscribed"
-        is CommunityRef.MultiCommunity -> TODO()
+        is CommunityRef.MultiCommunity -> throw MultiCommunityException()
     }
 
     return Uri.parse(url)
@@ -74,3 +74,5 @@ fun CommunityViewState.getShortDesc(context: Context): String =
         communityState.communityRef.getName(context),
         (communityState.currentPageIndex + 1).toString(),
     )
+
+class MultiCommunityException : Exception()

@@ -303,7 +303,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             Log.d(TAG, "updatePaneBackPressHandler(): selected panel: ${binding.rootView.getSelectedPanel()}")
             if (binding.rootView.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
                 paneOnBackPressHandler.remove()
-                requireMainActivity().onBackPressedDispatcher.addCallback(paneOnBackPressHandler)
+                requireMainActivity().onBackPressedDispatcher
+                    .addCallback(viewLifecycleOwner, paneOnBackPressHandler)
             } else {
                 paneOnBackPressHandler.remove()
             }

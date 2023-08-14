@@ -130,6 +130,9 @@ class MultiCommunityEditorDialogFragment :
             },
             onIconSelected = {
                 viewModel.selectedIcon.value = it
+            },
+            onCommunityClick = {
+                getMainActivity()?.showCommunityInfo(it)
             }
         )
 
@@ -315,6 +318,7 @@ class MultiCommunityEditorDialogFragment :
         private val onChooseCommunitiesClick: () -> Unit,
         private val onCommunityNameChanged: (String?) -> Unit,
         private val onIconSelected: (String?) -> Unit,
+        private val onCommunityClick: (CommunityRef) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private sealed interface Item {
@@ -430,6 +434,9 @@ class MultiCommunityEditorDialogFragment :
 
                 @Suppress("SetTextI18n")
                 b.monthlyActives.text = "(${item.communityRef.instance})"
+                b.root.setOnClickListener {
+                    onCommunityClick(item.communityRef)
+                }
             }
             addItemType(
                 clazz = Item.IconsItem::class,

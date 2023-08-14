@@ -85,15 +85,6 @@ class MainActivity : BaseActivity() {
         private val TAG = MainActivity::class.java.simpleName
     }
 
-    var toolbarTextView: TextView? = null
-        private set
-
-    // holds the original Toolbar height.
-    // this can also be obtained via (an)other method(s)
-    private var toolbarHeight: Int = 0
-
-    private var lastToolbarAppBarOffset = -1f
-
     private lateinit var binding: ActivityMainBinding
 
     val headerOffset = MutableLiveData<Int>()
@@ -582,19 +573,7 @@ class MainActivity : BaseActivity() {
             communitySelectorController.setCommunities(it)
             communitySelectorController.setCurrentCommunity(currentCommunityRef)
             communitySelectorController.onCommunityInfoClick = { ref ->
-                if (ref is CommunityRef.MultiCommunity) {
-                    val userCommunityItem = userCommunitiesManager.getAllUserCommunities()
-                        .firstOrNull { it.communityRef == ref }
-                    if (userCommunityItem != null) {
-                        MultiCommunityEditorDialogFragment.show(
-                            supportFragmentManager,
-                            userCommunityItem.communityRef as CommunityRef.MultiCommunity,
-                            userCommunityItem.id,
-                        )
-                    }
-                } else {
-                    showCommunityInfo(ref)
-                }
+                showCommunityInfo(ref)
             }
         }
 
@@ -936,7 +915,30 @@ class MainActivity : BaseActivity() {
     }
 
     fun showCommunityInfo(communityRef: CommunityRef) {
-        val direction = MainDirections.actionGlobalCommunityInfoFragment(communityRef)
-        currentNavController?.navigateSafe(direction)
+        if (communityRef is CommunityRef.MultiCommunity) {
+            val userCommunityItem = userCommunitiesManager.getAllUserCommunities()
+                .firstOrNull { it.communityRef == communityRef }
+            if (userCommunityItem != null) {
+
+                val navHostFragment =
+                    supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                        as? NavHostFragment
+                val currentFragment = navHostFragment
+                    ?.childFragmentManager
+                    ?.fragments
+                    ?.getOrNull(0)
+
+                currentFragment?.childFragmentManager?.let { childFragmentManager ->
+                    MultiCommunityEditorDialogFragment.show(
+                        childFragmentManager,
+                        userCommunityItem.communityRef as CommunityRef.MultiCommunity,
+                        userCommunityItem.id,
+                    )
+                }
+            }
+        } else {
+            val direction = MainDirections.actionGlobalCommunityInfoFragment(communityRef)
+            currentNavController?.navigateSafe(direction)
+        }
     }
 }
