@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy
 
 import android.util.Log
-import arrow.core.Either
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -47,7 +46,7 @@ class PostsRepository @Inject constructor(
     companion object {
         private val TAG = PostsRepository::class.simpleName
 
-        private const val POSTS_PER_PAGE = 20
+        private const val DEFAULT_POSTS_PER_PAGE = 20
     }
 
     private data class PostData(
@@ -71,6 +70,8 @@ class PostsRepository @Inject constructor(
     private var endReached = false
 
     private var currentPageInternal = 0
+    private var postsPerPage = DEFAULT_POSTS_PER_PAGE
+
     var hideRead = false
 
     var showLinkPosts = true
@@ -165,8 +166,8 @@ class PostsRepository @Inject constructor(
     }
 
     suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
-        val startIndex = pageIndex * POSTS_PER_PAGE
-        val endIndex = startIndex + POSTS_PER_PAGE
+        val startIndex = pageIndex * postsPerPage
+        val endIndex = startIndex + postsPerPage
 
         val communityRef = communityRef
 
@@ -251,6 +252,7 @@ class PostsRepository @Inject constructor(
                     communityName = null,
                     listingType = ListingType.Local,
                 )
+                postsPerPage = DEFAULT_POSTS_PER_PAGE
 
                 if (communityRef.instance != null) {
                     apiClient.changeInstance(communityRef.instance)
@@ -264,6 +266,7 @@ class PostsRepository @Inject constructor(
                     communityName = null,
                     listingType = ListingType.All,
                 )
+                postsPerPage = DEFAULT_POSTS_PER_PAGE
 
                 if (communityRef.instance != null) {
                     apiClient.changeInstance(communityRef.instance)
@@ -277,6 +280,7 @@ class PostsRepository @Inject constructor(
                     communityName = null,
                     listingType = ListingType.Subscribed,
                 )
+                postsPerPage = DEFAULT_POSTS_PER_PAGE
 
                 apiClient.defaultInstance()
             }
@@ -286,16 +290,18 @@ class PostsRepository @Inject constructor(
                     communityName = communityRef.getServerId(),
                     listingType = ListingType.All,
                 )
+                postsPerPage = DEFAULT_POSTS_PER_PAGE
 
                 apiClient.defaultInstance()
             }
             is CommunityRef.MultiCommunity -> {
-                apiClient.defaultInstance()
-
                 currentDataSource = multiCommunityDataSourceFactory.create(
                     apiClient.instance,
                     communityRef.communities
                 )
+                postsPerPage = 15
+
+                apiClient.defaultInstance()
             }
             null,
             -> {
@@ -303,6 +309,7 @@ class PostsRepository @Inject constructor(
                     communityName = null,
                     listingType = ListingType.All,
                 )
+                postsPerPage = DEFAULT_POSTS_PER_PAGE
 
                 apiClient.defaultInstance()
             }

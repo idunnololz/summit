@@ -67,12 +67,13 @@ open class LemmyListSource<T, O>(
         limit: Int,
         force: Boolean,
     ) -> Result<List<T>>,
+    private val pageSize: Int = DEFAULT_PAGE_SIZE,
 ) {
 
     companion object {
         private const val TAG = "InboxSource"
 
-        const val PAGE_SIZE = 20
+        const val DEFAULT_PAGE_SIZE = 20
     }
 
     data class ObjectData<T>(
@@ -117,7 +118,7 @@ open class LemmyListSource<T, O>(
         if (index < allObjects.size && !force) {
             return Result.success(allObjects[index].obj)
         }
-        val result = getPage(index / PAGE_SIZE, force, deleteCacheOnForce = false)
+        val result = getPage(index / pageSize, force, deleteCacheOnForce = false)
 
         return result.fold(
             {
@@ -135,8 +136,8 @@ open class LemmyListSource<T, O>(
         deleteCacheOnForce: Boolean = true,
     ): Result<PageResult<T>> {
         Log.d(TAG, "getPage(): $pageIndex force: $force")
-        val startIndex = pageIndex * PAGE_SIZE
-        val endIndex = startIndex + PAGE_SIZE
+        val startIndex = pageIndex * pageSize
+        val endIndex = startIndex + pageSize
         val finalForce = invalidatedPages.contains(pageIndex) || force
 
         if (finalForce && deleteCacheOnForce) {
@@ -156,7 +157,7 @@ open class LemmyListSource<T, O>(
             }
 
             val hasMoreResult = retry {
-                fetchPage(currentPageInternal, sortOrder, PAGE_SIZE, finalForce)
+                fetchPage(currentPageInternal, sortOrder, pageSize, finalForce)
             }
 
             if (hasMoreResult.isFailure) {
