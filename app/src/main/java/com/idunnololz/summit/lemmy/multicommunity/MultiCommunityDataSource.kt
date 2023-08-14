@@ -21,6 +21,8 @@ class MultiCommunityDataSource(
 
     companion object {
         private const val TAG = "MultiCommunityDataSource"
+
+        private const val DEFAULT_PAGE_SIZE = 10
     }
 
     class Factory @Inject constructor(
@@ -44,7 +46,8 @@ class MultiCommunityDataSource(
                             limit,
                             force,
                         )
-                    }
+                    },
+                    DEFAULT_PAGE_SIZE
                 )
             }
 
@@ -68,7 +71,7 @@ class MultiCommunityDataSource(
         sortType: SortType?,
         page: Int,
         force: Boolean,
-        ): Result<List<PostView>> {
+    ): Result<List<PostView>> {
         if (force) {
             reset()
         }
@@ -77,9 +80,6 @@ class MultiCommunityDataSource(
 
         return fetchPage(
             page,
-            sortType ?: SortType.Active,
-            ListingType.All,
-            force,
         ).fold(
             onSuccess = {
                 Result.success(it.posts)
@@ -96,9 +96,6 @@ class MultiCommunityDataSource(
 
     private suspend fun fetchPage(
         pageIndex: Int,
-        sortType: SortType,
-        listingType: ListingType,
-        force: Boolean,
     ): Result<Page> = withContext(pagesContext) a@{
         while (pagesCache.size <= pageIndex) {
             if (pagesCache.lastOrNull()?.hasMore == false) {
@@ -176,7 +173,7 @@ class MultiCommunityDataSource(
             // increment the max item
             nextSource.next()
 
-            if (pageItems.size >= LemmyListSource.PAGE_SIZE) {
+            if (pageItems.size >= LemmyListSource.DEFAULT_PAGE_SIZE) {
                 break
             }
         }
