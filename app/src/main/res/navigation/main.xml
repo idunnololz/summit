@@ -10,6 +10,7 @@
     <include app:graph="@navigation/login" />
 
     <action android:id="@+id/action_global_login" app:destination="@id/login"/>
+    <action android:id="@+id/action_global_community" app:destination="@id/community"/>
 
     <fragment
         android:id="@+id/mainFragment"

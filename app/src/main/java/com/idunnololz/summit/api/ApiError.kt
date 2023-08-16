@@ -18,6 +18,7 @@ class AccountInstanceMismatchException(
         "Account instance: $accountInstance Api instance: $apiInstance",
     401,
 )
+class RateLimitException(val timeout: Long) : ClientApiException("Rate limit timed out.", 429)
 
 /**
  * This is 99% a server error. For client side timeout errors, use a different error.

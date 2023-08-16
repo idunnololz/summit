@@ -31,6 +31,8 @@ sealed class Item {
 
     data class ErrorItem(val message: String, val pageToLoad: Int) : Item()
 
+    data class PersistentErrorItem(val exception: Exception) : Item()
+
     object EndItem : Item()
     object FooterSpacerItem : Item()
 }
@@ -71,6 +73,7 @@ class PostListEngine(
     val pages: List<LoadedPostsData>
         get() = _pages.value ?: listOf()
 
+    private var persistentErrors: List<Item> = listOf()
     private var expandedItems = mutableSetOf<String>()
     private var actionsExpandedItems = mutableSetOf<String>()
     private var postToHighlightForever: PostRef? = null
@@ -95,6 +98,12 @@ class PostListEngine(
             // We need to use let here because Google's lint rule doesn't support smart cast
             Log.d(TAG, "Restoration successful! Restored ${cachedPages.size} pages.")
             _pages.value = it
+        }
+    }
+
+    fun setPersistentErrors(persistentErrors: List<Exception>) {
+        this.persistentErrors = persistentErrors.map {
+            Item.PersistentErrorItem(it)
         }
     }
 
@@ -129,6 +138,8 @@ class PostListEngine(
 
         val firstPage = pages.first()
         val lastPage = pages.last()
+
+        items.addAll(persistentErrors)
 
         if (infinity && firstPage.pageIndex > 0) {
             items.add(Item.AutoLoadItem(firstPage.pageIndex - 1))
@@ -219,6 +230,7 @@ class PostListEngine(
                 is Item.ErrorItem -> false
                 is Item.PostItem ->
                     it.postView.post.id == postToHighlight.id
+                is Item.PersistentErrorItem -> false
             }
         }
     }
@@ -235,6 +247,7 @@ class PostListEngine(
                 is Item.ErrorItem -> false
                 is Item.PostItem ->
                     it.postView.post.id == postToHighlight.id
+                is Item.PersistentErrorItem -> false
             }
         }
     }

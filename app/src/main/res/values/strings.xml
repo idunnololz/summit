@@ -543,6 +543,9 @@
     <string name="error_cannot_share_multi_community">Multi-communities cannot be shared. Multi-communities are purely client-sided.</string>
     <string name="error_multi_community_limit_reached">There are too many communities selected for this multi-community. The maximum number of communities per multi-community is %1$s.</string>
     <string name="error_multi_community_unsaved_changes">You will lose your changes if you proceed. Do you want to continue?</string>
+    <string name="error_community_not_found_on_instance">The community \'%1$s\' was not found on this instance.</string>
+    <string name="cross_post">Cross-post</string>
+    <string name="cross_posted_from_format">cross-posted from: %1$s</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

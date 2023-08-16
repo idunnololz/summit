@@ -2,18 +2,26 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Application
 import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
+import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.SearchType
+import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,9 +36,14 @@ class CreateOrEditPostViewModel @Inject constructor(
     val createOrEditPostResult = StatefulLiveData<PostView>()
     val uploadImageResult = StatefulLiveData<UploadImageResult>()
     val uploadImageForUrlResult = StatefulLiveData<UploadImageResult>()
+    val searchResults = StatefulLiveData<List<CommunityView>>()
+    val showSearch = MutableStateFlow<Boolean>(false)
+    val showSearchLiveData = showSearch.asLiveData()
+
+    private var searchJob: Job? = null
 
     fun createPost(
-        communityRef: CommunityRef.CommunityRefByName,
+        communityFullName: String,
         name: String,
         body: String,
         url: String,
@@ -40,7 +53,7 @@ class CreateOrEditPostViewModel @Inject constructor(
         viewModelScope.launch {
             val communityIdResult =
                 apiClient.fetchCommunityWithRetry(
-                    Either.Right(communityRef.fullName),
+                    Either.Right(communityFullName),
                     force = false,
                 )
                     .fold(
@@ -127,6 +140,33 @@ class CreateOrEditPostViewModel @Inject constructor(
 
     fun uploadImageForUrl(instance: String, uri: Uri) {
         uploadImageInternal(instance, uri, uploadImageForUrlResult)
+    }
+
+    fun doQuery(query: String) {
+        searchResults.setIsLoading()
+
+        if (query.isBlank()) {
+            searchResults.setValue(listOf())
+            return
+        }
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            apiClient
+                .search(
+                    sortType = SortType.TopMonth,
+                    listingType = ListingType.All,
+                    searchType = SearchType.Communities,
+                    query = query.toString(),
+                    limit = 20,
+                )
+                .onSuccess {
+                    searchResults.setValue(it.communities)
+                }
+                .onFailure {
+                    searchResults.setError(it)
+                }
+        }
     }
 
     private fun uploadImageInternal(

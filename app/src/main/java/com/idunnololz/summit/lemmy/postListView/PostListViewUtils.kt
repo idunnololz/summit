@@ -93,6 +93,12 @@ fun BaseFragment<*>.showMorePostOptions(
         )
 
         addItemWithIcon(
+            R.id.cross_post,
+            getString(R.string.cross_post),
+            R.drawable.baseline_content_copy_24,
+        )
+
+        addItemWithIcon(
             R.id.share_fediverse_link,
             getString(R.string.share_source_link),
             R.drawable.ic_fediverse_24,
@@ -104,6 +110,7 @@ fun BaseFragment<*>.showMorePostOptions(
             R.drawable.ic_community_24,
         )
 
+        addDivider()
         addItemWithIcon(
             R.id.block_community,
             getString(R.string.block_this_community_format, postView.community.name),
@@ -114,6 +121,7 @@ fun BaseFragment<*>.showMorePostOptions(
             getString(R.string.block_this_user_format, postView.creator.name),
             R.drawable.baseline_person_off_24,
         )
+        addDivider()
         addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
 
         setOnMenuItemClickListener {
@@ -166,6 +174,18 @@ fun BaseFragment<*>.showMorePostOptions(
                         context = context,
                         link = LinkUtils.getLinkForPost(instance, postView.post.id),
                     )
+                }
+                R.id.cross_post -> {
+                    CreateOrEditPostFragment()
+                        .apply {
+                            arguments = CreateOrEditPostFragmentArgs(
+                                instance = actionsViewModel.apiInstance,
+                                post = null,
+                                communityName = null,
+                                crosspost = postView.post
+                            ).toBundle()
+                        }
+                        .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
                 }
                 R.id.share_fediverse_link -> {
                     Utils.shareLink(

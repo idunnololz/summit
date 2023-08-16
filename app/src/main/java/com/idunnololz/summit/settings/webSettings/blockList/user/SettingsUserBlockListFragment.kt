@@ -122,7 +122,7 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
                 old.blockedPerson.target.id == new.blockedPerson.target.id
             },
         ).apply {
-            addItemType(BlockedPersonItem::class, BlockListUserItemBinding::inflate) { item, b, h ->
+            addItemType(BlockedPersonItem::class, BlockListUserItemBinding::inflate) { item, b, _ ->
                 b.icon.load(item.blockedPerson.target.avatar)
                 b.title.text = item.blockedPerson.target.fullName
 

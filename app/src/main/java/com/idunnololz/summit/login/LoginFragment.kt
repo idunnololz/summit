@@ -149,7 +149,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
             login.setOnClickListener {
                 when (viewModel.state.value) {
                     LoginViewModel.State.Login -> {
-                        val instance = instance.editText?.text?.toString()
+                        val instance = instance.editText?.text?.toString()?.trim()
                             ?: return@setOnClickListener
                         val username = username.editText?.text?.toString()
                             ?: return@setOnClickListener

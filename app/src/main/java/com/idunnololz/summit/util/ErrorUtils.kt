@@ -12,15 +12,14 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.scrape.LoaderException
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 
 private const val TAG = "ErrorUtils"
 
 fun Throwable.toErrorMessage(context: Context): String {
-    val t = this
-
-    return when (t) {
+    return when (val t = this) {
         is LoaderException ->
             context.getString(WebsiteAdapterLoader.getDefaultErrorMessageFor(t.errorCode))
         is ApiException ->
@@ -51,6 +50,8 @@ fun Throwable.toErrorMessage(context: Context): String {
                 is NoInternetException ->
                     context.getString(R.string.error_network)
             }
+        is MultiCommunityDataSource.CommunityNotFoundException ->
+            context.getString(R.string.error_community_not_found_on_instance, t.communityRef.fullName)
         else -> {
             Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
             context.getString(R.string.error_unknown)

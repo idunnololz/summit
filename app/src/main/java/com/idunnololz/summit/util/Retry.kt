@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.RateLimitException
 import com.idunnololz.summit.api.ServerApiException
 import kotlinx.coroutines.delay
 
@@ -29,8 +30,13 @@ suspend fun <T> retry(
         if (result.isSuccess) {
             return result
         }
-        if (!retry(requireNotNull(result.exceptionOrNull()))) {
-            return result
+        val exception = requireNotNull(result.exceptionOrNull())
+        if (exception is RateLimitException && exception.timeout > 0L) {
+            delay(exception.timeout)
+        } else {
+            if (!retry(exception)) {
+                return result
+            }
         }
         delay(currentDelay)
         currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)

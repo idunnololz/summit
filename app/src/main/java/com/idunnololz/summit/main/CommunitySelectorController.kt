@@ -634,7 +634,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.subscribed),
-                            R.drawable.baseline_dynamic_feed_24,
+                            R.drawable.baseline_subscriptions_24,
                             CommunityRef.Subscribed(null),
                         ),
                     )

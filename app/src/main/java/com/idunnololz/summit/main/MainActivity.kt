@@ -45,6 +45,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
@@ -87,12 +88,10 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    val headerOffset = MutableLiveData<Int>()
     val bottomNavViewOffset = MutableLiveData<Int>(0)
     val bottomNavViewAnimationOffset = MutableLiveData<Float>(0f)
     val windowInsets = MutableLiveData<Rect>(Rect())
 
-    private var animatingBottomNavView = false
     private var enableBottomNavViewScrolling = false
 
     private val viewModel: MainActivityViewModel by viewModels()
@@ -330,12 +329,12 @@ class MainActivity : BaseActivity() {
         handleIntent(intent)
     }
 
-    fun showNotificationBarBg() {
+    private fun showNotificationBarBg() {
         showNotificationBarBg = true
         showNotificationBarBgIfNeeded()
     }
 
-    fun hideNotificationBarBg() {
+    private fun hideNotificationBarBg() {
         showNotificationBarBg = false
         hideNotificationBarBgIfNeeded()
     }
@@ -482,7 +481,15 @@ class MainActivity : BaseActivity() {
 
         when (page) {
             is CommunityRef -> {
-                handleWithMainFragment()
+//                handleWithMainFragment()
+
+                currentNavController?.navigate(
+                    R.id.action_global_community,
+                    CommunityFragmentArgs(
+                        null,
+                        page
+                    ).toBundle(),
+                )
             }
             is PostRef -> {
                 currentNavController?.navigate(

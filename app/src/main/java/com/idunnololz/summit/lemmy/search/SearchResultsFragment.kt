@@ -288,6 +288,10 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 queryEngine
                     ?.onItemsChangeFlow
                     ?.collect {
+                        if (!isBindingAvailable()) {
+                            return@collect
+                        }
+
                         adapter?.setData(queryEngine.getItems()) {
                             if (queryEngine.pageCount == 1) {
                                 binding.recyclerView.scrollToPosition(0)

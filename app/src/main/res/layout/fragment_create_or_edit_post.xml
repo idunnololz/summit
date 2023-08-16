@@ -37,15 +37,50 @@
                     android:background="?backgroundColor">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/url"
+                        android:id="@+id/community"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/upload_image"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:boxStrokeWidth="0dp"
                         app:boxStrokeWidthFocused="0dp"
                         app:hintEnabled="false">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/community_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autofillHints="no"
+                            android:background="@null"
+                            android:padding="@dimen/padding"
+                            android:textIsSelectable="true"
+                            android:scrollbars="vertical"
+                            android:textAppearance="?textAppearanceBodyMedium"
+                            android:inputType="textMultiLine"
+                            android:hint="@string/community"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/divider0"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/community"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/url"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/community"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:hintEnabled="false"
+                        app:endIconDrawable="@drawable/baseline_image_24"
+                        app:endIconTint="?colorControlNormal"
+                        app:endIconMode="custom">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/url_edit_text"
@@ -60,18 +95,6 @@
                             android:inputType="textMultiLine|textUri"
                             android:hint="@string/url_optional"/>
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <ImageView
-                        android:id="@+id/upload_image"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:padding="12dp"
-                        android:src="@drawable/baseline_image_24"
-                        android:background="?selectableItemBackgroundBorderless"
-                        app:tint="?colorControlNormal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/url"
-                        app:layout_constraintBottom_toBottomOf="@+id/url"/>
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/divider1"
@@ -168,6 +191,15 @@
                         app:layout_constrainedWidth="true"
                         app:layout_constraintTop_toTopOf="@+id/nsfw_switch"
                         app:layout_constraintBottom_toBottomOf="@+id/nsfw_switch"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/community_suggestions_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:background="?backgroundColor"
+                        app:layout_constraintTop_toBottomOf="@+id/community"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

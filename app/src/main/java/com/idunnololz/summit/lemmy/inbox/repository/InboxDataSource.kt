@@ -22,6 +22,7 @@ class InboxSource<O>(
     },
     defaultSortOrder,
     fetchObjects,
+    source = this,
 ) {
 
     fun markAsRead(id: Int, read: Boolean): InboxItem? {
@@ -68,6 +69,11 @@ open class LemmyListSource<T, O>(
         force: Boolean,
     ) -> Result<List<T>>,
     private val pageSize: Int = DEFAULT_PAGE_SIZE,
+    /**
+     * The source of this source. Useful if the caller needs to be able to differentiate between
+     * sources or needs more information about the source.
+     */
+    val source: Any,
 ) {
 
     companion object {

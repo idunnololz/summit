@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
@@ -138,9 +139,6 @@ class CommunityFragment :
                         getMainActivity()?.showBottomMenu(getSortByTopMenu())
                     else ->
                         idToSortOrder(menuItem.id)?.let {
-                            if (preferences.infinity) {
-                                shouldScrollToTopAfterFresh = true
-                            }
                             viewModel.setSortOrder(it)
                         }
                 }
@@ -165,9 +163,6 @@ class CommunityFragment :
 
             setOnMenuItemClickListener { menuItem ->
                 idToSortOrder(menuItem.id)?.let {
-                    if (preferences.infinity) {
-                        shouldScrollToTopAfterFresh = true
-                    }
                     viewModel.setSortOrder(it)
                 }
             }
@@ -561,6 +556,19 @@ class CommunityFragment :
 
         binding.recyclerView.addOnScrollListener(
             object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+
+                    val firstPos = layoutManager.findFirstVisibleItemPosition()
+                    val lastPos = layoutManager.findLastVisibleItemPosition()
+                    if (newState == SCROLL_STATE_IDLE) {
+                        fetchPageIfLoadItem(firstPos)
+                        fetchPageIfLoadItem(firstPos - 1)
+                        fetchPageIfLoadItem(lastPos)
+                        fetchPageIfLoadItem(lastPos + 1)
+                    }
+                }
+
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
@@ -759,6 +767,7 @@ class CommunityFragment :
     private fun LemmySwipeActionCallback.updatePostSwipeActions() {
         if (!isBindingAvailable()) return
         val context = requireContext()
+        this.gestureSize = preferences.postGestureSize
         this.actions = preferences.getPostSwipeActions(context)
     }
 

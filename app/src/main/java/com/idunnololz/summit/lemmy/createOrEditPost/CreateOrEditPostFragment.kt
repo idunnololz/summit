@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,27 +10,37 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.dto.Post
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
+import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateOrEditPostFragment :
@@ -47,6 +58,11 @@ class CreateOrEditPostFragment :
     private val viewModel: CreateOrEditPostViewModel by viewModels()
 
     private val textFormatterHelper = TextFormatterHelper()
+
+    private var adapter: CommunitySearchResultsAdapter? = null
+
+    @Inject
+    lateinit var offlineManager: OfflineManager
 
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -75,7 +91,10 @@ class CreateOrEditPostFragment :
 
         setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
 
-        childFragmentManager.setFragmentResultListener(AddLinkDialogFragment.REQUEST_KEY, this) { key, bundle ->
+        childFragmentManager.setFragmentResultListener(
+            AddLinkDialogFragment.REQUEST_KEY,
+            this
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
                 AddLinkDialogFragment.REQUEST_KEY_RESULT,
             )
@@ -133,10 +152,7 @@ class CreateOrEditPostFragment :
             when (it.itemId) {
                 R.id.create_post -> {
                     viewModel.createPost(
-                        communityRef = CommunityRef.CommunityRefByName(
-                            name = requireNotNull(args.communityName),
-                            instance = args.instance,
-                        ),
+                        communityFullName = binding.communityEditText.text.toString(),
                         name = binding.title.editText?.text.toString(),
                         body = binding.postEditor.editText?.text.toString(),
                         url = binding.url.editText?.text.toString(),
@@ -230,7 +246,7 @@ class CreateOrEditPostFragment :
 
         binding.loadingView.hideAll()
 
-        binding.uploadImage.setOnClickListener {
+        binding.url.setEndIconOnClickListener {
             val bottomMenu = BottomMenu(context).apply {
                 setTitle(R.string.insert_image)
                 addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
@@ -368,31 +384,149 @@ class CreateOrEditPostFragment :
             }
         }
 
+        binding.communityEditText.setOnClickListener {
+            viewModel.showSearch.value = true
+        }
+
+        binding.communityEditText.onFocusChangeListener = View.OnFocusChangeListener { editTextView, hasFocus ->
+            viewModel.showSearch.value =
+                binding.communityEditText.hasFocus() &&
+                    !binding.communityEditText.text.isNullOrBlank()
+        }
+
+        adapter = CommunitySearchResultsAdapter(
+            context,
+            offlineManager,
+            onCommunitySelected = {
+                binding.communityEditText.setText(it.community.toCommunityRef().fullName)
+                viewModel.showSearch.value = false
+            }
+        )
+        binding.communitySuggestionsRecyclerView.apply {
+            adapter = this@CreateOrEditPostFragment.adapter
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        viewModel.searchResults.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    adapter?.setQueryServerResults(listOf())
+                }
+                is StatefulData.Loading -> {
+                    adapter?.setQueryServerResultsInProgress()
+                }
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    adapter?.setQueryServerResults(it.data)
+                }
+            }
+        }
+
+        viewModel.showSearchLiveData.observe(viewLifecycleOwner) {
+            if (it) {
+                showSearch()
+            } else {
+                hideSearch()
+            }
+        }
+
+        binding.communityEditText.addTextChangedListener {
+            val query = it?.toString() ?: ""
+            adapter?.setQuery(query) {
+                binding.communitySuggestionsRecyclerView.scrollToPosition(0)
+            }
+            viewModel.doQuery(query.split("@").firstOrNull() ?: "")
+
+            if (binding.communityEditText.hasFocus()) {
+                viewModel.showSearch.value = query.isNotBlank()
+            }
+        }
+
         if (savedInstanceState == null && !viewModel.postPrefilled) {
             viewModel.postPrefilled = true
 
+            if (args.communityName != null) {
+                binding.communityEditText.setText(
+                    CommunityRef.CommunityRefByName(
+                        name = requireNotNull(args.communityName),
+                        instance = args.instance,
+                    ).fullName
+                )
+            }
+
             val post = args.post
-            if (post != null) {
+            val crossPost = args.crosspost
+            if (crossPost != null) {
+                binding.url.editText?.setText(crossPost.url)
+                binding.title.editText?.setText(crossPost.name)
+                binding.postEditor.editText?.setText(crossPost.getCrossPostContent())
+                binding.nsfwSwitch.isChecked = crossPost.nsfw
+            } else if (post != null) {
                 binding.url.editText?.setText(post.url)
                 binding.title.editText?.setText(post.name)
                 binding.postEditor.editText?.setText(post.body)
                 binding.nsfwSwitch.isChecked = post.nsfw
             }
         }
+
+        hideSearch(animate = false)
         updateEnableState()
     }
 
     private fun updateEnableState() {
         val isLoading = viewModel.createOrEditPostResult.isLoading
 
+        binding.community.isEnabled = !isLoading
         binding.url.isEnabled = !isLoading
-        binding.uploadImage.isEnabled = !isLoading
         binding.title.isEnabled = !isLoading
         binding.postEditor.isEnabled = !isLoading
         binding.postBodyToolbar.isEnabled = !isLoading
         binding.nsfwSwitch.isEnabled = !isLoading
         binding.textFormatToolbar.root.children.forEach {
             it.isEnabled = !isLoading
+        }
+    }
+
+    private fun Post.getCrossPostContent(): String =
+        buildString {
+            appendLine(getString(R.string.cross_posted_from_format, ap_id))
+            appendLine()
+
+            body ?: return@buildString
+
+            body.split("\n").forEach {
+                appendLine("> $it")
+            }
+        }
+
+    private fun showSearch() {
+        if (!isBindingAvailable()) return
+
+        binding.communitySuggestionsRecyclerView.animate().cancel()
+
+        binding.communitySuggestionsRecyclerView.visibility = View.VISIBLE
+        binding.communitySuggestionsRecyclerView.alpha = 0f
+        binding.communitySuggestionsRecyclerView.animate()
+            .alpha(1f)
+    }
+
+    private fun hideSearch(animate: Boolean = true) {
+        binding.communitySuggestionsRecyclerView.animate().cancel()
+
+        if (animate) {
+            binding.communitySuggestionsRecyclerView.animate()
+                .alpha(0f)
+                .withEndAction {
+                    binding.communitySuggestionsRecyclerView.visibility = View.GONE
+                    binding.communitySuggestionsRecyclerView.alpha = 1f
+                }
+        } else {
+            binding.communitySuggestionsRecyclerView.visibility = View.GONE
+            binding.communitySuggestionsRecyclerView.alpha = 1f
+        }
+        if (!binding.communityEditText.text.isNullOrBlank()) {
+            Utils.hideKeyboard(requireMainActivity())
         }
     }
 
@@ -405,6 +539,10 @@ class CreateOrEditPostFragment :
                 binding.coordinatorLayout.removeAllViews()
                 return true
             }
+        }
+        if (viewModel.showSearch.value) {
+            viewModel.showSearch.value = false
+            return true
         }
 
         try {
