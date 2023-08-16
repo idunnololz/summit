@@ -39,7 +39,6 @@ class PostsRepository @Inject constructor(
     private val hiddenPostsManager: HiddenPostsManager,
     private val contentFiltersManager: ContentFiltersManager,
     private val preferences: Preferences,
-
     private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
     private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
 ) {
@@ -55,7 +54,6 @@ class PostsRepository @Inject constructor(
     )
 
     private val coroutineScope = coroutineScopeFactory.create()
-    private val allPostsContext = Dispatchers.IO.limitedParallelism(1)
 
     private var currentDataSource: PostsDataSource = singlePostsDataSourceFactory.create(
         communityName = null,
@@ -64,6 +62,7 @@ class PostsRepository @Inject constructor(
 
     private var allPosts = mutableListOf<PostData>()
     private var seenPosts = mutableSetOf<String>()
+    var persistentErrors: List<Exception> = listOf()
 
     private var communityRef: CommunityRef = CommunityRef.All()
 
@@ -135,8 +134,6 @@ class PostsRepository @Inject constructor(
 
         this.performChanges()
 
-        val anchorsSet = anchors
-
         var curPage = 0
         while (true) {
             if (curPage > maxPage) {
@@ -149,12 +146,12 @@ class PostsRepository @Inject constructor(
             }
 
             val pageResult = result.getOrNull() ?: break
-            if (pageResult.posts.isEmpty() || anchorsSet.isEmpty()) {
+            if (pageResult.posts.isEmpty() || anchors.isEmpty()) {
                 break
             }
 
             // try to find our anchors
-            val anchorsMatched = pageResult.posts.count { anchorsSet.contains(it.post.id) }
+            val anchorsMatched = pageResult.posts.count { anchors.contains(it.post.id) }
             if (anchorsMatched > 0) {
                 return result
             }
@@ -169,14 +166,11 @@ class PostsRepository @Inject constructor(
         val startIndex = pageIndex * postsPerPage
         val endIndex = startIndex + postsPerPage
 
-        val communityRef = communityRef
-
         if (force) {
             // delete all cached data for the given page
             val minPageInternal = allPosts
                 .slice(startIndex until min(endIndex, allPosts.size))
-                .map { it.postPageIndexInternal }
-                .minOrNull() ?: 0
+                .minOfOrNull { it.postPageIndexInternal } ?: 0
 
             deleteFromPage(minPageInternal)
             endReached = false
@@ -367,10 +361,15 @@ class PostsRepository @Inject constructor(
         sortType: SortType,
         force: Boolean,
     ): Result<Boolean> {
-        val newPosts = currentDataSource.fetchPosts(sortType, pageIndex, force)
+        val currentDataSource = currentDataSource
+        val newPostResults = currentDataSource.fetchPosts(sortType, pageIndex, force)
         val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
 
-        return newPosts.fold(
+        if (currentDataSource is MultiCommunityDataSource) {
+            persistentErrors = currentDataSource.getPersistentErrors()
+        }
+
+        return newPostResults.fold(
             onSuccess = { newPosts ->
                 if (newPosts.isNotEmpty()) {
                     if (newPosts.first().community.nsfw &&

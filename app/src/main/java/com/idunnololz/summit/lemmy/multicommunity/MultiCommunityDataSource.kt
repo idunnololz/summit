@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.multicommunity
 import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
@@ -21,7 +22,7 @@ class MultiCommunityDataSource(
 ): PostsDataSource {
 
     companion object {
-        private const val TAG = "MultiCommunityDataSource"
+        private const val TAG = "MultiCommunityDataS"
 
         private const val DEFAULT_PAGE_SIZE = 10
 
@@ -53,7 +54,8 @@ class MultiCommunityDataSource(
                             force,
                         )
                     },
-                    DEFAULT_PAGE_SIZE
+                    DEFAULT_PAGE_SIZE,
+                    communityRef,
                 )
             }.take(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
 
@@ -70,8 +72,12 @@ class MultiCommunityDataSource(
 
     private var pagesCache = mutableListOf<Page>()
     private var sortType: SortType? = null
+    private var communityNotFoundOnInstance = mutableSetOf<CommunityRef.CommunityRefByName>()
 
     private val pagesContext = Dispatchers.Default.limitedParallelism(1)
+
+    private val validSources
+        get() = sources.filter { !communityNotFoundOnInstance.contains(it.source) }
 
     override suspend fun fetchPosts(
         sortType: SortType?,
@@ -85,7 +91,7 @@ class MultiCommunityDataSource(
         setSortType(sortType)
 
         // prefetch if needed
-        val prefetchJobs = sources.map {
+        val prefetchJobs = validSources.map {
             async { it.peekNextItem() }
         }
         prefetchJobs.forEach {
@@ -106,6 +112,12 @@ class MultiCommunityDataSource(
                 }
             }
         )
+    }
+
+    fun getPersistentErrors(): List<Exception> {
+        return communityNotFoundOnInstance.map {
+            CommunityNotFoundException(instance, it)
+        }
     }
 
     private suspend fun fetchPage(
@@ -133,14 +145,24 @@ class MultiCommunityDataSource(
         val pageItems = mutableListOf<PostView>()
 
         while(true) {
-            val results = sources.map { it.peekNextItem() }
-            val error = results.firstOrNull { it.isFailure }
+            val validSources = validSources
+            var sourceToResult = validSources.map { it to it.peekNextItem() }
+            val sourceAndError = sourceToResult
+                .firstOrNull { (_, result) -> result.isFailure }
 
-            if (error != null) {
-                return@a Result.failure(requireNotNull(error.exceptionOrNull()))
+            if (sourceAndError != null) {
+                val exception = requireNotNull(sourceAndError.second.exceptionOrNull())
+                if (exception is ClientApiException && exception.errorCode == 404) {
+                    communityNotFoundOnInstance.add(
+                        sourceAndError.first.source as CommunityRef.CommunityRefByName)
+                } else {
+                    return@a Result.failure(exception)
+                }
             }
-            val nextSource = sources.maxBy {
-                val postView = it.peekNextItem().getOrThrow() ?: return@maxBy 0L
+            sourceToResult = sourceToResult.filter { it.second.isSuccess }
+
+            val nextSourceAndResult = sourceToResult.maxBy { (_, result) ->
+                val postView = result.getOrThrow() ?: return@maxBy 0L
 
                 if (postView.post.featured_local || postView.post.featured_community) {
                     return@maxBy Long.MAX_VALUE
@@ -169,7 +191,7 @@ class MultiCommunityDataSource(
                     else -> postView.counts.score.toLong()
                 }
             }
-            val nextItem = nextSource.peekNextItem().getOrNull()
+            val nextItem = nextSourceAndResult.second.getOrNull()
 
             if (nextItem == null) {
                 // no more items!
@@ -185,7 +207,7 @@ class MultiCommunityDataSource(
             pageItems.add(nextItem)
 
             // increment the max item
-            nextSource.next()
+            nextSourceAndResult.first.next()
 
             if (pageItems.size >= LemmyListSource.DEFAULT_PAGE_SIZE) {
                 break
@@ -220,7 +242,12 @@ class MultiCommunityDataSource(
             it.invalidate()
         }
         pagesCache.clear()
+        communityNotFoundOnInstance.clear()
     }
 
     class EndReachedException : Exception()
+    class CommunityNotFoundException(
+        val instance: String,
+        val communityRef: CommunityRef.CommunityRefByName,
+    ) : Exception()
 }

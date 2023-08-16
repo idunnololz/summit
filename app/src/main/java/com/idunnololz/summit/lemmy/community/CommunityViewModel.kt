@@ -198,6 +198,7 @@ class CommunityViewModel @Inject constructor(
                     }
                 }
 
+                postListEngine.setPersistentErrors(postsRepository.persistentErrors)
                 updatedPages.forEach {
                     postListEngine.addPage(it)
                 }
@@ -321,6 +322,7 @@ class CommunityViewModel @Inject constructor(
                     if (clearPagesOnSuccess) {
                         postListEngine.clearPages()
                     }
+                    postListEngine.setPersistentErrors(postsRepository.persistentErrors)
                     postListEngine.addPage(pageData)
                     postListEngine.createItems()
 
@@ -331,6 +333,7 @@ class CommunityViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
+                    postListEngine.setPersistentErrors(postsRepository.persistentErrors)
                     postListEngine.addPage(
                         LoadedPostsData(
                             posts = listOf(),
@@ -401,6 +404,7 @@ class CommunityViewModel @Inject constructor(
                     }
                 }
 
+                postListEngine.setPersistentErrors(postsRepository.persistentErrors)
                 updatedPages.forEach {
                     postListEngine.addPage(it)
                 }
@@ -471,7 +475,7 @@ class CommunityViewModel @Inject constructor(
     fun setSortOrder(newSortOrder: CommunitySortOrder) {
         postsRepository.sortOrder = newSortOrder
 
-        reset()
+        reset(resetScrollPosition = preferences.infinity)
     }
 
     fun getCurrentSortOrder(): CommunitySortOrder = postsRepository.sortOrder
@@ -486,7 +490,7 @@ class CommunityViewModel @Inject constructor(
         val account = accountManager.currentAccount.value ?: return
         changeCommunity(CommunityRef.All(account.instance))
 
-        reset()
+        reset(resetScrollPosition = true)
     }
 
     fun onBlockSettingsChanged() {
@@ -516,10 +520,11 @@ class CommunityViewModel @Inject constructor(
         currentCommunityRef.removeObserver(communityRefChangeObserver)
     }
 
-    private fun reset() {
+    private fun reset(resetScrollPosition: Boolean = false) {
         assertMainThread()
 
         postListEngine.clearPages()
+        postListEngine.setPersistentErrors(postsRepository.persistentErrors)
         postListEngine.addPage(
             LoadedPostsData(
                 posts = listOf(),
@@ -531,6 +536,9 @@ class CommunityViewModel @Inject constructor(
         loadedPostsData.setValue(PostUpdateInfo())
         currentPageIndex.value = 0
         setPagePositionAtTop(0)
+        if (resetScrollPosition) {
+            resetScrollEvent.value = Unit
+        }
         fetchCurrentPage()
     }
 

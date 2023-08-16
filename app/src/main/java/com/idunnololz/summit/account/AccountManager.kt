@@ -32,7 +32,7 @@ class AccountManager @Inject constructor(
 
     init {
         runBlocking {
-            currentAccount.emit(accountDao.getCurrentAccount())
+            currentAccount.emit(accountDao.getCurrentAccount()?.fix())
         }
     }
 
@@ -52,6 +52,7 @@ class AccountManager @Inject constructor(
         }
 
         deferred.await()
+            .map { it.fix() }
     }
 
     suspend fun signOut(account: Account) = withContext(Dispatchers.IO) {
@@ -119,3 +120,6 @@ class AccountManager @Inject constructor(
         }
     }
 }
+
+private fun Account.fix() =
+    copy(instance = instance.trim())

@@ -14,6 +14,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -35,6 +36,8 @@ class MultiCommunityEditorViewModel @Inject constructor(
     val communityName = MutableLiveData<String>()
     val selectedIcon = MutableLiveData<String?>()
 
+    private var searchJob: Job? = null
+
     init {
         viewModelScope.launch {
             selectedCommunitiesFlow.collect {
@@ -51,7 +54,8 @@ class MultiCommunityEditorViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             apiClient
                 .search(
                     sortType = SortType.TopMonth,

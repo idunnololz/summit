@@ -3,6 +3,7 @@ package com.idunnololz.summit.api
 import android.content.Context
 import android.util.Log
 import arrow.core.Either
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
@@ -1323,8 +1324,16 @@ class LemmyApiClient @Inject constructor(
             if (errMsg?.contains("not_logged_in", ignoreCase = true) == true) {
                 return Result.failure(NotAuthenticatedException())
             }
+            if (errMsg == "rate_limit_error") {
+                return Result.failure(RateLimitException(0L))
+            }
 
-            Log.e("ApiError", "Code: $errorCode Error message: $errMsg", RuntimeException())
+            if (BuildConfig.DEBUG) {
+                Log.e(
+                    "ApiError",
+                    "Code: $errorCode Error message: $errMsg Call: ${call().request().url}",
+                    RuntimeException())
+            }
 
             if (errMsg?.contains("timeout", ignoreCase = true) == true) {
                 return Result.failure(ServerTimeoutException(errorCode))

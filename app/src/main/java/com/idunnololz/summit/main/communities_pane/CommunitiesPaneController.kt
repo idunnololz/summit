@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.annotation.DrawableRes
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -220,15 +221,31 @@ class CommunitiesPaneController @AssistedInject constructor(
                 } else {
                     View.GONE
                 }
-                if (item.communityRef is CommunityRef.Subscribed) {
-                    b.icon.load(
-                        context.getDrawableCompat(R.drawable.baseline_dynamic_feed_24)
-                            ?.tint(
-                                context.getColorFromAttribute(
-                                    androidx.appcompat.R.attr.colorControlNormal,
+
+                if (item.iconUrl == null) {
+                    fun loadIcon(d: Int) {
+                        b.icon.load(
+                            context.getDrawableCompat(d)
+                                ?.tint(
+                                    context.getColorFromAttribute(
+                                        androidx.appcompat.R.attr.colorControlNormal,
+                                    ),
                                 ),
-                            ),
-                    ) {}
+                        ) {}
+                    }
+
+                    when (item.communityRef) {
+                        is CommunityRef.All ->
+                            loadIcon(R.drawable.ic_subreddit_all)
+                        is CommunityRef.CommunityRefByName ->
+                            loadIcon(R.drawable.ic_subreddit_default)
+                        is CommunityRef.Local ->
+                            loadIcon(R.drawable.ic_subreddit_home)
+                        is CommunityRef.MultiCommunity ->
+                            loadIcon(R.drawable.baseline_dynamic_feed_24)
+                        is CommunityRef.Subscribed ->
+                            loadIcon(R.drawable.baseline_subscriptions_24)
+                    }
                 } else {
                     offlineManager.fetchImage(h.itemView, item.iconUrl) {
                         b.icon.load(it)
