@@ -427,9 +427,25 @@ class PostListViewBuilder @Inject constructor(
                         offlineManager.calculateImageMaxSizeIfNeeded(it)
                         offlineManager.getMaxImageSizeHint(it, tempSize)
 
+                        var w: Int? = null
+                        var h: Int? = null
+                        if (tempSize.height > 0 && tempSize.width > 0) {
+                            val heightToWidthRatio = tempSize.height / tempSize.width
+
+                            if (heightToWidthRatio > 10) {
+                                // shrink the image if needed
+                                w = tempSize.width
+                                h = tempSize.height
+                            }
+                        }
+
                         image.load(it) {
                             if (image is ShapeableImageView) {
                                 allowHardware(false)
+                            }
+
+                            if (w != null && h != null) {
+                                this.size(w, h)
                             }
                             fallback(R.drawable.thumbnail_placeholder_16_9)
                             placeholder(R.drawable.thumbnail_placeholder_16_9)

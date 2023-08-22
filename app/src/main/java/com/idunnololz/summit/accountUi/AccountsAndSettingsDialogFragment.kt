@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -29,9 +32,18 @@ import dagger.hilt.android.AndroidEntryPoint
 class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccountsBinding>() {
 
     companion object {
-        fun newInstance() =
-            AccountsAndSettingsDialogFragment()
+
+        const val REQUEST_KEY = "AccountsAndSettingsDialogFragment_req"
+        const val REQUEST_RESULT = "REQUEST_RESULT"
+
+        fun newInstance(dontSwitchAccount: Boolean = false) =
+            AccountsAndSettingsDialogFragment().apply {
+                arguments = AccountsAndSettingsDialogFragmentArgs(dontSwitchAccount)
+                    .toBundle()
+            }
     }
+
+    private val args by navArgs<AccountsAndSettingsDialogFragmentArgs>()
 
     private val viewModel: AccountsViewModel by viewModels()
 
@@ -67,11 +79,22 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
         with(binding) {
             val adapter = AccountAdapter(
                 context,
+                isSimple = false,
                 signOut = {
                     viewModel.signOut(it.account)
                 },
                 onAccountClick = {
-                    viewModel.switchAccount(it.account)
+                    if (args.dontSwitchAccount) {
+                        setFragmentResult(
+                            REQUEST_KEY,
+                            bundleOf(
+                                REQUEST_RESULT to it.account
+                            )
+                        )
+                        dismiss()
+                    } else {
+                        viewModel.switchAccount(it.account)
+                    }
                 },
                 onAddAccountClick = {
                     val direction = CommunityDirections.actionGlobalLogin()
@@ -127,107 +150,5 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
         super.onResume()
 
         viewModel.refreshAccounts()
-    }
-
-    private class AccountAdapter(
-        private val context: Context,
-        private val signOut: (AccountView) -> Unit,
-        private val onAccountClick: (AccountView) -> Unit,
-        private val onAddAccountClick: () -> Unit,
-        private val onSettingClick: () -> Unit,
-        private val onPersonClick: (AccountView) -> Unit,
-    ) : RecyclerView.Adapter<ViewHolder>() {
-
-        private sealed interface Item {
-            data class CurrentAccountItem(
-                val accountView: AccountView,
-            ) : Item
-            data class AccountItem(
-                val accountView: AccountView,
-            ) : Item
-            data class AddAccountItem(
-                val hasAccounts: Boolean,
-            ) : Item
-        }
-
-        private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
-            old::class == new::class && when (old) {
-                is Item.CurrentAccountItem ->
-                    old.accountView.account.id == (new as Item.CurrentAccountItem).accountView.account.id
-                is Item.AccountItem ->
-                    old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
-                is Item.AddAccountItem -> true
-            }
-        },).apply {
-            addItemType(
-                clazz = Item.CurrentAccountItem::class,
-                inflateFn = CurrentAccountItemBinding::inflate,
-            ) { item, b, _ ->
-                b.image.load(item.accountView.profileImage)
-                b.name.text = item.accountView.account.name
-                b.instance.text = item.accountView.account.instance
-                b.settings.setOnClickListener {
-                    onSettingClick()
-                }
-
-                b.signOut.setOnClickListener {
-                    signOut(item.accountView)
-                }
-                b.root.setOnClickListener {
-                    onPersonClick(item.accountView)
-                }
-            }
-            addItemType(Item.AccountItem::class, AccountItemBinding::inflate) { item, b, _ ->
-                b.image.load(item.accountView.profileImage)
-                b.name.text = item.accountView.account.name
-                b.instance.text = item.accountView.account.instance
-
-                b.root.setOnClickListener {
-                    onAccountClick(item.accountView)
-                }
-            }
-            addItemType(Item.AddAccountItem::class, AddAccountItemBinding::inflate) { item, b, _ ->
-                b.title.text = if (item.hasAccounts) {
-                    context.getString(R.string.add_another_account)
-                } else {
-                    context.getString(R.string.add_account)
-                }
-                b.root.setOnClickListener {
-                    onAddAccountClick()
-                }
-            }
-        }
-
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        fun setAccounts(accounts: List<AccountView>) {
-            val currentAccount = accounts.firstOrNull { it.account.current }
-            val newItems = mutableListOf<Item>()
-
-            if (currentAccount != null) {
-                newItems.add(Item.CurrentAccountItem(currentAccount))
-            }
-
-            accounts.mapNotNullTo(newItems) {
-                if (it.account.id != currentAccount?.account?.id) {
-                    Item.AccountItem(it)
-                } else {
-                    null
-                }
-            }
-
-            newItems.add(Item.AddAccountItem(hasAccounts = accounts.isNotEmpty()))
-
-            adapterHelper.setItems(newItems, this)
-        }
     }
 }

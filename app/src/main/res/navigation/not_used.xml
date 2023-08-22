@@ -102,4 +102,26 @@
             app:argType="long"
             android:defaultValue="0L" />
     </dialog>
+    <dialog
+        android:id="@+id/reportContentDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.report.ReportContentDialogFragment"
+        android:label="ReportContentDialogFragment" >
+        <argument
+            android:name="postRef"
+            app:argType="com.idunnololz.summit.lemmy.PostRef"
+            app:nullable="true" />
+        <argument
+            android:name="commentRef"
+            app:argType="com.idunnololz.summit.lemmy.CommentRef"
+            app:nullable="true" />
+    </dialog>
+    <dialog
+        android:id="@+id/accountsAndSettingsDialogFragment"
+        android:name="com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment"
+        android:label="AccountsAndSettingsDialogFragment" >
+        <argument
+            android:name="dontSwitchAccount"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </dialog>
 </navigation>

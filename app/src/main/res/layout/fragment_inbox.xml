@@ -113,6 +113,29 @@
             app:drawableStartCompat="@drawable/baseline_email_24"
             app:drawableTint="?colorControlNormal"/>
 
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/messages"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/reports"
+            android:text="@string/reports"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?textAppearanceTitleMedium"
+            android:paddingHorizontal="@dimen/dialog_padding"
+            android:paddingVertical="@dimen/padding"
+            android:drawablePadding="@dimen/padding"
+            android:background="?selectableItemBackground"
+            app:layout_constraintTop_toBottomOf="@+id/divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:drawableStartCompat="@drawable/outline_shield_24"
+            app:drawableTint="?colorControlNormal"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

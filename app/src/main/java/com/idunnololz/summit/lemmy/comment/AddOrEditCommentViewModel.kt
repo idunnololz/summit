@@ -105,6 +105,9 @@ class AddOrEditCommentViewModel @Inject constructor(
                 when (inboxItem) {
                     is InboxItem.MentionInboxItem,
                     is InboxItem.ReplyInboxItem,
+                    is InboxItem.ReportMessageInboxItem,
+                    is InboxItem.ReportCommentInboxItem,
+                    is InboxItem.ReportPostInboxItem,
                     -> error("Should never happen!")
                     is InboxItem.MessageInboxItem -> {
                         apiClient.changeInstance(instance)

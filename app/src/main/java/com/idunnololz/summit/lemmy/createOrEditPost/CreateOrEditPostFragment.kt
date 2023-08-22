@@ -436,7 +436,7 @@ class CreateOrEditPostFragment :
             adapter?.setQuery(query) {
                 binding.communitySuggestionsRecyclerView.scrollToPosition(0)
             }
-            viewModel.doQuery(query.split("@").firstOrNull() ?: "")
+            viewModel.query.value = query.split("@").firstOrNull() ?: ""
 
             if (binding.communityEditText.hasFocus()) {
                 viewModel.showSearch.value = query.isNotBlank()

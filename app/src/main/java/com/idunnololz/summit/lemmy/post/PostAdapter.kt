@@ -51,6 +51,10 @@ class PostsAdapter(
     private val instance: String,
     private val revealAll: Boolean,
     private val useFooter: Boolean,
+    /**
+     * Set this to true if this adapter is used for an embedded view.
+     */
+    private val isEmbedded: Boolean,
     private val currentAccountId: Int?,
     private val videoState: VideoState?,
     private val onRefreshClickCb: () -> Unit,
@@ -74,6 +78,7 @@ class PostsAdapter(
         data class HeaderItem(
             val postView: PostView,
             var videoState: VideoState?,
+            val showBottomDivider: Boolean,
         ) : Item(postView.getUniqueKey())
 
         data class CommentItem(
@@ -277,6 +282,12 @@ class PostsAdapter(
                         onInstanceMismatch = onInstanceMismatch,
                         onLinkLongClick = onLinkLongClick,
                     )
+
+                    if (item.showBottomDivider) {
+                        b.bottomDivider.visibility = View.VISIBLE
+                    } else {
+                        b.bottomDivider.visibility = View.GONE
+                    }
                 }
             }
             else -> super.onBindViewHolder(holder, position, payloads)
@@ -315,6 +326,12 @@ class PostsAdapter(
                     onInstanceMismatch = onInstanceMismatch,
                     onLinkLongClick = onLinkLongClick,
                 )
+
+                if (item.showBottomDivider) {
+                    b.bottomDivider.visibility = View.VISIBLE
+                } else {
+                    b.bottomDivider.visibility = View.GONE
+                }
             }
             is CommentItem -> {
                 if (item.isExpanded) {
@@ -496,17 +513,16 @@ class PostsAdapter(
                 val finalItems = mutableListOf<Item>()
 
                 val postView = rawData.postView
-                if (postView != null) {
-                    finalItems += HeaderItem(postView.post, videoState)
-                    absolutionPositionToTopLevelCommentPosition += -1
+                val commentItems = rawData.commentTree.flatten()
+                finalItems += HeaderItem(postView.post, videoState,
+                    showBottomDivider = !isEmbedded || commentItems.isNotEmpty())
+                absolutionPositionToTopLevelCommentPosition += -1
 
-                    if (rawData.isSingleComment) {
-                        finalItems += Item.ViewAllComments(postView.post.post.id)
-                        absolutionPositionToTopLevelCommentPosition += -1
-                    }
+                if (rawData.isSingleComment) {
+                    finalItems += Item.ViewAllComments(postView.post.post.id)
+                    absolutionPositionToTopLevelCommentPosition += -1
                 }
 
-                val commentItems = rawData.commentTree.flatten()
                 var lastTopLevelCommentPosition = -1
 
                 for (commentItem in commentItems) {
@@ -601,7 +617,7 @@ class PostsAdapter(
             } else {
                 val finalItems = mutableListOf<Item>()
                 rawData?.postView?.let {
-                    finalItems += HeaderItem(it.post, videoState)
+                    finalItems += HeaderItem(it.post, videoState, showBottomDivider = true)
                 }
                 finalItems += ProgressOrErrorItem(error)
 

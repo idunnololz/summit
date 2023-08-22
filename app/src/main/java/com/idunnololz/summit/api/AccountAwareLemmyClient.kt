@@ -10,6 +10,7 @@ import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
+import com.idunnololz.summit.api.dto.CommentReportId
 import com.idunnololz.summit.api.dto.CommentResponse
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -26,6 +27,8 @@ import com.idunnololz.summit.api.dto.PersonMentionId
 import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.PostReportId
+import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
@@ -370,6 +373,16 @@ class AccountAwareLemmyClient @Inject constructor(
             }
         }
 
+    suspend fun fetchUnresolvedReportsCountWithRetry(force: Boolean, account: Account) =
+        retry {
+            if (account == null) {
+                createAccountErrorResult()
+            } else {
+                apiClient.fetchUnresolvedReportCount(force, account)
+                    .autoSignOut(account)
+            }
+        }
+
     suspend fun deletePost(
         id: PostId,
         account: Account? = accountForInstance(),
@@ -533,6 +546,72 @@ class AccountAwareLemmyClient @Inject constructor(
                 .autoSignOut(account)
         }
 
+    suspend fun fetchReportMessages(
+        unresolvedOnly: Boolean? = null,
+        page: Int? = 0,
+        limit: Int? = 20,
+        account: Account? = accountForInstance(),
+        force: Boolean,
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchReportMessages(unresolvedOnly, page, limit, account, force)
+                .autoSignOut(account)
+        }
+
+    suspend fun fetchPostReports(
+        unresolvedOnly: Boolean? = null,
+        page: Int? = 0,
+        limit: Int? = 20,
+        account: Account? = accountForInstance(),
+        force: Boolean,
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchPostReports(unresolvedOnly, page, limit, account, force)
+                .autoSignOut(account)
+        }
+
+    suspend fun resolvePostReport(
+        reportId: PostReportId,
+        resolved: Boolean,
+        account: Account? = accountForInstance(),
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.resolvePostReport(reportId, resolved, account)
+                .autoSignOut(account)
+        }
+
+    suspend fun fetchCommentReports(
+        unresolvedOnly: Boolean? = null,
+        page: Int? = 0,
+        limit: Int? = 20,
+        account: Account? = accountForInstance(),
+        force: Boolean,
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchCommentReports(unresolvedOnly, page, limit, account, force)
+                .autoSignOut(account)
+        }
+
+    suspend fun resolveCommentReport(
+        reportId: CommentReportId,
+        resolved: Boolean,
+        account: Account? = accountForInstance(),
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.resolveCommentReport(reportId, resolved, account)
+                .autoSignOut(account)
+        }
+
     suspend fun markReplyAsRead(
         id: CommentReplyId,
         read: Boolean,
@@ -615,6 +694,40 @@ class AccountAwareLemmyClient @Inject constructor(
                 .autoSignOut(account)
         }
 
+    suspend fun createPostReport(
+        postId: PostId,
+        reason: String,
+        account: Account? = accountForInstance(),
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.createPostReport(postId, reason, account)
+                .autoSignOut(account)
+        }
+
+    suspend fun createCommentReport(
+        commentId: CommentId,
+        reason: String,
+        account: Account? = accountForInstance(),
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.createCommentReport(commentId, reason, account)
+                .autoSignOut(account)
+        }
+    suspend fun resolveObject(
+        q: String,
+        account: Account? = accountForInstance(),
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.resolveObject(q, account)
+                .autoSignOut(account)
+        }
+
     fun changeInstance(site: String) =
         apiClient.changeInstance(site)
 
@@ -655,15 +768,16 @@ class AccountAwareLemmyClient @Inject constructor(
         return Result.failure(NotAuthenticatedException())
     }
 
-    private fun setAccount(account: Account?, accountChanged: Boolean) {
+    fun setAccount(account: Account?, accountChanged: Boolean) {
         if (account == currentAccount) {
             return
         }
 
-        if (accountChanged) {
-            // on all account changes, clear the cache
-            apiClient.clearCache()
-        }
+
+//        if (accountChanged) {
+//            // on all account changes, clear the cache
+//            apiClient.clearCache()
+//        }
 
         if (account == null) {
             apiClient.defaultInstance()

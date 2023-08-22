@@ -44,12 +44,12 @@ import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.utils.bind
-import com.idunnololz.summit.lemmy.utils.getFormattedTitle
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
@@ -172,7 +172,16 @@ class PostAndCommentViewBuilder @Inject constructor(
             listAuthor = true,
         )
 
-        title.text = postView.getFormattedTitle()
+        LemmyTextHelper.bindText(
+            title,
+            postView.post.name,
+            instance,
+            onImageClick = {
+                onImageClick(Either.Left(postView), null, it)
+            },
+            onPageClick = onPageClick,
+            onLinkLongClick = onLinkLongClick,
+        )
 
         commentButton.text = abbrevNumber(postView.counts.comments.toLong())
         commentButton.isEnabled = !postView.post.locked
@@ -651,21 +660,54 @@ class PostAndCommentViewBuilder @Inject constructor(
             )
             upvoteButton.isEnabled = true
             downvoteButton.isEnabled = true
+            b.reply.isEnabled = true
+        } else if (item is ReportItem) {
+            voteUiHandler.unbindVoteUi(b.score)
+            b.score.visibility = View.GONE
+
+            upvoteButton.isEnabled = false
+            downvoteButton.isEnabled = false
+            b.reply.isEnabled = false
         } else {
             voteUiHandler.unbindVoteUi(b.score)
             b.score.visibility = View.GONE
 
             upvoteButton.isEnabled = false
             downvoteButton.isEnabled = false
+            b.reply.isEnabled = true
         }
 
         val drawable = when (item) {
-            is InboxItem.MentionInboxItem ->
+            is InboxItem.MentionInboxItem -> {
+                TextViewCompat.setCompoundDrawableTintList(
+                    b.author,
+                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle))
+                )
                 context.getDrawableCompat(R.drawable.baseline_at_24)
-            is InboxItem.MessageInboxItem ->
+            }
+            is InboxItem.MessageInboxItem -> {
+                TextViewCompat.setCompoundDrawableTintList(
+                    b.author,
+                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle))
+                )
                 context.getDrawableCompat(R.drawable.baseline_email_24)
-            is InboxItem.ReplyInboxItem ->
+            }
+            is InboxItem.ReplyInboxItem -> {
+                TextViewCompat.setCompoundDrawableTintList(
+                    b.author,
+                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle))
+                )
                 context.getDrawableCompat(R.drawable.baseline_reply_24)
+            }
+            is InboxItem.ReportMessageInboxItem,
+            is InboxItem.ReportPostInboxItem,
+            is InboxItem.ReportCommentInboxItem, -> {
+                TextViewCompat.setCompoundDrawableTintList(
+                    b.author,
+                    ColorStateList.valueOf(context.getColorCompat(R.color.style_red))
+                )
+                context.getDrawableCompat(R.drawable.baseline_outlined_flag_24)
+            }
         }
         drawable?.setBounds(
             0,

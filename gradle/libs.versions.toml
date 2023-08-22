@@ -1,15 +1,15 @@
 [versions]
 androidGradlePlugin = "8.1.0"
 hilt = "2.46.1"
-kotlin = "1.8.22"
-ksp = "1.8.22-1.0.11"
+kotlin = "1.9.0"
+ksp = "1.9.0-1.0.13"
 kotlinx = "1.7.1"
-navigation = "2.5.3"
+navigation = "2.7.0"
 markwon = "4.6.2"
-room = "2.5.1"
-lifecycle = "2.5.1"
+room = "2.5.2"
+lifecycle = "2.6.1"
 moshi = "1.15.0"
-media3 = "1.0.2"
+media3 = "1.1.1"
 fresco = "2.6.0"
 work = "2.8.1"
 coil = "2.4.0"
@@ -46,7 +46,7 @@ media3-core = { module = "androidx.media3:media3-exoplayer", version.ref = "medi
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3"}
 
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.1.0" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.2.2" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 
@@ -82,8 +82,8 @@ flow-layout = { module = "com.nex3z:flow-layout", version = "1.3.3" }
 material = { module = "com.google.android.material:material", version = "1.9.0" }
 mp-android-chart = { module = "com.github.PhilJay:MPAndroidChart", version = "v3.0.3" }
 disklrucache = { module = "com.jakewharton:disklrucache", version = "2.0.2" }
-play-services-ads = { module = "com.google.android.gms:play-services-ads", version = "22.0.0" }
-billing-ktx = { module = "com.android.billingclient:billing-ktx", version = "5.2.0" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version = "22.2.0" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version = "6.0.1" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coil" }
 asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflater", version = "1.0.0" }
@@ -93,19 +93,19 @@ gson = {module = "com.google.code.gson:gson", version = "2.10.1"}
 
 # AndroidX
 core = { module = "androidx.core:core-ktx", version = "1.10.1" }
-window = { module = "androidx.window:window", version = "1.0.0" }
-window-core = { module = "androidx.window:window-core", version = "1.1.0-beta02" }
+window = { module = "androidx.window:window", version = "1.1.0" }
+window-core = { module = "androidx.window:window-core", version = "1.1.0" }
 annotation = { module = "androidx.annotation:annotation", version = "1.6.0" }
 appcompat = { module = "androidx.appcompat:appcompat", version = "1.6.1" }
-browser = { module = "androidx.browser:browser", version = "1.5.0" }
+browser = { module = "androidx.browser:browser", version = "1.6.0" }
 cardview = { module = "androidx.cardview:cardview", version = "1.0.0" }
-recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.0" }
-preference-ktx = { module = "androidx.preference:preference-ktx", version = "1.2.0" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.1" }
+preference-ktx = { module = "androidx.preference:preference-ktx", version = "1.2.1" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.1.4" }
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.1.0" }
-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.5.7" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.6.1" }
 activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.7.2" }
-viewpager2 = { module = "androidx.viewpager2:viewpager2", version = "1.1.0-beta01" }
+viewpager2 = { module = "androidx.viewpager2:viewpager2", version = "1.1.0" }
 transition = { module = "androidx.transition:transition", version = "1.4.1" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1"}
 hilt-common = { module = "androidx.hilt:hilt-common", version = "1.0.0"}

@@ -42,9 +42,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.VerticalSpaceItemDecoration
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
@@ -150,6 +148,10 @@ class InboxFragment :
                         topToTop = R.id.messages
                         bottomToBottom = R.id.messages
                     }
+                    InboxViewModel.PageType.Reports -> {
+                        topToTop = R.id.reports
+                        bottomToBottom = R.id.reports
+                    }
                 }
             }
 
@@ -160,6 +162,13 @@ class InboxFragment :
 
         viewModel.inboxData.observe(viewLifecycleOwner) {
             onUpdate()
+        }
+        viewModel.currentFullAccount.observe(viewLifecycleOwner) {
+            if (it?.accountInfo?.miscAccountInfo?.modCommunityIds?.isNotEmpty() == true) {
+                setModReportsVisibility(isVisible = true)
+            } else {
+                setModReportsVisibility(isVisible = false)
+            }
         }
 
         val adapter = createAdapter()
@@ -309,6 +318,10 @@ class InboxFragment :
                 viewModel.pageTypeFlow.value = InboxViewModel.PageType.Messages
                 paneLayout.closePanels()
             }
+            reports.setOnClickListener {
+                viewModel.pageTypeFlow.value = InboxViewModel.PageType.Reports
+                paneLayout.closePanels()
+            }
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -343,7 +356,21 @@ class InboxFragment :
             }
         }
 
+        if (args.pageType == InboxViewModel.PageType.Reports) {
+            binding.fab.visibility = View.GONE
+        }
+
         viewModel.fetchInbox()
+    }
+
+    private fun setModReportsVisibility(isVisible: Boolean) {
+        if (!isBindingAvailable()) return
+
+        with(binding) {
+            val visibility = if (isVisible) View.VISIBLE else View.GONE
+            divider.visibility = visibility
+            reports.visibility = visibility
+        }
     }
 
     private fun markAsRead(inboxItem: InboxItem, read: Boolean) {
@@ -366,7 +393,7 @@ class InboxFragment :
                 getMainActivity()?.launchPage(it)
             },
             onMessageClick = {
-                if (!it.isRead) {
+                if (!it.isRead && it !is ReportItem) {
                     markAsRead(it, read = true)
                 }
                 (parentFragment as? InboxTabbedFragment)?.openMessage(it, viewModel.instance)

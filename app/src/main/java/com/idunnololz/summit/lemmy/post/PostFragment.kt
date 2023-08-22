@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.post
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -20,17 +19,18 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import arrow.core.Either
+import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
-import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -42,6 +42,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
 import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
@@ -62,7 +63,6 @@ import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
@@ -70,6 +70,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
@@ -140,6 +141,12 @@ class PostFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        actionsViewModel.apiClient = viewModel.lemmyApiClient
+
+        if (savedInstanceState == null) {
+            viewModel.updatePostOrCommentRef(args.postOrCommentRef())
+        }
+
         val context = requireContext()
 
         PreferenceUtil.preferences.edit().remove(PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_Y).apply()
@@ -164,8 +171,34 @@ class PostFragment :
             )
 
             if (result != null) {
-                viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+                viewModel.fetchPostData(force = true)
                 (parentFragment as? CommunityFragment)?.onPostUpdated()
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(
+            FastAccountSwitcherDialogFragment.REQUEST_KEY,
+            this,
+        ) { _, bundle ->
+            val result = bundle.getParcelableCompat<Account>(
+                FastAccountSwitcherDialogFragment.RESULT_ACCOUNT,
+            )
+
+            if (result != null) {
+                viewModel.switchAccount(result)
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(
+            AccountsAndSettingsDialogFragment.REQUEST_KEY,
+            this
+        ) { _, bundle ->
+            val result = bundle.getParcelableCompat<Account>(
+                AccountsAndSettingsDialogFragment.REQUEST_RESULT,
+            )
+
+            if (result != null) {
+                viewModel.switchAccount(result)
             }
         }
 
@@ -226,6 +259,7 @@ class PostFragment :
                 args.instance,
                 args.reveal,
                 useFooter = false,
+                isEmbedded = false,
                 accountManager.currentAccount.value?.id,
                 args.videoState,
                 onRefreshClickCb = {
@@ -303,7 +337,7 @@ class PostFragment :
                             instance = viewModel.apiInstance,
                             postView = postView,
                             actionsViewModel = it,
-                            fragmentManager = childFragmentManager
+                            fragmentManager = childFragmentManager,
                         )
                     }
                 },
@@ -321,7 +355,8 @@ class PostFragment :
                     viewModel.fetchMoreComments(it)
                 },
                 onLoadPost = {
-                    viewModel.fetchPostData(Either.Left(PostRef(args.instance, it)))
+                    viewModel.updatePostOrCommentRef(Either.Left(PostRef(args.instance, it)))
+                    viewModel.fetchPostData()
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)
@@ -336,7 +371,7 @@ class PostFragment :
             actionsViewModel = actionsViewModel,
             snackbarContainer = binding.coordinatorLayout,
             onPostUpdated = {
-                viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+                viewModel.fetchPostData(force = true)
                 (parentFragment as? CommunityFragment)?.onPostUpdated()
             },
             onCommentUpdated = {
@@ -366,7 +401,19 @@ class PostFragment :
                 val postView = data?.postView?.post ?: args.post
 
                 if (postView != null) {
-                    showMorePostOptions(viewModel.apiInstance, postView, actionsViewModel, childFragmentManager)
+                    showMorePostOptions(
+                        instance = viewModel.apiInstance,
+                        postView = postView,
+                        actionsViewModel = actionsViewModel,
+                        fragmentManager = childFragmentManager,
+                        isPostMenu = true,
+                        onSortOrderClick = {
+                            getMainActivity()?.showBottomMenu(getSortByMenu())
+                        },
+                        onRefreshClick = {
+                            viewModel.fetchPostData(force = true)
+                        },
+                    )
                 }
             }
         }
@@ -439,6 +486,34 @@ class PostFragment :
                     }
                 }
             )
+        }
+
+        viewModel.currentAccountView.observe(viewLifecycleOwner) {
+            binding.accountImageView.load(it?.profileImage)
+        }
+        binding.accountImageView.setOnClickListener {
+            AccountsAndSettingsDialogFragment.newInstance(dontSwitchAccount = true)
+                .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+        }
+        viewModel.switchAccountState.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingViewFullscreen.visibility = View.VISIBLE
+                    binding.loadingView2.showDefaultErrorMessageFor(it.error)
+                }
+                is StatefulData.Loading -> {
+                    binding.loadingViewFullscreen.visibility = View.VISIBLE
+                    binding.loadingView2.showProgressBarWithMessage(it.statusDesc)
+                }
+                is StatefulData.NotStarted -> {
+                    binding.loadingViewFullscreen.visibility = View.GONE
+                    binding.loadingView2.hideAll()
+                }
+                is StatefulData.Success -> {
+                    binding.loadingViewFullscreen.visibility = View.GONE
+                    binding.loadingView2.hideAll()
+                }
+            }
         }
     }
 
@@ -515,38 +590,6 @@ class PostFragment :
                 }
             }
             title = viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
-
-            inflateMenu(R.menu.menu_fragment_post)
-            setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.share -> {
-                        val sendIntent: Intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(
-                                Intent.EXTRA_TEXT,
-                                LinkUtils.postIdToLink(viewModel.apiInstance, args.id),
-                            )
-                            type = "text/plain"
-                        }
-
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-                        startActivity(shareIntent)
-                        true
-                    }
-
-                    R.id.sort_comments_by -> {
-                        getMainActivity()?.showBottomMenu(getSortByMenu())
-                        true
-                    }
-
-                    R.id.refresh -> {
-                        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
-                        true
-                    }
-
-                    else -> false
-                }
-            }
         }
 
         val swipeRefreshLayout = binding.swipeRefreshLayout
@@ -631,7 +674,7 @@ class PostFragment :
                 delay(400)
 
                 withContext(Dispatchers.Main) {
-                    viewModel.fetchPostData(args.postOrCommentRef())
+                    viewModel.fetchPostData()
                 }
             }
         }
@@ -663,30 +706,6 @@ class PostFragment :
 
         binding.root.doOnPreDraw {
             adapter.contentMaxWidth = binding.recyclerView.width
-        }
-    }
-
-    private fun handlePostActionStateChanged(state: StatefulData<MoreActionsViewModel.PostAction>) {
-        when (state) {
-            is StatefulData.Error -> {
-                if (state.error is ClientApiException && state.error.errorCode == 404) {
-                    viewModel.fetchPostData(args.postOrCommentRef(), force = true)
-                    (parentFragment as? CommunityFragment)?.onPostUpdated()
-                } else {
-                    ErrorDialogFragment.show(
-                        getString(R.string.error_unable_to_delete_post),
-                        state.error,
-                        childFragmentManager,
-                    )
-                }
-            }
-
-            is StatefulData.Loading -> {}
-            is StatefulData.NotStarted -> {}
-            is StatefulData.Success -> {
-                viewModel.fetchPostData(args.postOrCommentRef(), force = true)
-                (parentFragment as? CommunityFragment)?.onPostUpdated()
-            }
         }
     }
 
@@ -873,7 +892,7 @@ class PostFragment :
     }
 
     private fun forceRefresh() {
-        viewModel.fetchPostData(args.postOrCommentRef(), force = true)
+        viewModel.fetchPostData(force = true)
     }
 
     private fun onMainListingItemRetrieved(post: PostView) {

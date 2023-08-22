@@ -1,4 +1,5 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import java.util.Locale
 
 plugins {
     alias(libs.plugins.versions)
@@ -33,7 +34,7 @@ task<Delete>("clean") {
 }
 
 fun isNotStable(version: String): Boolean {
-    val versionLower = version.toLowerCase().trim()
+    val versionLower = version.lowercase(Locale.US).trim()
     return Regex("-(alpha|rc|beta)[0-9.]*\$").containsMatchIn(versionLower)
 }
 

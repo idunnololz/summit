@@ -71,7 +71,7 @@ class GalleryPageIndicator : View {
         }
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         val w = width
@@ -79,7 +79,7 @@ class GalleryPageIndicator : View {
 
         tempRect.set(0, 0, w, h)
 
-        canvas?.drawRect(tempRect, bgPaint)
+        canvas.drawRect(tempRect, bgPaint)
 
         if (numSegs > 0 && indicatorPosition >= 0 && indicatorPosition <= numSegs) {
             val segW = w / numSegs
@@ -87,7 +87,7 @@ class GalleryPageIndicator : View {
 
             tempRect.set(x.toInt(), 0, (segW + x).toInt(), h)
 
-            canvas?.drawRect(tempRect, indicatorPaint)
+            canvas.drawRect(tempRect, indicatorPaint)
         }
     }
 }

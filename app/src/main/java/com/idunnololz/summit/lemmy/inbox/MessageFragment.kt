@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -124,20 +125,35 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
         val inboxItem = args.inboxItem
 
-        LemmyTextHelper.bindText(
-            binding.title,
-            inboxItem.title,
-            args.instance,
-            onImageClick = { url ->
-                getMainActivity()?.openImage(null, binding.appBar, null, url, null)
-            },
-            onPageClick = {
-                getMainActivity()?.launchPage(it)
-            },
-            onLinkLongClick = { url, text ->
-                getMainActivity()?.showBottomMenuForLink(url, text)
-            },
-        )
+        when (inboxItem) {
+            is InboxItem.MentionInboxItem,
+            is InboxItem.MessageInboxItem,
+            is InboxItem.ReplyInboxItem -> {
+                LemmyTextHelper.bindText(
+                    binding.title,
+                    inboxItem.title,
+                    args.instance,
+                    onImageClick = { url ->
+                        getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+                    },
+                    onPageClick = {
+                        getMainActivity()?.launchPage(it)
+                    },
+                    onLinkLongClick = { url, text ->
+                        getMainActivity()?.showBottomMenuForLink(url, text)
+                    },
+                )
+            }
+            is InboxItem.ReportCommentInboxItem -> {
+                binding.title.setText(R.string.report_on_comment)
+            }
+            is InboxItem.ReportMessageInboxItem -> {
+                binding.title.setText(R.string.report)
+            }
+            is InboxItem.ReportPostInboxItem -> {
+                binding.title.setText(R.string.report_on_post)
+            }
+        }
         LemmyTextHelper.bindText(
             binding.content,
             inboxItem.content,
@@ -202,23 +218,39 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }
         }
 
-        binding.fab.setOnClickListener {
-            if (accountManager.currentAccount.value == null) {
-                PreAuthDialogFragment.newInstance(R.id.action_add_comment)
-                    .show(childFragmentManager, "asdf")
-                return@setOnClickListener
+        binding.bottomAppBar.menu.apply {
+            if (inboxItem is ReportItem) {
+                findItem(R.id.upvote).isVisible = false
+                findItem(R.id.downvote).isVisible = false
             }
+        }
 
-            AddOrEditCommentFragment().apply {
-                arguments =
-                    AddOrEditCommentFragmentArgs(
-                        args.instance,
-                        null,
-                        null,
-                        null,
-                        inboxItem,
-                    ).toBundle()
-            }.show(childFragmentManager, "asdf")
+        if (inboxItem is ReportItem) {
+            binding.fab.setImageResource(R.drawable.baseline_check_24)
+            binding.fab.setOnClickListener {
+                inboxViewModel.markAsRead(inboxItem, true)
+                (parentFragment as? InboxTabbedFragment)?.closeMessage()
+            }
+        } else {
+            binding.fab.setImageResource(R.drawable.baseline_reply_24)
+            binding.fab.setOnClickListener {
+                if (accountManager.currentAccount.value == null) {
+                    PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                        .show(childFragmentManager, "asdf")
+                    return@setOnClickListener
+                }
+
+                AddOrEditCommentFragment().apply {
+                    arguments =
+                        AddOrEditCommentFragmentArgs(
+                            args.instance,
+                            null,
+                            null,
+                            null,
+                            inboxItem,
+                        ).toBundle()
+                }.show(childFragmentManager, "asdf")
+            }
         }
 
         val upvoteColor = preferences.upvoteColor
@@ -272,6 +304,14 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 binding.bottomAppBar.menu.findItem(R.id.downvote).isEnabled = false
             }
 
+            is InboxItem.ReportCommentInboxItem,
+            is InboxItem.ReportPostInboxItem,
+            is InboxItem.ReportMessageInboxItem -> {
+                binding.score.visibility = View.GONE
+                binding.bottomAppBar.menu.findItem(R.id.upvote).isEnabled = false
+                binding.bottomAppBar.menu.findItem(R.id.downvote).isEnabled = false
+            }
+
             is InboxItem.MentionInboxItem,
             is InboxItem.ReplyInboxItem,
             -> error("THIS SHOULDNT HAPPEN!!!")
@@ -286,12 +326,20 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }
             updateContextState()
         }
+
+        if (inboxItem is ReportItem) {
+            viewModel.isContextShowing = true
+            loadContext()
+        }
+
         updateContextState()
     }
 
     private fun updateContextState() {
         with(binding) {
-            if (args.inboxItem !is CommentBackedItem) {
+            if (args.inboxItem !is CommentBackedItem &&
+                args.inboxItem !is InboxItem.ReportPostInboxItem &&
+                args.inboxItem !is InboxItem.ReportCommentInboxItem) {
                 contextCard.visibility = View.GONE
             } else if (viewModel.isContextShowing) {
                 indicator.setImageResource(R.drawable.baseline_expand_less_18)
@@ -318,62 +366,16 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 Log.d(TAG, "Context: " + inboxItem.commentPath)
                 viewModel.fetchCommentContext(inboxItem.postId, inboxItem.commentPath, force)
             }
-        }
-    }
-
-    private fun getPostMoreMenu(postView: PostView): BottomMenu {
-        val bottomMenu = BottomMenu(requireContext()).apply {
-            if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.value?.id) {
-                addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
-                addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
+            is InboxItem.ReportMessageInboxItem -> {
+                TODO()
             }
-
-            if (actionsViewModel != null) {
-                addItemWithIcon(
-                    R.id.block_community,
-                    getString(R.string.block_this_community_format, postView.community.name),
-                    R.drawable.baseline_block_24,
-                )
-                addItemWithIcon(
-                    R.id.block_user,
-                    getString(R.string.block_this_user_format, postView.creator.name),
-                    R.drawable.baseline_person_off_24,
-                )
+            is InboxItem.ReportCommentInboxItem -> {
+                viewModel.fetchCommentContext(inboxItem.postId, inboxItem.reportedCommentPath, force)
             }
-
-            if (this.itemsCount() == 0) {
-                addItem(io.noties.markwon.R.id.none, R.string.no_options)
-            }
-
-            setTitle(R.string.post_options)
-
-            setOnMenuItemClickListener {
-                when (it.id) {
-                    R.id.edit_post -> {
-                        CreateOrEditPostFragment()
-                            .apply {
-                                arguments = CreateOrEditPostFragmentArgs(
-                                    instance = args.instance,
-                                    post = postView.post,
-                                    communityName = null,
-                                ).toBundle()
-                            }
-                            .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
-                    }
-                    R.id.delete -> {
-                        actionsViewModel.deletePost(postView.post.id)
-                    }
-                    R.id.block_community -> {
-                        actionsViewModel.blockCommunity(postView.community.id)
-                    }
-                    R.id.block_user -> {
-                        actionsViewModel.blockPerson(postView.creator.id)
-                    }
-                }
+            is InboxItem.ReportPostInboxItem -> {
+                viewModel.fetchCommentContext(inboxItem.reportedPostId, null, force)
             }
         }
-
-        return bottomMenu
     }
 
     private fun loadRecyclerView(data: MessageViewModel.CommentContext) {
@@ -390,6 +392,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 instance = args.instance,
                 revealAll = false,
                 useFooter = false,
+                isEmbedded = true,
                 currentAccountId = viewModel.accountManager.currentAccount.value?.id,
                 videoState = null,
                 onRefreshClickCb = {
@@ -446,7 +449,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     getMainActivity()?.launchPage(it)
                 },
                 onPostMoreClick = {
-                    getMainActivity()?.showBottomMenu(getPostMoreMenu(it))
                     showMorePostOptions(viewModel.apiInstance, it, actionsViewModel, childFragmentManager)
                 },
                 onCommentMoreClick = {
@@ -457,6 +459,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         is InboxItem.MentionInboxItem -> inboxItem.postId
                         is InboxItem.MessageInboxItem -> return@PostsAdapter
                         is InboxItem.ReplyInboxItem -> inboxItem.postId
+                        is InboxItem.ReportMessageInboxItem -> TODO()
+                        is InboxItem.ReportCommentInboxItem -> inboxItem.postId
+                        is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
                     }
 
                     getMainActivity()?.launchPage(

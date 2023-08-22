@@ -106,4 +106,7 @@
     <item name="remove_feature_comment" type="id" />
     <item name="create_multi_community" type="id" />
     <item name="cross_post" type="id" />
+    <item name="report_post" type="id" />
+    <item name="report_comment" type="id" />
+    <item name="switch_account_temp" type="id" />
 </resources>

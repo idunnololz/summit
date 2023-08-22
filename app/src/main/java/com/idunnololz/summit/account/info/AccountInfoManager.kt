@@ -45,7 +45,7 @@ class AccountInfoManager @Inject constructor(
 
     val subscribedCommunities = MutableStateFlow<List<AccountSubscription>>(listOf())
     val accountInfoUpdateState = MutableStateFlow<StatefulData<Account?>>(StatefulData.NotStarted())
-    val unreadCount = MutableStateFlow<UnreadCount>(UnreadCount(0))
+    val unreadCount = MutableStateFlow<UnreadCount>(UnreadCount())
     val currentFullAccount = MutableStateFlow<FullAccount?>(null)
     val currentFullAccountOnChange = currentFullAccount.asSharedFlow().drop(1)
 
@@ -61,7 +61,7 @@ class AccountInfoManager @Inject constructor(
                         }
                     }
 
-                    unreadCount.emit(UnreadCount(0))
+                    unreadCount.emit(UnreadCount())
                 }
 
                 override suspend fun onAccountChanged(newAccount: Account?) {
@@ -69,7 +69,7 @@ class AccountInfoManager @Inject constructor(
 //                    currentFullAccount.emit(null)
                     subscribedCommunities.emit(listOf())
                     accountInfoUpdateState.emit(StatefulData.NotStarted())
-                    unreadCount.emit(UnreadCount(0))
+                    unreadCount.emit(UnreadCount())
                 }
             },
         )
@@ -173,7 +173,18 @@ class AccountInfoManager @Inject constructor(
     private suspend fun updateUnreadCount(account: Account) {
         accountAwareLemmyClient.fetchUnreadCountWithRetry(force = true, account)
             .onSuccess {
-                unreadCount.emit(UnreadCount(it.mentions + it.private_messages + it.replies))
+                unreadCount.emit(unreadCount.value.copy(
+                    totalUnreadCount = it.mentions + it.private_messages + it.replies
+                ))
+            }
+        accountAwareLemmyClient.fetchUnresolvedReportsCountWithRetry(force = true, account)
+            .onSuccess {
+                unreadCount.emit(unreadCount.value.copy(
+                    totalUnresolvedReportsCount =
+                    it.comment_reports +
+                        it.post_reports +
+                        (it.private_message_reports ?: 0)
+                ))
             }
     }
 
@@ -217,7 +228,8 @@ class AccountInfoManager @Inject constructor(
     }
 
     data class UnreadCount(
-        val totalUnreadCount: Int,
+        val totalUnreadCount: Int = 0,
+        val totalUnresolvedReportsCount: Int = 0,
     )
 
 //    private class AccountInfo(

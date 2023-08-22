@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:layout_marginTop="@dimen/padding" />
+        android:layout_marginTop="@dimen/padding"
+        android:maxHeight="@dimen/max_image_height"/>
 
     <com.idunnololz.summit.view.LoadingView
         android:id="@+id/loadingView"

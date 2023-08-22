@@ -122,7 +122,7 @@ class GalleryImageView : AppCompatImageView {
                 }
 
                 override fun onFling(
-                    e1: MotionEvent,
+                    e1: MotionEvent?,
                     e2: MotionEvent,
                     velocityX: Float,
                     velocityY: Float,
@@ -131,7 +131,7 @@ class GalleryImageView : AppCompatImageView {
                 }
 
                 override fun onScroll(
-                    e1: MotionEvent,
+                    e1: MotionEvent?,
                     e2: MotionEvent,
                     distanceX: Float,
                     distanceY: Float,
