@@ -353,7 +353,7 @@ object FileDownloadHelper {
                 } else {
                     val request = Request.Builder()
                         .url(checkNotNull(url))
-                        .header("User-Agent", "Chrome")
+                        .header("User-Agent", LinkUtils.USER_AGENT)
                         .build()
 
                     val response = Client.get().newCall(request).execute()
