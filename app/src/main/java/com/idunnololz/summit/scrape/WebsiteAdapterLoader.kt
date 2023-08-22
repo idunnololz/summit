@@ -14,6 +14,7 @@ import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.WEBSITE_ERROR
 import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.IDataCache
+import com.idunnololz.summit.util.LinkUtils
 import okhttp3.*
 import org.jsoup.HttpStatusException
 import java.io.IOException
@@ -234,7 +235,7 @@ class WebsiteAdapterLoader {
 
                 val builder = Request.Builder()
                     .url(tl.url)
-                    .header("User-Agent", "Chrome")
+                    .header("User-Agent", LinkUtils.USER_AGENT)
 
                 if (useHttpCache == NO_CACHE_NO_STORE) {
                     builder.header("Cache-Control", "no-cache, no-store")

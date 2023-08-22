@@ -16,6 +16,7 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -171,21 +172,28 @@ class AccountInfoManager @Inject constructor(
     }
 
     private suspend fun updateUnreadCount(account: Account) {
-        accountAwareLemmyClient.fetchUnreadCountWithRetry(force = true, account)
-            .onSuccess {
-                unreadCount.emit(unreadCount.value.copy(
-                    totalUnreadCount = it.mentions + it.private_messages + it.replies
-                ))
-            }
-        accountAwareLemmyClient.fetchUnresolvedReportsCountWithRetry(force = true, account)
-            .onSuccess {
-                unreadCount.emit(unreadCount.value.copy(
-                    totalUnresolvedReportsCount =
-                    it.comment_reports +
-                        it.post_reports +
-                        (it.private_message_reports ?: 0)
-                ))
-            }
+        val j1 = coroutineScope.launch {
+            accountAwareLemmyClient.fetchUnreadCountWithRetry(force = true, account)
+                .onSuccess {
+                    unreadCount.emit(unreadCount.value.copy(
+                        totalUnreadCount = it.mentions + it.private_messages + it.replies
+                    ))
+                }
+        }
+        val j2 = coroutineScope.launch {
+            accountAwareLemmyClient.fetchUnresolvedReportsCountWithRetry(force = true, account)
+                .onSuccess {
+                    unreadCount.emit(unreadCount.value.copy(
+                        totalUnresolvedReportsCount =
+                        it.comment_reports +
+                            it.post_reports +
+                            (it.private_message_reports ?: 0)
+                    ))
+                }
+        }
+
+        j1.join()
+        j2.join()
     }
 
     private suspend fun refreshAccountInfo(account: Account?): Result<GetSiteResponse> {

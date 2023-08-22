@@ -71,6 +71,7 @@ import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.SearchResponse
+import com.idunnololz.summit.util.LinkUtils
 import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.MultipartBody
@@ -540,7 +541,7 @@ interface LemmyApi {
                 }
                 .addInterceptor { chain ->
                     val requestBuilder = chain.request().newBuilder()
-                        .header("User-Agent", "Jerboa")
+                        .header("User-Agent", LinkUtils.USER_AGENT)
                     val newRequest = requestBuilder.build()
                     chain.proceed(newRequest)
                 }

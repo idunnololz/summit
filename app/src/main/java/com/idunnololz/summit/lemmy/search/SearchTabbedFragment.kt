@@ -422,6 +422,8 @@ class SearchTabbedFragment :
     }
 
     private fun updateQueryBackHandler() {
+        if (!isBindingAvailable()) return
+
         queryBackPressHandler.isEnabled = !(
             binding.searchEditText.text.isNullOrBlank() &&
                 binding.searchEditTextDummy.text.isNullOrBlank()

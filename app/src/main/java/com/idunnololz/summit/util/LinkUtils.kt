@@ -14,6 +14,8 @@ import org.jsoup.HttpStatusException
 
 object LinkUtils {
 
+    const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+
     const val APP_PERMISSIONS_HELP_ARTICLE = "https://support.google.com/android/answer/9431959"
 
     fun downloadSite(url: String, cache: Boolean = false): String {
@@ -34,7 +36,7 @@ object LinkUtils {
     private fun doRequest(url: String, cache: Boolean): Response {
         val builder = Request.Builder()
             .url(url)
-            .header("User-Agent", "Chrome")
+            .header("User-Agent", USER_AGENT)
         if (!cache) {
             builder.cacheControl(CacheControl.FORCE_NETWORK)
                 .header("Cache-Control", "no-cache, no-store")

@@ -15,6 +15,7 @@ import com.idunnololz.summit.cache.MoshiDiskCache
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.util.*
+import com.idunnololz.summit.util.LinkUtils.USER_AGENT
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -328,6 +329,7 @@ class OfflineManager @Inject constructor(
         force = false,
         saveToFileFn = { destFile ->
             val req = Request.Builder()
+                .header("User-Agent", USER_AGENT)
                 .url(url)
                 .build()
 
@@ -347,7 +349,7 @@ class OfflineManager @Inject constructor(
                 } else if (response.code >= 500) {
                     Result.failure(ServerApiException(response.code))
                 } else {
-                    Result.failure(ClientApiException(response.message, response.code))
+                    Result.failure(ClientApiException("${response.message} url: $url", response.code))
                 }
             } catch (e: Exception) {
                 Result.failure(e)
