@@ -22,6 +22,9 @@ import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,8 +42,19 @@ class CreateOrEditPostViewModel @Inject constructor(
     val searchResults = StatefulLiveData<List<CommunityView>>()
     val showSearch = MutableStateFlow<Boolean>(false)
     val showSearchLiveData = showSearch.asLiveData()
+    val query = MutableStateFlow("")
 
     private var searchJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            query
+                .debounce(300)
+                .collect {
+                    doQuery(it)
+                }
+        }
+    }
 
     fun createPost(
         communityFullName: String,
@@ -142,7 +156,7 @@ class CreateOrEditPostViewModel @Inject constructor(
         uploadImageInternal(instance, uri, uploadImageForUrlResult)
     }
 
-    fun doQuery(query: String) {
+    private fun doQuery(query: String) {
         searchResults.setIsLoading()
 
         if (query.isBlank()) {

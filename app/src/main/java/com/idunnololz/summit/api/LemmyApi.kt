@@ -38,10 +38,15 @@ import com.idunnololz.summit.api.dto.GetPersonMentionsResponse
 import com.idunnololz.summit.api.dto.GetPostResponse
 import com.idunnololz.summit.api.dto.GetPostsResponse
 import com.idunnololz.summit.api.dto.GetRepliesResponse
+import com.idunnololz.summit.api.dto.GetReportCountResponse
 import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.ListPostReportsResponse
+import com.idunnololz.summit.api.dto.ListPrivateMessageReports
+import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
 import com.idunnololz.summit.api.dto.LoginResponse
@@ -59,6 +64,9 @@ import com.idunnololz.summit.api.dto.PrivateMessageResponse
 import com.idunnololz.summit.api.dto.PrivateMessagesResponse
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemovePost
+import com.idunnololz.summit.api.dto.ResolveCommentReport
+import com.idunnololz.summit.api.dto.ResolveObjectResponse
+import com.idunnololz.summit.api.dto.ResolvePostReport
 import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
@@ -263,6 +271,33 @@ interface LemmyApi {
     fun getPrivateMessagesNoCache(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
 
     /**
+     * These are instance wide reports that are only visible for instance admins.
+     */
+    @GET("private_message/report/list")
+    fun getReportMessages(@QueryMap form: Map<String, String>): Call<ListPrivateMessageReportsResponse>
+    @GET("private_message/report/list")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getReportMessagesNoCache(@QueryMap form: Map<String, String>): Call<ListPrivateMessageReportsResponse>
+
+    @GET("post/report/list")
+    fun getPostReports(@QueryMap form: Map<String, String>): Call<ListPostReportsResponse>
+    @GET("post/report/list")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getPostReportsNoCache(@QueryMap form: Map<String, String>): Call<ListPostReportsResponse>
+
+    @PUT("post/report/resolve")
+    fun resolvePostReport(@Body resolvePostReport: ResolvePostReport): Call<PostReportResponse>
+
+    @GET("comment/report/list")
+    fun getCommentReports(@QueryMap form: Map<String, String>): Call<ListCommentReportsResponse>
+    @GET("comment/report/list")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getCommentReportsNoCache(@QueryMap form: Map<String, String>): Call<ListCommentReportsResponse>
+
+    @PUT("comment/report/resolve")
+    fun resolveCommentReport(@Body resolveCommentReport: ResolveCommentReport): Call<CommentReportResponse>
+
+    /**
      * Create a private message.
      */
     @POST("private_message")
@@ -277,6 +312,14 @@ interface LemmyApi {
     @GET("user/unread_count")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun getUnreadCountNoCache(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
+
+
+    @GET("user/report_count")
+    fun getReportCount(@QueryMap form: Map<String, String>): Call<GetReportCountResponse>
+
+    @GET("user/report_count")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getReportCountNoCache(@QueryMap form: Map<String, String>): Call<GetReportCountResponse>
 
     /**
      * Follow / subscribe to a community.
@@ -372,6 +415,9 @@ interface LemmyApi {
         @Header("Cookie") token: String,
         @Part filePart: MultipartBody.Part,
     ): Call<PictrsImages>
+
+    @GET("resolve_object")
+    fun resolveObject(@QueryMap form: Map<String, String>): Call<ResolveObjectResponse>
 
 
 

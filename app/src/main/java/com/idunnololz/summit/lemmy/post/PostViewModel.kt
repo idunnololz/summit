@@ -1,15 +1,23 @@
 package com.idunnololz.summit.lemmy.post
 
+import android.app.Application
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -26,17 +34,24 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
+    private val context: Application,
     private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
     private val accountActionsManager: AccountActionsManager,
     private val accountManager: AccountManager,
+    private val accountInfoManager: AccountInfoManager,
     private val postReadManager: PostReadManager,
     private val preferences: Preferences,
+    private val state: SavedStateHandle,
+    private val unauthedApiClient: LemmyApiClient,
 ) : ViewModel() {
 
     companion object {
@@ -48,10 +63,17 @@ class PostViewModel @Inject constructor(
     /**
      * Create a new instance so we can change the instance without screwing up app state
      */
-    private val lemmyApiClient = lemmyApiClientFactory.create()
+    val lemmyApiClient = lemmyApiClientFactory.create()
 
     private var postOrCommentRef: Either<PostRef, CommentRef>? = null
+        set(value) {
+            field = value
 
+            state["postRef"] = value?.leftOrNull()
+            state["commentRef"] = value?.getOrNull()
+        }
+
+    val currentAccountView = MutableLiveData<AccountView?>()
     private var postView: PostView? = null
     private var comments: List<CommentView>? = null
     private var pendingComments: List<PendingCommentView>? = null
@@ -59,6 +81,8 @@ class PostViewModel @Inject constructor(
 
     private val additionalLoadedCommentIds = mutableSetOf<CommentId>()
     private val removedCommentIds = mutableSetOf<CommentId>()
+
+    val switchAccountState = StatefulLiveData<Unit>()
 
     /**
      * Comments that didn't load by default but were loaded by the user requesting additional comments
@@ -75,11 +99,15 @@ class PostViewModel @Inject constructor(
     val commentNavControlsState = MutableLiveData<CommentNavControlsState?>()
 
     init {
+        state.get<PostRef>("postRef")?.let {
+            postOrCommentRef = Either.Left(it)
+        }
+        state.get<CommentRef>("commentRef")?.let {
+            postOrCommentRef = Either.Right(it)
+        }
+
         commentsSortOrderLiveData.observeForever {
-            val postOrCommentRef = postOrCommentRef
-            if (postOrCommentRef != null) {
-                fetchPostData(postOrCommentRef, fetchPostData = false)
-            }
+            fetchPostData(fetchPostData = false)
         }
         viewModelScope.launch {
             accountActionsManager.onCommentActionChanged.collect {
@@ -89,6 +117,17 @@ class PostViewModel @Inject constructor(
                         postOrCommentRef = postOrCommentRef,
                         resolveCompletedPendingComments = true,
                     )
+                }
+            }
+        }
+        viewModelScope.launch {
+            accountManager.currentAccount.collect {
+                withContext(Dispatchers.Main) {
+                    if (it != null) {
+                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(it)
+                    } else {
+                        currentAccountView.value = null
+                    }
                 }
             }
         }
@@ -104,12 +143,19 @@ class PostViewModel @Inject constructor(
             null
         }
 
+    fun updatePostOrCommentRef(
+        postOrCommentRef: Either<PostRef, CommentRef>
+    ) {
+        this.postOrCommentRef = postOrCommentRef
+    }
+
     fun fetchPostData(
-        postOrCommentRef: Either<PostRef, CommentRef>,
         fetchPostData: Boolean = true,
         fetchCommentData: Boolean = true,
         force: Boolean = false,
-    ) {
+    ): Job? {
+        val postOrCommentRef = postOrCommentRef ?: return null
+
         lemmyApiClient.changeInstance(
             postOrCommentRef
                 .fold(
@@ -122,12 +168,11 @@ class PostViewModel @Inject constructor(
                 ),
         )
 
-        this.postOrCommentRef = postOrCommentRef
         postData.setIsLoading()
 
         val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
-        viewModelScope.launch {
+        return viewModelScope.launch {
             val postResult = if (fetchPostData) {
                 postOrCommentRef
                     .fold(
@@ -204,6 +249,110 @@ class PostViewModel @Inject constructor(
         }
     }
 
+    class ObjectResolverFailedException : Exception {
+        constructor() : super()
+        constructor(message: String?) : super(message)
+        constructor(message: String?, cause: Throwable?) : super(message, cause)
+        constructor(cause: Throwable?) : super(cause)
+    }
+
+    fun switchAccount(account: Account) {
+        val postOrCommentRef = postOrCommentRef ?: return
+
+        val instance = postOrCommentRef.fold(
+            { it.instance },
+            { it.instance },
+        )
+
+        if (account.id == currentAccountView.value?.account?.id) {
+            return
+        }
+
+        switchAccountState.setIsLoading(context.getString(R.string.switching_instance))
+
+        Log.d(TAG, "Instance changed. Trying to resolve post in new instance.")
+
+        unauthedApiClient.changeInstance(instance)
+
+        viewModelScope.launch {
+            val linkToResolve = postOrCommentRef
+                .fold(
+                    {
+                        unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
+                            .fold(
+                                onSuccess = {
+                                    Result.success(it.post.ap_id)
+                                },
+                                onFailure = {
+                                    Result.failure(it)
+                                }
+                            )
+                    },
+                    { commentRef ->
+                        unauthedApiClient
+                            .fetchComments(
+                                null,
+                                id = Either.Right(commentRef.id),
+                                sort = CommentSortType.Top, force = false,
+                                maxDepth = 0
+                            )
+                            .fold(
+                                onSuccess = {
+                                    val url = it.firstOrNull { it.comment.id == commentRef.id }?.comment?.ap_id
+                                    if (url != null) {
+                                        Result.success(url)
+                                    } else {
+                                        Result.failure(ObjectResolverFailedException())
+                                    }
+                                },
+                                onFailure = {
+                                    Result.failure(it)
+                                }
+                            )
+                    },
+                )
+
+            accountManager.setCurrentAccount(account)
+
+            linkToResolve
+                .fold(
+                    onSuccess = {
+                        Log.d(TAG, "Attempting to resolve $linkToResolve " +
+                            "on instance $apiInstance")
+                        lemmyApiClient.resolveObject(it)
+                    },
+                    onFailure = {
+                        Result.failure(it)
+                    }
+                )
+                .fold(
+                    onSuccess = {
+                        val newPostOrCommentRef = if (it.post != null) {
+                            Either.Left(PostRef(account.instance, it.post.post.id))
+                        } else if (it.comment != null) {
+                            Either.Right(CommentRef(account.instance, it.comment.comment.id))
+                        } else {
+                            null
+                        }
+
+                        if (newPostOrCommentRef != null) {
+                            this@PostViewModel.postOrCommentRef = newPostOrCommentRef
+
+                            fetchPostData(fetchPostData = true, force = true)
+                                ?.join()
+                        }
+
+                        switchAccountState.postValue(Unit)
+                    },
+                    onFailure = {
+                        Log.e(TAG, "Error resolving object.", it)
+
+                        switchAccountState.postError(it)
+                    }
+                )
+        }
+    }
+
     private fun updatePendingComments(
         postOrCommentRef: Either<PostRef, CommentRef>,
         resolveCompletedPendingComments: Boolean,
@@ -253,33 +402,32 @@ class PostViewModel @Inject constructor(
                         fetchMoreCommentsInternal(pendingComment.parentId, sortOrder, force = true)
                     }
 
-                    commentsResult
-                        .onSuccess {
-                            modified = true
+                    commentsResult.onSuccess {
+                        modified = true
 
-                            // find the comment that was recently posts by guessing!
+                        // find the comment that was recently posts by guessing!
 
-                            if (pendingComment.isActionDelete) {
-                                newlyPostedCommentId = pendingComment.commentId
-                            } else if (pendingComment.commentId != null) {
-                                newlyPostedCommentId = pendingComment.commentId
-                            } else {
-                                newlyPostedCommentId = it
-                                    .sortedByDescending {
-                                        if (it.comment.updated != null) {
-                                            dateStringToTs(it.comment.updated)
-                                        } else {
-                                            dateStringToTs(it.comment.published)
-                                        }
+                        if (pendingComment.isActionDelete) {
+                            newlyPostedCommentId = pendingComment.commentId
+                        } else if (pendingComment.commentId != null) {
+                            newlyPostedCommentId = pendingComment.commentId
+                        } else {
+                            newlyPostedCommentId = it
+                                .sortedByDescending {
+                                    if (it.comment.updated != null) {
+                                        dateStringToTs(it.comment.updated)
+                                    } else {
+                                        dateStringToTs(it.comment.published)
                                     }
-                                    .firstOrNull {
-                                        it.comment.creator_id == accountManager.currentAccount.value?.id
-                                    }
-                                    ?.comment?.id
-                            }
-
-                            accountActionsManager.removePendingComment(pendingComment)
+                                }
+                                .firstOrNull {
+                                    it.comment.creator_id == accountManager.currentAccount.value?.id
+                                }
+                                ?.comment?.id
                         }
+
+                        accountActionsManager.removePendingComment(pendingComment)
+                    }
                 }
             }
         }

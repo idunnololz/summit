@@ -5,15 +5,18 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
 import com.idunnololz.summit.lemmy.mod.BanUserDialogFragment
 import com.idunnololz.summit.lemmy.mod.BanUserDialogFragmentArgs
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
+import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -26,6 +29,9 @@ fun BaseFragment<*>.showMorePostOptions(
     postView: PostView,
     actionsViewModel: MoreActionsViewModel,
     fragmentManager: FragmentManager,
+    isPostMenu: Boolean = false,
+    onSortOrderClick: () -> Unit = {},
+    onRefreshClick: () -> Unit = {},
 ) {
     if (!isBindingAvailable()) {
         return
@@ -41,6 +47,21 @@ fun BaseFragment<*>.showMorePostOptions(
             getString(R.string.add_comment),
             R.drawable.baseline_add_comment_24,
         )
+
+        if (isPostMenu) {
+            addDivider()
+            addItemWithIcon(
+                R.id.sort_comments_by,
+                R.string.sort_comments_by,
+                R.drawable.baseline_sort_24
+            )
+            addItemWithIcon(
+                R.id.refresh,
+                R.string.refresh,
+                R.drawable.baseline_refresh_24
+            )
+            addDivider()
+        }
 
         if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.value?.id) {
             addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
@@ -121,7 +142,16 @@ fun BaseFragment<*>.showMorePostOptions(
             getString(R.string.block_this_user_format, postView.creator.name),
             R.drawable.baseline_person_off_24,
         )
+        addItemWithIcon(
+            R.id.report_post,
+            getString(R.string.report_post),
+            R.drawable.baseline_outlined_flag_24,
+        )
         addDivider()
+//        addItemWithIcon(
+//            R.id.switch_account_temp,
+//            R.string.switch_account_for_post,
+//            R.drawable.baseline_account_circle_24)
         addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
 
         setOnMenuItemClickListener {
@@ -215,6 +245,25 @@ fun BaseFragment<*>.showMorePostOptions(
                 }
                 R.id.mod_tools -> {
                     ModActionsDialogFragment.show(postView, childFragmentManager)
+                }
+                R.id.report_post -> {
+                    ReportContentDialogFragment.show(
+                        childFragmentManager,
+                        PostRef(
+                            instance,
+                            postView.post.id
+                        ),
+                        null,
+                    )
+                }
+                R.id.switch_account_temp -> {
+                    FastAccountSwitcherDialogFragment.show(childFragmentManager)
+                }
+                R.id.sort_comments_by -> {
+                    onSortOrderClick()
+                }
+                R.id.refresh -> {
+                    onRefreshClick()
                 }
             }
         }

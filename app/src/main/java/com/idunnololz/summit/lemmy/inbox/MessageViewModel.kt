@@ -32,47 +32,57 @@ class MessageViewModel @Inject constructor(
     val commentContext = StatefulLiveData<CommentContext>()
     var isContextShowing = false
 
-    fun fetchCommentContext(postId: Int, commentPath: String, force: Boolean) {
+    fun fetchCommentContext(postId: Int, commentPath: String?, force: Boolean) {
         commentContext.setIsLoading()
 
         viewModelScope.launch {
-            val commentIds = commentPath.split(".").map { it.toInt() }
-            val topCommentId = commentIds.firstOrNull { it != 0 }
+            val finalTopCommentId = if (commentPath != null) {
+                val commentIds = commentPath.split(".").map { it.toInt() }
+                val topCommentId = commentIds.firstOrNull { it != 0 }
 
-            if (topCommentId == null) {
-                commentContext.setError(RuntimeException("No context found."))
-                return@launch
+                if (topCommentId == null) {
+                    commentContext.setError(RuntimeException("No context found."))
+                    return@launch
+                }
+                topCommentId
+            } else {
+                null
             }
 
             val postJob = async {
                 apiClient.fetchPostWithRetry(Either.Left(postId), force)
             }
-            val commentJob = async {
-                commentsFetcher
-                    .fetchCommentsWithRetry(
-                        Either.Right(topCommentId),
-                        CommentSortType.Top,
-                        null,
-                        force,
-                    )
-            }
+            val commentJob =
+                if (finalTopCommentId != null) {
+                    async {
+                        commentsFetcher
+                            .fetchCommentsWithRetry(
+                                Either.Right(finalTopCommentId),
+                                CommentSortType.Top,
+                                null,
+                                force,
+                            )
+                    }
+                } else {
+                    null
+                }
 
             val postResult = postJob.await()
-            val commentResult = commentJob.await()
+            val commentResult = commentJob?.await()
 
             if (postResult.isFailure) {
                 commentContext.setError(requireNotNull(postResult.exceptionOrNull()))
                 return@launch
             }
 
-            if (commentResult.isFailure) {
+            if (commentResult?.isFailure == true) {
                 commentContext.setError(requireNotNull(commentResult.exceptionOrNull()))
                 return@launch
             }
 
             val tree = CommentTreeBuilder(accountManager).buildCommentsTreeListView(
                 post = null,
-                comments = commentResult.getOrNull(),
+                comments = commentResult?.getOrNull(),
                 parentComment = true,
                 pendingComments = null,
                 supplementaryComments = mapOf(),

@@ -6,6 +6,5 @@ data class FullAccount(
     val account: Account,
     val accountInfo: AccountInfo,
 ) {
-    val accountId =
-        account.id
+    val accountId = account.id
 }

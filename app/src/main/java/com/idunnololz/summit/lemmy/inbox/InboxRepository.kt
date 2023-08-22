@@ -7,9 +7,6 @@ import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.lemmy.inbox.repository.InboxSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -34,65 +31,19 @@ class InboxRepository @Inject constructor(
         private const val PAGE_SIZE = 20
     }
 
-    /**
-     * Represents a change on the server. If a page is included in this set, it means we should
-     * fetch without a cache for the next fetch request.
-     */
-    private val serverInvalidated = mutableSetOf<InboxViewModel.PageType>()
-
     private val repliesStatelessSource: InboxSource<CommentSortType> =
         makeRepliesSource(unreadOnly = false)
     private val mentionsStatelessSource: InboxSource<CommentSortType> =
         makeMentionsSource(unreadOnly = false)
     private val messagesStatelessSource: InboxSource<Unit> =
         makeMessagesSource(unreadOnly = false)
-
-    private class InboxSourceState<O>(
-        val inboxSource: InboxSource<O>,
-        var itemIndex: Int = 0,
-    ) {
-        private var nextItem: Result<InboxItem?>? = null
-        suspend fun getItem(force: Boolean): Result<InboxItem?> {
-            nextItem?.let {
-                return it
-            }
-
-            val result = inboxSource.getItem(itemIndex, force)
-            Log.d(
-                TAG,
-                "Setting next item to ${(result.getOrNull() ?: Unit)}. " +
-                    "Index: $itemIndex. Force: $force",
-            )
-
-            val nextItem = result.also {
-                nextItem = it
-            }
-            return nextItem
-        }
-
-        suspend fun next() {
-            if (nextItem?.getOrNull() != null) {
-                itemIndex++
-                nextItem = null
-            }
-        }
-
-        fun reset() {
-            nextItem = null
-            itemIndex = 0
-            inboxSource.reset()
-        }
-
-        fun markAsRead(id: Int, read: Boolean): InboxItem? {
-            return inboxSource.markAsRead(id, read)
-        }
-
-        fun removeItemWithId(id: Int) =
-            inboxSource.removeItemWithId(id)
-    }
+    private val postReportsStatelessSource: InboxSource<Unit> =
+        makePostReportsSource(unresolvedOnly = false)
+    private val commentReportsStatelessSource: InboxSource<Unit> =
+        makeCommentReportsSource(unresolvedOnly = false)
 
     private class InboxMultiDataSource(
-        private val sources: List<InboxSourceState<*>>,
+        private val sources: List<InboxSource<*>>,
     ) {
 
         val allItems = mutableListOf<InboxItem>()
@@ -110,7 +61,7 @@ class InboxRepository @Inject constructor(
             if (force) {
                 allItems.clear()
                 sources.forEach {
-                    it.reset()
+                    it.invalidate()
                 }
             }
 
@@ -119,15 +70,17 @@ class InboxRepository @Inject constructor(
             var hasMore = true
 
             while (allItems.size < endIndex) {
-                val results = sources.asFlow().map { it.getItem(force) }.toList()
-                val error = results.firstOrNull { it.isFailure }
+                val sourceToResult = sources.map { it to it.peekNextItem() }
+                val sourceAndError = sourceToResult.firstOrNull { (_, result) -> result.isFailure }
 
-                if (error != null) {
-                    return Result.failure(requireNotNull(error.exceptionOrNull()))
+                if (sourceAndError != null) {
+                    return Result.failure(requireNotNull(sourceAndError.second.exceptionOrNull()))
                 }
 
-                val nextSource = sources.maxBy { it.getItem(force).getOrNull()?.lastUpdateTs ?: 0L }
-                val nextItem = nextSource.getItem(force).getOrNull()
+                val nextSourceAndResult = sourceToResult.maxBy {
+                        (_, result) -> result.getOrNull()?.lastUpdateTs ?: 0L
+                }
+                val nextItem = nextSourceAndResult.second.getOrNull()
 
                 if (nextItem == null) {
                     // no more items!
@@ -143,7 +96,7 @@ class InboxRepository @Inject constructor(
                 allItems.add(nextItem)
 
                 // increment the max item
-                nextSource.next()
+                nextSourceAndResult.first.next()
             }
 
             return Result.success(
@@ -175,78 +128,70 @@ class InboxRepository @Inject constructor(
         fun invalidate() {
             allItems.clear()
             sources.forEach {
-                it.reset()
+                it.invalidate()
             }
         }
     }
 
     private val repliesSource = InboxMultiDataSource(
-        listOf(InboxSourceState(repliesStatelessSource)),
+        listOf(repliesStatelessSource),
     )
     private val mentionsSource =
         InboxMultiDataSource(
-            listOf(InboxSourceState(mentionsStatelessSource)),
+            listOf(mentionsStatelessSource),
         )
     private val messagesSource =
         InboxMultiDataSource(
-            listOf(InboxSourceState(messagesStatelessSource)),
+            listOf(messagesStatelessSource),
+        )
+    private val reportsSource =
+        InboxMultiDataSource(
+            listOf(postReportsStatelessSource, commentReportsStatelessSource),
         )
     private val allSources = InboxMultiDataSource(
         listOf(
-            InboxSourceState(repliesStatelessSource),
-            InboxSourceState(mentionsStatelessSource),
-            InboxSourceState(messagesStatelessSource),
+            repliesStatelessSource,
+            mentionsStatelessSource,
+            messagesStatelessSource,
+            postReportsStatelessSource,
+            commentReportsStatelessSource
         ),
     )
     private val unreadSources = InboxMultiDataSource(
         listOf(
-            InboxSourceState(makeRepliesSource(unreadOnly = true)),
-            InboxSourceState(makeMentionsSource(unreadOnly = true)),
-            InboxSourceState(makeMessagesSource(unreadOnly = true)),
+            makeRepliesSource(unreadOnly = true),
+            makeMentionsSource(unreadOnly = true),
+            makeMessagesSource(unreadOnly = true),
+            makePostReportsSource(unresolvedOnly = true),
+            makeCommentReportsSource(unresolvedOnly = true),
         ),
     )
+
+    private fun getSource(pageType: InboxViewModel.PageType) = when (pageType) {
+        InboxViewModel.PageType.Unread -> unreadSources
+        InboxViewModel.PageType.All -> allSources
+        InboxViewModel.PageType.Replies -> repliesSource
+        InboxViewModel.PageType.Mentions -> mentionsSource
+        InboxViewModel.PageType.Messages -> messagesSource
+        InboxViewModel.PageType.Reports -> reportsSource
+    }
 
     suspend fun getPage(
         pageIndex: Int,
         pageType: InboxViewModel.PageType,
         force: Boolean,
     ): Result<PageResult<InboxItem>> {
-        val source = when (pageType) {
-            InboxViewModel.PageType.Unread -> unreadSources
-            InboxViewModel.PageType.All -> allSources
-            InboxViewModel.PageType.Replies -> repliesSource
-            InboxViewModel.PageType.Mentions -> mentionsSource
-            InboxViewModel.PageType.Messages -> messagesSource
-        }
+        val source = getSource(pageType)
 
-        val finalForce = serverInvalidated.contains(pageType) || force
-
-        val result = source.getPage(pageIndex, pageType, finalForce)
-
-        serverInvalidated.remove(pageType)
-        if (pageType == InboxViewModel.PageType.All) {
-            serverInvalidated.remove(InboxViewModel.PageType.Replies)
-            serverInvalidated.remove(InboxViewModel.PageType.Messages)
-            serverInvalidated.remove(InboxViewModel.PageType.Mentions)
-            repliesSource.invalidate()
-            messagesSource.invalidate()
-            mentionsSource.invalidate()
-        }
+        val result = source.getPage(pageIndex, pageType, force)
 
         Log.d(TAG, "Got ${result.getOrNull()?.items?.size} items for page $pageType")
 
         return result
     }
 
-    suspend fun invalidate(pageType: InboxViewModel.PageType) {
-        val source = when (pageType) {
-            InboxViewModel.PageType.Unread -> unreadSources
-            InboxViewModel.PageType.All -> allSources
-            InboxViewModel.PageType.Replies -> repliesSource
-            InboxViewModel.PageType.Mentions -> mentionsSource
-            InboxViewModel.PageType.Messages -> messagesSource
-        }
-        source.invalidate()
+    fun invalidate(pageType: InboxViewModel.PageType) {
+        getSource(pageType).invalidate()
     }
 
     private fun makeRepliesSource(unreadOnly: Boolean) = InboxSource(
@@ -308,6 +253,44 @@ class InboxRepository @Inject constructor(
         )
     }
 
+    private fun makePostReportsSource(unresolvedOnly: Boolean) = InboxSource(
+        apiClient,
+        Unit,
+    ) { page: Int, _: Unit, limit: Int, force: Boolean ->
+        fetchPostReports(
+            page = page,
+            limit = limit,
+            unresolvedOnly = unresolvedOnly,
+            force = force,
+        ).fold(
+            onSuccess = {
+                Result.success(it.post_reports.map { InboxItem.ReportPostInboxItem(it) })
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    private fun makeCommentReportsSource(unresolvedOnly: Boolean) = InboxSource(
+        apiClient,
+        Unit,
+    ) { page: Int, _: Unit, limit: Int, force: Boolean ->
+        fetchCommentReports(
+            page = page,
+            limit = limit,
+            unresolvedOnly = unresolvedOnly,
+            force = force,
+        ).fold(
+            onSuccess = {
+                Result.success(it.comment_reports.map { InboxItem.ReportCommentInboxItem(it) })
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
     suspend fun markAsRead(inboxItem: InboxItem, read: Boolean): Result<Unit> {
         val itemMarked = allSources.markAsRead(inboxItem.id, read)
 
@@ -326,6 +309,15 @@ class InboxRepository @Inject constructor(
                 apiClient.markPrivateMessageAsRead(inboxItem.id, read)
             is InboxItem.ReplyInboxItem ->
                 apiClient.markReplyAsRead(inboxItem.id, read)
+            is InboxItem.ReportMessageInboxItem -> {
+                Result.success(Unit)
+            }
+            is InboxItem.ReportCommentInboxItem -> {
+                apiClient.resolveCommentReport(inboxItem.id, read)
+            }
+            is InboxItem.ReportPostInboxItem -> {
+                apiClient.resolvePostReport(inboxItem.id, read)
+            }
         }
 
         return result.fold(
@@ -351,7 +343,7 @@ class InboxRepository @Inject constructor(
 
     fun onServerChanged() {
         InboxViewModel.PageType.values().forEach {
-            serverInvalidated.add(it)
+            invalidate(it)
         }
     }
 }

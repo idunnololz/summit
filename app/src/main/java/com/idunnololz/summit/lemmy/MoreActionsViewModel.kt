@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MoreActionsViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
+    var apiClient: AccountAwareLemmyClient,
     val accountManager: AccountManager,
     val accountInfoManager: AccountInfoManager,
     val accountActionsManager: AccountActionsManager,

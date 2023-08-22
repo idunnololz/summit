@@ -45,8 +45,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
-import java.lang.RuntimeException
 import javax.inject.Inject
+import kotlin.RuntimeException
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(

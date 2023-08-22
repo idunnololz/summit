@@ -413,8 +413,8 @@
     <string name="elapsed_time_hours_ago">%1$dh</string>
     <string name="elapsed_time_yesterday">1d</string>
     <string name="elapsed_time_days_ago">%1$dd</string>
-    <string name="elapsed_time_a_month_ago">1m</string>
-    <string name="elapsed_time_months_ago">%1$dm</string>
+    <string name="elapsed_time_a_month_ago">1mo</string>
+    <string name="elapsed_time_months_ago">%1$dmo</string>
     <string name="elapsed_time_a_year_ago">1y</string>
     <string name="elapsed_time_years_ago">%1$dy</string>
     <string name="prefer_title_text">Prefer title text</string>
@@ -546,6 +546,16 @@
     <string name="error_community_not_found_on_instance">The community \'%1$s\' was not found on this instance.</string>
     <string name="cross_post">Cross-post</string>
     <string name="cross_posted_from_format">cross-posted from: %1$s</string>
+    <string name="reports">Reports</string>
+    <string name="report">Report</string>
+    <string name="report_on_comment">Report on comment</string>
+    <string name="report_on_post">Report on post</string>
+    <string name="report_post">Report post</string>
+    <string name="report_comment">Report comment</string>
+    <string name="error_unable_to_send_report">Unable to send report</string>
+    <string name="create_report">Create report</string>
+    <string name="switch_account_for_post">Switch account for post</string>
+    <string name="switching_instance">Switching instance…</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

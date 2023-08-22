@@ -631,6 +631,8 @@ class CommunityFragment :
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+
                     val adapter = adapter ?: return@a
 
                     if (it.data.isReadPostUpdate) {
@@ -666,7 +668,6 @@ class CommunityFragment :
 
                         binding.swipeRefreshLayout.isRefreshing = false
                         binding.recyclerView.visibility = View.VISIBLE
-                        binding.loadingView.hideAll()
 
                         if (viewModel.postListEngine.items.isEmpty()) {
                             binding.loadingView.showErrorText(R.string.no_posts)
@@ -987,9 +988,12 @@ class CommunityFragment :
                 icon = R.drawable.baseline_settings_24,
             )
 
-            if (isCurrentPageDefault) {
-            } else {
-                addItemWithIcon(R.id.set_as_default, R.string.set_as_home_page, R.drawable.baseline_home_24)
+            if (!isCurrentPageDefault) {
+                addItemWithIcon(
+                    id = R.id.set_as_default,
+                    title = R.string.set_as_home_page,
+                    icon = R.drawable.baseline_home_24
+                )
             }
 
             if (isBookmarked) {

@@ -149,9 +149,13 @@ class MainActivity : BaseActivity() {
 
         viewModel.unreadCount.observe(this) { unreadCount ->
             binding.bottomNavigationView.getOrCreateBadge(R.id.inboxTabbedFragment).apply {
-                if (unreadCount.totalUnreadCount > 0) {
+                val allUnreads =
+                    unreadCount.totalUnreadCount +
+                        unreadCount.totalUnresolvedReportsCount
+
+                if (allUnreads > 0) {
                     isVisible = true
-                    number = unreadCount.totalUnreadCount
+                    number = allUnreads
                 } else {
                     isVisible = false
                 }

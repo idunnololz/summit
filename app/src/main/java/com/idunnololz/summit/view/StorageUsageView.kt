@@ -60,10 +60,8 @@ class StorageUsageView : ConstraintLayout {
         setWillNotDraw(false)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        canvas ?: return
 
         val offsetViewBounds = tempRect
         placeholder.getDrawingRect(offsetViewBounds)

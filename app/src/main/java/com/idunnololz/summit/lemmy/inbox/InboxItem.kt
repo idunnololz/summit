@@ -2,8 +2,11 @@ package com.idunnololz.summit.lemmy.inbox
 
 import android.os.Parcelable
 import com.idunnololz.summit.api.dto.CommentReplyView
+import com.idunnololz.summit.api.dto.CommentReportView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionView
+import com.idunnololz.summit.api.dto.PostReportView
+import com.idunnololz.summit.api.dto.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs
@@ -16,6 +19,8 @@ interface CommentBackedItem {
     val commentPath: String
     val postId: Int
 }
+
+sealed interface ReportItem
 
 sealed interface InboxItem : Parcelable {
 
@@ -156,10 +161,129 @@ sealed interface InboxItem : Parcelable {
             "MessageInboxItem { content = $content }"
     }
 
+    @Parcelize
+    data class ReportMessageInboxItem(
+        override val id: Int,
+        override val authorId: PersonId,
+        override val authorName: String,
+        override val authorInstance: String,
+        override val title: String,
+        override val content: String,
+        override val lastUpdate: String,
+        override val lastUpdateTs: Long,
+        override val score: Int?,
+        override val isDeleted: Boolean,
+        override val isRemoved: Boolean,
+        override val isRead: Boolean,
+    ) : InboxItem {
+
+        constructor(message: PrivateMessageReportView) : this(
+            message.private_message.id,
+            message.creator.id,
+            message.creator.name,
+            message.creator.instance,
+            message.creator.name,
+            message.private_message.content,
+            message.private_message.updated ?: message.private_message.published,
+            dateStringToTs(
+                message.private_message.updated
+                    ?: message.private_message.published,
+            ),
+            null,
+            message.private_message.deleted,
+            isRemoved = false,
+            message.private_message.read,
+        )
+
+        override fun toString(): String =
+            "ReportInboxItem { content = $content }"
+    }
+
+    @Parcelize
+    data class ReportPostInboxItem(
+        override val id: Int,
+        override val authorId: PersonId,
+        override val authorName: String,
+        override val authorInstance: String,
+        override val title: String,
+        override val content: String,
+        override val lastUpdate: String,
+        override val lastUpdateTs: Long,
+        override val score: Int?,
+        override val isDeleted: Boolean,
+        override val isRemoved: Boolean,
+        override val isRead: Boolean,
+        val reportedPostId: Int,
+    ) : InboxItem, ReportItem {
+
+        constructor(reportView: PostReportView) : this(
+            id = reportView.post_report.id,
+            authorId = reportView.creator.id,
+            authorName = reportView.creator.name,
+            authorInstance = reportView.creator.instance,
+            title = reportView.post.name,
+            content = reportView.post_report.reason,
+            lastUpdate = reportView.post_report.updated ?: reportView.post_report.published,
+            lastUpdateTs = dateStringToTs(reportView.post_report.updated ?: reportView.post_report.published),
+            score = reportView.counts.score,
+            isDeleted = false,
+            isRemoved = false,
+            isRead = reportView.post_report.resolved,
+            reportedPostId = reportView.post_report.post_id,
+        )
+
+        override fun toString(): String =
+            "ReplyInboxItem { content = $content }"
+    }
+
+    @Parcelize
+    data class ReportCommentInboxItem(
+        override val id: Int,
+        override val authorId: PersonId,
+        override val authorName: String,
+        override val authorInstance: String,
+        override val title: String,
+        override val content: String,
+        override val lastUpdate: String,
+        override val lastUpdateTs: Long,
+        override val score: Int?,
+        override val isDeleted: Boolean,
+        override val isRemoved: Boolean,
+        override val isRead: Boolean,
+        val postId: Int,
+        val reportedCommentId: Int,
+        val reportedCommentPath: String,
+    ) : InboxItem, ReportItem {
+
+        constructor(reportView: CommentReportView) : this(
+            id = reportView.comment_report.id,
+            authorId = reportView.creator.id,
+            authorName = reportView.creator.name,
+            authorInstance = reportView.creator.instance,
+            title = reportView.post.name,
+            content = reportView.comment_report.reason,
+            lastUpdate = reportView.comment_report.updated ?: reportView.comment_report.published,
+            lastUpdateTs = dateStringToTs(reportView.comment_report.updated ?: reportView.comment_report.published),
+            score = reportView.counts.score,
+            isDeleted = false,
+            isRemoved = false,
+            isRead = reportView.comment_report.resolved,
+            postId = reportView.post.id,
+            reportedCommentId = reportView.comment_report.comment_id,
+            reportedCommentPath = reportView.comment.path,
+        )
+
+        override fun toString(): String =
+            "ReplyInboxItem { content = $content }"
+    }
+
     val commentId: Int?
         get() = when (this) {
             is MentionInboxItem -> commentId
             is MessageInboxItem -> null
             is ReplyInboxItem -> commentId
+            is ReportMessageInboxItem -> null
+            is ReportCommentInboxItem -> null
+            is ReportPostInboxItem -> null
         }
 }

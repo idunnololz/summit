@@ -20,6 +20,7 @@ import androidx.annotation.LayoutRes
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import coil.load
+import coil.size.Scale
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
@@ -392,8 +393,26 @@ class LemmyContentHelper(
                         offlineManager.calculateImageMaxSizeIfNeeded(it)
                         offlineManager.getMaxImageSizeHint(it, tempSize)
 
+                        Log.d(TAG, "image size: $tempSize")
+
+                        var w: Int? = null
+                        var h: Int? = null
+                        if (tempSize.height > 0 && tempSize.width > 0) {
+                            val heightToWidthRatio = tempSize.height / tempSize.width
+
+                            if (heightToWidthRatio > 10) {
+                                // shrink the image if needed
+                                w = tempSize.width
+                                h = tempSize.height
+                            }
+                        }
+
                         fullImageView.load(it) {
                             allowHardware(false)
+
+                            if (w != null && h != null) {
+                                this.size(w, h)
+                            }
 
                             listener { _, result ->
                                 val d = result.drawable

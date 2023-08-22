@@ -14,6 +14,8 @@ import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
 import com.idunnololz.summit.api.dto.CommentReplyView
+import com.idunnololz.summit.api.dto.CommentReportId
+import com.idunnololz.summit.api.dto.CommentReportResponse
 import com.idunnololz.summit.api.dto.CommentResponse
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -21,8 +23,10 @@ import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.CreateComment
 import com.idunnololz.summit.api.dto.CreateCommentLike
+import com.idunnololz.summit.api.dto.CreateCommentReport
 import com.idunnololz.summit.api.dto.CreatePost
 import com.idunnololz.summit.api.dto.CreatePostLike
+import com.idunnololz.summit.api.dto.CreatePostReport
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeletePost
@@ -42,11 +46,19 @@ import com.idunnololz.summit.api.dto.GetPosts
 import com.idunnololz.summit.api.dto.GetPrivateMessages
 import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetRepliesResponse
+import com.idunnololz.summit.api.dto.GetReportCount
+import com.idunnololz.summit.api.dto.GetReportCountResponse
 import com.idunnololz.summit.api.dto.GetSite
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCount
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.ListCommentReports
+import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunities
+import com.idunnololz.summit.api.dto.ListPostReports
+import com.idunnololz.summit.api.dto.ListPostReportsResponse
+import com.idunnololz.summit.api.dto.ListPrivateMessageReports
+import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
@@ -61,11 +73,17 @@ import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.PostReportId
+import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemovePost
+import com.idunnololz.summit.api.dto.ResolveCommentReport
+import com.idunnololz.summit.api.dto.ResolveObject
+import com.idunnololz.summit.api.dto.ResolveObjectResponse
+import com.idunnololz.summit.api.dto.ResolvePostReport
 import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
@@ -538,6 +556,31 @@ class LemmyApiClient @Inject constructor(
                 api.getUnreadCountNoCache(form.serializeToMap())
             } else {
                 api.getUnreadCount(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun fetchUnresolvedReportCount(
+        force: Boolean,
+        account: Account,
+    ): Result<GetReportCountResponse> {
+        val form = GetReportCount(
+            null,
+            account.jwt
+        )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getReportCountNoCache(form.serializeToMap())
+            } else {
+                api.getReportCount(form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1109,6 +1152,144 @@ class LemmyApiClient @Inject constructor(
         )
     }
 
+    suspend fun fetchReportMessages(
+        unresolvedOnly: Boolean? = null,
+        page: Int? = null,
+        limit: Int? = null,
+        account: Account,
+        force: Boolean,
+    ): Result<ListPrivateMessageReportsResponse> {
+        val form = ListPrivateMessageReports(
+            page,
+            limit,
+            unresolvedOnly,
+            account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getReportMessagesNoCache(form.serializeToMap())
+            } else {
+                api.getReportMessages(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun fetchPostReports(
+        unresolvedOnly: Boolean? = null,
+        page: Int? = null,
+        limit: Int? = null,
+        account: Account,
+        force: Boolean,
+    ): Result<ListPostReportsResponse> {
+        val form = ListPostReports(
+            page = page,
+            limit = limit,
+            unresolved_only = unresolvedOnly,
+            community_id = null,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getPostReportsNoCache(form.serializeToMap())
+            } else {
+                api.getPostReports(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun resolvePostReport(
+        reportId: PostReportId,
+        resolved: Boolean,
+        account: Account,
+    ): Result<PostReportResponse> {
+        val form = ResolvePostReport(
+            auth = account.jwt,
+            report_id = reportId,
+            resolved = resolved,
+        )
+
+        return retrofitErrorHandler {
+            api.resolvePostReport(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun fetchCommentReports(
+        unresolvedOnly: Boolean? = null,
+        page: Int? = null,
+        limit: Int? = null,
+        account: Account,
+        force: Boolean,
+    ): Result<ListCommentReportsResponse> {
+        val form = ListCommentReports(
+            page = page,
+            limit = limit,
+            unresolved_only = unresolvedOnly,
+            community_id = null,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            if (force) {
+                api.getCommentReportsNoCache(form.serializeToMap())
+            } else {
+                api.getCommentReports(form.serializeToMap())
+            }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun resolveCommentReport(
+        reportId: CommentReportId,
+        resolved: Boolean,
+        account: Account,
+    ): Result<CommentReportResponse> {
+        val form = ResolveCommentReport(
+            auth = account.jwt,
+            report_id = reportId,
+            resolved = resolved,
+        )
+
+        return retrofitErrorHandler {
+            api.resolveCommentReport(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
     suspend fun markReplyAsRead(
         id: CommentReplyId,
         read: Boolean,
@@ -1253,12 +1434,79 @@ class LemmyApiClient @Inject constructor(
         )
     }
 
+    suspend fun createPostReport(
+        postId: PostId,
+        reason: String,
+        account: Account,
+    ): Result<PostReportResponse> {
+        val form = CreatePostReport(
+            postId,
+            reason,
+            account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.createPostReport(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun createCommentReport(
+        commentId: CommentId,
+        reason: String,
+        account: Account,
+    ): Result<CommentReportResponse> {
+        val form = CreateCommentReport(
+            commentId,
+            reason,
+            account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.createCommentReport(form)
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
     suspend fun saveUserSettings(settings: SaveUserSettings): Result<Unit> {
         return retrofitErrorHandler {
             api.saveUserSettings(settings)
         }.fold(
             onSuccess = {
                 Result.success(Unit)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun resolveObject(
+        q: String,
+        account: Account,
+    ): Result<ResolveObjectResponse> {
+        val form = ResolveObject(
+            q = q,
+            auth = account.jwt
+        )
+
+        return retrofitErrorHandler {
+            api.resolveObject(form.serializeToMap())
+        }.fold(
+            onSuccess = {
+                Result.success(it)
             },
             onFailure = {
                 Result.failure(it)

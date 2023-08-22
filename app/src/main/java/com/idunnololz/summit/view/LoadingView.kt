@@ -100,6 +100,16 @@ class LoadingView : ConstraintLayout {
         progressView.visibility = View.VISIBLE
     }
 
+    fun showProgressBarWithMessage(message: String?) {
+        if (message == null) {
+            show(progressBar = true)
+        } else {
+            show(progressBar = true, errorText = true)
+            bindErrorText(message)
+        }
+        progressView.visibility = View.VISIBLE
+    }
+
     fun showProgressBarWithMessageAndButton(
         @StringRes message: Int,
         @StringRes buttonText: Int,

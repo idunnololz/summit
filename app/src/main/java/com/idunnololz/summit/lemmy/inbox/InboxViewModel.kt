@@ -11,6 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.util.StatefulLiveData
@@ -44,6 +45,7 @@ class InboxViewModel @Inject constructor(
     val currentAccount
         get() = accountManager.currentAccount.asLiveData()
     val currentAccountView = MutableLiveData<AccountView?>()
+    val currentFullAccount = MutableLiveData<FullAccount?>()
     val markAsReadResult = StatefulLiveData<Unit>()
 
     val inboxData = StatefulLiveData<List<LemmyListSource.PageResult<InboxItem>>>()
@@ -60,6 +62,7 @@ class InboxViewModel @Inject constructor(
 
     private val allData: MutableList<LemmyListSource.PageResult<InboxItem>> = mutableListOf()
     private var hasMore = true
+    private val fetchingPages = mutableSetOf<Int>()
 
     init {
         viewModelScope.launch {
@@ -74,6 +77,7 @@ class InboxViewModel @Inject constructor(
                 pageIndex = 0
 
                 allData.clear()
+                fetchingPages.clear()
                 inboxData.setValue(allData)
 
                 fetchInbox(pageIndex, requireNotNull(pageTypeFlow.value))
@@ -98,6 +102,7 @@ class InboxViewModel @Inject constructor(
                     pageIndex = 0
 
                     allData.clear()
+                    fetchingPages.clear()
                     inboxData.setValue(allData)
 
                     fetchInbox()
@@ -112,6 +117,11 @@ class InboxViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            accountInfoManager.currentFullAccount.collect {
+                currentFullAccount.value = it
+            }
+        }
         inboxRepository.onServerChanged()
     }
 
@@ -120,6 +130,11 @@ class InboxViewModel @Inject constructor(
         pageType: PageType = requireNotNull(this.pageTypeFlow.value),
         force: Boolean = false,
     ) {
+        if (fetchingPages.contains(pageIndex)) {
+            return
+        }
+
+        fetchingPages.add(pageIndex)
         fetchInboxJob?.cancel()
         Log.d(TAG, "Loading inbox page $pageIndex. PageType: $pageType")
 
@@ -133,9 +148,13 @@ class InboxViewModel @Inject constructor(
                 .onSuccess {
                     addData(it)
                     inboxData.postValue(allData)
+
+                    fetchingPages.remove(pageIndex)
                 }
                 .onFailure {
                     inboxData.postError(it)
+
+                    fetchingPages.remove(pageIndex)
                 }
         }
     }
@@ -190,6 +209,12 @@ class InboxViewModel @Inject constructor(
                     item.copy(isRead = isRead)
                 is InboxItem.ReplyInboxItem ->
                     item.copy(isRead = isRead)
+                is InboxItem.ReportMessageInboxItem, ->
+                    item.copy(isRead = isRead)
+                is InboxItem.ReportCommentInboxItem, ->
+                    item.copy(isRead = isRead)
+                is InboxItem.ReportPostInboxItem ->
+                    item.copy(isRead = isRead)
             }
 
             allData[index] = data.copy(
@@ -233,6 +258,7 @@ class InboxViewModel @Inject constructor(
     private fun clearData() {
         hasMore = true
         allData.clear()
+        fetchingPages.clear()
     }
 
     override fun onCleared() {
@@ -247,6 +273,7 @@ class InboxViewModel @Inject constructor(
         Replies,
         Mentions,
         Messages,
+        Reports,
     }
 }
 
@@ -257,4 +284,5 @@ fun InboxViewModel.PageType.getName(context: Context) =
         InboxViewModel.PageType.Replies -> context.getString(R.string.replies)
         InboxViewModel.PageType.Mentions -> context.getString(R.string.mentions)
         InboxViewModel.PageType.Messages -> context.getString(R.string.messages)
+        InboxViewModel.PageType.Reports -> context.getString(R.string.reports)
     }
