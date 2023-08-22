@@ -489,7 +489,9 @@ class PostFragment :
         }
 
         viewModel.currentAccountView.observe(viewLifecycleOwner) {
-            binding.accountImageView.load(it?.profileImage)
+            binding.accountImageView.load(it?.profileImage) {
+                allowHardware(false)
+            }
         }
         binding.accountImageView.setOnClickListener {
             AccountsAndSettingsDialogFragment.newInstance(dontSwitchAccount = true)
