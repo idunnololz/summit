@@ -147,20 +147,10 @@ class PostFragment :
             viewModel.updatePostOrCommentRef(args.postOrCommentRef())
         }
 
-        val context = requireContext()
-
         PreferenceUtil.preferences.edit().remove(PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_Y).apply()
 
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
-
-        setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, bundle ->
-//            val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
-//
-//            if (result != null) {
-//                viewModel.fetchPostData(args.instance, args.id)
-//            }
-        }
 
         childFragmentManager.setFragmentResultListener(
             CreateOrEditPostFragment.REQUEST_KEY,
@@ -216,7 +206,7 @@ class PostFragment :
             // do things if this is a single page
         }
 
-        actionsViewModel.setPageInstance(args.instance)
+        actionsViewModel.setPageInstance(getInstance())
     }
 
     private fun goBack() {
@@ -256,7 +246,7 @@ class PostFragment :
                 context,
                 binding.recyclerView,
                 this,
-                args.instance,
+                getInstance(),
                 args.reveal,
                 useFooter = false,
                 isEmbedded = false,
@@ -292,7 +282,7 @@ class PostFragment :
                         arguments = postOrComment.fold(
                             {
                                 AddOrEditCommentFragmentArgs(
-                                    args.instance,
+                                    getInstance(),
                                     null,
                                     it,
                                     null,
@@ -300,7 +290,7 @@ class PostFragment :
                             },
                             {
                                 AddOrEditCommentFragmentArgs(
-                                    args.instance,
+                                    getInstance(),
                                     it,
                                     null,
                                     null,
@@ -355,7 +345,7 @@ class PostFragment :
                     viewModel.fetchMoreComments(it)
                 },
                 onLoadPost = {
-                    viewModel.updatePostOrCommentRef(Either.Left(PostRef(args.instance, it)))
+                    viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), it)))
                     viewModel.fetchPostData()
                 },
                 onLinkLongClick = { url, text ->
@@ -517,6 +507,10 @@ class PostFragment :
                 }
             }
         }
+        viewModel.onPostOrCommentRefChange.observe(viewLifecycleOwner) {
+            adapter?.instance = getInstance()
+            actionsViewModel.setPageInstance(getInstance())
+        }
     }
 
     private fun goToNextComment() {
@@ -552,6 +546,12 @@ class PostFragment :
             }
         }
     }
+
+    private fun getInstance() =
+        viewModel.postOrCommentRef?.fold(
+            { it.instance },
+            { it.instance },
+        ) ?: args.instance
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView()")
@@ -681,7 +681,7 @@ class PostFragment :
             }
         }
 
-        args.post?.getUrl(args.instance)?.let { url ->
+        args.post?.getUrl(getInstance())?.let { url ->
             historyManager.recordVisit(
                 jsonUrl = url,
                 saveReason = HistorySaveReason.LOADING,
@@ -747,7 +747,7 @@ class PostFragment :
                         CommentGestureAction.Reply -> {
                             AddOrEditCommentFragment().apply {
                                 arguments = AddOrEditCommentFragmentArgs(
-                                    args.instance,
+                                    getInstance(),
                                     commentView,
                                     null,
                                     null,
@@ -869,7 +869,7 @@ class PostFragment :
                 AddOrEditCommentFragment().apply {
                     arguments =
                         AddOrEditCommentFragmentArgs(
-                            args.instance,
+                            getInstance(),
                             null,
                             postView.post,
                             null,
@@ -882,7 +882,7 @@ class PostFragment :
                 AddOrEditCommentFragment().apply {
                     arguments =
                         AddOrEditCommentFragmentArgs(
-                            args.instance,
+                            getInstance(),
                             null,
                             postView.post,
                             null,
@@ -898,7 +898,7 @@ class PostFragment :
     }
 
     private fun onMainListingItemRetrieved(post: PostView) {
-        post.getUrl(args.instance).let { url ->
+        post.getUrl(getInstance()).let { url ->
             historyManager.recordVisit(
                 jsonUrl = url,
                 saveReason = HistorySaveReason.LOADED,
@@ -924,7 +924,7 @@ class PostFragment :
             CONFIRM_DELETE_COMMENT_TAG -> {
                 val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
                 if (commentId != null) {
-                    viewModel.deleteComment(PostRef(args.instance, args.id), commentId.toInt())
+                    viewModel.deleteComment(PostRef(getInstance(), args.id), commentId.toInt())
                 }
             }
         }

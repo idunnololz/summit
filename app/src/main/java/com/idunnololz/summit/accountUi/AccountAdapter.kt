@@ -59,6 +59,9 @@ class AccountAdapter(
                         onAccountClick(item.accountView)
                     }
                     b.signOut.setOnClickListener {}
+                    b.root.setOnClickListener {
+                        onAccountClick(item.accountView)
+                    }
                 } else {
                     b.signOut.visibility = View.VISIBLE
                     b.settings.setImageResource(R.drawable.baseline_settings_24)
@@ -69,9 +72,9 @@ class AccountAdapter(
                     b.signOut.setOnClickListener {
                         signOut(item.accountView)
                     }
-                }
-                b.root.setOnClickListener {
-                    onAccountClick(item.accountView)
+                    b.root.setOnClickListener {
+                        onPersonClick(item.accountView)
+                    }
                 }
             }
             addItemType(Item.AccountItem::class, AccountItemBinding::inflate) { item, b, _ ->

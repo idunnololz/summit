@@ -22,6 +22,7 @@ import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
+import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
@@ -48,7 +49,7 @@ class PostsAdapter(
     private val context: Context,
     private val containerView: View,
     private val lifecycleOwner: LifecycleOwner,
-    private val instance: String,
+    var instance: String,
     private val revealAll: Boolean,
     private val useFooter: Boolean,
     /**
@@ -122,6 +123,14 @@ class PostsAdapter(
             val baseDepth: Int,
         ) : Item(
             "more_comments_$parentId",
+        )
+
+        data class MissingCommentItem(
+            val commentId: CommentId?,
+            val depth: Int,
+            val baseDepth: Int,
+        ) : Item(
+            "deleted_$commentId",
         )
 
         class ProgressOrErrorItem(
@@ -200,6 +209,7 @@ class PostsAdapter(
         is MoreCommentsItem -> R.layout.post_more_comments_item
         is FooterItem -> R.layout.generic_space_footer_item
         is Item.ViewAllComments -> R.layout.view_all_comments
+        is Item.MissingCommentItem -> R.layout.post_missing_comment_item
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -240,6 +250,8 @@ class PostsAdapter(
                 ViewBindingViewHolder(GenericSpaceFooterItemBinding.bind(v))
             R.layout.view_all_comments ->
                 ViewBindingViewHolder(ViewAllCommentsBinding.bind(v))
+            R.layout.post_missing_comment_item ->
+                ViewBindingViewHolder(PostMissingCommentItemBinding.bind(v))
             else -> throw RuntimeException("ViewType: $viewType")
         }
     }
@@ -471,6 +483,12 @@ class PostsAdapter(
                     onLoadPost(item.postId)
                 }
             }
+
+            is Item.MissingCommentItem -> {
+                val b = holder.getBinding<PostMissingCommentItemBinding>()
+
+                postAndCommentViewBuilder.bindMissingCommentItem(b, item.depth, item.baseDepth)
+            }
         }
     }
 
@@ -533,7 +551,7 @@ class PostsAdapter(
                             val commentId = commentView.comment.comment.id
                             val isDeleting =
                                 commentView.pendingCommentView?.isActionDelete == true
-                            depth = commentView.comment.getDepth()
+                            depth = commentItem.depth
 
                             if (depth == 0) {
                                 lastTopLevelCommentPosition++
@@ -545,7 +563,7 @@ class PostsAdapter(
                                 commentView.pendingCommentView?.content
                                     ?: commentView.comment.comment.content,
                                 comment = commentView.comment,
-                                depth = depth,
+                                depth = commentItem.depth,
                                 baseDepth = 0,
                                 isExpanded = !commentView.isCollapsed,
                                 isPending = false,
@@ -571,7 +589,7 @@ class PostsAdapter(
                                 commentId = commentView.pendingCommentView.commentId,
                                 content = commentView.pendingCommentView.content,
                                 author = commentView.author,
-                                depth = depth,
+                                depth = commentItem.depth,
                                 baseDepth = 0,
                                 isExpanded = !commentView.isCollapsed,
                                 isPending = false,
@@ -592,11 +610,19 @@ class PostsAdapter(
                                 finalItems += MoreCommentsItem(
                                     parentId = commentView.parentCommentId,
                                     moreCount = commentView.moreCount,
-                                    depth = depth,
+                                    depth = commentItem.depth,
                                     baseDepth = 0,
                                 )
                                 absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                             }
+                        }
+
+                        is PostViewModel.ListView.MissingCommentItem -> {
+                            finalItems += Item.MissingCommentItem(
+                                commentId = commentView.commentId,
+                                depth = commentItem.depth,
+                                baseDepth = 0,
+                            )
                         }
                     }
 
@@ -668,6 +694,7 @@ class PostsAdapter(
                 is ProgressOrErrorItem -> false
                 FooterItem -> false
                 is Item.ViewAllComments -> false
+                is Item.MissingCommentItem -> false
             }
         }
 
