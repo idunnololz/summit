@@ -33,6 +33,7 @@ import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
+import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
@@ -806,6 +807,19 @@ class PostAndCommentViewBuilder @Inject constructor(
     ) = with(b) {
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
 
+        b.root.tag = ThreadLinesData(
+            depth = depth,
+            baseDepth = baseDepth,
+            commentUiConfig.indentationPerLevelDp,
+        )
+    }
+
+    fun bindMissingCommentItem(b: PostMissingCommentItemBinding, depth: Int, baseDepth: Int) {
+        b.text.text = buildSpannedString {
+            append(context.getString(R.string.missing_comment_special))
+            setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
+        }
+        b.threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
         b.root.tag = ThreadLinesData(
             depth = depth,
             baseDepth = baseDepth,

@@ -65,13 +65,14 @@ class PostViewModel @Inject constructor(
      */
     val lemmyApiClient = lemmyApiClientFactory.create()
 
-    private var postOrCommentRef: Either<PostRef, CommentRef>? = null
+    var postOrCommentRef: Either<PostRef, CommentRef>? = null
         set(value) {
             field = value
 
             state["postRef"] = value?.leftOrNull()
             state["commentRef"] = value?.getOrNull()
         }
+    val onPostOrCommentRefChange = MutableLiveData<Either<PostRef, CommentRef>>()
 
     val currentAccountView = MutableLiveData<AccountView?>()
     private var postView: PostView? = null
@@ -147,6 +148,8 @@ class PostViewModel @Inject constructor(
         postOrCommentRef: Either<PostRef, CommentRef>
     ) {
         this.postOrCommentRef = postOrCommentRef
+
+        onPostOrCommentRefChange.postValue(postOrCommentRef)
     }
 
     fun fetchPostData(
@@ -249,13 +252,6 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    class ObjectResolverFailedException : Exception {
-        constructor() : super()
-        constructor(message: String?) : super(message)
-        constructor(message: String?, cause: Throwable?) : super(message, cause)
-        constructor(cause: Throwable?) : super(cause)
-    }
-
     fun switchAccount(account: Account) {
         val postOrCommentRef = postOrCommentRef ?: return
 
@@ -263,6 +259,7 @@ class PostViewModel @Inject constructor(
             { it.instance },
             { it.instance },
         )
+        val didInstanceChange = instance != account.instance
 
         if (account.id == currentAccountView.value?.account?.id) {
             return
@@ -336,7 +333,16 @@ class PostViewModel @Inject constructor(
                         }
 
                         if (newPostOrCommentRef != null) {
-                            this@PostViewModel.postOrCommentRef = newPostOrCommentRef
+                            updatePostOrCommentRef(newPostOrCommentRef)
+
+                            if (didInstanceChange) {
+                                comments = null
+                                pendingComments = null
+                                supplementaryComments.clear()
+                                newlyPostedCommentId = null
+                                additionalLoadedCommentIds.clear()
+                                removedCommentIds.clear()
+                            }
 
                             fetchPostData(fetchPostData = true, force = true)
                                 ?.join()
@@ -442,17 +448,23 @@ class PostViewModel @Inject constructor(
         val comments = comments
         val pendingComments = pendingComments
         val supplementaryComments = supplementaryComments
+        val postOrCommentRef = postOrCommentRef
 
         postData.postValue(
             PostData(
                 ListView.PostListView(post),
                 CommentTreeBuilder(accountManager).buildCommentsTreeListView(
-                    post,
-                    comments,
+                    post = post,
+                    comments = comments,
                     parentComment = true,
-                    pendingComments,
-                    supplementaryComments,
-                    removedCommentIds,
+                    pendingComments = pendingComments,
+                    supplementaryComments = supplementaryComments,
+                    removedCommentIds = removedCommentIds,
+                    targetCommentRef = postOrCommentRef
+                        ?.fold(
+                            { null },
+                            { it }
+                        ),
                 ),
                 newlyPostedCommentId = newlyPostedCommentId,
                 selectedCommentId = postOrCommentRef?.getOrNull()?.id,
@@ -501,7 +513,7 @@ class PostViewModel @Inject constructor(
         additionalLoadedCommentIds.add(parentId)
 
         result.onSuccess { comments ->
-            if (comments.isEmpty()) {
+            if (comments.isEmpty() || comments.find { it.comment.id == parentId } == null) {
                 removedCommentIds.add(parentId)
             } else {
                 removedCommentIds.remove(parentId)
@@ -545,6 +557,12 @@ class PostViewModel @Inject constructor(
             val depth: Int,
             val moreCount: Int,
         ) : ListView
+
+        data class MissingCommentItem(
+            val commentId: CommentId,
+            val parentCommentId: CommentId?,
+            var isCollapsed: Boolean = false,
+        ) : ListView
     }
 
     fun setCommentsSortOrder(sortOrder: CommentsSortOrder) {
@@ -566,5 +584,9 @@ class PostViewModel @Inject constructor(
         } else {
             commentNavControlsState.value = null
         }
+    }
+
+    class ObjectResolverFailedException : Exception {
+        constructor() : super()
     }
 }

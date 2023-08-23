@@ -87,6 +87,7 @@ class MessageViewModel @Inject constructor(
                 pendingComments = null,
                 supplementaryComments = mapOf(),
                 removedCommentIds = setOf(),
+                targetCommentRef = null,
             )
 
             commentContext.postValue(
