@@ -22,7 +22,10 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 class CommunityAdapter(
     private val context: Context,
     private val offlineManager: OfflineManager,
-    private val onTooManyCommunities: (Int) -> Unit,
+    private val canSelectMultipleCommunities: Boolean,
+    private val onTooManyCommunities: (Int) -> Unit = {},
+    private val onSingleCommunitySelected: (
+        CommunityRef.CommunityRefByName, icon: String?) -> Unit = { _, _ -> },
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed interface Item {
@@ -119,12 +122,24 @@ class CommunityAdapter(
             b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
                 "(${item.communityView.community.instance})"
 
+            if (canSelectMultipleCommunities) {
+                b.checkbox.visibility = View.VISIBLE
+            } else {
+                b.checkbox.visibility = View.GONE
+            }
             b.checkbox.isChecked = item.isChecked
             b.checkbox.setOnClickListener {
                 toggleCommunity(item.communityView.community.toCommunityRef())
             }
             h.itemView.setOnClickListener {
-                toggleCommunity(item.communityView.community.toCommunityRef())
+                if (canSelectMultipleCommunities) {
+                    toggleCommunity(item.communityView.community.toCommunityRef())
+                } else {
+                    onSingleCommunitySelected(
+                        item.communityView.community.toCommunityRef(),
+                        item.communityView.community.icon
+                    )
+                }
             }
         }
         addItemType(
@@ -179,14 +194,16 @@ class CommunityAdapter(
 
         val newItems = mutableListOf<Item>()
 
-        newItems.add(Item.GroupHeaderItem(context.getString(R.string.selected_communities)))
-        if (selectedCommunities.isEmpty()) {
-            newItems += Item.NoResultsItem(context.getString(R.string.no_communities_selected))
-        } else {
-            selectedCommunities.forEach {
-                newItems += Item.SelectedCommunityItem(
-                    it,
-                )
+        if (canSelectMultipleCommunities) {
+            newItems.add(Item.GroupHeaderItem(context.getString(R.string.selected_communities)))
+            if (selectedCommunities.isEmpty()) {
+                newItems += Item.NoResultsItem(context.getString(R.string.no_communities_selected))
+            } else {
+                selectedCommunities.forEach {
+                    newItems += Item.SelectedCommunityItem(
+                        it,
+                    )
+                }
             }
         }
 

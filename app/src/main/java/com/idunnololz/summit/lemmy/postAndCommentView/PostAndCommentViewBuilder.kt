@@ -10,19 +10,24 @@ import android.text.style.StyleSpan
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Space
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
+import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
+import com.google.android.material.button.MaterialButton
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.CommentView
@@ -67,7 +72,9 @@ import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -121,6 +128,9 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var downvoteColor = preferences.downvoteColor
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
     private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
+    private var showUpAndDownVotes: Boolean = preferences.showUpAndDownVotes
+    private val selectableItemBackgroundBorderless =
+        context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackgroundBorderless)
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -140,7 +150,18 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
+        showUpAndDownVotes = preferences.showUpAndDownVotes
     }
+
+    class CustomViewHolder(
+        val root: ViewGroup,
+        val commentButton: View,
+        val controlsDivider: View,
+        var upvoteCount: TextView? = null,
+        var upvoteButton: View? = null,
+        var downvoteCount: TextView? = null,
+        var downvoteButton: View? = null,
+    )
 
     fun bindPostView(
         binding: PostHeaderItemBinding,
@@ -162,7 +183,17 @@ class PostAndCommentViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
+        val viewHolder = if (this.root.tag == null) {
+            val vh = CustomViewHolder(root, commentButton, controlsDivider)
+            this.root.setTag(R.id.custom_view_holder, vh)
+            ensureContent(vh)
+            vh
+        } else {
+            this.root.getTag(R.id.custom_view_holder) as CustomViewHolder
+        }
+
         scaleTextSizes()
+        viewHolder.scaleTextSizes()
 
         lemmyHeaderHelper.populateHeaderSpan(
             headerContainer = headerContainer,
@@ -179,6 +210,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             instance,
             onImageClick = {
                 onImageClick(Either.Left(postView), null, it)
+            },
+            onVideoClick = { url ->
+                onVideoClick(url, VideoType.UNKNOWN, null)
             },
             onPageClick = onPageClick,
             onLinkLongClick = onLinkLongClick,
@@ -228,18 +262,163 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
 
         voteUiHandler.bind(
-            viewLifecycleOwner,
-            instance,
-            postView,
-            upvoteButton,
-            downvoteButton,
-            upvoteCount,
-            null,
-            onSignInRequired,
-            onInstanceMismatch,
+            lifecycleOwner = viewLifecycleOwner,
+            instance = instance,
+            postView = postView,
+            upVoteView = viewHolder.upvoteButton,
+            downVoteView = viewHolder.downvoteButton,
+            scoreView = viewHolder.upvoteCount!!,
+            upvoteCount = viewHolder.upvoteCount,
+            downvoteCount = viewHolder.downvoteCount,
+            onUpdate = null,
+            onSignInRequired = onSignInRequired,
+            onInstanceMismatch = onInstanceMismatch,
         )
 
         root.tag = postView
+    }
+
+    fun ensureContent(vh: CustomViewHolder) = with(vh) {
+        root.removeView(upvoteButton)
+        root.removeView(downvoteButton)
+        root.removeView(upvoteCount)
+
+        if (showUpAndDownVotes) {
+            val downvoteButton = MaterialButton(
+                context,
+                null,
+                context.getResIdFromAttribute(
+                    com.google.android.material.R.attr.materialIconButtonStyle)
+            ).apply {
+                id = View.generateViewId()
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topToTop = commentButton.id
+                    bottomToBottom = commentButton.id
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    marginEnd = context.getDimen(R.dimen.padding)
+                }
+                iconPadding = context.getDimen(R.dimen.padding_half)
+                setPadding(
+                    context.getDimen(R.dimen.padding_half),
+                    context.getDimen(R.dimen.padding_quarter),
+                    context.getDimen(R.dimen.padding),
+                    context.getDimen(R.dimen.padding_quarter),
+                )
+                setIconResource(R.drawable.baseline_expand_more_18)
+                setBackgroundResource(R.drawable.downvote_chip_bg)
+                backgroundTintList = null
+                minHeight = Utils.convertDpToPixel(32f).toInt()
+                gravity = Gravity.CENTER
+            }.also {
+                downvoteButton = it
+                downvoteCount = it
+            }
+            root.addView(downvoteButton)
+
+            val upvoteButton = MaterialButton(
+                context,
+                null,
+                context.getResIdFromAttribute(com.google.android.material.R.attr.materialIconButtonStyle)
+            ).apply {
+                id = View.generateViewId()
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topToTop = commentButton.id
+                    bottomToBottom = commentButton.id
+                    endToStart = downvoteButton.id
+                    marginEnd = Utils.convertDpToPixel(2f).toInt()
+                }
+                iconPadding = context.getDimen(R.dimen.padding_half)
+                setPadding(
+                    context.getDimen(R.dimen.padding_half),
+                    context.getDimen(R.dimen.padding_quarter),
+                    context.getDimen(R.dimen.padding),
+                    context.getDimen(R.dimen.padding_quarter),
+                )
+                setIconResource(R.drawable.baseline_expand_less_18)
+                setBackgroundResource(R.drawable.upvote_chip_bg)
+                backgroundTintList = null
+                minHeight = Utils.convertDpToPixel(32f).toInt()
+                gravity = Gravity.CENTER
+            }.also {
+                upvoteButton = it
+                upvoteCount = it
+            }
+            root.addView(upvoteButton)
+
+            controlsDivider.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                endToStart = upvoteButton.id
+                marginEnd = context.getDimen(R.dimen.padding_half)
+            }
+        } else {
+            val downvoteButton = ImageView(
+                context
+            ).apply {
+                id = View.generateViewId()
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topToTop = commentButton.id
+                    bottomToBottom = commentButton.id
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    marginEnd = context.getDimen(R.dimen.padding_quarter)
+                }
+                setPadding(context.getDimen(R.dimen.padding_half))
+                setImageResource(R.drawable.baseline_arrow_downward_24)
+                setBackgroundResource(selectableItemBackgroundBorderless)
+            }.also {
+                downvoteButton = it
+            }
+            root.addView(downvoteButton)
+
+            val upvoteCount = TextView(
+                context
+            ).apply {
+                id = View.generateViewId()
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topToTop = commentButton.id
+                    bottomToBottom = commentButton.id
+                    endToStart = downvoteButton.id
+                }
+            }.also {
+                upvoteCount = it
+            }
+            root.addView(upvoteCount)
+
+            val upvoteButton = ImageView(
+                context
+            ).apply {
+                id = View.generateViewId()
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+
+                    topToTop = commentButton.id
+                    bottomToBottom = commentButton.id
+                    endToStart = upvoteCount.id
+                }
+                setPadding(context.getDimen(R.dimen.padding_half))
+                setImageResource(R.drawable.baseline_arrow_upward_24)
+                setBackgroundResource(selectableItemBackgroundBorderless)
+            }.also {
+                upvoteButton = it
+            }
+            root.addView(upvoteButton)
+
+            controlsDivider.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                endToStart = upvoteButton.id
+            }
+        }
     }
 
     fun bindCommentViewExpanded(
@@ -259,6 +438,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         viewLifecycleOwner: LifecycleOwner,
         isActionsExpanded: Boolean,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
+        onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
         toggleActionsExpanded: () -> Unit,
@@ -268,6 +448,14 @@ class PostAndCommentViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
+        if (showUpAndDownVotes) {
+            binding.upvoteCount = binding.headerView.textView2
+            binding.downvoteCount = binding.headerView.textView3
+        } else {
+            binding.upvoteCount = null
+            binding.downvoteCount = null
+        }
+
         scaleTextSizes()
 
         val isCompactView = this.rawBinding is PostCommentExpandedCompactItemBinding
@@ -304,7 +492,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
-        lemmyHeaderHelper.populateHeaderSpan(headerView, commentView, instance, onPageClick, onLinkLongClick)
+        lemmyHeaderHelper.populateHeaderSpan(
+            headerContainer = headerView,
+            item = commentView,
+            instance = instance,
+            onPageClick = onPageClick,
+            onLinkLongClick = onLinkLongClick
+        )
 
         if (commentView.comment.deleted || isDeleting) {
             text.text = buildSpannedString {
@@ -323,6 +517,9 @@ class PostAndCommentViewBuilder @Inject constructor(
                 instance = instance,
                 onImageClick = {
                     onImageClick(Either.Right(commentView), null, it)
+                },
+                onVideoClick = { url ->
+                    onVideoClick(url, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onPageClick,
                 onLinkLongClick = onLinkLongClick,
@@ -357,37 +554,74 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         voteUiHandler.bind(
-            viewLifecycleOwner,
-            instance,
-            commentView,
-            upvoteButton,
-            downvoteButton,
-            upvoteCount,
-            {
-                if (isCompactView) {
+            lifecycleOwner = viewLifecycleOwner,
+            instance = instance,
+            commentView = commentView,
+            upVoteView = upvoteButton,
+            downVoteView = downvoteButton,
+            scoreView = scoreCount,
+            upvoteCount = upvoteCount,
+            downvoteCount = downvoteCount,
+            onUpdate = {
+                if (showUpAndDownVotes) {
                     if (it > 0) {
-                        upvoteCount.setTextColor(upvoteColor)
+                        upvoteCount!!.setTextColor(upvoteColor)
                         TextViewCompat.setCompoundDrawableTintList(
-                            upvoteCount,
+                            upvoteCount!!,
                             ColorStateList.valueOf(upvoteColor),
                         )
-                    } else if (it == 0) {
-                        upvoteCount.setTextColor(unimportantTextColor)
+                        downvoteCount!!.setTextColor(unimportantTextColor)
                         TextViewCompat.setCompoundDrawableTintList(
-                            upvoteCount,
+                            downvoteCount!!,
+                            ColorStateList.valueOf(unimportantTextColor),
+                        )
+                    } else if (it == 0) {
+                        upvoteCount!!.setTextColor(unimportantTextColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            upvoteCount!!,
+                            ColorStateList.valueOf(unimportantTextColor),
+                        )
+                        downvoteCount!!.setTextColor(unimportantTextColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            downvoteCount!!,
                             ColorStateList.valueOf(unimportantTextColor),
                         )
                     } else {
-                        upvoteCount.setTextColor(downvoteColor)
+                        upvoteCount!!.setTextColor(unimportantTextColor)
                         TextViewCompat.setCompoundDrawableTintList(
-                            upvoteCount,
+                            upvoteCount!!,
+                            ColorStateList.valueOf(unimportantTextColor),
+                        )
+                        downvoteCount!!.setTextColor(downvoteColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            downvoteCount!!,
+                            ColorStateList.valueOf(downvoteColor),
+                        )
+                    }
+                } else {
+                    if (it > 0) {
+                        scoreCount.setTextColor(upvoteColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            scoreCount,
+                            ColorStateList.valueOf(upvoteColor),
+                        )
+                    } else if (it == 0) {
+                        scoreCount.setTextColor(unimportantTextColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            scoreCount,
+                            ColorStateList.valueOf(unimportantTextColor),
+                        )
+                    } else {
+                        scoreCount.setTextColor(downvoteColor)
+                        TextViewCompat.setCompoundDrawableTintList(
+                            scoreCount,
                             ColorStateList.valueOf(downvoteColor),
                         )
                     }
                 }
             },
-            onSignInRequired,
-            onInstanceMismatch,
+            onSignInRequired = onSignInRequired,
+            onInstanceMismatch = onInstanceMismatch,
         )
 
         highlightComment(highlight, highlightForever, highlightBg)
@@ -498,6 +732,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlight: Boolean,
         highlightForever: Boolean,
         onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
+        onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         collapseSection: (position: Int) -> Unit,
@@ -516,6 +751,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             instance = instance,
             onImageClick = {
                 onImageClick(null, null, it)
+            },
+            onVideoClick = { url ->
+                onVideoClick(url, VideoType.UNKNOWN, null)
             },
             onPageClick = onPageClick,
             onLinkLongClick = onLinkLongClick,
@@ -655,6 +893,8 @@ class PostAndCommentViewBuilder @Inject constructor(
                 upvoteButton,
                 downvoteButton,
                 b.score,
+                null,
+                null,
                 null,
                 onSignInRequired,
                 onInstanceMismatch,
@@ -830,12 +1070,14 @@ class PostAndCommentViewBuilder @Inject constructor(
     fun recycle(b: PostHeaderItemBinding): RecycledState {
         val recycledState = lemmyContentHelper.recycleFullContent(b.fullContent)
         offlineManager.cancelFetch(b.root)
-        voteUiHandler.unbindVoteUi(b.upvoteCount)
+        (b.root.getTag(R.id.custom_view_holder) as? CustomViewHolder)?.upvoteCount?.let {
+            voteUiHandler.unbindVoteUi(it)
+        }
         return recycledState
     }
 
     fun recycle(b: CommentExpandedViewHolder) {
-        voteUiHandler.unbindVoteUi(b.upvoteCount)
+        voteUiHandler.unbindVoteUi(b.scoreCount)
         b.actionsContainer?.let {
             if (it.childCount > 0) {
                 val actionsView = it.getChildAt(0)
@@ -869,13 +1111,18 @@ class PostAndCommentViewBuilder @Inject constructor(
         headerContainer.textSize = postUiConfig.headerTextSizeSp.toPostTextSize()
         title.textSize = postUiConfig.titleTextSizeSp.toPostTextSize()
         commentButton.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
-        upvoteCount.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
+
+    private fun PostAndCommentViewBuilder.CustomViewHolder.scaleTextSizes() {
+        upvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+        downvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+    }
+
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {
         headerView.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
         text.textSize = commentUiConfig.contentTextSizeSp.toCommentTextSize()
-        upvoteCount.textSize = postUiConfig.footerTextSizeSp.toCommentTextSize()
+        scoreCount.textSize = postUiConfig.footerTextSizeSp.toCommentTextSize()
     }
 
     private fun PostCommentCollapsedItemBinding.scaleTextSizes() {

@@ -22,8 +22,6 @@ import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.settings.util.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.skydoves.colorpickerview.ColorPickerDialog
-import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

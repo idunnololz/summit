@@ -38,6 +38,7 @@ import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
@@ -136,6 +137,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     onImageClick = { url ->
                         getMainActivity()?.openImage(null, binding.appBar, null, url, null)
                     },
+                    onVideoClick = { url ->
+                        getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
+                    },
                     onPageClick = {
                         getMainActivity()?.launchPage(it)
                     },
@@ -160,6 +164,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             args.instance,
             onImageClick = { url ->
                 getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+            },
+            onVideoClick = { url ->
+                getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -265,6 +272,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     null,
                     null,
                     binding.score,
+                    null,
+                    null,
                     {
                         if (it > 0) {
                             binding.score.setTextColor(upvoteColor)

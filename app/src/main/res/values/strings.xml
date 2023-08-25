@@ -557,6 +557,10 @@
     <string name="switch_account_for_post">Switch account for post</string>
     <string name="switching_instance">Switching instance…</string>
     <string name="missing_comment_special">[missing comment (removed or deleted)]</string>
+    <string name="show_up_and_down_votes">Show up and down votes</string>
+    <string name="show_up_and_down_votes_desc">When enabled, the upvote and downvote counts are shown separately. When disabled, the combined score is shown instead.</string>
+    <string name="add_bookmark">Add bookmark</string>
+    <string name="add_community">Add community</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

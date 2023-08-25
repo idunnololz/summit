@@ -14,6 +14,8 @@ import kotlinx.parcelize.Parcelize
 
 interface CommentBackedItem {
     val score: Int
+    val upvotes: Int
+    val downvotes: Int
     val myVote: Int?
     val commentId: Int
     val commentPath: String
@@ -48,6 +50,8 @@ sealed interface InboxItem : Parcelable {
         override val lastUpdate: String,
         override val lastUpdateTs: Long,
         override val score: Int,
+        override val upvotes: Int,
+        override val downvotes: Int,
         override val myVote: Int?,
         override val commentId: Int,
         override val commentPath: String,
@@ -67,6 +71,8 @@ sealed interface InboxItem : Parcelable {
             reply.comment.updated ?: reply.comment.published,
             dateStringToTs(reply.comment.updated ?: reply.comment.published),
             reply.counts.score,
+            reply.counts.upvotes,
+            reply.counts.downvotes,
             reply.my_vote,
             reply.comment.id,
             reply.comment.path,
@@ -91,6 +97,8 @@ sealed interface InboxItem : Parcelable {
         override val lastUpdate: String,
         override val lastUpdateTs: Long,
         override val score: Int,
+        override val upvotes: Int,
+        override val downvotes: Int,
         override val myVote: Int?,
         override val commentId: Int,
         override val commentPath: String,
@@ -110,6 +118,8 @@ sealed interface InboxItem : Parcelable {
             mention.comment.updated ?: mention.comment.published,
             dateStringToTs(mention.comment.updated ?: mention.comment.published),
             mention.counts.score,
+            mention.counts.upvotes,
+            mention.counts.downvotes,
             mention.my_vote,
             mention.comment.id,
             mention.comment.path,

@@ -50,6 +50,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
@@ -447,6 +448,13 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, value)
+                .apply()
+        }
+    var showUpAndDownVotes: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, value)
                 .apply()
         }
 

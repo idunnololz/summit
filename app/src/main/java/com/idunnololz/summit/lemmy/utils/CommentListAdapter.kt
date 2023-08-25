@@ -31,17 +31,20 @@ import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.video.VideoState
 
 class CommentListAdapter(
     private val context: Context,
     private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
     private val onLoadPage: (Int) -> Unit,
     private val onImageClick: (View?, String) -> Unit,
+    private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onCommentClick: (CommentRef) -> Unit,
     private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
@@ -91,6 +94,16 @@ class CommentListAdapter(
         }
         addItemType(Item.CommentItem::class, CommentListCommentItemBinding::inflate) { item, b, _ ->
             val post = item.commentView.post
+            val viewHolder = if (b.root.tag == null) {
+                val vh =
+                    PostAndCommentViewBuilder.CustomViewHolder(b.root, b.commentButton, b.controlsDivider)
+                b.root.setTag(R.id.custom_view_holder, vh)
+                postAndCommentViewBuilder.ensureContent(vh)
+                vh
+            } else {
+                b.root.getTag(R.id.custom_view_holder) as PostAndCommentViewBuilder.CustomViewHolder
+            }
+
             b.postInfo.text = buildSpannedString {
                 appendLink(
                     item.commentView.community.name,
@@ -158,6 +171,9 @@ class CommentListAdapter(
                 onImageClick = {
                     onImageClick(null, it)
                 },
+                onVideoClick = {
+                    onVideoClick(it, VideoType.UNKNOWN, null)
+                },
                 onPageClick = onPageClick,
                 onLinkLongClick = onLinkLongClick,
             )
@@ -166,9 +182,11 @@ class CommentListAdapter(
                 requireNotNull(viewLifecycleOwner),
                 item.instance,
                 item.commentView,
-                b.upvoteButton,
-                b.downvoteButton,
-                b.upvoteCount,
+                viewHolder.upvoteButton,
+                viewHolder.downvoteButton,
+                viewHolder.upvoteCount!!,
+                viewHolder.upvoteCount,
+                viewHolder.downvoteCount,
                 null,
                 onSignInRequired,
                 onInstanceMismatch,

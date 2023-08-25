@@ -12,6 +12,7 @@ import coil.Coil
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.decode.VideoFrameDecoder
 import coil.transition.CrossfadeTransition
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.offline.OfflineScheduleManager
@@ -191,6 +192,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                     } else {
                         add(GifDecoder.Factory())
                     }
+                    add(VideoFrameDecoder.Factory())
                 }
                 .build(),
         )

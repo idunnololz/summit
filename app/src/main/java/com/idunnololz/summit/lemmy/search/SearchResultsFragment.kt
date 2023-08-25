@@ -418,6 +418,16 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 inflateFn = CommentListCommentItemBinding::inflate,
             ) { item, b, _ ->
                 val post = item.commentView.post
+                val viewHolder = if (b.root.tag == null) {
+                    val vh =
+                        PostAndCommentViewBuilder.CustomViewHolder(b.root, b.commentButton, b.controlsDivider)
+                    b.root.setTag(R.id.custom_view_holder, vh)
+                    postAndCommentViewBuilder.ensureContent(vh)
+                    vh
+                } else {
+                    b.root.getTag(R.id.custom_view_holder) as PostAndCommentViewBuilder.CustomViewHolder
+                }
+
                 b.postInfo.text = buildSpannedString {
                     appendLink(
                         item.commentView.community.name,
@@ -486,6 +496,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         onImageClick(null, it)
                     },
                     onPageClick = onPageClick,
+                    onVideoClick = {
+                        onVideoClick(it, VideoType.UNKNOWN, null)
+                    },
                     onLinkLongClick = onLinkLongClick,
                 )
 
@@ -493,9 +506,11 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     requireNotNull(viewLifecycleOwner),
                     item.instance,
                     item.commentView,
-                    b.upvoteButton,
-                    b.downvoteButton,
-                    b.upvoteCount,
+                    viewHolder.upvoteButton,
+                    viewHolder.downvoteButton,
+                    viewHolder.upvoteCount!!,
+                    viewHolder.upvoteCount,
+                    viewHolder.downvoteCount,
                     null,
                     onSignInRequired,
                     onInstanceMismatch,

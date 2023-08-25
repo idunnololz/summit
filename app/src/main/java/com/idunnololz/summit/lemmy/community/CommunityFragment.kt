@@ -85,8 +85,6 @@ class CommunityFragment :
 
     private var adapter: ListingItemAdapter? = null
 
-    private var shouldScrollToTopAfterFresh = false
-
     @Inject
     lateinit var historyManager: HistoryManager
 
@@ -378,11 +376,6 @@ class CommunityFragment :
         viewModel.sortOrder.observe(viewLifecycleOwner) {
             lemmyAppBarController.setSortOrder(it)
         }
-        viewModel.resetScrollEvent.observe(viewLifecycleOwner) {
-            if (preferences.infinity) {
-                shouldScrollToTopAfterFresh = true
-            }
-        }
 
         installOnActionResultHandler(
             actionsViewModel = actionsViewModel,
@@ -512,8 +505,12 @@ class CommunityFragment :
         )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            shouldScrollToTopAfterFresh = true
-            viewModel.fetchCurrentPage(true, resetHideRead = true, clearPages = true)
+            viewModel.fetchCurrentPage(
+                force = true,
+                resetHideRead = true,
+                clearPages = true,
+                scrollToTop = true,
+            )
             binding.recyclerView.scrollToPosition(0)
         }
         binding.loadingView.setOnRefreshClickListener {
@@ -641,8 +638,7 @@ class CommunityFragment :
                         adapter.seenItemPositions.clear()
                         adapter.onItemsChanged()
 
-                        if (shouldScrollToTopAfterFresh) {
-                            shouldScrollToTopAfterFresh = false
+                        if (it.data.scrollToTop) {
                             binding.recyclerView.scrollToPosition(0)
                         } else {
                             val biggestPageIndex = viewModel.postListEngine.biggestPageIndex
@@ -1145,6 +1141,8 @@ class CommunityFragment :
         if (didLayoutChange || didUiConfigChange) {
             adapter?.layout = preferences.getPostsLayout()
         }
+
+        postListViewBuilder.onPostUiConfigUpdated()
     }
 
     private fun updateDecoratorAndGestureHandler(recyclerView: RecyclerView) {

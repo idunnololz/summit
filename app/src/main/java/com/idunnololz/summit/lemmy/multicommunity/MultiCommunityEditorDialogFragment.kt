@@ -197,12 +197,13 @@ AlertDialogFragment.AlertDialogFragmentListener {
             searchEditText.addTextChangedListener {
                 val query = it?.toString() ?: ""
                 adapter?.setQuery(query) {
-                    recyclerView.scrollToPosition(0)
+                    resultsRecyclerView.scrollToPosition(0)
                 }
                 viewModel.doQuery(query)
             }
 
             adapter = CommunityAdapter(context, offlineManager,
+                canSelectMultipleCommunities = true,
                 onTooManyCommunities = {
                     showTooManyCommunitiesMessage()
                 })
