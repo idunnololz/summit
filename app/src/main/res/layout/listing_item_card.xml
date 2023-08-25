@@ -158,7 +158,6 @@
             android:id="@+id/bottom_barrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="commentButton,open_link_button"
             app:barrierDirection="bottom"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
