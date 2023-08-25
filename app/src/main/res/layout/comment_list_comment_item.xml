@@ -96,7 +96,6 @@
         android:layout_width="1dp"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
-        app:layout_constraintEnd_toStartOf="@+id/upvoteButton"
         app:layout_constraintTop_toTopOf="@+id/commentButton"
         app:layout_constraintBottom_toBottomOf="@+id/commentButton" />
 
