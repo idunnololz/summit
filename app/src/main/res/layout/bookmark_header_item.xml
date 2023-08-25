@@ -18,4 +18,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/add"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:src="@drawable/baseline_add_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bookmarks_title"
+        app:layout_constraintBottom_toBottomOf="@+id/bookmarks_title"
+        app:tint="?colorControlNormal" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -29,14 +29,10 @@ import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
-import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
-import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.SliderSettingItem
-import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.ViewTypeSettings
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment

@@ -33,4 +33,17 @@
         android:ellipsize="end"
         app:drawableTint="?colorControlNormal"
         tools:text="Hello" />
+
+    <com.idunnololz.summit.view.LinkifyTextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextFaint"
+        android:gravity="start"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="end"
+        app:drawableTint="?colorControlNormal"
+        tools:text="Hello" />
 </merge>

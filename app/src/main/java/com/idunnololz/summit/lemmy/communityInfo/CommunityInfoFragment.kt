@@ -35,6 +35,7 @@ import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -44,6 +45,7 @@ import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -103,6 +105,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     url = url,
                     mimeType = null,
                 )
+            },
+            onVideoClick = { url, videoType, state ->
+                getMainActivity()?.openVideo(url, videoType, state)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -376,6 +381,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val context: Context,
         private val instance: String,
         private val onImageClick: (String, View?, String) -> Unit,
+        private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onLinkLongClick: (url: String, text: String) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -441,6 +447,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     instance = instance,
                     onImageClick = {
                         onImageClick("", null, it)
+                    },
+                    onVideoClick = {
+                        onVideoClick(it, VideoType.UNKNOWN, null)
                     },
                     onPageClick = onPageClick,
                     onLinkLongClick = onLinkLongClick,

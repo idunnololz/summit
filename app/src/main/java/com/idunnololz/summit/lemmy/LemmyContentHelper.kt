@@ -566,6 +566,9 @@ class LemmyContentHelper(
                     text = content,
                     instance = instance,
                     onImageClick = onImageClickListener,
+                    onVideoClick = {
+                        onVideoClickListener(it, VideoType.UNKNOWN, null)
+                    },
                     onPageClick = onLemmyUrlClick,
                     onLinkLongClick = onLinkLongClick,
                 )

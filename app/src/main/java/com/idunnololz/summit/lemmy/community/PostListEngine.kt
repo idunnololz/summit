@@ -300,7 +300,7 @@ class PostListEngine(
 
     fun getPostsCloseBy(): MutableList<PostView> {
         val start = (displayFirstItemsIndex - 1).coerceAtLeast(0)
-        val end = (start + 20).coerceAtMost(_items.size)
+        val end = (start + 10).coerceAtMost(_items.size)
 
         val results = mutableListOf<PostView>()
 

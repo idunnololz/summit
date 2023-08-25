@@ -50,6 +50,7 @@ class CommunitiesPaneController @AssistedInject constructor(
     @Assisted private val viewLifecycleOwner: LifecycleOwner,
     @Assisted private val onCommunitySelected: OnCommunitySelected,
     @Assisted private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
+    @Assisted private val onAddBookmarkClick: () -> Unit,
 ) {
 
     @AssistedFactory
@@ -60,6 +61,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             viewLifecycleOwner: LifecycleOwner,
             onCommunitySelected: OnCommunitySelected,
             onEditMultiCommunity: (UserCommunityItem) -> Unit,
+            onAddBookmarkClick: () -> Unit,
         ): CommunitiesPaneController
     }
 
@@ -78,7 +80,8 @@ class CommunitiesPaneController @AssistedInject constructor(
             },
             onEditMultiCommunity = { ref ->
                 onEditMultiCommunity(ref)
-            }
+            },
+            onAddBookmarkClick = onAddBookmarkClick,
         )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -119,6 +122,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         private val onCommunitySelected: OnCommunitySelected,
         private val onDeleteUserCommunity: (Long) -> Unit,
         private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
+        private val onAddBookmarkClick: () -> Unit,
         ) : Adapter<ViewHolder>() {
 
         private sealed interface Item {
@@ -196,7 +200,11 @@ class CommunitiesPaneController @AssistedInject constructor(
             addItemType(
                 clazz = Item.BookmarkHeaderItem::class,
                 inflateFn = BookmarkHeaderItemBinding::inflate,
-            ) { _, _, _ -> }
+            ) { _, b, _ ->
+                b.add.setOnClickListener {
+                    onAddBookmarkClick()
+                }
+            }
             addItemType(
                 clazz = Item.HomeCommunityItem::class,
                 inflateFn = HomeCommunityItemBinding::inflate,

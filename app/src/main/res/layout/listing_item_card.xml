@@ -8,6 +8,7 @@
     android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground">
@@ -98,59 +99,59 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/commentButton"
-            style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/padding_quarter"
-            app:icon="@drawable/baseline_comment_18"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title"/>
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/commentButton"-->
+<!--            style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="@dimen/padding_quarter"-->
+<!--            app:icon="@drawable/baseline_comment_18"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/title"/>-->
 
-        <ImageButton
-            android:id="@+id/open_link_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="9dp"
-            android:src="@drawable/baseline_open_in_new_22"
-            android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintTop_toTopOf="@+id/commentButton"
-            app:layout_constraintBottom_toBottomOf="@+id/commentButton"
-            app:layout_constraintEnd_toStartOf="@+id/upvoteButton" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/open_link_button"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:padding="9dp"-->
+<!--            android:src="@drawable/baseline_open_in_new_22"-->
+<!--            android:background="?selectableItemBackgroundBorderless"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/commentButton"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/commentButton"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/upvoteButton" />-->
 
-        <ImageButton
-            android:id="@+id/upvoteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_arrow_upward_24"
-            android:padding="@dimen/padding_half"
-            android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintTop_toTopOf="@+id/commentButton"
-            app:layout_constraintBottom_toBottomOf="@+id/commentButton"
-            app:layout_constraintEnd_toStartOf="@+id/upvoteCount" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/upvoteButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:src="@drawable/baseline_arrow_upward_24"-->
+<!--            android:padding="@dimen/padding_half"-->
+<!--            android:background="?selectableItemBackgroundBorderless"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/commentButton"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/commentButton"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/upvoteCount" />-->
 
-        <TextView
-            android:id="@+id/upvoteCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@+id/commentButton"
-            app:layout_constraintBottom_toBottomOf="@+id/commentButton"
-            app:layout_constraintEnd_toStartOf="@+id/downvoteButton" />
+<!--        <TextView-->
+<!--            android:id="@+id/upvoteCount"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/commentButton"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/commentButton"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/downvoteButton" />-->
 
-        <ImageButton
-            android:id="@+id/downvoteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_arrow_downward_24"
-            android:paddingStart="@dimen/padding_half"
-            android:paddingLeft="@dimen/padding_half"
-            android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"
-            android:paddingRight="@dimen/reddit_content_horizontal_padding_for_downvote"
-            android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintTop_toTopOf="@+id/commentButton"
-            app:layout_constraintBottom_toBottomOf="@+id/commentButton"
-            app:layout_constraintEnd_toEndOf="parent" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/downvoteButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:src="@drawable/baseline_arrow_downward_24"-->
+<!--            android:paddingStart="@dimen/padding_half"-->
+<!--            android:paddingLeft="@dimen/padding_half"-->
+<!--            android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"-->
+<!--            android:paddingRight="@dimen/reddit_content_horizontal_padding_for_downvote"-->
+<!--            android:background="?selectableItemBackgroundBorderless"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/commentButton"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/commentButton"-->
+<!--            app:layout_constraintEnd_toEndOf="parent" />-->
 
         <!-- used programatially when the image is is placed at the end. -->
         <androidx.constraintlayout.widget.Barrier

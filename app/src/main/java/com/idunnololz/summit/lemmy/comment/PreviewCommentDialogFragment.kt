@@ -51,6 +51,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
                 text = args.content,
                 instance = args.instance,
                 onImageClick = {},
+                onVideoClick = {},
                 onPageClick = {},
                 onLinkLongClick = { _, _ -> },
             )

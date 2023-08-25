@@ -109,4 +109,6 @@
     <item name="report_post" type="id" />
     <item name="report_comment" type="id" />
     <item name="switch_account_temp" type="id" />
+    <item name="custom_view_holder" type="id" />
+    <item name="add_community" type="id" />
 </resources>

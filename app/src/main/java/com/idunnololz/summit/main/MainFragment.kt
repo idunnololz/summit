@@ -35,6 +35,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
+import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
@@ -48,6 +49,7 @@ import com.idunnololz.summit.tabs.toTab
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
@@ -209,6 +211,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
+
         communitiesPaneController = communitiesPaneViewModel.createController(
             binding.startPanel,
             viewLifecycleOwner,
@@ -248,7 +252,43 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     multiCommunity = it.communityRef as CommunityRef.MultiCommunity,
                     dbId = it.id
                 )
-            }
+            },
+            onAddBookmarkClick = {
+                val bottomMenu = BottomMenu(context).apply {
+                    setTitle(R.string.add_bookmark)
+                    addItemWithIcon(
+                        id = R.id.add_community,
+                        title = R.string.add_community,
+                        icon = R.drawable.ic_community_24
+                    )
+                    addItemWithIcon(
+                        id = R.id.create_multi_community,
+                        title = R.string.create_multi_community,
+                        icon = R.drawable.baseline_dynamic_feed_24
+                    )
+
+                    setOnMenuItemClickListener {
+                        when (it.id) {
+                            R.id.add_community -> {
+                                CommunityPickerDialogFragment.show(
+                                    childFragmentManager,
+                                )
+                            }
+                            R.id.create_multi_community -> {
+                                MultiCommunityEditorDialogFragment.show(
+                                    childFragmentManager,
+                                    CommunityRef.MultiCommunity(
+                                        getString(R.string.default_multi_community_name),
+                                        null,
+                                        listOf()
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                getMainActivity()?.showBottomMenu(bottomMenu)
+            },
         )
 
         val currentTab = requireNotNull(tabsManager.currentTab.value)

@@ -17,6 +17,7 @@ class LemmyHeaderView : LinearLayout {
 
     private val textView1: TextView
     val textView2: TextView
+    val textView3: TextView
     private val flairView: FlairView
 
     constructor(context: Context?) : super(context)
@@ -35,6 +36,7 @@ class LemmyHeaderView : LinearLayout {
 
         textView1 = binding.textView1
         textView2 = binding.textView2
+        textView3 = binding.textView3
         flairView = binding.flairView
 
         flairView.visibility = View.GONE
@@ -54,6 +56,7 @@ class LemmyHeaderView : LinearLayout {
 
             textView1.textSize = value
             textView2.textSize = value
+            textView3.textSize = value
         }
 
     fun getFlairView(): FlairView = flairView

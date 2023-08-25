@@ -1016,9 +1016,15 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.auto_convert_phone_numbers_to_links),
         null,
     )
+    val showUpAndDownVotes = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_up_and_down_votes),
+        context.getString(R.string.show_up_and_down_votes_desc),
+    )
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
+        showUpAndDownVotes,
     )
 }
 

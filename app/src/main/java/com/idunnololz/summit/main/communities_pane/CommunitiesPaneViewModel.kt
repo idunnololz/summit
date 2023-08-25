@@ -71,6 +71,7 @@ class CommunitiesPaneViewModel @Inject constructor(
         viewLifecycleOwner: LifecycleOwner,
         onCommunitySelected: OnCommunitySelected,
         onEditMultiCommunity: (UserCommunityItem) -> Unit,
+        onAddBookmarkClick: () -> Unit,
     ) =
         communitiesPaneControllerFactory.create(
             this,
@@ -78,6 +79,7 @@ class CommunitiesPaneViewModel @Inject constructor(
             viewLifecycleOwner,
             onCommunitySelected,
             onEditMultiCommunity,
+            onAddBookmarkClick,
         )
 
     fun loadCommunities() {

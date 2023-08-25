@@ -40,6 +40,7 @@ import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
@@ -126,6 +127,9 @@ class MainActivity : BaseActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         super.onCreate(savedInstanceState)
+
+        // Markwon's Coil's imageloader breaks if the activity is destroyed... always recreate oncreate
+        LemmyTextHelper.resetMarkwon(this)
 
         viewModel.communities.observe(this) {
             communitySelectorController?.setCommunities(it)

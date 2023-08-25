@@ -6,8 +6,11 @@ import android.text.SpannableStringBuilder
 import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView
+import coil.imageLoader
 import com.idunnololz.summit.R
 import com.idunnololz.summit.spans.SpoilerSpan
+import com.idunnololz.summit.util.CoilImagesPlugin
+import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
@@ -22,7 +25,6 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.html.span.SuperScriptSpan
-import io.noties.markwon.image.coil.CoilImagesPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
 import java.util.Locale
@@ -43,6 +45,7 @@ object LemmyTextHelper {
         instance: String,
 
         onImageClick: (url: String) -> Unit,
+        onVideoClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
@@ -64,7 +67,13 @@ object LemmyTextHelper {
                 }
             }
             onLinkLongClickListener = DefaultLinkLongClickListener(textView.context, onLinkLongClick)
-            this.onImageClickListener = onImageClick
+            this.onImageClickListener = { url ->
+                if (isUrlVideo(url)) {
+                    onVideoClick(url)
+                } else {
+                    onImageClick(url)
+                }
+            }
         }
     }
 
@@ -74,10 +83,6 @@ object LemmyTextHelper {
             postProcessDetails(spanned, textView)
 
             it.setParsedMarkdown(textView, spanned)
-
-//            it.setMarkdown(textView, text)
-
-//            textView.text = it.toMarkdown(text)
         }
     }
 
@@ -177,7 +182,7 @@ object LemmyTextHelper {
 
     private fun createMarkwon(context: Context): Markwon =
         Markwon.builder(context)
-            .usePlugin(CoilImagesPlugin.create(context))
+            .usePlugin(CoilImagesPlugin.create(context, context.applicationContext.imageLoader))
             .usePlugin(
                 LinkifyPlugin.create(
                     if (autoLinkPhoneNumbers) {

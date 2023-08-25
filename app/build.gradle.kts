@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 82
-        versionName = "1.5.4"
+        versionCode = 84
+        versionName = "1.6.1"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -87,6 +87,7 @@ dependencies {
 
     implementation(libs.coil)
     implementation(libs.coil.gif)
+    implementation(libs.coil.video)
 
     implementation(libs.kotlinx.coroutine.android)
 
@@ -109,7 +110,6 @@ dependencies {
     implementation(libs.markwon.html)
     implementation(libs.markwon.ext.strikethrough)
     implementation(libs.markwon.linkify)
-    implementation(libs.markwon.image.coil)
 
     implementation(libs.work.runtime.ktx)
 

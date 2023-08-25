@@ -79,9 +79,10 @@ class CommunityViewModel @Inject constructor(
         var offset: Int = 0,
     ) : Parcelable
 
-    // Dont use data class so every change triggers the observers
+    // Don't use data class so every change triggers the observers
     class PostUpdateInfo(
         val isReadPostUpdate: Boolean = false,
+        val scrollToTop: Boolean = false,
     )
 
     private var pagePositions = arrayListOf<PageScrollState>()
@@ -104,7 +105,6 @@ class CommunityViewModel @Inject constructor(
 
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
     val currentAccount = MutableLiveData<AccountView?>(null)
-    val resetScrollEvent = MutableLiveData<Unit>() // INFINITY ONLY
 
     private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
 
@@ -177,9 +177,8 @@ class CommunityViewModel @Inject constructor(
                     pagePositions.clear()
 
                     loadedPostsData.setValue(PostUpdateInfo())
-                    resetScrollEvent.value = Unit
                 }
-                fetchInitialPage(force = true, clearPagesOnSuccess = true)
+                fetchInitialPage(force = true, clearPagesOnSuccess = true, scrollToTop = true)
             }
         }
 
@@ -244,16 +243,25 @@ class CommunityViewModel @Inject constructor(
         fetchPageInternal(pageIndex + 1, force)
     }
 
-    fun fetchPage(pageIndex: Int, force: Boolean = false, clearPagesOnSuccess: Boolean = false) {
+    fun fetchPage(
+        pageIndex: Int,
+        force: Boolean = false,
+        clearPagesOnSuccess: Boolean = false,
+        scrollToTop: Boolean = false,
+    ) {
         if (!postListEngine.infinity) {
             currentPageIndex.value = pageIndex
         }
-        fetchPageInternal(pageIndex, force = force, clearPagesOnSuccess)
+        fetchPageInternal(pageIndex, force = force, clearPagesOnSuccess, scrollToTop)
     }
 
-    fun fetchInitialPage(force: Boolean = false, clearPagesOnSuccess: Boolean = false) {
+    fun fetchInitialPage(
+        force: Boolean = false,
+        clearPagesOnSuccess: Boolean = false,
+        scrollToTop: Boolean = false,
+    ) {
         if (postListEngine.infinity) {
-            fetchPage(0, force, clearPagesOnSuccess)
+            fetchPage(0, force, clearPagesOnSuccess, scrollToTop)
         } else {
             fetchCurrentPage(force, clearPagesOnSuccess)
         }
@@ -263,6 +271,7 @@ class CommunityViewModel @Inject constructor(
         force: Boolean = false,
         resetHideRead: Boolean = false,
         clearPages: Boolean = false,
+        scrollToTop: Boolean = false,
     ) {
         if (resetHideRead) {
             isHideReadEnabled.value = false
@@ -280,14 +289,19 @@ class CommunityViewModel @Inject constructor(
         }
         if (pages.isEmpty()) {
             if (postListEngine.infinity) {
-                fetchPage(0, force = true, clearPages)
+                fetchPage(
+                    pageIndex = 0,
+                    force = true,
+                    clearPagesOnSuccess = clearPages,
+                    scrollToTop = scrollToTop
+                )
             } else {
                 fetchCurrentPage()
             }
             return
         }
         pages.forEach {
-            fetchPageInternal(it, force)
+            fetchPageInternal(it, force, scrollToTop = scrollToTop)
         }
     }
 
@@ -295,6 +309,7 @@ class CommunityViewModel @Inject constructor(
         pageToFetch: Int,
         force: Boolean,
         clearPagesOnSuccess: Boolean = false,
+        scrollToTop: Boolean = false,
     ) {
         if (fetchingPages.contains(pageToFetch)) {
             return
@@ -326,7 +341,7 @@ class CommunityViewModel @Inject constructor(
                     postListEngine.addPage(pageData)
                     postListEngine.createItems()
 
-                    loadedPostsData.postValue(PostUpdateInfo())
+                    loadedPostsData.postValue(PostUpdateInfo(scrollToTop = scrollToTop))
 
                     withContext(Dispatchers.Main) {
                         fetchingPages.remove(pageToFetch)
@@ -536,10 +551,7 @@ class CommunityViewModel @Inject constructor(
         loadedPostsData.setValue(PostUpdateInfo())
         currentPageIndex.value = 0
         setPagePositionAtTop(0)
-        if (resetScrollPosition) {
-            resetScrollEvent.value = Unit
-        }
-        fetchCurrentPage()
+        fetchCurrentPage(scrollToTop = resetScrollPosition)
     }
 
     fun onPostRead(postView: PostView, delayMs: Long = 0) {
@@ -622,17 +634,19 @@ class CommunityViewModel @Inject constructor(
                 )
                 .onSuccess {
                     val position = it.posts.indexOfFirst { anchorPosts.contains(it.post.id) }
+                    var scrollToTop = false
 
                     if (position != -1) {
                         setPagePosition(it.pageIndex, position, 0)
                     } else {
                         setPagePositionAtTop(it.pageIndex)
+                        scrollToTop = true
                     }
 
                     if (infinity) {
                         postListEngine.clearPages()
                         for (index in 0..it.pageIndex) {
-                            fetchPageInternal(index, force = false)
+                            fetchPageInternal(index, force = false, scrollToTop = scrollToTop)
                         }
                     } else {
                         fetchPageInternal(it.pageIndex, force = false)

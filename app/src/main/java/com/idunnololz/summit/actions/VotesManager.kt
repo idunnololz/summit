@@ -17,6 +17,8 @@ class VotesManager(
     private val pendingVotes = hashMapOf<VotableRef, Int>()
 
     private val scores = mutableMapOf<VotableRef, Int>()
+    private val upvotes = mutableMapOf<VotableRef, Int>()
+    private val downvotes = mutableMapOf<VotableRef, Int>()
 
     fun setPendingVote(key: VotableRef, like: Int) {
         pendingVotes[key] = like
@@ -59,8 +61,60 @@ class VotesManager(
             }
         }
 
+    fun setUpvotes(key: VotableRef, count: Int) {
+        upvotes[key] = count
+    }
+
+    fun getUpvotes(key: VotableRef, force: Boolean = false) =
+        when (key) {
+            is VotableRef.CommentRef -> {
+                if (!force && preferences.hideCommentScores) {
+                    null
+                } else {
+                    upvotes[key]
+                }
+            }
+            is VotableRef.PostRef -> {
+                if (!force && preferences.hidePostScores) {
+                    null
+                } else {
+                    upvotes[key]
+                }
+            }
+        }
+
+    fun setDownvotes(key: VotableRef, count: Int) {
+        downvotes[key] = count
+    }
+
+    fun getDownvotes(key: VotableRef, force: Boolean = false) =
+        when (key) {
+            is VotableRef.CommentRef -> {
+                if (!force && preferences.hideCommentScores) {
+                    null
+                } else {
+                    downvotes[key]
+                }
+            }
+            is VotableRef.PostRef -> {
+                if (!force && preferences.hidePostScores) {
+                    null
+                } else {
+                    downvotes[key]
+                }
+            }
+        }
+
     fun setScoreIfNoneSet(key: VotableRef, score: Int) {
         scores.getOrPut(key) { score }
+    }
+
+    fun setUpvotesIfNoneSet(key: VotableRef, upvotes: Int) {
+        this.upvotes.getOrPut(key) { upvotes }
+    }
+
+    fun setDownvotesIfNoneSet(key: VotableRef, downvotes: Int) {
+        this.downvotes.getOrPut(key) { downvotes }
     }
 
     fun deleteScore(ref: VotableRef) {
@@ -71,5 +125,7 @@ class VotesManager(
         votes.clear()
         pendingVotes.clear()
         scores.clear()
+        upvotes.clear()
+        downvotes.clear()
     }
 }

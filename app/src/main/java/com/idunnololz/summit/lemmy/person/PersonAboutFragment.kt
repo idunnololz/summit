@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentPersonAboutBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
@@ -90,6 +91,9 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                     url = url,
                     mimeType = null,
                 )
+            },
+            onVideoClick = { url ->
+                getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)

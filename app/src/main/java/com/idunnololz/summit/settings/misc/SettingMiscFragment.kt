@@ -4,15 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
-import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.FragmentSettingHiddenPostsBinding
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.HiddenPostsSettings
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
@@ -20,9 +15,6 @@ import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -92,6 +84,13 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>() {
 
                 LemmyTextHelper.autoLinkPhoneNumbers = it
                 LemmyTextHelper.resetMarkwon(context)
+            }
+        )
+        settings.showUpAndDownVotes.bindTo(
+            binding.showUpAndDownVotes,
+            { preferences.showUpAndDownVotes },
+            {
+                preferences.showUpAndDownVotes = it
             }
         )
     }

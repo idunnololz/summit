@@ -312,7 +312,7 @@
     </style>
 
     <style name="MyApp.Widget.Material3.CardView" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardBackgroundColor">@color/card_background_color</item>
+<!--        <item name="cardBackgroundColor">@color/card_background_color</item>-->
     </style>
 
     <style name="SettingHeaderStyle">
