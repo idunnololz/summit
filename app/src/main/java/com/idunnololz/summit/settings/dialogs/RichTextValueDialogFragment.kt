@@ -11,6 +11,7 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentRichTextValueBinding
+import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
@@ -18,6 +19,7 @@ import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -150,6 +152,12 @@ class RichTextValueDialogFragment :
                             ).toBundle()
                         }
                         .showAllowingStateLoss(childFragmentManager, "AA")
+                },
+                onAddLinkClick = {
+                    AddLinkDialogFragment.show(
+                        binding.textEditor.getSelectedText(),
+                        childFragmentManager
+                    )
                 },
             )
 

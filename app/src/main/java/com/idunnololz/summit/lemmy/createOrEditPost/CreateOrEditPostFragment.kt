@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +18,11 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.Post
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
-import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.offline.OfflineManager
@@ -35,8 +32,8 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,7 +90,7 @@ class CreateOrEditPostFragment :
 
         childFragmentManager.setFragmentResultListener(
             AddLinkDialogFragment.REQUEST_KEY,
-            this
+            this,
         ) { _, bundle ->
             val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
                 AddLinkDialogFragment.REQUEST_KEY_RESULT,
@@ -229,8 +226,10 @@ class CreateOrEditPostFragment :
                 )
             },
             onAddLinkClick = {
-                AddLinkDialogFragment()
-                    .showAllowingStateLoss(childFragmentManager, "asdf")
+                AddLinkDialogFragment.show(
+                    binding.postEditText.getSelectedText(),
+                    childFragmentManager
+                )
             },
             onPreviewClick = {
                 PreviewCommentDialogFragment()
@@ -400,7 +399,7 @@ class CreateOrEditPostFragment :
             onCommunitySelected = {
                 binding.communityEditText.setText(it.community.toCommunityRef().fullName)
                 viewModel.showSearch.value = false
-            }
+            },
         )
         binding.communitySuggestionsRecyclerView.apply {
             adapter = this@CreateOrEditPostFragment.adapter
@@ -451,7 +450,7 @@ class CreateOrEditPostFragment :
                     CommunityRef.CommunityRefByName(
                         name = requireNotNull(args.communityName),
                         instance = args.instance,
-                    ).fullName
+                    ).fullName,
                 )
             }
 

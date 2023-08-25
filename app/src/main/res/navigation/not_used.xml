@@ -124,4 +124,13 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </dialog>
+    <dialog
+        android:id="@+id/addLinkDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment"
+        android:label="AddLinkDialogFragment" >
+        <argument
+            android:name="prefillText"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>

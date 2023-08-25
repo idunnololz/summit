@@ -29,6 +29,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -307,8 +308,10 @@ class AddOrEditCommentFragment :
                 )
             },
             onAddLinkClick = {
-                AddLinkDialogFragment()
-                    .showAllowingStateLoss(childFragmentManager, "asdf")
+                AddLinkDialogFragment.show(
+                    binding.commentEditText.getSelectedText(),
+                    childFragmentManager
+                )
             },
             onPreviewClick = {
                 PreviewCommentDialogFragment()
