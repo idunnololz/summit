@@ -11,14 +11,18 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
+import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>() {
+class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
+    SettingValueUpdateCallback {
 
     @Inject
     lateinit var preferences: Preferences
@@ -93,5 +97,23 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>() {
                 preferences.showUpAndDownVotes = it
             }
         )
+        settings.instanceNameStyle.bindTo(
+            binding.instanceNameStyle,
+            { preferences.displayInstanceStyle },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            }
+        )
+    }
+
+    override fun updateValue(key: Int, value: Any?) {
+        when (key) {
+            settings.instanceNameStyle.id -> {
+                preferences.displayInstanceStyle = value as Int
+            }
+        }
+
+        updateRendering()
     }
 }

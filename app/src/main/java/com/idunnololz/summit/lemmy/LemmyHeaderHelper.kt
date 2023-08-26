@@ -17,6 +17,7 @@ import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
@@ -58,6 +59,7 @@ class LemmyHeaderHelper(
         instance: String,
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
+        displayInstanceStyle: Int,
         listAuthor: Boolean = true,
     ) {
         val context = headerContainer.context
@@ -120,10 +122,44 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
         }
 
-        sb.appendLink(
-            postView.community.name,
-            LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
-        )
+        val postInstance = postView.community.instance
+        val displayFullName = when (displayInstanceStyle) {
+            DisplayInstanceOptions.NeverDisplayInstance -> {
+                false
+            }
+            DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
+                instance != postInstance
+            }
+            DisplayInstanceOptions.AlwaysDisplayInstance -> {
+                true
+            }
+            else -> false
+        }
+
+        if (displayFullName) {
+            sb.appendLink(
+                "${postView.community.name}",
+                LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+            )
+            val start = sb.length
+            sb.appendLink(
+                "@$postInstance",
+                LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+            )
+            val end = sb.length
+            sb.setSpan(
+                ForegroundColorSpan(unimportantColor),
+                start,
+                end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        } else {
+            sb.appendLink(
+                postView.community.name,
+                LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+            )
+        }
+
         sb.appendSeparator()
         dateStringToPretty(context, postView.post.updated ?: postView.post.published).let {
             sb.append(it)
@@ -182,11 +218,6 @@ class LemmyHeaderHelper(
                 )
             }
         }
-
-        postView.community.instance.let { domain ->
-            sb.appendSeparator()
-            sb.append(domain)
-        }
 //        if (listingItem.linkFlairText != null) {
 //            appendSeparator(sb)
 //            run {
@@ -234,13 +265,16 @@ class LemmyHeaderHelper(
 
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,
-        item: CommentView,
+        commentView: CommentView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
+        displayInstanceStyle: Int,
         detailed: Boolean = false,
         childrenCount: Int? = null,
     ) {
+        val creatorInstance = commentView.creator.instance
+
         var sb = SpannableStringBuilder()
 //        if (item.creator.mode) {
 //            run {
@@ -261,12 +295,14 @@ class LemmyHeaderHelper(
 //                )
 //            }
 //        } else
-        if (item.creator.admin) {
+
+        val creatorName = commentView.creator.name.trim()
+        if (commentView.creator.admin) {
             run {
                 val s = sb.length
                 sb.appendLink(
-                    item.creator.name,
-                    LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name),
+                    creatorName,
+                    LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
                 )
                 val e = sb.length
                 sb.setSpan(
@@ -285,8 +321,8 @@ class LemmyHeaderHelper(
         } else {
             val s = sb.length
             sb.appendLink(
-                text = item.creator.name.trim(),
-                url = LinkUtils.getLinkForPerson(item.creator.instance, item.creator.name),
+                text = creatorName,
+                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
                 underline = false,
             )
             val e = sb.length
@@ -298,7 +334,36 @@ class LemmyHeaderHelper(
             )
         }
 
-        if (item.creator.id == item.post.creator_id) {
+        val displayFullName = when (displayInstanceStyle) {
+            DisplayInstanceOptions.NeverDisplayInstance -> {
+                false
+            }
+            DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
+                instance != creatorInstance
+            }
+            DisplayInstanceOptions.AlwaysDisplayInstance -> {
+                true
+            }
+            else -> false
+        }
+
+        if (displayFullName) {
+            val s = sb.length
+            sb.appendLink(
+                text = "@${creatorInstance}",
+                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
+                underline = false,
+            )
+            val e = sb.length
+            sb.setSpan(
+                ForegroundColorSpan(unimportantColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
+
+        if (commentView.creator.id == commentView.post.creator_id) {
             run {
                 val d = Utils.tint(context, R.drawable.ic_op, R.color.style_blue)
                 val size: Int = Utils.convertDpToPixel(16f).toInt()
@@ -318,7 +383,7 @@ class LemmyHeaderHelper(
 
         sb.append("  ")
         sb.append(
-            dateStringToPretty(context, item.comment.updated ?: item.comment.published),
+            dateStringToPretty(context, commentView.comment.updated ?: commentView.comment.published),
         )
 
 //        if (item.comment.distinguished) {
@@ -393,8 +458,8 @@ class LemmyHeaderHelper(
             sb.append(
                 headerContainer.context.resources.getQuantityString(
                     R.plurals.point_count_format,
-                    item.counts.score,
-                    LemmyUtils.abbrevNumber(item.counts.score.toLong()),
+                    commentView.counts.score,
+                    LemmyUtils.abbrevNumber(commentView.counts.score.toLong()),
                 ),
             )
 //            }

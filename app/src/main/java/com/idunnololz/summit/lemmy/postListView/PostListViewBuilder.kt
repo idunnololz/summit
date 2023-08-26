@@ -99,6 +99,7 @@ class PostListViewBuilder @Inject constructor(
     private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
     private var contentMaxLines: Int = postUiConfig.contentMaxLines
     private var showUpAndDownVotes: Boolean = preferences.showUpAndDownVotes
+    private var displayInstanceStyle = preferences.displayInstanceStyle
 
     private val upvoteColor = preferences.upvoteColor
     private val downvoteColor = preferences.downvoteColor
@@ -127,6 +128,7 @@ class PostListViewBuilder @Inject constructor(
         lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
         singleTapToViewImage = preferences.postListViewImageOnSingleTap
         showUpAndDownVotes = preferences.showUpAndDownVotes
+        displayInstanceStyle = preferences.displayInstanceStyle
     }
 
     /**
@@ -480,6 +482,7 @@ class PostListViewBuilder @Inject constructor(
                     instance = instance,
                     onPageClick = onPageClick,
                     onLinkLongClick = onLinkLongClick,
+                    displayInstanceStyle = displayInstanceStyle,
                 )
 
 

@@ -19,11 +19,18 @@ class MultipleChoiceDialogFragment :
 
     companion object {
         private const val ARG_SETTING_ITEM = "ARG_SETTING_ITEM"
+        private const val ARG_CURRENT_VALUE = "ARG_CURRENT_VALUE"
 
-        fun newInstance(settingItem: RadioGroupSettingItem) =
+        fun newInstance(
+            settingItem: RadioGroupSettingItem,
+            currentValue: Int?,
+        ) =
             MultipleChoiceDialogFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(ARG_SETTING_ITEM, settingItem)
+                    if (currentValue != null) {
+                        putInt(ARG_CURRENT_VALUE, currentValue)
+                    }
                 }
             }
     }
@@ -60,13 +67,20 @@ class MultipleChoiceDialogFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val settingItem = requireArguments().getParcelableCompat<RadioGroupSettingItem>(
+        val args = requireArguments()
+        val settingItem = args.getParcelableCompat<RadioGroupSettingItem>(
             ARG_SETTING_ITEM,
         )
 
         if (settingItem == null) {
             dismiss()
             return
+        }
+
+        val currentValue = if (args.containsKey(ARG_CURRENT_VALUE)) {
+            args.getInt(ARG_CURRENT_VALUE)
+        } else {
+            null
         }
 
         BottomMenu(requireContext())
@@ -78,6 +92,9 @@ class MultipleChoiceDialogFragment :
                     } else {
                         addItem(it.id, it.title)
                     }
+                }
+                if (currentValue != null) {
+                    setChecked(currentValue)
                 }
 
                 setOnMenuItemClickListener {

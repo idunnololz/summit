@@ -44,7 +44,7 @@ class ModernThreadLinesDecoration(
         strokeWidth = Utils.convertDpToPixel(1f)
     }
 
-    fun getColorForDepth(depth: Int): Int {
+    private fun getColorForDepth(depth: Int): Int {
         if (depth == 0) {
             return Color.TRANSPARENT
         }

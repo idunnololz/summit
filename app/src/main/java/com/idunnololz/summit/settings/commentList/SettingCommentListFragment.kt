@@ -71,8 +71,8 @@ class SettingCommentListFragment :
                 preferences.defaultCommentsSortOrder?.toApiSortOrder()?.toId()
                     ?: R.id.comments_sort_order_default
             },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )

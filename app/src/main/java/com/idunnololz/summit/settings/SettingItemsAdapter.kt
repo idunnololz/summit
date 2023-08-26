@@ -109,7 +109,7 @@ class SettingItemsAdapter(
                     updateSettingValue(settingItem.id, (it as MaterialSwitch).isChecked)
                 }
                 is RadioGroupSettingItem -> {
-                    MultipleChoiceDialogFragment.newInstance(settingItem)
+                    MultipleChoiceDialogFragment.newInstance(settingItem, null)
                         .showAllowingStateLoss(fragmentManager, "aaaaaaa")
                 }
                 is SliderSettingItem -> {

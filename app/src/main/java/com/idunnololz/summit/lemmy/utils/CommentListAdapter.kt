@@ -94,15 +94,17 @@ class CommentListAdapter(
         }
         addItemType(Item.CommentItem::class, CommentListCommentItemBinding::inflate) { item, b, _ ->
             val post = item.commentView.post
-            val viewHolder = if (b.root.tag == null) {
-                val vh =
-                    PostAndCommentViewBuilder.CustomViewHolder(b.root, b.commentButton, b.controlsDivider)
-                b.root.setTag(R.id.custom_view_holder, vh)
-                postAndCommentViewBuilder.ensureContent(vh)
-                vh
-            } else {
-                b.root.getTag(R.id.custom_view_holder) as PostAndCommentViewBuilder.CustomViewHolder
-            }
+            val viewHolder = b.root.getTag(R.id.view_holder) as? PostAndCommentViewBuilder.CustomViewHolder
+                ?: run {
+                    val vh = PostAndCommentViewBuilder.CustomViewHolder(
+                        root = b.root,
+                        commentButton = b.commentButton,
+                        controlsDivider = b.controlsDivider
+                    )
+                    b.root.setTag(R.id.view_holder, vh)
+                    postAndCommentViewBuilder.ensureContent(vh)
+                    vh
+                }
 
             b.postInfo.text = buildSpannedString {
                 appendLink(
@@ -156,10 +158,10 @@ class CommentListAdapter(
                     }
                 }
             }
-            postAndCommentViewBuilder.lemmyHeaderHelper
+            postAndCommentViewBuilder
                 .populateHeaderSpan(
                     headerContainer = b.headerContainer,
-                    item = item.commentView,
+                    commentView = item.commentView,
                     instance = item.instance,
                     onPageClick = onPageClick,
                     onLinkLongClick = onLinkLongClick,

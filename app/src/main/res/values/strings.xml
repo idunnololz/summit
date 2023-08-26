@@ -561,6 +561,12 @@
     <string name="show_up_and_down_votes_desc">When enabled, the upvote and downvote counts are shown separately. When disabled, the combined score is shown instead.</string>
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_community">Add community</string>
+    <string name="display_instance_names">Display instance names</string>
+    <string name="display_instance_names_desc">Choose how instance names are displayed</string>
+    <string name="never">Never</string>
+    <string name="only_for_different_instances">Only for different instances</string>
+    <string name="always">Always</string>
+    <string name="classic_but_with_colors">Classic but with colors</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

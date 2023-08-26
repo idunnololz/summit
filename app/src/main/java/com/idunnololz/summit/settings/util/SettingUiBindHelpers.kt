@@ -151,14 +151,14 @@ fun <T> TextOnlySettingItem.bindTo(
 fun RadioGroupSettingItem.bindTo(
     b: SettingTextValueBinding,
     getCurrentValue: () -> Int,
-    onSettingClick: (RadioGroupSettingItem) -> Unit,
+    onSettingClick: (setting: RadioGroupSettingItem, currentValue: Int) -> Unit,
 ) {
     b.title.text = this.title
     b.value.text = this.options.firstOrNull { it.id == getCurrentValue() }?.title
 
     b.root.tag = this
     b.root.setOnClickListener {
-        onSettingClick(this)
+        onSettingClick(this, getCurrentValue())
     }
 }
 

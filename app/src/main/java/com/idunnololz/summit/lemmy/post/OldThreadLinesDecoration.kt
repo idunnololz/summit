@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +12,7 @@ import com.idunnololz.summit.util.Utils
 class OldThreadLinesDecoration(
     private val context: Context,
     private val isCompactView: Boolean,
+    private val colorful: Boolean = false,
 ) : RecyclerView.ItemDecoration() {
 
     private val distanceBetweenLinesUnit =
@@ -24,9 +26,22 @@ class OldThreadLinesDecoration(
             context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw)
         }
 
+    private val lineColors = listOf(
+        Color.parseColor("#D32F2F"),
+        Color.parseColor("#F57C00"),
+        Color.parseColor("#FBC02D"),
+        Color.parseColor("#388E3C"),
+        Color.parseColor("#1976D2"),
+        Color.parseColor("#7B1FA2"),
+    )
+
     private val linePaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.colorThreadLines)
         strokeWidth = Utils.convertDpToPixel(2f)
+    }
+
+    private fun getColorForDepth(depth: Int): Int {
+        return lineColors[depth % lineColors.size]
     }
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -64,6 +79,11 @@ class OldThreadLinesDecoration(
             val totalDepth = threadLinesData.depth - threadLinesData.baseDepth
 
             for (lineIndex in 0 until totalDepth) {
+                if (colorful) {
+                    linePaint.color = getColorForDepth(lineIndex)
+                    linePaint.alpha = (view.alpha * 255).toInt()
+                }
+
                 val indent = view.left + (lineIndex.toFloat()) * distanceBetweenLinesUnit *
                     threadLinesData.indentationPerLevel + startingPadding
                 c.drawLine(
