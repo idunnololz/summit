@@ -152,6 +152,7 @@ object PreferenceUtil {
     const val KEY_OPEN_LINKS_IN_APP = "KEY_OPEN_LINKS_IN_APP"
     const val KEY_AUTO_LINK_PHONE_NUMBERS = "KEY_AUTO_LINK_PHONE_NUMBERS"
     const val KEY_SHOW_UP_AND_DOWN_VOTES = "KEY_SHOW_UP_AND_DOWN_VOTES"
+    const val KEY_DISPLAY_INSTANCE_STYLE = "KEY_DISPLAY_INSTANCE_STYLE"
 
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {

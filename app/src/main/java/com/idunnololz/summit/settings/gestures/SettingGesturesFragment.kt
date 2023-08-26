@@ -86,8 +86,8 @@ class SettingGesturesFragment :
         settings.postGestureAction1.bindTo(
             binding.postGestureAction1,
             { preferences.postGestureAction1 },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
@@ -95,8 +95,8 @@ class SettingGesturesFragment :
         settings.postGestureAction2.bindTo(
             binding.postGestureAction2,
             { preferences.postGestureAction2 },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
@@ -104,8 +104,8 @@ class SettingGesturesFragment :
         settings.postGestureAction3.bindTo(
             binding.postGestureAction3,
             { preferences.postGestureAction3 },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
@@ -120,8 +120,8 @@ class SettingGesturesFragment :
         settings.commentGestureAction1.bindTo(
             binding.commentGestureAction1,
             { preferences.commentGestureAction1 },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
@@ -129,8 +129,8 @@ class SettingGesturesFragment :
         settings.commentGestureAction2.bindTo(
             binding.commentGestureAction2,
             { preferences.commentGestureAction2 },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
@@ -138,8 +138,8 @@ class SettingGesturesFragment :
         settings.commentGestureAction3.bindTo(
             binding.commentGestureAction3,
             { preferences.commentGestureAction3 },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )

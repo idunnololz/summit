@@ -77,6 +77,7 @@ import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
+import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -131,6 +132,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var showUpAndDownVotes: Boolean = preferences.showUpAndDownVotes
     private val selectableItemBackgroundBorderless =
         context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackgroundBorderless)
+    private var displayInstanceStyle = preferences.displayInstanceStyle
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -147,6 +149,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         globalFontSizeMultiplier = GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
         lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
         lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
+        displayInstanceStyle = preferences.displayInstanceStyle
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
@@ -183,14 +186,14 @@ class PostAndCommentViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
-        val viewHolder = if (this.root.tag == null) {
-            val vh = CustomViewHolder(root, commentButton, controlsDivider)
-            this.root.setTag(R.id.custom_view_holder, vh)
-            ensureContent(vh)
-            vh
-        } else {
-            this.root.getTag(R.id.custom_view_holder) as CustomViewHolder
-        }
+        val viewHolder =
+            root.getTag(R.id.view_holder) as? CustomViewHolder
+                ?: run {
+                    val vh = CustomViewHolder(root, commentButton, controlsDivider)
+                    this.root.setTag(R.id.view_holder, vh)
+                    ensureContent(vh)
+                    vh
+                }
 
         scaleTextSizes()
         viewHolder.scaleTextSizes()
@@ -201,6 +204,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             instance = instance,
             onPageClick = onPageClick,
             onLinkLongClick = onLinkLongClick,
+            displayInstanceStyle = displayInstanceStyle,
             listAuthor = true,
         )
 
@@ -449,9 +453,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
         if (showUpAndDownVotes) {
+            binding.headerView.textView3.visibility = View.VISIBLE
+
             binding.upvoteCount = binding.headerView.textView2
             binding.downvoteCount = binding.headerView.textView3
         } else {
+            binding.headerView.textView3.visibility = View.GONE
+
             binding.upvoteCount = null
             binding.downvoteCount = null
         }
@@ -494,10 +502,11 @@ class PostAndCommentViewBuilder @Inject constructor(
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
         lemmyHeaderHelper.populateHeaderSpan(
             headerContainer = headerView,
-            item = commentView,
+            commentView = commentView,
             instance = instance,
             onPageClick = onPageClick,
-            onLinkLongClick = onLinkLongClick
+            onLinkLongClick = onLinkLongClick,
+            displayInstanceStyle = displayInstanceStyle,
         )
 
         if (commentView.comment.deleted || isDeleting) {
@@ -682,12 +691,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
         lemmyHeaderHelper.populateHeaderSpan(
             headerContainer = headerView,
-            item = commentView,
+            commentView = commentView,
             instance = instance,
             onPageClick = onPageClick,
             detailed = true,
             childrenCount = childrenCount,
             onLinkLongClick = onLinkLongClick,
+            displayInstanceStyle = displayInstanceStyle,
         )
 
         expandSectionButton.setOnClickListener {
@@ -1070,7 +1080,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     fun recycle(b: PostHeaderItemBinding): RecycledState {
         val recycledState = lemmyContentHelper.recycleFullContent(b.fullContent)
         offlineManager.cancelFetch(b.root)
-        (b.root.getTag(R.id.custom_view_holder) as? CustomViewHolder)?.upvoteCount?.let {
+        (b.root.getTag(R.id.view_holder) as? CustomViewHolder)?.upvoteCount?.let {
             voteUiHandler.unbindVoteUi(it)
         }
         return recycledState
@@ -1085,6 +1095,23 @@ class PostAndCommentViewBuilder @Inject constructor(
                 viewRecycler.addRecycledView(actionsView, R.layout.comment_actions_view)
             }
         }
+    }
+
+    fun populateHeaderSpan(
+        headerContainer: LemmyHeaderView,
+        commentView: CommentView,
+        instance: String,
+        onPageClick: (PageRef) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
+    ) {
+        lemmyHeaderHelper.populateHeaderSpan(
+            headerContainer,
+            commentView,
+            instance,
+            onPageClick,
+            onLinkLongClick,
+            displayInstanceStyle,
+        )
     }
 
     private fun highlightComment(isCommentHighlighted: Boolean, highlightForever: Boolean, bg: View) {

@@ -12,6 +12,7 @@ import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostInListUiConfig
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
+import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
@@ -38,6 +39,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -455,6 +457,14 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, value)
+                .apply()
+        }
+
+    var displayInstanceStyle: Int
+        get() = prefs.getInt(KEY_DISPLAY_INSTANCE_STYLE, DisplayInstanceOptions.OnlyDisplayNonLocalInstances)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_DISPLAY_INSTANCE_STYLE, value)
                 .apply()
         }
 

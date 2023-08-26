@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 86
-        versionName = "1.6.3"
+        versionCode = 87
+        versionName = "1.6.5"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")

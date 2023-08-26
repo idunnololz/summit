@@ -6,9 +6,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.CommentsThreadStyle
-import com.idunnololz.summit.preferences.FontId
 import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.PostGestureAction
+import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -686,6 +686,12 @@ class PostAndCommentsSettings @Inject constructor(
                 null,
                 null,
             ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentsThreadStyle.LegacyWithColors,
+                context.getString(R.string.classic_but_with_colors),
+                null,
+                null,
+            ),
         ),
     )
 
@@ -1020,6 +1026,31 @@ class MiscSettings @Inject constructor(
         null,
         context.getString(R.string.show_up_and_down_votes),
         context.getString(R.string.show_up_and_down_votes_desc),
+    )
+    val instanceNameStyle = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.display_instance_names),
+        context.getString(R.string.display_instance_names_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                DisplayInstanceOptions.NeverDisplayInstance,
+                context.getString(R.string.never),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                DisplayInstanceOptions.OnlyDisplayNonLocalInstances,
+                context.getString(R.string.only_for_different_instances),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                DisplayInstanceOptions.AlwaysDisplayInstance,
+                context.getString(R.string.always),
+                null,
+                null,
+            ),
+        )
     )
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,

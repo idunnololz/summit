@@ -132,7 +132,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 onImageClick = { view, url ->
                     getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
                 },
-                onPostImageClick = { postOrCommentView, view, url ->
+                onPostImageClick = { _, view, url ->
                     getMainActivity()?.openImage(view, null, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
@@ -410,7 +410,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 }
             },
         ).apply {
-            addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { item, b, h ->
+
+            addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { _, b, _ ->
                 b.loadingView.showProgressBar()
             }
             addItemType(
@@ -418,15 +419,17 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 inflateFn = CommentListCommentItemBinding::inflate,
             ) { item, b, _ ->
                 val post = item.commentView.post
-                val viewHolder = if (b.root.tag == null) {
-                    val vh =
-                        PostAndCommentViewBuilder.CustomViewHolder(b.root, b.commentButton, b.controlsDivider)
-                    b.root.setTag(R.id.custom_view_holder, vh)
-                    postAndCommentViewBuilder.ensureContent(vh)
-                    vh
-                } else {
-                    b.root.getTag(R.id.custom_view_holder) as PostAndCommentViewBuilder.CustomViewHolder
-                }
+                val viewHolder = b.root.getTag(R.id.view_holder) as? PostAndCommentViewBuilder.CustomViewHolder
+                    ?: run {
+                        val vh = PostAndCommentViewBuilder.CustomViewHolder(
+                            root = b.root,
+                            commentButton = b.commentButton,
+                            controlsDivider = b.controlsDivider
+                        )
+                        b.root.setTag(R.id.view_holder, vh)
+                        postAndCommentViewBuilder.ensureContent(vh)
+                        vh
+                    }
 
                 b.postInfo.text = buildSpannedString {
                     appendLink(
@@ -480,10 +483,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         }
                     }
                 }
-                postAndCommentViewBuilder.lemmyHeaderHelper
-                    .populateHeaderSpan(
+                postAndCommentViewBuilder.populateHeaderSpan(
                         headerContainer = b.headerContainer,
-                        item = item.commentView,
+                        commentView = item.commentView,
                         instance = item.instance,
                         onPageClick = onPageClick,
                         onLinkLongClick = onLinkLongClick,
@@ -503,7 +505,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 )
 
                 postAndCommentViewBuilder.voteUiHandler.bind(
-                    requireNotNull(viewLifecycleOwner),
+                    viewLifecycleOwner,
                     item.instance,
                     item.commentView,
                     viewHolder.upvoteButton,
@@ -552,7 +554,11 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 }
             }
             addItemType(Item.PostItem::class, SearchResultPostItemBinding::inflate) { item, b, h ->
-                val h: ListingItemViewHolder = ListingItemViewHolder.fromBinding(b)
+                val h = b.root.getTag(R.id.view_holder) as? ListingItemViewHolder ?: run {
+                    ListingItemViewHolder.fromBinding(b).also {
+                        b.root.setTag(R.id.view_holder, it)
+                    }
+                }
                 val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
                 val isActionsExpanded = true
                 val isExpanded = false
@@ -567,7 +573,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     isRevealed = isRevealed,
                     contentMaxWidth = contentMaxWidth,
                     contentPreferredHeight = contentPreferredHeight,
-                    viewLifecycleOwner = requireNotNull(viewLifecycleOwner),
+                    viewLifecycleOwner = viewLifecycleOwner,
                     isExpanded = isExpanded,
                     isActionsExpanded = isActionsExpanded,
                     alwaysRenderAsUnread = alwaysRenderAsUnread,
@@ -593,7 +599,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkLongClick = onLinkLongClick,
                 )
             }
-            addItemType(Item.UserItem::class, UserItemBinding::inflate) { item, b, h ->
+            addItemType(Item.UserItem::class, UserItemBinding::inflate) { item, b, _ ->
                 val person = item.personView.person
                 b.icon.load(person.avatar)
                 b.name.text = person.name
@@ -603,7 +609,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onPageClick(PersonRef.PersonRefByName(person.name, person.instance))
                 }
             }
-            addItemType(Item.ErrorItem::class, LoadingViewItemBinding::inflate) { item, b, h ->
+            addItemType(Item.ErrorItem::class, LoadingViewItemBinding::inflate) { item, b, _ ->
                 b.loadingView.showDefaultErrorMessageFor(item.error)
                 b.loadingView.setOnRefreshClickListener {
                     onLoadPage(item.pageToLoad)

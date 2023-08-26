@@ -18,6 +18,7 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.ThemeSettings
+import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.settings.util.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
@@ -130,8 +131,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
             settings.colorScheme.bindTo(
                 binding.colorScheme,
                 { preferences.colorScheme },
-                {
-                    ColorSchemePickerDialogFragment()
+                { setting, currentValue ->
+                    MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                         .show(childFragmentManager, "asdaa")
                 },
             )
@@ -151,8 +152,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
             settings.font.bindTo(
                 binding.font,
                 { preferences.globalFont },
-                onSettingClick = {
-                    FontPickerDialogFragment()
+                { setting, currentValue ->
+                    MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                         .show(childFragmentManager, "FontPickerDialogFragment")
                 },
             )

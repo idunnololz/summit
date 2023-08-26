@@ -109,6 +109,9 @@
     <item name="report_post" type="id" />
     <item name="report_comment" type="id" />
     <item name="switch_account_temp" type="id" />
-    <item name="custom_view_holder" type="id" />
     <item name="add_community" type="id" />
+    <item name="instance_name_display_never" type="id" />
+    <item name="instance_name_display_different_instance" type="id" />
+    <item name="instance_name_display_always" type="id" />
+    <item name="view_holder" type="id" />
 </resources>

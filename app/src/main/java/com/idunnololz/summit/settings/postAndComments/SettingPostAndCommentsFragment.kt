@@ -208,8 +208,8 @@ class SettingPostAndCommentsFragment :
         settings.commentsThreadStyle.bindTo(
             binding.commentThreadStyle,
             { viewModel.preferences.commentThreadStyle },
-            {
-                MultipleChoiceDialogFragment.newInstance(it)
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )

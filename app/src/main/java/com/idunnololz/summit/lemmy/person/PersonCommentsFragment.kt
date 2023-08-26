@@ -216,6 +216,12 @@ class PersonCommentsFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        postAndCommentViewBuilder.onPreferencesChanged()
+    }
+
     private fun setupView() {
         if (!isBindingAvailable()) return
 
