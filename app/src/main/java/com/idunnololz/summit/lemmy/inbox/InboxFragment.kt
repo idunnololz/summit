@@ -38,6 +38,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomDividerItemDecoration
@@ -46,6 +47,7 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -386,6 +388,9 @@ class InboxFragment :
             onImageClick = { url ->
                 getMainActivity()?.openImage(null, binding.appBar, null, url, null)
             },
+            onVideoClick = { url, videoType, state ->
+                getMainActivity()?.openVideo(url, videoType, state)
+            },
             onMarkAsRead = { inboxItem, read ->
                 markAsRead(inboxItem, read)
             },
@@ -501,6 +506,7 @@ class InboxFragment :
         private val instance: String,
         private val lifecycleOwner: LifecycleOwner,
         private val onImageClick: (String) -> Unit,
+        private val onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         private val onMarkAsRead: (InboxItem, Boolean) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onMessageClick: (InboxItem) -> Unit,
@@ -540,6 +546,7 @@ class InboxFragment :
                     viewLifecycleOwner = lifecycleOwner,
                     item = item.inboxItem,
                     onImageClick = onImageClick,
+                    onVideoClick = onVideoClick,
                     onMarkAsRead = onMarkAsRead,
                     onPageClick = onPageClick,
                     onMessageClick = onMessageClick,

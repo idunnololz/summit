@@ -132,7 +132,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 binding.colorScheme,
                 { preferences.colorScheme },
                 { setting, currentValue ->
-                    MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    ColorSchemePickerDialogFragment()
                         .show(childFragmentManager, "asdaa")
                 },
             )
@@ -153,7 +153,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 binding.font,
                 { preferences.globalFont },
                 { setting, currentValue ->
-                    MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    FontPickerDialogFragment()
                         .show(childFragmentManager, "FontPickerDialogFragment")
                 },
             )

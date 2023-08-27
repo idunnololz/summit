@@ -115,6 +115,8 @@
     <string name="local">Local</string>
     <string name="deleted_special">[deleted]</string>
     <string name="removed_special">[removed]</string>
+    <string name="deleted_special2">[deleted]</string>
+    <string name="removed_special2">[removed]</string>
     <string name="error_server">Server error. Code: %1$s.</string>
     <string name="login">Login</string>
     <string name="instance">Instance</string>
@@ -567,6 +569,10 @@
     <string name="only_for_different_instances">Only for different instances</string>
     <string name="always">Always</string>
     <string name="classic_but_with_colors">Classic but with colors</string>
+    <string name="find_in_page">Find in page</string>
+    <string name="choose_a_font">Choose a font</string>
+
+    <string name="font_sample_text">The quick brown fox jumped over the lazy dog.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

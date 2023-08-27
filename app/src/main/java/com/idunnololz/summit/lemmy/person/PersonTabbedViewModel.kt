@@ -145,7 +145,9 @@ class PersonTabbedViewModel @Inject constructor(
                                 error = PostLoadError(
                                     errorCode = 0,
                                     errorMessage = it.toErrorMessage(context),
+
                                     isRetryable = true,
+                                    isLoading = false,
                                 ),
                             ),
                         )

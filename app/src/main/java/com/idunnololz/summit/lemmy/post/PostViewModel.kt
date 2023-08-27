@@ -37,6 +37,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -75,6 +77,11 @@ class PostViewModel @Inject constructor(
     val onPostOrCommentRefChange = MutableLiveData<Either<PostRef, CommentRef>>()
 
     val currentAccountView = MutableLiveData<AccountView?>()
+
+    val findInPageVisible = MutableLiveData<Boolean>(false)
+    val findInPageQuery = MutableLiveData<String>("")
+    private val findInPageQueryFlow = MutableStateFlow<String>("")
+
     private var postView: PostView? = null
     private var comments: List<CommentView>? = null
     private var pendingComments: List<PendingCommentView>? = null
@@ -131,6 +138,13 @@ class PostViewModel @Inject constructor(
                     }
                 }
             }
+        }
+        viewModelScope.launch {
+            findInPageQueryFlow
+                .debounce(300)
+                .collect {
+                    findInPageQuery.postValue(it)
+                }
         }
     }
 
@@ -583,6 +597,12 @@ class PostViewModel @Inject constructor(
             )
         } else {
             commentNavControlsState.value = null
+        }
+    }
+
+    fun setFindInPageQuery(query: String) {
+        viewModelScope.launch {
+            findInPageQueryFlow.emit(query)
         }
     }
 

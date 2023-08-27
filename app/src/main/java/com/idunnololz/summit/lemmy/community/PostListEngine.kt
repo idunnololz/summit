@@ -29,7 +29,7 @@ sealed class Item {
 
     data class AutoLoadItem(val pageToLoad: Int) : Item()
 
-    data class ErrorItem(val message: String, val pageToLoad: Int) : Item()
+    data class ErrorItem(val message: String, val pageToLoad: Int, val isLoading: Boolean) : Item()
 
     data class PersistentErrorItem(val exception: Exception) : Item()
 
@@ -146,7 +146,11 @@ class PostListEngine(
         }
         for (page in pages) {
             if (page.error != null) {
-                items.add(Item.ErrorItem(page.error.errorMessage, page.pageIndex))
+                items.add(Item.ErrorItem(
+                    message = page.error.errorMessage,
+                    pageToLoad = page.pageIndex,
+                    isLoading = page.error.isLoading
+                ))
             } else {
                 page.posts
                     .mapTo(items) {
@@ -353,5 +357,15 @@ class PostListEngine(
             }
         }
         _pages.value = pages
+    }
+
+    fun setPageItemLoading(pageToLoad: Int) {
+        _pages.value?.find { it.pageIndex == pageToLoad }?.let {
+            if (it.error != null && !it.error.isLoading) {
+                it.error.isLoading = true
+
+                createItems()
+            }
+        }
     }
 }

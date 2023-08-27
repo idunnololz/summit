@@ -176,6 +176,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         viewLifecycleOwner: LifecycleOwner,
         videoState: VideoState?,
         updateContent: Boolean,
+        queryHighlight: String?,
         onRevealContentClickedFn: () -> Unit,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
@@ -212,6 +213,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             title,
             postView.post.name,
             instance,
+            queryHighlight = queryHighlight,
             onImageClick = {
                 onImageClick(Either.Left(postView), null, it)
             },
@@ -252,6 +254,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             fullContentContainerView = fullContent,
             lazyUpdate = !updateContent,
             videoState = videoState,
+            queryHighlight = queryHighlight,
             onFullImageViewClickListener = { view, url ->
                 onImageClick(Either.Left(postView), view, url)
             },
@@ -441,6 +444,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightForever: Boolean,
         viewLifecycleOwner: LifecycleOwner,
         isActionsExpanded: Boolean,
+        queryHighlight: String?,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
@@ -510,20 +514,41 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
 
         if (commentView.comment.deleted || isDeleting) {
-            text.text = buildSpannedString {
-                append(context.getString(R.string.deleted_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
-            }
+            LemmyTextHelper.bindText(
+                textView = text,
+                text = context.getString(R.string.deleted_special2),
+                instance = instance,
+                queryHighlight = queryHighlight,
+                onImageClick = {
+                    onImageClick(Either.Right(commentView), null, it)
+                },
+                onVideoClick = { url ->
+                    onVideoClick(url, VideoType.UNKNOWN, null)
+                },
+                onPageClick = onPageClick,
+                onLinkLongClick = onLinkLongClick,
+            )
         } else if (commentView.comment.removed || isRemoved) {
-            text.text = buildSpannedString {
-                append(context.getString(R.string.removed_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
-            }
+            LemmyTextHelper.bindText(
+                textView = text,
+                text = context.getString(R.string.removed_special2),
+                instance = instance,
+                queryHighlight = queryHighlight,
+                onImageClick = {
+                    onImageClick(Either.Right(commentView), null, it)
+                },
+                onVideoClick = { url ->
+                    onVideoClick(url, VideoType.UNKNOWN, null)
+                },
+                onPageClick = onPageClick,
+                onLinkLongClick = onLinkLongClick,
+            )
         } else {
             LemmyTextHelper.bindText(
                 textView = text,
                 text = content,
                 instance = instance,
+                queryHighlight = queryHighlight,
                 onImageClick = {
                     onImageClick(Either.Right(commentView), null, it)
                 },
@@ -826,6 +851,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         accountId: PersonId?,
         item: InboxItem,
         onImageClick: (String) -> Unit,
+        onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onMarkAsRead: (InboxItem, Boolean) -> Unit,
         onMessageClick: (InboxItem) -> Unit,
@@ -879,53 +905,59 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
         }
 
-        if (item is CommentBackedItem) {
-            val scoreDrawable = context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)
-            scoreDrawable?.setBounds(
-                0,
-                0,
-                Utils.convertDpToPixel(16f).toInt(),
-                Utils.convertDpToPixel(16f).toInt(),
-            )
-            b.score.setCompoundDrawablesRelative(
-                scoreDrawable,
-                null,
-                null,
-                null,
-            )
-            b.score.text = LemmyUtils.abbrevNumber(item.score.toLong())
-            b.score.visibility = View.VISIBLE
+        when (item) {
+            is CommentBackedItem -> {
+                val scoreDrawable = context.getDrawableCompat(R.drawable.baseline_arrow_upward_24)
+                scoreDrawable?.setBounds(
+                    0,
+                    0,
+                    Utils.convertDpToPixel(16f).toInt(),
+                    Utils.convertDpToPixel(16f).toInt(),
+                )
+                b.score.setCompoundDrawablesRelative(
+                    scoreDrawable,
+                    null,
+                    null,
+                    null,
+                )
+                b.score.text = LemmyUtils.abbrevNumber(item.score.toLong())
+                b.score.visibility = View.VISIBLE
 
-            voteUiHandler.bind(
-                viewLifecycleOwner,
-                instance,
-                item,
-                upvoteButton,
-                downvoteButton,
-                b.score,
-                null,
-                null,
-                null,
-                onSignInRequired,
-                onInstanceMismatch,
-            )
-            upvoteButton.isEnabled = true
-            downvoteButton.isEnabled = true
-            b.reply.isEnabled = true
-        } else if (item is ReportItem) {
-            voteUiHandler.unbindVoteUi(b.score)
-            b.score.visibility = View.GONE
+                voteUiHandler.bind(
+                    viewLifecycleOwner,
+                    instance,
+                    item,
+                    upvoteButton,
+                    downvoteButton,
+                    b.score,
+                    null,
+                    null,
+                    null,
+                    onSignInRequired,
+                    onInstanceMismatch,
+                )
+                upvoteButton.isEnabled = true
+                downvoteButton.isEnabled = true
+                b.reply.isEnabled = true
+            }
 
-            upvoteButton.isEnabled = false
-            downvoteButton.isEnabled = false
-            b.reply.isEnabled = false
-        } else {
-            voteUiHandler.unbindVoteUi(b.score)
-            b.score.visibility = View.GONE
+            is ReportItem -> {
+                voteUiHandler.unbindVoteUi(b.score)
+                b.score.visibility = View.GONE
 
-            upvoteButton.isEnabled = false
-            downvoteButton.isEnabled = false
-            b.reply.isEnabled = true
+                upvoteButton.isEnabled = false
+                downvoteButton.isEnabled = false
+                b.reply.isEnabled = false
+            }
+
+            else -> {
+                voteUiHandler.unbindVoteUi(b.score)
+                b.score.visibility = View.GONE
+
+                upvoteButton.isEnabled = false
+                downvoteButton.isEnabled = false
+                b.reply.isEnabled = true
+            }
         }
 
         val drawable = when (item) {
@@ -977,18 +1009,30 @@ class PostAndCommentViewBuilder @Inject constructor(
         b.date.text = dateStringToPretty(context, item.lastUpdate)
         b.title.text = item.title
 
-        b.content.text = if (item.isDeleted) {
-            buildSpannedString {
+        if (item.isDeleted) {
+            b.content.text = buildSpannedString {
                 append(context.getString(R.string.deleted_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
             }
         } else if (item.isRemoved) {
-            buildSpannedString {
+            b.content.text = buildSpannedString {
                 append(context.getString(R.string.removed_special))
                 setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
             }
         } else {
-            item.content
+            LemmyTextHelper.bindText(
+                textView = b.content,
+                text = item.content,
+                instance = instance,
+                onImageClick = {
+                    onImageClick(it)
+                },
+                onVideoClick = { url ->
+                    onVideoClick(url, VideoType.UNKNOWN, null)
+                },
+                onPageClick = onPageClick,
+                onLinkLongClick = onLinkLongClick,
+            )
         }
 
         if (item.isRead) {

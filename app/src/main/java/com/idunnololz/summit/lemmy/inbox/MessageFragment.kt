@@ -402,7 +402,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 revealAll = false,
                 useFooter = false,
                 isEmbedded = true,
-                currentAccountId = viewModel.accountManager.currentAccount.value?.id,
                 videoState = null,
                 onRefreshClickCb = {
                     loadContext(force = true)

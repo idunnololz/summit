@@ -114,4 +114,5 @@
     <item name="instance_name_display_different_instance" type="id" />
     <item name="instance_name_display_always" type="id" />
     <item name="view_holder" type="id" />
+    <item name="find_in_page" type="id" />
 </resources>

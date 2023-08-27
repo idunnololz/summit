@@ -88,7 +88,10 @@ class FontPickerDialogFragment :
                 inflateFn = FontItemBinding::inflate,
             ) { item, b, h ->
                 b.title.text = item.name
+                b.sampleText.text = context.getString(R.string.font_sample_text)
+
                 CalligraphyUtils.applyFontToTextView(context, b.title, item.fontId.toFontAsset())
+                CalligraphyUtils.applyFontToTextView(context, b.sampleText, item.fontId.toFontAsset())
 
                 b.root.setOnClickListener {
                     onFontSelected(item.fontId)
