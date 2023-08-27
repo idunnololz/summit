@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.util.query
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
@@ -39,6 +41,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.count
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
@@ -56,7 +59,6 @@ class PostsAdapter(
      * Set this to true if this adapter is used for an embedded view.
      */
     private val isEmbedded: Boolean,
-    private val currentAccountId: Int?,
     private val videoState: VideoState?,
     private val onRefreshClickCb: () -> Unit,
     private val onSignInRequired: () -> Unit,
@@ -80,6 +82,7 @@ class PostsAdapter(
             val postView: PostView,
             var videoState: VideoState?,
             val showBottomDivider: Boolean,
+            val query: String?,
         ) : Item(postView.getUniqueKey())
 
         data class CommentItem(
@@ -98,6 +101,7 @@ class PostsAdapter(
             val isRemoved: Boolean,
             val isActionsExpanded: Boolean,
             val isHighlighted: Boolean,
+            val query: String?,
         ) : Item(
             "comment_${comment.comment.id}",
         )
@@ -112,6 +116,7 @@ class PostsAdapter(
             val isPending: Boolean,
             val view: PostViewModel.ListView.PendingCommentListView,
             val childrenCount: Int,
+            val query: String?,
         ) : Item(
             "pending_comment_${view.pendingCommentView.id}",
         )
@@ -141,7 +146,7 @@ class PostsAdapter(
             val postId: PostId,
         ) : Item("view_all_yo")
 
-        object FooterItem : Item("footer")
+        data object FooterItem : Item("footer")
     }
 
     private val inflater = LayoutInflater.from(context)
@@ -164,6 +169,8 @@ class PostsAdapter(
 
     private var topLevelCommentIndices = listOf<Int>()
     private var absolutionPositionToTopLevelCommentPosition = listOf<Int>()
+
+    private var query: String? = null
 
     var isLoaded: Boolean = false
     var error: Throwable? = null
@@ -318,6 +325,7 @@ class PostsAdapter(
                         viewLifecycleOwner = lifecycleOwner,
                         videoState = item.videoState,
                         updateContent = false,
+                        queryHighlight = item.query,
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
                             notifyItemChanged(holder.absoluteAdapterPosition)
@@ -362,6 +370,7 @@ class PostsAdapter(
                     viewLifecycleOwner = lifecycleOwner,
                     videoState = item.videoState,
                     updateContent = true,
+                    queryHighlight = item.query,
                     onRevealContentClickedFn = {
                         revealedItems.add(postKey)
                         notifyItemChanged(holder.absoluteAdapterPosition)
@@ -389,35 +398,36 @@ class PostsAdapter(
                     val highlightForever = highlightedCommentForever == item.commentId
 
                     postAndCommentViewBuilder.bindCommentViewExpanded(
-                        holder,
-                        b,
-                        item.baseDepth,
-                        item.depth,
-                        item.comment,
-                        item.isDeleting,
-                        item.isRemoved,
-                        item.content,
-                        instance,
-                        item.isPostLocked,
-                        item.isUpdating,
-                        highlight,
-                        highlightForever,
-                        lifecycleOwner,
-                        item.isActionsExpanded,
-                        onImageClick,
-                        onVideoClick,
-                        onPageClick,
-                        {
+                        h = holder,
+                        binding = b,
+                        baseDepth = item.baseDepth,
+                        depth = item.depth,
+                        commentView = item.comment,
+                        isDeleting = item.isDeleting,
+                        isRemoved = item.isRemoved,
+                        content = item.content,
+                        instance = instance,
+                        isPostLocked = item.isPostLocked,
+                        isUpdating = item.isUpdating,
+                        highlight = highlight,
+                        highlightForever = highlightForever,
+                        viewLifecycleOwner = lifecycleOwner,
+                        isActionsExpanded = item.isActionsExpanded,
+                        onImageClick = onImageClick,
+                        onVideoClick = onVideoClick,
+                        onPageClick = onPageClick,
+                        queryHighlight = item.query,
+                        collapseSection = {
                             collapseSection(holder.bindingAdapterPosition)
                         },
-                        {
+                        toggleActionsExpanded = {
                             toggleActions(item.comment.comment.id)
                         },
-                        onAddCommentClick,
-                        onCommentMoreClick,
+                        onAddCommentClick = onAddCommentClick,
+                        onCommentMoreClick = onCommentMoreClick,
                         onLinkLongClick = onLinkLongClick,
-                        onSignInRequired,
-                        onInstanceMismatch,
+                        onSignInRequired = onSignInRequired,
+                        onInstanceMismatch = onInstanceMismatch,
                     )
                 } else {
                     // collapsed
@@ -556,9 +566,10 @@ class PostsAdapter(
      * @param refreshHeader Pass false to not always refresh header. Useful for web view headers
      * as refreshing them might cause a relayout causing janky animations
      */
-    private fun refreshItems(refreshHeader: Boolean = true) {
+    private fun refreshItems(refreshHeader: Boolean = true, cb: () -> Unit = {}) {
         val rawData = rawData
         val oldItems = items
+        val query = query
 
         val topLevelCommentIndices = mutableListOf<Int>()
         val absolutionPositionToTopLevelCommentPosition = mutableListOf<Int>()
@@ -571,8 +582,13 @@ class PostsAdapter(
 
                 val postView = rawData.postView
                 val commentItems = rawData.commentTree.flatten()
-                finalItems += HeaderItem(postView.post, videoState,
-                    showBottomDivider = !isEmbedded || commentItems.isNotEmpty())
+                finalItems += HeaderItem(
+                    postView = postView.post,
+                    videoState = videoState,
+                    showBottomDivider = !isEmbedded || commentItems.isNotEmpty(),
+                    query = query,
+                )
+
                 absolutionPositionToTopLevelCommentPosition += -1
 
                 if (rawData.isSingleComment) {
@@ -616,6 +632,7 @@ class PostsAdapter(
                                     commentId,
                                 ),
                                 isHighlighted = rawData.selectedCommentId == commentId,
+                                query = query,
                             )
                             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
@@ -634,6 +651,7 @@ class PostsAdapter(
                                 isPending = false,
                                 view = commentView,
                                 childrenCount = commentItem.children.size,
+                                query = query,
                             )
                             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
@@ -682,7 +700,12 @@ class PostsAdapter(
             } else {
                 val finalItems = mutableListOf<Item>()
                 rawData?.postView?.let {
-                    finalItems += HeaderItem(it.post, videoState, showBottomDivider = true)
+                    finalItems += HeaderItem(
+                        postView = it.post,
+                        videoState = videoState,
+                        showBottomDivider = true,
+                        query = query,
+                    )
                 }
                 finalItems += ProgressOrErrorItem(error)
 
@@ -721,6 +744,8 @@ class PostsAdapter(
 
         this.topLevelCommentIndices = topLevelCommentIndices
         this.absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
+
+        cb()
     }
 
     fun getPositionOfComment(commentId: CommentId): Int =
@@ -850,4 +875,74 @@ class PostsAdapter(
 
         refreshItems(refreshHeader = false)
     }
+
+    fun setQuery(query: String?, cb: (List<QueryResult>) -> Unit) {
+        val realQuery = if (query.isNullOrBlank()) {
+            null
+        } else {
+            query
+        }
+
+        if (realQuery == this.query) {
+            return
+        }
+
+        this.query = realQuery
+
+        val occurrences = mutableListOf<QueryResult>()
+
+        fun count(s: String?, query: String, cb: (count: Int) -> Unit) {
+            s ?: return
+
+            var count = 0
+            val queryLength = query.length
+
+            // Check if the string contains the element at all
+            var lastIndex = s.indexOf(query, 0)
+            while (lastIndex >= 0) {
+                cb(count)
+
+                count += 1
+
+                // Find the next occurrence
+                lastIndex = s.indexOf(query, lastIndex + queryLength)
+            }
+        }
+
+        refreshItems(refreshHeader = true) {
+            val finalQuery = this.query ?: return@refreshItems
+
+            items.forEach { item ->
+                when (item) {
+                    is CommentItem -> {
+                        count(item.comment.comment.content, finalQuery) {
+                            occurrences.add(QueryResult(item.commentId, it))
+                        }
+                    }
+                    FooterItem -> {}
+                    is HeaderItem -> {
+                        count(item.postView.post.name, finalQuery) {
+                            occurrences.add(QueryResult(item.postView.post.id, it))
+                        }
+                        count(item.postView.post.body, finalQuery) {
+                            occurrences.add(QueryResult(item.postView.post.id, it))
+                        }
+                    }
+                    is Item.MissingCommentItem -> {}
+                    is MoreCommentsItem -> {}
+                    is PendingCommentItem -> {}
+                    is ProgressOrErrorItem -> {}
+                    is Item.ViewAllComments -> {}
+                }
+            }
+
+            cb(occurrences)
+        }
+    }
+
+    data class QueryResult(
+        val targetId: Int,
+        val count: Int,
+
+    )
 }

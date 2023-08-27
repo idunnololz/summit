@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.doOnPreDraw
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -147,8 +148,6 @@ class PostFragment :
             viewModel.updatePostOrCommentRef(args.postOrCommentRef())
         }
 
-        PreferenceUtil.preferences.edit().remove(PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_Y).apply()
-
         sharedElementEnterTransition = SharedElementTransition()
         sharedElementReturnTransition = SharedElementTransition()
 
@@ -198,6 +197,11 @@ class PostFragment :
                     this,
                     object : OnBackPressedCallback(true) {
                         override fun handleOnBackPressed() {
+                            if (viewModel.findInPageVisible.value == true) {
+                                viewModel.findInPageVisible.value = false
+                                return
+                            }
+
                             goBack()
                         }
                     },
@@ -239,6 +243,10 @@ class PostFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireMainActivity().apply {
+            insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.findInPageToolbar)
+        }
+
         val context = requireContext()
         if (adapter == null) {
             adapter = PostsAdapter(
@@ -250,7 +258,6 @@ class PostFragment :
                 args.reveal,
                 useFooter = false,
                 isEmbedded = false,
-                accountManager.currentAccount.value?.id,
                 args.videoState,
                 onRefreshClickCb = {
                     forceRefresh()
@@ -403,6 +410,9 @@ class PostFragment :
                         onRefreshClick = {
                             viewModel.fetchPostData(force = true)
                         },
+                        onFindInPageClick = {
+                            viewModel.findInPageVisible.value = true
+                        }
                     )
                 }
             }
@@ -510,6 +520,23 @@ class PostFragment :
         viewModel.onPostOrCommentRefChange.observe(viewLifecycleOwner) {
             adapter?.instance = getInstance()
             actionsViewModel.setPageInstance(getInstance())
+        }
+
+        binding.searchEditText.addTextChangedListener {
+            viewModel.setFindInPageQuery(it?.toString() ?: "")
+        }
+        viewModel.findInPageVisible.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.findInPageToolbar.visibility = View.VISIBLE
+            } else {
+                binding.findInPageToolbar.visibility = View.GONE
+                viewModel.findInPageQuery.value = ""
+            }
+        }
+        viewModel.findInPageQuery.observe(viewLifecycleOwner) {
+            adapter?.setQuery(it) {
+                binding.searchInputLayout
+            }
         }
     }
 
@@ -841,6 +868,8 @@ class PostFragment :
 
             attachGestureHandlerToRecyclerViewIfNeeded()
         }
+
+        postAndCommentViewBuilder.onPreferencesChanged()
     }
 
     override fun onPause() {

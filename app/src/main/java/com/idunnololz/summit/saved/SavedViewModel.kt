@@ -170,6 +170,7 @@ class SavedViewModel @Inject constructor(
                                     errorCode = 0,
                                     errorMessage = it.toErrorMessage(context),
                                     isRetryable = true,
+                                    isLoading = false,
                                 ),
                             ),
                         )

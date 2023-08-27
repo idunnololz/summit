@@ -291,9 +291,16 @@ class ListingItemAdapter(
             Item.EndItem -> {}
             is Item.ErrorItem -> {
                 val b = holder.getBinding<LoadingViewItemBinding>()
-                b.loadingView.showErrorWithRetry(item.message)
+                if (item.isLoading) {
+                    b.loadingView.showProgressBar()
+                } else {
+                    b.loadingView.showErrorWithRetry(item.message)
+                }
+
                 b.loadingView.setOnRefreshClickListener {
+                    postListEngine.setPageItemLoading(item.pageToLoad)
                     onLoadPage(item.pageToLoad)
+                    onItemsChanged()
                 }
             }
 

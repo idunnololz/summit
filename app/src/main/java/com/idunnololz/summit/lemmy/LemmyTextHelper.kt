@@ -2,7 +2,10 @@ package com.idunnololz.summit.lemmy
 
 import android.content.Context
 import android.graphics.RectF
+import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView
@@ -15,6 +18,7 @@ import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.markwon.DetailsTagHandler
 import com.idunnololz.summit.util.markwon.postProcessDetails
 import io.noties.markwon.AbstractMarkwonPlugin
@@ -43,13 +47,14 @@ object LemmyTextHelper {
         textView: TextView,
         text: String,
         instance: String,
+        queryHighlight: String? = null,
 
         onImageClick: (url: String) -> Unit,
         onVideoClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
-        bindLemmyText(textView, text, instance)
+        bindLemmyText(textView, text, instance, queryHighlight)
         textView.movementMethod = CustomLinkMovementMethod().apply {
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
@@ -77,10 +82,29 @@ object LemmyTextHelper {
         }
     }
 
-    private fun bindLemmyText(textView: TextView, text: String, instance: String) {
+    private fun bindLemmyText(textView: TextView, text: String, instance: String, queryHighlight: String?) {
         getMarkwon(textView.context).let {
             val spanned = SpannableStringBuilder(it.toMarkdown(text))
             postProcessDetails(spanned, textView)
+
+            if (queryHighlight != null) {
+                val highlightColor = textView.context.getColorFromAttribute(
+                    androidx.appcompat.R.attr.colorPrimary)
+                val queryLength = queryHighlight.length
+                var curStartIndex = 0
+                while (true) {
+                    val index = spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
+
+                    if (index < 0) {
+                        break
+                    }
+
+                    spanned.setSpan(
+                        BackgroundColorSpan(highlightColor), index, index + queryLength,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    curStartIndex = index + queryLength
+                }
+            }
 
             it.setParsedMarkdown(textView, spanned)
         }

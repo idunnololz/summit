@@ -22,4 +22,5 @@ data class PostLoadError(
     val errorCode: Int,
     val errorMessage: String,
     val isRetryable: Boolean,
+    var isLoading: Boolean,
 ) : Parcelable

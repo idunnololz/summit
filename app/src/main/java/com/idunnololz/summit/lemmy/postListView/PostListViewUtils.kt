@@ -32,6 +32,7 @@ fun BaseFragment<*>.showMorePostOptions(
     isPostMenu: Boolean = false,
     onSortOrderClick: () -> Unit = {},
     onRefreshClick: () -> Unit = {},
+    onFindInPageClick: () -> Unit = {},
 ) {
     if (!isBindingAvailable()) {
         return
@@ -60,6 +61,11 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.string.refresh,
                 R.drawable.baseline_refresh_24
             )
+//            addItemWithIcon(
+//                R.id.find_in_page,
+//                R.string.find_in_page,
+//                R.drawable.outline_find_in_page_24
+//            )
             addDivider()
         }
 
@@ -264,6 +270,9 @@ fun BaseFragment<*>.showMorePostOptions(
                 }
                 R.id.refresh -> {
                     onRefreshClick()
+                }
+                R.id.find_in_page -> {
+                    onFindInPageClick()
                 }
             }
         }

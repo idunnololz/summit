@@ -92,6 +92,7 @@ class LemmyContentHelper(
         lazyUpdate: Boolean = false,
         videoState: VideoState? = null,
         contentMaxLines: Int = -1,
+        queryHighlight: String? = null,
 
         onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
@@ -565,6 +566,7 @@ class LemmyContentHelper(
                     textView = bodyTextView,
                     text = content,
                     instance = instance,
+                    queryHighlight = queryHighlight,
                     onImageClick = onImageClickListener,
                     onVideoClick = {
                         onVideoClickListener(it, VideoType.UNKNOWN, null)

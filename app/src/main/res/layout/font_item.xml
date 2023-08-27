@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?selectableItemBackground"
     android:paddingHorizontal="@dimen/dialog_padding"
-    android:paddingVertical="@dimen/padding_half">
+    android:paddingVertical="@dimen/padding">
 
     <TextView
         android:id="@+id/title"
@@ -15,5 +15,15 @@
         android:textAppearance="?textAppearanceTitleMedium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/sampleText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:layout_marginTop="@dimen/padding_half"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -101,4 +101,52 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>
     </FrameLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/find_in_page_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?backgroundColor"
+        android:visibility="gone"
+        app:navigationIconTint="?colorControlNormal">
+
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:background="?colorSurface"/>-->
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/search_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:layout_marginVertical="@dimen/padding_half"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:hintEnabled="false"
+            app:startIconDrawable="@drawable/baseline_search_18"
+            app:startIconMinSize="48dp"
+            app:endIconMinSize="48dp"
+            app:endIconMode="clear_text"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/search_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="no"
+                android:background="@null"
+                android:paddingHorizontal="@dimen/padding"
+                android:paddingVertical="@dimen/padding_half"
+                android:textIsSelectable="true"
+                android:scrollbars="vertical"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:hint="@string/search"
+                android:imeOptions="actionSearch"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
