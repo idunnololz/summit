@@ -357,8 +357,10 @@ class SearchTabbedFragment :
             binding.searchContainer.animate()
                 .alpha(0f)
                 .withEndAction {
-                    binding.searchContainer.visibility = View.GONE
-                    binding.searchContainer.alpha = 1f
+                    if (isBindingAvailable()) {
+                        binding.searchContainer.visibility = View.GONE
+                        binding.searchContainer.alpha = 1f
+                    }
                 }
         } else {
             binding.searchContainer.visibility = View.GONE

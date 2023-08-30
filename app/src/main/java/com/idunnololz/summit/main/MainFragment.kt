@@ -243,7 +243,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                             }
                         }
                     },
-                    300,
+                    200,
                 )
             },
             onEditMultiCommunity = {

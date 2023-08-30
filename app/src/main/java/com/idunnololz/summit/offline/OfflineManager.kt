@@ -25,6 +25,7 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import org.threeten.bp.Duration
+import java.io.EOFException
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -111,6 +112,7 @@ class OfflineManager @Inject constructor(
     }
 
     fun fetchImageWithError(rootView: View, url: String?, listener: TaskListener, errorListener: TaskFailedListener?) {
+        Log.d(TAG, "fetchImageWithError(): $url")
         url ?: return
         val registrations: MutableList<Registration> = (
             rootView.getTag(
@@ -349,7 +351,12 @@ class OfflineManager @Inject constructor(
                 } else if (response.code >= 500) {
                     Result.failure(ServerApiException(response.code))
                 } else {
-                    Result.failure(ClientApiException("${response.message} url: $url", response.code))
+                    Result.failure(
+                        ClientApiException(
+                            "${response.message} url: $url",
+                            response.code
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 Result.failure(e)

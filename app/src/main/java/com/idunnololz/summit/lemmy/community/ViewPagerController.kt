@@ -90,11 +90,16 @@ class ViewPagerController(
                             val postFragment = childFragmentManager
                                 .findFragmentById(R.id.post_fragment_container)
                             if (postFragment != null) {
+                                childFragmentManager.commit(allowStateLoss = true) {
+                                    if (retainClosedPosts) {
+                                        detach(postFragment)
+                                    } else {
+                                        remove(postFragment)
+                                    }
+                                }
+
                                 if (retainClosedPosts) {
                                     lastPostFragment = postFragment as? PostFragment
-                                }
-                                childFragmentManager.commit(allowStateLoss = true) {
-                                    remove(postFragment)
                                 }
                             }
                             fragment.getMainActivity()?.setNavUiOpenness(0f)
@@ -138,14 +143,21 @@ class ViewPagerController(
         try {
             // Best effort restore PostFragment
 
-            val postFragment = lastPostFragment
+            val lastPostFragment = lastPostFragment
 
-            if (postFragment != null) {
-                val args = PostFragmentArgs.fromBundle(requireNotNull(postFragment.arguments))
+            if (lastPostFragment != null) {
+                val args = PostFragmentArgs.fromBundle(requireNotNull(lastPostFragment.arguments))
 
                 if (id == args.post?.post?.id) {
-                    openPostInternal(Bundle(), null, postFragment)
+                    openPostInternal(Bundle(), null, lastPostFragment)
                     return
+                } else {
+                    this.lastPostFragment = null
+                    childFragmentManager.commit(allowStateLoss = true) {
+                        // Apparently we don't need to call attach before remove
+                        // attach(lastPostFragment)
+                        remove(lastPostFragment)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -196,6 +208,9 @@ class ViewPagerController(
                     }
 
             childFragmentManager.commit(allowStateLoss = true) {
+                if (postFragmentOverride != null) {
+                    attach(postFragmentOverride)
+                }
                 replace(R.id.post_fragment_container, fragment)
             }
 

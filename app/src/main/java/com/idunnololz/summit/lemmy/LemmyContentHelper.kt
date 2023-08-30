@@ -359,7 +359,7 @@ class LemmyContentHelper(
                 true
             }
         }
-        fun insertAndLoadFullImage(imageUrl: String) {
+        fun insertAndLoadFullImage(imageUrl: String, fallback: String? = null) {
             val fullContentImageView = getView<View>(R.layout.full_content_image_view)
             val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.fullImage)
             val loadingView =
@@ -386,7 +386,7 @@ class LemmyContentHelper(
                 }
             }
 
-            fun fetchFullImage() {
+            fun fetchFullImage(imageUrl: String) {
                 loadingView?.showProgressBar()
                 offlineManager.fetchImageWithError(
                     rootView,
@@ -433,7 +433,11 @@ class LemmyContentHelper(
                         }
                     },
                     {
-                        loadingView?.showDefaultErrorMessageFor(it)
+                        if (imageUrl != fallback && fallback != null) {
+                            fetchFullImage(fallback)
+                        } else {
+                            loadingView?.showDefaultErrorMessageFor(it)
+                        }
                     },
                 )
             }
@@ -441,9 +445,9 @@ class LemmyContentHelper(
             updateLayoutParams()
 
             loadingView?.setOnRefreshClickListener {
-                fetchFullImage()
+                fetchFullImage(imageUrl)
             }
-            fetchFullImage()
+            fetchFullImage(imageUrl)
 
             fullImageView.transitionName = fullImageViewTransitionName
             fullImageView.setOnClickListener {
@@ -455,7 +459,10 @@ class LemmyContentHelper(
             val postType = postView.getType()
             when (postType) {
                 PostType.Image -> {
-                    insertAndLoadFullImage(requireNotNull(targetPostView.post.url))
+                    insertAndLoadFullImage(
+                        requireNotNull(targetPostView.post.url),
+                        targetPostView.post.thumbnail_url,
+                    )
                 }
                 PostType.Video -> {
                     val containerView = getView<View>(R.layout.full_content_video_view)
