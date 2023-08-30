@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +41,7 @@ class ViewPagerController(
     private val viewModel: PostViewPagerViewModel,
     private val lockPanes: Boolean = false,
     private val compatibilityMode: Boolean = false,
+    private val retainClosedPosts: Boolean = false,
     private val onPageSelected: (Int) -> Unit,
 ) {
 
@@ -55,6 +57,7 @@ class ViewPagerController(
     private val viewPagerAdapter = viewModel.viewPagerAdapter
     private var activeOpenPostJob: Job? = null
     private var activeClosePostJob: Job? = null
+    private var lastPostFragment: PostFragment? = null
 
     private val scroller: FixedSpeedScroller =
         FixedSpeedScroller(viewPager.context, DecelerateInterpolator())
@@ -87,6 +90,9 @@ class ViewPagerController(
                             val postFragment = childFragmentManager
                                 .findFragmentById(R.id.post_fragment_container)
                             if (postFragment != null) {
+                                if (retainClosedPosts) {
+                                    lastPostFragment = postFragment as? PostFragment
+                                }
                                 childFragmentManager.commit(allowStateLoss = true) {
                                     remove(postFragment)
                                 }
@@ -129,6 +135,23 @@ class ViewPagerController(
         reveal: Boolean = false,
         videoState: VideoState? = null,
     ) {
+        try {
+            // Best effort restore PostFragment
+
+            val postFragment = lastPostFragment
+
+            if (postFragment != null) {
+                val args = PostFragmentArgs.fromBundle(requireNotNull(postFragment.arguments))
+
+                if (id == args.post?.post?.id) {
+                    openPostInternal(Bundle(), null, postFragment)
+                    return
+                }
+            }
+        } catch (e: Exception) {
+            // do nothing
+        }
+
         openPostInternal(
             PostFragmentArgs(
                 instance = instance,
@@ -158,6 +181,7 @@ class ViewPagerController(
     private fun openPostInternal(
         args: Bundle,
         postRef: PostRef? = null,
+        postFragmentOverride: PostFragment? = null,
     ) {
         if (activeOpenPostJob != null) {
             Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
@@ -165,13 +189,21 @@ class ViewPagerController(
         }
 
         activeOpenPostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
-            val fragment = PostFragment()
-                .apply {
-                    arguments = args
-                }
+            val fragment =
+                postFragmentOverride
+                    ?: PostFragment().apply {
+                        arguments = args
+                    }
 
             childFragmentManager.commit(allowStateLoss = true) {
                 replace(R.id.post_fragment_container, fragment)
+            }
+
+            if (postFragmentOverride != null) {
+                withContext(Dispatchers.IO) {
+                    // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
+                    delay(100)
+                }
             }
 
             onPostOpen()

@@ -175,6 +175,7 @@ class SearchTabbedFragment :
                 viewModel,
                 true,
                 compatibilityMode = preferences.compatibilityMode,
+                retainClosedPosts = preferences.retainLastPost,
             ) {
                 if (it == 0) {
                     val lastSelectedPost = viewModel.lastSelectedPost

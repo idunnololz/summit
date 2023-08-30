@@ -470,6 +470,9 @@ class AccountActionsManager @Inject constructor(
         votesManager.setScore(ref, score)
     }
 
+    fun getScore(ref: VotableRef) =
+        votesManager.getScore(ref)
+
     fun getVote(ref: VotableRef) =
         votesManager.getVote(ref)
 }

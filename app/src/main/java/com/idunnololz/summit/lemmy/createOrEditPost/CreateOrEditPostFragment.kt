@@ -19,6 +19,11 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
+import com.idunnololz.summit.drafts.DraftData
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftTypes
+import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.OriginalPostData
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -99,6 +104,16 @@ class CreateOrEditPostFragment :
                 textFormatterHelper.onLinkAdded(result.text, result.url)
             }
         }
+        childFragmentManager.setFragmentResultListener(
+            DraftsDialogFragment.REQUEST_KEY, this
+        ) { key, bundle ->
+            val result = bundle.getParcelableCompat<DraftEntry>(
+                DraftsDialogFragment.REQUEST_KEY_RESULT,
+            )
+            if (result != null) {
+                viewModel.currentDraftEntry.value = result
+            }
+        }
     }
 
     override fun onStart() {
@@ -143,7 +158,7 @@ class CreateOrEditPostFragment :
         binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
         binding.toolbar.setNavigationIconTint(context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
         binding.toolbar.setNavigationOnClickListener {
-            dismiss()
+            onBackPressed()
         }
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -232,14 +247,24 @@ class CreateOrEditPostFragment :
                 )
             },
             onPreviewClick = {
+                val postStr = buildString {
+                    appendLine("## ${binding.titleEditText.text.toString()}")
+                    appendLine()
+                    appendLine("![](${binding.urlEditText.text.toString()})")
+                    appendLine()
+                    appendLine(postEditor.editText?.text.toString())
+                }
                 PreviewCommentDialogFragment()
                     .apply {
                         arguments = PreviewCommentDialogFragmentArgs(
                             args.instance,
-                            postEditor.editText?.text.toString(),
+                            postStr,
                         ).toBundle()
                     }
                     .showAllowingStateLoss(childFragmentManager, "AA")
+            },
+            onDraftsClick = {
+                DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
             },
         )
 
@@ -441,6 +466,17 @@ class CreateOrEditPostFragment :
                 viewModel.showSearch.value = query.isNotBlank()
             }
         }
+        viewModel.currentDraftEntry.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+
+            val data = it.data
+            if (data is DraftData.PostDraftData) {
+                binding.titleEditText.setText(data.name)
+                binding.postEditText.setText(data.body)
+                binding.urlEditText.setText(data.url)
+                binding.nsfwSwitch.isChecked = data.isNsfw
+            }
+        }
 
         if (savedInstanceState == null && !viewModel.postPrefilled) {
             viewModel.postPrefilled = true
@@ -545,10 +581,60 @@ class CreateOrEditPostFragment :
         }
 
         try {
+            saveDraft()
+
             dismiss()
         } catch (e: IllegalStateException) {
             // do nothing... very rare
         }
         return true
     }
+
+    private fun saveDraft() {
+        val title = binding.titleEditText.text?.toString()
+        val body = binding.postEditText.text?.toString()
+        val url = binding.urlEditText.text?.toString()
+        val isNsfw = binding.nsfwSwitch.isChecked
+
+        val currentDraftEntry = viewModel.currentDraftEntry.value
+
+        if (!title.isNullOrBlank() || !body.isNullOrBlank() || !url.isNullOrBlank()) {
+            if (currentDraftEntry?.data != null &&
+                currentDraftEntry.data is DraftData.PostDraftData) {
+
+                viewModel.draftsManager.updateDraftAsync(
+                    currentDraftEntry.id,
+                    currentDraftEntry.data.copy(
+                        name = title,
+                        body = body,
+                        url = url,
+                        isNsfw = isNsfw
+                    ),
+                    showToast = true,
+                )
+            } else {
+                viewModel.draftsManager.saveDraftAsync(
+                    DraftData.PostDraftData(
+                        originalPost = args.post?.toOriginalPostData(),
+                        name = title,
+                        body = body,
+                        url = url,
+                        isNsfw = isNsfw,
+                        accountId = viewModel.currentAccount?.id ?: 0,
+                        accountInstance = viewModel.currentAccount?.instance ?: "",
+                        targetCommunityFullName = binding.communityEditText.text.toString(),
+                    ),
+                    showToast = true,
+                )
+            }
+        }
+    }
+
+    private fun Post.toOriginalPostData(): OriginalPostData =
+        OriginalPostData(
+            this.name,
+            this.body,
+            this.url,
+            this.nsfw,
+        )
 }

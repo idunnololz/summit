@@ -51,10 +51,13 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.ReportItem
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
+import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.GlobalFontSizeId
@@ -176,7 +179,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         viewLifecycleOwner: LifecycleOwner,
         videoState: VideoState?,
         updateContent: Boolean,
-        queryHighlight: String?,
+        highlightTextData: HighlightTextData?,
         onRevealContentClickedFn: () -> Unit,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
@@ -192,9 +195,10 @@ class PostAndCommentViewBuilder @Inject constructor(
                 ?: run {
                     val vh = CustomViewHolder(root, commentButton, controlsDivider)
                     this.root.setTag(R.id.view_holder, vh)
-                    ensureContent(vh)
                     vh
                 }
+
+        ensureContent(viewHolder)
 
         scaleTextSizes()
         viewHolder.scaleTextSizes()
@@ -213,7 +217,11 @@ class PostAndCommentViewBuilder @Inject constructor(
             title,
             postView.post.name,
             instance,
-            queryHighlight = queryHighlight,
+            highlight = if (highlightTextData?.targetSubtype == 0) {
+                highlightTextData
+            } else {
+                highlightTextData?.copy(matchIndex = null)
+            },
             onImageClick = {
                 onImageClick(Either.Left(postView), null, it)
             },
@@ -254,7 +262,11 @@ class PostAndCommentViewBuilder @Inject constructor(
             fullContentContainerView = fullContent,
             lazyUpdate = !updateContent,
             videoState = videoState,
-            queryHighlight = queryHighlight,
+            highlight = if (highlightTextData?.targetSubtype == 1) {
+                highlightTextData
+            } else {
+                highlightTextData?.copy(matchIndex = null)
+            },
             onFullImageViewClickListener = { view, url ->
                 onImageClick(Either.Left(postView), view, url)
             },
@@ -286,6 +298,14 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     fun ensureContent(vh: CustomViewHolder) = with(vh) {
+        val currentState = vh.root.getTag(R.id.show_up_and_down_votes) as? Boolean
+
+        if (showUpAndDownVotes == currentState) {
+            return@with
+        }
+
+        vh.root.setTag(R.id.show_up_and_down_votes, showUpAndDownVotes)
+
         root.removeView(upvoteButton)
         root.removeView(downvoteButton)
         root.removeView(upvoteCount)
@@ -444,7 +464,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightForever: Boolean,
         viewLifecycleOwner: LifecycleOwner,
         isActionsExpanded: Boolean,
-        queryHighlight: String?,
+        highlightTextData: HighlightTextData?,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
@@ -508,6 +528,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             headerContainer = headerView,
             commentView = commentView,
             instance = instance,
+            score = null,
             onPageClick = onPageClick,
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
@@ -518,7 +539,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 textView = text,
                 text = context.getString(R.string.deleted_special2),
                 instance = instance,
-                queryHighlight = queryHighlight,
+                highlight = highlightTextData,
                 onImageClick = {
                     onImageClick(Either.Right(commentView), null, it)
                 },
@@ -533,7 +554,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 textView = text,
                 text = context.getString(R.string.removed_special2),
                 instance = instance,
-                queryHighlight = queryHighlight,
+                highlight = highlightTextData,
                 onImageClick = {
                     onImageClick(Either.Right(commentView), null, it)
                 },
@@ -548,7 +569,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 textView = text,
                 text = content,
                 instance = instance,
-                queryHighlight = queryHighlight,
+                highlight = highlightTextData,
                 onImageClick = {
                     onImageClick(Either.Right(commentView), null, it)
                 },
@@ -718,6 +739,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             headerContainer = headerView,
             commentView = commentView,
             instance = instance,
+            score = accountActionsManager.getScore(VotableRef.CommentRef(commentView.comment.id)),
             onPageClick = onPageClick,
             detailed = true,
             childrenCount = childrenCount,
@@ -1007,7 +1029,20 @@ class PostAndCommentViewBuilder @Inject constructor(
             null,
         )
         b.date.text = dateStringToPretty(context, item.lastUpdate)
-        b.title.text = item.title
+
+        LemmyTextHelper.bindText(
+            textView = b.title,
+            text = item.title,
+            instance = instance,
+            onImageClick = {
+                onImageClick(it)
+            },
+            onVideoClick = { url ->
+                onVideoClick(url, VideoType.UNKNOWN, null)
+            },
+            onPageClick = onPageClick,
+            onLinkLongClick = onLinkLongClick,
+        )
 
         if (item.isDeleted) {
             b.content.text = buildSpannedString {
@@ -1152,6 +1187,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             headerContainer,
             commentView,
             instance,
+            score = null,
             onPageClick,
             onLinkLongClick,
             displayInstanceStyle,
@@ -1184,7 +1220,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentButton.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
 
-    private fun PostAndCommentViewBuilder.CustomViewHolder.scaleTextSizes() {
+    private fun CustomViewHolder.scaleTextSizes() {
         upvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
         downvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }

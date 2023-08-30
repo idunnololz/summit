@@ -54,7 +54,11 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             }
 
             swipeRefreshLayout.setOnRefreshListener {
-                parentFragment.viewModel.fetchPage(0, true, true)
+                parentFragment.viewModel.fetchPage(
+                    pageIndex = 0,
+                    isPeronInfoFetch = true,
+                    force = true
+                )
             }
         }
     }

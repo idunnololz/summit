@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:background="@color/colorSurface">
 
+        <!-- constrained programmatically -->
         <View
             android:id="@+id/item_highlighter"
             android:layout_width="0dp"

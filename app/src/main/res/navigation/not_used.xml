@@ -51,6 +51,11 @@
             android:name="show_raw"
             app:argType="boolean"
             android:defaultValue="false" />
+        <argument
+            android:name="postView"
+            app:argType="com.idunnololz.summit.api.dto.PostView"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </dialog>
     <fragment
         android:id="@+id/searchResultsFragment"
@@ -132,5 +137,13 @@
             android:name="prefillText"
             app:argType="string"
             app:nullable="true" />
+    </dialog>
+    <dialog
+        android:id="@+id/draftsDialogFragment"
+        android:name="com.idunnololz.summit.drafts.DraftsDialogFragment"
+        android:label="DraftsDialogFragment" >
+        <argument
+            android:name="draftType"
+            app:argType="integer" />
     </dialog>
 </navigation>

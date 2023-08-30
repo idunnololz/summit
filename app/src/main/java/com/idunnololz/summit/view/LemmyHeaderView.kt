@@ -15,7 +15,7 @@ class LemmyHeaderView : LinearLayout {
         const val STATIC_VIEW_COUNT = 3
     }
 
-    private val textView1: TextView
+    val textView1: TextView
     val textView2: TextView
     val textView3: TextView
     private val flairView: FlairView

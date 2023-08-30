@@ -18,6 +18,17 @@
         app:tint="?colorControlNormal"/>
 
     <ImageView
+        android:id="@+id/drafts"
+        android:src="@drawable/baseline_note_24"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:contentDescription="@string/drafts"
+        android:background="?selectableItemBackgroundBorderless"
+        android:layout_gravity="center_vertical"
+        app:tint="?colorControlNormal"/>
+
+    <ImageView
         android:id="@+id/text_emojis"
         android:src="@drawable/baseline_emoji_emotions_24"
         android:layout_width="48dp"

@@ -267,6 +267,7 @@ class LemmyHeaderHelper(
         headerContainer: LemmyHeaderView,
         commentView: CommentView,
         instance: String,
+        score: Int?,
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
@@ -446,23 +447,17 @@ class LemmyHeaderHelper(
 //        }
         headerContainer.getFlairView().visibility = View.GONE
 
-        headerContainer.setTextFirstPart(sb)
-        sb = SpannableStringBuilder()
-
         if (detailed) {
             sb.appendSeparator()
 
-//            if (item.scoreHidden) {
-//                sb.append(headerContainer.context.getString(R.string.score_hidden))
-//            } else {
+            val score = score ?: commentView.counts.score
             sb.append(
                 headerContainer.context.resources.getQuantityString(
                     R.plurals.point_count_format,
-                    commentView.counts.score,
-                    LemmyUtils.abbrevNumber(commentView.counts.score.toLong()),
+                    score,
+                    LemmyUtils.abbrevNumber(score.toLong()),
                 ),
             )
-//            }
 
             if (childrenCount != null) {
                 sb.appendSeparator()
@@ -474,10 +469,13 @@ class LemmyHeaderHelper(
                     ),
                 )
             }
-        } else {
-//            appendAwards(headerContainer, item.allAwardings, sb)
+            headerContainer.textView1.apply {
+                maxLines = 2
+                isSingleLine = false
+            }
         }
-        headerContainer.setTextSecondPart(sb)
+
+        headerContainer.setTextFirstPart(sb)
 
         val textView = headerContainer.getChildAt(0) as TextView
         textView.movementMethod = CustomLinkMovementMethod().apply {

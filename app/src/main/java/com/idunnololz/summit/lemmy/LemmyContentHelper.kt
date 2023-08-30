@@ -32,6 +32,8 @@ import com.idunnololz.summit.api.utils.getThumbnailUrl
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getVideoInfo
 import com.idunnololz.summit.api.utils.shouldHideItem
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.postListView.FullContentConfig
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
@@ -92,7 +94,7 @@ class LemmyContentHelper(
         lazyUpdate: Boolean = false,
         videoState: VideoState? = null,
         contentMaxLines: Int = -1,
-        queryHighlight: String? = null,
+        highlight: HighlightTextData? = null,
 
         onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
@@ -547,9 +549,9 @@ class LemmyContentHelper(
             }
 
             if (!postView.post.body.isNullOrBlank()) {
-                val content = postView.post.body
                 val fullTextView = getView<View>(R.layout.full_content_text_view)
                 val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
+                rootView.setTag(R.id.body, bodyTextView)
 
                 bodyTextView.visibility = View.VISIBLE
                 bodyTextView.textSize = config.bodyTextSizeSp.toTextSize()
@@ -561,19 +563,6 @@ class LemmyContentHelper(
                 } else {
                     bodyTextView.maxLines = Integer.MAX_VALUE
                 }
-
-                LemmyTextHelper.bindText(
-                    textView = bodyTextView,
-                    text = content,
-                    instance = instance,
-                    queryHighlight = queryHighlight,
-                    onImageClick = onImageClickListener,
-                    onVideoClick = {
-                        onVideoClickListener(it, VideoType.UNKNOWN, null)
-                    },
-                    onPageClick = onLemmyUrlClick,
-                    onLinkLongClick = onLinkLongClick,
-                )
                 bodyTextView.setOnClickListener {
                     onItemClickListener()
                 }
@@ -588,6 +577,21 @@ class LemmyContentHelper(
                     appendUiForExternalOrInternalUrl(targetPostView.post.url)
                 }
             }
+        }
+
+        (rootView.getTag(R.id.body) as? TextView)?.let { textView ->
+            LemmyTextHelper.bindText(
+                textView = textView,
+                text = postView.post.body ?: "",
+                instance = instance,
+                highlight = highlight,
+                onImageClick = onImageClickListener,
+                onVideoClick = {
+                    onVideoClickListener(it, VideoType.UNKNOWN, null)
+                },
+                onPageClick = onLemmyUrlClick,
+                onLinkLongClick = onLinkLongClick,
+            )
         }
 
         addFooter()

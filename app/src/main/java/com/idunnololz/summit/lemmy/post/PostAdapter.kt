@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,14 +8,12 @@ import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.util.query
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
@@ -37,11 +34,12 @@ import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.HeaderItem
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.MoreCommentsItem
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.PendingCommentItem
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.ProgressOrErrorItem
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper.QueryResult
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.count
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
@@ -83,6 +81,7 @@ class PostsAdapter(
             var videoState: VideoState?,
             val showBottomDivider: Boolean,
             val query: String?,
+            val currentMatch: QueryResult?,
         ) : Item(postView.getUniqueKey())
 
         data class CommentItem(
@@ -102,6 +101,7 @@ class PostsAdapter(
             val isActionsExpanded: Boolean,
             val isHighlighted: Boolean,
             val query: String?,
+            val currentMatch: QueryResult?,
         ) : Item(
             "comment_${comment.comment.id}",
         )
@@ -171,6 +171,12 @@ class PostsAdapter(
     private var absolutionPositionToTopLevelCommentPosition = listOf<Int>()
 
     private var query: String? = null
+    var currentMatch: QueryResult? = null
+        set(value) {
+            field = value
+
+            refreshItems(animate = false)
+        }
 
     var isLoaded: Boolean = false
     var error: Throwable? = null
@@ -325,7 +331,15 @@ class PostsAdapter(
                         viewLifecycleOwner = lifecycleOwner,
                         videoState = item.videoState,
                         updateContent = false,
-                        queryHighlight = item.query,
+                        highlightTextData = if (item.query == null) {
+                            null
+                        } else {
+                            HighlightTextData(
+                                item.query,
+                                item.currentMatch?.relativeMatchIndex,
+                                item.currentMatch?.targetSubtype,
+                            )
+                        },
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
                             notifyItemChanged(holder.absoluteAdapterPosition)
@@ -370,7 +384,15 @@ class PostsAdapter(
                     viewLifecycleOwner = lifecycleOwner,
                     videoState = item.videoState,
                     updateContent = true,
-                    queryHighlight = item.query,
+                    highlightTextData = if (item.query == null) {
+                        null
+                    } else {
+                        HighlightTextData(
+                            item.query,
+                            item.currentMatch?.relativeMatchIndex,
+                            item.currentMatch?.targetSubtype,
+                        )
+                    },
                     onRevealContentClickedFn = {
                         revealedItems.add(postKey)
                         notifyItemChanged(holder.absoluteAdapterPosition)
@@ -416,7 +438,15 @@ class PostsAdapter(
                         onImageClick = onImageClick,
                         onVideoClick = onVideoClick,
                         onPageClick = onPageClick,
-                        queryHighlight = item.query,
+                        highlightTextData = if (item.query == null) {
+                            null
+                        } else {
+                            HighlightTextData(
+                                item.query,
+                                item.currentMatch?.relativeMatchIndex,
+                                item.currentMatch?.targetSubtype,
+                            )
+                        },
                         collapseSection = {
                             collapseSection(holder.bindingAdapterPosition)
                         },
@@ -566,10 +596,15 @@ class PostsAdapter(
      * @param refreshHeader Pass false to not always refresh header. Useful for web view headers
      * as refreshing them might cause a relayout causing janky animations
      */
-    private fun refreshItems(refreshHeader: Boolean = true, cb: () -> Unit = {}) {
+    private fun refreshItems(
+        refreshHeader: Boolean = true,
+        animate: Boolean = true,
+        cb: () -> Unit = {},
+    ) {
         val rawData = rawData
         val oldItems = items
         val query = query
+        val currentMatch = currentMatch
 
         val topLevelCommentIndices = mutableListOf<Int>()
         val absolutionPositionToTopLevelCommentPosition = mutableListOf<Int>()
@@ -587,6 +622,11 @@ class PostsAdapter(
                     videoState = videoState,
                     showBottomDivider = !isEmbedded || commentItems.isNotEmpty(),
                     query = query,
+                    currentMatch = if (currentMatch?.targetId == postView.post.post.id) {
+                        currentMatch
+                    } else {
+                        null
+                    }
                 )
 
                 absolutionPositionToTopLevelCommentPosition += -1
@@ -604,6 +644,7 @@ class PostsAdapter(
                     when (val commentView = commentItem.commentView) {
                         is PostViewModel.ListView.CommentListView -> {
                             val commentId = commentView.comment.comment.id
+                            val isCurrentMatchThisComment = currentMatch?.targetId == commentId
                             val isDeleting =
                                 commentView.pendingCommentView?.isActionDelete == true
                             depth = commentItem.depth
@@ -620,7 +661,7 @@ class PostsAdapter(
                                 comment = commentView.comment,
                                 depth = commentItem.depth,
                                 baseDepth = 0,
-                                isExpanded = !commentView.isCollapsed,
+                                isExpanded = !commentView.isCollapsed || isCurrentMatchThisComment,
                                 isPending = false,
                                 view = commentView,
                                 childrenCount = commentItem.children.size,
@@ -633,6 +674,11 @@ class PostsAdapter(
                                 ),
                                 isHighlighted = rawData.selectedCommentId == commentId,
                                 query = query,
+                                currentMatch = if (isCurrentMatchThisComment) {
+                                    currentMatch
+                                } else {
+                                    null
+                                }
                             )
                             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
@@ -705,6 +751,11 @@ class PostsAdapter(
                         videoState = videoState,
                         showBottomDivider = true,
                         query = query,
+                        currentMatch = if (currentMatch?.targetId == it.post.post.id) {
+                            currentMatch
+                        } else {
+                            null
+                        },
                     )
                 }
                 finalItems += ProgressOrErrorItem(error)
@@ -732,6 +783,14 @@ class PostsAdapter(
                         is HeaderItem ->
                             oldItem.postView.post == (newItem as HeaderItem).postView.post
                         else -> oldItem == newItem
+                    }
+                }
+
+                override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+                    return if (animate) {
+                        null
+                    } else {
+                        Unit
                     }
                 }
             },
@@ -896,36 +955,56 @@ class PostsAdapter(
 
             var count = 0
             val queryLength = query.length
+            var lastIndex = 0
 
-            // Check if the string contains the element at all
-            var lastIndex = s.indexOf(query, 0)
-            while (lastIndex >= 0) {
+            while (true) {
+                val nextIndex = s.indexOf(query, lastIndex, ignoreCase = true)
+
+                if (nextIndex < 0) break
+
                 cb(count)
 
                 count += 1
 
-                // Find the next occurrence
-                lastIndex = s.indexOf(query, lastIndex + queryLength)
+                lastIndex = nextIndex + queryLength
             }
         }
 
         refreshItems(refreshHeader = true) {
             val finalQuery = this.query ?: return@refreshItems
 
-            items.forEach { item ->
+            items.withIndex().forEach { (index, item) ->
                 when (item) {
                     is CommentItem -> {
                         count(item.comment.comment.content, finalQuery) {
-                            occurrences.add(QueryResult(item.commentId, it))
+                            occurrences.add(QueryResult(
+                                targetId = item.commentId,
+                                targetSubtype = 0,
+                                relativeMatchIndex = it,
+                                itemIndex = index,
+                                matchIndex = occurrences.size
+                            ))
                         }
                     }
                     FooterItem -> {}
                     is HeaderItem -> {
                         count(item.postView.post.name, finalQuery) {
-                            occurrences.add(QueryResult(item.postView.post.id, it))
+                            occurrences.add(QueryResult(
+                                targetId = item.postView.post.id,
+                                targetSubtype = 0,
+                                relativeMatchIndex = it,
+                                itemIndex = index,
+                                matchIndex = occurrences.size
+                            ))
                         }
                         count(item.postView.post.body, finalQuery) {
-                            occurrences.add(QueryResult(item.postView.post.id, it))
+                            occurrences.add(QueryResult(
+                                targetId = item.postView.post.id,
+                                targetSubtype = 1,
+                                relativeMatchIndex = it,
+                                itemIndex = index,
+                                matchIndex = occurrences.size
+                            ))
                         }
                     }
                     is Item.MissingCommentItem -> {}
@@ -939,10 +1018,4 @@ class PostsAdapter(
             cb(occurrences)
         }
     }
-
-    data class QueryResult(
-        val targetId: Int,
-        val count: Int,
-
-    )
 }

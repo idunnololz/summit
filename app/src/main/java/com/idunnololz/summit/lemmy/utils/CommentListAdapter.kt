@@ -102,9 +102,10 @@ class CommentListAdapter(
                         controlsDivider = b.controlsDivider
                     )
                     b.root.setTag(R.id.view_holder, vh)
-                    postAndCommentViewBuilder.ensureContent(vh)
                     vh
                 }
+
+            postAndCommentViewBuilder.ensureContent(viewHolder)
 
             b.postInfo.text = buildSpannedString {
                 appendLink(

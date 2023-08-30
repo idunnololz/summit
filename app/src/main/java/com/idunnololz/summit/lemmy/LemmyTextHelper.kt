@@ -11,6 +11,8 @@ import android.util.Log
 import android.widget.TextView
 import coil.imageLoader
 import com.idunnololz.summit.R
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.spans.SpoilerSpan
 import com.idunnololz.summit.util.CoilImagesPlugin
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
@@ -47,14 +49,14 @@ object LemmyTextHelper {
         textView: TextView,
         text: String,
         instance: String,
-        queryHighlight: String? = null,
+        highlight: HighlightTextData? = null,
 
         onImageClick: (url: String) -> Unit,
         onVideoClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
-        bindLemmyText(textView, text, instance, queryHighlight)
+        bindLemmyText(textView, text, instance, highlight)
         textView.movementMethod = CustomLinkMovementMethod().apply {
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
@@ -82,16 +84,29 @@ object LemmyTextHelper {
         }
     }
 
-    private fun bindLemmyText(textView: TextView, text: String, instance: String, queryHighlight: String?) {
+    private fun bindLemmyText(
+        textView: TextView,
+        text: String,
+        instance: String,
+        highlight: HighlightTextData?,
+    ) {
         getMarkwon(textView.context).let {
             val spanned = SpannableStringBuilder(it.toMarkdown(text))
             postProcessDetails(spanned, textView)
 
-            if (queryHighlight != null) {
+            if (highlight != null) {
                 val highlightColor = textView.context.getColorFromAttribute(
+                    com.google.android.material.R.attr.colorSurfaceInverse
+                )
+                val highlightTextColor = textView.context.getColorFromAttribute(
+                    com.google.android.material.R.attr.colorOnSurfaceInverse
+                )
+                val currentQueryColor = textView.context.getColorFromAttribute(
                     androidx.appcompat.R.attr.colorPrimary)
+                val queryHighlight = highlight.query
                 val queryLength = queryHighlight.length
                 var curStartIndex = 0
+                var matchIndex = 0
                 while (true) {
                     val index = spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
 
@@ -99,10 +114,21 @@ object LemmyTextHelper {
                         break
                     }
 
-                    spanned.setSpan(
-                        BackgroundColorSpan(highlightColor), index, index + queryLength,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    if (highlight.matchIndex == matchIndex) {
+                        spanned.setSpan(
+                            BackgroundColorSpan(currentQueryColor), index, index + queryLength,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    } else {
+                        spanned.setSpan(
+                            BackgroundColorSpan(highlightColor), index, index + queryLength,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        spanned.setSpan(
+                            ForegroundColorSpan(highlightTextColor), index, index + queryLength,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
                     curStartIndex = index + queryLength
+
+                    matchIndex++
                 }
             }
 

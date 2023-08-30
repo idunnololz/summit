@@ -481,7 +481,10 @@ interface LemmyApi {
                     var request = chain.request()
 
                     val shouldUseCache = request.header(CACHE_CONTROL_HEADER) != CACHE_CONTROL_NO_CACHE
-                    if (!shouldUseCache) return@a chain.proceed(request)
+                    if (!shouldUseCache) {
+                        Log.d(TAG, "headers: ${request.headers} url ${request.url}")
+                        return@a chain.proceed(request)
+                    }
 
                     /*
                     *  Leveraging the advantage of using Kotlin,
@@ -489,6 +492,10 @@ interface LemmyApi {
                     *  the device is connected to Internet or not.
                     */
                     request = if (hasNetwork(context)) {
+
+                        val cacheControl = CacheControl.Builder()
+                            .maxStale(10, TimeUnit.MINUTES)
+                            .build()
                             /*
                     *  If there is Internet, get the cache that was stored 5 seconds ago.
                     *  If the cache is older than 5 seconds, then discard it,
@@ -498,36 +505,32 @@ interface LemmyApi {
                         request.newBuilder()
                             .header(
                                 CACHE_CONTROL_HEADER,
-                                "public, max-stale=600", // 600 = 10 minutes
+                                cacheControl.toString()
                             )
                             .removeHeader("Pragma")
                             .build()
                     } else {
-                            /*
-                    *  If there is no Internet, get the cache that was stored 7 days ago.
-                    *  If the cache is older than 7 days, then discard it,
-                    *  and indicate an error in fetching the response.
-                    *  The 'max-stale' attribute is responsible for this behavior.
-                    *  The 'only-if-cached' attribute indicates to not retrieve new data; fetch the cache only instead.
-                    */
+                        /*
+                         *  If there is no Internet, get the cache that was stored 7 days ago.
+                         *  If the cache is older than 7 days, then discard it,
+                         *  and indicate an error in fetching the response.
+                         *  The 'max-stale' attribute is responsible for this behavior.
+                         *  The 'only-if-cached' attribute indicates to not retrieve new data; fetch the cache only instead.
+                         */
                         request.newBuilder()
-                            .header(
-                                CACHE_CONTROL_HEADER,
-                                CacheControl.Builder()
-                                    .maxAge(7, TimeUnit.DAYS)
-                                    .onlyIfCached()
-                                    .build()
-                                    .toString(),
-                            )
+                            .cacheControl(CacheControl.FORCE_CACHE)
                             .removeHeader("Pragma")
                             .build()
                     }
                     // End of if-else statement
 
+                    Log.d(TAG, "headers: ${request.headers} url ${request.url}")
+
                     // Add the modified request to the chain.
                     val response = chain.proceed(request)
 
-                    Log.d(TAG, "Response 1 response:          $response")
+                    Log.d(TAG, "header: ${request.headers}")
+                    Log.d(TAG, "Response 1 response:          ${response}")
                     Log.d(
                         TAG,
                         "Response 1 cache response:    ${response.cacheResponse}",

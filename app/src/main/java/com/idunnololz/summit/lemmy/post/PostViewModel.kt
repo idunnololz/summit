@@ -54,6 +54,7 @@ class PostViewModel @Inject constructor(
     private val preferences: Preferences,
     private val state: SavedStateHandle,
     private val unauthedApiClient: LemmyApiClient,
+    val queryMatchHelper: QueryMatchHelper,
 ) : ViewModel() {
 
     companion object {
@@ -171,6 +172,9 @@ class PostViewModel @Inject constructor(
         fetchCommentData: Boolean = true,
         force: Boolean = false,
     ): Job? {
+        Log.d(TAG, "fetchPostData(): fetchPostData = $fetchPostData " +
+            "fetchCommentData = $fetchCommentData force = $force")
+
         val postOrCommentRef = postOrCommentRef ?: return null
 
         lemmyApiClient.changeInstance(

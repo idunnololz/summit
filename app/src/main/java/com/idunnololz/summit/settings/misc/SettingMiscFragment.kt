@@ -105,6 +105,13 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             }
         )
+        settings.retainLastPost.bindTo(
+            binding.restoreLastPost,
+            { preferences.retainLastPost },
+            {
+                preferences.retainLastPost = it
+            }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {
