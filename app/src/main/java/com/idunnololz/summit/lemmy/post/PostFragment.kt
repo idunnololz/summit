@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.doOnPreDraw
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -64,10 +63,10 @@ import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
-import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -122,6 +121,10 @@ class PostFragment :
     private var itemTouchHelper: ItemTouchHelper? = null
     private var commentNavViewController: CommentNavViewController? = null
     private var smoothScroller: SmoothScroller? = null
+    private var layoutManager: LinearLayoutManager? = null
+
+    private val scrollOffsetTop
+        get() = (requireMainActivity().lastInsets.topInset + Utils.convertDpToPixel(56f)).toInt()
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -525,9 +528,10 @@ class PostFragment :
         binding.searchEditText.addTextChangedListener {
             viewModel.setFindInPageQuery(it?.toString() ?: "")
         }
-        viewModel.findInPageVisible.observe(viewLifecycleOwner) {
-            if (it) {
+        viewModel.findInPageVisible.observe(viewLifecycleOwner) { showFindInPage ->
+            if (showFindInPage) {
                 binding.findInPageToolbar.visibility = View.VISIBLE
+                binding.searchEditText.focusAndShowKeyboard()
             } else {
                 binding.findInPageToolbar.visibility = View.GONE
                 viewModel.findInPageQuery.value = ""
@@ -535,8 +539,37 @@ class PostFragment :
         }
         viewModel.findInPageQuery.observe(viewLifecycleOwner) {
             adapter?.setQuery(it) {
-                binding.searchInputLayout
+                viewModel.queryMatchHelper.setMatches(it)
             }
+        }
+        viewModel.queryMatchHelper.currentQueryMatch.observe(viewLifecycleOwner) { match ->
+            if (viewModel.queryMatchHelper.matchCount == 0) {
+                binding.foundCount.text = "0 / 0"
+            } else {
+                match ?: return@observe
+
+                highlightMatch(match)
+                adapter?.currentMatch = match
+                binding.foundCount.text = "${match.matchIndex + 1} / ${viewModel.queryMatchHelper.matchCount}"
+            }
+        }
+
+        binding.nextResult.setOnClickListener {
+            viewModel.queryMatchHelper.nextMatch()
+            Utils.hideKeyboard(activity)
+        }
+        binding.prevResult.setOnClickListener {
+            viewModel.queryMatchHelper.prevMatch()
+            Utils.hideKeyboard(activity)
+        }
+        binding.clear.setOnClickListener {
+            binding.searchEditText.setText("")
+        }
+    }
+
+    private fun highlightMatch(match: QueryMatchHelper.QueryResult) {
+        layoutManager?.let {
+            it.scrollToPositionWithOffset(match.itemIndex, scrollOffsetTop)
         }
     }
 
@@ -678,7 +711,7 @@ class PostFragment :
                                 (binding.recyclerView.layoutManager as? LinearLayoutManager)
                                     ?.scrollToPositionWithOffset(
                                         pos,
-                                        (requireMainActivity().lastInsets.topInset + Utils.convertDpToPixel(56f)).toInt(),
+                                        scrollOffsetTop,
                                     )
                                 adapter.highlightComment(newlyPostedCommentId)
 
@@ -716,16 +749,17 @@ class PostFragment :
             )
         }
 
+        layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.setupForPostAndComments(preferences)
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
             hasConsumedJumpToComments = true
             (binding.recyclerView.layoutManager as LinearLayoutManager)
-                .scrollToPositionWithOffset(1, (Utils.convertDpToPixel(48f)).toInt())
+                .scrollToPositionWithOffset(1, scrollOffsetTop)
         }
 
         viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {

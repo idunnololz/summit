@@ -13,6 +13,9 @@ import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoConverters
 import com.idunnololz.summit.account.info.AccountInfoDao
+import com.idunnololz.summit.drafts.DraftConverters
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftsDao
 import com.idunnololz.summit.filterLists.ContentFiltersDao
 import com.idunnololz.summit.filterLists.FilterEntry
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
@@ -43,16 +46,17 @@ import com.idunnololz.summit.util.moshi
         AccountInfo::class,
         HiddenPostEntry::class,
         FilterEntry::class,
+        DraftEntry::class,
     ],
     autoMigrations = [
         AutoMigration(from = 20, to = 21),
         AutoMigration(from = 26, to = 27),
         AutoMigration(from = 27, to = 28),
     ],
-    version = 28,
+    version = 29,
     exportSchema = true,
 )
-@TypeConverters(HistoryConverters::class)
+@TypeConverters(HistoryConverters::class, DraftConverters::class)
 abstract class MainDatabase : RoomDatabase() {
 
     abstract fun lemmyActionsDao(): LemmyActionsDao
@@ -63,6 +67,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun accountInfoDao(): AccountInfoDao
     abstract fun hiddenPostsDao(): HiddenPostsDao
     abstract fun contentFiltersDao(): ContentFiltersDao
+    abstract fun draftsDao(): DraftsDao
 
     companion object {
 
@@ -87,12 +92,14 @@ abstract class MainDatabase : RoomDatabase() {
                 .addTypeConverter(LemmyActionConverters(moshi))
                 .addTypeConverter(UserCommunitiesConverters(moshi))
                 .addTypeConverter(AccountInfoConverters(moshi))
+                .addTypeConverter(DraftConverters(moshi))
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_24)
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_26)
                 .addMigrations(MIGRATION_25_26)
+                .addMigrations(MIGRATION_28_29)
                 .build()
         }
     }
@@ -139,3 +146,11 @@ val MIGRATION_25_26 = object : Migration(24, 26) {
         database.execSQL("CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, `misc_account_info` TEXT, PRIMARY KEY(`account_id`))")
     }
 }
+
+val MIGRATION_28_29 = object : Migration(28, 29) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS drafts;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `drafts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cts` INTEGER NOT NULL, `uts` INTEGER NOT NULL, `draft_type` INTEGER NOT NULL, `data` TEXT)")
+    }
+}
+

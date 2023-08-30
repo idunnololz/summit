@@ -44,7 +44,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@+id/author"/>
 
-    <TextView
+    <com.idunnololz.summit.view.LinkifyTextView
         android:id="@+id/title"
         android:layout_marginTop="@dimen/padding_quarter"
         android:layout_width="0dp"
@@ -58,7 +58,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/author"/>
 
-    <com.idunnololz.summit.view.FixedTextView
+    <com.idunnololz.summit.view.LinkifyTextView
         android:id="@+id/content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

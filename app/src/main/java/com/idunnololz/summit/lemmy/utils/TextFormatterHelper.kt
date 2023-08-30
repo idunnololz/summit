@@ -27,12 +27,26 @@ class TextFormatterHelper {
         editText: EditText,
         onChooseImageClick: (() -> Unit)? = null,
         onAddLinkClick: (() -> Unit)? = null,
-        onPreviewClick: () -> Unit,
+        onPreviewClick: (() -> Unit)? = null,
+        onDraftsClick: (() -> Unit)? = null,
     ) {
         this.editText = editText
         with(textFormatToolbarBinding) {
-            preview.setOnClickListener {
-                onPreviewClick()
+            if (onPreviewClick != null) {
+                preview.visibility = View.VISIBLE
+                preview.setOnClickListener {
+                    onPreviewClick()
+                }
+            } else {
+                preview.visibility = View.GONE
+            }
+            if (onDraftsClick != null) {
+                drafts.visibility = View.VISIBLE
+                drafts.setOnClickListener {
+                    onDraftsClick()
+                }
+            } else {
+                drafts.visibility = View.GONE
             }
 
             textEmojis.setOnClickListener {

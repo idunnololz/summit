@@ -61,11 +61,11 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.string.refresh,
                 R.drawable.baseline_refresh_24
             )
-//            addItemWithIcon(
-//                R.id.find_in_page,
-//                R.string.find_in_page,
-//                R.drawable.outline_find_in_page_24
-//            )
+            addItemWithIcon(
+                R.id.find_in_page,
+                R.string.find_in_page,
+                R.drawable.outline_find_in_page_24
+            )
             addDivider()
         }
 

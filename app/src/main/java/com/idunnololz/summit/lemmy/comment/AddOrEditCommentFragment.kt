@@ -10,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.github.drjacky.imagepicker.ImagePicker
@@ -19,7 +18,13 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
+import com.idunnololz.summit.drafts.DraftData
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftTypes
+import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.OriginalCommentData
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
@@ -76,12 +81,24 @@ class AddOrEditCommentFragment :
 
         setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
 
-        childFragmentManager.setFragmentResultListener(AddLinkDialogFragment.REQUEST_KEY, this) { key, bundle ->
+        childFragmentManager.setFragmentResultListener(
+            AddLinkDialogFragment.REQUEST_KEY, this
+        ) { key, bundle ->
             val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
                 AddLinkDialogFragment.REQUEST_KEY_RESULT,
             )
             if (result != null) {
                 textFormatterHelper.onLinkAdded(result.text, result.url)
+            }
+        }
+        childFragmentManager.setFragmentResultListener(
+            DraftsDialogFragment.REQUEST_KEY, this
+        ) { key, bundle ->
+            val result = bundle.getParcelableCompat<DraftEntry>(
+                DraftsDialogFragment.REQUEST_KEY_RESULT,
+            )
+            if (result != null) {
+                viewModel.currentDraftEntry.value = result
             }
         }
     }
@@ -151,9 +168,10 @@ class AddOrEditCommentFragment :
             binding.toolbar.inflateMenu(R.menu.menu_add_comment)
         }
         binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-        binding.toolbar.setNavigationIconTint(context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+        binding.toolbar.setNavigationIconTint(
+            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
         binding.toolbar.setNavigationOnClickListener {
-            dismiss()
+            onBackPressed()
         }
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -323,6 +341,9 @@ class AddOrEditCommentFragment :
                     }
                     .showAllowingStateLoss(childFragmentManager, "AA")
             },
+            onDraftsClick = {
+                DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
+            },
         )
         viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
             when (it) {
@@ -350,6 +371,14 @@ class AddOrEditCommentFragment :
                 }
             }
         }
+        viewModel.currentDraftEntry.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+
+            val data = it.data
+            if (data is DraftData.CommentDraftData) {
+                binding.commentEditText.setText(data.content)
+            }
+        }
     }
 
     private fun isEdit(): Boolean {
@@ -373,10 +402,56 @@ class AddOrEditCommentFragment :
         }
 
         try {
+            saveDraft()
+
             dismiss()
         } catch (e: IllegalStateException) {
             // do nothing... very rare
         }
         return true
     }
+
+    private fun saveDraft() {
+        val content = binding.commentEditText.text?.toString()
+
+        val currentDraftEntry = viewModel.currentDraftEntry.value
+        if (!content.isNullOrBlank()) {
+            if (currentDraftEntry?.data != null &&
+                currentDraftEntry.data is DraftData.CommentDraftData) {
+
+                viewModel.draftsManager.updateDraftAsync(
+                    currentDraftEntry.id,
+                    currentDraftEntry.data.copy(
+                        content = content
+                    ),
+                    showToast = true,
+                )
+            } else {
+                viewModel.draftsManager.saveDraftAsync(
+                    DraftData.CommentDraftData(
+                        args.editCommentView?.toOriginalCommentData(),
+                        PostRef(
+                            args.instance,
+                            args.postView?.post?.id
+                                ?: args.commentView?.post?.id
+                                ?: args.editCommentView?.post?.id ?: 0,
+                        ),
+                        args.commentView?.comment?.id,
+                        content,
+                        viewModel.currentAccount.value?.id ?: 0,
+                        viewModel.currentAccount.value?.instance ?: "",
+                    ),
+                    showToast = true,
+                )
+            }
+        }
+    }
+
+    private fun CommentView.toOriginalCommentData(): OriginalCommentData =
+        OriginalCommentData(
+            postRef = PostRef(args.instance, this.post.id),
+            commentId = this.comment.id,
+            content = this.comment.content,
+            parentCommentId = args.commentView?.comment?.id
+        )
 }

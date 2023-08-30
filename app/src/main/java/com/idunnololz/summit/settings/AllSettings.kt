@@ -1052,10 +1052,18 @@ class MiscSettings @Inject constructor(
             ),
         )
     )
+
+    val retainLastPost = OnOffSettingItem(
+        null,
+        context.getString(R.string.retain_last_post),
+        context.getString(R.string.retain_last_post_desc),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
         showUpAndDownVotes,
+        retainLastPost,
     )
 }
 

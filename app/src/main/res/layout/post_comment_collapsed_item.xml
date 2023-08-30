@@ -54,11 +54,12 @@
         android:fadingEdge="horizontal"
         android:requiresFadingEdge="horizontal"
         android:scrollbars="none"
+        android:layout_marginVertical="@dimen/padding"
         app:layout_goneMarginStart="0dp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toTopOf="@+id/expandSectionButton"
-        app:layout_constraintBottom_toBottomOf="@+id/expandSectionButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/progress_bar"
         app:layout_constraintEnd_toStartOf="@+id/expandSectionButton"/>
 

@@ -63,11 +63,11 @@
         android:requiresFadingEdge="horizontal"
         android:scrollbars="none"
         android:layout_marginStart="@dimen/padding_half"
+        android:layout_marginTop="@dimen/padding"
         app:layout_goneMarginStart="0dp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toTopOf="@+id/collapseSectionButton"
-        app:layout_constraintBottom_toBottomOf="@+id/collapseSectionButton"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@+id/progress_bar"
         app:layout_constraintEnd_toStartOf="@+id/collapseSectionButton"/>
 
@@ -80,7 +80,8 @@
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding"
         app:layout_constraintStart_toEndOf="@+id/headerView"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/headerView"
+        app:layout_constraintBottom_toBottomOf="@+id/headerView"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

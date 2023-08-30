@@ -26,6 +26,7 @@ import com.idunnololz.summit.databinding.FragmentSettingPostAndCommentsBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
@@ -304,7 +305,7 @@ class SettingPostAndCommentsFragment :
                     contentMaxWidth = contentMaxWidth,
                     viewLifecycleOwner = viewLifecycleOwner,
                     updateContent = true,
-                    queryHighlight = null,
+                    highlightTextData = null,
                     onRevealContentClickedFn = {},
                     onImageClick = { _, _, _ -> },
                     onVideoClick = { _, _, _ -> },
@@ -361,7 +362,7 @@ class SettingPostAndCommentsFragment :
                         highlightForever = false,
                         viewLifecycleOwner = viewLifecycleOwner,
                         isActionsExpanded = false,
-                        queryHighlight = null,
+                        highlightTextData = null,
                         onImageClick = { _, _, _ -> },
                         onVideoClick = { _, _, _ -> },
                         onPageClick = {},
@@ -406,7 +407,7 @@ class SettingPostAndCommentsFragment :
                         highlightForever = false,
                         viewLifecycleOwner = viewLifecycleOwner,
                         isActionsExpanded = false,
-                        queryHighlight = null,
+                        highlightTextData = null,
                         onImageClick = { _, _, _ -> },
                         onVideoClick = { _, _, _ -> },
                         onPageClick = {},

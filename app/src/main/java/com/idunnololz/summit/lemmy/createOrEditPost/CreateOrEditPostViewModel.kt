@@ -3,10 +3,12 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
@@ -17,6 +19,8 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +37,8 @@ class CreateOrEditPostViewModel @Inject constructor(
     private val context: Application,
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
+    private val state: SavedStateHandle,
+    val draftsManager: DraftsManager,
 ) : ViewModel() {
 
     var postPrefilled: Boolean = false
@@ -43,6 +49,11 @@ class CreateOrEditPostViewModel @Inject constructor(
     val showSearch = MutableStateFlow<Boolean>(false)
     val showSearchLiveData = showSearch.asLiveData()
     val query = MutableStateFlow("")
+
+    val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
+
+    val currentAccount: Account?
+        get() = accountManager.currentAccount.value
 
     private var searchJob: Job? = null
 

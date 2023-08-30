@@ -48,6 +48,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
@@ -453,7 +454,7 @@ class Preferences @Inject constructor(
                 .apply()
         }
     var showUpAndDownVotes: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, true)
+        get() = prefs.getBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, false)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, value)
@@ -465,6 +466,14 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putInt(KEY_DISPLAY_INSTANCE_STYLE, value)
+                .apply()
+        }
+
+    var retainLastPost: Boolean
+        get() = prefs.getBoolean(KEY_RETAIN_LAST_POST, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_RETAIN_LAST_POST, value)
                 .apply()
         }
 

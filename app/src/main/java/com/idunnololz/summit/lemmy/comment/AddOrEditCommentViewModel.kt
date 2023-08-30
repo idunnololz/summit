@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.comment
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,8 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
@@ -31,11 +34,15 @@ class AddOrEditCommentViewModel @Inject constructor(
     private val authedApiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val accountActionsManager: AccountActionsManager,
+    private val state: SavedStateHandle,
+    val draftsManager: DraftsManager,
 ) : ViewModel() {
     val currentAccount = accountManager.currentAccount.asLiveData()
 
     val commentSentEvent = MutableLiveData<Event<Result<Unit>>>()
     val uploadImageEvent = StatefulLiveData<UploadImageResult>()
+
+    val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
     fun editComment() {
         accountActionsManager

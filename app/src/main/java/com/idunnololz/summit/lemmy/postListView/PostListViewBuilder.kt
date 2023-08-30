@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.postListView
 import android.content.Context
 import android.content.res.ColorStateList
 import android.net.Uri
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -504,6 +505,14 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     val imageUrl = thumbnailImageUrl ?: url
+                    val backupImageUrl = if (imageUrl != url &&
+                        url != null &&
+                        ContentUtils.isUrlImage(url)) {
+
+                        url
+                    } else {
+                        null
+                    }
 
                     if (imageUrl == "default") {
                         showDefaultImage()
@@ -529,42 +538,56 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
 
-                    offlineManager.fetchImageWithError(itemView, imageUrl, {
-                        offlineManager.calculateImageMaxSizeIfNeeded(it)
-                        offlineManager.getMaxImageSizeHint(it, tempSize)
-
-                        var w: Int? = null
-                        var h: Int? = null
-                        if (tempSize.height > 0 && tempSize.width > 0) {
-                            val heightToWidthRatio = tempSize.height / tempSize.width
-
-                            if (heightToWidthRatio > 10) {
-                                // shrink the image if needed
-                                w = tempSize.width
-                                h = tempSize.height
-                            }
+                    fun loadImage(useBackupUrl: Boolean = false) {
+                        val urlToLoad = if(useBackupUrl) {
+                            backupImageUrl
+                        } else {
+                            imageUrl
                         }
+                        offlineManager.fetchImageWithError(itemView, urlToLoad, {
+                            offlineManager.calculateImageMaxSizeIfNeeded(it)
+                            offlineManager.getMaxImageSizeHint(it, tempSize)
 
-                        image.load(it) {
-                            if (image is ShapeableImageView) {
-                                allowHardware(false)
+                            var w: Int? = null
+                            var h: Int? = null
+                            if (tempSize.height > 0 && tempSize.width > 0) {
+                                val heightToWidthRatio = tempSize.height / tempSize.width
+
+                                if (heightToWidthRatio > 10) {
+                                    // shrink the image if needed
+                                    w = tempSize.width
+                                    h = tempSize.height
+                                }
                             }
 
-                            if (w != null && h != null) {
-                                this.size(w, h)
-                            }
-                            fallback(R.drawable.thumbnail_placeholder_16_9)
-                            placeholder(R.drawable.thumbnail_placeholder_16_9)
+                            image.load(it) {
+                                if (image is ShapeableImageView) {
+                                    allowHardware(false)
+                                }
 
-                            if (!isRevealed && postView.post.nsfw) {
-                                val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+                                if (w != null && h != null) {
+                                    this.size(w, h)
+                                }
+                                fallback(R.drawable.thumbnail_placeholder_16_9)
+                                placeholder(R.drawable.thumbnail_placeholder_16_9)
 
-                                transformations(BlurTransformation(context, sampling = sampling))
+                                if (!isRevealed && postView.post.nsfw) {
+                                    val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+
+                                    transformations(BlurTransformation(context, sampling = sampling))
+                                }
                             }
-                        }
-                    }, {
-                        image.visibility = View.GONE
-                    },)
+                        }, {
+                            if (!useBackupUrl && backupImageUrl != null) {
+                                loadImage(true)
+                            } else {
+                                image.visibility = View.GONE
+                            }
+                        },)
+                    }
+
+                    loadImage()
+
                     image.transitionName = "image_$absoluteAdapterPosition"
                     image.setOnClickListener {
                         if (fullContentContainerView != null) {

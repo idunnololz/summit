@@ -573,6 +573,12 @@
     <string name="choose_a_font">Choose a font</string>
 
     <string name="font_sample_text">The quick brown fox jumped over the lazy dog.</string>
+    <string name="retain_last_post">Retain last post</string>
+    <string name="retain_last_post_desc">Restore the state of a post when returning to a post. Enabling this may reduce performance.</string>
+    <string name="draft_saved">Draft saved</string>
+    <string name="drafts">Drafts</string>
+    <string name="delete_all">Delete all</string>
+    <string name="warn_delete_all_drafts">Delete all drafts?</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
