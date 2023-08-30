@@ -528,6 +528,14 @@ class PostFragment :
         binding.searchEditText.addTextChangedListener {
             viewModel.setFindInPageQuery(it?.toString() ?: "")
         }
+        binding.searchEditText.setOnKeyListener { _, actionId, keyEvent ->
+            if (keyEvent.action == KeyEvent.ACTION_DOWN && actionId == KeyEvent.KEYCODE_ENTER) {
+                Utils.hideKeyboard(activity)
+                true
+            } else {
+                false
+            }
+        }
         viewModel.findInPageVisible.observe(viewLifecycleOwner) { showFindInPage ->
             if (showFindInPage) {
                 binding.findInPageToolbar.visibility = View.VISIBLE
@@ -535,6 +543,7 @@ class PostFragment :
             } else {
                 binding.findInPageToolbar.visibility = View.GONE
                 viewModel.findInPageQuery.value = ""
+                Utils.hideKeyboard(activity)
             }
         }
         viewModel.findInPageQuery.observe(viewLifecycleOwner) {
@@ -563,7 +572,7 @@ class PostFragment :
             Utils.hideKeyboard(activity)
         }
         binding.clear.setOnClickListener {
-            binding.searchEditText.setText("")
+            viewModel.findInPageVisible.value = false
         }
     }
 

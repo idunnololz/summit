@@ -610,6 +610,11 @@ class PostViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        Log.d(TAG, "onCleared()")
+        super.onCleared()
+    }
+
     class ObjectResolverFailedException : Exception {
         constructor() : super()
     }
