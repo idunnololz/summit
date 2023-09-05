@@ -202,6 +202,13 @@ class SettingsPostListFragment :
                 preferences.compatibilityMode = it
             },
         )
+        settings.lockBottomBar.bindTo(
+            binding.lockBottomBar,
+            { preferences.lockBottomBar },
+            {
+                preferences.lockBottomBar = it
+            },
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

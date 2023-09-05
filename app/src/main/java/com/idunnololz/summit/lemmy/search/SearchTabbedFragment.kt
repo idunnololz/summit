@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -28,10 +29,13 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
+import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showSortTypeMenu
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.SavedTabbedFragment
@@ -44,6 +48,7 @@ import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -71,13 +76,45 @@ class SearchTabbedFragment :
 
     private val searchViewBackPressedHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            hideSearch()
+            viewModel.showSearch.value = false
         }
     }
     private val queryBackPressHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             resetQuery()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        childFragmentManager.setFragmentResultListener(
+            CommunityPickerDialogFragment.REQUEST_KEY, this
+        ) { key, bundle ->
+            val result = bundle.getParcelableCompat<CommunityPickerDialogFragment.Result>(
+                CommunityPickerDialogFragment.REQUEST_KEY_RESULT,
+            )
+            if (result != null) {
+                viewModel.nextCommunityFilter.value = SearchViewModel.CommunityFilter(
+                    result.communityId,
+                    result.communityRef,
+                )
+            }
+        }
+        childFragmentManager.setFragmentResultListener(
+            PersonPickerDialogFragment.REQUEST_KEY, this
+        ) { key, bundle ->
+            val result = bundle.getParcelableCompat<PersonPickerDialogFragment.Result>(
+                PersonPickerDialogFragment.REQUEST_KEY_RESULT,
+            )
+            if (result != null) {
+                viewModel.nextPersonFilter.value = SearchViewModel.PersonFilter(
+                    result.personId,
+                    result.personRef,
+                )
+            }
+        }
+
     }
 
     override fun onCreateView(
@@ -102,7 +139,14 @@ class SearchTabbedFragment :
 
         val context = requireContext()
 
+        val personFilter = args.personFilter
+        val communityFilter = args.communityFilter
+
         viewModel.setSortType(args.sortType)
+        viewModel.setCurrentPersonFilter(personFilter)
+        viewModel.setCurrentCommunityFilter(communityFilter)
+        viewModel.nextCommunityFilter.value = communityFilter
+        viewModel.nextPersonFilter.value = personFilter
         if (args.query.isNotBlank()) {
             binding.searchEditText.setText(args.query)
             performSearch()
@@ -124,6 +168,29 @@ class SearchTabbedFragment :
                 SearchType.Users,
                 SearchType.Url,
             )
+
+            if (personFilter == null) {
+                readonlyFilterByCreator.visibility = View.GONE
+            } else {
+                readonlyFilterByCreator.text = personFilter.personRef.fullName
+            }
+            if (communityFilter == null) {
+                readonlyFilterByCommunity.visibility = View.GONE
+            } else {
+                readonlyFilterByCommunity.text = communityFilter.communityRef.fullName
+            }
+            if (!readonlyFilterByCommunity.isVisible && !readonlyFilterByCreator.isVisible) {
+                currentFiltersContainer.visibility = View.GONE
+            }
+
+            readonlyFilterByCreator.setOnClickListener {
+                viewModel.showSearch.value = true
+                filterByCreator.performClick()
+            }
+            readonlyFilterByCommunity.setOnClickListener {
+                viewModel.showSearch.value = true
+                filterByCommunity.performClick()
+            }
 
             if (viewPager.adapter == null) {
                 viewPager.offscreenPageLimit = 5
@@ -272,20 +339,65 @@ class SearchTabbedFragment :
             )
 
             searchEditTextDummy.setOnClickListener {
-                showSearch()
+                viewModel.showSearch.value = true
             }
 
+            viewModel.showSearch.observe(viewLifecycleOwner) {
+                if (it) {
+                    showSearch()
+                } else {
+                    hideSearch()
+                }
+            }
             viewModel.currentQueryLiveData.observe(viewLifecycleOwner) {
                 searchEditTextDummy.setText(it)
                 updateQueryBackHandler()
             }
+            viewModel.nextPersonFilter.observe(viewLifecycleOwner) {
+                binding.filterByCreator.let { chip ->
+                    chip.isCloseIconVisible = it != null
+                    if (it == null) {
+                        chip.text = getString(R.string.filter_by_creator)
+                    } else {
+                        chip.text = it.personRef.fullName
+                    }
+                }
+            }
+            viewModel.nextCommunityFilter.observe(viewLifecycleOwner) {
+                binding.filterByCommunity.let { chip ->
+                    chip.isCloseIconVisible = it != null
+                    if (it == null) {
+                        chip.text = getString(R.string.filter_by_community)
+                    } else {
+                        chip.text = it.communityRef.fullName
+                    }
+                }
+            }
 
             if (viewModel.currentQueryFlow.value.isNotBlank()) {
                 hideSearch(animate = false)
+                viewModel.showSearch.value = false
             }
 
             fab.setOnClickListener {
                 showMoreOptions()
+            }
+            binding.fab.setup(preferences)
+            binding.filterByCommunity.let {
+                it.setOnClickListener {
+                    CommunityPickerDialogFragment.show(childFragmentManager)
+                }
+                it.setOnCloseIconClickListener {
+                    viewModel.nextCommunityFilter.value = null
+                }
+            }
+            binding.filterByCreator.let {
+                it.setOnClickListener {
+                    PersonPickerDialogFragment.show(childFragmentManager)
+                }
+                it.setOnCloseIconClickListener {
+                    viewModel.nextPersonFilter.value = null
+                }
             }
         }
     }
@@ -379,6 +491,8 @@ class SearchTabbedFragment :
         val directions = SearchTabbedFragmentDirections.actionSearchFragmentSelf(
             queryString,
             viewModel.currentSortTypeFlow.value,
+            viewModel.nextPersonFilter.value,
+            viewModel.nextCommunityFilter.value,
         )
         findNavController().navigateSafe(directions)
     }

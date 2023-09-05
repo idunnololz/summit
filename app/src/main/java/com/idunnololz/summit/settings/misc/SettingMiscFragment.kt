@@ -112,6 +112,21 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
                 preferences.retainLastPost = it
             }
         )
+        settings.leftHandMode.bindTo(
+            binding.leftHandMode,
+            { preferences.leftHandMode },
+            {
+                preferences.leftHandMode = it
+            }
+        )
+        settings.transparentNotificationBar.bindTo(
+            binding.transparentNotificationBar,
+            { preferences.transparentNotificationBar },
+            {
+                preferences.transparentNotificationBar = it
+                getMainActivity()?.onPreferencesChanged()
+            }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

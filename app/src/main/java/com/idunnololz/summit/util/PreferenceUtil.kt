@@ -154,6 +154,9 @@ object PreferenceUtil {
     const val KEY_SHOW_UP_AND_DOWN_VOTES = "KEY_SHOW_UP_AND_DOWN_VOTES"
     const val KEY_DISPLAY_INSTANCE_STYLE = "KEY_DISPLAY_INSTANCE_STYLE"
     const val KEY_RETAIN_LAST_POST = "KEY_RETAIN_LAST_POST"
+    const val KEY_LEFT_HAND_MODE = "KEY_LEFT_HAND_MODE"
+    const val KEY_TRANSPARENT_NOTIFICATION_BAR = "KEY_TRANSPARENT_NOTIFICATION_BAR"
+    const val KEY_LOCK_BOTTOM_BAR = "KEY_LOCK_BOTTOM_BAR"
 
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {

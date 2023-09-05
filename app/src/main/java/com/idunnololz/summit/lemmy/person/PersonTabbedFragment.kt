@@ -26,6 +26,7 @@ import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
@@ -116,6 +117,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     }
                 }
             }
+            binding.fab.setup(preferences)
 
             actionsViewModel.blockPersonResult.observe(viewLifecycleOwner) {
                 when (it) {

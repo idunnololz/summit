@@ -34,7 +34,9 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -59,6 +61,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
@@ -344,6 +349,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 binding.fab.visibility = View.GONE
                 subscribe.visibility = View.GONE
             }
+            binding.fab.setup(preferences)
         }
     }
 

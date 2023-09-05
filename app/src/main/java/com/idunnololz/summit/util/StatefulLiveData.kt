@@ -157,3 +157,6 @@ sealed class StatefulData<T> {
     class Success<T>(val data: T) : StatefulData<T>()
     class Error<T>(val error: Throwable) : StatefulData<T>()
 }
+
+fun StatefulData<*>.isLoading() =
+    this is StatefulData.Loading<*>

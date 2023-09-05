@@ -26,7 +26,6 @@ import com.idunnololz.summit.databinding.FragmentSettingPostAndCommentsBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
-import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
@@ -338,7 +337,7 @@ class SettingPostAndCommentsFragment :
 
                     postAndCommentViewBuilder.bindCommentViewExpanded(
                         h = h,
-                        binding = CommentExpandedViewHolder.fromBinding(b),
+                        holder = CommentExpandedViewHolder.fromBinding(b),
                         baseDepth = 0,
                         depth = when (item.comment.id) {
                             LemmyFakeModels.fakeCommentView1.comment.id -> {
@@ -383,7 +382,7 @@ class SettingPostAndCommentsFragment :
 
                     postAndCommentViewBuilder.bindCommentViewExpanded(
                         h = h,
-                        binding = CommentExpandedViewHolder.fromBinding(b),
+                        holder = CommentExpandedViewHolder.fromBinding(b),
                         baseDepth = 0,
                         depth = when (item.comment.id) {
                             LemmyFakeModels.fakeCommentView1.comment.id -> {

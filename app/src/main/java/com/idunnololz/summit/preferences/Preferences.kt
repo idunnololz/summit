@@ -40,6 +40,8 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -56,6 +58,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
@@ -474,6 +477,30 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_RETAIN_LAST_POST, value)
+                .apply()
+        }
+
+    var leftHandMode: Boolean
+        get() = prefs.getBoolean(KEY_LEFT_HAND_MODE, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_LEFT_HAND_MODE, value)
+                .apply()
+        }
+
+    var transparentNotificationBar: Boolean
+        get() = prefs.getBoolean(KEY_TRANSPARENT_NOTIFICATION_BAR, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_TRANSPARENT_NOTIFICATION_BAR, value)
+                .apply()
+        }
+
+    var lockBottomBar: Boolean
+        get() = prefs.getBoolean(KEY_LOCK_BOTTOM_BAR, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_LOCK_BOTTOM_BAR, value)
                 .apply()
         }
 

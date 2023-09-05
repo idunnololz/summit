@@ -238,6 +238,7 @@ class AccountAwareLemmyClient @Inject constructor(
             page = page,
             limit = limit,
             query = query,
+            creatorId = creatorId,
             force = force,
         )
             .autoSignOut(account)

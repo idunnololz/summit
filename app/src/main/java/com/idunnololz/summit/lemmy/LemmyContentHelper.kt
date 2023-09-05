@@ -207,21 +207,62 @@ class LemmyContentHelper(
             val textView = fullContentHiddenView.findViewById<TextView>(R.id.message)
             val button = fullContentHiddenView.findViewById<Button>(R.id.button)
 
+            fullImageView.load(null)
             textView.textSize = config.bodyTextSizeSp.toTextSize()
 
-            val imageUrl = postView.getThumbnailUrl(false)
+            val imageUrl = targetPostView.post.url ?: postView.getThumbnailUrl(false)
 
-            if (imageUrl != null) {
-                fullImageView.load(null)
+            fun updateLayoutParams() {
+                imageUrl ?: return
 
-                fun fetchFullImage() {
-                    offlineManager.fetchImage(rootView, imageUrl) b@{
+                offlineManager.getImageSizeHint(imageUrl, tempSize)
+                if (tempSize.width > 0 && tempSize.height > 0) {
+                    val thumbnailMaxHeight =
+                        (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+                    fullImageView.updateLayoutParams<LayoutParams> {
+                        this.height = thumbnailMaxHeight
+                    }
+                } else {
+                    fullImageView.updateLayoutParams<LayoutParams> {
+                        this.height = WRAP_CONTENT
+                    }
+                }
+            }
+
+            fun fetchFullImage() {
+                imageUrl ?: return
+
+                offlineManager.fetchImageWithError(
+                    rootView,
+                    imageUrl,
+                    b@{
                         offlineManager.calculateImageMaxSizeIfNeeded(it)
                         offlineManager.getMaxImageSizeHint(it, tempSize)
 
+                        Log.d(TAG, "image size: $tempSize")
+
+                        var w: Int? = null
+                        var h: Int? = null
+                        if (tempSize.height > 0 && tempSize.width > 0) {
+                            val heightToWidthRatio = tempSize.height / tempSize.width
+
+                            if (heightToWidthRatio > 10) {
+                                // shrink the image if needed
+                                w = tempSize.width
+                                h = tempSize.height
+                            }
+                        }
+
                         fullImageView.load(it) {
+                            allowHardware(false)
                             val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
                             this.transformations(BlurTransformation(context, sampling = sampling))
+
+                            val finalW = w
+                            val finalH = h
+                            if (finalW != null && finalH != null) {
+                                this.size(finalW, finalH)
+                            }
 
                             listener { _, result ->
                                 val d = result.drawable
@@ -232,20 +273,19 @@ class LemmyContentHelper(
                                         d.bitmap.height,
                                     )
                                     Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
+
+                                    updateLayoutParams()
                                 }
                             }
                         }
-                    }
-                }
+                    }, {
 
-                offlineManager.getImageSizeHint(imageUrl, tempSize)
-                if (tempSize.width > 0 && tempSize.height > 0) {
-                    val thumbnailMaxHeight =
-                        (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-                    fullImageView.updateLayoutParams<LayoutParams> {
-                        this.height = thumbnailMaxHeight
                     }
-                }
+                )
+            }
+
+            if (imageUrl != null) {
+                updateLayoutParams()
                 fullImageView.setOnLongClickListener {
                     onLinkLongClick(imageUrl, null)
                     true
@@ -413,8 +453,10 @@ class LemmyContentHelper(
                         fullImageView.load(it) {
                             allowHardware(false)
 
-                            if (w != null && h != null) {
-                                this.size(w, h)
+                            val finalW = w
+                            val finalH = h
+                            if (finalW != null && finalH != null) {
+                                this.size(finalW, finalH)
                             }
 
                             listener { _, result ->

@@ -32,6 +32,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
@@ -197,6 +198,19 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             this,
             onBackPressedCallback,
         )
+        childFragmentManager.setFragmentResultListener(
+            CommunityPickerDialogFragment.REQUEST_KEY, this
+        ) { key, bundle ->
+            val result = bundle.getParcelableCompat<CommunityPickerDialogFragment.Result>(
+                CommunityPickerDialogFragment.REQUEST_KEY_RESULT,
+            )
+            if (result != null) {
+                userCommunitiesManager.addUserCommunity(
+                    communityRef = result.communityRef,
+                    icon = result.icon,
+                )
+            }
+        }
     }
 
     override fun onCreateView(

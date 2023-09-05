@@ -116,6 +116,8 @@ class CommunityViewModel @Inject constructor(
 
     val sortOrder = postsRepository.sortOrderFlow.asLiveData()
 
+    var lockBottomBar: Boolean = false
+
     private var hiddenPostObserverJob: Job? = null
     private var fetchPageJob: Job? = null
 
@@ -210,11 +212,12 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun updateInfinity() {
+    fun updatePreferences() {
         // check for inconsistency
         if (postListEngine.infinity != preferences.infinity) {
             postListEngine.infinity = preferences.infinity
         }
+        lockBottomBar = preferences.lockBottomBar
     }
 
     fun fetchPrevPage(force: Boolean = false) {

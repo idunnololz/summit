@@ -55,6 +55,7 @@ import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.login.LoginFragment
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
@@ -120,6 +121,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -201,6 +205,16 @@ class MainActivity : BaseActivity() {
                 }
             },
         )
+
+        onPreferencesChanged()
+    }
+
+    fun onPreferencesChanged() {
+        if (preferences.transparentNotificationBar) {
+            binding.notificationBarBgContainer.visibility = View.GONE
+        } else {
+            binding.notificationBarBgContainer.visibility = View.VISIBLE
+        }
     }
 
     private val bottomNavY

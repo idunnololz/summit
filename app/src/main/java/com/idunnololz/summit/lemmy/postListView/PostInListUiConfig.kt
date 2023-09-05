@@ -14,7 +14,7 @@ data class PostInListUiConfig(
     // We need this because some layouts show the full content or can show it
     val fullContentConfig: FullContentConfig = FullContentConfig(),
     val preferImagesAtEnd: Boolean = false,
-    val preferFullSizeImages: Boolean = false,
+    val preferFullSizeImages: Boolean = true,
     val preferTitleText: Boolean = false,
     val contentMaxLines: Int = -1,
 ) {

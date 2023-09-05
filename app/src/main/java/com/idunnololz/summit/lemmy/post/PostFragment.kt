@@ -55,6 +55,7 @@ import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
@@ -387,6 +388,7 @@ class PostFragment :
             setup()
         }
 
+        binding.fab.setup(preferences)
         if (preferences.commentsNavigationFab) {
             binding.fab.setImageResource(R.drawable.outline_navigation_24)
             binding.fab.show()

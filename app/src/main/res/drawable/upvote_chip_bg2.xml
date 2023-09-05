@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/upvote_chip_bg"
+    android:insetTop="@dimen/padding_half"
+    android:insetBottom="@dimen/padding_half"/>

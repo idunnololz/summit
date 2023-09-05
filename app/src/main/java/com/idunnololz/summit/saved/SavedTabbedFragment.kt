@@ -17,6 +17,7 @@ import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ViewPagerAdapter
@@ -68,6 +69,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
 
         with(binding) {
             fab.visibility = View.GONE
+            binding.fab.setup(preferences)
 
             viewModel.currentAccountView.observe(viewLifecycleOwner) {
                 accountImageView.load(it?.profileImage) {
