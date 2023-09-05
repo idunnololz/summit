@@ -22,45 +22,83 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
+                <LinearLayout
+                    android:id="@+id/collapsing_toolbar_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+                    android:orientation="vertical"
+                    app:statusBarScrim="?backgroundColor"
+                    app:contentScrim="?backgroundColor"
+                    app:titleEnabled="false"
+                    app:layout_scrollFlags="scroll|enterAlways">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/title"
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolbar"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/subreddit_filter_bg"
-                        android:layout_marginHorizontal="@dimen/padding"
-                        android:layout_marginTop="@dimen/padding"
-                        app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp"
-                        app:hintEnabled="false"
-                        app:startIconDrawable="@drawable/baseline_search_18"
-                        app:startIconMinSize="48dp"
-                        app:endIconMinSize="48dp"
-                        app:endIconMode="clear_text">
+                        android:layout_height="?attr/actionBarSize"
+                        app:layout_collapseMode="pin">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/search_edit_text_dummy"
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autofillHints="no"
-                            android:background="@null"
+                            android:background="@drawable/subreddit_filter_bg"
+                            android:layout_marginHorizontal="@dimen/padding"
+                            android:layout_marginTop="@dimen/padding"
+                            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+                            app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="0dp"
+                            app:hintEnabled="false"
+                            app:startIconDrawable="@drawable/baseline_search_18"
+                            app:startIconMinSize="48dp"
+                            app:endIconMinSize="48dp"
+                            app:endIconMode="clear_text">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/search_edit_text_dummy"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autofillHints="no"
+                                android:background="@null"
+                                android:paddingHorizontal="@dimen/padding"
+                                android:paddingVertical="@dimen/padding_half"
+                                android:textIsSelectable="true"
+                                android:scrollbars="vertical"
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                android:inputType="none"
+                                android:hint="@string/search"
+                                android:focusable="false"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </com.google.android.material.appbar.MaterialToolbar>
+
+                    <HorizontalScrollView
+                        android:id="@+id/current_filters_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_collapseMode="pin">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:paddingHorizontal="@dimen/padding"
-                            android:paddingVertical="@dimen/padding_half"
-                            android:textIsSelectable="true"
-                            android:scrollbars="vertical"
-                            android:textAppearance="?textAppearanceBodyMedium"
-                            android:inputType="none"
-                            android:hint="@string/search"
-                            android:focusable="false"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-                </com.google.android.material.appbar.MaterialToolbar>
+                            android:paddingTop="@dimen/padding_half">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/readonly_filter_by_community"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/padding_half"
+                                android:text="@string/filter_by_community"/>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/readonly_filter_by_creator"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/filter_by_creator"/>
+                        </LinearLayout>
+                    </HorizontalScrollView>
+                </LinearLayout>
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/tab_layout"
@@ -82,13 +120,13 @@
                     android:layout_height="match_parent"/>
             </FrameLayout>
 
-
             <LinearLayout
                 android:id="@+id/search_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?backgroundColor"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:elevation="24dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/search_input_layout"
@@ -122,9 +160,34 @@
                         android:inputType="text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/padding"
+                        android:paddingVertical="@dimen/padding_half">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/filter_by_community"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/filter_by_community"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/filter_by_creator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/filter_by_creator"
+                            android:layout_marginStart="@dimen/padding_half"/>
+                    </LinearLayout>
+                </HorizontalScrollView>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/search_suggestions_recycler_view"
-                    android:layout_marginTop="@dimen/padding"
                     android:layout_width="match_parent"
                     android:paddingBottom="@dimen/footer_spacer_height"
                     android:clipToPadding="false"

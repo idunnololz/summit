@@ -177,5 +177,15 @@
             android:name="sortType"
             app:argType="com.idunnololz.summit.api.dto.SortType"
             android:defaultValue="Active" />
+        <argument
+            android:name="personFilter"
+            app:argType="com.idunnololz.summit.lemmy.search.SearchViewModel$PersonFilter"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="communityFilter"
+            app:argType="com.idunnololz.summit.lemmy.search.SearchViewModel$CommunityFilter"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 </navigation>

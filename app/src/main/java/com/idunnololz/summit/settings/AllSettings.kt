@@ -529,6 +529,11 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.show_nsfw_posts),
         null,
     )
+    val lockBottomBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.lock_bottom_bar),
+        context.getString(R.string.lock_bottom_bar_desc),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -547,6 +552,7 @@ class PostListSettings @Inject constructor(
         showVideoPosts,
         showTextPosts,
         showNsfwPosts,
+        lockBottomBar,
     )
 }
 
@@ -1059,11 +1065,25 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.retain_last_post_desc),
     )
 
+    val leftHandMode = OnOffSettingItem(
+        null,
+        context.getString(R.string.left_hand_mode),
+        context.getString(R.string.left_hand_mode_desc),
+    )
+
+    val transparentNotificationBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.transparent_notification_bar),
+        null,
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
         showUpAndDownVotes,
         retainLastPost,
+        leftHandMode,
+        transparentNotificationBar,
     )
 }
 

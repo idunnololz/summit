@@ -25,7 +25,8 @@ class CommunityAdapter(
     private val canSelectMultipleCommunities: Boolean,
     private val onTooManyCommunities: (Int) -> Unit = {},
     private val onSingleCommunitySelected: (
-        CommunityRef.CommunityRefByName, icon: String?) -> Unit = { _, _ -> },
+        CommunityRef.CommunityRefByName, icon: String?, communityId: Int
+    ) -> Unit = { _, _, _ -> },
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed interface Item {
@@ -137,7 +138,8 @@ class CommunityAdapter(
                 } else {
                     onSingleCommunitySelected(
                         item.communityView.community.toCommunityRef(),
-                        item.communityView.community.icon
+                        item.communityView.community.icon,
+                        item.communityView.community.id,
                     )
                 }
             }

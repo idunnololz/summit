@@ -13,12 +13,15 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FilterItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsFilterListBinding
 import com.idunnololz.summit.filterLists.FilterEntry
+import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBinding>() {
@@ -26,6 +29,9 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
     private val args by navArgs<SettingsFilterListFragmentArgs>()
 
     private val viewModel: SettingsFilterListViewModel by viewModels()
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +120,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
                     )
                     .show(childFragmentManager, "sadsaad")
             }
+            binding.fab.setup(preferences)
 
             recyclerView.adapter = adapter
             recyclerView.setHasFixedSize(true)

@@ -292,12 +292,16 @@ class LemmyApiClient @Inject constructor(
     ): Result<List<CommentView>> {
         val commentsForm =
             GetComments(
-                max_depth = 1,
+                // max_depth cannot be used right now due to a bug
+                // See https://github.com/LemmyNet/lemmy/issues/3065
+//                max_depth = 1,
                 type_ = ListingType.All,
                 post_id = null,
                 sort = CommentSortType.New,
                 saved_only = true,
                 auth = account?.jwt,
+                page = page,
+                limit = limit,
             )
 
         return retrofitErrorHandler {

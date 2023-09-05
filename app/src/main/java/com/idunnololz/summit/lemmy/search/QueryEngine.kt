@@ -144,8 +144,12 @@ class QueryEngine(
 
     private val coroutineScope = coroutineScopeFactory.create()
 
+    private val activePageQueries = mutableSetOf<Int>()
     private var pages: List<QueryResultsPage> = listOf()
     private var _items: List<Item> = listOf()
+
+    private var personIdFilter: Int? = null
+    private var communityIdFilter: Int? = null
 
     private val trigram = NGram(3)
 
@@ -156,6 +160,28 @@ class QueryEngine(
             // should be ok because we are generating a blank page.
             generateItems()
         }
+    }
+
+    fun setPersonFilter(personId: Int?) {
+        if (personIdFilter == personId) {
+            return
+        }
+        personIdFilter = personId
+
+        reset()
+
+        performQuery(0, force = false)
+    }
+
+    fun setCommunityFilter(communityId: Int?) {
+        if (communityIdFilter == communityId) {
+            return
+        }
+        communityIdFilter = communityId
+
+        reset()
+
+        performQuery(0, force = false)
     }
 
     fun setQuery(query: String) {
@@ -194,6 +220,12 @@ class QueryEngine(
     }
 
     fun performQuery(pageIndex: Int, force: Boolean) {
+        if (activePageQueries.contains(pageIndex)) {
+            return
+        }
+
+        activePageQueries.add(pageIndex)
+
         val currentQuery = currentQuery
 
         if (currentQuery.isBlank()) {
@@ -209,7 +241,7 @@ class QueryEngine(
 
             apiClient
                 .search(
-                    null,
+                    communityIdFilter,
                     null,
                     currentSortType,
                     ListingType.All,
@@ -217,7 +249,7 @@ class QueryEngine(
                     pageIndex.toLemmyPageIndex(),
                     currentQuery,
                     MAX_QUERY_PAGE_LIMIT,
-                    null,
+                    personIdFilter,
                     force = force,
                 )
                 .onSuccess {
@@ -369,6 +401,10 @@ class QueryEngine(
                     }
                     currentState.value = StatefulData.Success(Unit)
                     generateItems()
+
+                    withContext(Dispatchers.Main) {
+                        activePageQueries.remove(pageIndex)
+                    }
                 }
                 .onFailure {
                     val newPages = pages.toMutableList().apply {
@@ -379,6 +415,10 @@ class QueryEngine(
                     }
                     currentState.value = StatefulData.Error(it)
                     generateItems()
+
+                    withContext(Dispatchers.Main) {
+                        activePageQueries.remove(pageIndex)
+                    }
                 }
         }
     }
@@ -475,6 +515,7 @@ class QueryEngine(
 
     private fun reset() {
         pages = listOf()
+        activePageQueries.clear()
     }
 
     private fun Int.toLemmyPageIndex() =

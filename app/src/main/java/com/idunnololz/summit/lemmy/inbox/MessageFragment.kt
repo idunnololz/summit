@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.inbox
 
 import android.os.Bundle
+import android.util.LayoutDirection
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -37,6 +38,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
@@ -274,10 +276,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     binding.score,
                     null,
                     null,
-                    {
-                        if (it > 0) {
+                    { vote, totalScore, upvotes, downvotes, ->
+                        if (vote > 0) {
                             binding.score.setTextColor(upvoteColor)
-                        } else if (it == 0) {
+                        } else if (vote == 0) {
                             binding.score.setTextColor(normalTextColor)
                         } else {
                             binding.score.setTextColor(downvoteColor)
@@ -342,6 +344,17 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         }
 
         updateContextState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (preferences.leftHandMode) {
+            binding.bottomAppBar.layoutDirection = View.LAYOUT_DIRECTION_RTL
+            binding.fabContainer.layoutDirection = View.LAYOUT_DIRECTION_RTL
+        } else {
+            binding.bottomAppBar.layoutDirection = View.LAYOUT_DIRECTION_INHERIT
+        }
     }
 
     private fun updateContextState() {

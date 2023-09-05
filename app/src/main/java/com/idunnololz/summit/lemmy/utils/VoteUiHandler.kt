@@ -53,7 +53,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((score: Int) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -85,7 +85,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((score: Int) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -117,7 +117,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((score: Int) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -153,18 +153,18 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((score: Int) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
     val context = scoreView.context
-    fun update(score: Int) {
+    fun update(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
         if (upVoteView is ImageView && downVoteView is ImageView) {
-            if (score < 0) {
+            if (vote < 0) {
                 upVoteView.setColorFilter(
                     context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
                 downVoteView.setColorFilter(downvoteColor)
-            } else if (score > 0) {
+            } else if (vote > 0) {
                 upVoteView.setColorFilter(upvoteColor)
                 downVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
             } else {
@@ -172,13 +172,13 @@ fun VoteUiHandler.bind(
                 downVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
             }
         } else if (upVoteView is MaterialButton && downVoteView is MaterialButton) {
-            if (score < 0) {
+            if (vote < 0) {
                 upVoteView.iconTint =
                     ColorStateList.valueOf(
                         context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
                 downVoteView.iconTint =
                     ColorStateList.valueOf(downvoteColor)
-            } else if (score > 0) {
+            } else if (vote > 0) {
                 upVoteView.iconTint =
                     ColorStateList.valueOf(upvoteColor)
                 downVoteView.iconTint =
@@ -193,14 +193,14 @@ fun VoteUiHandler.bind(
                         context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
             }
         }
-        if (score < 0) {
+        if (vote < 0) {
             if (downvoteCount == null || upvoteCount == null) {
                 scoreView.setTextColor(downvoteColor)
             } else {
                 downvoteCount.setTextColor(downvoteColor)
                 upvoteCount.setTextColor(context.getColorCompat(R.color.colorText))
             }
-        } else if (score > 0) {
+        } else if (vote > 0) {
             if (downvoteCount == null || upvoteCount == null) {
                 scoreView.setTextColor(upvoteColor)
             } else {
@@ -219,7 +219,7 @@ fun VoteUiHandler.bind(
         upVoteView?.invalidate()
         downVoteView?.invalidate()
 
-        onUpdate?.invoke(score)
+        onUpdate?.invoke(vote, totalScore, upvotes, downvotes)
     }
     bindVoteUi(
         lifecycleOwner,
@@ -235,29 +235,29 @@ fun VoteUiHandler.bind(
         upvoteCount,
         downvoteCount,
         object : AccountActionsManager.Registration {
-            override fun voteCurrent(score: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
-                update(score)
+            override fun voteCurrent(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
+                update(vote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun voteSuccess(newScore: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
-                update(newScore)
+            override fun voteSuccess(newVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
+                update(newVote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun votePending(pendingScore: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
-                update(pendingScore)
+            override fun votePending(pendingVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
+                update(pendingVote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun voteFailed(score: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?, e: Throwable) {
-                update(score)
+            override fun voteFailed(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?, e: Throwable) {
+                update(vote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())

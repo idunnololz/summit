@@ -38,6 +38,8 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -72,6 +74,9 @@ class InboxFragment :
 
     @Inject
     lateinit var accountInfoManager: AccountInfoManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     private var adapter: InboxItemAdapter? = null
 
@@ -361,6 +366,7 @@ class InboxFragment :
         if (args.pageType == InboxViewModel.PageType.Reports) {
             binding.fab.visibility = View.GONE
         }
+        binding.fab.setup(preferences)
 
         viewModel.fetchInbox()
     }

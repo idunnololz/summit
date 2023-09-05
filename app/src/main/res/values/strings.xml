@@ -541,7 +541,7 @@
     <string name="auto_convert_phone_numbers_to_links">Auto-convert phone numbers to links</string>
     <string name="no_communities_selected">No communities selected</string>
     <string name="multi_community_icon">Multi-community icon</string>
-    <string name="no_icons">No icons</string>
+    <string name="no_icons">No icons found. Select some communities.</string>
     <string name="error_cannot_share_multi_community">Multi-communities cannot be shared. Multi-communities are purely client-sided.</string>
     <string name="error_multi_community_limit_reached">There are too many communities selected for this multi-community. The maximum number of communities per multi-community is %1$s.</string>
     <string name="error_multi_community_unsaved_changes">You will lose your changes if you proceed. Do you want to continue?</string>
@@ -579,6 +579,15 @@
     <string name="drafts">Drafts</string>
     <string name="delete_all">Delete all</string>
     <string name="warn_delete_all_drafts">Delete all drafts?</string>
+    <string name="filter_by_community">Filter by community</string>
+    <string name="filter_by_creator">Filter by creator</string>
+    <string name="user_hint">user</string>
+    <string name="left_hand_mode">Left hand mode</string>
+    <string name="left_hand_mode_desc">Changes the position of some buttons to be more accessible for left-handed users.</string>
+    <string name="transparent_notification_bar">Fully transparent notification bar</string>
+    <string name="lock_bottom_bar">Lock bottom navigation bar</string>
+    <string name="lock_bottom_bar_desc">Prevents the bottom navigation bar from hiding on scroll.</string>
+    <string name="advanced">Advanced</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

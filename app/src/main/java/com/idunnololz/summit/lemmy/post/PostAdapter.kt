@@ -234,31 +234,6 @@ class PostsAdapter(
             R.layout.post_header_item -> ViewBindingViewHolder(PostHeaderItemBinding.bind(v))
             R.layout.post_comment_expanded_item ->
                 CommentExpandedViewHolder.fromBinding(PostCommentExpandedItemBinding.bind(v))
-                    .apply {
-                        headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                            R.drawable.baseline_arrow_upward_16,
-                            0,
-                            0,
-                            0,
-                        )
-                        headerView.textView2.compoundDrawablePadding =
-                            Utils.convertDpToPixel(4f).toInt()
-                        headerView.textView2.updatePaddingRelative(
-                            start = Utils.convertDpToPixel(8f).toInt(),
-                        )
-
-                        headerView.textView3.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                            R.drawable.baseline_arrow_downward_16,
-                            0,
-                            0,
-                            0,
-                        )
-                        headerView.textView3.compoundDrawablePadding =
-                            Utils.convertDpToPixel(4f).toInt()
-                        headerView.textView3.updatePaddingRelative(
-                            start = Utils.convertDpToPixel(8f).toInt(),
-                        )
-                    }
             R.layout.post_comment_expanded_compact_item ->
                 CommentExpandedViewHolder.fromBinding(PostCommentExpandedCompactItemBinding.bind(v))
                     .apply {
@@ -421,7 +396,7 @@ class PostsAdapter(
 
                     postAndCommentViewBuilder.bindCommentViewExpanded(
                         h = holder,
-                        binding = b,
+                        holder = b,
                         baseDepth = item.baseDepth,
                         depth = item.depth,
                         commentView = item.comment,

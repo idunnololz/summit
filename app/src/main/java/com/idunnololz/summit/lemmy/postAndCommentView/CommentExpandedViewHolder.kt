@@ -11,29 +11,43 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
+import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.view.LemmyHeaderView
 
 class CommentExpandedViewHolder(
     val rawBinding: ViewBinding,
-    val root: View,
+    val root: ViewGroup,
     val highlightBg: View,
     val threadLinesSpacer: Space,
     val progressBar: ProgressBar,
     val headerView: LemmyHeaderView,
     val collapseSectionButton: View,
     val topHotspot: View,
+    val leftHotspot: View,
     val mediaContainer: ConstraintLayout,
     val overlay: View,
     val text: TextView,
-    val scoreCount: TextView,
+    var scoreCount: TextView?,
     var upvoteCount: TextView?,
-    val upvoteButton: ImageView?,
+    var upvoteButton: View?,
     var downvoteCount: TextView?,
-    val downvoteButton: ImageView?,
-    val commentButton: View?,
-    val moreButton: View?,
+    var downvoteButton: View?,
+    var commentButton: View?,
+    var moreButton: View?,
     val actionsContainer: ViewGroup?,
+
+    var actionsDivider1: View? = null,
+    var actionsDivider2: View? = null,
+    var scoreCount2: TextView? = null,
+    var upvoteCount2: TextView? = null,
+    var downvoteCount2: TextView? = null,
 ) : RecyclerView.ViewHolder(root) {
+
+    data class State(
+        var preferUpAndDownVotes: Boolean? = null,
+    )
+
+    var state = State()
 
     companion object {
         fun fromBinding(binding: PostCommentExpandedItemBinding) =
@@ -46,16 +60,17 @@ class CommentExpandedViewHolder(
                 headerView = binding.headerView,
                 collapseSectionButton = binding.collapseSectionButton,
                 topHotspot = binding.topHotspot,
+                leftHotspot = binding.leftHotspot,
                 mediaContainer = binding.mediaContainer,
                 overlay = binding.overlay,
                 text = binding.text,
-                scoreCount = binding.upvoteCount,
+                scoreCount = null,
                 upvoteCount = null,
-                upvoteButton = binding.upvoteButton,
+                upvoteButton = null,
                 downvoteCount = null,
-                downvoteButton = binding.downvoteButton,
-                commentButton = binding.commentButton,
-                moreButton = binding.moreButton,
+                downvoteButton = null,
+                commentButton = null,
+                moreButton = null,
                 actionsContainer = null,
             )
         fun fromBinding(binding: PostCommentExpandedCompactItemBinding) =
@@ -68,6 +83,7 @@ class CommentExpandedViewHolder(
                 headerView = binding.headerView,
                 collapseSectionButton = binding.collapseSectionButton,
                 topHotspot = binding.topHotspot,
+                leftHotspot = binding.leftHotspot,
                 mediaContainer = binding.mediaContainer,
                 overlay = binding.overlay,
                 text = binding.text,

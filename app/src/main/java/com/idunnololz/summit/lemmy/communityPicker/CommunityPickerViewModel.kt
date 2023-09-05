@@ -43,10 +43,10 @@ class CommunityPickerViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             apiClient
                 .search(
-                    sortType = SortType.TopMonth,
+                    sortType = SortType.TopAll,
                     listingType = ListingType.All,
                     searchType = SearchType.Communities,
-                    query = query.toString(),
+                    query = query,
                     limit = 20,
                 )
                 .onSuccess {

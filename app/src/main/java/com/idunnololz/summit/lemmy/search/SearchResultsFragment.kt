@@ -68,6 +68,7 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.appendLink
+import com.idunnololz.summit.util.isLoading
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
 import com.idunnololz.summit.video.VideoState
@@ -293,7 +294,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         }
 
                         adapter?.setData(queryEngine.getItems()) {
-                            if (queryEngine.pageCount == 1) {
+                            if (queryEngine.pageCount == 1 && !queryEngine.currentState.value.isLoading()) {
                                 binding.recyclerView.scrollToPosition(0)
                             }
                         }
@@ -423,8 +424,10 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     ?: run {
                         val vh = PostAndCommentViewBuilder.CustomViewHolder(
                             root = b.root,
-                            commentButton = b.commentButton,
-                            controlsDivider = b.controlsDivider
+                            controlsDivider = b.controlsDivider,
+                            addCommentButton = b.commentButton,
+                            controlsDivider2 = b.controlsDivider2,
+                            moreButton = b.moreButton,
                         )
                         b.root.setTag(R.id.view_holder, vh)
                         vh
@@ -505,18 +508,30 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkLongClick = onLinkLongClick,
                 )
 
+
+                val scoreCount: TextView = viewHolder.upvoteCount!!
+                val upvoteCount: TextView?
+                val downvoteCount: TextView?
+
+                if (viewHolder.downvoteCount != null) {
+                    upvoteCount = viewHolder.upvoteCount
+                    downvoteCount = viewHolder.downvoteCount
+                } else {
+                    upvoteCount = null
+                    downvoteCount = null
+                }
                 postAndCommentViewBuilder.voteUiHandler.bind(
-                    viewLifecycleOwner,
-                    item.instance,
-                    item.commentView,
-                    viewHolder.upvoteButton,
-                    viewHolder.downvoteButton,
-                    viewHolder.upvoteCount!!,
-                    viewHolder.upvoteCount,
-                    viewHolder.downvoteCount,
-                    null,
-                    onSignInRequired,
-                    onInstanceMismatch,
+                    lifecycleOwner = viewLifecycleOwner,
+                    instance = item.instance,
+                    commentView = item.commentView,
+                    upVoteView = viewHolder.upvoteButton,
+                    downVoteView = viewHolder.downvoteButton,
+                    scoreView = scoreCount,
+                    upvoteCount = upvoteCount,
+                    downvoteCount = downvoteCount,
+                    onUpdate = null,
+                    onSignInRequired = onSignInRequired,
+                    onInstanceMismatch = onInstanceMismatch,
                 )
 
                 b.commentButton.isEnabled = !post.locked

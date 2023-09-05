@@ -1,6 +1,8 @@
 package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
+import com.idunnololz.summit.api.dto.Person
+import com.idunnololz.summit.api.utils.instance
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
@@ -26,3 +28,6 @@ sealed interface PersonRef : Parcelable, PageRef {
                 is PersonRefByName -> "$name@$instance"
             }
 }
+
+fun Person.toPersonRef() =
+    PersonRef.PersonRefByName(name, instance)

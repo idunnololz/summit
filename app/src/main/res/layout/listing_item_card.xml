@@ -30,7 +30,7 @@
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             style="@style/CardImageView"
-            app:layout_constraintHeight_min="200dp"
+            app:layout_constraintHeight_min="100dp"
             app:layout_constraintHeight_max="1000dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

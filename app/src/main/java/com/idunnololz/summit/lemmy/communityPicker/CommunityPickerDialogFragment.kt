@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.communityPicker
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -40,6 +41,7 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -67,6 +69,13 @@ class CommunityPickerDialogFragment :
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
+    @Parcelize
+    data class Result(
+        val communityRef: CommunityRef.CommunityRefByName,
+        val icon: String?,
+        val communityId: Int,
+    ): Parcelable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +112,6 @@ class CommunityPickerDialogFragment :
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
         }
 
-
         val context = requireContext()
 
         with(binding) {
@@ -118,15 +126,9 @@ class CommunityPickerDialogFragment :
             adapter = CommunityAdapter(
                 context = context,
                 offlineManager = offlineManager, canSelectMultipleCommunities = false,
-                onSingleCommunitySelected = { ref, icon ->
-
-                    userCommunitiesManager.addUserCommunity(
-                        communityRef = ref,
-                        icon = icon,
-                    )
-
+                onSingleCommunitySelected = { ref, icon, communityId ->
                     setFragmentResult(REQUEST_KEY, bundleOf(
-                        REQUEST_KEY_RESULT to ref
+                        REQUEST_KEY_RESULT to Result(ref, icon, communityId)
                     ))
                     dismiss()
                 },

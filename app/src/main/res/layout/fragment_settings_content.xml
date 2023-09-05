@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"/>
 
                 <include
-                    android:id="@+id/compatibility_mode"
+                    android:id="@+id/lock_bottom_bar"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -137,6 +137,22 @@ s
 
                 <include
                     android:id="@+id/show_nsfw_posts"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/advanced_title"
+                    android:text="@string/advanced"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingBottom="@dimen/padding"
+                    android:paddingTop="@dimen/padding_two"
+                    style="@style/SettingHeaderStyle"/>
+
+                <include
+                    android:id="@+id/compatibility_mode"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

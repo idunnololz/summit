@@ -25,7 +25,6 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
-import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -49,6 +48,7 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
@@ -362,7 +362,7 @@ class CommunityFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.updateInfinity()
+        viewModel.updatePreferences()
         binding.loadingView.hideAll()
 
         lemmyAppBarController = LemmyAppBarController(requireMainActivity(), binding.customAppBar)
@@ -386,9 +386,16 @@ class CommunityFragment :
         )
 
         requireMainActivity().apply {
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.customAppBar.customActionBar)
+            insetViewExceptBottomAutomaticallyByMargins(
+                lifecycleOwner = viewLifecycleOwner,
+                view = binding.customAppBar.customActionBar
+            )
 
             binding.customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
+                if (viewModel.lockBottomBar) {
+                    return@addOnOffsetChangedListener
+                }
+
                 val percentShown = -verticalOffset.toFloat() / binding.customAppBar.root.height
 
                 bottomNavViewOffset.value =
@@ -429,6 +436,7 @@ class CommunityFragment :
             onReady()
         }
 
+        binding.fab.setup(preferences)
         binding.fab.setOnClickListener a@{
             showOverflowMenu()
         }
