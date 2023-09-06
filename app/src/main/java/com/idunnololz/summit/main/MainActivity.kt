@@ -210,9 +210,15 @@ class MainActivity : BaseActivity() {
 
         onPreferencesChanged()
 
-        if (isVersionUpdate()) {
+        val newInstall = preferences.appVersionLastLaunch == 0
+        val isVersionUpdate = isVersionUpdate()
+        if (isVersionUpdate) {
             preferences.appVersionLastLaunch = BuildConfig.VERSION_CODE
-            onUpdateComplete()
+        }
+        if (isVersionUpdate || newInstall) {
+            binding.rootView.post {
+                onUpdateComplete()
+            }
         }
     }
 
@@ -229,7 +235,7 @@ class MainActivity : BaseActivity() {
         if (preferences.appVersionLastLaunch == 0) {
             Log.d(TAG, "New install")
             preferences.appVersionLastLaunch = curVersion
-            return true
+            return false
         }
         val prevVersion = preferences.appVersionLastLaunch
         Log.w(TAG, "Current version: $prevVersion New version: $curVersion")
