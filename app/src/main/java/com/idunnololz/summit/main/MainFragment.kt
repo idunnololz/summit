@@ -424,7 +424,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         }
     }
 
-    fun navigateToPage(page: PageRef) {
+    fun navigateToPage(page: PageRef, switchToNativeInstance: Boolean) {
         if (!isBindingAvailable()) return
 
         when (page) {
@@ -445,6 +445,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         page.id,
                         null,
                         isSinglePage = true,
+                        switchToNativeInstance = switchToNativeInstance,
                     ).toBundle(),
                 )
             }

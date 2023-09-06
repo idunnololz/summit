@@ -588,6 +588,9 @@
     <string name="lock_bottom_bar">Lock bottom navigation bar</string>
     <string name="lock_bottom_bar_desc">Prevents the bottom navigation bar from hiding on scroll.</string>
     <string name="advanced">Advanced</string>
+    <string name="update_complete_message">App updated to v%1$s!</string>
+    <string name="changelog">Changelog</string>
+    <string name="sarcasm">Sarcasm</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

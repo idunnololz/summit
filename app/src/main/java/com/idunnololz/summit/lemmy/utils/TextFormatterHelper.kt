@@ -111,6 +111,32 @@ class TextFormatterHelper {
                     autoLineBreak = true,
                 )
             }
+            spongebob.setOnClickListener {
+                val startSelection: Int = editText.selectionStart
+                val endSelection: Int = editText.selectionEnd
+
+                val selectedText: String =
+                    editText.text.toString().substring(startSelection, endSelection)
+                var index = 0
+
+                val newString = buildString {
+                    selectedText.lowercase().forEach a@{
+                        if (it.uppercase() == it.toString()) {
+                            append(it)
+                            return@a
+                        }
+
+                        if (index % 2 == 0) {
+                            append(it.uppercase())
+                        } else {
+                            append(it)
+                        }
+
+                        index++
+                    }
+                }
+                editText.replaceTextAtCursor(newString)
+            }
 
             if (onChooseImageClick != null) {
                 image.visibility = View.VISIBLE

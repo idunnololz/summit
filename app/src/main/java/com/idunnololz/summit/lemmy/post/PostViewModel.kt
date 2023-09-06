@@ -171,29 +171,36 @@ class PostViewModel @Inject constructor(
         fetchPostData: Boolean = true,
         fetchCommentData: Boolean = true,
         force: Boolean = false,
+        switchToNativeInstance: Boolean = false,
     ): Job? {
         Log.d(TAG, "fetchPostData(): fetchPostData = $fetchPostData " +
             "fetchCommentData = $fetchCommentData force = $force")
 
-        val postOrCommentRef = postOrCommentRef ?: return null
-
-        lemmyApiClient.changeInstance(
-            postOrCommentRef
-                .fold(
-                    {
-                        it.instance
-                    },
-                    {
-                        it.instance
-                    },
-                ),
-        )
+        postOrCommentRef ?: return null
 
         postData.setIsLoading()
 
         val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
         return viewModelScope.launch {
+            if (switchToNativeInstance) {
+                translatePostToCurrentInstance()
+            }
+
+            val postOrCommentRef = postOrCommentRef ?: return@launch
+
+            lemmyApiClient.changeInstance(
+                postOrCommentRef
+                    .fold(
+                        {
+                            it.instance
+                        },
+                        {
+                            it.instance
+                        },
+                    ),
+            )
+
             val postResult = if (fetchPostData) {
                 postOrCommentRef
                     .fold(
@@ -375,6 +382,100 @@ class PostViewModel @Inject constructor(
                     }
                 )
         }
+    }
+
+    private suspend fun translatePostToCurrentInstance() {
+        val postOrCommentRef = postOrCommentRef ?: return
+        val currentAccount = currentAccountView.value?.account ?: return
+
+        val instance = postOrCommentRef.fold(
+            { it.instance },
+            { it.instance },
+        )
+        val isNativePost = instance == apiInstance
+
+        if (isNativePost) return
+
+        unauthedApiClient.changeInstance(instance)
+
+        val linkToResolve = postOrCommentRef
+            .fold(
+                {
+                    unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
+                        .fold(
+                            onSuccess = {
+                                Result.success(it.post.ap_id)
+                            },
+                            onFailure = {
+                                Result.failure(it)
+                            }
+                        )
+                },
+                { commentRef ->
+                    unauthedApiClient
+                        .fetchComments(
+                            null,
+                            id = Either.Right(commentRef.id),
+                            sort = CommentSortType.Top, force = false,
+                            maxDepth = 0
+                        )
+                        .fold(
+                            onSuccess = {
+                                val url = it.firstOrNull { it.comment.id == commentRef.id }?.comment?.ap_id
+                                if (url != null) {
+                                    Result.success(url)
+                                } else {
+                                    Result.failure(ObjectResolverFailedException())
+                                }
+                            },
+                            onFailure = {
+                                Result.failure(it)
+                            }
+                        )
+                },
+            )
+
+        linkToResolve
+            .fold(
+                onSuccess = {
+                    Log.d(TAG, "Attempting to resolve $linkToResolve " +
+                        "on instance $apiInstance")
+                    lemmyApiClient.resolveObject(it)
+                },
+                onFailure = {
+                    Result.failure(it)
+                }
+            )
+            .fold(
+                onSuccess = {
+                    val newPostOrCommentRef = if (it.post != null) {
+                        Either.Left(PostRef(currentAccount.instance, it.post.post.id))
+                    } else if (it.comment != null) {
+                        Either.Right(CommentRef(currentAccount.instance, it.comment.comment.id))
+                    } else {
+                        null
+                    }
+
+                    if (newPostOrCommentRef != null) {
+                        updatePostOrCommentRef(newPostOrCommentRef)
+
+                        if (!isNativePost) {
+                            comments = null
+                            pendingComments = null
+                            supplementaryComments.clear()
+                            newlyPostedCommentId = null
+                            additionalLoadedCommentIds.clear()
+                            removedCommentIds.clear()
+                        }
+
+                        fetchPostData(fetchPostData = true, force = true)
+                            ?.join()
+                    }
+                },
+                onFailure = {
+                    Log.e(TAG, "Error resolving object.", it)
+                }
+            )
     }
 
     private fun updatePendingComments(
