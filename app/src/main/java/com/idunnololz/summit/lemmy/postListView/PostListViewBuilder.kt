@@ -389,8 +389,13 @@ class PostListViewBuilder @Inject constructor(
                 holder.state.preferImagesAtEnd = postUiConfig.preferImagesAtEnd
             }
 
-            if (holder.state.preferFullSizeImages != postUiConfig.preferFullSizeImages) {
-                if (postUiConfig.preferFullSizeImages) {
+            val preferFullSizeImages = postUiConfig.preferFullSizeImages &&
+                (rawBinding is ListingItemCardBinding) ||
+                (rawBinding is ListingItemCard2Binding) ||
+                (rawBinding is ListingItemCard3Binding) ||
+                (rawBinding is ListingItemLargeListBinding)
+            if (holder.state.preferFullSizeImages != preferFullSizeImages) {
+                if (preferFullSizeImages) {
                     when (val rb = rawBinding) {
                         is ListingItemCardBinding -> {
                             rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
@@ -439,7 +444,7 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
 
-                holder.state.preferFullSizeImages = postUiConfig.preferFullSizeImages
+                holder.state.preferFullSizeImages = preferFullSizeImages
             }
 
             val finalContentMaxWidth =
