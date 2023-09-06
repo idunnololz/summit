@@ -158,6 +158,8 @@ object PreferenceUtil {
     const val KEY_TRANSPARENT_NOTIFICATION_BAR = "KEY_TRANSPARENT_NOTIFICATION_BAR"
     const val KEY_LOCK_BOTTOM_BAR = "KEY_LOCK_BOTTOM_BAR"
 
+    const val KEY_PREF_VERSION = "pref_version"
+
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {
             preferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE)

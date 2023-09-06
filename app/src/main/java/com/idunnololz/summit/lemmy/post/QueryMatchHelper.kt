@@ -8,7 +8,7 @@ class QueryMatchHelper @Inject constructor(
 ) {
     private var queryMatches: List<QueryResult> = listOf()
     private var currentMatchIndex: Int = 0
-    val currentQueryMatch = MutableLiveData<QueryResult>()
+    val currentQueryMatch = MutableLiveData<QueryResult?>()
 
     val matchCount: Int
         get() = queryMatches.size

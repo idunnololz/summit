@@ -151,6 +151,10 @@
             android:name="isSinglePage"
             android:defaultValue="false"
             app:argType="boolean"/>
+        <argument
+            android:name="switchToNativeInstance"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/communityInfoFragment"

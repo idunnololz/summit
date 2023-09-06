@@ -33,6 +33,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.snackbar.Snackbar
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -207,6 +209,11 @@ class MainActivity : BaseActivity() {
         )
 
         onPreferencesChanged()
+
+        if (isVersionUpdate()) {
+            preferences.appVersionLastLaunch = BuildConfig.VERSION_CODE
+            onUpdateComplete()
+        }
     }
 
     fun onPreferencesChanged() {
@@ -215,6 +222,31 @@ class MainActivity : BaseActivity() {
         } else {
             binding.notificationBarBgContainer.visibility = View.VISIBLE
         }
+    }
+
+    private fun isVersionUpdate(): Boolean {
+        val curVersion = BuildConfig.VERSION_CODE
+        if (preferences.appVersionLastLaunch == 0) {
+            Log.d(TAG, "New install")
+            preferences.appVersionLastLaunch = curVersion
+            return true
+        }
+        val prevVersion = preferences.appVersionLastLaunch
+        Log.w(TAG, "Current version: $prevVersion New version: $curVersion")
+        return prevVersion < curVersion
+    }
+
+    fun onUpdateComplete() {
+        Snackbar
+            .make(
+                binding.snackbarContainer,
+                getString(R.string.update_complete_message, BuildConfig.VERSION_NAME),
+                5000, // 5s
+            )
+            .setAction(R.string.changelog) {
+                launchPage(PostRef("lemmy.world", 4534394), switchToNativeInstance = true)
+            }
+            .show()
     }
 
     private val bottomNavY
@@ -483,7 +515,7 @@ class MainActivity : BaseActivity() {
 //        }
     }
 
-    fun launchPage(page: PageRef) {
+    fun launchPage(page: PageRef, switchToNativeInstance: Boolean = false) {
         val isMainFragment = binding.bottomNavigationView.selectedItemId == R.id.mainFragment &&
             currentNavController?.currentDestination?.id == R.id.mainFragment
 
@@ -492,7 +524,7 @@ class MainActivity : BaseActivity() {
                 binding.bottomNavigationView.selectedItemId = R.id.mainFragment
             }
             executeWhenMainFragmentAvailable { mainFragment ->
-                mainFragment.navigateToPage(page)
+                mainFragment.navigateToPage(page, switchToNativeInstance)
             }
         }
 

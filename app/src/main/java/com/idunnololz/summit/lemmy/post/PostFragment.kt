@@ -747,7 +747,7 @@ class PostFragment :
                 delay(400)
 
                 withContext(Dispatchers.Main) {
-                    viewModel.fetchPostData()
+                    viewModel.fetchPostData(switchToNativeInstance = args.switchToNativeInstance)
                 }
             }
         }
