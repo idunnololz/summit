@@ -201,6 +201,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onPostMoreClick: (PostView) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -230,6 +231,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             postView = postView,
             instance = instance,
             onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
             listAuthor = true,
@@ -251,6 +253,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onVideoClick(url, VideoType.UNKNOWN, null)
             },
             onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
         )
 
@@ -299,6 +302,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onRevealContentClickedFn = onRevealContentClickedFn,
             onItemClickListener = {},
             onLemmyUrlClick = onPageClick,
+            onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
         )
 
@@ -570,6 +574,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         toggleActionsExpanded: () -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onCommentMoreClick: (CommentView) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -620,6 +625,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             instance = instance,
             score = null,
             onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
         )
@@ -637,6 +643,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onVideoClick(url, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
         } else if (commentView.comment.removed || isRemoved) {
@@ -652,6 +659,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onVideoClick(url, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
         } else {
@@ -667,6 +675,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onVideoClick(url, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
         }
@@ -804,6 +813,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         instance: String,
         expandSection: (position: Int) -> Unit,
         onPageClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(binding) {
         scaleTextSizes()
@@ -817,6 +827,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onPageClick = onPageClick,
             detailed = true,
             childrenCount = childrenCount,
+            onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
         )
@@ -868,6 +879,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         collapseSection: (position: Int) -> Unit,
     ) = with(binding) {
@@ -890,6 +902,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onVideoClick(url, VideoType.UNKNOWN, null)
             },
             onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
         )
 
@@ -956,6 +969,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onMessageClick: (InboxItem) -> Unit,
         onAddCommentClick: (InboxItem) -> Unit,
         onOverflowMenuClick: (InboxItem) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -1134,6 +1148,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onVideoClick(url, VideoType.UNKNOWN, null)
             },
             onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
         )
 
@@ -1159,6 +1174,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onVideoClick(url, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
         }
@@ -1574,16 +1590,18 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentView: CommentView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
         lemmyHeaderHelper.populateHeaderSpan(
-            headerContainer,
-            commentView,
-            instance,
+            headerContainer = headerContainer,
+            commentView = commentView,
+            instance = instance,
             score = null,
-            onPageClick,
-            onLinkLongClick,
-            displayInstanceStyle,
+            onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
+            onLinkLongClick = onLinkLongClick,
+            displayInstanceStyle = displayInstanceStyle,
         )
     }
 

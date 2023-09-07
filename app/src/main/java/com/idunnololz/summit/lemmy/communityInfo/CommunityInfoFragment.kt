@@ -34,6 +34,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
@@ -116,6 +117,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
+            },
+            onLinkClick = { url, text ->
+                onLinkClick(url, text)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)
@@ -389,6 +393,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val onImageClick: (String, View?, String) -> Unit,
         private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
+        private val onLinkClick: (url: String, text: String) -> Unit,
         private val onLinkLongClick: (url: String, text: String) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -446,7 +451,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             addItemType(
                 clazz = Item.DescriptionItem::class,
                 inflateFn = PageDataDescriptionItemBinding::inflate,
-            ) { item, b, h ->
+            ) { item, b, _ ->
                 LemmyTextHelper.bindText(
                     textView = b.text,
                     text = item.content,
@@ -458,13 +463,14 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         onVideoClick(it, VideoType.UNKNOWN, null)
                     },
                     onPageClick = onPageClick,
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
             }
             addItemType(
                 Item.StatsItem::class,
                 PageDataStatsItemBinding::inflate,
-            ) { item, b, h ->
+            ) { item, b, _ ->
                 b.posts.text = nf.format(item.postCount)
                 b.comments.text = nf.format(item.commentCount)
                 b.users.text = nf.format(item.userCount)
@@ -476,7 +482,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             addItemType(
                 Item.AdminItem::class,
                 PageDataAdminItemBinding::inflate,
-            ) { item, b, h ->
+            ) { item, b, _ ->
                 b.icon.load(item.admin.person.avatar)
                 b.name.text = item.admin.person.name
 
@@ -487,7 +493,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             addItemType(
                 Item.ModItem::class,
                 PageDataModItemBinding::inflate,
-            ) { item, b, h ->
+            ) { item, b, _ ->
                 b.icon.load(item.mod.avatar)
                 b.name.text = item.mod.name
 
@@ -498,7 +504,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             addItemType(
                 Item.TitleItem::class,
                 PageDataTitleItemBinding::inflate,
-            ) { item, b, h ->
+            ) { item, b, _ ->
                 b.title.text = item.title
             }
         }

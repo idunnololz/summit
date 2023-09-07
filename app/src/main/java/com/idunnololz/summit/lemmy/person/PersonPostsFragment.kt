@@ -15,6 +15,7 @@ import com.idunnololz.summit.lemmy.community.Item
 import com.idunnololz.summit.lemmy.community.ListingItemAdapter
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
@@ -109,6 +110,9 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
             },
             onLoadPage = {
                 viewModel.fetchPage(it)
+            },
+            onLinkClick = { url, text ->
+                onLinkClick(url, text)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)

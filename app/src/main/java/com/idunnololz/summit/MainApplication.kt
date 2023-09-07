@@ -28,9 +28,6 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
-import io.github.inflationx.calligraphy3.CalligraphyConfig
-import io.github.inflationx.calligraphy3.CalligraphyInterceptor
-import io.github.inflationx.viewpump.ViewPump
 import java.util.Locale
 import javax.inject.Inject
 
@@ -200,7 +197,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
         hiltEntryPoint.themeManager().applyThemeFromPreferences()
-        Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInApp
+        Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInExternalApp
         LemmyTextHelper.autoLinkPhoneNumbers = hiltEntryPoint.preferences().autoLinkPhoneNumbers
     }
 

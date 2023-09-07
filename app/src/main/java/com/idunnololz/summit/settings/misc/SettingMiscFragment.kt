@@ -74,10 +74,10 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
 
         settings.openLinksInExternalBrowser.bindTo(
             b = binding.openLinksInApp,
-            { preferences.openLinksInApp },
+            { preferences.openLinksInExternalApp },
             {
-                preferences.openLinksInApp = it
-                Utils.openExternalLinksInBrowser = preferences.openLinksInApp
+                preferences.openLinksInExternalApp = it
+                Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
             }
         )
         settings.autoLinkPhoneNumbers.bindTo(

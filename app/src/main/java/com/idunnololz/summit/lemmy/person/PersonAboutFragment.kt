@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentPersonAboutBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -101,6 +102,9 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
+            },
+            onLinkClick = { url, text ->
+                onLinkClick(url, text)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)

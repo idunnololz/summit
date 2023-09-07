@@ -102,6 +102,7 @@ class LemmyContentHelper(
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
         assertMainThread()
@@ -639,6 +640,7 @@ class LemmyContentHelper(
                     onVideoClickListener(it, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onLemmyUrlClick,
+                onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
         }

@@ -37,17 +37,17 @@ class CustomPlayerView : PlayerView {
             muteButton.visibility = View.GONE
         } else {
             if (player.volume <= 0.1f) {
-                muteButton.setImageResource(R.drawable.baseline_volume_up_24)
-            } else {
                 muteButton.setImageResource(R.drawable.baseline_volume_off_24)
+            } else {
+                muteButton.setImageResource(R.drawable.baseline_volume_up_24)
             }
             muteButton.setOnClickListener {
                 if (player.volume <= 0.1f) {
                     player.volume = 1f
-                    muteButton.setImageResource(R.drawable.baseline_volume_off_24)
+                    muteButton.setImageResource(R.drawable.baseline_volume_up_24)
                 } else {
                     player.volume = 0f
-                    muteButton.setImageResource(R.drawable.baseline_volume_up_24)
+                    muteButton.setImageResource(R.drawable.baseline_volume_off_24)
                 }
             }
         }

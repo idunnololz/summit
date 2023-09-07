@@ -58,6 +58,7 @@ class ListingItemAdapter(
     private val onShowMoreActions: (PostView) -> Unit,
     private val onPostRead: (PostView) -> Unit,
     private val onLoadPage: (Int) -> Unit,
+    private val onLinkClick: (url: String, text: String?) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -200,6 +201,7 @@ class ListingItemAdapter(
                         onHighlightComplete = {
                             postListEngine.clearHighlight()
                         },
+                        onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                     )
                 }
@@ -279,6 +281,7 @@ class ListingItemAdapter(
                     onHighlightComplete = {
                         postListEngine.clearHighlight()
                     },
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
             }
