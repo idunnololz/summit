@@ -51,6 +51,7 @@ class CommentListAdapter(
     private val onCommentMoreClick: (CommentView) -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
+    private val onLinkClick: (url: String, text: String) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
 ) : Adapter<ViewHolder>() {
 
@@ -167,6 +168,7 @@ class CommentListAdapter(
                     commentView = item.commentView,
                     instance = item.instance,
                     onPageClick = onPageClick,
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
             LemmyTextHelper.bindText(
@@ -180,6 +182,7 @@ class CommentListAdapter(
                     onVideoClick(it, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
 
@@ -225,7 +228,7 @@ class CommentListAdapter(
             }
         }
         addItemType(Item.EndItem::class, CommentListEndItemBinding::inflate) { _, _, _ -> }
-        addItemType(Item.ErrorItem::class, LoadingViewItemBinding::inflate) { item, b, h ->
+        addItemType(Item.ErrorItem::class, LoadingViewItemBinding::inflate) { item, b, _ ->
             b.loadingView.showDefaultErrorMessageFor(item.error)
             b.loadingView.setOnRefreshClickListener {
                 onLoadPage(item.pageToLoad)

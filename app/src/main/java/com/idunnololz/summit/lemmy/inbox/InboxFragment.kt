@@ -38,6 +38,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -451,6 +452,9 @@ class InboxFragment :
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
+            onLinkClick = { url, text ->
+                onLinkClick(url, text)
+            },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)
             },
@@ -520,6 +524,7 @@ class InboxFragment :
         private val onOverflowMenuClick: (InboxItem) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
+        private val onLinkClick: (url: String, text: String) -> Unit,
         private val onLinkLongClick: (String, String) -> Unit,
     ) : RecyclerView.Adapter<ViewHolder>() {
 
@@ -544,7 +549,7 @@ class InboxFragment :
                 }
             },
         ).apply {
-            addItemType(Item.InboxListItem::class, InboxListItemBinding::inflate) { item, b, h ->
+            addItemType(Item.InboxListItem::class, InboxListItemBinding::inflate) { item, b, _ ->
                 postAndCommentViewBuilder.bindMessage(
                     b = b,
                     instance = instance,
@@ -560,10 +565,11 @@ class InboxFragment :
                     onOverflowMenuClick = onOverflowMenuClick,
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
             }
-            addItemType(Item.LoaderItem::class, InboxListLoaderItemBinding::inflate) { item, b, h ->
+            addItemType(Item.LoaderItem::class, InboxListLoaderItemBinding::inflate) { item, b, _ ->
                 when (val state = item.state) {
                     is StatefulData.Error -> {
                         b.loadingView.showDefaultErrorMessageFor(state.error)
@@ -594,8 +600,8 @@ class InboxFragment :
         private fun refreshItems() {
             val newItems = mutableListOf<Item>()
 
-            allData.forEach {
-                it.items.mapTo(newItems) {
+            allData.forEach { data ->
+                data.items.mapTo(newItems) {
                     Item.InboxListItem(it)
                 }
             }

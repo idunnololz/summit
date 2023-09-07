@@ -38,6 +38,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -145,6 +146,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     onPageClick = {
                         getMainActivity()?.launchPage(it)
                     },
+                    onLinkClick = { url, text ->
+                        onLinkClick(url, text)
+                    },
                     onLinkLongClick = { url, text ->
                         getMainActivity()?.showBottomMenuForLink(url, text)
                     },
@@ -172,6 +176,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
+            },
+            onLinkClick = { url, text ->
+                onLinkClick(url, text)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)
@@ -490,6 +497,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     )
                 },
                 onLoadPost = {},
+                onLinkClick = { url, text ->
+                    onLinkClick(url, text)
+                },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)
                 },

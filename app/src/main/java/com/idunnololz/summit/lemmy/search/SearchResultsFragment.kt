@@ -59,6 +59,7 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
@@ -200,6 +201,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                             ),
                         )
                         .createAndShow(childFragmentManager, "aa")
+                },
+                onLinkClick = { url, text ->
+                    onLinkClick(url, text)
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)
@@ -349,6 +353,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private val onPostMoreClick: (PostView) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
+        private val onLinkClick: (url: String, text: String) -> Unit,
         private val onLinkLongClick: (url: String, text: String?) -> Unit,
         private val onCommentClick: (CommentRef) -> Unit,
         private val onItemClick: (
@@ -488,12 +493,13 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     }
                 }
                 postAndCommentViewBuilder.populateHeaderSpan(
-                        headerContainer = b.headerContainer,
-                        commentView = item.commentView,
-                        instance = item.instance,
-                        onPageClick = onPageClick,
-                        onLinkLongClick = onLinkLongClick,
-                    )
+                    headerContainer = b.headerContainer,
+                    commentView = item.commentView,
+                    instance = item.instance,
+                    onPageClick = onPageClick,
+                    onLinkClick = onLinkClick,
+                    onLinkLongClick = onLinkLongClick,
+                )
                 LemmyTextHelper.bindText(
                     textView = b.text,
                     text = item.commentView.comment.content,
@@ -505,6 +511,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onVideoClick = {
                         onVideoClick(it, VideoType.UNKNOWN, null)
                     },
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
 
@@ -569,7 +576,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onPageClick(community.community.toCommunityRef())
                 }
             }
-            addItemType(Item.PostItem::class, SearchResultPostItemBinding::inflate) { item, b, h ->
+            addItemType(Item.PostItem::class, SearchResultPostItemBinding::inflate) { item, b, _ ->
                 val h = b.root.getTag(R.id.view_holder) as? ListingItemViewHolder ?: run {
                     ListingItemViewHolder.fromBinding(b).also {
                         b.root.setTag(R.id.view_holder, it)
@@ -612,6 +619,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
                     onHighlightComplete = {},
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
             }

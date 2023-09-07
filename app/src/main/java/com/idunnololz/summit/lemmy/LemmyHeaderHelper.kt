@@ -58,6 +58,7 @@ class LemmyHeaderHelper(
         postView: PostView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
         listAuthor: Boolean = true,
@@ -252,12 +253,12 @@ class LemmyHeaderHelper(
                 ): Boolean {
                     val pageRef = LinkResolver.parseUrl(url, instance)
 
-                    return if (pageRef != null) {
+                    if (pageRef != null) {
                         onPageClick(pageRef)
-                        true
                     } else {
-                        false
+                        onLinkClick(url, text)
                     }
+                    return true
                 }
             }
         }
@@ -269,6 +270,7 @@ class LemmyHeaderHelper(
         instance: String,
         score: Int?,
         onPageClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
         detailed: Boolean = false,
@@ -450,12 +452,12 @@ class LemmyHeaderHelper(
         if (detailed) {
             sb.appendSeparator()
 
-            val score = score ?: commentView.counts.score
+            val finalScore = score ?: commentView.counts.score
             sb.append(
                 headerContainer.context.resources.getQuantityString(
                     R.plurals.point_count_format,
-                    score,
-                    LemmyUtils.abbrevNumber(score.toLong()),
+                    finalScore,
+                    LemmyUtils.abbrevNumber(finalScore.toLong()),
                 ),
             )
 
@@ -489,12 +491,12 @@ class LemmyHeaderHelper(
                 ): Boolean {
                     val pageRef = LinkResolver.parseUrl(url, instance)
 
-                    return if (pageRef != null) {
+                    if (pageRef != null) {
                         onPageClick(pageRef)
-                        true
                     } else {
-                        false
+                        onLinkClick(url, text)
                     }
+                    return true
                 }
             }
         }
@@ -621,6 +623,7 @@ class LemmyHeaderHelper(
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun SpannableStringBuilder.appendSeparator() {
     val s = length
     append(LemmyHeaderHelper.SEPARATOR)

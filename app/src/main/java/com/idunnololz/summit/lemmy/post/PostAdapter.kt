@@ -69,6 +69,7 @@ class PostsAdapter(
     private val onCommentMoreClick: (CommentView) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
+    private val onLinkClick: (url: String, text: String) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -326,6 +327,7 @@ class PostsAdapter(
                         onPostMoreClick = onPostMoreClick,
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch = onInstanceMismatch,
+                        onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                     )
 
@@ -379,6 +381,7 @@ class PostsAdapter(
                     onPostMoreClick = onPostMoreClick,
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
 
@@ -432,6 +435,7 @@ class PostsAdapter(
                         onCommentMoreClick = onCommentMoreClick,
                         onLinkLongClick = onLinkLongClick,
                         onSignInRequired = onSignInRequired,
+                        onLinkClick = onLinkClick,
                         onInstanceMismatch = onInstanceMismatch,
                     )
                 } else {
@@ -453,6 +457,7 @@ class PostsAdapter(
                         instance,
                         ::expandSection,
                         onPageClick,
+                        onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                     )
                 }
@@ -480,6 +485,7 @@ class PostsAdapter(
                         onImageClick,
                         onVideoClick,
                         onPageClick,
+                        onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                         ::collapseSection,
                     )

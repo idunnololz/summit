@@ -51,6 +51,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
+import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
@@ -443,7 +444,7 @@ class Preferences @Inject constructor(
                 .apply()
         }
 
-    var openLinksInApp: Boolean
+    var openLinksInExternalApp: Boolean
         get() = prefs.getBoolean(KEY_OPEN_LINKS_IN_APP, false)
         set(value) {
             prefs.edit()
@@ -474,7 +475,7 @@ class Preferences @Inject constructor(
         }
 
     var retainLastPost: Boolean
-        get() = prefs.getBoolean(KEY_RETAIN_LAST_POST, false)
+        get() = prefs.getBoolean(KEY_RETAIN_LAST_POST, true)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_RETAIN_LAST_POST, value)
@@ -482,7 +483,7 @@ class Preferences @Inject constructor(
         }
 
     var leftHandMode: Boolean
-        get() = prefs.getBoolean(KEY_LEFT_HAND_MODE, true)
+        get() = prefs.getBoolean(KEY_LEFT_HAND_MODE, false)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_LEFT_HAND_MODE, value)
@@ -510,6 +511,14 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putInt(KEY_PREF_VERSION, value)
+                .apply()
+        }
+
+    var previewLinks: Boolean
+        get() = prefs.getBoolean(KEY_PREVIEW_LINKS, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_PREVIEW_LINKS, value)
                 .apply()
         }
 

@@ -303,6 +303,7 @@ class SettingViewTypeFragment :
             onSignInRequired = {},
             onInstanceMismatch = { _, _ -> },
             onHighlightComplete = {},
+            onLinkClick = { _, _ -> },
             onLinkLongClick = { _, _ -> },
         )
     }

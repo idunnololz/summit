@@ -55,6 +55,7 @@ import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
@@ -358,6 +359,9 @@ class PostFragment :
                 onLoadPost = {
                     viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), it)))
                     viewModel.fetchPostData()
+                },
+                onLinkClick = { url, text ->
+                    onLinkClick(url, text)
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)

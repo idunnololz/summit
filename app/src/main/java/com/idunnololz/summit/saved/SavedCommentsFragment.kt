@@ -22,6 +22,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
@@ -120,6 +121,9 @@ class SavedCommentsFragment :
             },
             onCommentMoreClick = {
                 showMoreCommentOptions(parentFragment.viewModel.instance, it, actionsViewModel, childFragmentManager)
+            },
+            onLinkClick = { url, text ->
+                onLinkClick(url, text)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)

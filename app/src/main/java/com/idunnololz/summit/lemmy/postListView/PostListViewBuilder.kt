@@ -176,6 +176,7 @@ class PostListViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
         val url = postView.post.url
@@ -495,6 +496,7 @@ class PostListViewBuilder @Inject constructor(
                     postView = postView,
                     instance = instance,
                     onPageClick = onPageClick,
+                    onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                     displayInstanceStyle = displayInstanceStyle,
                 )
@@ -696,6 +698,7 @@ class PostListViewBuilder @Inject constructor(
                             onRevealContentClickedFn()
                         },
                         onLemmyUrlClick = onPageClick,
+                        onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                     )
                 }
@@ -784,6 +787,7 @@ class PostListViewBuilder @Inject constructor(
                     onVideoClick(it, VideoType.UNKNOWN, null)
                 },
                 onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
 

@@ -54,6 +54,7 @@ object LemmyTextHelper {
         onImageClick: (url: String) -> Unit,
         onVideoClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
         bindLemmyText(textView, text, instance, highlight)
@@ -69,8 +70,10 @@ object LemmyTextHelper {
 
                     if (pageRef != null) {
                         onPageClick(pageRef)
+                    } else {
+                        onLinkClick(url, text)
                     }
-                    return pageRef != null
+                    return true
                 }
             }
             onLinkLongClickListener = DefaultLinkLongClickListener(textView.context, onLinkLongClick)

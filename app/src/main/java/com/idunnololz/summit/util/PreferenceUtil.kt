@@ -157,6 +157,7 @@ object PreferenceUtil {
     const val KEY_LEFT_HAND_MODE = "KEY_LEFT_HAND_MODE"
     const val KEY_TRANSPARENT_NOTIFICATION_BAR = "KEY_TRANSPARENT_NOTIFICATION_BAR"
     const val KEY_LOCK_BOTTOM_BAR = "KEY_LOCK_BOTTOM_BAR"
+    const val KEY_PREVIEW_LINKS = "KEY_PREVIEW_LINKS"
 
     const val KEY_PREF_VERSION = "pref_version"
 

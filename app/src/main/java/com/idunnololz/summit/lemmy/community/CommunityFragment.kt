@@ -48,6 +48,7 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.main.LemmyAppBarController
@@ -288,6 +289,9 @@ class CommunityFragment :
                 },
                 onLoadPage = {
                     viewModel.fetchPage(it)
+                },
+                onLinkClick = { url, text ->
+                    onLinkClick(url, text)
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)
