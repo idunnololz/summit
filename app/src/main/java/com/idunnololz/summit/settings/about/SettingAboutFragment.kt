@@ -63,7 +63,9 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
     }
 
     private fun updateRendering() {
-        aboutSettings.version.bindTo(binding.version, {})
+        aboutSettings.version.bindTo(binding.version, {
+            getMainActivity()?.launchChangelog()
+        })
 
         aboutSettings.googlePlayLink.bindTo(binding.playStoreListing) {
             try {

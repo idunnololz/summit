@@ -2,6 +2,7 @@ package com.idunnololz.summit.account.info
 
 import android.content.Context
 import android.net.Uri
+import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
@@ -13,6 +14,7 @@ import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -159,12 +161,22 @@ class AccountInfoManager @Inject constructor(
                 response.my_user?.moderates?.map { it.community.id },
             ),
         )
-        currentFullAccount.emit(
-            FullAccount(
-                account,
-                accountInfo,
-            ),
+        val fullAccount = FullAccount(
+            account,
+            accountInfo,
         )
+        currentFullAccount.emit(fullAccount)
+
+//        fullAccount.accountInfo
+//            .miscAccountInfo
+//            ?.modCommunityIds
+//            ?.let {
+//                CommunityRef.MultiCommunity(
+//                    context.getString(R.string.moderated_communities),
+//                    "mod",
+//
+//                    )
+//            }
 
         accountInfoDao.insert(accountInfo)
 

@@ -13,6 +13,7 @@ import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
+import com.idunnololz.summit.lemmy.multicommunity.NoModeratedCommunitiesException
 import com.idunnololz.summit.scrape.LoaderException
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 
@@ -52,6 +53,8 @@ fun Throwable.toErrorMessage(context: Context): String {
             }
         is MultiCommunityDataSource.CommunityNotFoundException ->
             context.getString(R.string.error_community_not_found_on_instance, t.communityRef.fullName)
+        is NoModeratedCommunitiesException ->
+            context.getString(R.string.error_no_moderated_communities)
         else -> {
             Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
             context.getString(R.string.error_unknown)

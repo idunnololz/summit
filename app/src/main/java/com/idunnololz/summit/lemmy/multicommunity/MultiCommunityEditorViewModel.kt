@@ -80,7 +80,8 @@ class MultiCommunityEditorViewModel @Inject constructor(
             val icons = flow {
                 communities.forEach { community ->
                     apiClient
-                        .fetchCommunityWithRetry(Either.Right(community.getServerId()), false)
+                        .fetchCommunityWithRetry(
+                            Either.Right(community.getServerId(apiClient.instance)), false)
                         .onSuccess {
                             val icon = it.community_view.community.icon
                             if (icon != null) {

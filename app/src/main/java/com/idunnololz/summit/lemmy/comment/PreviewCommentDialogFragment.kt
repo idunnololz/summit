@@ -53,7 +53,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
                 onImageClick = {},
                 onVideoClick = {},
                 onPageClick = {},
-                onLinkClick = { _, _ -> },
+                onLinkClick = { _, _, _ -> },
                 onLinkLongClick = { _, _ -> },
             )
         }

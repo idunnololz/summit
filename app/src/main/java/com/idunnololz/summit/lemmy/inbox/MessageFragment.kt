@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.inbox
 
 import android.os.Bundle
-import android.util.LayoutDirection
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +18,6 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
@@ -28,8 +25,6 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.post.PostsAdapter
@@ -38,15 +33,12 @@ import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
-import com.idunnololz.summit.lemmy.utils.onLinkClick
-import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -146,8 +138,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     onPageClick = {
                         getMainActivity()?.launchPage(it)
                     },
-                    onLinkClick = { url, text ->
-                        onLinkClick(url, text)
+                    onLinkClick = { url, text, linkType ->
+                        onLinkClick(url, text, linkType)
                     },
                     onLinkLongClick = { url, text ->
                         getMainActivity()?.showBottomMenuForLink(url, text)
@@ -177,8 +169,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             onPageClick = {
                 getMainActivity()?.launchPage(it)
             },
-            onLinkClick = { url, text ->
-                onLinkClick(url, text)
+            onLinkClick = { url, text, linkType ->
+                onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)
@@ -283,7 +275,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     binding.score,
                     null,
                     null,
-                    { vote, totalScore, upvotes, downvotes, ->
+                    { vote, _, _, _, ->
                         if (vote > 0) {
                             binding.score.setTextColor(upvoteColor)
                         } else if (vote == 0) {
@@ -467,7 +459,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         },).toBundle()
                     }.show(childFragmentManager, "asdf")
                 },
-                onImageClick = { postOrCommentView, view, url ->
+                onImageClick = { _, view, url ->
                     getMainActivity()?.openImage(view, binding.appBar, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
@@ -497,8 +489,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     )
                 },
                 onLoadPost = {},
-                onLinkClick = { url, text ->
-                    onLinkClick(url, text)
+                onLinkClick = { url, text, linkType ->
+                    onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)

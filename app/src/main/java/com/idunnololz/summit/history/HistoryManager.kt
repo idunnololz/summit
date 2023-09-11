@@ -80,7 +80,8 @@ class HistoryManager @Inject constructor(
     ) {
         coroutineScope.launch {
             withContext(dbContext) {
-                if (state.communityState.communityRef is CommunityRef.MultiCommunity) {
+                if (state.communityState.communityRef is CommunityRef.MultiCommunity ||
+                    state.communityState.communityRef is CommunityRef.ModeratedCommunities) {
                     // Multi-communities are purely client sided so we cannot record history for them.
                     return@withContext
                 }

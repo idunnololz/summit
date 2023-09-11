@@ -62,7 +62,10 @@ sealed interface CommunityRef : PageRef, Parcelable {
                 return "$name@$instance"
             }
 
-        fun getServerId(): String {
+        fun getServerId(apiInstance: String): String {
+            if (apiInstance == "burggit.moe") {
+                return name
+            }
             if (instance == null) {
                 return "$name@"
             }
@@ -86,6 +89,13 @@ sealed interface CommunityRef : PageRef, Parcelable {
         val communities: List<CommunityRefByName>
     ) : CommunityRef
 
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("7")
+    data class ModeratedCommunities(
+        val instance: String?,
+    ) : CommunityRef
+
     fun getName(context: Context): String =
         when (this) {
             is Local -> context.getString(R.string.local)
@@ -93,6 +103,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
             is CommunityRefByName -> this.name
             is Subscribed -> context.getString(R.string.subscribed)
             is MultiCommunity -> this.name
+            is ModeratedCommunities -> context.getString(R.string.moderated_communities)
         }
 
     fun getKey(): String =
@@ -118,6 +129,13 @@ sealed interface CommunityRef : PageRef, Parcelable {
                 }
             is MultiCommunity ->
                 "multicommunity@${this.name}"
+
+            is ModeratedCommunities ->
+                if (this.instance != null) {
+                    "mc@${this.instance}"
+                } else {
+                    "mc"
+                }
         }
 }
 

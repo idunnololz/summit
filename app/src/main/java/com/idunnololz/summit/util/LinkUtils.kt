@@ -6,6 +6,8 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
 import okhttp3.CacheControl
 import okhttp3.Request
@@ -148,7 +150,7 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
                     Utils.shareLink(context, url)
                 }
                 R.id.open_in_browser -> {
-                    Utils.openExternalLink(context, url)
+                    onLinkClick(url, null, LinkType.Action)
                 }
                 R.id.open_link_incognito -> {
                     Utils.openExternalLink(context, url, openNewIncognitoTab = true)

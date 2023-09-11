@@ -50,6 +50,7 @@ fun CommunityRef.toUri(apiInstance: String): Uri {
         is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
         is CommunityRef.Subscribed -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Subscribed"
         is CommunityRef.MultiCommunity -> throw MultiCommunityException()
+        is CommunityRef.ModeratedCommunities -> throw ModeratedCommunitiesException()
     }
 
     return Uri.parse(url)
@@ -76,3 +77,4 @@ fun CommunityViewState.getShortDesc(context: Context): String =
     )
 
 class MultiCommunityException : Exception()
+class ModeratedCommunitiesException : Exception()

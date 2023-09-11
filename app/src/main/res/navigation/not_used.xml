@@ -146,4 +146,12 @@
             android:name="draftType"
             app:argType="integer" />
     </dialog>
+    <fragment
+        android:id="@+id/linkPreviewDialogFragment"
+        android:name="com.idunnololz.summit.links.LinkPreviewDialogFragment"
+        android:label="LinkPreviewDialogFragment" >
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </fragment>
 </navigation>

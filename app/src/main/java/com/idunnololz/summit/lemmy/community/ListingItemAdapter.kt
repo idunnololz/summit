@@ -28,6 +28,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
@@ -58,7 +59,7 @@ class ListingItemAdapter(
     private val onShowMoreActions: (PostView) -> Unit,
     private val onPostRead: (PostView) -> Unit,
     private val onLoadPage: (Int) -> Unit,
-    private val onLinkClick: (url: String, text: String?) -> Unit,
+    private val onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -302,8 +303,9 @@ class ListingItemAdapter(
 
                 b.loadingView.setOnRefreshClickListener {
                     postListEngine.setPageItemLoading(item.pageToLoad)
-                    onLoadPage(item.pageToLoad)
                     onItemsChanged()
+
+                    onLoadPage(item.pageToLoad)
                 }
             }
 

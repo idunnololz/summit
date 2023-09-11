@@ -48,7 +48,7 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
-import com.idunnololz.summit.lemmy.utils.onLinkClick
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.main.LemmyAppBarController
@@ -290,8 +290,8 @@ class CommunityFragment :
                 onLoadPage = {
                     viewModel.fetchPage(it)
                 },
-                onLinkClick = { url, text ->
-                    onLinkClick(url, text)
+                onLinkClick = { url, text, linkType ->
+                    onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)
@@ -752,7 +752,7 @@ class CommunityFragment :
                                     postView,
                                     null,
                                 ).toBundle()
-                            }.show(childFragmentManager, "asdf")
+                            }.showAllowingStateLoss(childFragmentManager, "asdf")
                         }
 
                         PostGestureAction.Hide -> {
@@ -963,6 +963,7 @@ class CommunityFragment :
                 is CommunityRef.Local -> {}
                 is CommunityRef.Subscribed -> {}
                 is CommunityRef.MultiCommunity -> {}
+                is CommunityRef.ModeratedCommunities -> {}
                 null -> {}
             }
 
@@ -1092,7 +1093,15 @@ class CommunityFragment :
                         } else {
                             userCommunitiesManager.addUserCommunity(
                                 currentCommunityRef,
-                                viewModel.postListEngine.getCommunityIcon(),
+                                when (currentCommunityRef) {
+                                    is CommunityRef.CommunityRefByName ->
+                                        viewModel.postListEngine.getCommunityIcon()
+                                    is CommunityRef.All,
+                                    is CommunityRef.Local,
+                                    is CommunityRef.ModeratedCommunities,
+                                    is CommunityRef.MultiCommunity,
+                                    is CommunityRef.Subscribed -> null
+                                },
                             )
                         }
                     }

@@ -314,7 +314,7 @@ class SettingPostAndCommentsFragment :
                     videoState = null,
                     onAddCommentClick = {},
                     onPostMoreClick = {},
-                    onLinkClick = { _, _ -> },
+                    onLinkClick = { _, _, _ -> },
                     onLinkLongClick = { _, _ -> },
                 )
             }
@@ -372,7 +372,7 @@ class SettingPostAndCommentsFragment :
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
                         onCommentMoreClick = {},
-                        onLinkClick = { _, _ -> },
+                        onLinkClick = { _, _, _ -> },
                         onLinkLongClick = { _, _ -> },
                     )
                 }
@@ -418,7 +418,7 @@ class SettingPostAndCommentsFragment :
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
                         onCommentMoreClick = {},
-                        onLinkClick = { _, _ -> },
+                        onLinkClick = { _, _, _ -> },
                         onLinkLongClick = { _, _ -> },
                     )
                 }

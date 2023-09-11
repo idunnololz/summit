@@ -591,6 +591,19 @@
     <string name="update_complete_message">App updated to v%1$s!</string>
     <string name="changelog">Changelog</string>
     <string name="sarcasm">Sarcasm</string>
+    <string name="preview_links">Preview links</string>
+    <string name="preview_links_desc">Tapping on a link opens a preview of the link before opening the link.</string>
+    <string name="open_link">Open link</string>
+    <string name="error_no_preview_image">No preview image available</string>
+    <string name="copy_link">Copy link</string>
+    <string name="copied">Copied</string>
+    <string name="preview_text_links">Preview text links</string>
+    <string name="dont_preview_links">Don\'t preview links</string>
+    <string name="preview_all_links">Preview all links</string>
+    <string name="full_url">Full url</string>
+    <string name="removed">Removed</string>
+    <string name="moderated_communities">Moderated communities</string>
+    <string name="error_no_moderated_communities">User is not the moderator of any communities.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

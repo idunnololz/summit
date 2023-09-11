@@ -16,6 +16,7 @@ import coil.decode.VideoFrameDecoder
 import coil.transition.CrossfadeTransition
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.offline.OfflineScheduleManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
 import com.idunnololz.summit.util.Client
@@ -40,6 +41,9 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
     @Inject
     lateinit var themeManager: ThemeManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     companion object {
         private val TAG = MainApplication::class.java.simpleName

@@ -29,6 +29,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
+import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
@@ -308,7 +310,7 @@ class ImageViewerActivity : BaseActivity() {
                             true
                         }
                         R.id.openInBrowser -> {
-                            Utils.openExternalLink(context, args.url)
+                            onLinkClick(args.url, null, LinkType.Action)
                             true
                         }
                         else -> false

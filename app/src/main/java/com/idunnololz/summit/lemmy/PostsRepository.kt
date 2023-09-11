@@ -16,6 +16,7 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
+import com.idunnololz.summit.lemmy.multicommunity.ModeratedCommunitiesDataSource
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.Preferences
@@ -41,6 +42,7 @@ class PostsRepository @Inject constructor(
     private val preferences: Preferences,
     private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
     private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
+    private val moderatedCommunitiesDataSourceFactory: ModeratedCommunitiesDataSource.Factory,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -232,6 +234,7 @@ class PostsRepository @Inject constructor(
                 is CommunityRef.Subscribed -> communityRef.instance ?: apiClient.instance
                 is CommunityRef.MultiCommunity ->
                     communityRef.communities.firstOrNull()?.instance ?: apiClient.instance
+                is CommunityRef.ModeratedCommunities -> apiClient.instance
             }
 
     val apiInstance: String
@@ -281,7 +284,7 @@ class PostsRepository @Inject constructor(
 
             is CommunityRef.CommunityRefByName -> {
                 currentDataSource = singlePostsDataSourceFactory.create(
-                    communityName = communityRef.getServerId(),
+                    communityName = communityRef.getServerId(apiClient.instance),
                     listingType = ListingType.All,
                 )
                 postsPerPage = DEFAULT_POSTS_PER_PAGE
@@ -293,6 +296,12 @@ class PostsRepository @Inject constructor(
                     apiClient.instance,
                     communityRef.communities
                 )
+                postsPerPage = 15
+
+                apiClient.defaultInstance()
+            }
+            is CommunityRef.ModeratedCommunities -> {
+                currentDataSource = moderatedCommunitiesDataSourceFactory.create()
                 postsPerPage = 15
 
                 apiClient.defaultInstance()
@@ -337,6 +346,15 @@ class PostsRepository @Inject constructor(
 
         allPosts = mutableListOf()
         seenPosts = mutableSetOf()
+    }
+
+    fun onAccountChanged() {
+        reset()
+
+        if (communityRef is CommunityRef.ModeratedCommunities) {
+            // We need to reload the moderated community list on account switch
+            setCommunity(communityRef)
+        }
     }
 
     suspend fun onHiddenPostsChange() {
@@ -392,6 +410,7 @@ class PostsRepository @Inject constructor(
                 }
             },
             onFailure = {
+                Log.d(TAG, "fetchPage() error: $it")
                 Result.failure(it)
             },
         )

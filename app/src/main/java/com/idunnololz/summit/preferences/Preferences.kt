@@ -12,6 +12,7 @@ import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostInListUiConfig
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
+import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
@@ -514,11 +515,15 @@ class Preferences @Inject constructor(
                 .apply()
         }
 
-    var previewLinks: Boolean
-        get() = prefs.getBoolean(KEY_PREVIEW_LINKS, false)
+    var previewLinks: Int
+        get() = try {
+            prefs.getInt(KEY_PREVIEW_LINKS, PreviewTextLinks)
+        } catch (e: Exception) {
+            PreviewTextLinks
+        }
         set(value) {
             prefs.edit()
-                .putBoolean(KEY_PREVIEW_LINKS, value)
+                .putInt(KEY_PREVIEW_LINKS, value)
                 .apply()
         }
 
