@@ -3,6 +3,7 @@ package com.idunnololz.summit.settings
 import android.content.Context
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.links.PreviewLinkOptions
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.CommentsThreadStyle
@@ -1077,6 +1078,32 @@ class MiscSettings @Inject constructor(
         null,
     )
 
+    val previewLinks = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.preview_links),
+        context.getString(R.string.preview_links_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                PreviewLinkOptions.PreviewTextLinks,
+                context.getString(R.string.preview_text_links),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PreviewLinkOptions.PreviewNoLinks,
+                context.getString(R.string.dont_preview_links),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PreviewLinkOptions.PreviewAllLinks,
+                context.getString(R.string.preview_all_links),
+                null,
+                null,
+            ),
+        ),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
@@ -1084,6 +1111,7 @@ class MiscSettings @Inject constructor(
         retainLastPost,
         leftHandMode,
         transparentNotificationBar,
+        previewLinks,
     )
 }
 

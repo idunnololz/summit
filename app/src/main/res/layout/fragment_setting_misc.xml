@@ -75,6 +75,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <include
+                    android:id="@+id/preview_links"
+                    layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>

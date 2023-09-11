@@ -38,8 +38,9 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.lemmy.utils.onLinkClick
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
@@ -92,7 +93,7 @@ class InboxFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, bundle ->
+        setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, _ ->
 //            val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
 //
 //            if (result != null) {
@@ -247,7 +248,7 @@ class InboxFragment :
                 context.getColorCompat(R.color.style_green),
                 R.drawable.baseline_check_24,
                 binding.recyclerView,
-            ) { viewHolder, direction ->
+            ) { viewHolder, _ ->
                 val inboxItem = adapter.getItemAt(viewHolder.absoluteAdapterPosition)
                 if (inboxItem != null) {
                     viewModel.markAsRead(
@@ -452,8 +453,8 @@ class InboxFragment :
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
-            onLinkClick = { url, text ->
-                onLinkClick(url, text)
+            onLinkClick = { url, text, linkType ->
+                onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)
@@ -524,7 +525,7 @@ class InboxFragment :
         private val onOverflowMenuClick: (InboxItem) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
-        private val onLinkClick: (url: String, text: String) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         private val onLinkLongClick: (String, String) -> Unit,
     ) : RecyclerView.Adapter<ViewHolder>() {
 

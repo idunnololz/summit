@@ -38,6 +38,7 @@ import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.QueryResult
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
@@ -69,7 +70,7 @@ class PostsAdapter(
     private val onCommentMoreClick: (CommentView) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
-    private val onLinkClick: (url: String, text: String) -> Unit,
+    private val onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

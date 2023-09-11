@@ -17,6 +17,7 @@ import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
@@ -58,7 +59,7 @@ class LemmyHeaderHelper(
         postView: PostView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
         listAuthor: Boolean = true,
@@ -72,6 +73,22 @@ class LemmyHeaderHelper(
             val e = sb.length
             sb.setSpan(
                 RoundedBackgroundSpan(criticalWarningColor, emphasisColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.appendSeparator()
+        }
+
+        if (postView.post.removed) {
+            val d = Utils.tint(context, R.drawable.baseline_delete_24, R.color.style_red)
+            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            d.setBounds(0, 0, size, size)
+            val s = sb.length
+            sb.append("  ")
+            val e = sb.length
+            sb.setSpan(
+                CenteredImageSpan(d),
                 s,
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
@@ -256,7 +273,7 @@ class LemmyHeaderHelper(
                     if (pageRef != null) {
                         onPageClick(pageRef)
                     } else {
-                        onLinkClick(url, text)
+                        onLinkClick(url, text, LinkType.Text)
                     }
                     return true
                 }
@@ -270,7 +287,7 @@ class LemmyHeaderHelper(
         instance: String,
         score: Int?,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
         detailed: Boolean = false,
@@ -494,7 +511,7 @@ class LemmyHeaderHelper(
                     if (pageRef != null) {
                         onPageClick(pageRef)
                     } else {
-                        onLinkClick(url, text)
+                        onLinkClick(url, text, LinkType.Text)
                     }
                     return true
                 }

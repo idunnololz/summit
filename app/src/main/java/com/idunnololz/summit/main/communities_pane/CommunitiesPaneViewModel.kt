@@ -1,9 +1,11 @@
 package com.idunnololz.summit.main.communities_pane
 
+import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
@@ -14,11 +16,13 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CommunitiesPaneViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val communitiesPaneControllerFactory: CommunitiesPaneController.Factory,
     private val accountInfoManager: AccountInfoManager,
     private val userCommunitiesManager: UserCommunitiesManager,

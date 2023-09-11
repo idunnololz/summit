@@ -11,8 +11,8 @@ import android.util.Log
 import android.widget.TextView
 import coil.imageLoader
 import com.idunnololz.summit.R
-import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.spans.SpoilerSpan
 import com.idunnololz.summit.util.CoilImagesPlugin
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
@@ -54,10 +54,10 @@ object LemmyTextHelper {
         onImageClick: (url: String) -> Unit,
         onVideoClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
-        bindLemmyText(textView, text, instance, highlight)
+        bindLemmyText(textView, text, highlight)
         textView.movementMethod = CustomLinkMovementMethod().apply {
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
@@ -71,7 +71,7 @@ object LemmyTextHelper {
                     if (pageRef != null) {
                         onPageClick(pageRef)
                     } else {
-                        onLinkClick(url, text)
+                        onLinkClick(url, text, LinkType.Text)
                     }
                     return true
                 }
@@ -90,7 +90,6 @@ object LemmyTextHelper {
     private fun bindLemmyText(
         textView: TextView,
         text: String,
-        instance: String,
         highlight: HighlightTextData?,
     ) {
         getMarkwon(textView.context).let {
@@ -189,6 +188,7 @@ object LemmyTextHelper {
                 if (referenceTypeToken != null &&
                     name != null &&
                     instance != null &&
+                    !name.contains("]") &&
                     !instance.contains("]") /* make sure we are not within a link def */
                 ) {
                     when (referenceTypeToken.lowercase(Locale.US)) {

@@ -48,6 +48,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
@@ -176,7 +177,7 @@ class PostListViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
         val url = postView.post.url
@@ -508,6 +509,10 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 fun loadAndShowImage() {
+                    if (postView.post.removed) {
+                        // Do not show the image if the post is removed.
+                        return
+                    }
                     val image = image ?: return
 
                     val thumbnailImageUrl = if (thumbnailUrl != null &&
@@ -639,7 +644,7 @@ class PostListViewBuilder @Inject constructor(
                             }
                         } else {
                             if (url != null && (postType == PostType.Text || postType == PostType.Link)) {
-                                Utils.openExternalLink(context, url)
+                                onLinkClick(url, null, LinkType.Rich)
                             } else {
                                 onImageClick(postView, image, imageUrl)
                             }
@@ -891,7 +896,7 @@ class PostListViewBuilder @Inject constructor(
                         val t = Uri.parse(url).host ?: url
                         linkText?.text = t
                         linkOverlay?.setOnClickListener {
-                            Utils.openExternalLink(context, url)
+                            onLinkClick(url, null, LinkType.Rich)
                         }
                         linkOverlay?.setOnLongClickListener {
                             onLinkLongClick(url, t)
@@ -903,7 +908,7 @@ class PostListViewBuilder @Inject constructor(
                         linkIcon?.visibility = View.GONE
                         linkOverlay?.visibility = View.GONE
                         openLinkButton?.setOnClickListener {
-                            Utils.openExternalLink(context, url)
+                            onLinkClick(url, null, LinkType.Action)
                         }
                     }
                 }

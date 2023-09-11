@@ -253,6 +253,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                             loadIcon(R.drawable.baseline_dynamic_feed_24)
                         is CommunityRef.Subscribed ->
                             loadIcon(R.drawable.baseline_subscriptions_24)
+                        is CommunityRef.ModeratedCommunities ->
+                            loadIcon(R.drawable.outline_shield_24)
                     }
                 } else {
                     offlineManager.fetchImage(h.itemView, item.iconUrl) {

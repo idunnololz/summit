@@ -20,7 +20,6 @@ import androidx.annotation.LayoutRes
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import coil.load
-import coil.size.Scale
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
@@ -32,9 +31,9 @@ import com.idunnololz.summit.api.utils.getThumbnailUrl
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getVideoInfo
 import com.idunnololz.summit.api.utils.shouldHideItem
-import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.postListView.FullContentConfig
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
@@ -102,7 +101,7 @@ class LemmyContentHelper(
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
         assertMainThread()
@@ -376,23 +375,23 @@ class LemmyContentHelper(
                     onVideoClickListener(url, VideoType.UNKNOWN, customPlayerView?.getVideoState())
                 } else if (uri.host == "gfycat.com") {
                     val keyLowerCase = uri.path?.substring(1)?.split("-")?.get(0) ?: ""
-                    val url = requireNotNull(targetPostView.post.thumbnail_url)
-                    val startIndex = url.indexOf(keyLowerCase, ignoreCase = true)
+                    val thumbnailUrl = requireNotNull(targetPostView.post.thumbnail_url)
+                    val startIndex = thumbnailUrl.indexOf(keyLowerCase, ignoreCase = true)
                     if (startIndex > -1 && keyLowerCase.isNotBlank()) {
                         val key =
-                            url.substring(startIndex, startIndex + keyLowerCase.length)
+                            thumbnailUrl.substring(startIndex, startIndex + keyLowerCase.length)
                         onVideoClickListener(
                             "https://thumbs.gfycat.com/$key-mobile.mp4",
                             VideoType.UNKNOWN,
                             customPlayerView?.getVideoState(),
                         )
                     } else {
-                        Utils.openExternalLink(context, url)
+                        onLinkClick(thumbnailUrl, null, LinkType.Rich)
                     }
                 } else if (uri.host == "imgur.com") {
                     onImageClickListener(url)
                 } else {
-                    Utils.openExternalLink(context, url)
+                    onLinkClick(url, null, LinkType.Rich)
                 }
             }
             externalContentView.setOnLongClickListener {

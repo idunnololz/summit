@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.communityInfo
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +25,7 @@ import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.SiteView
 import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.databinding.CommunityInfoCommunityItemBinding
 import com.idunnololz.summit.databinding.FragmentCommunityInfoBinding
 import com.idunnololz.summit.databinding.PageDataAdminItemBinding
 import com.idunnololz.summit.databinding.PageDataDescriptionItemBinding
@@ -31,11 +34,15 @@ import com.idunnololz.summit.databinding.PageDataStatsItemBinding
 import com.idunnololz.summit.databinding.PageDataTitleItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
-import com.idunnololz.summit.lemmy.utils.onLinkClick
+import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
+import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -45,6 +52,7 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToTs
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
@@ -103,6 +111,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val adapter = PageDataAdapter(
             context,
             viewModel.instance,
+            offlineManager,
             onImageClick = { imageName, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
@@ -118,12 +127,15 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             onPageClick = {
                 getMainActivity()?.launchPage(it)
             },
-            onLinkClick = { url, text ->
-                onLinkClick(url, text)
+            onLinkClick = { url, text, linkType ->
+                onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showBottomMenuForLink(url, text)
             },
+            onCommunityInfoClick = { communityRef ->
+                getMainActivity()?.showCommunityInfo(communityRef)
+            }
         )
 
         binding.loadingView.setOnRefreshClickListener {
@@ -137,7 +149,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
-                is StatefulData.NotStarted -> {}
+                is StatefulData.NotStarted -> {
+                    binding.loadingView.hideAll()
+                }
                 is StatefulData.Success -> {
                     binding.loadingView.hideAll()
                     val pageData = it.data.fold(
@@ -152,6 +166,33 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 }
             }
         }
+        viewModel.multiCommunity.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.showDefaultErrorMessageFor(it.error)
+                }
+                is StatefulData.Loading -> {
+                    binding.loadingView.showProgressBar()
+                }
+                is StatefulData.NotStarted -> {
+                    binding.loadingView.hideAll()
+                }
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+
+                    adapter.multiCommunity = it.data
+                    binding.recyclerView.adapter = adapter
+
+                    binding.subtitle.text = viewModel.instance
+                    binding.icon.setImageResource(R.drawable.outline_shield_24)
+                    binding.icon.strokeWidth = 0f
+                    ImageViewCompat.setImageTintList(
+                        binding.icon,
+                        ColorStateList.valueOf(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                    )
+                }
+            }
+        }
 
         // setup initial view state so animations aren't messy
         with(binding) {
@@ -160,6 +201,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is CommunityRef.Local,
                 is CommunityRef.Subscribed,
                 is CommunityRef.MultiCommunity,
+                is CommunityRef.ModeratedCommunities,
                 -> {
                     subscribe.visibility = View.GONE
                 }
@@ -292,7 +334,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val context = requireContext()
 
         val communityView = data.backingObject.leftOrNull()
-        val siteView = data.backingObject.getOrNull()
+//        val siteView = data.backingObject.getOrNull()
 
         TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
 
@@ -390,11 +432,13 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private class PageDataAdapter(
         private val context: Context,
         private val instance: String,
+        private val offlineManager: OfflineManager,
         private val onImageClick: (String, View?, String) -> Unit,
         private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
-        private val onLinkClick: (url: String, text: String) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         private val onLinkLongClick: (url: String, text: String) -> Unit,
+        private val onCommunityInfoClick: (communityRef: CommunityRef) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private sealed interface Item {
@@ -420,9 +464,18 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             data class TitleItem(
                 val title: String,
             ) : Item
+            data class CommunityItem(
+                val communityView: CommunityView,
+            ) : Item
         }
 
         var data: PageData? = null
+            set(value) {
+                field = value
+
+                refreshItems()
+            }
+        var multiCommunity: List<GetCommunityResponse>? = null
             set(value) {
                 field = value
 
@@ -445,6 +498,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         true
                     is Item.TitleItem ->
                         old.title == (new as Item.TitleItem).title
+                    is Item.CommunityItem ->
+                        old.communityView.community.id ==
+                            (new as Item.CommunityItem).communityView.community.id
                 }
             },
         ).apply {
@@ -507,6 +563,26 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             ) { item, b, _ ->
                 b.title.text = item.title
             }
+            addItemType(
+                Item.CommunityItem::class,
+                CommunityInfoCommunityItemBinding::inflate,
+            ) { item, b, h ->
+                b.icon.load(R.drawable.ic_subreddit_default)
+                offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
+                    b.icon.load(it)
+                }
+
+                b.title.text = item.communityView.community.name
+                val mauString = LemmyUtils.abbrevNumber(item.communityView.counts.users_active_month.toLong())
+
+                @Suppress("SetTextI18n")
+                b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
+                    "(${item.communityView.community.instance})"
+
+                b.root.setOnClickListener {
+                    onCommunityInfoClick(item.communityView.community.toCommunityRef())
+                }
+            }
         }
 
         override fun getItemViewType(position: Int): Int =
@@ -521,32 +597,41 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             adapterHelper.onBindViewHolder(holder, position)
 
         private fun refreshItems() {
-            val data = data ?: return
+            val data = data
+            val multiCommunity = multiCommunity
             val newItems = mutableListOf<Item>()
 
-            newItems.add(
-                Item.StatsItem(
-                    data.postCount,
-                    data.commentCount,
-                    data.userCount,
-                    data.usersPerDay,
-                    data.usersPerWeek,
-                    data.usersPerMonth,
-                    data.usersPerSixMonth,
-                ),
-            )
-            newItems.add(Item.DescriptionItem(data.content ?: ""))
+            if (data != null) {
+                newItems.add(
+                    Item.StatsItem(
+                        data.postCount,
+                        data.commentCount,
+                        data.userCount,
+                        data.usersPerDay,
+                        data.usersPerWeek,
+                        data.usersPerMonth,
+                        data.usersPerSixMonth,
+                    ),
+                )
+                newItems.add(Item.DescriptionItem(data.content ?: ""))
 
-            if (data.admins.isNotEmpty()) {
-                newItems.add(Item.TitleItem(context.getString(R.string.admins)))
-                data.admins.mapTo(newItems) {
-                    Item.AdminItem(it)
+                if (data.admins.isNotEmpty()) {
+                    newItems.add(Item.TitleItem(context.getString(R.string.admins)))
+                    data.admins.mapTo(newItems) {
+                        Item.AdminItem(it)
+                    }
                 }
-            }
-            if (data.mods.isNotEmpty()) {
-                newItems.add(Item.TitleItem(context.getString(R.string.mods)))
-                data.mods.mapTo(newItems) {
-                    Item.ModItem(it)
+                if (data.mods.isNotEmpty()) {
+                    newItems.add(Item.TitleItem(context.getString(R.string.mods)))
+                    data.mods.mapTo(newItems) {
+                        Item.ModItem(it)
+                    }
+                }
+            } else if (multiCommunity != null) {
+                for (community in multiCommunity) {
+                    newItems.add(Item.CommunityItem(
+                        community.community_view
+                    ))
                 }
             }
 

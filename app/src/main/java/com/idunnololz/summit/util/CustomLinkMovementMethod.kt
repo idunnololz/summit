@@ -193,6 +193,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                 ) ?: false
 
                 if (!handled) {
+                    // this shouldn't really be called
                     Utils.openExternalLink(textView.context, clickableSpanWithText.url)
                 }
             } else {

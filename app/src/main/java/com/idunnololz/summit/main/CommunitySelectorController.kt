@@ -18,6 +18,7 @@ import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommonLemmyInstance
 import com.idunnololz.summit.api.dto.CommunityView
@@ -62,6 +63,7 @@ class CommunitySelectorController @AssistedInject constructor(
     @Assisted private val viewLifecycleOwner: LifecycleOwner,
     private val offlineManager: OfflineManager,
     private val accountManager: AccountManager,
+    private val accountInfoManager: AccountInfoManager,
     private val lemmyApiClient: AccountAwareLemmyClient,
     private val recentCommunityManager: RecentCommunityManager,
 ) {
@@ -334,36 +336,36 @@ class CommunitySelectorController @AssistedInject constructor(
                 clazz = Item.CurrentCommunity::class,
                 inflateFn = CommunitySelectorCurrentCommunityItemBinding::inflate,
             ) { item, b, _ ->
+                b.communityName.text = item.communityRef.getName(context)
 
                 when (item.communityRef) {
                     is CommunityRef.All -> {
-                        b.communityName.text = context.getString(R.string.all)
                         item.communityRef.instance?.let {
                             b.instance.text = it
                         }
                     }
                     is CommunityRef.CommunityRefByName -> {
-                        b.communityName.text = item.communityRef.name
                         item.communityRef.instance?.let {
                             b.instance.text = it
                         }
                     }
                     is CommunityRef.Local -> {
-                        b.communityName.text = context.getString(R.string.local)
                         item.communityRef.instance?.let {
                             b.instance.text = it
                         }
                     }
                     is CommunityRef.Subscribed -> {
-                        b.communityName.text = context.getString(R.string.subscribed)
                         item.communityRef.instance?.let {
                             b.instance.text = it
                         }
                     }
 
                     is CommunityRef.MultiCommunity -> {
-                        b.communityName.text = item.communityRef.name
                         b.instance.text = context.getString(R.string.multicommunity)
+                    }
+
+                    is CommunityRef.ModeratedCommunities -> {
+                        b.instance.text = item.communityRef.getName(context)
                     }
                 }
 
@@ -549,7 +551,8 @@ class CommunitySelectorController @AssistedInject constructor(
             if (!isQueryActive) {
                 val currentCommunityData = currentCommunityData
                 val currentCommunityRef = currentCommunityRef
-                if (currentCommunityRef is CommunityRef.MultiCommunity) {
+                if (currentCommunityRef is CommunityRef.MultiCommunity ||
+                    currentCommunityRef is CommunityRef.ModeratedCommunities) {
                     newItems.add(
                         Item.CurrentCommunity(
                             communityRef = currentCommunityRef,
@@ -645,6 +648,20 @@ class CommunitySelectorController @AssistedInject constructor(
                             CommunityRef.Local(null),
                         ),
                     )
+                    if (accountInfoManager.currentFullAccount.value
+                        ?.accountInfo
+                        ?.miscAccountInfo
+                        ?.modCommunityIds
+                        ?.isNotEmpty() == true) {
+
+                        newItems.add(
+                            Item.StaticChildItem(
+                                context.getString(R.string.moderated_communities),
+                                R.drawable.outline_shield_24,
+                                CommunityRef.ModeratedCommunities(null),
+                            ),
+                        )
+                    }
                 } else {
                     newItems.addAll(
                         listOf(

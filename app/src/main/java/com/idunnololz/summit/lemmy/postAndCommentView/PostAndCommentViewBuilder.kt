@@ -63,6 +63,7 @@ import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
@@ -201,7 +202,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onPostMoreClick: (PostView) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -574,7 +575,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         toggleActionsExpanded: () -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onCommentMoreClick: (CommentView) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -813,7 +814,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         instance: String,
         expandSection: (position: Int) -> Unit,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(binding) {
         scaleTextSizes()
@@ -879,7 +880,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         collapseSection: (position: Int) -> Unit,
     ) = with(binding) {
@@ -969,7 +970,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onMessageClick: (InboxItem) -> Unit,
         onAddCommentClick: (InboxItem) -> Unit,
         onOverflowMenuClick: (InboxItem) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -1590,7 +1591,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentView: CommentView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
         lemmyHeaderHelper.populateHeaderSpan(

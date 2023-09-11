@@ -55,7 +55,7 @@ import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
-import com.idunnololz.summit.lemmy.utils.onLinkClick
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
@@ -311,9 +311,9 @@ class PostFragment :
                         ).toBundle()
                     }.show(childFragmentManager, "asdf")
                 },
-                onImageClick = { postOrCommentView, view, url ->
+                onImageClick = { postOrCommentView, imageView, url ->
                     getMainActivity()?.openImage(
-                        sharedElement = view,
+                        sharedElement = imageView,
                         appBar = binding.appBar,
                         title = postOrCommentView?.fold(
                             {
@@ -360,8 +360,8 @@ class PostFragment :
                     viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), it)))
                     viewModel.fetchPostData()
                 },
-                onLinkClick = { url, text ->
-                    onLinkClick(url, text)
+                onLinkClick = { url, text, linkType ->
+                    onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showBottomMenuForLink(url, text)

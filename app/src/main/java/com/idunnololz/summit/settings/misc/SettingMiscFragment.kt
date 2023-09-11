@@ -127,12 +127,23 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
                 getMainActivity()?.onPreferencesChanged()
             }
         )
+        settings.previewLinks.bindTo(
+            binding.previewLinks,
+            { preferences.previewLinks },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {
             settings.instanceNameStyle.id -> {
                 preferences.displayInstanceStyle = value as Int
+            }
+            settings.previewLinks.id -> {
+                preferences.previewLinks = value as Int
             }
         }
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
@@ -15,7 +16,11 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.lang.RuntimeException
 import javax.inject.Inject
@@ -33,6 +38,7 @@ class CommunityInfoViewModel @Inject constructor(
     private var communityRef: CommunityRef? = null
 
     val siteOrCommunity = StatefulLiveData<Either<GetSiteResponse, GetCommunityResponse>>()
+    val multiCommunity = StatefulLiveData<List<GetCommunityResponse>>()
     private val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
 
     val instance
@@ -44,6 +50,10 @@ class CommunityInfoViewModel @Inject constructor(
             if (communityRef is CommunityRef.MultiCommunity) {
                 siteOrCommunity.postError(RuntimeException())
                 return@launch
+            } else if (communityRef is CommunityRef.ModeratedCommunities) {
+                siteOrCommunity.setIdle()
+                fetchModeratedCommunities()
+                return@launch
             }
 
             val result = when (communityRef) {
@@ -51,7 +61,8 @@ class CommunityInfoViewModel @Inject constructor(
                     Either.Left(apiClient.fetchSiteWithRetry(force))
                 }
                 is CommunityRef.CommunityRefByName -> {
-                    Either.Right(apiClient.fetchCommunityWithRetry(Either.Right(communityRef.getServerId()), force))
+                    Either.Right(apiClient.fetchCommunityWithRetry(
+                        Either.Right(communityRef.getServerId(instance)), force))
                 }
                 is CommunityRef.Local -> {
                     Either.Left(apiClient.fetchSiteWithRetry(force))
@@ -60,6 +71,7 @@ class CommunityInfoViewModel @Inject constructor(
                     Either.Left(apiClient.fetchSiteWithRetry(force))
                 }
                 is CommunityRef.MultiCommunity -> error("unreachable code")
+                is CommunityRef.ModeratedCommunities -> error("unreachable code")
             }
 
             result
@@ -82,6 +94,41 @@ class CommunityInfoViewModel @Inject constructor(
                         }
                 }
         }
+    }
+
+    private suspend fun fetchModeratedCommunities() {
+        multiCommunity.setIsLoading()
+        val fullAccount = accountInfoManager.currentFullAccount.value
+
+        if (fullAccount == null) {
+            multiCommunity.setError(NotAuthenticatedException())
+            return
+        }
+
+        val results = flow {
+            val moderatedCommunityIds = fullAccount
+                .accountInfo
+                .miscAccountInfo
+                ?.modCommunityIds
+                ?: listOf()
+            moderatedCommunityIds.forEach { community ->
+                val result = apiClient
+                    .fetchCommunityWithRetry(Either.Left(community), false)
+                emit(result)
+            }
+        }.flowOn(Dispatchers.Default).toList()
+
+        val successResults = mutableListOf<GetCommunityResponse>()
+        for (result in results) {
+            if (result.isSuccess) {
+                successResults.add(result.getOrThrow())
+            } else {
+                multiCommunity.setError(requireNotNull(result.exceptionOrNull()))
+                return
+            }
+        }
+
+        multiCommunity.setValue(successResults)
     }
 
     fun updateSubscriptionStatus(communityId: Int, subscribe: Boolean) {

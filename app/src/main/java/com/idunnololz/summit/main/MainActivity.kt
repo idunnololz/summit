@@ -250,9 +250,13 @@ class MainActivity : BaseActivity() {
                 5000, // 5s
             )
             .setAction(R.string.changelog) {
-                launchPage(PostRef("lemmy.world", 4534394), switchToNativeInstance = true)
+                launchChangelog()
             }
             .show()
+    }
+
+    fun launchChangelog() {
+        launchPage(PostRef("lemmy.world", 4851929), switchToNativeInstance = true)
     }
 
     private val bottomNavY

@@ -46,7 +46,7 @@ class MultiCommunityDataSource(
                     SortType.Active,
                     { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
                         this.fetchPosts(
-                            Either.Right(communityRef.getServerId()),
+                            Either.Right(communityRef.getServerId(apiClient.instance)),
                             sortOrder,
                             ListingType.All,
                             page,
@@ -120,6 +120,9 @@ class MultiCommunityDataSource(
         }
     }
 
+    val sourcesCount: Int
+        get() = sources.size
+
     private suspend fun fetchPage(
         pageIndex: Int,
     ): Result<Page> = withContext(pagesContext) a@{
@@ -162,7 +165,7 @@ class MultiCommunityDataSource(
             sourceToResult = sourceToResult.filter { it.second.isSuccess }
 
             val nextSourceAndResult = sourceToResult.maxBy { (_, result) ->
-                val postView = result.getOrThrow() ?: return@maxBy 0L
+                val postView = result.getOrThrow() ?: return@maxBy -1L
 
                 if (postView.post.featured_local || postView.post.featured_community) {
                     return@maxBy Long.MAX_VALUE

@@ -135,7 +135,7 @@ class CommunityViewModel @Inject constructor(
                     fetchPageJob?.cancel()
                     fetchingPages.clear()
 
-                    postsRepository.reset()
+                    postsRepository.onAccountChanged()
 
                     onCommunityOrInstanceChange()
                 }
