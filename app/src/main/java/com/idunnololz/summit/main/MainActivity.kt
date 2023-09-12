@@ -563,6 +563,7 @@ class MainActivity : BaseActivity() {
                         page.id,
                         null,
                         isSinglePage = true,
+                        switchToNativeInstance = switchToNativeInstance,
                     ).toBundle(),
                 )
             }

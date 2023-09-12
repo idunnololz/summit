@@ -556,11 +556,7 @@ class PostsAdapter(
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
 
-        val item = if (holder.absoluteAdapterPosition >= 0) {
-            items[holder.absoluteAdapterPosition]
-        } else {
-            null
-        }
+        val item = items.getOrNull(holder.absoluteAdapterPosition)
 
         if (holder.isBinding<PostHeaderItemBinding>()) {
             val b = holder.getBinding<PostHeaderItemBinding>()
