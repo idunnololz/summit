@@ -149,7 +149,7 @@ object LemmyTextHelper {
          * 3) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
          * 4) Matches against full community names (!a@b.com)
          */
-        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\s+\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(!|[cC]/|@|[uU]/)([^@\s]+)@([^@\s]+\.[^@\s]+)""")
+        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\s+\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]+)""")
 
         private fun processAll(s: String): String {
             val matcher = largeRegex.matcher(s)
@@ -181,18 +181,20 @@ object LemmyTextHelper {
                     Log.d(TAG, "Fixed ${"$formattingChar $rest"}")
                 }
 
-                val referenceTypeToken = matcher.group(7)
-                val name = matcher.group(8)
-                val instance = matcher.group(9)
+                val linkStart = matcher.group(7)
+                val referenceTypeToken = matcher.group(8)
+                val name = matcher.group(9)
+                val instance = matcher.group(10)
 
-                if (referenceTypeToken != null &&
+                if (linkStart == null &&
+                    referenceTypeToken != null &&
                     name != null &&
                     instance != null &&
                     !name.contains("]") &&
                     !instance.contains("]") /* make sure we are not within a link def */
                 ) {
                     when (referenceTypeToken.lowercase(Locale.US)) {
-                        "!", "c/" -> {
+                        "!", "c/", "/c/" -> {
                             val communityRef = CommunityRef.CommunityRefByName(name, instance)
 
                             matcher.appendReplacement(
@@ -200,7 +202,7 @@ object LemmyTextHelper {
                                 "[${matcher.group(0)}](${LinkUtils.getLinkForCommunity(communityRef)})",
                             )
                         }
-                        "@", "u/" -> {
+                        "@", "u/", "/u/" -> {
                             val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
                             matcher.appendReplacement(
                                 sb,

@@ -63,7 +63,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
             }
 
         fun getServerId(apiInstance: String): String {
-            if (apiInstance == "burggit.moe") {
+            if (apiInstance == "burggit.moe" && instance == apiInstance) {
                 return name
             }
             if (instance == null) {

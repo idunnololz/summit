@@ -28,7 +28,7 @@ class LinkPreviewViewModel @Inject constructor() : ViewModel() {
             try {
                 linkMetadata.postValue(_loadLinkMetadata(url))
             } catch (e: Exception) {
-                var host: String = url
+                var host: String? = url
                 val uri: URI?
                 try {
                     uri = URI(url)
