@@ -5,6 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <View
+        android:id="@+id/start_guideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <HorizontalScrollView
         android:id="@+id/headerView"
         android:layout_width="0dp"
@@ -16,7 +24,7 @@
         android:requiresFadingEdge="horizontal"
         android:scrollbars="none"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.idunnololz.summit.view.LemmyHeaderView
@@ -35,7 +43,7 @@
         android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
         android:scrollbars="none"
         app:layout_constraintTop_toBottomOf="@+id/headerView"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
@@ -44,14 +52,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
 
     <Space
         android:id="@+id/content_footer"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/padding_half"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintTop_toBottomOf="@+id/fullContent"/>
 
     <com.google.android.material.button.MaterialButton
@@ -61,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_quarter"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:icon="@drawable/baseline_comment_18"
         app:layout_constraintTop_toBottomOf="@+id/content_footer"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -146,6 +154,6 @@
         android:id="@+id/bottom_divider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
