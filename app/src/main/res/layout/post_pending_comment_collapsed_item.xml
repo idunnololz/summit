@@ -25,6 +25,14 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <View
+        android:id="@+id/start_guideline"
+        android:layout_width="@dimen/padding_quarter"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <View
         android:id="@+id/topHotspot"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -604,6 +604,8 @@
     <string name="removed">Removed</string>
     <string name="moderated_communities">Moderated communities</string>
     <string name="error_no_moderated_communities">User is not the moderator of any communities.</string>
+    <string name="preview_link">Preview link</string>
+    <string name="take_screenshot">Take screenshot</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

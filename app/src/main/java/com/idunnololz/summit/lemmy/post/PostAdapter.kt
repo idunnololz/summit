@@ -1,14 +1,19 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
@@ -84,6 +89,7 @@ class PostsAdapter(
             val showBottomDivider: Boolean,
             val query: String?,
             val currentMatch: QueryResult?,
+            val screenshotMode: Boolean,
         ) : Item(postView.getUniqueKey())
 
         data class CommentItem(
@@ -104,6 +110,7 @@ class PostsAdapter(
             val isHighlighted: Boolean,
             val query: String?,
             val currentMatch: QueryResult?,
+            val screenshotMode: Boolean,
         ) : Item(
             "comment_${comment.comment.id}",
         )
@@ -119,6 +126,7 @@ class PostsAdapter(
             val view: PostViewModel.ListView.PendingCommentListView,
             val childrenCount: Int,
             val query: String?,
+            val screenshotMode: Boolean,
         ) : Item(
             "pending_comment_${view.pendingCommentView.id}",
         )
@@ -128,6 +136,7 @@ class PostsAdapter(
             val moreCount: Int,
             val depth: Int,
             val baseDepth: Int,
+            val screenshotMode: Boolean,
         ) : Item(
             "more_comments_$parentId",
         )
@@ -136,6 +145,7 @@ class PostsAdapter(
             val commentId: CommentId?,
             val depth: Int,
             val baseDepth: Int,
+            val screenshotMode: Boolean,
         ) : Item(
             "deleted_$commentId",
         )
@@ -146,6 +156,7 @@ class PostsAdapter(
 
         data class ViewAllComments(
             val postId: PostId,
+            val screenshotMode: Boolean,
         ) : Item("view_all_yo")
 
         data object FooterItem : Item("footer")
@@ -163,6 +174,8 @@ class PostsAdapter(
     private var revealedItems = mutableSetOf<String>()
 
     private var actionExpandedComments = mutableSetOf<CommentId>()
+
+    private var checkedItems = mutableSetOf<String>()
 
     private var rawData: PostViewModel.PostData? = null
 
@@ -200,6 +213,16 @@ class PostsAdapter(
                     notifyItemChanged(i)
                 }
             }
+        }
+
+    var screenshotMode: Boolean = false
+        set(value) {
+            if (value == field) {
+                return
+            }
+            field = value
+
+            refreshItems()
         }
 
     override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
@@ -337,6 +360,8 @@ class PostsAdapter(
                     } else {
                         b.bottomDivider.visibility = View.GONE
                     }
+
+                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
                 }
             }
             else -> super.onBindViewHolder(holder, position, payloads)
@@ -391,6 +416,8 @@ class PostsAdapter(
                 } else {
                     b.bottomDivider.visibility = View.GONE
                 }
+
+                updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
             }
             is CommentItem -> {
                 if (item.isExpanded) {
@@ -439,6 +466,8 @@ class PostsAdapter(
                         onLinkClick = onLinkClick,
                         onInstanceMismatch = onInstanceMismatch,
                     )
+
+                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
                 } else {
                     // collapsed
                     val b = holder.getBinding<PostCommentCollapsedItemBinding>()
@@ -461,6 +490,8 @@ class PostsAdapter(
                         onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                     )
+
+                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
                 }
 
                 holder.itemView.setTag(R.id.swipeable, true)
@@ -490,6 +521,8 @@ class PostsAdapter(
                         onLinkLongClick = onLinkLongClick,
                         ::collapseSection,
                     )
+
+                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
                 } else {
                     // collapsed
                     val b = holder.getBinding<PostPendingCommentCollapsedItemBinding>()
@@ -506,6 +539,8 @@ class PostsAdapter(
                         highlightForever,
                         ::collapseSection,
                     )
+
+                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
                 }
                 holder.itemView.setTag(R.id.expanded, item.isExpanded)
             }
@@ -535,6 +570,7 @@ class PostsAdapter(
                         onFetchComments(item.parentId)
                     }
                 }
+                updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
             }
 
             FooterItem -> {}
@@ -543,6 +579,7 @@ class PostsAdapter(
                 b.button.setOnClickListener {
                     onLoadPost(item.postId)
                 }
+                updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
             }
 
             is Item.MissingCommentItem -> {
@@ -569,6 +606,40 @@ class PostsAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+
+    private fun updateScreenshotMode(
+        screenshotMode: Boolean,
+        startGuideline: View,
+        root: ConstraintLayout,
+    ) {
+        if (screenshotMode) {
+            startGuideline.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                marginStart = Utils.convertDpToPixel(48f).toInt()
+            }
+
+            val checkbox = MaterialCheckBox(context).apply {
+                buttonDrawable = null
+                buttonIconDrawable = null
+                setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    null,
+                    AppCompatResources.getDrawable(
+                        context, com.google.android.material.R.drawable.mtrl_checkbox_button),
+                    null,
+                    null)
+                text = "Include in screenshot"
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                }
+                gravity = Gravity.CENTER
+            }
+            root.addView(checkbox)
+        }
+    }
 
     /**
      * @param refreshHeader Pass false to not always refresh header. Useful for web view headers
@@ -604,13 +675,14 @@ class PostsAdapter(
                         currentMatch
                     } else {
                         null
-                    }
+                    },
+                    screenshotMode,
                 )
 
                 absolutionPositionToTopLevelCommentPosition += -1
 
                 if (rawData.isSingleComment) {
-                    finalItems += Item.ViewAllComments(postView.post.post.id)
+                    finalItems += Item.ViewAllComments(postView.post.post.id, screenshotMode)
                     absolutionPositionToTopLevelCommentPosition += -1
                 }
 
@@ -656,7 +728,8 @@ class PostsAdapter(
                                     currentMatch
                                 } else {
                                     null
-                                }
+                                },
+                                screenshotMode,
                             )
                             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
@@ -676,6 +749,7 @@ class PostsAdapter(
                                 view = commentView,
                                 childrenCount = commentItem.children.size,
                                 query = query,
+                                screenshotMode,
                             )
                             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
@@ -693,6 +767,7 @@ class PostsAdapter(
                                     moreCount = commentView.moreCount,
                                     depth = commentItem.depth,
                                     baseDepth = 0,
+                                    screenshotMode,
                                 )
                                 absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                             }
@@ -703,6 +778,7 @@ class PostsAdapter(
                                 commentId = commentView.commentId,
                                 depth = commentItem.depth,
                                 baseDepth = 0,
+                                screenshotMode,
                             )
                         }
                     }
@@ -734,6 +810,7 @@ class PostsAdapter(
                         } else {
                             null
                         },
+                        screenshotMode,
                     )
                 }
                 finalItems += ProgressOrErrorItem(error)

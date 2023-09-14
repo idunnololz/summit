@@ -33,6 +33,7 @@ fun BaseFragment<*>.showMorePostOptions(
     onSortOrderClick: () -> Unit = {},
     onRefreshClick: () -> Unit = {},
     onFindInPageClick: () -> Unit = {},
+    onScreenshotClick: (() -> Unit)? = null,
 ) {
     if (!isBindingAvailable()) {
         return
@@ -153,6 +154,13 @@ fun BaseFragment<*>.showMorePostOptions(
             getString(R.string.report_post),
             R.drawable.baseline_outlined_flag_24,
         )
+        if (onScreenshotClick != null) {
+            addItemWithIcon(
+                R.id.screenshot,
+                getString(R.string.take_screenshot),
+                R.drawable.baseline_screenshot_24
+            )
+        }
         addDivider()
 //        addItemWithIcon(
 //            R.id.switch_account_temp,
@@ -273,6 +281,9 @@ fun BaseFragment<*>.showMorePostOptions(
                 }
                 R.id.find_in_page -> {
                     onFindInPageClick()
+                }
+                R.id.screenshot -> {
+                    onScreenshotClick?.invoke()
                 }
             }
         }

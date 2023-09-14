@@ -421,6 +421,9 @@ class PostFragment :
                         },
                         onFindInPageClick = {
                             viewModel.findInPageVisible.value = true
+                        },
+                        onScreenshotClick = {
+                            adapter?.screenshotMode = true
                         }
                     )
                 }

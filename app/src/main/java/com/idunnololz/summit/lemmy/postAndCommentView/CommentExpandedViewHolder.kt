@@ -16,7 +16,7 @@ import com.idunnololz.summit.view.LemmyHeaderView
 
 class CommentExpandedViewHolder(
     val rawBinding: ViewBinding,
-    val root: ViewGroup,
+    val root: ConstraintLayout,
     val highlightBg: View,
     val threadLinesSpacer: Space,
     val progressBar: ProgressBar,
@@ -27,6 +27,7 @@ class CommentExpandedViewHolder(
     val mediaContainer: ConstraintLayout,
     val overlay: View,
     val text: TextView,
+    val startGuideline: View,
     var scoreCount: TextView?,
     var upvoteCount: TextView?,
     var upvoteButton: View?,
@@ -64,6 +65,7 @@ class CommentExpandedViewHolder(
                 mediaContainer = binding.mediaContainer,
                 overlay = binding.overlay,
                 text = binding.text,
+                startGuideline = binding.startGuideline,
                 scoreCount = null,
                 upvoteCount = null,
                 upvoteButton = null,
@@ -87,6 +89,7 @@ class CommentExpandedViewHolder(
                 mediaContainer = binding.mediaContainer,
                 overlay = binding.overlay,
                 text = binding.text,
+                startGuideline = binding.startGuideline,
                 scoreCount = binding.headerView.textView2,
                 upvoteCount = null,
                 upvoteButton = null,

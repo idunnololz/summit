@@ -6,6 +6,7 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
@@ -137,6 +138,7 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
         addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
         addItemWithIcon(R.id.open_in_browser, R.string.open_in_browser, R.drawable.baseline_public_24)
         addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
+        addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -154,6 +156,9 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
                 }
                 R.id.open_link_incognito -> {
                     Utils.openExternalLink(context, url, openNewIncognitoTab = true)
+                }
+                R.id.preview_link -> {
+                    LinkPreviewDialogFragment.show(supportFragmentManager, url)
                 }
             }
         }

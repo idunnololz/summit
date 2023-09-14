@@ -115,4 +115,6 @@
     <item name="instance_name_display_always" type="id" />
     <item name="view_holder" type="id" />
     <item name="find_in_page" type="id" />
+    <item name="preview_link" type="id" />
+    <item name="screenshot" type="id" />
 </resources>
