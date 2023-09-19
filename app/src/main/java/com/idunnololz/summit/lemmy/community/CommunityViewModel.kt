@@ -87,9 +87,11 @@ class CommunityViewModel @Inject constructor(
 
     private var pagePositions = arrayListOf<PageScrollState>()
 
-    val currentCommunityRef = MutableLiveData<CommunityRef>(CommunityRef.All())
+    val currentCommunityRef = MutableLiveData<CommunityRef?>(null)
     val currentPageIndex = MutableLiveData(0)
-    private val communityRefChangeObserver = Observer<CommunityRef> {
+    private val communityRefChangeObserver = Observer<CommunityRef?> {
+        it ?: return@Observer
+
         recentCommunityManager.addRecentCommunity(it)
     }
     val loadedPostsData = StatefulLiveData<PostUpdateInfo>()
@@ -381,11 +383,25 @@ class CommunityViewModel @Inject constructor(
             return
         }
 
-        if (communityRef is CommunityRef.Subscribed && accountManager.currentAccount.value == null) {
+        val currentAccount = accountManager.currentAccount.value
+        if (communityRef is CommunityRef.Subscribed && currentAccount == null) {
             return
         }
 
         val communityRefSafe: CommunityRef = communityRef
+        val instance = when (communityRefSafe) {
+            is CommunityRef.All -> communityRefSafe.instance
+            is CommunityRef.CommunityRefByName -> communityRefSafe.instance
+            is CommunityRef.Local -> communityRefSafe.instance
+            is CommunityRef.ModeratedCommunities -> communityRefSafe.instance
+            is CommunityRef.MultiCommunity -> currentAccount?.instance
+            is CommunityRef.Subscribed -> communityRefSafe.instance
+        }
+        val instanceChange = instance != null && instance != apiInstance
+
+        if (currentCommunityRef.value == communityRefSafe && !instanceChange) {
+            return
+        }
 
         FirebaseCrashlytics.getInstance().apply {
             setCustomKey("community", communityRef.toString())

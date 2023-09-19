@@ -120,6 +120,14 @@ fun BaseFragment<*>.showMorePostOptions(
             R.drawable.baseline_share_24,
         )
 
+        if (onScreenshotClick != null) {
+            addItemWithIcon(
+                R.id.screenshot,
+                getString(R.string.take_screenshot),
+                R.drawable.baseline_screenshot_24
+            )
+        }
+
         addItemWithIcon(
             R.id.cross_post,
             getString(R.string.cross_post),
@@ -154,13 +162,6 @@ fun BaseFragment<*>.showMorePostOptions(
             getString(R.string.report_post),
             R.drawable.baseline_outlined_flag_24,
         )
-        if (onScreenshotClick != null) {
-            addItemWithIcon(
-                R.id.screenshot,
-                getString(R.string.take_screenshot),
-                R.drawable.baseline_screenshot_24
-            )
-        }
         addDivider()
 //        addItemWithIcon(
 //            R.id.switch_account_temp,

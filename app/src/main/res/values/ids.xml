@@ -117,4 +117,7 @@
     <item name="find_in_page" type="id" />
     <item name="preview_link" type="id" />
     <item name="screenshot" type="id" />
+    <item name="screenshot_mode" type="id" />
+    <item name="screenshot_mode_app_bar" type="id" />
+    <item name="screenshot_options_view" type="id" />
 </resources>

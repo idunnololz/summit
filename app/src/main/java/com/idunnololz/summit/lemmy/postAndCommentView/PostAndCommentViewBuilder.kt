@@ -60,6 +60,7 @@ import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
+import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -196,6 +197,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         videoState: VideoState?,
         updateContent: Boolean,
         highlightTextData: HighlightTextData?,
+        screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
         onRevealContentClickedFn: () -> Unit,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
@@ -293,6 +295,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             } else {
                 highlightTextData?.copy(matchIndex = null)
             },
+            screenshotConfig = screenshotConfig,
             onFullImageViewClickListener = { view, url ->
                 onImageClick(Either.Left(postView), view, url)
             },
@@ -334,6 +337,48 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
 
         root.tag = postView
+
+        when (screenshotConfig?.postViewType) {
+            ScreenshotModeViewModel.PostViewType.Full -> {
+                moreButton.visibility = View.GONE
+                controlsDivider2.visibility = View.GONE
+                addCommentButton.visibility = View.GONE
+                controlsDivider.visibility = View.GONE
+
+                title.visibility = View.VISIBLE
+                headerView.visibility = View.VISIBLE
+            }
+            ScreenshotModeViewModel.PostViewType.ImageOnly -> {
+                moreButton.visibility = View.GONE
+                controlsDivider2.visibility = View.GONE
+                addCommentButton.visibility = View.GONE
+                controlsDivider.visibility = View.GONE
+
+                title.visibility = View.GONE
+                headerView.visibility = View.GONE
+            }
+            ScreenshotModeViewModel.PostViewType.TextOnly -> {
+                moreButton.visibility = View.GONE
+                controlsDivider2.visibility = View.GONE
+                addCommentButton.visibility = View.GONE
+                controlsDivider.visibility = View.GONE
+
+                title.visibility = View.VISIBLE
+                headerView.visibility = View.VISIBLE
+            }
+            ScreenshotModeViewModel.PostViewType.Compact -> {
+                moreButton.visibility = View.GONE
+                controlsDivider2.visibility = View.GONE
+                addCommentButton.visibility = View.GONE
+                controlsDivider.visibility = View.GONE
+
+                title.visibility = View.VISIBLE
+                headerView.visibility = View.VISIBLE
+            }
+            null -> {
+
+            }
+        }
     }
 
     fun ensureContent(vh: CustomViewHolder) = with(vh) {

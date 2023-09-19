@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +10,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
+import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.idunnololz.summit.R
@@ -30,6 +33,7 @@ import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
+import com.idunnololz.summit.databinding.ScreenshotModeOptionsBinding
 import com.idunnololz.summit.databinding.ViewAllCommentsBinding
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.flatten
@@ -43,9 +47,12 @@ import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.QueryResult
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
@@ -77,7 +84,10 @@ class PostsAdapter(
     private val onLoadPost: (PostId) -> Unit,
     private val onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<ViewHolder>() {
+
+    interface ScreenshotOptions {
+    }
 
     private sealed class Item(
         open val id: String,
@@ -90,7 +100,8 @@ class PostsAdapter(
             val query: String?,
             val currentMatch: QueryResult?,
             val screenshotMode: Boolean,
-        ) : Item(postView.getUniqueKey())
+        ) : Item(postView.getUniqueKey()), ScreenshotOptions {
+        }
 
         data class CommentItem(
             val commentId: CommentId,
@@ -113,7 +124,8 @@ class PostsAdapter(
             val screenshotMode: Boolean,
         ) : Item(
             "comment_${comment.comment.id}",
-        )
+        ), ScreenshotOptions {
+        }
 
         data class PendingCommentItem(
             val commentId: CommentId?,
@@ -129,7 +141,8 @@ class PostsAdapter(
             val screenshotMode: Boolean,
         ) : Item(
             "pending_comment_${view.pendingCommentView.id}",
-        )
+        ), ScreenshotOptions {
+        }
 
         data class MoreCommentsItem(
             val parentId: CommentId?,
@@ -139,7 +152,8 @@ class PostsAdapter(
             val screenshotMode: Boolean,
         ) : Item(
             "more_comments_$parentId",
-        )
+        ), ScreenshotOptions {
+        }
 
         data class MissingCommentItem(
             val commentId: CommentId?,
@@ -148,7 +162,8 @@ class PostsAdapter(
             val screenshotMode: Boolean,
         ) : Item(
             "deleted_$commentId",
-        )
+        ), ScreenshotOptions {
+        }
 
         class ProgressOrErrorItem(
             val error: Throwable? = null,
@@ -157,7 +172,8 @@ class PostsAdapter(
         data class ViewAllComments(
             val postId: PostId,
             val screenshotMode: Boolean,
-        ) : Item("view_all_yo")
+        ) : Item("view_all_yo"), ScreenshotOptions {
+        }
 
         data object FooterItem : Item("footer")
     }
@@ -174,8 +190,7 @@ class PostsAdapter(
     private var revealedItems = mutableSetOf<String>()
 
     private var actionExpandedComments = mutableSetOf<CommentId>()
-
-    private var checkedItems = mutableSetOf<String>()
+    private var includedInScreenshot = mutableSetOf<String>()
 
     private var rawData: PostViewModel.PostData? = null
 
@@ -215,6 +230,18 @@ class PostsAdapter(
             }
         }
 
+    var isScreenshoting: Boolean = false
+    var screenshotMaxWidth: Int = 0
+    var screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null
+        set(value) {
+            if (value == field) {
+                return
+            }
+            field = value
+
+            refreshItems()
+        }
+
     var screenshotMode: Boolean = false
         set(value) {
             if (value == field) {
@@ -250,7 +277,7 @@ class PostsAdapter(
         is Item.MissingCommentItem -> R.layout.post_missing_comment_item
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = inflater.inflate(viewType, parent, false)
 
         parentHeight = parent.height
@@ -307,7 +334,7 @@ class PostsAdapter(
     }
 
     override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder,
+        holder: ViewHolder,
         position: Int,
         payloads: MutableList<Any>,
     ) {
@@ -320,6 +347,26 @@ class PostsAdapter(
                     val b = holder.getBinding<PostHeaderItemBinding>()
                     val post = item.postView
                     val postKey = post.getUniqueKey()
+                    val contentMaxWidth = if (isScreenshoting) {
+                        screenshotMaxWidth
+                    } else {
+                        contentMaxWidth
+                    }
+                    val onImageClick = if (isScreenshoting) {
+                        { _, _, _ -> }
+                    } else {
+                        onImageClick
+                    }
+                    val onVideoClick = if (isScreenshoting) {
+                        { _, _, _ -> }
+                    } else {
+                        onVideoClick
+                    }
+                    val screenshotConfig = if (isScreenshoting) {
+                        screenshotConfig
+                    } else {
+                        null
+                    }
 
                     postAndCommentViewBuilder.bindPostView(
                         binding = b,
@@ -353,6 +400,7 @@ class PostsAdapter(
                         onInstanceMismatch = onInstanceMismatch,
                         onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
+                        screenshotConfig = screenshotConfig,
                     )
 
                     if (item.showBottomDivider) {
@@ -361,19 +409,39 @@ class PostsAdapter(
                         b.bottomDivider.visibility = View.GONE
                     }
 
-                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
                 }
             }
             else -> super.onBindViewHolder(holder, position, payloads)
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (val item = items[position]) {
             is HeaderItem -> {
                 val b = holder.getBinding<PostHeaderItemBinding>()
                 val post = item.postView
                 val postKey = post.getUniqueKey()
+                val contentMaxWidth = if (isScreenshoting) {
+                    screenshotMaxWidth
+                } else {
+                    contentMaxWidth
+                }
+                val onImageClick = if (isScreenshoting) {
+                    { _, _, _ -> }
+                } else {
+                    onImageClick
+                }
+                val onVideoClick = if (isScreenshoting) {
+                    { _, _, _ -> }
+                } else {
+                    onVideoClick
+                }
+                val screenshotConfig = if (isScreenshoting) {
+                    screenshotConfig
+                } else {
+                    null
+                }
 
                 holder.itemView.setTag(R.id.swipeable, true)
 
@@ -409,6 +477,7 @@ class PostsAdapter(
                     onInstanceMismatch = onInstanceMismatch,
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
+                    screenshotConfig = screenshotConfig,
                 )
 
                 if (item.showBottomDivider) {
@@ -417,7 +486,11 @@ class PostsAdapter(
                     b.bottomDivider.visibility = View.GONE
                 }
 
-                updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                if (isScreenshoting && screenshotConfig?.showPostDivider == false) {
+                    b.bottomDivider.visibility = View.GONE
+                }
+
+                updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
             }
             is CommentItem -> {
                 if (item.isExpanded) {
@@ -467,7 +540,7 @@ class PostsAdapter(
                         onInstanceMismatch = onInstanceMismatch,
                     )
 
-                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
                 } else {
                     // collapsed
                     val b = holder.getBinding<PostCommentCollapsedItemBinding>()
@@ -491,7 +564,7 @@ class PostsAdapter(
                         onLinkLongClick = onLinkLongClick,
                     )
 
-                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
                 }
 
                 holder.itemView.setTag(R.id.swipeable, true)
@@ -522,7 +595,7 @@ class PostsAdapter(
                         ::collapseSection,
                     )
 
-                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
                 } else {
                     // collapsed
                     val b = holder.getBinding<PostPendingCommentCollapsedItemBinding>()
@@ -540,7 +613,7 @@ class PostsAdapter(
                         ::collapseSection,
                     )
 
-                    updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
                 }
                 holder.itemView.setTag(R.id.expanded, item.isExpanded)
             }
@@ -570,7 +643,7 @@ class PostsAdapter(
                         onFetchComments(item.parentId)
                     }
                 }
-                updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
             }
 
             FooterItem -> {}
@@ -579,7 +652,7 @@ class PostsAdapter(
                 b.button.setOnClickListener {
                     onLoadPost(item.postId)
                 }
-                updateScreenshotMode(item.screenshotMode, b.startGuideline, b.root)
+                updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
             }
 
             is Item.MissingCommentItem -> {
@@ -590,7 +663,7 @@ class PostsAdapter(
         }
     }
 
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+    override fun onViewRecycled(holder: ViewHolder) {
         super.onViewRecycled(holder)
 
         val item = items.getOrNull(holder.absoluteAdapterPosition)
@@ -608,36 +681,60 @@ class PostsAdapter(
     override fun getItemCount(): Int = items.size
 
     private fun updateScreenshotMode(
+        viewHolder: ViewHolder,
         screenshotMode: Boolean,
         startGuideline: View,
         root: ConstraintLayout,
+        item: Item,
     ) {
+        if (isScreenshoting) {
+            return
+        }
+
         if (screenshotMode) {
             startGuideline.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                marginStart = Utils.convertDpToPixel(48f).toInt()
+                marginStart = context.getDimen(R.dimen.screenshot_options_size)
             }
 
-            val checkbox = MaterialCheckBox(context).apply {
-                buttonDrawable = null
-                buttonIconDrawable = null
-                setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    null,
-                    AppCompatResources.getDrawable(
-                        context, com.google.android.material.R.drawable.mtrl_checkbox_button),
-                    null,
-                    null)
-                text = "Include in screenshot"
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                }
-                gravity = Gravity.CENTER
+            val previousBinding = root.getTag(R.id.screenshot_options_view)
+                as? ScreenshotModeOptionsBinding
+            val binding = previousBinding ?: ScreenshotModeOptionsBinding.inflate(
+                LayoutInflater.from(context), root, false)
+
+            binding.root.updateLayoutParams<ConstraintLayout.LayoutParams> {  }
+            binding.root.setOnClickListener {
+                binding.screenshotCb.isChecked = !binding.screenshotCb.isChecked
             }
-            root.addView(checkbox)
+            binding.screenshotCb.setOnCheckedChangeListener(null)
+            binding.screenshotCb.isChecked = includedInScreenshot.contains(item.id)
+            binding.screenshotCb.setOnCheckedChangeListener a@{ compoundButton, b ->
+                val item = items.getOrNull(viewHolder.absoluteAdapterPosition) ?: return@a
+                if (includedInScreenshot.contains(item.id)) {
+                    includedInScreenshot.remove(item.id)
+                } else {
+                    includedInScreenshot.add(item.id)
+                }
+            }
+
+            if (previousBinding == null) {
+                root.addView(binding.root)
+                root.setTag(R.id.screenshot_mode, true)
+                root.setTag(R.id.screenshot_options_view, binding)
+            }
+        } else {
+            if (root.getTag(R.id.screenshot_mode) as? Boolean != true) {
+                return
+            }
+
+            (root.getTag(R.id.screenshot_options_view) as? ScreenshotModeOptionsBinding)?.let {
+                root.removeView(it.root)
+                startGuideline.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    marginStart = 0
+                }
+            }
+
+            root.setTag(R.id.screenshot_mode, false)
+            root.setTag(R.id.screenshot_options_view, null)
         }
     }
 
@@ -1073,4 +1170,16 @@ class PostsAdapter(
             cb(occurrences)
         }
     }
+
+    fun isSelectedForScreenshot(position: Int): Boolean {
+        val item = items[position]
+        return if (item is ScreenshotOptions) {
+            includedInScreenshot.contains(item.id)
+        } else {
+            false
+        }
+    }
+
+    fun isPost(position: Int): Boolean =
+        items[position] is Item.HeaderItem
 }

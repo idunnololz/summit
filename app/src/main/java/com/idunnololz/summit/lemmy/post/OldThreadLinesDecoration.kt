@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getDimen
 
 class OldThreadLinesDecoration(
     private val context: Context,
@@ -39,6 +40,7 @@ class OldThreadLinesDecoration(
         color = ContextCompat.getColor(context, R.color.colorThreadLines)
         strokeWidth = Utils.convertDpToPixel(2f)
     }
+    private val screenshotWidth = context.getDimen(R.dimen.screenshot_options_size)
 
     private fun getColorForDepth(depth: Int): Int {
         return lineColors[depth % lineColors.size]
@@ -56,8 +58,14 @@ class OldThreadLinesDecoration(
             }
             val previousTag = previousChild?.tag
             val tag = view.tag
-            val translationX = view.translationX
+            val screenshotMode = view.getTag(R.id.screenshot_mode) as? Boolean == true
+            var translationX = view.translationX
             val translationY = view.translationY
+
+            if (screenshotMode) {
+                translationX += screenshotWidth
+            }
+
             val topOverdraw =
                 if (previousChild != null && previousTag !is ThreadLinesData) {
                     // Do not overdraw above if the element above is not a comment!

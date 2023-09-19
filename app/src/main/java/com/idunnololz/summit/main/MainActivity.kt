@@ -256,7 +256,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchChangelog() {
-        launchPage(PostRef("lemmy.world", 4851929), switchToNativeInstance = true)
+        launchPage(PostRef("lemmy.world", 5327633), switchToNativeInstance = true)
     }
 
     private val bottomNavY
@@ -803,7 +803,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun insetViewAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
+    fun insetViewAutomaticallyByPadding(
+        lifecycleOwner: LifecycleOwner,
+        rootView: View,
+        additionalPaddingBottom: Int = 0,
+    ) {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
 
@@ -811,7 +815,7 @@ class MainActivity : BaseActivity() {
                 insets.leftInset,
                 insets.topInset,
                 insets.rightInset,
-                insets.bottomInset,
+                insets.bottomInset + additionalPaddingBottom,
             )
         }
     }

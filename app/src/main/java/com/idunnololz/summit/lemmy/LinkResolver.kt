@@ -95,9 +95,15 @@ object LinkResolver {
                 }
             }
             "post" -> {
-                val postId = uri.pathSegments.getOrNull(1)
+                val postIdStr = uri.pathSegments.getOrNull(1)
                     ?: return defaultResult
-                return PostRef(instance, postId.toIntOrNull() ?: return defaultResult)
+                val postId = postIdStr.toIntOrNull()
+
+                if (postIdStr.isNotBlank() && postId == null) {
+                    return null
+                }
+
+                return PostRef(instance, postId ?: return defaultResult)
             }
             "comment" -> {
                 val commentId = uri.pathSegments.getOrNull(1)
