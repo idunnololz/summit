@@ -106,5 +106,16 @@
             android:authorities="com.idunnololz.summit.search.SuggestionProvider"
             android:exported="false"
             android:enabled="true" />
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.idunnololz.summit.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
     </application>
 </manifest>

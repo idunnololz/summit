@@ -606,6 +606,15 @@
     <string name="error_no_moderated_communities">User is not the moderator of any communities.</string>
     <string name="preview_link">Preview link</string>
     <string name="take_screenshot">Take screenshot</string>
+    <string name="save_screenshot">Save screenshot</string>
+    <string name="toggle_post_view">Toggle post view</string>
+    <string name="full_post">Full post</string>
+    <string name="post_image_only">Post image only</string>
+    <string name="post_text_only">Post text only</string>
+    <string name="compact_post">Compact post</string>
+    <string name="screenshot_size_settings">Screenshot size settings</string>
+    <string name="screenshot_width">Screenshot width</string>
+    <string name="screenshot_saved">Screenshot saved to %1$s.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

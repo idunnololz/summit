@@ -11,7 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -33,6 +35,8 @@ import com.idunnololz.summit.api.utils.getVideoInfo
 import com.idunnololz.summit.api.utils.shouldHideItem
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.postListView.FullContentConfig
+import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
+import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel.PostViewType
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
@@ -94,6 +98,7 @@ class LemmyContentHelper(
         videoState: VideoState? = null,
         contentMaxLines: Int = -1,
         highlight: HighlightTextData? = null,
+        screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
 
         onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
@@ -112,6 +117,12 @@ class LemmyContentHelper(
         val context = rootView.context
         // Handles crossposts
         val targetPostView = postView
+
+        val showText = screenshotConfig?.postViewType != PostViewType.ImageOnly
+        val showImage = screenshotConfig?.postViewType != PostViewType.TextOnly
+        val showLink = screenshotConfig?.postViewType == null ||
+            screenshotConfig.postViewType == PostViewType.Full
+        val onlyImage = screenshotConfig?.postViewType == PostViewType.ImageOnly
 
         @Suppress("UNCHECKED_CAST")
         fun <T : View> getView(@LayoutRes resId: Int): T =
@@ -400,10 +411,18 @@ class LemmyContentHelper(
             }
         }
         fun insertAndLoadFullImage(imageUrl: String, fallback: String? = null) {
+            if (!showImage) return
+
             val fullContentImageView = getView<View>(R.layout.full_content_image_view)
             val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.fullImage)
             val loadingView =
                 fullContentImageView.findViewById<LoadingView>(R.id.loadingView)
+
+            if (onlyImage) {
+                fullImageView.updateLayoutParams<MarginLayoutParams> {
+                    this.topMargin = 0
+                }
+            }
 
             fullImageView.load(null)
             fullImageView.setOnLongClickListener {
@@ -597,7 +616,7 @@ class LemmyContentHelper(
                 }
             }
 
-            if (!postView.post.body.isNullOrBlank()) {
+            if (!postView.post.body.isNullOrBlank() && showText) {
                 val fullTextView = getView<View>(R.layout.full_content_text_view)
                 val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
                 rootView.setTag(R.id.body, bodyTextView)
@@ -617,7 +636,10 @@ class LemmyContentHelper(
                 }
             }
 
-            if (alwaysShowLinkBelowPost || postType == PostType.Link || postType == PostType.Text) {
+            if ((alwaysShowLinkBelowPost ||
+                    postType == PostType.Link ||
+                    postType == PostType.Text) && showLink) {
+
                 if (targetPostView.post.embed_video_url != null) {
                     appendUiForExternalOrInternalUrl(targetPostView.post.embed_video_url)
                 } else if (targetPostView.post.url != null &&

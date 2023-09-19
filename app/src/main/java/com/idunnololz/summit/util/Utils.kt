@@ -27,6 +27,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.fragment.app.Fragment
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -757,3 +758,15 @@ fun startFeedbackIntent(context: Context) {
 }
 
 val summitCommunityPage = CommunityRef.CommunityRefByName("summit", "lemmy.world")
+
+
+
+fun Fragment.shareUri(uri: Uri, mimeType: String) {
+    val shareIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        // Example: content://com.google.android.apps.photos.contentprovider/...
+        putExtra(Intent.EXTRA_STREAM, uri)
+        type = mimeType
+    }
+    startActivity(Intent.createChooser(shareIntent, null))
+}

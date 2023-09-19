@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
@@ -11,11 +12,12 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
+import com.idunnololz.summit.view.ScreenshotLayout
 
 class ModernThreadLinesDecoration(
     private val context: Context,
     private val isCompactView: Boolean,
-) : RecyclerView.ItemDecoration() {
+) : RecyclerView.ItemDecoration(), ScreenshotLayout.ScreenshotDecorator {
 
     private val distanceBetweenLinesUnit =
         Utils.convertDpToPixel(1f)
@@ -43,6 +45,7 @@ class ModernThreadLinesDecoration(
         color = ColorUtils.blendARGB(color1, color2, 0.88f)
         strokeWidth = Utils.convertDpToPixel(1f)
     }
+    private val screenshotWidth = context.getDimen(R.dimen.screenshot_options_size)
 
     private fun getColorForDepth(depth: Int): Int {
         if (depth == 0) {
@@ -52,6 +55,10 @@ class ModernThreadLinesDecoration(
     }
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+        onDraw(c, parent as ViewGroup)
+    }
+
+    override fun onDraw(c: Canvas, parent: ViewGroup) {
         context.getColorFromAttribute(R.attr.border_color)
         val childCount = parent.childCount
 
@@ -72,8 +79,13 @@ class ModernThreadLinesDecoration(
                 }
 
             val tag = view.tag
-            val translationX = view.translationX
+            val screenshotMode = view.getTag(R.id.screenshot_mode) as? Boolean == true
+            var translationX = view.translationX
             val translationY = view.translationY
+
+            if (screenshotMode) {
+                translationX += screenshotWidth
+            }
 
             val threadLinesData: ThreadLinesData? = when (tag) {
                 is ThreadLinesData -> {

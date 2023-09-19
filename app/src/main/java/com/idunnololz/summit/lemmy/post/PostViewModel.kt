@@ -81,6 +81,7 @@ class PostViewModel @Inject constructor(
 
     val findInPageVisible = MutableLiveData<Boolean>(false)
     val findInPageQuery = MutableLiveData<String>("")
+    val screenshotMode = MutableLiveData<Boolean>(false)
     private val findInPageQueryFlow = MutableStateFlow<String>("")
 
     private var postView: PostView? = null

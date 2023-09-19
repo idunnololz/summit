@@ -1,13 +1,20 @@
 package com.idunnololz.summit.lemmy.post
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +27,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import arrow.core.Either
 import coil.load
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
@@ -31,6 +40,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
+import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -51,6 +61,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
@@ -80,6 +91,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -196,6 +208,42 @@ class PostFragment :
             }
         }
 
+        childFragmentManager.setFragmentResultListener(
+            ScreenshotModeDialogFragment.REQUEST_KEY,
+            this
+        ) { _, bundle ->
+            val result = bundle.getParcelableCompat<ScreenshotModeDialogFragment.Result>(
+                ScreenshotModeDialogFragment.REQUEST_KEY_RESULT,
+            )
+
+            if (result != null) {
+                viewModel.screenshotMode.postValue(false)
+
+                try {
+                    val uri = result.uri
+                    val mimeType = result.mimeType
+
+                    val snackbarMsg = getString(R.string.screenshot_saved, uri.toString())
+                    Snackbar.make(binding.root, snackbarMsg, Snackbar.LENGTH_LONG).setAction(
+                        R.string.view,
+                    ) {
+                        if (!isAdded) {
+                            return@setAction
+                        }
+
+                        Utils.safeLaunchExternalIntentWithErrorDialog(
+                            requireContext(),
+                            parentFragmentManager,
+                            Intent(Intent.ACTION_VIEW).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                setDataAndType(uri, mimeType)
+                            },
+                        )
+                    }.show()
+                } catch (e: IOException) { /* do nothing */ }
+            }
+        }
+
         if (!args.isSinglePage) {
             requireMainActivity().onBackPressedDispatcher
                 .addCallback(
@@ -204,6 +252,10 @@ class PostFragment :
                         override fun handleOnBackPressed() {
                             if (viewModel.findInPageVisible.value == true) {
                                 viewModel.findInPageVisible.value = false
+                                return
+                            }
+                            if (viewModel.screenshotMode.value == true) {
+                                viewModel.screenshotMode.value = false
                                 return
                             }
 
@@ -334,24 +386,20 @@ class PostFragment :
                     getMainActivity()?.launchPage(it)
                 },
                 onPostMoreClick = { postView ->
-                    actionsViewModel.let {
-                        showMorePostOptions(
-                            instance = viewModel.apiInstance,
-                            postView = postView,
-                            actionsViewModel = it,
-                            fragmentManager = childFragmentManager,
-                        )
-                    }
+                    showMorePostOptions(
+                        instance = viewModel.apiInstance,
+                        postView = postView,
+                        actionsViewModel = actionsViewModel,
+                        fragmentManager = childFragmentManager,
+                    )
                 },
                 onCommentMoreClick = { commentView ->
-                    actionsViewModel.let {
-                        showMoreCommentOptions(
-                            instance = viewModel.apiInstance,
-                            commentView = commentView,
-                            actionsViewModel = it,
-                            fragmentManager = childFragmentManager
-                        )
-                    }
+                    showMoreCommentOptions(
+                        instance = viewModel.apiInstance,
+                        commentView = commentView,
+                        actionsViewModel = actionsViewModel,
+                        fragmentManager = childFragmentManager
+                    )
                 },
                 onFetchComments = {
                     viewModel.fetchMoreComments(it)
@@ -423,7 +471,7 @@ class PostFragment :
                             viewModel.findInPageVisible.value = true
                         },
                         onScreenshotClick = {
-                            adapter?.screenshotMode = true
+                            viewModel.screenshotMode.value = true
                         }
                     )
                 }
@@ -571,6 +619,9 @@ class PostFragment :
                 binding.foundCount.text = "${match.matchIndex + 1} / ${viewModel.queryMatchHelper.matchCount}"
             }
         }
+        viewModel.screenshotMode.observe(viewLifecycleOwner) {
+            updateScreenshotMode(it)
+        }
 
         binding.nextResult.setOnClickListener {
             viewModel.queryMatchHelper.nextMatch()
@@ -582,6 +633,51 @@ class PostFragment :
         }
         binding.clear.setOnClickListener {
             viewModel.findInPageVisible.value = false
+        }
+    }
+
+    private fun updateScreenshotMode(screenshotMode: Boolean?) {
+        screenshotMode ?: return
+        if (!isBindingAvailable()) {
+            return
+        }
+
+        val context = requireContext()
+
+        adapter?.screenshotMode = screenshotMode
+
+        if (screenshotMode) {
+            ScreenshotModeAppBarBinding
+                .inflate(LayoutInflater.from(context), binding.root, false)
+                .apply {
+                    root.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                        this.gravity = Gravity.BOTTOM
+                    }
+                    binding.root.addView(root)
+                    root.updatePadding(
+                        left = 0,
+                        top = 0,
+                        right = 0,
+                        bottom = getMainActivity()?.lastInsets?.bottomInset ?: 0
+                    )
+
+                    screenshotModeAppBar.setOnMenuItemClickListener {
+                        when (it.itemId) {
+                            R.id.cancel -> {
+                                viewModel.screenshotMode.postValue(false)
+                            }
+                        }
+
+                        true
+                    }
+                    screenshotModeFab.setOnClickListener {
+                        ScreenshotModeDialogFragment.show(childFragmentManager)
+                    }
+                }
+            binding.fab.hide()
+        } else {
+            binding.root.removeView(binding.root.findViewById(R.id.screenshot_mode_container))
+            binding.fab.show()
         }
     }
 
@@ -1021,4 +1117,6 @@ class PostFragment :
         } else {
             Either.Right(CommentRef(this.instance, this.commentId))
         }
+
+    fun getAdapter() = adapter
 }

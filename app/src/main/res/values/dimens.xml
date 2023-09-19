@@ -34,4 +34,5 @@
     <dimen name="footer_height">16dp</dimen>
     <dimen name="footer_spacer_height">260dp</dimen>
     <dimen name="max_image_height">1000dp</dimen>
+    <dimen name="screenshot_options_size">64dp</dimen>
 </resources>

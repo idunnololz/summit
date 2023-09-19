@@ -27,7 +27,7 @@
 
     <View
         android:id="@+id/start_guideline"
-        android:layout_width="@dimen/padding_quarter"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
         app:layout_constraintTop_toTopOf="parent"
@@ -61,7 +61,7 @@
         app:indicatorSize="16dp"
         app:layout_constraintTop_toTopOf="@+id/expandSectionButton"
         app:layout_constraintBottom_toBottomOf="@+id/expandSectionButton"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
+        app:layout_constraintStart_toEndOf="@+id/start_guideline"
         style="@style/Widget.Material3.CircularProgressIndicator.ExtraSmall" />
 
     <com.idunnololz.summit.view.LemmyHeaderView

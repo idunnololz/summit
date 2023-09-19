@@ -784,6 +784,8 @@ class CommunityFragment :
     override fun onResume() {
         super.onResume()
 
+        viewModel.changeCommunity(args.communityRef)
+
         runOnReady {
             val customAppBarController = lemmyAppBarController
 

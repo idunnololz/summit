@@ -54,6 +54,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SIN
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
@@ -524,6 +525,14 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putInt(KEY_PREVIEW_LINKS, value)
+                .apply()
+        }
+
+    var screenshotWidthDp: Int
+        get() = prefs.getInt(KEY_SCREENSHOT_WIDTH_DP, 500)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_SCREENSHOT_WIDTH_DP, value)
                 .apply()
         }
 

@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 96
-        versionName = "1.9.1"
+        versionCode = 97
+        versionName = "1.10.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -141,6 +141,7 @@ dependencies {
     kapt(libs.hilt.android.compiler)
 
     implementation(libs.threeten.abp)
+    implementation(libs.zoom.layout)
 }
 
 // Allow references to generated code
