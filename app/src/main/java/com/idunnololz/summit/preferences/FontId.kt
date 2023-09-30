@@ -1,7 +1,5 @@
 package com.idunnololz.summit.preferences
 
-import kotlin.reflect.jvm.internal.impl.load.java.JavaClassesTracker.Default
-
 typealias FontId = Int
 
 object FontIds {

@@ -89,7 +89,8 @@ class SearchTabbedFragment :
         super.onCreate(savedInstanceState)
 
         childFragmentManager.setFragmentResultListener(
-            CommunityPickerDialogFragment.REQUEST_KEY, this
+            CommunityPickerDialogFragment.REQUEST_KEY,
+            this,
         ) { key, bundle ->
             val result = bundle.getParcelableCompat<CommunityPickerDialogFragment.Result>(
                 CommunityPickerDialogFragment.REQUEST_KEY_RESULT,
@@ -102,7 +103,8 @@ class SearchTabbedFragment :
             }
         }
         childFragmentManager.setFragmentResultListener(
-            PersonPickerDialogFragment.REQUEST_KEY, this
+            PersonPickerDialogFragment.REQUEST_KEY,
+            this,
         ) { key, bundle ->
             val result = bundle.getParcelableCompat<PersonPickerDialogFragment.Result>(
                 PersonPickerDialogFragment.REQUEST_KEY_RESULT,
@@ -114,7 +116,6 @@ class SearchTabbedFragment :
                 )
             }
         }
-
     }
 
     override fun onCreateView(
@@ -156,7 +157,9 @@ class SearchTabbedFragment :
             setupForFragment<SavedTabbedFragment>()
 
             insetViewAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner, binding.coordinatorLayoutContainer)
+                viewLifecycleOwner,
+                binding.coordinatorLayoutContainer,
+            )
         }
 
         with(binding) {

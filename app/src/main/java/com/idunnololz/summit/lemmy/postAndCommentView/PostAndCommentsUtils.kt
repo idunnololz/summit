@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.postAndCommentView
 
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
@@ -9,14 +8,10 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
-import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
-import com.idunnololz.summit.lemmy.mod.BanUserDialogFragment
-import com.idunnololz.summit.lemmy.mod.BanUserDialogFragmentArgs
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
@@ -29,8 +24,6 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.clearItemDecorations
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
 const val EXTRA_COMMENT_ID = "EXTRA_COMMENT_ID"
@@ -113,17 +106,17 @@ fun BaseFragment<*>.showMoreCommentOptions(
 
         val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
         if (fullAccount
-                ?.accountInfo
-                ?.miscAccountInfo
-                ?.modCommunityIds
-                ?.contains(commentView.community.id) == true
+            ?.accountInfo
+            ?.miscAccountInfo
+            ?.modCommunityIds
+            ?.contains(commentView.community.id) == true
         ) {
             addDivider()
 
             addItemWithIcon(
                 id = R.id.mod_tools,
                 title = R.string.mod_tools,
-                icon = R.drawable.outline_shield_24
+                icon = R.drawable.outline_shield_24,
             )
 
             addDivider()
@@ -210,7 +203,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
                         null,
                         CommentRef(
                             instance,
-                            commentView.comment.id
+                            commentView.comment.id,
                         ),
                     )
                 }

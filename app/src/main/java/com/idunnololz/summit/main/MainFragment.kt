@@ -32,7 +32,6 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
@@ -199,7 +198,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             onBackPressedCallback,
         )
         childFragmentManager.setFragmentResultListener(
-            CommunityPickerDialogFragment.REQUEST_KEY, this
+            CommunityPickerDialogFragment.REQUEST_KEY,
+            this,
         ) { key, bundle ->
             val result = bundle.getParcelableCompat<CommunityPickerDialogFragment.Result>(
                 CommunityPickerDialogFragment.REQUEST_KEY_RESULT,
@@ -264,7 +264,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 MultiCommunityEditorDialogFragment.show(
                     fragmentManager = childFragmentManager,
                     multiCommunity = it.communityRef as CommunityRef.MultiCommunity,
-                    dbId = it.id
+                    dbId = it.id,
                 )
             },
             onAddBookmarkClick = {
@@ -273,12 +273,12 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     addItemWithIcon(
                         id = R.id.add_community,
                         title = R.string.add_community,
-                        icon = R.drawable.ic_community_24
+                        icon = R.drawable.ic_community_24,
                     )
                     addItemWithIcon(
                         id = R.id.create_multi_community,
                         title = R.string.create_multi_community,
-                        icon = R.drawable.baseline_dynamic_feed_24
+                        icon = R.drawable.baseline_dynamic_feed_24,
                     )
 
                     setOnMenuItemClickListener {
@@ -294,8 +294,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                                     CommunityRef.MultiCommunity(
                                         getString(R.string.default_multi_community_name),
                                         null,
-                                        listOf()
-                                    )
+                                        listOf(),
+                                    ),
                                 )
                             }
                         }

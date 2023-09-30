@@ -552,7 +552,8 @@ class CommunitySelectorController @AssistedInject constructor(
                 val currentCommunityData = currentCommunityData
                 val currentCommunityRef = currentCommunityRef
                 if (currentCommunityRef is CommunityRef.MultiCommunity ||
-                    currentCommunityRef is CommunityRef.ModeratedCommunities) {
+                    currentCommunityRef is CommunityRef.ModeratedCommunities
+                ) {
                     newItems.add(
                         Item.CurrentCommunity(
                             communityRef = currentCommunityRef,
@@ -652,8 +653,8 @@ class CommunitySelectorController @AssistedInject constructor(
                         ?.accountInfo
                         ?.miscAccountInfo
                         ?.modCommunityIds
-                        ?.isNotEmpty() == true) {
-
+                        ?.isNotEmpty() == true
+                    ) {
                         newItems.add(
                             Item.StaticChildItem(
                                 context.getString(R.string.moderated_communities),

@@ -156,7 +156,7 @@ class RichTextValueDialogFragment :
                 onAddLinkClick = {
                     AddLinkDialogFragment.show(
                         binding.textEditor.getSelectedText(),
-                        childFragmentManager
+                        childFragmentManager,
                     )
                 },
             )

@@ -209,9 +209,9 @@ class InboxViewModel @Inject constructor(
                     item.copy(isRead = isRead)
                 is InboxItem.ReplyInboxItem ->
                     item.copy(isRead = isRead)
-                is InboxItem.ReportMessageInboxItem, ->
+                is InboxItem.ReportMessageInboxItem ->
                     item.copy(isRead = isRead)
-                is InboxItem.ReportCommentInboxItem, ->
+                is InboxItem.ReportCommentInboxItem ->
                     item.copy(isRead = isRead)
                 is InboxItem.ReportPostInboxItem ->
                     item.copy(isRead = isRead)

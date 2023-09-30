@@ -38,11 +38,10 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
-import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
 import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -135,7 +134,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             },
             onCommunityInfoClick = { communityRef ->
                 getMainActivity()?.showCommunityInfo(communityRef)
-            }
+            },
         )
 
         binding.loadingView.setOnRefreshClickListener {
@@ -188,7 +187,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     binding.icon.strokeWidth = 0f
                     ImageViewCompat.setImageTintList(
                         binding.icon,
-                        ColorStateList.valueOf(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                        ColorStateList.valueOf(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal)),
                     )
                 }
             }
@@ -334,7 +333,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val context = requireContext()
 
         val communityView = data.backingObject.leftOrNull()
-//        val siteView = data.backingObject.getOrNull()
+        val siteView = data.backingObject.getOrNull()
 
         TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
 
@@ -391,6 +390,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 binding.fab.setOnClickListener {
                     showOverflowMenu(communityView)
                 }
+            } else if (siteView != null) {
+                binding.fab.visibility = View.VISIBLE
+                binding.fab.setOnClickListener {
+                    showOverflowMenu(siteView)
+                }
             } else {
                 binding.fab.visibility = View.GONE
                 subscribe.visibility = View.GONE
@@ -413,6 +417,16 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 title = getString(R.string.unblock_this_community_format, communityView.community.name),
                 icon = R.drawable.ic_subreddit_default,
             )
+            addItemWithIcon(
+                id = R.id.block_instance,
+                title = getString(R.string.block_this_instance_format, communityView.community.instance),
+                icon = R.drawable.baseline_public_off_24,
+            )
+            addItemWithIcon(
+                id = R.id.unblock_instance,
+                title = getString(R.string.unblock_this_instance_format, communityView.community.instance),
+                icon = R.drawable.baseline_public_24,
+            )
 
             setOnMenuItemClickListener {
                 when (it.id) {
@@ -421,6 +435,42 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     }
                     R.id.unblock_community -> {
                         actionsViewModel.blockCommunity(communityView.community.id, false)
+                    }
+                    R.id.block_instance -> {
+                        actionsViewModel.blockInstance(communityView.community.instance_id, true)
+                    }
+                    R.id.unblock_instance -> {
+                        actionsViewModel.blockInstance(communityView.community.instance_id, false)
+                    }
+                }
+            }
+        }
+
+        requireMainActivity().showBottomMenu(bottomMenu)
+    }
+
+    private fun showOverflowMenu(siteView: SiteView) {
+        if (!isBindingAvailable()) return
+
+        val bottomMenu = BottomMenu(requireContext()).apply {
+            addItemWithIcon(
+                id = R.id.block_instance,
+                title = getString(R.string.block_this_instance_format, siteView.site.instance),
+                icon = R.drawable.baseline_public_off_24,
+            )
+            addItemWithIcon(
+                id = R.id.unblock_instance,
+                title = getString(R.string.unblock_this_instance_format, siteView.site.instance),
+                icon = R.drawable.baseline_public_24,
+            )
+
+            setOnMenuItemClickListener {
+                when (it.id) {
+                    R.id.block_instance -> {
+                        actionsViewModel.blockInstance(siteView.site.instance_id, true)
+                    }
+                    R.id.unblock_instance -> {
+                        actionsViewModel.blockInstance(siteView.site.instance_id, false)
                     }
                 }
             }
@@ -629,9 +679,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 }
             } else if (multiCommunity != null) {
                 for (community in multiCommunity) {
-                    newItems.add(Item.CommunityItem(
-                        community.community_view
-                    ))
+                    newItems.add(
+                        Item.CommunityItem(
+                            community.community_view,
+                        ),
+                    )
                 }
             }
 

@@ -105,7 +105,8 @@ class CreateOrEditPostFragment :
             }
         }
         childFragmentManager.setFragmentResultListener(
-            DraftsDialogFragment.REQUEST_KEY, this
+            DraftsDialogFragment.REQUEST_KEY,
+            this,
         ) { key, bundle ->
             val result = bundle.getParcelableCompat<DraftEntry>(
                 DraftsDialogFragment.REQUEST_KEY_RESULT,
@@ -243,14 +244,14 @@ class CreateOrEditPostFragment :
             onAddLinkClick = {
                 AddLinkDialogFragment.show(
                     binding.postEditText.getSelectedText(),
-                    childFragmentManager
+                    childFragmentManager,
                 )
             },
             onPreviewClick = {
                 val postStr = buildString {
-                    appendLine("## ${binding.titleEditText.text.toString()}")
+                    appendLine("## ${binding.titleEditText.text}")
                     appendLine()
-                    appendLine("![](${binding.urlEditText.text.toString()})")
+                    appendLine("![](${binding.urlEditText.text})")
                     appendLine()
                     appendLine(postEditor.editText?.text.toString())
                 }
@@ -415,7 +416,7 @@ class CreateOrEditPostFragment :
         binding.communityEditText.onFocusChangeListener = View.OnFocusChangeListener { editTextView, hasFocus ->
             viewModel.showSearch.value =
                 binding.communityEditText.hasFocus() &&
-                    !binding.communityEditText.text.isNullOrBlank()
+                !binding.communityEditText.text.isNullOrBlank()
         }
 
         adapter = CommunitySearchResultsAdapter(
@@ -600,15 +601,15 @@ class CreateOrEditPostFragment :
 
         if (!title.isNullOrBlank() || !body.isNullOrBlank() || !url.isNullOrBlank()) {
             if (currentDraftEntry?.data != null &&
-                currentDraftEntry.data is DraftData.PostDraftData) {
-
+                currentDraftEntry.data is DraftData.PostDraftData
+            ) {
                 viewModel.draftsManager.updateDraftAsync(
                     currentDraftEntry.id,
                     currentDraftEntry.data.copy(
                         name = title,
                         body = body,
                         url = url,
-                        isNsfw = isNsfw
+                        isNsfw = isNsfw,
                     ),
                     showToast = true,
                 )

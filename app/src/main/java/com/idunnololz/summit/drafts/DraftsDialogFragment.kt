@@ -17,24 +17,18 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.CommentDraftItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentDraftsBinding
 import com.idunnololz.summit.databinding.DraftLoadingItemBinding
 import com.idunnololz.summit.databinding.EmptyDraftItemBinding
-import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
 import com.idunnololz.summit.databinding.PostDraftItemBinding
-import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
-import com.idunnololz.summit.lemmy.search.Item
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
-import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,7 +37,7 @@ class DraftsDialogFragment :
     BaseDialogFragment<DialogFragmentDraftsBinding>(),
     FullscreenDialogFragment,
     BackPressHandler,
-    AlertDialogFragment.AlertDialogFragmentListener{
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "DraftsDialogFragment_req_key"
@@ -101,7 +95,8 @@ class DraftsDialogFragment :
             dismiss()
         }
         binding.toolbar.setNavigationIconTint(
-            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+        )
         binding.toolbar.inflateMenu(R.menu.menu_drafts)
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -125,7 +120,7 @@ class DraftsDialogFragment :
                 },
                 onDeleteClick = {
                     viewModel.deleteDraft(it)
-                }
+                },
             )
             val layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
@@ -217,11 +212,11 @@ class DraftsDialogFragment :
                     DraftsViewModel.ViewModelItem.LoadingItem -> true
                     DraftsViewModel.ViewModelItem.EmptyItem -> true
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = DraftsViewModel.ViewModelItem.PostDraftItem::class,
-                inflateFn = PostDraftItemBinding::inflate
+                inflateFn = PostDraftItemBinding::inflate,
             ) { item, b, h ->
                 b.title.text = item.postData.name
                 b.text.text = item.postData.body
@@ -236,7 +231,7 @@ class DraftsDialogFragment :
 
             addItemType(
                 clazz = DraftsViewModel.ViewModelItem.CommentDraftItem::class,
-                inflateFn = CommentDraftItemBinding::inflate
+                inflateFn = CommentDraftItemBinding::inflate,
             ) { item, b, h ->
                 b.text.text = item.commentData.content
 
@@ -249,13 +244,13 @@ class DraftsDialogFragment :
             }
             addItemType(
                 clazz = DraftsViewModel.ViewModelItem.LoadingItem::class,
-                inflateFn = DraftLoadingItemBinding::inflate
+                inflateFn = DraftLoadingItemBinding::inflate,
             ) { item, b, h ->
                 b.loadingView.showProgressBar()
             }
             addItemType(
                 clazz = DraftsViewModel.ViewModelItem.EmptyItem::class,
-                inflateFn = EmptyDraftItemBinding::inflate
+                inflateFn = EmptyDraftItemBinding::inflate,
             ) { item, b, h -> }
         }
 
@@ -289,6 +284,5 @@ class DraftsDialogFragment :
     }
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
-
     }
 }

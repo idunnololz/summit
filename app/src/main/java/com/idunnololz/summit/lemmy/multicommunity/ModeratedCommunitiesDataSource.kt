@@ -18,7 +18,7 @@ class ModeratedCommunitiesDataSource(
     private val apiClient: AccountAwareLemmyClient,
     private val accountInfoManager: AccountInfoManager,
     private val dataSourceFactory: MultiCommunityDataSource.Factory,
-): PostsDataSource {
+) : PostsDataSource {
 
     companion object {
         private const val TAG = "ModeratedCommunitiesDataSource"
@@ -36,8 +36,7 @@ class ModeratedCommunitiesDataSource(
         private val accountInfoManager: AccountInfoManager,
         private val dataSourceFactory: MultiCommunityDataSource.Factory,
     ) {
-        fun create(
-        ): ModeratedCommunitiesDataSource {
+        fun create(): ModeratedCommunitiesDataSource {
             return ModeratedCommunitiesDataSource(apiClient, accountInfoManager, dataSourceFactory)
         }
     }
@@ -59,7 +58,7 @@ class ModeratedCommunitiesDataSource(
             },
             onFailure = {
                 Result.failure(it)
-            }
+            },
         )
 
     private suspend fun getDataSource(): Result<MultiCommunityDataSource> {

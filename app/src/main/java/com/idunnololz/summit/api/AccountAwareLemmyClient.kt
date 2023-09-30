@@ -4,9 +4,7 @@ import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
-import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
@@ -21,6 +19,7 @@ import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetRepliesResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionId
@@ -28,7 +27,6 @@ import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostReportId
-import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
@@ -285,7 +283,7 @@ class AccountAwareLemmyClient @Inject constructor(
                     removeData = removeData,
                     reason = reason,
                     expiresDays = expiresDays,
-                    account = account
+                    account = account,
                 )
                 .autoSignOut(account)
         } else {
@@ -304,7 +302,7 @@ class AccountAwareLemmyClient @Inject constructor(
                     communityId = communityId,
                     personId = personId,
                     add = add,
-                    account = account
+                    account = account,
                 )
                 .autoSignOut(account)
         } else {
@@ -321,7 +319,7 @@ class AccountAwareLemmyClient @Inject constructor(
                 .distinguishComment(
                     commentId = commentId,
                     distinguish = distinguish,
-                    account = account
+                    account = account,
                 )
                 .autoSignOut(account)
         } else {
@@ -340,7 +338,7 @@ class AccountAwareLemmyClient @Inject constructor(
                     commentId = commentId,
                     remove = remove,
                     reason = reason,
-                    account = account
+                    account = account,
                 )
                 .autoSignOut(account)
         } else {
@@ -500,6 +498,18 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         } else {
             apiClient.blockPerson(personId, block, account)
+                .autoSignOut(account)
+        }
+
+    suspend fun blockInstance(
+        instanceId: InstanceId,
+        block: Boolean,
+        account: Account? = accountForInstance(),
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.blockInstance(instanceId, block, account)
                 .autoSignOut(account)
         }
 
@@ -773,7 +783,6 @@ class AccountAwareLemmyClient @Inject constructor(
         if (account == currentAccount) {
             return
         }
-
 
 //        if (accountChanged) {
 //            // on all account changes, clear the cache

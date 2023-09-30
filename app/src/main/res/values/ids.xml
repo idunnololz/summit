@@ -120,4 +120,14 @@
     <item name="screenshot_mode" type="id" />
     <item name="screenshot_mode_app_bar" type="id" />
     <item name="screenshot_options_view" type="id" />
+    <item name="auto_collapse_comment_threshold_50" type="id" />
+    <item name="auto_collapse_comment_threshold_40" type="id" />
+    <item name="auto_collapse_comment_threshold_30" type="id" />
+    <item name="auto_collapse_comment_threshold_20" type="id" />
+    <item name="auto_collapse_comment_threshold_10" type="id" />
+    <item name="auto_collapse_comment_threshold_never_collapse" type="id" />
+    <item name="sort_order_controversial" type="id" />
+    <item name="sort_order_scaled" type="id" />
+    <item name="block_instance" type="id" />
+    <item name="unblock_instance" type="id" />
 </resources>

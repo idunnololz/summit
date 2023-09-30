@@ -146,11 +146,13 @@ class PostListEngine(
         }
         for (page in pages) {
             if (page.error != null) {
-                items.add(Item.ErrorItem(
-                    message = page.error.errorMessage,
-                    pageToLoad = page.pageIndex,
-                    isLoading = page.error.isLoading
-                ))
+                items.add(
+                    Item.ErrorItem(
+                        message = page.error.errorMessage,
+                        pageToLoad = page.pageIndex,
+                        isLoading = page.error.isLoading,
+                    ),
+                )
             } else {
                 page.posts
                     .mapTo(items) {
@@ -342,7 +344,7 @@ class PostListEngine(
                         } else {
                             it
                         }
-                    }
+                    },
                 )
             }
         }

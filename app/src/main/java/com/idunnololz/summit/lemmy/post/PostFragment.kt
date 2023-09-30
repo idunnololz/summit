@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -27,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import arrow.core.Either
 import coil.load
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -66,8 +64,8 @@ import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
@@ -197,7 +195,7 @@ class PostFragment :
 
         childFragmentManager.setFragmentResultListener(
             AccountsAndSettingsDialogFragment.REQUEST_KEY,
-            this
+            this,
         ) { _, bundle ->
             val result = bundle.getParcelableCompat<Account>(
                 AccountsAndSettingsDialogFragment.REQUEST_RESULT,
@@ -210,7 +208,7 @@ class PostFragment :
 
         childFragmentManager.setFragmentResultListener(
             ScreenshotModeDialogFragment.REQUEST_KEY,
-            this
+            this,
         ) { _, bundle ->
             val result = bundle.getParcelableCompat<ScreenshotModeDialogFragment.Result>(
                 ScreenshotModeDialogFragment.REQUEST_KEY_RESULT,
@@ -316,6 +314,7 @@ class PostFragment :
                 useFooter = false,
                 isEmbedded = false,
                 args.videoState,
+                autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
                 onRefreshClickCb = {
                     forceRefresh()
                 },
@@ -398,7 +397,7 @@ class PostFragment :
                         instance = viewModel.apiInstance,
                         commentView = commentView,
                         actionsViewModel = actionsViewModel,
-                        fragmentManager = childFragmentManager
+                        fragmentManager = childFragmentManager,
                     )
                 },
                 onFetchComments = {
@@ -472,7 +471,7 @@ class PostFragment :
                         },
                         onScreenshotClick = {
                             viewModel.screenshotMode.value = true
-                        }
+                        },
                     )
                 }
             }
@@ -507,10 +506,10 @@ class PostFragment :
                 commentNavViewController?.show(
                     it,
                     onNextClick = {
-                      goToNextComment()
+                        goToNextComment()
                     },
                     onPrevClick = {
-                      goToPreviousComment()
+                        goToPreviousComment()
                     },
                     onMoreClick = {
                         val data = viewModel.postData.valueOrNull
@@ -544,7 +543,7 @@ class PostFragment :
 
                         return false
                     }
-                }
+                },
             )
         }
 
@@ -658,7 +657,7 @@ class PostFragment :
                         left = 0,
                         top = 0,
                         right = 0,
-                        bottom = getMainActivity()?.lastInsets?.bottomInset ?: 0
+                        bottom = getMainActivity()?.lastInsets?.bottomInset ?: 0,
                     )
 
                     screenshotModeAppBar.setOnMenuItemClickListener {

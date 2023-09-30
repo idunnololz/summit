@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Space
 import android.widget.TextView
@@ -11,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
-import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.view.LemmyHeaderView
 
 class CommentExpandedViewHolder(

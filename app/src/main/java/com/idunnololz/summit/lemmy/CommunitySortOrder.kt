@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SortType
 import com.squareup.moshi.JsonClass
@@ -12,27 +13,27 @@ sealed interface CommunitySortOrder : Parcelable {
 
     @Parcelize
     @TypeLabel("1")
-    object Hot : CommunitySortOrder
+    data object Hot : CommunitySortOrder
 
     @Parcelize
     @TypeLabel("2")
-    object Active : CommunitySortOrder
+    data object Active : CommunitySortOrder
 
     @Parcelize
     @TypeLabel("3")
-    object New : CommunitySortOrder
+    data object New : CommunitySortOrder
 
     @Parcelize
     @TypeLabel("4")
-    object Old : CommunitySortOrder
+    data object Old : CommunitySortOrder
 
     @Parcelize
     @TypeLabel("5")
-    object MostComments : CommunitySortOrder
+    data object MostComments : CommunitySortOrder
 
     @Parcelize
     @TypeLabel("6")
-    object NewComments : CommunitySortOrder
+    data object NewComments : CommunitySortOrder
 
     @Parcelize
     @TypeLabel("7")
@@ -40,6 +41,14 @@ sealed interface CommunitySortOrder : Parcelable {
     data class TopOrder(
         val timeFrame: TimeFrame = TimeFrame.Today,
     ) : CommunitySortOrder
+
+    @Parcelize
+    @TypeLabel("8")
+    data object Controversial : CommunitySortOrder
+
+    @Parcelize
+    @TypeLabel("9")
+    data object Scaled : CommunitySortOrder
 
     enum class TimeFrame {
         LastHour,
@@ -92,6 +101,10 @@ fun idToSortOrder(id: Int) =
             CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.ThisYear)
         R.id.sort_order_top_all_time ->
             CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.AllTime)
+        R.id.sort_order_controversial ->
+            CommunitySortOrder.Controversial
+        R.id.sort_order_scaled ->
+            CommunitySortOrder.Scaled
         else -> null
     }
 
@@ -118,6 +131,8 @@ fun CommunitySortOrder.toApiSortOrder(): SortType =
                 CommunitySortOrder.TimeFrame.AllTime -> SortType.TopAll
             }
         }
+        CommunitySortOrder.Controversial -> SortType.Controversial
+        CommunitySortOrder.Scaled -> SortType.Scaled
     }
 
 fun SortType.toId() =
@@ -139,6 +154,8 @@ fun SortType.toId() =
         SortType.TopThreeMonths -> R.id.sort_order_top_last_three_month
         SortType.TopSixMonths -> R.id.sort_order_top_last_six_month
         SortType.TopNineMonths -> R.id.sort_order_top_last_nine_month
+        SortType.Controversial -> R.id.sort_order_controversial
+        SortType.Scaled -> R.id.sort_order_scaled
     }
 
 fun SortType.toSortOrder(): CommunitySortOrder =
@@ -165,4 +182,6 @@ fun SortType.toSortOrder(): CommunitySortOrder =
             CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastSixMonth)
         SortType.TopNineMonths ->
             CommunitySortOrder.TopOrder(CommunitySortOrder.TimeFrame.LastNineMonth)
+        SortType.Controversial -> CommunitySortOrder.Controversial
+        SortType.Scaled -> CommunitySortOrder.Scaled
     }

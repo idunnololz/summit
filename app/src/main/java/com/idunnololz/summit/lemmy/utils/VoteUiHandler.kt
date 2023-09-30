@@ -53,7 +53,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -85,7 +85,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -117,7 +117,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
@@ -153,16 +153,17 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
-    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) -> Unit)?,
+    onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
     val context = scoreView.context
-    fun update(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
+    fun update(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
         if (upVoteView is ImageView && downVoteView is ImageView) {
             if (vote < 0) {
                 upVoteView.setColorFilter(
-                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+                )
                 downVoteView.setColorFilter(downvoteColor)
             } else if (vote > 0) {
                 upVoteView.setColorFilter(upvoteColor)
@@ -175,7 +176,8 @@ fun VoteUiHandler.bind(
             if (vote < 0) {
                 upVoteView.iconTint =
                     ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+                    )
                 downVoteView.iconTint =
                     ColorStateList.valueOf(downvoteColor)
             } else if (vote > 0) {
@@ -183,14 +185,17 @@ fun VoteUiHandler.bind(
                     ColorStateList.valueOf(upvoteColor)
                 downVoteView.iconTint =
                     ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+                    )
             } else {
                 upVoteView.iconTint =
                     ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+                    )
                 downVoteView.iconTint =
                     ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+                    )
             }
         }
         if (vote < 0) {
@@ -235,21 +240,21 @@ fun VoteUiHandler.bind(
         upvoteCount,
         downvoteCount,
         object : AccountActionsManager.Registration {
-            override fun voteCurrent(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
+            override fun voteCurrent(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
                 update(vote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun voteSuccess(newVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
+            override fun voteSuccess(newVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
                 update(newVote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun votePending(pendingVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,) {
+            override fun votePending(pendingVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
                 update(pendingVote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())

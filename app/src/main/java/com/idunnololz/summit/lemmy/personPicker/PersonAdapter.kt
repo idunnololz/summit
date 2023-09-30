@@ -10,24 +10,15 @@ import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorSelectedCommunityItemBinding
 import com.idunnololz.summit.databinding.PersonSelectorSearchResultPersonItemBinding
 import com.idunnololz.summit.databinding.PersonSelectorSelectedPersonItemBinding
-import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PersonRef
-import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.tint
@@ -40,7 +31,10 @@ class PersonAdapter(
     private val instance: String,
     private val onTooManyPersons: (Int) -> Unit = {},
     private val onSinglePersonSelected: (
-        PersonRef.PersonRefByName, icon: String?, personId: Int) -> Unit = { _, _, _ -> },
+        PersonRef.PersonRefByName,
+        icon: String?,
+        personId: Int,
+    ) -> Unit = { _, _, _ -> },
     private val maxSelectedPersons: Int = 100,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -108,8 +102,13 @@ class PersonAdapter(
             clazz = Item.SelectedPersonItem::class,
             inflateFn = PersonSelectorSelectedPersonItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.setImageDrawable(context.getDrawableCompat(R.drawable.baseline_person_24)?.tint(context.getColorFromAttribute(
-                androidx.appcompat.R.attr.colorControlNormal)))
+            b.icon.setImageDrawable(
+                context.getDrawableCompat(R.drawable.baseline_person_24)?.tint(
+                    context.getColorFromAttribute(
+                        androidx.appcompat.R.attr.colorControlNormal,
+                    ),
+                ),
+            )
 
             b.title.text = buildSpannedString {
                 append(item.personRef.name)
@@ -140,8 +139,13 @@ class PersonAdapter(
             clazz = Item.SearchResultPersonItem::class,
             inflateFn = PersonSelectorSearchResultPersonItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.setImageDrawable(context.getDrawableCompat(R.drawable.baseline_person_24)?.tint(context.getColorFromAttribute(
-                androidx.appcompat.R.attr.colorControlNormal)))
+            b.icon.setImageDrawable(
+                context.getDrawableCompat(R.drawable.baseline_person_24)?.tint(
+                    context.getColorFromAttribute(
+                        androidx.appcompat.R.attr.colorControlNormal,
+                    ),
+                ),
+            )
 
             offlineManager.fetchImage(h.itemView, item.personView.person.avatar) {
                 b.icon.load(it)
@@ -204,7 +208,7 @@ class PersonAdapter(
             }
         }
 
-        refreshItems {  }
+        refreshItems { }
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -264,7 +268,7 @@ class PersonAdapter(
                     newItems += Item.SearchResultPersonItem(
                         it.person.name,
                         it,
-                        selectedPersons.contains(it.person.toPersonRef())
+                        selectedPersons.contains(it.person.toPersonRef()),
                     )
                 }
             }

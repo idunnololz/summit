@@ -14,6 +14,9 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.VideoFrameDecoder
 import coil.transition.CrossfadeTransition
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.preferences.Preferences
@@ -31,7 +34,6 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import java.util.Locale
 import javax.inject.Inject
-
 
 @HiltAndroidApp
 class MainApplication : Application(), androidx.work.Configuration.Provider {
@@ -203,6 +205,11 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         hiltEntryPoint.themeManager().applyThemeFromPreferences()
         Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInExternalApp
         LemmyTextHelper.autoLinkPhoneNumbers = hiltEntryPoint.preferences().autoLinkPhoneNumbers
+
+        if (hiltEntryPoint.preferences().useFirebase) {
+            FirebaseApp.initializeApp(this)
+            Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+        }
     }
 
     override fun getWorkManagerConfiguration(): androidx.work.Configuration {

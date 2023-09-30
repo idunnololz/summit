@@ -13,8 +13,6 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
-import com.idunnololz.summit.lemmy.mod.BanUserDialogFragment
-import com.idunnololz.summit.lemmy.mod.BanUserDialogFragmentArgs
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -55,17 +53,17 @@ fun BaseFragment<*>.showMorePostOptions(
             addItemWithIcon(
                 R.id.sort_comments_by,
                 R.string.sort_comments_by,
-                R.drawable.baseline_sort_24
+                R.drawable.baseline_sort_24,
             )
             addItemWithIcon(
                 R.id.refresh,
                 R.string.refresh,
-                R.drawable.baseline_refresh_24
+                R.drawable.baseline_refresh_24,
             )
             addItemWithIcon(
                 R.id.find_in_page,
                 R.string.find_in_page,
-                R.drawable.outline_find_in_page_24
+                R.drawable.outline_find_in_page_24,
             )
             addDivider()
         }
@@ -81,14 +79,13 @@ fun BaseFragment<*>.showMorePostOptions(
             ?.miscAccountInfo
             ?.modCommunityIds
             ?.contains(postView.community.id) == true
-            ) {
-
+        ) {
             addDivider()
 
             addItemWithIcon(
                 id = R.id.mod_tools,
                 title = R.string.mod_tools,
-                icon = R.drawable.outline_shield_24
+                icon = R.drawable.outline_shield_24,
             )
 
             addDivider()
@@ -124,7 +121,7 @@ fun BaseFragment<*>.showMorePostOptions(
             addItemWithIcon(
                 R.id.screenshot,
                 getString(R.string.take_screenshot),
-                R.drawable.baseline_screenshot_24
+                R.drawable.baseline_screenshot_24,
             )
         }
 
@@ -148,9 +145,9 @@ fun BaseFragment<*>.showMorePostOptions(
 
         addDivider()
         addItemWithIcon(
-            R.id.block_community,
-            getString(R.string.block_this_community_format, postView.community.name),
-            R.drawable.baseline_block_24,
+            R.id.report_post,
+            getString(R.string.report_post),
+            R.drawable.baseline_outlined_flag_24,
         )
         addItemWithIcon(
             R.id.block_user,
@@ -158,9 +155,14 @@ fun BaseFragment<*>.showMorePostOptions(
             R.drawable.baseline_person_off_24,
         )
         addItemWithIcon(
-            R.id.report_post,
-            getString(R.string.report_post),
-            R.drawable.baseline_outlined_flag_24,
+            R.id.block_community,
+            getString(R.string.block_this_community_format, postView.community.name),
+            R.drawable.baseline_block_24,
+        )
+        addItemWithIcon(
+            R.id.block_instance,
+            getString(R.string.block_this_instance_format, postView.instance),
+            R.drawable.baseline_public_off_24,
         )
         addDivider()
 //        addItemWithIcon(
@@ -214,6 +216,9 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.id.block_user -> {
                     actionsViewModel.blockPerson(postView.creator.id)
                 }
+                R.id.block_instance -> {
+                    actionsViewModel.blockInstance(postView.community.instance_id)
+                }
                 R.id.share -> {
                     Utils.shareLink(
                         context = context,
@@ -227,7 +232,7 @@ fun BaseFragment<*>.showMorePostOptions(
                                 instance = actionsViewModel.apiInstance,
                                 post = null,
                                 communityName = null,
-                                crosspost = postView.post
+                                crosspost = postView.post,
                             ).toBundle()
                         }
                         .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
@@ -266,7 +271,7 @@ fun BaseFragment<*>.showMorePostOptions(
                         childFragmentManager,
                         PostRef(
                             instance,
-                            postView.post.id
+                            postView.post.id,
                         ),
                         null,
                     )

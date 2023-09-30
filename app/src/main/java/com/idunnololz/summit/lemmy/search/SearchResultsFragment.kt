@@ -516,7 +516,6 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkLongClick = onLinkLongClick,
                 )
 
-
                 val scoreCount: TextView = viewHolder.upvoteCount!!
                 val upvoteCount: TextView?
                 val downvoteCount: TextView?

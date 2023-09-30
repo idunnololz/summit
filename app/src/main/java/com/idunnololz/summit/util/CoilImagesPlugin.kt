@@ -2,7 +2,6 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
 import android.text.Spanned
 import android.widget.TextView
@@ -58,7 +57,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
 
     private class CoilAsyncDrawableLoader internal constructor(
         private val coilStore: CoilStore,
-        private val imageLoader: ImageLoader
+        private val imageLoader: ImageLoader,
     ) : AsyncDrawableLoader() {
         private val cache: MutableMap<AsyncDrawable, Disposable?> = HashMap(2)
         override fun load(drawable: AsyncDrawable) {
@@ -92,14 +91,13 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
 
         private inner class AsyncDrawableTarget(
             private val drawable: AsyncDrawable,
-            private val loaded: AtomicBoolean
+            private val loaded: AtomicBoolean,
         ) : Target {
             override fun onSuccess(loadedDrawable: Drawable) {
                 // @since 4.5.1 check finished flag (result can be delivered _before_ disposable is created)
-                if (cache.remove(drawable) != null
-                    || !loaded.get()
+                if (cache.remove(drawable) != null ||
+                    !loaded.get()
                 ) {
-
                     // mark
                     loaded.set(true)
                     if (drawable.isAttached) {
@@ -133,39 +131,45 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
 
     companion object {
         fun create(context: Context): CoilImagesPlugin {
-            return create(object : CoilStore {
-                override fun load(drawable: AsyncDrawable): ImageRequest {
-                    return ImageRequest.Builder(context)
-                        .data(drawable.destination)
-                        .build()
-                }
+            return create(
+                object : CoilStore {
+                    override fun load(drawable: AsyncDrawable): ImageRequest {
+                        return ImageRequest.Builder(context)
+                            .data(drawable.destination)
+                            .build()
+                    }
 
-                override fun cancel(disposable: Disposable) {
-                    disposable.dispose()
-                }
-            }, imageLoader(context))
+                    override fun cancel(disposable: Disposable) {
+                        disposable.dispose()
+                    }
+                },
+                imageLoader(context),
+            )
         }
 
         fun create(
             context: Context,
-            imageLoader: ImageLoader
+            imageLoader: ImageLoader,
         ): CoilImagesPlugin {
-            return create(object : CoilStore {
-                override fun load(drawable: AsyncDrawable): ImageRequest {
-                    return ImageRequest.Builder(context)
-                        .data(drawable.destination)
-                        .build()
-                }
+            return create(
+                object : CoilStore {
+                    override fun load(drawable: AsyncDrawable): ImageRequest {
+                        return ImageRequest.Builder(context)
+                            .data(drawable.destination)
+                            .build()
+                    }
 
-                override fun cancel(disposable: Disposable) {
-                    disposable.dispose()
-                }
-            }, imageLoader)
+                    override fun cancel(disposable: Disposable) {
+                        disposable.dispose()
+                    }
+                },
+                imageLoader,
+            )
         }
 
         fun create(
             coilStore: CoilStore,
-            imageLoader: ImageLoader
+            imageLoader: ImageLoader,
         ): CoilImagesPlugin {
             return CoilImagesPlugin(coilStore, imageLoader)
         }

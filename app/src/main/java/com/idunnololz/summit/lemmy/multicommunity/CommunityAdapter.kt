@@ -25,7 +25,9 @@ class CommunityAdapter(
     private val canSelectMultipleCommunities: Boolean,
     private val onTooManyCommunities: (Int) -> Unit = {},
     private val onSingleCommunitySelected: (
-        CommunityRef.CommunityRefByName, icon: String?, communityId: Int
+        CommunityRef.CommunityRefByName,
+        icon: String?,
+        communityId: Int,
     ) -> Unit = { _, _, _ -> },
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -163,7 +165,7 @@ class CommunityAdapter(
             }
         }
 
-        refreshItems {  }
+        refreshItems { }
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -224,7 +226,7 @@ class CommunityAdapter(
                         it.community.name,
                         it,
                         it.counts.users_active_month,
-                        selectedCommunities.contains(it.community.toCommunityRef())
+                        selectedCommunities.contains(it.community.toCommunityRef()),
                     )
                 }
             }

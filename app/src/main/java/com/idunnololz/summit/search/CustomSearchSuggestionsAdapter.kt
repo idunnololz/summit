@@ -219,7 +219,8 @@ class CustomSearchSuggestionsAdapter(
             ): Boolean {
                 return oldItems[oldItemPosition] == newItems[newItemPosition]
             }
-        },)
+        },
+        )
         items = newItems
         diff.dispatchUpdatesTo(this)
     }

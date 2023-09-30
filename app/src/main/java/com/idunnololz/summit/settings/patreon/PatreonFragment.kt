@@ -9,7 +9,6 @@ import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.Utils
 
 class PatreonFragment : BaseFragment<FragmentPatreonBinding>() {
 

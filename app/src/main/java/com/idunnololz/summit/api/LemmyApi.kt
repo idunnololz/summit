@@ -12,6 +12,8 @@ import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockCommunityResponse
+import com.idunnololz.summit.api.dto.BlockInstance
+import com.idunnololz.summit.api.dto.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.BlockPersonResponse
 import com.idunnololz.summit.api.dto.CommentReportResponse
@@ -45,7 +47,6 @@ import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
-import com.idunnololz.summit.api.dto.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
@@ -55,7 +56,6 @@ import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.MarkPostAsRead
 import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
-import com.idunnololz.summit.api.dto.ModAdd
 import com.idunnololz.summit.api.dto.PersonMentionResponse
 import com.idunnololz.summit.api.dto.PictrsImages
 import com.idunnololz.summit.api.dto.PostReportResponse
@@ -97,314 +97,517 @@ private const val TAG = "LemmyApi"
 
 interface LemmyApi {
     @GET("site")
-    fun getSite(@QueryMap form: Map<String, String>): Call<GetSiteResponse>
+    fun getSite(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetSiteResponse>
 
     @GET("site")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getSiteNoCache(@QueryMap form: Map<String, String>): Call<GetSiteResponse>
+    fun getSiteNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetSiteResponse>
 
     /**
      * Get / fetch posts, with various filters.
      */
     @GET("post/list")
-    fun getPosts(@QueryMap form: Map<String, String>): Call<GetPostsResponse>
+    fun getPosts(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPostsResponse>
 
     @GET("post/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getPostsNoCache(@QueryMap form: Map<String, String>): Call<GetPostsResponse>
+    fun getPostsNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPostsResponse>
 
     /**
      * Get / fetch a post.
      */
     @GET("post")
-    fun getPost(@QueryMap form: Map<String, String>): Call<GetPostResponse>
+    fun getPost(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPostResponse>
 
     @GET("post")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getPostNoCache(@QueryMap form: Map<String, String>): Call<GetPostResponse>
+    fun getPostNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPostResponse>
 
     /**
      * Log into lemmy.
      */
     @POST("user/login")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun login(@Body form: Login): Call<LoginResponse>
+    fun login(
+        @Body form: Login,
+    ): Call<LoginResponse>
 
     /**
      * Like / vote on a post.
      */
     @POST("post/like")
-    fun likePost(@Body form: CreatePostLike): Call<PostResponse>
+    fun likePost(
+        @Header("Authorization") authorization: String?,
+        @Body form: CreatePostLike,
+    ): Call<PostResponse>
 
     /**
      * Like / vote on a comment.
      */
     @POST("comment/like")
-    fun likeComment(@Body form: CreateCommentLike): Call<CommentResponse>
+    fun likeComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: CreateCommentLike,
+    ): Call<CommentResponse>
 
     /**
      * Create a comment.
      */
     @POST("comment")
-    fun createComment(@Body form: CreateComment): Call<CommentResponse>
+    fun createComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: CreateComment,
+    ): Call<CommentResponse>
 
     /**
      * Edit a comment.
      */
     @PUT("comment")
-    fun editComment(@Body form: EditComment): Call<CommentResponse>
+    fun editComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: EditComment,
+    ): Call<CommentResponse>
 
     /**
      * Delete a comment.
      */
     @POST("comment/delete")
-    fun deleteComment(@Body form: DeleteComment): Call<CommentResponse>
+    fun deleteComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: DeleteComment,
+    ): Call<CommentResponse>
 
     /**
      * Save a post.
      */
     @PUT("post/save")
-    fun savePost(@Body form: SavePost): Call<PostResponse>
+    fun savePost(
+        @Header("Authorization") authorization: String?,
+        @Body form: SavePost,
+    ): Call<PostResponse>
 
     @POST("post/mark_as_read")
-    fun markPostAsRead(@Body form: MarkPostAsRead): Call<PostResponse>
+    fun markPostAsRead(
+        @Header("Authorization") authorization: String?,
+        @Body form: MarkPostAsRead,
+    ): Call<PostResponse>
 
     /**
      * Save a comment.
      */
     @PUT("comment/save")
-    fun saveComment(@Body form: SaveComment): Call<CommentResponse>
+    fun saveComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: SaveComment,
+    ): Call<CommentResponse>
 
     /**
      * Get / fetch comments.
      */
     @GET("comment/list")
-    fun getComments(@QueryMap form: Map<String, String>): Call<GetCommentsResponse>
+    fun getComments(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetCommentsResponse>
 
     @GET("comment/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getCommentsNoCache(@QueryMap form: Map<String, String>): Call<GetCommentsResponse>
+    fun getCommentsNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetCommentsResponse>
 
     @POST("comment/distinguish")
-    fun distinguishComment(@Body form: DistinguishComment): Call<CommentResponse>
-    @POST("comment/remove")
-    fun removeComment(@Body form: RemoveComment): Call<CommentResponse>
+    fun distinguishComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: DistinguishComment,
+    ): Call<CommentResponse>
 
+    @POST("comment/remove")
+    fun removeComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: RemoveComment,
+    ): Call<CommentResponse>
 
     /**
      * Get / fetch a community.
      */
     @GET("community")
-    fun getCommunity(@QueryMap form: Map<String, String>): Call<GetCommunityResponse>
+    fun getCommunity(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetCommunityResponse>
 
     @GET("community")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getCommunityNoCache(@QueryMap form: Map<String, String>): Call<GetCommunityResponse>
+    fun getCommunityNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetCommunityResponse>
 
     /**
      * Get / fetch a community.
      */
     @GET("community/list")
-    fun getCommunityList(@QueryMap form: Map<String, String>): Call<ListCommunitiesResponse>
+    fun getCommunityList(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ListCommunitiesResponse>
 
     /**
      * Get the details for a person.
      */
     @GET("user")
-    fun getPersonDetails(@QueryMap form: Map<String, String>): Call<GetPersonDetailsResponse>
+    fun getPersonDetails(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPersonDetailsResponse>
 
     @GET("user")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getPersonDetailsNoCache(@QueryMap form: Map<String, String>): Call<GetPersonDetailsResponse>
+    fun getPersonDetailsNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPersonDetailsResponse>
 
     /**
      * Get comment replies.
      */
     @GET("user/replies")
-    fun getReplies(@QueryMap form: Map<String, String>): Call<GetRepliesResponse>
+    fun getReplies(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetRepliesResponse>
 
     @GET("user/replies")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getRepliesNoCache(@QueryMap form: Map<String, String>): Call<GetRepliesResponse>
+    fun getRepliesNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetRepliesResponse>
 
     /**
      * Mark a comment as read.
      */
     @POST("comment/mark_as_read")
-    fun markCommentReplyAsRead(@Body form: MarkCommentReplyAsRead): Call<CommentResponse>
+    fun markCommentReplyAsRead(
+        @Header("Authorization") authorization: String?,
+        @Body form: MarkCommentReplyAsRead,
+    ): Call<CommentResponse>
 
     /**
      * Mark a person mention as read.
      */
     @POST("user/mention/mark_as_read")
-    fun markPersonMentionAsRead(@Body form: MarkPersonMentionAsRead): Call<PersonMentionResponse>
+    fun markPersonMentionAsRead(
+        @Header("Authorization") authorization: String?,
+        @Body form: MarkPersonMentionAsRead,
+    ): Call<PersonMentionResponse>
 
     /**
      * Mark a private message as read.
      */
     @POST("private_message/mark_as_read")
-    fun markPrivateMessageAsRead(@Body form: MarkPrivateMessageAsRead): Call<PrivateMessageResponse>
+    fun markPrivateMessageAsRead(
+        @Header("Authorization") authorization: String?,
+        @Body form: MarkPrivateMessageAsRead,
+    ): Call<PrivateMessageResponse>
 
     /**
      * Mark all replies as read.
      */
     @POST("user/mark_all_as_read")
-    fun markAllAsRead(@Body form: MarkAllAsRead): Call<GetRepliesResponse>
+    fun markAllAsRead(
+        @Header("Authorization") authorization: String?,
+        @Body form: MarkAllAsRead,
+    ): Call<GetRepliesResponse>
 
     /**
      * Get mentions for your user.
      */
     @GET("user/mention")
-    fun getPersonMentions(@QueryMap form: Map<String, String>): Call<GetPersonMentionsResponse>
+    fun getPersonMentions(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPersonMentionsResponse>
 
     @GET("user/mention")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getPersonMentionsNoCache(@QueryMap form: Map<String, String>): Call<GetPersonMentionsResponse>
+    fun getPersonMentionsNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetPersonMentionsResponse>
 
     /**
      * Get / fetch private messages.
      */
     @GET("private_message/list")
-    fun getPrivateMessages(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
+    fun getPrivateMessages(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<PrivateMessagesResponse>
 
     @GET("private_message/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getPrivateMessagesNoCache(@QueryMap form: Map<String, String>): Call<PrivateMessagesResponse>
+    fun getPrivateMessagesNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<PrivateMessagesResponse>
 
     /**
      * These are instance wide reports that are only visible for instance admins.
      */
     @GET("private_message/report/list")
-    fun getReportMessages(@QueryMap form: Map<String, String>): Call<ListPrivateMessageReportsResponse>
+    fun getReportMessages(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ListPrivateMessageReportsResponse>
+
     @GET("private_message/report/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getReportMessagesNoCache(@QueryMap form: Map<String, String>): Call<ListPrivateMessageReportsResponse>
+    fun getReportMessagesNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ListPrivateMessageReportsResponse>
 
     @GET("post/report/list")
-    fun getPostReports(@QueryMap form: Map<String, String>): Call<ListPostReportsResponse>
+    fun getPostReports(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ListPostReportsResponse>
+
     @GET("post/report/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getPostReportsNoCache(@QueryMap form: Map<String, String>): Call<ListPostReportsResponse>
+    fun getPostReportsNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ListPostReportsResponse>
 
     @PUT("post/report/resolve")
-    fun resolvePostReport(@Body resolvePostReport: ResolvePostReport): Call<PostReportResponse>
+    fun resolvePostReport(
+        @Header("Authorization") authorization: String?,
+        @Body resolvePostReport: ResolvePostReport,
+    ): Call<PostReportResponse>
 
     @GET("comment/report/list")
-    fun getCommentReports(@QueryMap form: Map<String, String>): Call<ListCommentReportsResponse>
+    fun getCommentReports(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ListCommentReportsResponse>
+
     @GET("comment/report/list")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getCommentReportsNoCache(@QueryMap form: Map<String, String>): Call<ListCommentReportsResponse>
+    fun getCommentReportsNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ListCommentReportsResponse>
 
     @PUT("comment/report/resolve")
-    fun resolveCommentReport(@Body resolveCommentReport: ResolveCommentReport): Call<CommentReportResponse>
+    fun resolveCommentReport(
+        @Header("Authorization") authorization: String?,
+        @Body resolveCommentReport: ResolveCommentReport,
+    ): Call<CommentReportResponse>
 
     /**
      * Create a private message.
      */
     @POST("private_message")
-    fun createPrivateMessage(@Body form: CreatePrivateMessage): Call<PrivateMessageResponse>
+    fun createPrivateMessage(
+        @Header("Authorization") authorization: String?,
+        @Body form: CreatePrivateMessage,
+    ): Call<PrivateMessageResponse>
 
     /**
      * Get your unread counts
      */
     @GET("user/unread_count")
-    fun getUnreadCount(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
+    fun getUnreadCount(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetUnreadCountResponse>
 
     @GET("user/unread_count")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getUnreadCountNoCache(@QueryMap form: Map<String, String>): Call<GetUnreadCountResponse>
-
+    fun getUnreadCountNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetUnreadCountResponse>
 
     @GET("user/report_count")
-    fun getReportCount(@QueryMap form: Map<String, String>): Call<GetReportCountResponse>
+    fun getReportCount(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetReportCountResponse>
 
     @GET("user/report_count")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun getReportCountNoCache(@QueryMap form: Map<String, String>): Call<GetReportCountResponse>
+    fun getReportCountNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetReportCountResponse>
 
     /**
      * Follow / subscribe to a community.
      */
     @POST("community/follow")
-    fun followCommunity(@Body form: FollowCommunity): Call<CommunityResponse>
+    fun followCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body form: FollowCommunity,
+    ): Call<CommunityResponse>
 
     @POST("community/ban_user")
-    fun banUserFromCommunity(@Body banUser: BanFromCommunity): Call<BanFromCommunityResponse>
+    fun banUserFromCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body banUser: BanFromCommunity,
+    ): Call<BanFromCommunityResponse>
+
     @POST("community/mod")
-    fun modUser(@Body modUser: AddModToCommunity): Call<AddModToCommunityResponse>
+    fun modUser(
+        @Header("Authorization") authorization: String?,
+        @Body modUser: AddModToCommunity,
+    ): Call<AddModToCommunityResponse>
 
     /**
      * Create a post.
      */
     @POST("post")
-    fun createPost(@Body form: CreatePost): Call<PostResponse>
+    fun createPost(
+        @Header("Authorization") authorization: String?,
+        @Body form: CreatePost,
+    ): Call<PostResponse>
 
     /**
      * Edit a post.
      */
     @PUT("post")
-    fun editPost(@Body form: EditPost): Call<PostResponse>
+    fun editPost(
+        @Header("Authorization") authorization: String?,
+        @Body form: EditPost,
+    ): Call<PostResponse>
 
     /**
      * Delete a post.
      */
     @POST("post/delete")
-    fun deletePost(@Body form: DeletePost): Call<PostResponse>
+    fun deletePost(
+        @Header("Authorization") authorization: String?,
+        @Body form: DeletePost,
+    ): Call<PostResponse>
 
     @POST("post/feature")
-    fun featurePost(@Body form: FeaturePost): Call<PostResponse>
+    fun featurePost(
+        @Header("Authorization") authorization: String?,
+        @Body form: FeaturePost,
+    ): Call<PostResponse>
 
     @POST("post/lock")
-    fun lockPost(@Body form: LockPost): Call<PostResponse>
+    fun lockPost(
+        @Header("Authorization") authorization: String?,
+        @Body form: LockPost,
+    ): Call<PostResponse>
 
     @POST("post/remove")
-    fun removePost(@Body form: RemovePost): Call<PostResponse>
+    fun removePost(
+        @Header("Authorization") authorization: String?,
+        @Body form: RemovePost,
+    ): Call<PostResponse>
 
     /**
      * Search lemmy.
      */
     @GET("search")
-    fun search(@QueryMap form: Map<String, String>): Call<SearchResponse>
+    fun search(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<SearchResponse>
 
     @GET("search")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun searchNoCache(@QueryMap form: Map<String, String>): Call<SearchResponse>
+    fun searchNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<SearchResponse>
 
     /**
      * Fetch metadata for any given site.
      */
     @GET("post/site_metadata")
-    fun getSiteMetadata(@QueryMap form: Map<String, String>): Call<GetSiteMetadataResponse>
+    fun getSiteMetadata(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetSiteMetadataResponse>
 
     /**
      * Report a comment.
      */
     @POST("comment/report")
-    fun createCommentReport(@Body form: CreateCommentReport): Call<CommentReportResponse>
+    fun createCommentReport(
+        @Header("Authorization") authorization: String?,
+        @Body form: CreateCommentReport,
+    ): Call<CommentReportResponse>
 
     /**
      * Report a post.
      */
     @POST("post/report")
-    fun createPostReport(@Body form: CreatePostReport): Call<PostReportResponse>
+    fun createPostReport(
+        @Header("Authorization") authorization: String?,
+        @Body form: CreatePostReport,
+    ): Call<PostReportResponse>
 
     /**
      * Block a person.
      */
     @POST("user/block")
-    fun blockPerson(@Body form: BlockPerson): Call<BlockPersonResponse>
+    fun blockPerson(
+        @Header("Authorization") authorization: String?,
+        @Body form: BlockPerson,
+    ): Call<BlockPersonResponse>
 
     /**
      * Block a community.
      */
     @POST("community/block")
-    fun blockCommunity(@Body form: BlockCommunity): Call<BlockCommunityResponse>
+    fun blockCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body form: BlockCommunity,
+    ): Call<BlockCommunityResponse>
+
+    /**
+     * Block an instance.
+     */
+    @POST("site/block")
+    fun blockInstance(
+        @Header("Authorization") authorization: String?,
+        @Body form: BlockInstance,
+    ): Call<BlockInstanceResponse>
 
     /**
      * Save your user settings.
      */
     @PUT("user/save_user_settings")
-    fun saveUserSettings(@Body form: SaveUserSettings): Call<LoginResponse>
+    fun saveUserSettings(
+        @Header("Authorization") authorization: String?,
+        @Body form: SaveUserSettings,
+    ): Call<LoginResponse>
 
     /**
      * Upload an image.
@@ -412,15 +615,17 @@ interface LemmyApi {
     @Multipart
     @POST
     fun uploadImage(
+        @Header("Authorization") authorization: String?,
         @Url url: String,
         @Header("Cookie") token: String,
         @Part filePart: MultipartBody.Part,
     ): Call<PictrsImages>
 
     @GET("resolve_object")
-    fun resolveObject(@QueryMap form: Map<String, String>): Call<ResolveObjectResponse>
-
-
+    fun resolveObject(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<ResolveObjectResponse>
 
     companion object {
 
@@ -492,7 +697,6 @@ interface LemmyApi {
                     *  the device is connected to Internet or not.
                     */
                     request = if (hasNetwork(context)) {
-
                         val cacheControl = CacheControl.Builder()
                             .maxStale(10, TimeUnit.MINUTES)
                             .build()
@@ -505,7 +709,7 @@ interface LemmyApi {
                         request.newBuilder()
                             .header(
                                 CACHE_CONTROL_HEADER,
-                                cacheControl.toString()
+                                cacheControl.toString(),
                             )
                             .removeHeader("Pragma")
                             .build()
@@ -530,7 +734,7 @@ interface LemmyApi {
                     val response = chain.proceed(request)
 
                     Log.d(TAG, "header: ${request.headers}")
-                    Log.d(TAG, "Response 1 response:          ${response}")
+                    Log.d(TAG, "Response 1 response:          $response")
                     Log.d(
                         TAG,
                         "Response 1 cache response:    ${response.cacheResponse}",

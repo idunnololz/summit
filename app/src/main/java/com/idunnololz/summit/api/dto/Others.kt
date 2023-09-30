@@ -115,6 +115,12 @@ enum class SortType {
      */
     @SerializedName("TopNineMonths")
     TopNineMonths,
+
+    @SerializedName("Controversial")
+    Controversial,
+
+    @SerializedName("Scaled")
+    Scaled,
 }
 
 /**

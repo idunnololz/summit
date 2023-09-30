@@ -52,7 +52,7 @@ class MultiCommunityEditorDialogFragment :
     BaseDialogFragment<DialogFragmentMultiCommunityEditorBinding>(),
     FullscreenDialogFragment,
     BackPressHandler,
-AlertDialogFragment.AlertDialogFragmentListener {
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "MultiCommunityEditorDialogFragment_req_key"
@@ -108,11 +108,13 @@ AlertDialogFragment.AlertDialogFragmentListener {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentMultiCommunityEditorBinding.inflate(
-            inflater,
-            container,
-            false
-        ))
+        setBinding(
+            DialogFragmentMultiCommunityEditorBinding.inflate(
+                inflater,
+                container,
+                false,
+            ),
+        )
 
         return binding.root
     }
@@ -135,7 +137,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             },
             onCommunityClick = {
                 getMainActivity()?.showCommunityInfo(it)
-            }
+            },
         )
 
         requireMainActivity().apply {
@@ -183,9 +185,12 @@ AlertDialogFragment.AlertDialogFragmentListener {
                             icon = ref.icon,
                         )
 
-                        setFragmentResult(REQUEST_KEY, bundleOf(
-                            REQUEST_KEY_RESULT to ref
-                        ))
+                        setFragmentResult(
+                            REQUEST_KEY,
+                            bundleOf(
+                                REQUEST_KEY_RESULT to ref,
+                            ),
+                        )
                         dismiss()
 
                         true
@@ -202,11 +207,14 @@ AlertDialogFragment.AlertDialogFragmentListener {
                 viewModel.doQuery(query)
             }
 
-            adapter = CommunityAdapter(context, offlineManager,
+            adapter = CommunityAdapter(
+                context,
+                offlineManager,
                 canSelectMultipleCommunities = true,
                 onTooManyCommunities = {
                     showTooManyCommunitiesMessage()
-                })
+                },
+            )
             resultsRecyclerView.adapter = adapter
             resultsRecyclerView.setHasFixedSize(true)
             resultsRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -258,7 +266,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     selectedCommunities ?: listOf(),
                     communityIcons ?: listOf(),
                     selectedIcon,
-                )
+                ),
             )
         }
 
@@ -281,9 +289,12 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
     private fun showTooManyCommunitiesMessage() {
         AlertDialogFragment.Builder()
-            .setMessage(getString(
-                R.string.error_multi_community_limit_reached,
-                MULTI_COMMUNITY_DATA_SOURCE_LIMIT.toString()))
+            .setMessage(
+                getString(
+                    R.string.error_multi_community_limit_reached,
+                    MULTI_COMMUNITY_DATA_SOURCE_LIMIT.toString(),
+                ),
+            )
             .createAndShow(childFragmentManager, "asdfss")
     }
 
@@ -295,7 +306,8 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
         if (viewModel.communityName.value != args.multiCommunity.name ||
             viewModel.selectedIcon.value != args.multiCommunity.icon ||
-            viewModel.selectedCommunitiesFlow.value != args.multiCommunity.communities) {
+            viewModel.selectedCommunitiesFlow.value != args.multiCommunity.communities
+        ) {
             AlertDialogFragment.Builder()
                 .setTitle(R.string.error_unsaved_changes)
                 .setMessage(R.string.error_multi_community_unsaved_changes)
@@ -304,7 +316,6 @@ AlertDialogFragment.AlertDialogFragmentListener {
                 .createAndShow(childFragmentManager, "UnsavedChanges")
             return true
         }
-
 
         try {
             dismiss()
@@ -365,7 +376,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
         private sealed interface Item {
 
             data class HeaderItem(
-                val communityName: String
+                val communityName: String,
             ) : Item
 
             data class GroupHeaderItem(
@@ -417,7 +428,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     is Item.HeaderItem -> new.communityName
                     else -> null
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.HeaderItem::class,
@@ -438,15 +449,14 @@ AlertDialogFragment.AlertDialogFragmentListener {
                         override fun afterTextChanged(p0: Editable?) {
                             onCommunityNameChanged(p0?.toString())
                         }
-
-                    })
-                }
+                    },)
+                },
             ) { item, b, h ->
                 b.nameEditText.setText(item.communityName)
             }
             addItemType(
                 clazz = Item.SelectedCommunitiesHeader::class,
-                inflateFn = MultiCommunitySelectedCommunitiesItemBinding::inflate
+                inflateFn = MultiCommunitySelectedCommunitiesItemBinding::inflate,
             ) { item, b, _ ->
                 b.edit.setOnClickListener {
                     onChooseCommunitiesClick()
@@ -558,7 +568,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             val newItems = mutableListOf<Item>()
 
             newItems += Item.HeaderItem(
-                data.communityName
+                data.communityName,
             )
 
             newItems.add(Item.GroupHeaderItem(context.getString(R.string.multi_community_icon)))

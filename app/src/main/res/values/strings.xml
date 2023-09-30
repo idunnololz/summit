@@ -615,6 +615,27 @@
     <string name="screenshot_size_settings">Screenshot size settings</string>
     <string name="screenshot_width">Screenshot width</string>
     <string name="screenshot_saved">Screenshot saved to %1$s.</string>
+    <string name="logging">Logging</string>
+    <string name="logging_desc">Configure what the app logs</string>
+    <string name="use_firebase">Log crashes to Google Firebase</string>
+    <string name="use_firebase_desc">If disabled, crashes you encounter in the app will not be logged. Please consider reporting crashes to c/summit if you disable this setting.</string>
+    <string name="app_restart_required_by_setting">App restart required</string>
+    <string name="app_restart_required_by_setting_desc">Changing this setting requires a restart of the app.</string>
+    <string name="restart_app">Restart Summit</string>
+    <string name="auto_collapse_comment_threshold">Auto-collapse comments below some upvote percent</string>
+    <string name="never_auto_collapse_comments">Never auto-collapse comments</string>
+    <string name="history_desc"><![CDATA[View & configure app history]]></string>
+    <string name="record_browsing_history">Record browsing history</string>
+    <string name="record_browsing_history_desc">If enabled, your browsing history will be stored and shown on the history screen.</string>
+    <string name="sort_order_controversial">Controversial</string>
+    <string name="sort_order_scaled">Hot (scaled by community size)</string>
+    <string name="sort_order_scaled_short">Hot (scaled)</string>
+    <string name="block_this_instance_format">Block this instance (%1$s)</string>
+    <string name="unblock_this_instance_format">Unblock this instance (%1$s)</string>
+    <string name="error_unable_to_block_instance">Failed to block instance.</string>
+    <string name="error_unable_to_block_community">Failed to block community</string>
+    <string name="error_unable_to_block_person">Failed to block person</string>
+    <string name="error_new_api_format">This feature is unsupported by your Lemmy instance. This is likely because your instance version is too low. This feature requires the instance to be on %1$s or up.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

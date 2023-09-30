@@ -78,7 +78,8 @@ class InboxRepository @Inject constructor(
                 }
 
                 val nextSourceAndResult = sourceToResult.maxBy {
-                        (_, result) -> result.getOrNull()?.lastUpdateTs ?: 0L
+                        (_, result) ->
+                    result.getOrNull()?.lastUpdateTs ?: 0L
                 }
                 val nextItem = nextSourceAndResult.second.getOrNull()
 
@@ -154,7 +155,7 @@ class InboxRepository @Inject constructor(
             mentionsStatelessSource,
             messagesStatelessSource,
             postReportsStatelessSource,
-            commentReportsStatelessSource
+            commentReportsStatelessSource,
         ),
     )
     private val unreadSources = InboxMultiDataSource(

@@ -9,13 +9,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.accountUi.AccountAdapter
 import com.idunnololz.summit.databinding.DialogFragmentFastAccountSwitchBinding
-import com.idunnololz.summit.databinding.DialogFragmentModActionsBinding
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
-import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -68,7 +65,7 @@ class FastAccountSwitcherDialogFragment :
                 },
                 onAddAccountClick = {},
                 onSettingClick = {},
-                onPersonClick = {}
+                onPersonClick = {},
             )
 
             recyclerView.setHasFixedSize(true)

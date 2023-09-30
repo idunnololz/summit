@@ -124,7 +124,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         when (inboxItem) {
             is InboxItem.MentionInboxItem,
             is InboxItem.MessageInboxItem,
-            is InboxItem.ReplyInboxItem -> {
+            is InboxItem.ReplyInboxItem,
+            -> {
                 LemmyTextHelper.bindText(
                     binding.title,
                     inboxItem.title,
@@ -275,7 +276,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     binding.score,
                     null,
                     null,
-                    { vote, _, _, _, ->
+                    { vote, _, _, _ ->
                         if (vote > 0) {
                             binding.score.setTextColor(upvoteColor)
                         } else if (vote == 0) {
@@ -316,7 +317,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
             is InboxItem.ReportCommentInboxItem,
             is InboxItem.ReportPostInboxItem,
-            is InboxItem.ReportMessageInboxItem -> {
+            is InboxItem.ReportMessageInboxItem,
+            -> {
                 binding.score.visibility = View.GONE
                 binding.bottomAppBar.menu.findItem(R.id.upvote).isEnabled = false
                 binding.bottomAppBar.menu.findItem(R.id.downvote).isEnabled = false
@@ -360,7 +362,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         with(binding) {
             if (args.inboxItem !is CommentBackedItem &&
                 args.inboxItem !is InboxItem.ReportPostInboxItem &&
-                args.inboxItem !is InboxItem.ReportCommentInboxItem) {
+                args.inboxItem !is InboxItem.ReportCommentInboxItem
+            ) {
                 contextCard.visibility = View.GONE
             } else if (viewModel.isContextShowing) {
                 indicator.setImageResource(R.drawable.baseline_expand_less_18)
@@ -415,6 +418,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 useFooter = false,
                 isEmbedded = true,
                 videoState = null,
+                autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
                 onRefreshClickCb = {
                     loadContext(force = true)
                 },

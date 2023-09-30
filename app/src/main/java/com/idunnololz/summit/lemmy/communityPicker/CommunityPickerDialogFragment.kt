@@ -1,10 +1,7 @@
 package com.idunnololz.summit.lemmy.communityPicker
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,31 +12,17 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentCommunityPickerBinding
-import com.idunnololz.summit.databinding.MultiCommunityHeaderItemBinding
-import com.idunnololz.summit.databinding.MultiCommunityIconSelectorBinding
-import com.idunnololz.summit.databinding.MultiCommunitySelectedCommunitiesItemBinding
-import com.idunnololz.summit.databinding.MultiCommunitySelectedCommunityBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
-import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.recyclerView.getBinding
-import com.idunnololz.summit.util.recyclerView.isBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
@@ -75,7 +58,7 @@ class CommunityPickerDialogFragment :
         val communityRef: CommunityRef.CommunityRefByName,
         val icon: String?,
         val communityId: Int,
-    ): Parcelable
+    ) : Parcelable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,11 +108,15 @@ class CommunityPickerDialogFragment :
 
             adapter = CommunityAdapter(
                 context = context,
-                offlineManager = offlineManager, canSelectMultipleCommunities = false,
+                offlineManager = offlineManager,
+                canSelectMultipleCommunities = false,
                 onSingleCommunitySelected = { ref, icon, communityId ->
-                    setFragmentResult(REQUEST_KEY, bundleOf(
-                        REQUEST_KEY_RESULT to Result(ref, icon, communityId)
-                    ))
+                    setFragmentResult(
+                        REQUEST_KEY,
+                        bundleOf(
+                            REQUEST_KEY_RESULT to Result(ref, icon, communityId),
+                        ),
+                    )
                     dismiss()
                 },
             )
@@ -152,7 +139,6 @@ class CommunityPickerDialogFragment :
                 }
             }
         }
-
     }
 
     override fun onBackPressed(): Boolean {
@@ -168,5 +154,4 @@ class CommunityPickerDialogFragment :
         }
         return true
     }
-
 }

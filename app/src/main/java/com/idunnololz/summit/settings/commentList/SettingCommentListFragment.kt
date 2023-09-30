@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsCommentListBinding
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
@@ -85,12 +86,12 @@ class SettingCommentListFragment :
         commentListSettings.useVolumeButtonNavigation.bindTo(
             binding.useVolumeButtonNavigation,
             { preferences.useVolumeButtonNavigation },
-            { preferences.useVolumeButtonNavigation = it }
+            { preferences.useVolumeButtonNavigation = it },
         )
         commentListSettings.collapseChildCommentsByDefault.bindTo(
             binding.collapseChildCommentsByDefault,
             { preferences.collapseChildCommentsByDefault },
-            { preferences.collapseChildCommentsByDefault = it }
+            { preferences.collapseChildCommentsByDefault = it },
         )
         commentListSettings.hideCommentScores.bindTo(
             binding.hideCommentScores,
@@ -99,12 +100,60 @@ class SettingCommentListFragment :
                 preferences.hideCommentScores = it
             },
         )
+        commentListSettings.autoCollapseCommentThreshold.bindTo(
+            binding.autoCollapseComments,
+            { convertAutoCollapseCommentToOptionId(preferences.autoCollapseCommentThreshold) },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            },
+        )
     }
+
+    private fun convertAutoCollapseCommentToOptionId(value: Float) =
+        when {
+            value >= 0.499f -> {
+                R.id.auto_collapse_comment_threshold_50
+            }
+            value >= 0.399f -> {
+                R.id.auto_collapse_comment_threshold_40
+            }
+            value >= 0.299f -> {
+                R.id.auto_collapse_comment_threshold_30
+            }
+            value >= 0.199f -> {
+                R.id.auto_collapse_comment_threshold_20
+            }
+            value >= 0f -> {
+                R.id.auto_collapse_comment_threshold_10
+            }
+            else -> {
+                R.id.auto_collapse_comment_threshold_never_collapse
+            }
+        }
+
+    private fun convertOptionIdToAutoCollapseCommentThreshold(@IdRes id: Int) =
+        when (id) {
+            R.id.auto_collapse_comment_threshold_50 -> 0.5f
+            R.id.auto_collapse_comment_threshold_40 -> 0.4f
+            R.id.auto_collapse_comment_threshold_30 -> 0.3f
+            R.id.auto_collapse_comment_threshold_20 -> 0.2f
+            R.id.auto_collapse_comment_threshold_10 -> 0.1f
+            R.id.auto_collapse_comment_threshold_never_collapse -> -1f
+            else -> null
+        }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {
             commentListSettings.defaultCommentsSortOrder.id -> {
                 preferences.defaultCommentsSortOrder = idToCommentsSortOrder(value as Int)
+            }
+            commentListSettings.autoCollapseCommentThreshold.id -> {
+                val threshold = convertOptionIdToAutoCollapseCommentThreshold(value as Int)
+
+                if (threshold != null) {
+                    preferences.autoCollapseCommentThreshold = threshold
+                }
             }
         }
 

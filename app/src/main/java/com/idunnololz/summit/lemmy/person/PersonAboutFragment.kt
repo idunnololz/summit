@@ -58,7 +58,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                 parentFragment.viewModel.fetchPage(
                     pageIndex = 0,
                     isPeronInfoFetch = true,
-                    force = true
+                    force = true,
                 )
             }
         }

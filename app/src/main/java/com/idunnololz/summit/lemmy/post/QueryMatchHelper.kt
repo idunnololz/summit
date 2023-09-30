@@ -4,8 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import java.lang.Math.floorMod
 import javax.inject.Inject
 
-class QueryMatchHelper @Inject constructor(
-) {
+class QueryMatchHelper @Inject constructor() {
     private var queryMatches: List<QueryResult> = listOf()
     private var currentMatchIndex: Int = 0
     val currentQueryMatch = MutableLiveData<QueryResult?>()

@@ -294,7 +294,7 @@ class PostsRepository @Inject constructor(
             is CommunityRef.MultiCommunity -> {
                 currentDataSource = multiCommunityDataSourceFactory.create(
                     apiClient.instance,
-                    communityRef.communities
+                    communityRef.communities,
                 )
                 postsPerPage = 15
 

@@ -138,6 +138,12 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"  />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingLoggingFragment"
+            app:destination="@id/settingLoggingFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_historyFragment2"
+            app:destination="@id/historyFragment2" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -213,4 +219,12 @@
         android:id="@+id/settingMiscFragment"
         android:name="com.idunnololz.summit.settings.misc.SettingMiscFragment"
         android:label="SettingMiscFragment" />
+    <fragment
+        android:id="@+id/settingLoggingFragment"
+        android:name="com.idunnololz.summit.settings.logging.SettingLoggingFragment"
+        android:label="SettingLoggingFragment" />
+    <fragment
+        android:id="@+id/historyFragment2"
+        android:name="com.idunnololz.summit.history.HistoryFragment"
+        android:label="HistoryFragment" />
 </navigation>

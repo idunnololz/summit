@@ -153,4 +153,3 @@ val MIGRATION_28_29 = object : Migration(28, 29) {
         database.execSQL("CREATE TABLE IF NOT EXISTS `drafts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cts` INTEGER NOT NULL, `uts` INTEGER NOT NULL, `draft_type` INTEGER NOT NULL, `data` TEXT)")
     }
 }
-

@@ -1,22 +1,17 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
-import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
@@ -35,6 +30,7 @@ import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.ScreenshotModeOptionsBinding
 import com.idunnololz.summit.databinding.ViewAllCommentsBinding
+import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.flatten
 import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.CommentItem
@@ -51,12 +47,12 @@ import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
 import com.idunnololz.summit.video.VideoState
+import java.util.LinkedList
 
 class PostsAdapter(
     private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
@@ -71,6 +67,7 @@ class PostsAdapter(
      */
     private val isEmbedded: Boolean,
     private val videoState: VideoState?,
+    private var autoCollapseCommentThreshold: Float,
     private val onRefreshClickCb: () -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
@@ -86,8 +83,7 @@ class PostsAdapter(
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<ViewHolder>() {
 
-    interface ScreenshotOptions {
-    }
+    interface ScreenshotOptions
 
     private sealed class Item(
         open val id: String,
@@ -100,8 +96,7 @@ class PostsAdapter(
             val query: String?,
             val currentMatch: QueryResult?,
             val screenshotMode: Boolean,
-        ) : Item(postView.getUniqueKey()), ScreenshotOptions {
-        }
+        ) : Item(postView.getUniqueKey()), ScreenshotOptions
 
         data class CommentItem(
             val commentId: CommentId,
@@ -124,8 +119,8 @@ class PostsAdapter(
             val screenshotMode: Boolean,
         ) : Item(
             "comment_${comment.comment.id}",
-        ), ScreenshotOptions {
-        }
+        ),
+            ScreenshotOptions
 
         data class PendingCommentItem(
             val commentId: CommentId?,
@@ -141,8 +136,8 @@ class PostsAdapter(
             val screenshotMode: Boolean,
         ) : Item(
             "pending_comment_${view.pendingCommentView.id}",
-        ), ScreenshotOptions {
-        }
+        ),
+            ScreenshotOptions
 
         data class MoreCommentsItem(
             val parentId: CommentId?,
@@ -152,18 +147,20 @@ class PostsAdapter(
             val screenshotMode: Boolean,
         ) : Item(
             "more_comments_$parentId",
-        ), ScreenshotOptions {
-        }
+        ),
+            ScreenshotOptions
 
         data class MissingCommentItem(
+            val view: PostViewModel.ListView.MissingCommentItem,
             val commentId: CommentId?,
             val depth: Int,
             val baseDepth: Int,
             val screenshotMode: Boolean,
+            val isExpanded: Boolean,
         ) : Item(
             "deleted_$commentId",
-        ), ScreenshotOptions {
-        }
+        ),
+            ScreenshotOptions
 
         class ProgressOrErrorItem(
             val error: Throwable? = null,
@@ -172,8 +169,7 @@ class PostsAdapter(
         data class ViewAllComments(
             val postId: PostId,
             val screenshotMode: Boolean,
-        ) : Item("view_all_yo"), ScreenshotOptions {
-        }
+        ) : Item("view_all_yo"), ScreenshotOptions
 
         data object FooterItem : Item("footer")
     }
@@ -199,6 +195,8 @@ class PostsAdapter(
 
     private var topLevelCommentIndices = listOf<Int>()
     private var absolutionPositionToTopLevelCommentPosition = listOf<Int>()
+
+    private var seenCommentIds = mutableSetOf<CommentId>()
 
     private var query: String? = null
     var currentMatch: QueryResult? = null
@@ -658,7 +656,15 @@ class PostsAdapter(
             is Item.MissingCommentItem -> {
                 val b = holder.getBinding<PostMissingCommentItemBinding>()
 
-                postAndCommentViewBuilder.bindMissingCommentItem(b, item.depth, item.baseDepth)
+                postAndCommentViewBuilder.bindMissingCommentItem(
+                    b = b,
+                    depth = item.depth,
+                    baseDepth = item.baseDepth,
+                    isExpanded = item.isExpanded,
+                    onToggleClick = {
+                        toggleSection(holder.absoluteAdapterPosition)
+                    },
+                )
             }
         }
     }
@@ -699,9 +705,12 @@ class PostsAdapter(
             val previousBinding = root.getTag(R.id.screenshot_options_view)
                 as? ScreenshotModeOptionsBinding
             val binding = previousBinding ?: ScreenshotModeOptionsBinding.inflate(
-                LayoutInflater.from(context), root, false)
+                LayoutInflater.from(context),
+                root,
+                false,
+            )
 
-            binding.root.updateLayoutParams<ConstraintLayout.LayoutParams> {  }
+            binding.root.updateLayoutParams<ConstraintLayout.LayoutParams> { }
             binding.root.setOnClickListener {
                 binding.screenshotCb.isChecked = !binding.screenshotCb.isChecked
             }
@@ -760,6 +769,8 @@ class PostsAdapter(
                 rawData ?: return
 
                 val finalItems = mutableListOf<Item>()
+
+                val changed = autoCollapseComments(rawData.commentTree)
 
                 val postView = rawData.postView
                 val commentItems = rawData.commentTree.flatten()
@@ -872,10 +883,12 @@ class PostsAdapter(
 
                         is PostViewModel.ListView.MissingCommentItem -> {
                             finalItems += Item.MissingCommentItem(
+                                view = commentView,
                                 commentId = commentView.commentId,
                                 depth = commentItem.depth,
                                 baseDepth = 0,
                                 screenshotMode,
+                                isExpanded = !commentView.isCollapsed,
                             )
                         }
                     }
@@ -957,6 +970,47 @@ class PostsAdapter(
         this.absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
 
         cb()
+    }
+
+    private fun autoCollapseComments(commentTree: List<CommentNodeData>): Boolean {
+        var changed = false
+
+        val toVisit = LinkedList(commentTree)
+        while (toVisit.isNotEmpty()) {
+            val node = requireNotNull(toVisit.pollFirst())
+
+            toVisit.addAll(node.children)
+
+            when (val commentView = node.commentView) {
+                is PostViewModel.ListView.CommentListView -> {
+                    val commentId = commentView.comment.comment.id
+                    if (seenCommentIds.add(commentId)) {
+                        val upvotes = commentView.comment.counts.upvotes
+                        val downvotes = commentView.comment.counts.downvotes
+                        val totalVotes = upvotes + downvotes
+                        val upvoteRate = upvotes.toFloat() / totalVotes
+                        val autoCollapse =
+                            upvoteRate < autoCollapseCommentThreshold && totalVotes >= 10
+
+                        if (autoCollapse &&
+                            !commentView.isCollapsed
+                        ) {
+                            commentView.isCollapsed = true
+                            changed = true
+                        }
+                    }
+                }
+                is PostViewModel.ListView.MissingCommentItem -> {
+                }
+                is PostViewModel.ListView.MoreCommentsItem -> {
+                }
+                is PostViewModel.ListView.PendingCommentListView -> {
+                }
+                is PostViewModel.ListView.PostListView -> {
+                }
+            }
+        }
+        return changed
     }
 
     fun getPositionOfComment(commentId: CommentId): Int =
@@ -1051,8 +1105,17 @@ class PostsAdapter(
     private fun collapseSection(position: Int) {
         if (position < 0) return
 
-        (items[position] as? CommentItem)?.view?.isCollapsed = true
-        (items[position] as? PendingCommentItem)?.view?.isCollapsed = true
+        when (val item = items[position]) {
+            is CommentItem -> item.view.isCollapsed = true
+            is PendingCommentItem -> item.view.isCollapsed = true
+            is Item.MissingCommentItem -> item.view.isCollapsed = true
+            FooterItem,
+            is HeaderItem,
+            is MoreCommentsItem,
+            is ProgressOrErrorItem,
+            is Item.ViewAllComments,
+            -> {}
+        }
 
         refreshItems(refreshHeader = false)
     }
@@ -1060,15 +1123,33 @@ class PostsAdapter(
     private fun expandSection(position: Int) {
         if (position < 0) return
 
-        (items[position] as? CommentItem)?.view?.isCollapsed = false
-        (items[position] as? PendingCommentItem)?.view?.isCollapsed = false
+        when (val item = items[position]) {
+            is CommentItem -> item.view.isCollapsed = false
+            is PendingCommentItem -> item.view.isCollapsed = false
+            is Item.MissingCommentItem -> item.view.isCollapsed = false
+            FooterItem,
+            is HeaderItem,
+            is MoreCommentsItem,
+            is ProgressOrErrorItem,
+            is Item.ViewAllComments,
+            -> {}
+        }
 
         refreshItems(refreshHeader = false)
     }
 
     fun toggleSection(position: Int) {
-        val isCollapsed = (items[position] as? CommentItem)?.view?.isCollapsed
-            ?: (items[position] as? PendingCommentItem)?.view?.isCollapsed
+        val isCollapsed = when (val item = items[position]) {
+            is CommentItem -> item.view.isCollapsed
+            is PendingCommentItem -> item.view.isCollapsed
+            is Item.MissingCommentItem -> item.view.isCollapsed
+            FooterItem,
+            is HeaderItem,
+            is MoreCommentsItem,
+            is ProgressOrErrorItem,
+            is Item.ViewAllComments,
+            -> null
+        }
 
         if (isCollapsed == true) {
             expandSection(position)
@@ -1129,34 +1210,40 @@ class PostsAdapter(
                 when (item) {
                     is CommentItem -> {
                         count(item.comment.comment.content, finalQuery) {
-                            occurrences.add(QueryResult(
-                                targetId = item.commentId,
-                                targetSubtype = 0,
-                                relativeMatchIndex = it,
-                                itemIndex = index,
-                                matchIndex = occurrences.size
-                            ))
+                            occurrences.add(
+                                QueryResult(
+                                    targetId = item.commentId,
+                                    targetSubtype = 0,
+                                    relativeMatchIndex = it,
+                                    itemIndex = index,
+                                    matchIndex = occurrences.size,
+                                ),
+                            )
                         }
                     }
                     FooterItem -> {}
                     is HeaderItem -> {
                         count(item.postView.post.name, finalQuery) {
-                            occurrences.add(QueryResult(
-                                targetId = item.postView.post.id,
-                                targetSubtype = 0,
-                                relativeMatchIndex = it,
-                                itemIndex = index,
-                                matchIndex = occurrences.size
-                            ))
+                            occurrences.add(
+                                QueryResult(
+                                    targetId = item.postView.post.id,
+                                    targetSubtype = 0,
+                                    relativeMatchIndex = it,
+                                    itemIndex = index,
+                                    matchIndex = occurrences.size,
+                                ),
+                            )
                         }
                         count(item.postView.post.body, finalQuery) {
-                            occurrences.add(QueryResult(
-                                targetId = item.postView.post.id,
-                                targetSubtype = 1,
-                                relativeMatchIndex = it,
-                                itemIndex = index,
-                                matchIndex = occurrences.size
-                            ))
+                            occurrences.add(
+                                QueryResult(
+                                    targetId = item.postView.post.id,
+                                    targetSubtype = 1,
+                                    relativeMatchIndex = it,
+                                    itemIndex = index,
+                                    matchIndex = occurrences.size,
+                                ),
+                            )
                         }
                     }
                     is Item.MissingCommentItem -> {}

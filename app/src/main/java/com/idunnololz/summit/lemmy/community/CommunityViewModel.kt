@@ -298,7 +298,7 @@ class CommunityViewModel @Inject constructor(
                     pageIndex = 0,
                     force = true,
                     clearPagesOnSuccess = clearPages,
-                    scrollToTop = scrollToTop
+                    scrollToTop = scrollToTop,
                 )
             } else {
                 fetchCurrentPage()

@@ -21,7 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
+class SettingMiscFragment :
+    BaseFragment<FragmentSettingMiscBinding>(),
     SettingValueUpdateCallback {
 
     @Inject
@@ -78,7 +79,7 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
             {
                 preferences.openLinksInExternalApp = it
                 Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
-            }
+            },
         )
         settings.autoLinkPhoneNumbers.bindTo(
             binding.autoLinkPhoneNumbers,
@@ -88,14 +89,14 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
 
                 LemmyTextHelper.autoLinkPhoneNumbers = it
                 LemmyTextHelper.resetMarkwon(context)
-            }
+            },
         )
         settings.showUpAndDownVotes.bindTo(
             binding.showUpAndDownVotes,
             { preferences.showUpAndDownVotes },
             {
                 preferences.showUpAndDownVotes = it
-            }
+            },
         )
         settings.instanceNameStyle.bindTo(
             binding.instanceNameStyle,
@@ -103,21 +104,21 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
             { setting, currentValue ->
                 MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
         settings.retainLastPost.bindTo(
             binding.restoreLastPost,
             { preferences.retainLastPost },
             {
                 preferences.retainLastPost = it
-            }
+            },
         )
         settings.leftHandMode.bindTo(
             binding.leftHandMode,
             { preferences.leftHandMode },
             {
                 preferences.leftHandMode = it
-            }
+            },
         )
         settings.transparentNotificationBar.bindTo(
             binding.transparentNotificationBar,
@@ -125,7 +126,7 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
             {
                 preferences.transparentNotificationBar = it
                 getMainActivity()?.onPreferencesChanged()
-            }
+            },
         )
         settings.previewLinks.bindTo(
             binding.previewLinks,
@@ -133,7 +134,7 @@ class SettingMiscFragment : BaseFragment<FragmentSettingMiscBinding>(),
             { setting, currentValue ->
                 MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
     }
 

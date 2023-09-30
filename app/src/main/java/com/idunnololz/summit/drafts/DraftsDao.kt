@@ -24,7 +24,6 @@ interface DraftsDao {
     @Delete
     suspend fun delete(action: DraftEntry)
 
-
     @Query("DELETE FROM drafts WHERE draft_type = :type")
     suspend fun deleteAll(type: Int)
 

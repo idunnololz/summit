@@ -91,6 +91,7 @@ asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflat
 okio = { module = "com.squareup.okio:okio", version = "3.3.0" }
 zoom-layout = { module = "com.otaliastudios:zoomlayout", version = "1.9.0" }
 gson = {module = "com.google.code.gson:gson", version = "2.10.1"}
+process-phoenix = {module = "com.jakewharton:process-phoenix", version = "2.1.2"}
 
 # AndroidX
 core = { module = "androidx.core:core-ktx", version = "1.10.1" }

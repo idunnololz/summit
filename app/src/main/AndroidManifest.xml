@@ -20,6 +20,10 @@
         android:theme="@style/Theme.App.Splash"
         android:usesCleartextTraffic="true">
 
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+
         <activity
             android:configChanges="layoutDirection|locale"
             android:launchMode="singleTop"

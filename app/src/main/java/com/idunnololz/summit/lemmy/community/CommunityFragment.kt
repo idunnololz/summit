@@ -48,9 +48,9 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
@@ -130,6 +130,8 @@ class CommunityFragment :
             addItem(R.id.sort_order_old, R.string.sort_order_old)
             addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
             addItem(R.id.sort_order_new_comments, R.string.sort_order_new_comments)
+            addItem(R.id.sort_order_controversial, R.string.sort_order_controversial)
+            addItem(R.id.sort_order_scaled, R.string.sort_order_scaled)
             setTitle(R.string.sort_by)
 
             setOnMenuItemClickListener { menuItem ->
@@ -386,13 +388,13 @@ class CommunityFragment :
             snackbarContainer = binding.fabSnackbarCoordinatorLayout,
             onPostUpdated = {
                 viewModel.updatePost(it)
-            }
+            },
         )
 
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(
                 lifecycleOwner = viewLifecycleOwner,
-                view = binding.customAppBar.customActionBar
+                view = binding.customAppBar.customActionBar,
             )
 
             binding.customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
@@ -687,15 +689,54 @@ class CommunityFragment :
         }
 
         actionsViewModel.blockCommunityResult.observe(viewLifecycleOwner) {
-            if (it is StatefulData.Success) {
-                actionsViewModel.blockCommunityResult.setIdle()
-                viewModel.onBlockSettingsChanged()
+            when (it) {
+                is StatefulData.Error -> {
+                    Snackbar.make(
+                        requireMainActivity().getSnackbarContainer(),
+                        R.string.error_unable_to_block_community,
+                        Snackbar.LENGTH_LONG,
+                    ).show()
+                }
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    actionsViewModel.blockCommunityResult.setIdle()
+                    viewModel.onBlockSettingsChanged()
+                }
             }
         }
         actionsViewModel.blockPersonResult.observe(viewLifecycleOwner) {
-            if (it is StatefulData.Success) {
-                actionsViewModel.blockPersonResult.setIdle()
-                viewModel.onBlockSettingsChanged()
+            when (it) {
+                is StatefulData.Error -> {
+                    Snackbar.make(
+                        requireMainActivity().getSnackbarContainer(),
+                        R.string.error_unable_to_block_person,
+                        Snackbar.LENGTH_LONG,
+                    ).show()
+                }
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    actionsViewModel.blockPersonResult.setIdle()
+                    viewModel.onBlockSettingsChanged()
+                }
+            }
+        }
+        actionsViewModel.blockInstanceResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    Snackbar.make(
+                        requireMainActivity().getSnackbarContainer(),
+                        R.string.error_unable_to_block_instance,
+                        Snackbar.LENGTH_LONG,
+                    ).show()
+                }
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    actionsViewModel.blockInstanceResult.setIdle()
+                    viewModel.onBlockSettingsChanged()
+                }
             }
         }
 
@@ -887,6 +928,8 @@ class CommunityFragment :
             CommunitySortOrder.MostComments -> _sortByMenu.setChecked(R.id.sort_order_most_comments)
             CommunitySortOrder.NewComments -> _sortByMenu.setChecked(R.id.sort_order_new_comments)
             CommunitySortOrder.Old -> _sortByMenu.setChecked(R.id.sort_order_old)
+            CommunitySortOrder.Controversial -> _sortByMenu.setChecked(R.id.sort_order_controversial)
+            CommunitySortOrder.Scaled -> _sortByMenu.setChecked(R.id.sort_order_scaled)
         }
 
         return _sortByMenu
@@ -1004,7 +1047,7 @@ class CommunityFragment :
                 addItemWithIcon(
                     id = R.id.set_as_default,
                     title = R.string.set_as_home_page,
-                    icon = R.drawable.baseline_home_24
+                    icon = R.drawable.baseline_home_24,
                 )
             }
 
@@ -1102,7 +1145,8 @@ class CommunityFragment :
                                     is CommunityRef.Local,
                                     is CommunityRef.ModeratedCommunities,
                                     is CommunityRef.MultiCommunity,
-                                    is CommunityRef.Subscribed -> null
+                                    is CommunityRef.Subscribed,
+                    -> null
                                 },
                             )
                         }
@@ -1119,8 +1163,8 @@ class CommunityFragment :
                             CommunityRef.MultiCommunity(
                                 getString(R.string.default_multi_community_name),
                                 null,
-                                listOf()
-                            )
+                                listOf(),
+                            ),
                         )
                     }
                 }
