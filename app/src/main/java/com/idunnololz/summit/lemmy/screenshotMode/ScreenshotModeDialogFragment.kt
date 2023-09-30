@@ -66,8 +66,7 @@ class ScreenshotModeDialogFragment :
     data class Result(
         val uri: Uri,
         val mimeType: String,
-    ): Parcelable
-
+    ) : Parcelable
 
     private val viewModel: ScreenshotModeViewModel by viewModels()
 
@@ -99,12 +98,15 @@ class ScreenshotModeDialogFragment :
                         }
                     }
 
-                    setFragmentResult(REQUEST_KEY, bundleOf(
-                        REQUEST_KEY_RESULT to Result(
-                            uriToSave,
-                            MimeTypes.PNG,
-                        )
-                    ))
+                    setFragmentResult(
+                        REQUEST_KEY,
+                        bundleOf(
+                            REQUEST_KEY_RESULT to Result(
+                                uriToSave,
+                                MimeTypes.PNG,
+                            ),
+                        ),
+                    )
                     dismiss()
                 }
             }
@@ -160,7 +162,7 @@ class ScreenshotModeDialogFragment :
             insetViewAutomaticallyByPadding(
                 viewLifecycleOwner,
                 binding.container,
-                Utils.convertDpToPixel(100f).toInt()
+                Utils.convertDpToPixel(100f).toInt(),
             )
         }
 
@@ -208,7 +210,7 @@ class ScreenshotModeDialogFragment :
                 R.id.toggle_post_view -> {
                     val currentConfig = requireNotNull(viewModel.screenshotConfig.value)
                     viewModel.screenshotConfig.value = currentConfig.copy(
-                        postViewType = currentConfig.postViewType.nextValue
+                        postViewType = currentConfig.postViewType.nextValue,
                     )
                 }
                 R.id.cancel -> {
@@ -272,7 +274,9 @@ class ScreenshotModeDialogFragment :
         val context = requireContext()
 
         val screenshotStage = ScreenshotStageBinding.inflate(
-            LayoutInflater.from(context), binding.zoomLayout, false,
+            LayoutInflater.from(context),
+            binding.zoomLayout,
+            false,
         )
 
         var screenshotWidthDp = preferences.screenshotWidthDp
@@ -300,7 +304,7 @@ class ScreenshotModeDialogFragment :
         }
 
         val screenshotConfig = viewModel.screenshotConfig.value?.copy(
-            showPostDivider = hasNonPosts
+            showPostDivider = hasNonPosts,
         )
 
         adapter.screenshotConfig = screenshotConfig

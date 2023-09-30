@@ -40,11 +40,11 @@ class InboxSource<O>(
                 item.copy(obj = item.obj.copy(isRead = read))
             is InboxItem.ReplyInboxItem ->
                 item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.ReportMessageInboxItem, ->
+            is InboxItem.ReportMessageInboxItem ->
                 item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.ReportCommentInboxItem, ->
+            is InboxItem.ReportCommentInboxItem ->
                 item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.ReportPostInboxItem, ->
+            is InboxItem.ReportPostInboxItem ->
                 item.copy(obj = item.obj.copy(isRead = read))
         }
         allObjects[position] = newItem

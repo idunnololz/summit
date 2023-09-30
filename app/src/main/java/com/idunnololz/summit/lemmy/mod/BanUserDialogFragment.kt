@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
@@ -50,7 +49,6 @@ class BanUserDialogFragment : BaseDialogFragment<DialogFragmentBanUserBinding>()
         super.onViewCreated(view, savedInstanceState)
 
         with(binding) {
-
             actionsViewModel.banUserResult.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {
@@ -90,7 +88,7 @@ class BanUserDialogFragment : BaseDialogFragment<DialogFragmentBanUserBinding>()
                             null
                         }
                     },
-                    numberOfDaysEditText.text.toString().toIntOrNull()
+                    numberOfDaysEditText.text.toString().toIntOrNull(),
                 )
             }
         }

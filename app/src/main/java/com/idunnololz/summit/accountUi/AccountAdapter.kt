@@ -20,115 +20,115 @@ class AccountAdapter(
     private val onAddAccountClick: () -> Unit,
     private val onSettingClick: () -> Unit,
     private val onPersonClick: (AccountView) -> Unit,
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        private sealed interface Item {
-            data class CurrentAccountItem(
-                val accountView: AccountView,
-            ) : Item
-            data class AccountItem(
-                val accountView: AccountView,
-            ) : Item
-            data class AddAccountItem(
-                val hasAccounts: Boolean,
-            ) : Item
+    private sealed interface Item {
+        data class CurrentAccountItem(
+            val accountView: AccountView,
+        ) : Item
+        data class AccountItem(
+            val accountView: AccountView,
+        ) : Item
+        data class AddAccountItem(
+            val hasAccounts: Boolean,
+        ) : Item
+    }
+
+    private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
+        old::class == new::class && when (old) {
+            is Item.CurrentAccountItem ->
+                old.accountView.account.id == (new as Item.CurrentAccountItem).accountView.account.id
+            is Item.AccountItem ->
+                old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
+            is Item.AddAccountItem -> true
         }
+    },).apply {
+        addItemType(
+            clazz = Item.CurrentAccountItem::class,
+            inflateFn = CurrentAccountItemBinding::inflate,
+        ) { item, b, _ ->
+            b.image.load(item.accountView.profileImage)
+            b.name.text = item.accountView.account.name
+            b.instance.text = item.accountView.account.instance
 
-        private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
-            old::class == new::class && when (old) {
-                is Item.CurrentAccountItem ->
-                    old.accountView.account.id == (new as Item.CurrentAccountItem).accountView.account.id
-                is Item.AccountItem ->
-                    old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
-                is Item.AddAccountItem -> true
-            }
-        },).apply {
-            addItemType(
-                clazz = Item.CurrentAccountItem::class,
-                inflateFn = CurrentAccountItemBinding::inflate,
-            ) { item, b, _ ->
-                b.image.load(item.accountView.profileImage)
-                b.name.text = item.accountView.account.name
-                b.instance.text = item.accountView.account.instance
+            if (isSimple) {
+                b.signOut.visibility = View.GONE
+                b.settings.setImageResource(R.drawable.baseline_check_24)
 
-                if (isSimple) {
-                    b.signOut.visibility = View.GONE
-                    b.settings.setImageResource(R.drawable.baseline_check_24)
-
-                    b.settings.setOnClickListener {
-                        onAccountClick(item.accountView)
-                    }
-                    b.signOut.setOnClickListener {}
-                    b.root.setOnClickListener {
-                        onAccountClick(item.accountView)
-                    }
-                } else {
-                    b.signOut.visibility = View.VISIBLE
-                    b.settings.setImageResource(R.drawable.baseline_settings_24)
-
-                    b.settings.setOnClickListener {
-                        onSettingClick()
-                    }
-                    b.signOut.setOnClickListener {
-                        signOut(item.accountView)
-                    }
-                    b.root.setOnClickListener {
-                        onPersonClick(item.accountView)
-                    }
+                b.settings.setOnClickListener {
+                    onAccountClick(item.accountView)
                 }
-            }
-            addItemType(Item.AccountItem::class, AccountItemBinding::inflate) { item, b, _ ->
-                b.image.load(item.accountView.profileImage)
-                b.name.text = item.accountView.account.name
-                b.instance.text = item.accountView.account.instance
-
+                b.signOut.setOnClickListener {}
                 b.root.setOnClickListener {
                     onAccountClick(item.accountView)
                 }
-            }
-            addItemType(Item.AddAccountItem::class, AddAccountItemBinding::inflate) { item, b, _ ->
-                b.title.text = if (item.hasAccounts) {
-                    context.getString(R.string.add_another_account)
-                } else {
-                    context.getString(R.string.add_account)
+            } else {
+                b.signOut.visibility = View.VISIBLE
+                b.settings.setImageResource(R.drawable.baseline_settings_24)
+
+                b.settings.setOnClickListener {
+                    onSettingClick()
+                }
+                b.signOut.setOnClickListener {
+                    signOut(item.accountView)
                 }
                 b.root.setOnClickListener {
-                    onAddAccountClick()
+                    onPersonClick(item.accountView)
                 }
             }
         }
+        addItemType(Item.AccountItem::class, AccountItemBinding::inflate) { item, b, _ ->
+            b.image.load(item.accountView.profileImage)
+            b.name.text = item.accountView.account.name
+            b.instance.text = item.accountView.account.instance
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        fun setAccounts(accounts: List<AccountView>, cb: () -> Unit = {}) {
-            val currentAccount = accounts.firstOrNull { it.account.current }
-            val newItems = mutableListOf<Item>()
-
-            if (currentAccount != null) {
-                newItems.add(Item.CurrentAccountItem(currentAccount))
+            b.root.setOnClickListener {
+                onAccountClick(item.accountView)
             }
-
-            accounts.mapNotNullTo(newItems) {
-                if (it.account.id != currentAccount?.account?.id) {
-                    Item.AccountItem(it)
-                } else {
-                    null
-                }
+        }
+        addItemType(Item.AddAccountItem::class, AddAccountItemBinding::inflate) { item, b, _ ->
+            b.title.text = if (item.hasAccounts) {
+                context.getString(R.string.add_another_account)
+            } else {
+                context.getString(R.string.add_account)
             }
-
-            if (!isSimple) {
-                newItems.add(Item.AddAccountItem(hasAccounts = accounts.isNotEmpty()))
+            b.root.setOnClickListener {
+                onAddAccountClick()
             }
-
-            adapterHelper.setItems(newItems, this, cb)
         }
     }
+
+    override fun getItemViewType(position: Int): Int =
+        adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+        adapterHelper.onBindViewHolder(holder, position)
+
+    fun setAccounts(accounts: List<AccountView>, cb: () -> Unit = {}) {
+        val currentAccount = accounts.firstOrNull { it.account.current }
+        val newItems = mutableListOf<Item>()
+
+        if (currentAccount != null) {
+            newItems.add(Item.CurrentAccountItem(currentAccount))
+        }
+
+        accounts.mapNotNullTo(newItems) {
+            if (it.account.id != currentAccount?.account?.id) {
+                Item.AccountItem(it)
+            } else {
+                null
+            }
+        }
+
+        if (!isSimple) {
+            newItems.add(Item.AddAccountItem(hasAccounts = accounts.isNotEmpty()))
+        }
+
+        adapterHelper.setItems(newItems, this, cb)
+    }
+}

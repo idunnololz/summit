@@ -20,7 +20,8 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ReportContentDialogFragment : BaseDialogFragment<DialogFragmentReportContentBinding>(),
+class ReportContentDialogFragment :
+    BaseDialogFragment<DialogFragmentReportContentBinding>(),
     BackPressHandler {
 
     companion object {
@@ -84,7 +85,7 @@ class ReportContentDialogFragment : BaseDialogFragment<DialogFragmentReportConte
         binding.report.setOnClickListener {
             viewModel.sendReport(
                 target,
-                binding.reasonEditText.text.toString()
+                binding.reasonEditText.text.toString(),
             )
         }
         binding.cancel.setOnClickListener {

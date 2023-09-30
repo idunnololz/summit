@@ -137,7 +137,6 @@ class SettingItemsAdapter(
                     onImagePickerClick?.invoke(settingItem)
                 }
                 is ColorSettingItem -> {
-
                 }
             }
         }

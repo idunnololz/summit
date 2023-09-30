@@ -85,7 +85,7 @@ class HistoryFragment :
                         .setMessage(R.string.error_history_entry_corrupt)
                         .createAndShow(this@HistoryFragment, "asdf")
                 } else {
-                    requireMainActivity().launchPage(pageRef)
+                    requireMainActivity().launchPage(pageRef, preferMainFragment = true)
                 }
             },
         )

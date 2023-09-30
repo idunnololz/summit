@@ -18,14 +18,12 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.ThemeSettings
-import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.settings.util.bindToMultiView
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.getColorCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
@@ -219,7 +217,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
                     postAndCommentViewBuilder.onPreferencesChanged()
                 },
-                { context.getColorCompat(R.color.upvoteColor) }
+                { context.getColorCompat(R.color.upvoteColor) },
             )
             settings.downvoteColor.bindTo(
                 binding.downvoteColor,
@@ -229,7 +227,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
                     postAndCommentViewBuilder.onPreferencesChanged()
                 },
-                { context.getColorCompat(R.color.downvoteColor) }
+                { context.getColorCompat(R.color.downvoteColor) },
             )
         }
     }

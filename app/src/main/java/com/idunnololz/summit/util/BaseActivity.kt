@@ -10,7 +10,6 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
-import io.github.inflationx.viewpump.ViewPump
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -41,8 +40,8 @@ abstract class BaseActivity : AppCompatActivity() {
         if (PreferenceUtil.usingCustomFont) {
             super.attachBaseContext(
                 ViewPumpContextWrapper.wrap(
-                    LocaleHelper.setLocale(base)
-                )
+                    LocaleHelper.setLocale(base),
+                ),
             )
         } else {
             super.attachBaseContext(LocaleHelper.setLocale(base))

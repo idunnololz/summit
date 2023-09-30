@@ -36,10 +36,11 @@ fun BaseFragment<*>.installOnActionResultHandler(
 
     childFragmentManager.setFragmentResultListener(
         ModActionsDialogFragment.REQUEST_KEY,
-        viewLifecycleOwner
+        viewLifecycleOwner,
     ) { requestKey, result ->
         val updatedObject = result.getParcelableCompat<ModActionsDialogFragment.UpdatedObject>(
-            ModActionsDialogFragment.RESULT_UPDATED_OBJ)
+            ModActionsDialogFragment.RESULT_UPDATED_OBJ,
+        )
 
         when (updatedObject) {
             is ModActionsDialogFragment.UpdatedObject.CommentObject -> {
@@ -121,27 +122,27 @@ fun BaseFragment<*>.installOnActionResultHandler(
 //                        onPostUpdated(actionType)
 //                        (parentFragment as? CommunityFragment)?.onPostUpdated()
 //                    } else {
-                        ErrorDialogFragment.show(
-                            when (actionType) {
-                                MoreActionsViewModel.PostActionType.DeletePost -> {
-                                    getString(R.string.error_unable_to_delete_post)
-                                }
-                                MoreActionsViewModel.PostActionType.SavePost -> {
-                                    getString(R.string.error_unable_to_save_post)
-                                }
-                                MoreActionsViewModel.PostActionType.FeaturePost -> {
-                                    getString(R.string.error_unable_to_feature_post)
-                                }
-                                MoreActionsViewModel.PostActionType.LockPost -> {
-                                    getString(R.string.error_unable_to_lock_post)
-                                }
-                                MoreActionsViewModel.PostActionType.RemovePost -> {
-                                    getString(R.string.error_unable_to_remove_post)
-                                }
-                            },
-                            it.error,
-                            childFragmentManager,
-                        )
+                    ErrorDialogFragment.show(
+                        when (actionType) {
+                            MoreActionsViewModel.PostActionType.DeletePost -> {
+                                getString(R.string.error_unable_to_delete_post)
+                            }
+                            MoreActionsViewModel.PostActionType.SavePost -> {
+                                getString(R.string.error_unable_to_save_post)
+                            }
+                            MoreActionsViewModel.PostActionType.FeaturePost -> {
+                                getString(R.string.error_unable_to_feature_post)
+                            }
+                            MoreActionsViewModel.PostActionType.LockPost -> {
+                                getString(R.string.error_unable_to_lock_post)
+                            }
+                            MoreActionsViewModel.PostActionType.RemovePost -> {
+                                getString(R.string.error_unable_to_remove_post)
+                            }
+                        },
+                        it.error,
+                        childFragmentManager,
+                    )
 //                    }
                 }
 
@@ -153,7 +154,6 @@ fun BaseFragment<*>.installOnActionResultHandler(
             }
         }
     }
-
 
     actionsViewModel.deletePostAction.handleStateChange()
     actionsViewModel.featurePostAction.handleStateChange()

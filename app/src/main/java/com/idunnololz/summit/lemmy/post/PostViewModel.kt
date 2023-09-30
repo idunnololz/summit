@@ -161,7 +161,7 @@ class PostViewModel @Inject constructor(
         }
 
     fun updatePostOrCommentRef(
-        postOrCommentRef: Either<PostRef, CommentRef>
+        postOrCommentRef: Either<PostRef, CommentRef>,
     ) {
         this.postOrCommentRef = postOrCommentRef
 
@@ -174,8 +174,11 @@ class PostViewModel @Inject constructor(
         force: Boolean = false,
         switchToNativeInstance: Boolean = false,
     ): Job? {
-        Log.d(TAG, "fetchPostData(): fetchPostData = $fetchPostData " +
-            "fetchCommentData = $fetchCommentData force = $force")
+        Log.d(
+            TAG,
+            "fetchPostData(): fetchPostData = $fetchPostData " +
+                "fetchCommentData = $fetchCommentData force = $force",
+        )
 
         postOrCommentRef ?: return null
 
@@ -226,14 +229,15 @@ class PostViewModel @Inject constructor(
                                 id = Either.Left(it.id),
                                 sort = sortOrder,
                                 maxDepth = maxDepth,
-                                force = force,)
+                                force = force,
+                            )
                         },
                         {
                             commentsFetcher.fetchCommentsWithRetry(
                                 id = Either.Right(it.id),
                                 sort = sortOrder,
                                 maxDepth = maxDepth,
-                                force = force
+                                force = force,
                             )
                         },
                     )
@@ -308,7 +312,7 @@ class PostViewModel @Inject constructor(
                                 },
                                 onFailure = {
                                     Result.failure(it)
-                                }
+                                },
                             )
                     },
                     { commentRef ->
@@ -316,8 +320,9 @@ class PostViewModel @Inject constructor(
                             .fetchComments(
                                 null,
                                 id = Either.Right(commentRef.id),
-                                sort = CommentSortType.Top, force = false,
-                                maxDepth = 0
+                                sort = CommentSortType.Top,
+                                force = false,
+                                maxDepth = 0,
                             )
                             .fold(
                                 onSuccess = {
@@ -330,7 +335,7 @@ class PostViewModel @Inject constructor(
                                 },
                                 onFailure = {
                                     Result.failure(it)
-                                }
+                                },
                             )
                     },
                 )
@@ -340,13 +345,16 @@ class PostViewModel @Inject constructor(
             linkToResolve
                 .fold(
                     onSuccess = {
-                        Log.d(TAG, "Attempting to resolve $linkToResolve " +
-                            "on instance $apiInstance")
+                        Log.d(
+                            TAG,
+                            "Attempting to resolve $linkToResolve " +
+                                "on instance $apiInstance",
+                        )
                         lemmyApiClient.resolveObject(it)
                     },
                     onFailure = {
                         Result.failure(it)
-                    }
+                    },
                 )
                 .fold(
                     onSuccess = {
@@ -380,7 +388,7 @@ class PostViewModel @Inject constructor(
                         Log.e(TAG, "Error resolving object.", it)
 
                         switchAccountState.postError(it)
-                    }
+                    },
                 )
         }
     }
@@ -409,7 +417,7 @@ class PostViewModel @Inject constructor(
                             },
                             onFailure = {
                                 Result.failure(it)
-                            }
+                            },
                         )
                 },
                 { commentRef ->
@@ -417,8 +425,9 @@ class PostViewModel @Inject constructor(
                         .fetchComments(
                             null,
                             id = Either.Right(commentRef.id),
-                            sort = CommentSortType.Top, force = false,
-                            maxDepth = 0
+                            sort = CommentSortType.Top,
+                            force = false,
+                            maxDepth = 0,
                         )
                         .fold(
                             onSuccess = {
@@ -431,7 +440,7 @@ class PostViewModel @Inject constructor(
                             },
                             onFailure = {
                                 Result.failure(it)
-                            }
+                            },
                         )
                 },
             )
@@ -439,13 +448,16 @@ class PostViewModel @Inject constructor(
         linkToResolve
             .fold(
                 onSuccess = {
-                    Log.d(TAG, "Attempting to resolve $linkToResolve " +
-                        "on instance $apiInstance")
+                    Log.d(
+                        TAG,
+                        "Attempting to resolve $linkToResolve " +
+                            "on instance $apiInstance",
+                    )
                     lemmyApiClient.resolveObject(it)
                 },
                 onFailure = {
                     Result.failure(it)
-                }
+                },
             )
             .fold(
                 onSuccess = {
@@ -475,7 +487,7 @@ class PostViewModel @Inject constructor(
                 },
                 onFailure = {
                     Log.e(TAG, "Error resolving object.", it)
-                }
+                },
             )
     }
 
@@ -583,7 +595,7 @@ class PostViewModel @Inject constructor(
                     targetCommentRef = postOrCommentRef
                         ?.fold(
                             { null },
-                            { it }
+                            { it },
                         ),
                 ),
                 newlyPostedCommentId = newlyPostedCommentId,
@@ -717,7 +729,5 @@ class PostViewModel @Inject constructor(
         super.onCleared()
     }
 
-    class ObjectResolverFailedException : Exception {
-        constructor() : super()
-    }
+    class ObjectResolverFailedException : Exception()
 }

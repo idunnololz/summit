@@ -52,8 +52,8 @@ class AccountActionsManager @Inject constructor(
     private var nextId: Long = 1
 
     interface Registration {
-        fun voteCurrent(score: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,)
-        fun voteSuccess(newScore: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?,)
+        fun voteCurrent(score: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?)
+        fun voteSuccess(newScore: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?)
         fun votePending(pendingScore: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?)
         fun voteFailed(score: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?, e: Throwable)
     }

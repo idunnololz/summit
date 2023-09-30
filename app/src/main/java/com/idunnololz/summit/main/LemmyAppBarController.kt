@@ -160,6 +160,8 @@ class LemmyAppBarController(
                                 context.getString(R.string.time_frame_all_time)
                         },
                     )
+                CommunitySortOrder.Controversial -> context.getString(R.string.sort_order_controversial)
+                CommunitySortOrder.Scaled -> context.getString(R.string.sort_order_scaled_short)
             }
     }
 

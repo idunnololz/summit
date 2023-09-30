@@ -13,7 +13,6 @@ import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
@@ -256,7 +255,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchChangelog() {
-        launchPage(PostRef("lemmy.world", 5327633), switchToNativeInstance = true)
+        launchPage(PostRef("lemmy.world", 6037877), switchToNativeInstance = true)
     }
 
     private val bottomNavY
@@ -525,7 +524,11 @@ class MainActivity : BaseActivity() {
 //        }
     }
 
-    fun launchPage(page: PageRef, switchToNativeInstance: Boolean = false) {
+    fun launchPage(
+        page: PageRef,
+        switchToNativeInstance: Boolean = false,
+        preferMainFragment: Boolean = false,
+    ) {
         val isMainFragment = binding.bottomNavigationView.selectedItemId == R.id.mainFragment &&
             currentNavController?.currentDestination?.id == R.id.mainFragment
 
@@ -538,7 +541,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        if (isMainFragment) {
+        if (isMainFragment || preferMainFragment) {
             handleWithMainFragment()
             return
         }
@@ -551,7 +554,7 @@ class MainActivity : BaseActivity() {
                     R.id.action_global_community,
                     CommunityFragmentArgs(
                         null,
-                        page
+                        page,
                     ).toBundle(),
                 )
             }
@@ -995,7 +998,6 @@ class MainActivity : BaseActivity() {
             val userCommunityItem = userCommunitiesManager.getAllUserCommunities()
                 .firstOrNull { it.communityRef == communityRef }
             if (userCommunityItem != null) {
-
                 val navHostFragment =
                     supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
                         as? NavHostFragment

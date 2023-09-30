@@ -50,7 +50,7 @@ class DraftsViewModel @Inject constructor(
             val drafts = draftsManager.getDrafts(
                 draftType = draftType,
                 limit = LIMIT,
-                updateTs = ts
+                updateTs = ts,
             )
             withContext(draftEntriesContext) {
                 for (draft in drafts) {
@@ -128,17 +128,15 @@ class DraftsViewModel @Inject constructor(
         data class PostDraftItem(
             val draftEntry: DraftEntry,
             val postData: DraftData.PostDraftData,
-        ): ViewModelItem
+        ) : ViewModelItem
 
         data class CommentDraftItem(
             val draftEntry: DraftEntry,
             val commentData: DraftData.CommentDraftData,
-        ): ViewModelItem
+        ) : ViewModelItem
 
         data object LoadingItem : ViewModelItem
 
         data object EmptyItem : ViewModelItem
     }
-
-
 }

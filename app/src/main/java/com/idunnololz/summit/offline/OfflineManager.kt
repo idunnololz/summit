@@ -25,7 +25,6 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import org.threeten.bp.Duration
-import java.io.EOFException
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -354,8 +353,8 @@ class OfflineManager @Inject constructor(
                     Result.failure(
                         ClientApiException(
                             "${response.message} url: $url",
-                            response.code
-                        )
+                            response.code,
+                        ),
                     )
                 }
             } catch (e: Exception) {

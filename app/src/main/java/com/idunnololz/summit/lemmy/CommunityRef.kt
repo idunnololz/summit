@@ -86,7 +86,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
     data class MultiCommunity(
         val name: String,
         val icon: String?,
-        val communities: List<CommunityRefByName>
+        val communities: List<CommunityRefByName>,
     ) : CommunityRef
 
     @Parcelize

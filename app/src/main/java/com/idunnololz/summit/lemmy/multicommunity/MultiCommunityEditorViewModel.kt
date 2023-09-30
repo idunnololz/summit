@@ -81,7 +81,9 @@ class MultiCommunityEditorViewModel @Inject constructor(
                 communities.forEach { community ->
                     apiClient
                         .fetchCommunityWithRetry(
-                            Either.Right(community.getServerId(apiClient.instance)), false)
+                            Either.Right(community.getServerId(apiClient.instance)),
+                            false,
+                        )
                         .onSuccess {
                             val icon = it.community_view.community.icon
                             if (icon != null) {
@@ -99,6 +101,5 @@ class MultiCommunityEditorViewModel @Inject constructor(
         viewModelScope.launch {
             selectedCommunitiesFlow.emit(communities)
         }
-
     }
 }

@@ -1,7 +1,5 @@
 package com.idunnololz.summit.accountUi
 
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,21 +10,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.load
 import com.idunnololz.summit.CommunityDirections
-import com.idunnololz.summit.R
-import com.idunnololz.summit.account.AccountView
-import com.idunnololz.summit.databinding.AccountItemBinding
-import com.idunnololz.summit.databinding.AddAccountItemBinding
-import com.idunnololz.summit.databinding.CurrentAccountItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentAccountsBinding
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -89,8 +78,8 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                         setFragmentResult(
                             REQUEST_KEY,
                             bundleOf(
-                                REQUEST_RESULT to it.account
-                            )
+                                REQUEST_RESULT to it.account,
+                            ),
                         )
                         dismiss()
                     } else {

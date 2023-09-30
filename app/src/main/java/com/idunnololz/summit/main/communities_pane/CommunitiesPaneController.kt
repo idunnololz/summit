@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.annotation.DrawableRes
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +20,6 @@ import com.idunnololz.summit.databinding.HomeCommunityItemBinding
 import com.idunnololz.summit.databinding.NoSubscriptionsItemBinding
 import com.idunnololz.summit.databinding.TabStateItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.tabs.TabsManager
@@ -123,7 +121,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         private val onDeleteUserCommunity: (Long) -> Unit,
         private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
         private val onAddBookmarkClick: () -> Unit,
-        ) : Adapter<ViewHolder>() {
+    ) : Adapter<ViewHolder>() {
 
         private sealed interface Item {
             object BookmarkHeaderItem : Item

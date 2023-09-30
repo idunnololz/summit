@@ -46,7 +46,6 @@ class SearchViewModel @Inject constructor(
     val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
     val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
 
-
     val currentQueryLiveData = currentQueryFlow.asLiveData()
     val currentPersonFilterLiveData = currentPersonFilter.asLiveData()
     val currentCommunityFilterLiveData = currentCommunityFilter.asLiveData()
@@ -150,11 +149,11 @@ class SearchViewModel @Inject constructor(
     data class PersonFilter(
         val personId: Int,
         val personRef: PersonRef.PersonRefByName,
-    ): Parcelable
+    ) : Parcelable
 
     @Parcelize
     data class CommunityFilter(
         val communityId: Int,
         val communityRef: CommunityRef.CommunityRefByName,
-    ): Parcelable
+    ) : Parcelable
 }

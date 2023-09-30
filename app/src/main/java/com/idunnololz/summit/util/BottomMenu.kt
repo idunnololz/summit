@@ -28,7 +28,6 @@ import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
-
 class BottomMenu(private val context: Context) {
 
     companion object {
@@ -243,7 +242,6 @@ class BottomMenu(private val context: Context) {
         var bottomSheetBehavior: BottomSheetBehavior<*>? = null,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-
         private val checkedTextColor = context.getColorFromAttribute(
             com.google.android.material.R.attr.colorPrimary,
         )
@@ -324,7 +322,6 @@ class BottomMenu(private val context: Context) {
             addItemType(Item.FooterItem::class, MenuItemFooterBinding::inflate) { _, _, _ -> }
         }
 
-
         fun addItem(@IdRes id: Int, @StringRes title: Int) {
             menuItems.add(MenuItem.ActionItem(id, context.getString(title)))
         }
@@ -391,7 +388,7 @@ class BottomMenu(private val context: Context) {
             val title: String,
             val icon: MenuIcon? = null,
             @DrawableRes val checkIcon: Int = 0,
-        ): MenuItem
+        ) : MenuItem
         object DividerItem : MenuItem
     }
 

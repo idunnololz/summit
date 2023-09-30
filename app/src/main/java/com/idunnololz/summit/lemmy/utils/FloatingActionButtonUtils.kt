@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.utils
 
-import android.util.LayoutDirection
 import android.view.Gravity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams

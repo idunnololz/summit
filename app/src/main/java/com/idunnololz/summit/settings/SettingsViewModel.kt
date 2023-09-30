@@ -93,7 +93,7 @@ class SettingsViewModel @Inject constructor(
             is SliderSettingItem,
             is TextOnlySettingItem,
             is TextValueSettingItem,
-            is ColorSettingItem
+            is ColorSettingItem,
             -> {
                 addItem()
             }

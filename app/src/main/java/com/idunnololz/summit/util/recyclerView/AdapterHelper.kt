@@ -1,6 +1,5 @@
 package com.idunnololz.summit.util.recyclerView
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncDifferConfig
@@ -18,7 +17,7 @@ class AdapterHelper<T : Any>(
     private val areContentsTheSame: (old: T, new: T) -> Boolean =
         { oldItem, newItem -> oldItem == newItem },
     private val getChangePayload: (old: T, new: T) -> Any? =
-        { old, new -> null }
+        { old, new -> null },
 ) {
 
     data class ItemInfo<T>(

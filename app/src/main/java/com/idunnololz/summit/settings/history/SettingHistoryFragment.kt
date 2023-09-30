@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingHistoryBinding
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.HistorySettings
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -17,6 +19,9 @@ class SettingHistoryFragment : BaseFragment<FragmentSettingHistoryBinding>() {
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var settings: HistorySettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,5 +56,13 @@ class SettingHistoryFragment : BaseFragment<FragmentSettingHistoryBinding>() {
     }
 
     private fun updateRendering() {
+        settings.recordBrowsingHistory.bindTo(
+            binding.trackBrowsingHistory,
+            { preferences.trackBrowsingHistory },
+            {
+                preferences.trackBrowsingHistory = it
+                updateRendering()
+            },
+        )
     }
 }

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -124,12 +123,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 findNavController().navigateSafe(directions)
                                 true
                             }
-                            mainSettings.settingHistory.id -> {
-                                val directions = SettingsFragmentDirections
-                                    .actionSettingsFragmentToSettingHistoryFragment()
-                                findNavController().navigateSafe(directions)
-                                true
-                            }
                             mainSettings.settingCache.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingCacheFragment()
@@ -177,6 +170,18 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             mainSettings.miscSettings.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingMiscFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
+                            mainSettings.loggingSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingLoggingFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
+                            mainSettings.historySettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingHistoryFragment()
                                 findNavController().navigateSafe(directions)
                                 true
                             }
@@ -285,6 +290,16 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                         is MiscSettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingMiscFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is LoggingSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingLoggingFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+                        is HistorySettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingHistoryFragment()
                             findNavController().navigateSafe(directions)
                         }
 

@@ -93,48 +93,64 @@ object LemmyTextHelper {
         highlight: HighlightTextData?,
     ) {
         getMarkwon(textView.context).let {
-            val spanned = SpannableStringBuilder(it.toMarkdown(text))
-            postProcessDetails(spanned, textView)
+            try {
+                val spanned = SpannableStringBuilder(it.toMarkdown(text))
+                postProcessDetails(spanned, textView)
 
-            if (highlight != null) {
-                val highlightColor = textView.context.getColorFromAttribute(
-                    com.google.android.material.R.attr.colorSurfaceInverse
-                )
-                val highlightTextColor = textView.context.getColorFromAttribute(
-                    com.google.android.material.R.attr.colorOnSurfaceInverse
-                )
-                val currentQueryColor = textView.context.getColorFromAttribute(
-                    androidx.appcompat.R.attr.colorPrimary)
-                val queryHighlight = highlight.query
-                val queryLength = queryHighlight.length
-                var curStartIndex = 0
-                var matchIndex = 0
-                while (true) {
-                    val index = spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
+                if (highlight != null) {
+                    val highlightColor = textView.context.getColorFromAttribute(
+                        com.google.android.material.R.attr.colorSurfaceInverse,
+                    )
+                    val highlightTextColor = textView.context.getColorFromAttribute(
+                        com.google.android.material.R.attr.colorOnSurfaceInverse,
+                    )
+                    val currentQueryColor = textView.context.getColorFromAttribute(
+                        androidx.appcompat.R.attr.colorPrimary,
+                    )
+                    val queryHighlight = highlight.query
+                    val queryLength = queryHighlight.length
+                    var curStartIndex = 0
+                    var matchIndex = 0
+                    while (true) {
+                        val index =
+                            spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
 
-                    if (index < 0) {
-                        break
+                        if (index < 0) {
+                            break
+                        }
+
+                        if (highlight.matchIndex == matchIndex) {
+                            spanned.setSpan(
+                                BackgroundColorSpan(currentQueryColor),
+                                index,
+                                index + queryLength,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                            )
+                        } else {
+                            spanned.setSpan(
+                                BackgroundColorSpan(highlightColor),
+                                index,
+                                index + queryLength,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                            )
+                            spanned.setSpan(
+                                ForegroundColorSpan(highlightTextColor),
+                                index,
+                                index + queryLength,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                            )
+                        }
+                        curStartIndex = index + queryLength
+
+                        matchIndex++
                     }
-
-                    if (highlight.matchIndex == matchIndex) {
-                        spanned.setSpan(
-                            BackgroundColorSpan(currentQueryColor), index, index + queryLength,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    } else {
-                        spanned.setSpan(
-                            BackgroundColorSpan(highlightColor), index, index + queryLength,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        spanned.setSpan(
-                            ForegroundColorSpan(highlightTextColor), index, index + queryLength,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    curStartIndex = index + queryLength
-
-                    matchIndex++
                 }
-            }
 
-            it.setParsedMarkdown(textView, spanned)
+                it.setParsedMarkdown(textView, spanned)
+            } catch (e: Exception) {
+                Log.w(TAG, "Error parsing markdown. Falling back to plain text", e)
+                textView.text = text
+            }
         }
     }
 
@@ -149,7 +165,7 @@ object LemmyTextHelper {
          * 3) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
          * 4) Matches against full community names (!a@b.com)
          */
-        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n*)*?)(:::\s+\n|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]+)""")
+        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n)*?)(:::\s*\n?|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]+)""")
 
         private fun processAll(s: String): String {
             val matcher = largeRegex.matcher(s)
@@ -244,7 +260,7 @@ object LemmyTextHelper {
                         Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS or Linkify.WEB_URLS
                     } else {
                         Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS
-                   },
+                    },
                 ),
             )
             .usePlugin(TablePlugin.create(context))

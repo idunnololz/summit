@@ -10,6 +10,7 @@ import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
+import com.idunnololz.summit.util.PrettyPrintUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,7 +48,12 @@ object SettingPath {
                 context.getString(R.string.misc)
             ViewTypeSettings::class ->
                 context.getString(R.string.view_type)
-            else -> error("No name for ${this}")
+            LoggingSettings::class ->
+                context.getString(R.string.logging)
+            HistorySettings::class ->
+                context.getString(R.string.history)
+
+            else -> error("No name for $this")
         }
     }
 
@@ -85,11 +91,6 @@ class MainSettings @Inject constructor(
         R.drawable.baseline_gesture_24,
         context.getString(R.string.gestures),
         context.getString(R.string.gestures_desc),
-    )
-    val settingHistory = BasicSettingItem(
-        R.drawable.baseline_history_24,
-        context.getString(R.string.history),
-        context.getString(R.string.history_setting_desc),
     )
     val settingCache = BasicSettingItem(
         R.drawable.baseline_cached_24,
@@ -133,6 +134,16 @@ class MainSettings @Inject constructor(
         context.getString(R.string.misc),
         context.getString(R.string.misc_desc),
     )
+    val loggingSettings = BasicSettingItem(
+        R.drawable.outline_analytics_24,
+        context.getString(R.string.logging),
+        context.getString(R.string.logging_desc),
+    )
+    val historySettings = BasicSettingItem(
+        R.drawable.baseline_history_24,
+        context.getString(R.string.history),
+        context.getString(R.string.history_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -158,7 +169,8 @@ class MainSettings @Inject constructor(
             listOf(
                 settingCache,
                 settingHiddenPosts,
-//                mainSettings.settingHistory,
+                loggingSettings,
+                historySettings,
                 settingAbout,
                 settingSummitCommunity,
                 patreonSettings,
@@ -621,6 +633,50 @@ class CommentListSettings @Inject constructor(
         context.getString(R.string.collapse_child_comments),
         context.getString(R.string.collapse_child_comments_desc),
     )
+    val autoCollapseCommentThreshold = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.auto_collapse_comment_threshold),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.auto_collapse_comment_threshold_50,
+                PrettyPrintUtils.defaultPercentFormat.format(0.5f),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.auto_collapse_comment_threshold_40,
+                PrettyPrintUtils.defaultPercentFormat.format(0.4f),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.auto_collapse_comment_threshold_30,
+                PrettyPrintUtils.defaultPercentFormat.format(0.3f),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.auto_collapse_comment_threshold_20,
+                PrettyPrintUtils.defaultPercentFormat.format(0.2f),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.auto_collapse_comment_threshold_10,
+                PrettyPrintUtils.defaultPercentFormat.format(0.1f),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.auto_collapse_comment_threshold_never_collapse,
+                context.getString(R.string.never_auto_collapse_comments),
+                null,
+                null,
+            ),
+        ),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,
         relayStyleNavigation,
@@ -1057,7 +1113,7 @@ class MiscSettings @Inject constructor(
                 null,
                 null,
             ),
-        )
+        ),
     )
 
     val retainLastPost = OnOffSettingItem(
@@ -1128,6 +1184,8 @@ class AllSettings @Inject constructor(
     private val themeSettings: ThemeSettings,
     private val viewTypeSettings: ViewTypeSettings,
     private val miscSettings: MiscSettings,
+    private val loggingSettings: LoggingSettings,
+    private val historySettings: HistorySettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -1142,6 +1200,8 @@ class AllSettings @Inject constructor(
         themeSettings,
         viewTypeSettings,
         miscSettings,
+        loggingSettings,
+        historySettings,
     )
 
     init {
@@ -1263,3 +1323,43 @@ fun makeCommunitySortOrderChoices(context: Context) =
             null,
         ),
     )
+
+@Singleton
+class LoggingSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val useFirebase = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_firebase),
+        context.getString(R.string.use_firebase_desc),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        useFirebase,
+    )
+}
+
+@Singleton
+class HistorySettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val recordBrowsingHistory = OnOffSettingItem(
+        null,
+        context.getString(R.string.record_browsing_history),
+        context.getString(R.string.record_browsing_history_desc),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        recordBrowsingHistory,
+    )
+}

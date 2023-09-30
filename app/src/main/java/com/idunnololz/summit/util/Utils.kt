@@ -759,8 +759,6 @@ fun startFeedbackIntent(context: Context) {
 
 val summitCommunityPage = CommunityRef.CommunityRefByName("summit", "lemmy.world")
 
-
-
 fun Fragment.shareUri(uri: Uri, mimeType: String) {
     val shareIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND

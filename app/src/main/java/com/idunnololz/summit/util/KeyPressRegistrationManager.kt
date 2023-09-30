@@ -1,7 +1,6 @@
 package com.idunnololz.summit.util
 
 import android.view.KeyEvent
-import androidx.core.view.MenuHostHelper
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner

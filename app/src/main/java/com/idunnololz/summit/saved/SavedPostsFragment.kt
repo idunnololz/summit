@@ -10,14 +10,13 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentSavedPostsBinding
 import com.idunnololz.summit.lemmy.community.Item
 import com.idunnololz.summit.lemmy.community.ListingItemAdapter
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData

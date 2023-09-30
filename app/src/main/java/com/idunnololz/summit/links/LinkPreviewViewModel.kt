@@ -7,7 +7,6 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import org.jsoup.Connection
@@ -76,9 +75,9 @@ class LinkPreviewViewModel @Inject constructor() : ViewModel() {
             title = url
         }
 
-        //getDescription
+        // getDescription
 
-        //getDescription
+        // getDescription
         var description = doc.select("meta[name=description]").attr("content")
         if (description.isEmpty()) {
             description = doc.select("meta[name=Description]").attr("content")
@@ -90,9 +89,7 @@ class LinkPreviewViewModel @Inject constructor() : ViewModel() {
             description = ""
         }
 
-
         // getMediaType
-
 
         // getMediaType
         val mediaTypes = doc.select("meta[name=medium]")
@@ -104,11 +101,9 @@ class LinkPreviewViewModel @Inject constructor() : ViewModel() {
             doc.select("meta[property=og:type]").attr("content")
         }
 
+        // getImages
 
-        //getImages
-
-
-        //getImages
+        // getImages
         val imageUrls = mutableListOf<String>()
         var favIcon: String? = null
         var ogUrl: String? = null
@@ -124,9 +119,9 @@ class LinkPreviewViewModel @Inject constructor() : ViewModel() {
             }
         }
 
-        //get image from meta[name=og:image]
+        // get image from meta[name=og:image]
 
-        //get image from meta[name=og:image]
+        // get image from meta[name=og:image]
         if (imageUrls.isEmpty()) {
             val imageElements = doc.select("meta[name=og:image]")
             if (imageElements.size > 0) {
@@ -164,9 +159,9 @@ class LinkPreviewViewModel @Inject constructor() : ViewModel() {
             }
         }
 
-        //Favicon
+        // Favicon
 
-        //Favicon
+        // Favicon
         var src = doc.select("link[rel=apple-touch-icon]").attr("href")
         if (!src.isEmpty()) {
             favIcon = resolveUrl(url, src)

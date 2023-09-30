@@ -9,12 +9,7 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.actions.ActionInfo
-import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
-import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
-import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -107,7 +102,7 @@ data class OriginalPostData(
     val body: String?,
     val url: String?,
     val isNsfw: Boolean,
-): Parcelable
+) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
@@ -116,4 +111,4 @@ data class OriginalCommentData(
     val commentId: Int,
     val content: String,
     val parentCommentId: Int?,
-): Parcelable
+) : Parcelable

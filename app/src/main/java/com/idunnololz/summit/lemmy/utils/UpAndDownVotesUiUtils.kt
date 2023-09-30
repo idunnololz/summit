@@ -14,7 +14,7 @@ fun makeUpAndDownVoteButtons(context: Context): UpAndDownVoteUi {
     val downvoteButton = MaterialButton(
         context,
         null,
-        context.getResIdFromAttribute(R.attr.materialIconButtonStyle)
+        context.getResIdFromAttribute(R.attr.materialIconButtonStyle),
     ).apply {
         id = View.generateViewId()
         layoutParams = ConstraintLayout.LayoutParams(
@@ -38,7 +38,7 @@ fun makeUpAndDownVoteButtons(context: Context): UpAndDownVoteUi {
     val upvoteButton = MaterialButton(
         context,
         null,
-        context.getResIdFromAttribute(R.attr.materialIconButtonStyle)
+        context.getResIdFromAttribute(R.attr.materialIconButtonStyle),
     ).apply {
         id = View.generateViewId()
         layoutParams = ConstraintLayout.LayoutParams(

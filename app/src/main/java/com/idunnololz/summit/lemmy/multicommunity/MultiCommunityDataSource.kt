@@ -19,7 +19,7 @@ import javax.inject.Inject
 class MultiCommunityDataSource(
     private val instance: String,
     private val sources: List<LemmyListSource<PostView, SortType>>,
-): PostsDataSource {
+) : PostsDataSource {
 
     companion object {
         private const val TAG = "MultiCommunityDataS"
@@ -110,7 +110,7 @@ class MultiCommunityDataSource(
                 } else {
                     Result.failure(it)
                 }
-            }
+            },
         )
     }
 
@@ -147,7 +147,7 @@ class MultiCommunityDataSource(
         var hasMore = true
         val pageItems = mutableListOf<PostView>()
 
-        while(true) {
+        while (true) {
             val validSources = validSources
             var sourceToResult = validSources.map { it to it.peekNextItem() }
             val sourceAndError = sourceToResult
@@ -157,7 +157,8 @@ class MultiCommunityDataSource(
                 val exception = requireNotNull(sourceAndError.second.exceptionOrNull())
                 if (exception is ClientApiException && exception.errorCode == 404) {
                     communityNotFoundOnInstance.add(
-                        sourceAndError.first.source as CommunityRef.CommunityRefByName)
+                        sourceAndError.first.source as CommunityRef.CommunityRefByName,
+                    )
                 } else {
                     return@a Result.failure(exception)
                 }
@@ -165,20 +166,20 @@ class MultiCommunityDataSource(
             sourceToResult = sourceToResult.filter { it.second.isSuccess }
 
             val nextSourceAndResult = sourceToResult.maxBy { (_, result) ->
-                val postView = result.getOrThrow() ?: return@maxBy -1L
+                val postView = result.getOrThrow() ?: return@maxBy -1.0
 
                 if (postView.post.featured_local || postView.post.featured_community) {
-                    return@maxBy Long.MAX_VALUE
+                    return@maxBy Double.MAX_VALUE
                 }
 
                 when (sortType) {
-                    SortType.Active -> postView.counts.hot_rank_active?.toLong() ?: 0L
-                    SortType.Hot -> postView.counts.hot_rank?.toLong() ?: 0L
-                    SortType.New -> dateStringToTs(postView.counts.published)
-                    SortType.Old -> -dateStringToTs(postView.counts.published)
-                    SortType.MostComments -> postView.counts.comments.toLong()
+                    SortType.Active -> postView.counts.hot_rank_active ?: 0.0
+                    SortType.Hot -> postView.counts.hot_rank ?: 0.0
+                    SortType.New -> dateStringToTs(postView.counts.published).toDouble()
+                    SortType.Old -> -dateStringToTs(postView.counts.published).toDouble()
+                    SortType.MostComments -> postView.counts.comments.toDouble()
                     SortType.NewComments -> postView.counts.newest_comment_time.let {
-                        dateStringToTs(it)
+                        dateStringToTs(it).toDouble()
                     }
                     SortType.TopDay,
                     SortType.TopWeek,
@@ -190,8 +191,12 @@ class MultiCommunityDataSource(
                     SortType.TopTwelveHour,
                     SortType.TopThreeMonths,
                     SortType.TopSixMonths,
-                    SortType.TopNineMonths -> postView.counts.score.toLong()
-                    else -> postView.counts.score.toLong()
+                    SortType.TopNineMonths,
+                    -> postView.counts.score.toDouble()
+                    SortType.Controversial -> postView.counts.controversy_rank ?: 0.0
+                    SortType.Scaled -> postView.counts.scaled_rank ?: 0.0
+                    null ->
+                        postView.counts.score.toDouble() ?: 0.0
                 }
             }
             val nextItem = nextSourceAndResult.second.getOrNull()
@@ -223,7 +228,7 @@ class MultiCommunityDataSource(
                 pagesCache.size,
                 instance,
                 hasMore,
-            )
+            ),
         )
     }
 

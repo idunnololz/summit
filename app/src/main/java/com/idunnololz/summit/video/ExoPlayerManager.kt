@@ -8,6 +8,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.Util
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
@@ -15,7 +16,6 @@ import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.idunnololz.summit.preview.VideoType
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * Facilitates exoplayer reuse
@@ -174,6 +174,21 @@ class ExoPlayerManager(
         } else {
             ExoPlayer.Builder(context)
                 .build()
+                .apply {
+                    addListener(
+                        object : Player.Listener {
+                            override fun onEvents(player: Player, events: Player.Events) {
+                                super.onEvents(player, events)
+
+                                if (events.containsAny(Player.EVENT_REPEAT_MODE_CHANGED)) {
+                                    if (!player.isPlaying && player.repeatMode != Player.REPEAT_MODE_OFF) {
+                                        Util.handlePlayPauseButtonAction(player)
+                                    }
+                                }
+                            }
+                        },
+                    )
+                }
         }.also {
             allocatedPlayers.push(it)
 

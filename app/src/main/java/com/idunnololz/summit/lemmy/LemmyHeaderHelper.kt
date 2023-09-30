@@ -370,7 +370,7 @@ class LemmyHeaderHelper(
         if (displayFullName) {
             val s = sb.length
             sb.appendLink(
-                text = "@${creatorInstance}",
+                text = "@$creatorInstance",
                 url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
                 underline = false,
             )

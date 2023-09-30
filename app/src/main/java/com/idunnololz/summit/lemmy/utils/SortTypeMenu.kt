@@ -75,6 +75,8 @@ fun BaseFragment<*>.showSortTypeMenu(
             addItem(R.id.sort_order_old, R.string.sort_order_old)
             addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
             addItem(R.id.sort_order_new_comments, R.string.sort_order_new_comments)
+            addItem(R.id.sort_order_controversial, R.string.sort_order_controversial)
+            addItem(R.id.sort_order_scaled, R.string.sort_order_scaled)
             setTitle(R.string.sort_by)
 
             setOnMenuItemClickListener { menuItem ->
@@ -99,6 +101,8 @@ fun BaseFragment<*>.showSortTypeMenu(
             CommunitySortOrder.MostComments -> _sortByMenu.setChecked(R.id.sort_order_most_comments)
             CommunitySortOrder.NewComments -> _sortByMenu.setChecked(R.id.sort_order_new_comments)
             CommunitySortOrder.Old -> _sortByMenu.setChecked(R.id.sort_order_old)
+            CommunitySortOrder.Controversial -> _sortByMenu.setChecked(R.id.sort_order_controversial)
+            CommunitySortOrder.Scaled -> _sortByMenu.setChecked(R.id.sort_order_scaled)
         }
 
         return _sortByMenu

@@ -43,14 +43,14 @@ class ModActionsDialogFragment :
 
         fun show(
             postView: PostView,
-            fragmentManager: FragmentManager
+            fragmentManager: FragmentManager,
         ) {
             show(
                 communityId = postView.community.id,
                 commentId = -1,
                 postId = postView.post.id,
                 personId = postView.creator.id,
-                fragmentManager = fragmentManager
+                fragmentManager = fragmentManager,
             )
         }
 
@@ -63,7 +63,7 @@ class ModActionsDialogFragment :
                 commentId = commentView.comment.id,
                 postId = -1,
                 personId = commentView.creator.id,
-                fragmentManager = fragmentManager
+                fragmentManager = fragmentManager,
             )
         }
 
@@ -91,11 +91,12 @@ class ModActionsDialogFragment :
         @Parcelize
         data class PostObject(
             val postId: Int,
-        ): UpdatedObject
+        ) : UpdatedObject
+
         @Parcelize
         data class CommentObject(
             val commentId: Int,
-        ): UpdatedObject
+        ) : UpdatedObject
     }
 
     private val args by navArgs<ModActionsDialogFragmentArgs>()
@@ -163,7 +164,9 @@ class ModActionsDialogFragment :
                                         ).toBundle()
                                     }
                                     .showAllowingStateLoss(
-                                        parentFragmentManager, "BanUserDialogFragment")
+                                        parentFragmentManager,
+                                        "BanUserDialogFragment",
+                                    )
                             }
                             dismiss()
                         }
@@ -174,7 +177,7 @@ class ModActionsDialogFragment :
                                 ban = false,
                                 removeData = false,
                                 reason = null,
-                                expiresDays = null
+                                expiresDays = null,
                             )
                         }
                         R.id.remove_feature_comment -> {
@@ -248,7 +251,7 @@ class ModActionsDialogFragment :
                     } else {
                         null
                     }
-                }
+                },
             )
             actionsViewModel.modUserResult.handleStateChange(
                 { getString(R.string.error_unable_to_add_user_as_moderator) },
@@ -260,15 +263,15 @@ class ModActionsDialogFragment :
                     } else {
                         null
                     }
-                }
+                },
             )
             actionsViewModel.distinguishCommentResult.handleStateChange(
                 { getString(R.string.error_unable_to_update_comment) },
-                { UpdatedObject.CommentObject(args.commentId) }
+                { UpdatedObject.CommentObject(args.commentId) },
             )
             actionsViewModel.removeCommentResult.handleStateChange(
                 { getString(R.string.error_unable_to_remove_comment) },
-                { UpdatedObject.CommentObject(args.commentId) }
+                { UpdatedObject.CommentObject(args.commentId) },
             )
         }
     }
@@ -282,9 +285,10 @@ class ModActionsDialogFragment :
                 is StatefulData.Error -> {
                     if (it.error is ClientApiException && it.error.errorCode == 404) {
                         setFragmentResult(
-                            REQUEST_KEY, bundleOf(
-                                RESULT_UPDATED_OBJ to updatedObject()
-                            )
+                            REQUEST_KEY,
+                            bundleOf(
+                                RESULT_UPDATED_OBJ to updatedObject(),
+                            ),
                         )
                         dismiss()
                     } else {
@@ -300,9 +304,10 @@ class ModActionsDialogFragment :
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     setFragmentResult(
-                        REQUEST_KEY, bundleOf(
-                            RESULT_UPDATED_OBJ to updatedObject()
-                        )
+                        REQUEST_KEY,
+                        bundleOf(
+                            RESULT_UPDATED_OBJ to updatedObject(),
+                        ),
                     )
                     dismiss()
                 }
@@ -333,14 +338,13 @@ class ModActionsDialogFragment :
             },
             updatedObject = {
                 UpdatedObject.PostObject(
-                    args.postId
+                    args.postId,
                 )
-            }
+            },
         )
     }
 
     private fun setupUi(data: ModActionsViewModel.FullModState) {
-
         for (modState in data.modStates) {
             when (modState) {
                 is CommentModState -> {

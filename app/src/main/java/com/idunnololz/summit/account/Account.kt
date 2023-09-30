@@ -26,4 +26,4 @@ data class Account(
         defaultValue = "0",
     )
     val defaultSortType: Int,
-): Parcelable
+) : Parcelable

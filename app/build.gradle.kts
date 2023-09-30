@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 33
-        versionCode = 97
-        versionName = "1.10.0"
+        versionCode = 98
+        versionName = "1.11.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -95,7 +95,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.analytics)
+//    implementation(libs.firebase.analytics)
 
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp.okhttp)
@@ -142,6 +142,7 @@ dependencies {
 
     implementation(libs.threeten.abp)
     implementation(libs.zoom.layout)
+    implementation(libs.process.phoenix)
 }
 
 // Allow references to generated code

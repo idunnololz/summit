@@ -26,7 +26,8 @@ import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PersonPickerDialogFragment : BaseDialogFragment<DialogFragmentPersonPickerBinding>(),
+class PersonPickerDialogFragment :
+    BaseDialogFragment<DialogFragmentPersonPickerBinding>(),
     FullscreenDialogFragment,
     BackPressHandler {
 
@@ -52,7 +53,7 @@ class PersonPickerDialogFragment : BaseDialogFragment<DialogFragmentPersonPicker
         val personRef: PersonRef.PersonRefByName,
         val icon: String?,
         val personId: Int,
-    ): Parcelable
+    ) : Parcelable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,11 +108,14 @@ class PersonPickerDialogFragment : BaseDialogFragment<DialogFragmentPersonPicker
                 instance = viewModel.instance,
                 onSinglePersonSelected = { ref, icon, personId ->
                     setFragmentResult(
-                        REQUEST_KEY, bundleOf(REQUEST_KEY_RESULT to Result(
-                            personRef = ref,
-                            icon = icon,
-                            personId = personId
-                        ))
+                        REQUEST_KEY,
+                        bundleOf(
+                            REQUEST_KEY_RESULT to Result(
+                                personRef = ref,
+                                icon = icon,
+                                personId = personId,
+                            ),
+                        ),
                     )
                     dismiss()
                 },
@@ -135,7 +139,6 @@ class PersonPickerDialogFragment : BaseDialogFragment<DialogFragmentPersonPicker
                 }
             }
         }
-
     }
 
     override fun onBackPressed(): Boolean {

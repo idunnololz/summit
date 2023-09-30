@@ -16,6 +16,7 @@ import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
@@ -32,6 +33,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
@@ -40,7 +42,6 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
-import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
@@ -62,8 +63,10 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.Utils
@@ -533,6 +536,30 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putInt(KEY_SCREENSHOT_WIDTH_DP, value)
+                .apply()
+        }
+
+    var useFirebase: Boolean
+        get() = prefs.getBoolean(KEY_USE_FIREBASE, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_FIREBASE, value)
+                .apply()
+        }
+
+    var autoCollapseCommentThreshold: Float
+        get() = prefs.getFloat(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD, 0.3f)
+        set(value) {
+            prefs.edit()
+                .putFloat(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD, value)
+                .apply()
+        }
+
+    var trackBrowsingHistory: Boolean
+        get() = prefs.getBoolean(KEY_TRACK_BROWSING_HISTORY, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_TRACK_BROWSING_HISTORY, value)
                 .apply()
         }
 

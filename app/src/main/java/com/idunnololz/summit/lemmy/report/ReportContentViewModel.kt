@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ReportContentViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient
+    private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
     val reportState = StatefulLiveData<Unit>()
@@ -33,7 +33,7 @@ class ReportContentViewModel @Inject constructor(
                     },
                     ifRight = {
                         apiClient.createCommentReport(it.id, reason)
-                    }
+                    },
                 )
                 .onSuccess {
                     reportState.postValue(Unit)

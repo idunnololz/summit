@@ -22,22 +22,22 @@ class ModActionsViewModel @Inject constructor(
         data class CommentModState(
             val isRemoved: Boolean,
             val isDistinguished: Boolean?,
-        ): ModState
+        ) : ModState
         data class PostModState(
             val isRemoved: Boolean,
             val isFeatured: Boolean,
             val isLocked: Boolean,
-        ): ModState
+        ) : ModState
         data class UserModState(
             val isBannedFromCommunity: Boolean,
-        ): ModState
+        ) : ModState
         data class CommunityModState(
             val isMod: Boolean,
-        ): ModState
+        ) : ModState
     }
 
     data class FullModState(
-        val modStates: List<ModState>
+        val modStates: List<ModState>,
     )
 
     val currentAccount
@@ -79,7 +79,7 @@ class ModActionsViewModel @Inject constructor(
                             id = Either.Right(commentId),
                             sort = CommentSortType.New,
                             force = force,
-                            maxDepth = 1
+                            maxDepth = 1,
                         )
                         .onFailure {
                             currentModState.postError(it)
@@ -107,7 +107,7 @@ class ModActionsViewModel @Inject constructor(
                     )
                 allModState +=
                     ModState.UserModState(
-                        isBannedFromCommunity = postResult.creator_banned_from_community
+                        isBannedFromCommunity = postResult.creator_banned_from_community,
                     )
             }
             if (commentResult != null) {
@@ -126,7 +126,7 @@ class ModActionsViewModel @Inject constructor(
                         )
                     allModState +=
                         ModState.UserModState(
-                            isBannedFromCommunity = comment.creator_banned_from_community
+                            isBannedFromCommunity = comment.creator_banned_from_community,
                         )
                 }
             }
@@ -134,13 +134,11 @@ class ModActionsViewModel @Inject constructor(
             if (communityResult != null) {
                 allModState +=
                     ModState.CommunityModState(
-                        communityResult.moderators.any { it.moderator.id == personId }
+                        communityResult.moderators.any { it.moderator.id == personId },
                     )
             }
 
             currentModState.postValue(FullModState(allModState))
         }
     }
-
-
 }

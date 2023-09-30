@@ -9,11 +9,12 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
+import com.idunnololz.summit.api.dto.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
@@ -55,6 +56,7 @@ class MoreActionsViewModel @Inject constructor(
 
     val blockCommunityResult = StatefulLiveData<Unit>()
     val blockPersonResult = StatefulLiveData<BlockPersonResult>()
+    val blockInstanceResult = StatefulLiveData<BlockInstanceResult>()
     val saveCommentResult = StatefulLiveData<CommentView>()
     val banUserResult = StatefulLiveData<Unit>()
     val modUserResult = StatefulLiveData<Unit>()
@@ -91,6 +93,19 @@ class MoreActionsViewModel @Inject constructor(
                 }
                 .onSuccess {
                     blockPersonResult.postValue(BlockPersonResult(block))
+                }
+        }
+    }
+
+    fun blockInstance(id: InstanceId, block: Boolean = true) {
+        blockInstanceResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance { apiClient.blockInstance(id, block) }
+                .onFailure {
+                    blockInstanceResult.postError(it)
+                }
+                .onSuccess {
+                    blockInstanceResult.postValue(BlockInstanceResult(block))
                 }
         }
     }
@@ -347,3 +362,8 @@ class MoreActionsViewModel @Inject constructor(
 data class BlockPersonResult(
     val blockedPerson: Boolean,
 )
+
+data class BlockInstanceResult(
+    val blocked: Boolean,
+)
+

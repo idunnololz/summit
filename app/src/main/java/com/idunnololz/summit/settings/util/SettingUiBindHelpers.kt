@@ -262,5 +262,4 @@ fun ColorSettingItem.bindTo(
             }
             .show()
     }
-
 }

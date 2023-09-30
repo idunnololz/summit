@@ -82,7 +82,8 @@ class AddOrEditCommentFragment :
         setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
 
         childFragmentManager.setFragmentResultListener(
-            AddLinkDialogFragment.REQUEST_KEY, this
+            AddLinkDialogFragment.REQUEST_KEY,
+            this,
         ) { key, bundle ->
             val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
                 AddLinkDialogFragment.REQUEST_KEY_RESULT,
@@ -92,7 +93,8 @@ class AddOrEditCommentFragment :
             }
         }
         childFragmentManager.setFragmentResultListener(
-            DraftsDialogFragment.REQUEST_KEY, this
+            DraftsDialogFragment.REQUEST_KEY,
+            this,
         ) { key, bundle ->
             val result = bundle.getParcelableCompat<DraftEntry>(
                 DraftsDialogFragment.REQUEST_KEY_RESULT,
@@ -169,7 +171,8 @@ class AddOrEditCommentFragment :
         }
         binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
         binding.toolbar.setNavigationIconTint(
-            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+        )
         binding.toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
@@ -328,7 +331,7 @@ class AddOrEditCommentFragment :
             onAddLinkClick = {
                 AddLinkDialogFragment.show(
                     binding.commentEditText.getSelectedText(),
-                    childFragmentManager
+                    childFragmentManager,
                 )
             },
             onPreviewClick = {
@@ -417,12 +420,12 @@ class AddOrEditCommentFragment :
         val currentDraftEntry = viewModel.currentDraftEntry.value
         if (!content.isNullOrBlank()) {
             if (currentDraftEntry?.data != null &&
-                currentDraftEntry.data is DraftData.CommentDraftData) {
-
+                currentDraftEntry.data is DraftData.CommentDraftData
+            ) {
                 viewModel.draftsManager.updateDraftAsync(
                     currentDraftEntry.id,
                     currentDraftEntry.data.copy(
-                        content = content
+                        content = content,
                     ),
                     showToast = true,
                 )
@@ -452,6 +455,6 @@ class AddOrEditCommentFragment :
             postRef = PostRef(args.instance, this.post.id),
             commentId = this.comment.id,
             content = this.comment.content,
-            parentCommentId = args.commentView?.comment?.id
+            parentCommentId = args.commentView?.comment?.id,
         )
 }

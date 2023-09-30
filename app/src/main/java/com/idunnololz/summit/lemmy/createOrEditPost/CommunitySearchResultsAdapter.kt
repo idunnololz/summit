@@ -11,12 +11,7 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitySearchResultCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorSelectedCommunityItemBinding
-import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 

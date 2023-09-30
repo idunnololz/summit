@@ -7,6 +7,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.NetworkException
+import com.idunnololz.summit.api.NewApiException
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.ServerApiException
@@ -27,16 +28,26 @@ fun Throwable.toErrorMessage(context: Context): String {
             when (t) {
                 is ClientApiException -> {
                     Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
-                    if (t is ServerTimeoutException) {
-                        context.getString(R.string.error_server_timeout)
-                    } else if (t is NotAuthenticatedException) {
-                        context.getString(R.string.error_not_signed_in)
-                    } else {
-                        if (t.errorCode == 404) {
-                            context.getString(R.string.error_page_not_found)
-                        } else {
-                            FirebaseCrashlytics.getInstance().recordException(t)
-                            context.getString(R.string.error_unknown)
+                    when (t) {
+                        is ServerTimeoutException -> {
+                            context.getString(R.string.error_server_timeout)
+                        }
+
+                        is NotAuthenticatedException -> {
+                            context.getString(R.string.error_not_signed_in)
+                        }
+
+                        is NewApiException -> {
+                            context.getString(R.string.error_new_api_format, t.minVersion)
+                        }
+
+                        else -> {
+                            if (t.errorCode == 404) {
+                                context.getString(R.string.error_page_not_found)
+                            } else {
+                                FirebaseCrashlytics.getInstance().recordException(t)
+                                context.getString(R.string.error_unknown)
+                            }
                         }
                     }
                 }

@@ -34,7 +34,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@+id/state"/>
 
     <Space
         android:layout_width="wrap_content"
@@ -42,15 +42,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text"/>
 
-    <View
-        android:id="@+id/overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="@dimen/padding_quarter"
-        android:layout_marginStart="-8dp"
+    <ImageButton
+        android:id="@+id/state"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:src="@drawable/baseline_expand_less_18"
+        android:background="?selectableItemBackgroundBorderless"
+        android:paddingStart="@dimen/reddit_content_horizontal_padding"
+        android:paddingEnd="@dimen/reddit_content_horizontal_padding"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/startGuideLine" />
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

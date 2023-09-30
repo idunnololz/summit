@@ -88,6 +88,7 @@
         android:background="?selectableItemBackgroundBorderless"
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintStart_toEndOf="@+id/headerView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

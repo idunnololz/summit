@@ -7,6 +7,7 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,6 +24,7 @@ class HistoryManager @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val historyDao: HistoryDao,
     private val apiClient: AccountAwareLemmyClient,
+    private val preferences: Preferences,
 ) {
 
     companion object {
@@ -55,6 +57,10 @@ class HistoryManager @Inject constructor(
 
     fun recordVisit(jsonUrl: String, saveReason: HistorySaveReason, post: PostView?) {
         coroutineScope.launch {
+            if (!preferences.trackBrowsingHistory) {
+                return@launch
+            }
+
             withContext(dbContext) {
                 val ts = System.currentTimeMillis()
                 val newEntry = HistoryEntry(
@@ -79,9 +85,14 @@ class HistoryManager @Inject constructor(
         shortDesc: String,
     ) {
         coroutineScope.launch {
+            if (!preferences.trackBrowsingHistory) {
+                return@launch
+            }
+
             withContext(dbContext) {
                 if (state.communityState.communityRef is CommunityRef.MultiCommunity ||
-                    state.communityState.communityRef is CommunityRef.ModeratedCommunities) {
+                    state.communityState.communityRef is CommunityRef.ModeratedCommunities
+                ) {
                     // Multi-communities are purely client sided so we cannot record history for them.
                     return@withContext
                 }

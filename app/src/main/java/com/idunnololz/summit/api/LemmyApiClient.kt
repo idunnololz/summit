@@ -10,6 +10,8 @@ import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.BlockCommunity
+import com.idunnololz.summit.api.dto.BlockInstance
+import com.idunnololz.summit.api.dto.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
@@ -52,6 +54,7 @@ import com.idunnololz.summit.api.dto.GetSite
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCount
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.ListCommentReports
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunities
@@ -96,7 +99,6 @@ import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runInterruptible
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -187,9 +189,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPostsNoCache(form = form.serializeToMap())
+                api.getPostsNoCache(authorization = account?.bearer, form = form.serializeToMap())
             } else {
-                api.getPosts(form = form.serializeToMap())
+                api.getPosts(authorization = account?.bearer, form = form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -214,9 +216,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPostNoCache(form = postForm.serializeToMap())
+                api.getPostNoCache(authorization = account?.bearer, form = postForm.serializeToMap())
             } else {
-                api.getPost(form = postForm.serializeToMap())
+                api.getPost(authorization = account?.bearer, form = postForm.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -240,7 +242,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.markPostAsRead(form = form)
+            api.markPostAsRead(authorization = account.bearer, form = form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -275,9 +277,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPostsNoCache(form = form.serializeToMap())
+                api.getPostsNoCache(authorization = account?.bearer, form = form.serializeToMap())
             } else {
-                api.getPosts(form = form.serializeToMap())
+                api.getPosts(authorization = account?.bearer, form = form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -312,11 +314,13 @@ class LemmyApiClient @Inject constructor(
         return retrofitErrorHandler {
             if (force) {
                 api.getCommentsNoCache(
+                    authorization = account?.bearer,
                     commentsForm
                         .serializeToMap(),
                 )
             } else {
                 api.getComments(
+                    authorization = account?.bearer,
                     commentsForm
                         .serializeToMap(),
                 )
@@ -359,11 +363,13 @@ class LemmyApiClient @Inject constructor(
         return retrofitErrorHandler {
             if (force) {
                 api.getCommentsNoCache(
+                    authorization = account?.bearer,
                     commentsForm
                         .serializeToMap(),
                 )
             } else {
                 api.getComments(
+                    authorization = account?.bearer,
                     commentsForm
                         .serializeToMap(),
                 )
@@ -394,9 +400,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getCommunityNoCache(form = form.serializeToMap())
+                api.getCommunityNoCache(authorization = account?.bearer, form = form.serializeToMap())
             } else {
-                api.getCommunity(form = form.serializeToMap())
+                api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -421,9 +427,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getCommunityNoCache(form = form.serializeToMap())
+                api.getCommunityNoCache(authorization = account?.bearer, form = form.serializeToMap())
             } else {
-                api.getCommunity(form = form.serializeToMap())
+                api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -463,9 +469,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.searchNoCache(form = form.serializeToMap())
+                api.searchNoCache(authorization = account?.bearer, form = form.serializeToMap())
             } else {
-                api.search(form = form.serializeToMap())
+                api.search(authorization = account?.bearer, form = form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -492,7 +498,7 @@ class LemmyApiClient @Inject constructor(
             auth = account?.jwt,
         )
         return retrofitErrorHandler {
-            api.getCommunityList(form = form.serializeToMap())
+            api.getCommunityList(authorization = account?.bearer, form = form.serializeToMap())
         }.fold(
             onSuccess = {
                 Result.success(it.communities)
@@ -539,9 +545,9 @@ class LemmyApiClient @Inject constructor(
 
         retrofitErrorHandler {
             if (force) {
-                api.getSiteNoCache(form = form.serializeToMap())
+                api.getSiteNoCache(authorization = auth?.toBearer(), form = form.serializeToMap())
             } else {
-                api.getSite(form = form.serializeToMap())
+                api.getSite(authorization = auth?.toBearer(), form = form.serializeToMap())
             }
         }
             .fold(
@@ -562,9 +568,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getUnreadCountNoCache(form.serializeToMap())
+                api.getUnreadCountNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getUnreadCount(form.serializeToMap())
+                api.getUnreadCount(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -582,14 +588,14 @@ class LemmyApiClient @Inject constructor(
     ): Result<GetReportCountResponse> {
         val form = GetReportCount(
             null,
-            account.jwt
+            account.jwt,
         )
 
         return retrofitErrorHandler {
             if (force) {
-                api.getReportCountNoCache(form.serializeToMap())
+                api.getReportCountNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getReportCount(form.serializeToMap())
+                api.getReportCount(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -612,7 +618,7 @@ class LemmyApiClient @Inject constructor(
             auth = account.jwt,
         )
 
-        retrofitErrorHandler { api.likePost(form) }
+        retrofitErrorHandler { api.likePost(authorization = account?.bearer, form) }
             .fold(
                 onSuccess = {
                     Result.success(it.post_view)
@@ -634,7 +640,7 @@ class LemmyApiClient @Inject constructor(
             auth = account.jwt,
         )
 
-        retrofitErrorHandler { api.likeComment(form) }
+        retrofitErrorHandler { api.likeComment(authorization = account?.bearer, form) }
             .fold(
                 onSuccess = {
                     Result.success(it.comment_view)
@@ -656,7 +662,7 @@ class LemmyApiClient @Inject constructor(
             auth = account.jwt,
         )
 
-        retrofitErrorHandler { api.followCommunity(form) }
+        retrofitErrorHandler { api.followCommunity(authorization = account?.bearer, form) }
             .fold(
                 onSuccess = {
                     Result.success(it.community_view)
@@ -687,7 +693,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.banUserFromCommunity(form)
+            api.banUserFromCommunity(authorization = account?.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -708,7 +714,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.modUser(form)
+            api.modUser(authorization = account?.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -723,11 +729,11 @@ class LemmyApiClient @Inject constructor(
         val form = DistinguishComment(
             commentId,
             distinguish,
-            account.jwt
+            account.jwt,
         )
 
         return retrofitErrorHandler {
-            api.distinguishComment(form)
+            api.distinguishComment(authorization = account?.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -748,7 +754,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.removeComment(form)
+            api.removeComment(authorization = account?.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -769,7 +775,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.createComment(form)
+            api.createComment(authorization = account?.bearer, form)
         }.fold(
             onSuccess = { Result.success(it.comment_view) },
             onFailure = { Result.failure(it) },
@@ -788,7 +794,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.editComment(form)
+            api.editComment(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -810,7 +816,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.deleteComment(form)
+            api.deleteComment(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -839,7 +845,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.createPost(form)
+            api.createPost(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -868,7 +874,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.editPost(form)
+            api.editPost(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -887,7 +893,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.deletePost(form)
+            api.deletePost(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -912,7 +918,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.featurePost(form)
+            api.featurePost(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -935,7 +941,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.lockPost(form)
+            api.lockPost(authorization = account?.bearer, form)
         }.fold(
             onSuccess = { Result.success(it.post_view) },
             onFailure = { Result.failure(it) },
@@ -956,7 +962,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.removePost(form)
+            api.removePost(authorization = account?.bearer, form)
         }.fold(
             onSuccess = { Result.success(it.post_view) },
             onFailure = { Result.failure(it) },
@@ -977,7 +983,7 @@ class LemmyApiClient @Inject constructor(
         val cookie = "jwt=${account.jwt}"
 
         return retrofitErrorHandler {
-            api.uploadImage(url, cookie, part)
+            api.uploadImage(authorization = account?.bearer, url, cookie, part)
         }.fold(
             onSuccess = {
                 val imageUrl = "$url/${it.files?.get(0)?.file}"
@@ -1001,7 +1007,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.blockCommunity(form)
+            api.blockCommunity(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.community_view)
@@ -1024,10 +1030,33 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.blockPerson(form)
+            api.blockPerson(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.person_view)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun blockInstance(
+        instanceId: InstanceId,
+        block: Boolean,
+        account: Account,
+    ): Result<BlockInstanceResponse> {
+        val form = BlockInstance(
+            instance_id = instanceId,
+            block = block,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.blockInstance(authorization = account?.bearer, form)
+        }.fold(
+            onSuccess = {
+                Result.success(it)
             },
             onFailure = {
                 Result.failure(it)
@@ -1053,9 +1082,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPersonDetailsNoCache(form.serializeToMap())
+                api.getPersonDetailsNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getPersonDetails(form.serializeToMap())
+                api.getPersonDetails(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1085,9 +1114,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getRepliesNoCache(form.serializeToMap())
+                api.getRepliesNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getReplies(form.serializeToMap())
+                api.getReplies(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1117,9 +1146,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPersonMentionsNoCache(form.serializeToMap())
+                api.getPersonMentionsNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getPersonMentions(form.serializeToMap())
+                api.getPersonMentions(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1147,9 +1176,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPrivateMessagesNoCache(form.serializeToMap())
+                api.getPrivateMessagesNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getPrivateMessages(form.serializeToMap())
+                api.getPrivateMessages(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1177,9 +1206,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getReportMessagesNoCache(form.serializeToMap())
+                api.getReportMessagesNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getReportMessages(form.serializeToMap())
+                api.getReportMessages(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1208,9 +1237,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPostReportsNoCache(form.serializeToMap())
+                api.getPostReportsNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getPostReports(form.serializeToMap())
+                api.getPostReports(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1234,7 +1263,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.resolvePostReport(form)
+            api.resolvePostReport(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1262,9 +1291,9 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getCommentReportsNoCache(form.serializeToMap())
+                api.getCommentReportsNoCache(authorization = account?.bearer, form.serializeToMap())
             } else {
-                api.getCommentReports(form.serializeToMap())
+                api.getCommentReports(authorization = account?.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1288,7 +1317,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.resolveCommentReport(form)
+            api.resolveCommentReport(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1310,7 +1339,7 @@ class LemmyApiClient @Inject constructor(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markCommentReplyAsRead(form)
+            api.markCommentReplyAsRead(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -1332,7 +1361,7 @@ class LemmyApiClient @Inject constructor(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markPersonMentionAsRead(form)
+            api.markPersonMentionAsRead(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.person_mention_view)
@@ -1354,7 +1383,7 @@ class LemmyApiClient @Inject constructor(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markPrivateMessageAsRead(form)
+            api.markPrivateMessageAsRead(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.private_message_view)
@@ -1372,7 +1401,7 @@ class LemmyApiClient @Inject constructor(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markAllAsRead(form)
+            api.markAllAsRead(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1394,7 +1423,7 @@ class LemmyApiClient @Inject constructor(
             auth = account.jwt,
         )
         return retrofitErrorHandler {
-            api.createPrivateMessage(form)
+            api.createPrivateMessage(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.private_message_view)
@@ -1413,7 +1442,7 @@ class LemmyApiClient @Inject constructor(
         val form = SavePost(postId, save, account.jwt)
 
         return retrofitErrorHandler {
-            api.savePost(form)
+            api.savePost(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -1432,7 +1461,7 @@ class LemmyApiClient @Inject constructor(
         val form = SaveComment(commentId, save, account.jwt)
 
         return retrofitErrorHandler {
-            api.saveComment(form)
+            api.saveComment(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -1455,7 +1484,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.createPostReport(form)
+            api.createPostReport(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1478,7 +1507,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.createCommentReport(form)
+            api.createCommentReport(authorization = account?.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1491,7 +1520,7 @@ class LemmyApiClient @Inject constructor(
 
     suspend fun saveUserSettings(settings: SaveUserSettings): Result<Unit> {
         return retrofitErrorHandler {
-            api.saveUserSettings(settings)
+            api.saveUserSettings(authorization = settings.auth.toBearer(), settings)
         }.fold(
             onSuccess = {
                 Result.success(Unit)
@@ -1508,11 +1537,11 @@ class LemmyApiClient @Inject constructor(
     ): Result<ResolveObjectResponse> {
         val form = ResolveObject(
             q = q,
-            auth = account.jwt
+            auth = account.jwt,
         )
 
         return retrofitErrorHandler {
-            api.resolveObject(form.serializeToMap())
+            api.resolveObject(authorization = account?.bearer, form.serializeToMap())
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1584,12 +1613,17 @@ class LemmyApiClient @Inject constructor(
             if (errMsg == "rate_limit_error") {
                 return Result.failure(RateLimitException(0L))
             }
+            // TODO: Remove these checks once v0.19 is out for everyone.
+            if (errMsg?.contains("unknown variant") == true || (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))) {
+                return Result.failure(NewApiException("v0.19"))
+            }
 
             if (BuildConfig.DEBUG) {
                 Log.e(
                     "ApiError",
                     "Code: $errorCode Error message: $errMsg Call: ${call().request().url}",
-                    RuntimeException())
+                    RuntimeException(),
+                )
             }
 
             if (errMsg?.contains("timeout", ignoreCase = true) == true) {
@@ -1603,6 +1637,12 @@ class LemmyApiClient @Inject constructor(
             return Result.failure(ClientApiException(errMsg, errorCode))
         }
     }
+
+    private val Account.bearer: String
+        get() = "Bearer $jwt"
+
+    private fun String.toBearer(): String =
+        "Bearer $this"
 }
 
 class UploadImageResult(

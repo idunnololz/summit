@@ -7,20 +7,17 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Space
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
-import androidx.core.view.marginTop
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
@@ -28,14 +25,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.databinding.CommentActionsViewBinding
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
@@ -57,7 +52,6 @@ import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
-import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
@@ -376,7 +370,6 @@ class PostAndCommentViewBuilder @Inject constructor(
                 headerView.visibility = View.VISIBLE
             }
             null -> {
-
             }
         }
     }
@@ -455,12 +448,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
         } else {
             val button1 = ImageView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     topToTop = existingActionButton.id
                     bottomToBottom = existingActionButton.id
@@ -479,12 +472,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             root.addView(button1)
 
             val upvoteCount = TextView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     topToTop = existingActionButton.id
                     bottomToBottom = existingActionButton.id
@@ -501,14 +494,13 @@ class PostAndCommentViewBuilder @Inject constructor(
             root.addView(upvoteCount)
 
             val button2 = ImageView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
-
                     topToTop = existingActionButton.id
                     bottomToBottom = existingActionButton.id
 
@@ -625,7 +617,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(holder) {
-
         val isCompactView = this.rawBinding is PostCommentExpandedCompactItemBinding
 
         with(holder) {
@@ -771,7 +762,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 scoreView = scoreCount,
                 upvoteCount = upvoteCount,
                 downvoteCount = downvoteCount,
-                onUpdate = { vote, totalScore, upvotes, downvotes, ->
+                onUpdate = { vote, totalScore, upvotes, downvotes ->
                     if (vote < 0) {
                         if (downvoteCount2 == null || upvoteCount2 == null) {
                             scoreCount2?.setTextColor(downvoteColor)
@@ -1139,30 +1130,31 @@ class PostAndCommentViewBuilder @Inject constructor(
             is InboxItem.MentionInboxItem -> {
                 TextViewCompat.setCompoundDrawableTintList(
                     b.author,
-                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle))
+                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle)),
                 )
                 context.getDrawableCompat(R.drawable.baseline_at_24)
             }
             is InboxItem.MessageInboxItem -> {
                 TextViewCompat.setCompoundDrawableTintList(
                     b.author,
-                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle))
+                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle)),
                 )
                 context.getDrawableCompat(R.drawable.baseline_email_24)
             }
             is InboxItem.ReplyInboxItem -> {
                 TextViewCompat.setCompoundDrawableTintList(
                     b.author,
-                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle))
+                    ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle)),
                 )
                 context.getDrawableCompat(R.drawable.baseline_reply_24)
             }
             is InboxItem.ReportMessageInboxItem,
             is InboxItem.ReportPostInboxItem,
-            is InboxItem.ReportCommentInboxItem, -> {
+            is InboxItem.ReportCommentInboxItem,
+            -> {
                 TextViewCompat.setCompoundDrawableTintList(
                     b.author,
-                    ColorStateList.valueOf(context.getColorCompat(R.color.style_red))
+                    ColorStateList.valueOf(context.getColorCompat(R.color.style_red)),
                 )
                 context.getDrawableCompat(R.drawable.baseline_outlined_flag_24)
             }
@@ -1347,12 +1339,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
         } else {
             val button1 = ImageView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     topToBottom = R.id.bottomBarrier
                     if (leftHandMode) {
@@ -1375,12 +1367,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
 
             val scoreCount = TextView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     topToTop = button1.id
                     bottomToBottom = button1.id
@@ -1401,12 +1393,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             root.addView(scoreCount)
 
             val button2 = ImageView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     topToTop = button1.id
                     bottomToBottom = button1.id
@@ -1464,7 +1456,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             id = View.generateViewId()
             layoutParams = ConstraintLayout.LayoutParams(
                 Utils.convertDpToPixel(1f).toInt(),
-                0
+                0,
             ).apply {
                 topToTop = downvoteButton.id
                 bottomToBottom = downvoteButton.id
@@ -1497,7 +1489,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             id = View.generateViewId()
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
             ).apply {
                 topToTop = downvoteButton.id
                 bottomToBottom = downvoteButton.id
@@ -1523,14 +1515,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
         root.addView(commentButton)
 
-
         val actionsDivider2 = MaterialDivider(
             context,
         ).apply {
             id = View.generateViewId()
             layoutParams = ConstraintLayout.LayoutParams(
                 Utils.convertDpToPixel(1f).toInt(),
-                0
+                0,
             ).apply {
                 topToTop = downvoteButton.id
                 bottomToBottom = downvoteButton.id
@@ -1555,7 +1546,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             id = View.generateViewId()
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
             ).apply {
                 topToTop = downvoteButton.id
                 bottomToBottom = downvoteButton.id
@@ -1596,7 +1587,14 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
     }
 
-    fun bindMissingCommentItem(b: PostMissingCommentItemBinding, depth: Int, baseDepth: Int) {
+    fun bindMissingCommentItem(
+        b: PostMissingCommentItemBinding,
+        depth: Int,
+        baseDepth: Int,
+        isExpanded: Boolean,
+        onToggleClick: () -> Unit,
+    ) {
+        b.text.disableTouch = true
         b.text.text = buildSpannedString {
             append(context.getString(R.string.missing_comment_special))
             setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
@@ -1607,6 +1605,19 @@ class PostAndCommentViewBuilder @Inject constructor(
             baseDepth = baseDepth,
             commentUiConfig.indentationPerLevelDp,
         )
+
+        if (isExpanded) {
+            b.state.setImageResource(R.drawable.baseline_expand_less_18)
+        } else {
+            b.state.setImageResource(R.drawable.baseline_expand_more_18)
+        }
+
+        b.root.setOnClickListener {
+            onToggleClick()
+        }
+        b.state.setOnClickListener {
+            onToggleClick()
+        }
     }
 
     fun recycle(b: PostHeaderItemBinding): RecycledState {
@@ -1681,7 +1692,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         upvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
         downvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
-
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {
         headerView.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()

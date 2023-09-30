@@ -15,8 +15,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginBottom
-import androidx.core.view.marginTop
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
@@ -24,7 +22,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
@@ -56,8 +53,6 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
-import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -192,16 +187,22 @@ class PostListViewBuilder @Inject constructor(
                             id = View.generateViewId()
                             layoutParams = ConstraintLayout.LayoutParams(
                                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                                ConstraintLayout.LayoutParams.WRAP_CONTENT
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
                             ).apply {
                                 startToEnd = R.id.score_text
                                 baselineToBaseline = R.id.comment_text
                                 marginStart = context.getDimen(R.dimen.padding_half)
                             }
                             setCompoundDrawablesRelativeWithIntrinsicBounds(
-                                R.drawable.baseline_arrow_downward_16, 0, 0, 0)
+                                R.drawable.baseline_arrow_downward_16,
+                                0,
+                                0,
+                                0,
+                            )
                             TextViewCompat.setCompoundDrawableTintList(
-                                this, ColorStateList.valueOf(normalTextColor))
+                                this,
+                                ColorStateList.valueOf(normalTextColor),
+                            )
                             includeFontPadding = false
                             setBackgroundResource(selectableItemBackground)
                             gravity = Gravity.CENTER
@@ -526,8 +527,8 @@ class PostListViewBuilder @Inject constructor(
                     val imageUrl = thumbnailImageUrl ?: url
                     val backupImageUrl = if (imageUrl != url &&
                         url != null &&
-                        ContentUtils.isUrlImage(url)) {
-
+                        ContentUtils.isUrlImage(url)
+                    ) {
                         url
                     } else {
                         null
@@ -558,7 +559,7 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     fun loadImage(useBackupUrl: Boolean = false) {
-                        val urlToLoad = if(useBackupUrl) {
+                        val urlToLoad = if (useBackupUrl) {
                             backupImageUrl
                         } else {
                             imageUrl
@@ -978,7 +979,7 @@ class PostListViewBuilder @Inject constructor(
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     if (leftHandMode) {
                         endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
@@ -988,9 +989,15 @@ class PostListViewBuilder @Inject constructor(
                     topToBottom = R.id.bottomBarrier
                 }
                 setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.baseline_comment_18, 0, 0, 0)
+                    R.drawable.baseline_comment_18,
+                    0,
+                    0,
+                    0,
+                )
                 TextViewCompat.setCompoundDrawableTintList(
-                    this, ColorStateList.valueOf(normalTextColor))
+                    this,
+                    ColorStateList.valueOf(normalTextColor),
+                )
                 compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
                 includeFontPadding = false
                 setPadding(context.getDimen(R.dimen.padding))
@@ -1046,7 +1053,7 @@ class PostListViewBuilder @Inject constructor(
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     if (leftHandMode) {
                         endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
@@ -1056,9 +1063,15 @@ class PostListViewBuilder @Inject constructor(
                     topToBottom = R.id.bottomBarrier
                 }
                 setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.baseline_comment_18, 0, 0, 0)
+                    R.drawable.baseline_comment_18,
+                    0,
+                    0,
+                    0,
+                )
                 TextViewCompat.setCompoundDrawableTintList(
-                    this, ColorStateList.valueOf(normalTextColor))
+                    this,
+                    ColorStateList.valueOf(normalTextColor),
+                )
                 compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
                 includeFontPadding = false
                 setPadding(context.getDimen(R.dimen.padding))
@@ -1070,12 +1083,12 @@ class PostListViewBuilder @Inject constructor(
             root.addView(commentButton)
 
             val button1 = ImageView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     topToTop = commentButton.id
                     bottomToBottom = commentButton.id
@@ -1093,12 +1106,12 @@ class PostListViewBuilder @Inject constructor(
             root.addView(button1)
 
             val upvoteCount = TextView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
                     topToTop = commentButton.id
                     bottomToBottom = commentButton.id
@@ -1115,14 +1128,13 @@ class PostListViewBuilder @Inject constructor(
             root.addView(upvoteCount)
 
             val button2 = ImageView(
-                context
+                context,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
-
                     topToTop = commentButton.id
                     bottomToBottom = commentButton.id
 
@@ -1152,5 +1164,4 @@ class PostListViewBuilder @Inject constructor(
             }
         }
     }
-
 }

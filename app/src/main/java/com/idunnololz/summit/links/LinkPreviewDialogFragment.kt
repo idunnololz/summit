@@ -11,7 +11,6 @@ import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentLinkPreviewBinding
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -22,7 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBinding>() {
 
     companion object {
-        fun show(fragmentManager: FragmentManager, url: String,) {
+        fun show(fragmentManager: FragmentManager, url: String) {
             LinkPreviewDialogFragment()
                 .apply {
                     arguments = LinkPreviewDialogFragmentArgs(url).toBundle()
@@ -74,7 +73,8 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
                 dismiss()
             }
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+            )
 
             url.text = args.url
 
@@ -105,7 +105,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
                 onError = { _, _ ->
                     imageError.visibility = View.VISIBLE
                     imageError.text = getString(R.string.error_no_preview_image)
-                }
+                },
             )
         }
 

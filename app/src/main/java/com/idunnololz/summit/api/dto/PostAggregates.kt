@@ -18,6 +18,8 @@ data class PostAggregates(
     val newest_comment_time: String,
     val featured_community: Boolean,
     val featured_local: Boolean,
-    val hot_rank: Int? = null,
-    val hot_rank_active: Int? = null,
+    val hot_rank: Double? = null,
+    val hot_rank_active: Double? = null,
+    val scaled_rank: Double? = null,
+    val controversy_rank: Double? = null,
 ) : Parcelable

@@ -13,7 +13,6 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -45,7 +44,6 @@ import com.idunnololz.summit.util.ContentUtils.isUrlMp4
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.ext.setup
@@ -289,9 +287,9 @@ class LemmyContentHelper(
                                 }
                             }
                         }
-                    }, {
-
-                    }
+                    },
+                    {
+                    },
                 )
             }
 
@@ -636,10 +634,12 @@ class LemmyContentHelper(
                 }
             }
 
-            if ((alwaysShowLinkBelowPost ||
+            if ((
+                alwaysShowLinkBelowPost ||
                     postType == PostType.Link ||
-                    postType == PostType.Text) && showLink) {
-
+                    postType == PostType.Text
+                ) && showLink
+            ) {
                 if (targetPostView.post.embed_video_url != null) {
                     appendUiForExternalOrInternalUrl(targetPostView.post.embed_video_url)
                 } else if (targetPostView.post.url != null &&

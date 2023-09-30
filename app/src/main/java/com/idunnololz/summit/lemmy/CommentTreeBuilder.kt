@@ -91,9 +91,12 @@ class CommentTreeBuilder(
                         .lastOrNull()
                         ?.toIntOrNull()
 
-                    Log.d(TAG, "Can't find parent id: ${commentView.comment.comment.path} " +
-                        "parentNodeId: $cParentId parentParentNodeId: $parentParentNodeId " +
-                        "depth: ${node.depth}")
+                    Log.d(
+                        TAG,
+                        "Can't find parent id: ${commentView.comment.comment.path} " +
+                            "parentNodeId: $cParentId parentParentNodeId: $parentParentNodeId " +
+                            "depth: ${node.depth}",
+                    )
 
                     // Let's make a dummy comment in this case!
                     val parentNodeData = CommentNodeData(
@@ -112,7 +115,8 @@ class CommentTreeBuilder(
         map.values.forEach { node ->
             val commentView = node.commentView
             if (commentView !is PostViewModel.ListView.CommentListView &&
-                commentView !is PostViewModel.ListView.MissingCommentItem) {
+                commentView !is PostViewModel.ListView.MissingCommentItem
+            ) {
                 return@forEach
             }
 
@@ -147,7 +151,8 @@ class CommentTreeBuilder(
                 }
                 is PostViewModel.ListView.MoreCommentsItem,
                 is PostViewModel.ListView.PendingCommentListView,
-                is PostViewModel.ListView.PostListView -> {}
+                is PostViewModel.ListView.PostListView,
+                -> {}
             }
         }
 
@@ -226,7 +231,8 @@ class CommentTreeBuilder(
                     }
                     is PostViewModel.ListView.MoreCommentsItem,
                     is PostViewModel.ListView.PostListView,
-                    is PostViewModel.ListView.MissingCommentItem -> {}
+                    is PostViewModel.ListView.MissingCommentItem,
+                    -> {}
                 }
             }
 
@@ -263,7 +269,8 @@ class CommentTreeBuilder(
                 }
                 is PostViewModel.ListView.MoreCommentsItem,
                 is PostViewModel.ListView.PostListView,
-                is PostViewModel.ListView.MissingCommentItem -> {}
+                is PostViewModel.ListView.MissingCommentItem,
+                -> {}
             }
         }
 

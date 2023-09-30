@@ -50,8 +50,8 @@ class DraftsManager @Inject constructor(
                     System.currentTimeMillis(),
                     System.currentTimeMillis(),
                     draftData.type,
-                    draftData
-                )
+                    draftData,
+                ),
             )
         }
         if (showToast) {
@@ -118,13 +118,15 @@ class DraftsManager @Inject constructor(
                     "aaaa",
                 )
 
-                draftsDao.insert(DraftEntry(
-                    id = 0,
-                    creationTs = System.currentTimeMillis(),
-                    updatedTs = System.currentTimeMillis(),
-                    draftType = draftData.type,
-                    data = draftData
-                ))
+                draftsDao.insert(
+                    DraftEntry(
+                        id = 0,
+                        creationTs = System.currentTimeMillis(),
+                        updatedTs = System.currentTimeMillis(),
+                        draftType = draftData.type,
+                        data = draftData,
+                    ),
+                )
             }
         }
     }
