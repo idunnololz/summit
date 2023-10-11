@@ -10,6 +10,7 @@ import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
+import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PrettyPrintUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -52,6 +53,8 @@ object SettingPath {
                 context.getString(R.string.logging)
             HistorySettings::class ->
                 context.getString(R.string.history)
+            NavigationSettings::class ->
+                context.getString(R.string.navigation)
 
             else -> error("No name for $this")
         }
@@ -144,6 +147,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.history),
         context.getString(R.string.history_desc),
     )
+    val navigationSettings = BasicSettingItem(
+        R.drawable.outline_navigation_24,
+        context.getString(R.string.navigation),
+        context.getString(R.string.navigation_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -171,6 +179,7 @@ class MainSettings @Inject constructor(
                 settingHiddenPosts,
                 loggingSettings,
                 historySettings,
+                navigationSettings,
                 settingAbout,
                 settingSummitCommunity,
                 patreonSettings,
@@ -1186,6 +1195,7 @@ class AllSettings @Inject constructor(
     private val miscSettings: MiscSettings,
     private val loggingSettings: LoggingSettings,
     private val historySettings: HistorySettings,
+    private val navigationSettings: NavigationSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -1202,17 +1212,20 @@ class AllSettings @Inject constructor(
         miscSettings,
         loggingSettings,
         historySettings,
+        navigationSettings,
     )
 
     init {
-        val classes: MutableSet<KClass<*>> =
-            SearchableSettings::class.sealedSubclasses.toMutableSet()
-        allSearchableSettings.forEach {
-            classes.remove(it::class)
-        }
+        if (BuildConfig.DEBUG) {
+            val classes: MutableSet<KClass<*>> =
+                SearchableSettings::class.sealedSubclasses.toMutableSet()
+            allSearchableSettings.forEach {
+                classes.remove(it::class)
+            }
 
-        assert(classes.isEmpty()) {
-            "Some setting pages not added: $classes"
+            assert(classes.isEmpty()) {
+                "Some setting pages not added: $classes"
+            }
         }
     }
 }
@@ -1361,5 +1374,104 @@ class HistorySettings @Inject constructor(
 
     override val allSettings: List<SettingItem> = listOf(
         recordBrowsingHistory,
+    )
+}
+
+@Singleton
+class NavigationSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val navBarDestOptions =
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Home,
+                context.getString(R.string.home),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.History,
+                context.getString(R.string.history),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Inbox,
+                context.getString(R.string.inbox),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Saved,
+                context.getString(R.string.save),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Search,
+                context.getString(R.string.search),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.None,
+                context.getString(R.string.none),
+                null,
+                null,
+            ),
+        )
+
+    val useCustomNavBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_custom_navigation_bar),
+        context.getString(R.string.use_custom_navigation_bar_desc),
+    )
+
+    val navBarDest1 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "1"),
+        null,
+        navBarDestOptions,
+    )
+
+    val navBarDest2 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "2"),
+        null,
+        navBarDestOptions,
+    )
+
+    val navBarDest3 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "3"),
+        null,
+        navBarDestOptions,
+    )
+
+    val navBarDest4 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "4"),
+        null,
+        navBarDestOptions,
+    )
+
+    val navBarDest5 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "5"),
+        null,
+        navBarDestOptions,
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        navBarDest1,
+        navBarDest2,
+        navBarDest3,
+        navBarDest4,
+        navBarDest5,
     )
 }

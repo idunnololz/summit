@@ -636,6 +636,12 @@
     <string name="error_unable_to_block_community">Failed to block community</string>
     <string name="error_unable_to_block_person">Failed to block person</string>
     <string name="error_new_api_format">This feature is unsupported by your Lemmy instance. This is likely because your instance version is too low. This feature requires the instance to be on %1$s or up.</string>
+    <string name="navigation">Navigation</string>
+    <string name="navigation_desc">Change how you navigate the app</string>
+    <string name="nav_bar_option_format">Nav bar option %1$s</string>
+    <string name="use_custom_navigation_bar">Use custom navigation bar</string>
+    <string name="use_custom_navigation_bar_desc">Enables customizations to the navigation bar.</string>
+    <string name="navigation_options">Navigation options</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

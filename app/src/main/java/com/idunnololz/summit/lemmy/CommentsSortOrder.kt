@@ -1,16 +1,31 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
+import android.os.Parcelable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentSortType
+import com.squareup.moshi.JsonClass
+import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import kotlinx.parcelize.Parcelize
 
-enum class CommentsSortOrder(
-    val key: String,
-) {
-    Hot("hot"),
-    Top("top"),
-    New("new"),
-    Old("old"),
+@JsonClass(generateAdapter = true, generator = "sealed:t")
+sealed interface CommentsSortOrder : Parcelable {
+
+    @Parcelize
+    @TypeLabel("1")
+    data object Hot : CommentsSortOrder
+
+    @Parcelize
+    @TypeLabel("2")
+    data object Top : CommentsSortOrder
+
+    @Parcelize
+    @TypeLabel("3")
+    data object New : CommentsSortOrder
+
+    @Parcelize
+    @TypeLabel("4")
+    data object Old : CommentsSortOrder
 }
 
 fun CommentsSortOrder.getLocalizedName(context: Context) =

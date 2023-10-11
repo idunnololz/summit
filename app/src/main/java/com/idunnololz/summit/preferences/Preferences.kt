@@ -14,6 +14,8 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
+import com.idunnololz.summit.settings.navigation.NavBarConfig
+import com.idunnololz.summit.settings.navigation.NavBarDestId
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
@@ -45,6 +47,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
+import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
@@ -66,9 +69,11 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
+import com.idunnololz.summit.util.PreferenceUtil.putList
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.fromJsonSafe
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -322,13 +327,17 @@ class Preferences @Inject constructor(
     var defaultCommunitySortOrder: CommunitySortOrder?
         get() = moshi.fromJsonSafe(prefs.getString(KEY_DEFAULT_COMMUNITY_SORT_ORDER, null))
         set(value) {
-            prefs.edit().putString(KEY_DEFAULT_COMMUNITY_SORT_ORDER, moshi.toJsonSafe(value)).apply()
+            prefs.edit()
+                .putString(KEY_DEFAULT_COMMUNITY_SORT_ORDER, moshi.toJsonSafe(value))
+                .apply()
         }
 
     var defaultCommentsSortOrder: CommentsSortOrder?
         get() = moshi.fromJsonSafe(prefs.getString(KEY_DEFAULT_COMMENTS_SORT_ORDER, null))
         set(value) {
-            prefs.edit().putString(KEY_DEFAULT_COMMENTS_SORT_ORDER, moshi.toJsonSafe(value)).apply()
+            prefs.edit()
+                .putString(KEY_DEFAULT_COMMENTS_SORT_ORDER, moshi.toJsonSafe(value))
+                .apply()
         }
 
     var alwaysShowLinkButtonBelowPost: Boolean
@@ -561,6 +570,20 @@ class Preferences @Inject constructor(
             prefs.edit()
                 .putBoolean(KEY_TRACK_BROWSING_HISTORY, value)
                 .apply()
+        }
+
+    var useCustomNavBar: Boolean
+        get() = prefs.getBoolean(KEY_USE_CUSTOM_NAV_BAR, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_CUSTOM_NAV_BAR, value)
+                .apply()
+        }
+
+    var navBarConfig: NavBarConfig
+        get() = prefs.getMoshiValue<NavBarConfig>(KEY_NAV_BAR_ITEMS) ?: NavBarConfig()
+        set(value) {
+            prefs.putMoshiValue(KEY_NAV_BAR_ITEMS, value)
         }
 
     fun reset(key: String) {

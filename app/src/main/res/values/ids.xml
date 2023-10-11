@@ -130,4 +130,5 @@
     <item name="sort_order_scaled" type="id" />
     <item name="block_instance" type="id" />
     <item name="unblock_instance" type="id" />
+    <item name="custom_nav_bar" type="id" />
 </resources>
