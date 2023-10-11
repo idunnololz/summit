@@ -263,3 +263,11 @@ fun ColorSettingItem.bindTo(
             .show()
     }
 }
+
+var SettingTextValueBinding.isEnabled: Boolean
+    get() = root.isEnabled
+    set(value) {
+        root.isEnabled = value
+        this.title.isEnabled = value
+        this.value.isEnabled = value
+    }

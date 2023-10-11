@@ -140,10 +140,25 @@
             app:popExitAnim="@anim/slide_out"  />
         <action
             android:id="@+id/action_settingsFragment_to_settingLoggingFragment"
-            app:destination="@id/settingLoggingFragment" />
+            app:destination="@id/settingLoggingFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
         <action
             android:id="@+id/action_settingsFragment_to_historyFragment2"
-            app:destination="@id/historyFragment2" />
+            app:destination="@id/historyFragment2"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingNavigationFragment"
+            app:destination="@id/settingNavigationFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -227,4 +242,8 @@
         android:id="@+id/historyFragment2"
         android:name="com.idunnololz.summit.history.HistoryFragment"
         android:label="HistoryFragment" />
+    <fragment
+        android:id="@+id/settingNavigationFragment"
+        android:name="com.idunnololz.summit.settings.navigation.SettingNavigationFragment"
+        android:label="SettingNavigationFragment" />
 </navigation>

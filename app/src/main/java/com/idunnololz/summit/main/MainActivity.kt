@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -65,6 +66,7 @@ import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
+import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
@@ -226,6 +228,76 @@ class MainActivity : BaseActivity() {
             binding.notificationBarBgContainer.visibility = View.GONE
         } else {
             binding.notificationBarBgContainer.visibility = View.VISIBLE
+        }
+
+        if (preferences.useCustomNavBar) {
+            binding.bottomNavigationView.setTag(R.id.custom_nav_bar, true)
+            binding.bottomNavigationView.menu.apply {
+                clear()
+                val navBarDestinations = preferences.navBarConfig.navBarDestinations
+                for (dest in navBarDestinations) {
+                    when (dest) {
+                        NavBarDestinations.Home -> {
+                            add(
+                                Menu.NONE,
+                                R.id.mainFragment,
+                                Menu.NONE,
+                                getString(R.string.home),
+                            ).apply {
+                                setIcon(R.drawable.baseline_home_24)
+                            }
+                        }
+                        NavBarDestinations.Saved -> {
+                            add(
+                                Menu.NONE,
+                                R.id.savedFragment,
+                                Menu.NONE,
+                                getString(R.string.saved),
+                            ).apply {
+                                setIcon(R.drawable.baseline_bookmark_24)
+                            }
+                        }
+                        NavBarDestinations.Search -> {
+                            add(
+                                Menu.NONE,
+                                R.id.searchFragment,
+                                Menu.NONE,
+                                getString(R.string.search),
+                            ).apply {
+                                setIcon(R.drawable.baseline_search_24)
+                            }
+                        }
+                        NavBarDestinations.History -> {
+                            add(
+                                Menu.NONE,
+                                R.id.historyFragment,
+                                Menu.NONE,
+                                getString(R.string.history),
+                            ).apply {
+                                setIcon(R.drawable.baseline_history_24)
+                            }
+                        }
+                        NavBarDestinations.Inbox -> {
+                            add(
+                                Menu.NONE,
+                                R.id.inboxTabbedFragment,
+                                Menu.NONE,
+                                getString(R.string.inbox),
+                            ).apply {
+                                setIcon(R.drawable.baseline_inbox_24)
+                            }
+                        }
+                        NavBarDestinations.None -> {
+                        }
+                    }
+                }
+            }
+        } else {
+            if (binding.bottomNavigationView.getTag(R.id.custom_nav_bar) == true) {
+                binding.bottomNavigationView.menu.clear()
+                binding.bottomNavigationView.inflateMenu(R.menu.bottom_navigation_menu)
+                binding.bottomNavigationView.setTag(R.id.custom_nav_bar, false)
+            }
         }
     }
 

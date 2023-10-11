@@ -1,5 +1,6 @@
 package com.idunnololz.summit.settings.dialogs
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.core.view.WindowCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentBottomMenuBinding
 import com.idunnololz.summit.settings.RadioGroupSettingItem
+import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -15,7 +17,8 @@ import com.idunnololz.summit.util.getParcelableCompat
 
 class MultipleChoiceDialogFragment :
     BaseDialogFragment<DialogFragmentBottomMenuBinding>(),
-    FullscreenDialogFragment {
+    FullscreenDialogFragment,
+    BackPressHandler {
 
     companion object {
         private const val ARG_SETTING_ITEM = "ARG_SETTING_ITEM"
@@ -35,6 +38,8 @@ class MultipleChoiceDialogFragment :
             }
     }
 
+    private var bottomMenu: BottomMenu? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,6 +53,7 @@ class MultipleChoiceDialogFragment :
             dialog.window?.let { window ->
                 window.setBackgroundDrawable(null)
                 WindowCompat.setDecorFitsSystemWindows(window, false)
+                window.setWindowAnimations(R.style.BottomSheetAnimations)
             }
         }
     }
@@ -83,6 +89,7 @@ class MultipleChoiceDialogFragment :
             null
         }
 
+
         BottomMenu(requireContext())
             .apply {
                 setTitle(settingItem.title)
@@ -108,6 +115,30 @@ class MultipleChoiceDialogFragment :
                     dismiss()
                 }
             }
+            .also {
+                bottomMenu = it
+            }
             .show(requireMainActivity(), binding.root, handleBackPress = false, expandFully = true)
     }
+
+    override fun dismiss() {
+        super.dismiss()
+        bottomMenu?.close()
+    }
+
+    override fun dismissAllowingStateLoss() {
+        super.dismissAllowingStateLoss()
+        bottomMenu?.close()
+    }
+
+    override fun onBackPressed(): Boolean {
+        bottomMenu?.close()
+
+        return true
+    }
+
+    //    override fun onDismiss(dialog: DialogInterface) {
+//        super.onDismiss(dialog)
+//
+//    }
 }
