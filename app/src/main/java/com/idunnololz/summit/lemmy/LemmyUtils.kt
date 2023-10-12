@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Point
 import android.icu.text.CompactDecimalFormat
+import android.icu.text.DecimalFormat
 import android.net.Uri
 import android.os.Build
 import android.view.View
@@ -23,6 +24,8 @@ object LemmyUtils {
 
     private val GIPHY_REGEX = Pattern.compile("\\(giphy\\|([^\\s]*)\\)")
 
+    private var compactDecimalFormat: DecimalFormat? = null
+
     fun formatAuthor(author: String): String = "u/%s".format(author)
 
     fun abbrevNumber(number: Long?): String {
@@ -30,10 +33,12 @@ object LemmyUtils {
             return "⬤"
         }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val formatter = CompactDecimalFormat.getInstance(
+            val formatter = compactDecimalFormat ?: CompactDecimalFormat.getInstance(
                 Locale.getDefault(),
                 CompactDecimalFormat.CompactStyle.SHORT,
-            )
+            ).also {
+                compactDecimalFormat = it
+            }
 
             formatter.format(number)
         } else {

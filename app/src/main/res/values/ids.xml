@@ -131,4 +131,6 @@
     <item name="block_instance" type="id" />
     <item name="unblock_instance" type="id" />
     <item name="custom_nav_bar" type="id" />
+    <item name="scroll_to_top" type="id"/>
+    <item name="back_to_the_beginning" type="id" />
 </resources>

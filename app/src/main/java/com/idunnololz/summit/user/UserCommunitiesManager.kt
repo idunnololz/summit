@@ -72,6 +72,8 @@ class UserCommunitiesManager @Inject constructor(
                 ).sortOrder + 1
 
                 isLoading = false
+
+                Log.d("dbdb", "userCommunitiesDao: ${userCommunitiesDao.count()}")
             }
         }
     }

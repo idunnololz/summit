@@ -295,7 +295,4 @@ object LemmyTextHelper {
                 },
             )
             .build()
-            .also {
-                Log.d(TAG, "createMarkwon()")
-            }
 }

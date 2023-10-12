@@ -723,6 +723,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         binding.rootView.openStartPanel()
     }
 
+    fun backToBeginning() {
+        val tab = tabsManager.currentTab.value ?: return
+        resetCurrentTab(tab)
+    }
+
     private fun resetCurrentTab(tab: TabsManager.Tab) {
         currentNavController?.popBackStack(R.id.community, false)
 

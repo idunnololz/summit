@@ -29,4 +29,7 @@ interface DraftsDao {
 
     @Query("DELETE FROM drafts")
     suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM drafts")
+    abstract suspend fun count(): Int
 }

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.history
 
 import android.content.Context
+import android.util.Log
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -41,6 +42,12 @@ class HistoryManager @Inject constructor(
     private val dbContext = Dispatchers.IO.limitedParallelism(1)
 
     private val historyChangedListeners = arrayListOf<OnHistoryChangedListener>()
+
+    init {
+        coroutineScope.launch {
+            Log.d("dbdb", "historyDao: ${historyDao.count()}")
+        }
+    }
 
     suspend fun getEntireHistory(): List<LiteHistoryEntry> = withContext(Dispatchers.IO) {
         historyDao

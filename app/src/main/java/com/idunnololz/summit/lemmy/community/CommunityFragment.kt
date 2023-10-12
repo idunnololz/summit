@@ -56,6 +56,7 @@ import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -1065,6 +1066,63 @@ class CommunityFragment :
                 )
             }
 
+            val mainFragment = parentFragment?.parentFragment as? MainFragment
+
+            if (mainFragment != null) {
+                addDivider()
+                addItemWithIcon(
+                    id = R.id.back_to_the_beginning,
+                    title = R.string.back_to_the_beginning,
+                    icon = R.drawable.baseline_arrow_upward_24,
+                )
+            }
+
+            if (getMainActivity()?.useBottomNavBar == false) {
+                addDivider()
+                val navBarDestinations = preferences.navBarConfig.navBarDestinations
+                for (dest in navBarDestinations) {
+                    when (dest) {
+                        NavBarDestinations.Home -> {
+//                            addItemWithIcon(
+//                                R.id.mainFragment,
+//                                getString(R.string.home),
+//                                R.drawable.baseline_home_24,
+//                            )
+                        }
+                        NavBarDestinations.Saved -> {
+                            addItemWithIcon(
+                                R.id.savedFragment,
+                                getString(R.string.saved),
+                                R.drawable.baseline_bookmark_24,
+                            )
+                        }
+                        NavBarDestinations.Search -> {
+                            addItemWithIcon(
+                                R.id.searchFragment,
+                                getString(R.string.search),
+                                R.drawable.baseline_search_24,
+                            )
+                        }
+                        NavBarDestinations.History -> {
+                            addItemWithIcon(
+                                R.id.historyFragment,
+                                getString(R.string.history),
+                                R.drawable.baseline_history_24,
+                            )
+                        }
+                        NavBarDestinations.Inbox -> {
+                            addItemWithIcon(
+                                R.id.inboxTabbedFragment,
+                                getString(R.string.inbox),
+                                R.drawable.baseline_inbox_24,
+                            )
+                        }
+                        NavBarDestinations.None -> {
+                        }
+                    }
+                }
+            }
+
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.id) {
                     R.id.create_post -> {
@@ -1166,6 +1224,24 @@ class CommunityFragment :
                                 listOf(),
                             ),
                         )
+                    }
+                    R.id.mainFragment -> {
+                        getMainActivity()?.navigateTopLevel(menuItem.id)
+                    }
+                    R.id.savedFragment -> {
+                        getMainActivity()?.navigateTopLevel(menuItem.id)
+                    }
+                    R.id.searchFragment -> {
+                        getMainActivity()?.navigateTopLevel(menuItem.id)
+                    }
+                    R.id.historyFragment -> {
+                        getMainActivity()?.navigateTopLevel(menuItem.id)
+                    }
+                    R.id.inboxTabbedFragment -> {
+                        getMainActivity()?.navigateTopLevel(menuItem.id)
+                    }
+                    R.id.back_to_the_beginning -> {
+                        mainFragment?.backToBeginning()
                     }
                 }
             }

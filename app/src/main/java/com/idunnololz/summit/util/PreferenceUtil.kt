@@ -164,6 +164,7 @@ object PreferenceUtil {
     const val KEY_TRACK_BROWSING_HISTORY = "KEY_TRACK_BROWSING_HISTORY"
     const val KEY_NAV_BAR_ITEMS = "KEY_NAV_BAR_ITEMS"
     const val KEY_USE_CUSTOM_NAV_BAR = "KEY_USE_CUSTOM_NAV_BAR"
+    const val KEY_USE_BOTTOM_NAV_BAR = "KEY_USE_BOTTOM_NAV_BAR"
 
     const val KEY_PREF_VERSION = "pref_version"
 

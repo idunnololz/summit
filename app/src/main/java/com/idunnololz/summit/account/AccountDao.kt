@@ -40,6 +40,9 @@ abstract class AccountDao {
     @Delete(entity = Account::class)
     abstract suspend fun delete(account: Account)
 
+    @Query("SELECT COUNT(*) FROM account")
+    abstract suspend fun count(): Int
+
     @Transaction
     open suspend fun clearAndSetCurrent(accountId: Int) {
         removeCurrent()

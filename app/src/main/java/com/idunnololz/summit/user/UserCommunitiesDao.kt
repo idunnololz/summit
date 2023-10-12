@@ -24,6 +24,9 @@ interface UserCommunitiesDao {
 
     @Query("DELETE FROM user_communities")
     suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM user_communities")
+    suspend fun count(): Int
 }
 
 @Entity(tableName = "user_communities")

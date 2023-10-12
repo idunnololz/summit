@@ -175,6 +175,8 @@ class PostListViewBuilder @Inject constructor(
         onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
+        var start = System.nanoTime()
+
         val url = postView.post.url
         val thumbnailUrl = postView.post.thumbnail_url
         with(holder) {
@@ -312,6 +314,9 @@ class PostListViewBuilder @Inject constructor(
                 holder.state.preferTitleText = postUiConfig.preferTitleText
             }
 
+            Log.d("HAHA", "s1: ${System.nanoTime() - start}")
+            start = System.nanoTime()
+
             scaleTextSizes()
 
             if (holder.state.preferImagesAtEnd != postUiConfig.preferImagesAtEnd) {
@@ -391,6 +396,9 @@ class PostListViewBuilder @Inject constructor(
 
                 holder.state.preferImagesAtEnd = postUiConfig.preferImagesAtEnd
             }
+
+            Log.d("HAHA", "s2: ${System.nanoTime() - start}")
+            start = System.nanoTime()
 
             val preferFullSizeImages = postUiConfig.preferFullSizeImages &&
                 (rawBinding is ListingItemCardBinding) ||
@@ -490,6 +498,9 @@ class PostListViewBuilder @Inject constructor(
                     videoState,
                 )
             }
+
+            Log.d("HAHA", "s3: ${System.nanoTime() - start}")
+            start = System.nanoTime()
 
             val postType = postView.getType()
             if (updateContent) {
@@ -669,6 +680,9 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
 
+                Log.d("HAHA", "s4: ${System.nanoTime() - start}")
+                start = System.nanoTime()
+
                 linkTypeImage?.visibility = View.GONE
                 iconImage?.visibility = View.GONE
                 iconImage?.setOnClickListener(null)
@@ -797,6 +811,9 @@ class PostListViewBuilder @Inject constructor(
                 onLinkLongClick = onLinkLongClick,
             )
 
+            Log.d("HAHA", "s5: ${System.nanoTime() - start}")
+            start = System.nanoTime()
+
             if (postView.read && !alwaysRenderAsUnread) {
                 if (themeManager.isLightTheme) {
                     title.alpha = 0.41f
@@ -826,6 +843,9 @@ class PostListViewBuilder @Inject constructor(
             }
             commentButton?.isEnabled = !postView.post.locked
 
+
+            Log.d("HAHA", "s6: ${System.nanoTime() - start}")
+            start = System.nanoTime()
             val scoreCount: TextView? = upvoteCount
             if (scoreCount != null) {
                 val upvoteCount: TextView?
@@ -853,6 +873,9 @@ class PostListViewBuilder @Inject constructor(
                     onInstanceMismatch,
                 )
             }
+
+            Log.d("HAHA", "s7: ${System.nanoTime() - start}")
+            start = System.nanoTime()
 
             if (highlightForever) {
                 highlightBg.visibility = View.VISIBLE
@@ -942,6 +965,9 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
             }
+
+            Log.d("HAHA", "s8: ${System.nanoTime() - start}")
+            start = System.nanoTime()
         }
     }
 

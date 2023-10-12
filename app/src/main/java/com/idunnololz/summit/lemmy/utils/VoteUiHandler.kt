@@ -42,6 +42,8 @@ interface VoteUiHandler {
 
     val upvoteColor: Int
     val downvoteColor: Int
+    val neutralColor: Int
+    val controlColor: Int
 }
 
 fun VoteUiHandler.bind(
@@ -157,45 +159,34 @@ fun VoteUiHandler.bind(
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
-    val context = scoreView.context
     fun update(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
         if (upVoteView is ImageView && downVoteView is ImageView) {
             if (vote < 0) {
-                upVoteView.setColorFilter(
-                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-                )
+                upVoteView.setColorFilter(controlColor)
                 downVoteView.setColorFilter(downvoteColor)
             } else if (vote > 0) {
                 upVoteView.setColorFilter(upvoteColor)
-                downVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                downVoteView.setColorFilter(controlColor)
             } else {
-                upVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
-                downVoteView.setColorFilter(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+                upVoteView.setColorFilter(controlColor)
+                downVoteView.setColorFilter(controlColor)
             }
         } else if (upVoteView is MaterialButton && downVoteView is MaterialButton) {
             if (vote < 0) {
                 upVoteView.iconTint =
-                    ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-                    )
+                    ColorStateList.valueOf(controlColor)
                 downVoteView.iconTint =
                     ColorStateList.valueOf(downvoteColor)
             } else if (vote > 0) {
                 upVoteView.iconTint =
                     ColorStateList.valueOf(upvoteColor)
                 downVoteView.iconTint =
-                    ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-                    )
+                    ColorStateList.valueOf(controlColor)
             } else {
                 upVoteView.iconTint =
-                    ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-                    )
+                    ColorStateList.valueOf(controlColor)
                 downVoteView.iconTint =
-                    ColorStateList.valueOf(
-                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-                    )
+                    ColorStateList.valueOf(controlColor)
             }
         }
         if (vote < 0) {
@@ -203,21 +194,21 @@ fun VoteUiHandler.bind(
                 scoreView.setTextColor(downvoteColor)
             } else {
                 downvoteCount.setTextColor(downvoteColor)
-                upvoteCount.setTextColor(context.getColorCompat(R.color.colorText))
+                upvoteCount.setTextColor(neutralColor)
             }
         } else if (vote > 0) {
             if (downvoteCount == null || upvoteCount == null) {
                 scoreView.setTextColor(upvoteColor)
             } else {
-                downvoteCount.setTextColor(context.getColorCompat(R.color.colorText))
+                downvoteCount.setTextColor(neutralColor)
                 upvoteCount.setTextColor(upvoteColor)
             }
         } else {
             if (downvoteCount == null || upvoteCount == null) {
-                scoreView.setTextColor(context.getColorCompat(R.color.colorText))
+                scoreView.setTextColor(neutralColor)
             } else {
-                downvoteCount.setTextColor(context.getColorCompat(R.color.colorText))
-                upvoteCount.setTextColor(context.getColorCompat(R.color.colorText))
+                downvoteCount.setTextColor(neutralColor)
+                upvoteCount.setTextColor(neutralColor)
             }
         }
 

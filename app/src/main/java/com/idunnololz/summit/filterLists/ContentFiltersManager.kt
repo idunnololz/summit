@@ -42,6 +42,7 @@ class ContentFiltersManager @Inject constructor(
                     FirebaseCrashlytics.getInstance().recordException(e)
                 }
             }
+            Log.d("dbdb", "hiddenPostsDao: ${dao.count()}")
         }
     }
 

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.drafts
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -28,6 +29,12 @@ class DraftsManager @Inject constructor(
     init {
 //        fixEntries()
 //        addTestEntries()
+    }
+
+    init {
+        coroutineScope.launch {
+            Log.d("dbdb", "draftsDao: ${draftsDao.count()}")
+        }
     }
 
     fun saveDraftAsync(
