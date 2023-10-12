@@ -81,6 +81,9 @@ class PendingActionsManager @Inject constructor(
             val dbActions = actionsDao.getAllPendingActions()
             val dbFailedActions = failedActionsDao.getLast100FailedActions()
 
+            Log.d("dbdb", "actionsDao: ${actionsDao.count()}")
+            Log.d("dbdb", "failedActionsDao: ${failedActionsDao.count()}")
+
             withContext(actionsContext) {
                 actions.clear()
                 actions.addAll(dbActions)

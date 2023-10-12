@@ -85,6 +85,16 @@ class SettingNavigationFragment :
 
         val context = requireContext()
 
+        settings.useBottomNavBar.bindTo(
+            b = binding.useBottomNavBar,
+            { preferences.useBottomNavBar },
+            {
+                preferences.useBottomNavBar = it
+
+                updateRendering()
+            },
+        )
+
         settings.useCustomNavBar.bindTo(
             b = binding.useCustomNavBar,
             { preferences.useCustomNavBar },

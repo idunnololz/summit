@@ -1,5 +1,6 @@
 package com.idunnololz.summit.hidePosts
 
+import android.util.Log
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,6 +17,12 @@ class HiddenPostsManager @Inject constructor(
 
     private val onHiddenPostsChange = mutableMapOf<String, MutableSharedFlow<Unit>>()
     private val instanceToCache = mutableMapOf<String, MutableSet<PostId>>()
+
+    init {
+        coroutineScope.launch {
+            Log.d("dbdb", "hiddenPostsDao: ${hiddenPostsDao.count()}")
+        }
+    }
 
     fun getOnHiddenPostsChangeFlow(instance: String): MutableSharedFlow<Unit> {
         onHiddenPostsChange[instance]?.let {

@@ -1463,6 +1463,12 @@ class NavigationSettings @Inject constructor(
         navBarDestOptions,
     )
 
+    val useBottomNavBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_bottom_nav_bar),
+        context.getString(R.string.use_bottom_nav_bar_desc),
+    )
+
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
     )

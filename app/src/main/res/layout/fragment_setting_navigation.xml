@@ -36,6 +36,12 @@
                 android:clipToPadding="false">
 
                 <include
+                    android:id="@+id/use_bottom_nav_bar"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/use_custom_nav_bar"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"

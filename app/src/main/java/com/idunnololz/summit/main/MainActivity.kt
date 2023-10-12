@@ -8,13 +8,16 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
+import android.widget.PopupMenu
 import androidx.activity.viewModels
+import androidx.appcompat.view.menu.ActionMenuItem
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -29,6 +32,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -119,6 +123,8 @@ class MainActivity : BaseActivity() {
 
     var lockUiOpenness = false
 
+    var useBottomNavBar = true
+
     @Inject
     lateinit var themeManager: ThemeManager
 
@@ -148,6 +154,7 @@ class MainActivity : BaseActivity() {
         registerInsetsHandler()
 
         fun updateBottomTranslationY() {
+            if (!useBottomNavBar) return
             binding.bottomNavigationView.translationY = bottomNavY
         }
 
@@ -159,6 +166,8 @@ class MainActivity : BaseActivity() {
         }
 
         viewModel.unreadCount.observe(this) { unreadCount ->
+            if (!useBottomNavBar) return@observe
+
             binding.bottomNavigationView.getOrCreateBadge(R.id.inboxTabbedFragment).apply {
                 val allUnreads =
                     unreadCount.totalUnreadCount +
@@ -230,7 +239,11 @@ class MainActivity : BaseActivity() {
             binding.notificationBarBgContainer.visibility = View.VISIBLE
         }
 
-        if (preferences.useCustomNavBar) {
+        useBottomNavBar = preferences.useBottomNavBar
+
+        if (!useBottomNavBar) {
+            binding.bottomNavigationView.visibility = View.GONE
+        } else if (preferences.useCustomNavBar) {
             binding.bottomNavigationView.setTag(R.id.custom_nav_bar, true)
             binding.bottomNavigationView.menu.apply {
                 clear()
@@ -327,7 +340,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchChangelog() {
-        launchPage(PostRef("lemmy.world", 6037877), switchToNativeInstance = true)
+        launchPage(PostRef("lemmy.world", 6718871), switchToNativeInstance = true)
     }
 
     private val bottomNavY
@@ -496,15 +509,9 @@ class MainActivity : BaseActivity() {
             .translationY(0f)
     }
 
-    private fun showBottomNavWithScrollBehavior() {
-        showBottomNav()
-        binding.bottomNavigationView.layoutParams =
-            (binding.bottomNavigationView.layoutParams as CoordinatorLayout.LayoutParams).apply {
-                behavior = HideBottomViewOnScrollBehavior<BottomNavigationView>()
-            }
-    }
-
     fun enableBottomNavViewScrolling() {
+        if (!useBottomNavBar) return
+
         enableBottomNavViewScrolling = true
         binding.bottomNavigationView.visibility = View.VISIBLE
     }
@@ -519,6 +526,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun showBottomNav(supportOpenness: Boolean = false) {
+        if (!useBottomNavBar) return
         if (enableBottomNavViewScrolling && binding.bottomNavigationView.visibility == View.VISIBLE) {
             return
         }
@@ -550,6 +558,8 @@ class MainActivity : BaseActivity() {
     }
 
     fun hideBottomNav(animate: Boolean) {
+        if (!useBottomNavBar) return
+
         Log.d(TAG, "bottomNavigationView.height: ${binding.bottomNavigationView.height}")
 
         if (animate) {
@@ -895,16 +905,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun restoreTabState(state: TabCommunityState?) {
-        state ?: return
-        if (binding.bottomNavigationView.selectedItemId != R.id.main) {
-            binding.bottomNavigationView.selectedItemId = R.id.main
-        }
-        executeWhenMainFragmentAvailable { mainFragment ->
-            mainFragment.restoreTabState(state)
-        }
-    }
-
     inline fun <reified T> setupForFragment(animate: Boolean = true) {
         setupForFragment(T::class, animate)
     }
@@ -995,7 +995,12 @@ class MainActivity : BaseActivity() {
     }
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
-    fun getBottomNavHeight() = binding.bottomNavigationView.height
+    fun getBottomNavHeight() =
+        if (useBottomNavBar) {
+            binding.bottomNavigationView.height
+        } else {
+            0
+        }
 
     fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {
         viewModel.isReady.observe(lifecycleOwner) {
@@ -1090,5 +1095,11 @@ class MainActivity : BaseActivity() {
             val direction = MainDirections.actionGlobalCommunityInfoFragment(communityRef)
             currentNavController?.navigateSafe(direction)
         }
+    }
+
+    fun navigateTopLevel(menuId: Int) {
+        val currentNavController = currentNavController ?: return
+        val menuItem = binding.bottomNavigationView.menu.findItem(menuId) ?: return
+        NavigationUI.onNavDestinationSelected(menuItem, currentNavController)
     }
 }

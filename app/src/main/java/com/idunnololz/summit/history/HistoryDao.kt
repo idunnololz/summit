@@ -43,6 +43,9 @@ interface HistoryDao {
     @Query("SELECT id, url, shortDesc, ts, type, reason FROM history WHERE shortDesc LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' ORDER BY ts DESC LIMIT 1000")
     suspend fun query(query: String): List<LiteHistoryEntry>
 
+    @Query("SELECT COUNT(*) FROM history")
+    suspend fun count(): Int
+
     @Transaction
     open suspend fun insertEntryMergeWithPreviousIfSame(newEntry: HistoryEntry) {
         val lastEntry = getLastHistoryEntryWithType(newEntry.type)

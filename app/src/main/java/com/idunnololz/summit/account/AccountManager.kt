@@ -1,5 +1,6 @@
 package com.idunnololz.summit.account
 
+import android.util.Log
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,6 +34,9 @@ class AccountManager @Inject constructor(
     init {
         runBlocking {
             currentAccount.emit(accountDao.getCurrentAccount()?.fix())
+        }
+        coroutineScope.launch {
+            Log.d("dbdb", "accountDao: ${accountDao.count()}")
         }
     }
 

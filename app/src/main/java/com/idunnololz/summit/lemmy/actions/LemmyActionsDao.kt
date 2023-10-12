@@ -37,6 +37,9 @@ interface LemmyActionsDao {
 
     @Query("DELETE FROM lemmy_actions")
     suspend fun deleteAllActions()
+
+    @Query("SELECT COUNT(*) FROM lemmy_actions")
+    suspend fun count(): Int
 }
 
 @Entity(tableName = "lemmy_actions")

@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.text.Spanned
-import android.util.Log
 import android.widget.TextView
 import coil.Coil.imageLoader
 import coil.ImageLoader
@@ -95,23 +94,19 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             private val loaded: AtomicBoolean,
         ) : Target {
             override fun onSuccess(loadedDrawable: Drawable) {
-                Log.d("HAHA", "onSuccess() 1")
                 // @since 4.5.1 check finished flag (result can be delivered _before_ disposable is created)
                 if (cache.remove(drawable) != null ||
                     !loaded.get()
                 ) {
-                    Log.d("HAHA", "onSuccess() 2")
                     // mark
                     loaded.set(true)
 //                    if (drawable.isAttached) {
-                        Log.d("HAHA", "onSuccess() 3")
-                        DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
-                        drawable.result = loadedDrawable
+                    DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
+                    drawable.result = loadedDrawable
 
-                        if (loadedDrawable is Animatable) {
-                            Log.d("HAHA", "onSuccess() 4")
-                            loadedDrawable.start()
-                        }
+                    if (loadedDrawable is Animatable) {
+                        loadedDrawable.start()
+                    }
 //                    }
                 }
             }

@@ -71,6 +71,9 @@ abstract class AccountInfoDao {
 
     @Query("DELETE FROM account_info WHERE account_id = :accountId")
     abstract suspend fun delete(accountId: Int)
+
+    @Query("SELECT COUNT(*) FROM account_info")
+    abstract suspend fun count(): Int
 }
 
 @ProvidedTypeConverter

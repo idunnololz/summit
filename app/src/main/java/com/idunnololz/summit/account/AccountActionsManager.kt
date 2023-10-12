@@ -27,6 +27,8 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -186,6 +188,10 @@ class AccountActionsManager @Inject constructor(
             get() = preferences.upvoteColor
         override val downvoteColor: Int
             get() = preferences.downvoteColor
+        override val neutralColor: Int
+            get() = context.getColorCompat(R.color.colorText)
+        override val controlColor: Int
+            get() = context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal)
     }
 
     private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {

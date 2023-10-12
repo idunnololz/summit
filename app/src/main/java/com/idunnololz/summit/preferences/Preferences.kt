@@ -69,6 +69,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
@@ -584,6 +585,14 @@ class Preferences @Inject constructor(
         get() = prefs.getMoshiValue<NavBarConfig>(KEY_NAV_BAR_ITEMS) ?: NavBarConfig()
         set(value) {
             prefs.putMoshiValue(KEY_NAV_BAR_ITEMS, value)
+        }
+
+    var useBottomNavBar: Boolean
+        get() = prefs.getBoolean(KEY_USE_BOTTOM_NAV_BAR, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_BOTTOM_NAV_BAR, value)
+                .apply()
         }
 
     fun reset(key: String) {
