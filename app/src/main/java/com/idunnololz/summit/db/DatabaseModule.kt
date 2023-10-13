@@ -8,6 +8,7 @@ import com.idunnololz.summit.filterLists.ContentFiltersDao
 import com.idunnololz.summit.hidePosts.HiddenPostsDao
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
+import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.user.UserCommunitiesDao
 import dagger.Module
@@ -35,6 +36,10 @@ class DatabaseModule {
     @Provides
     fun provideLemmyFailedActionsDao(db: MainDatabase): LemmyFailedActionsDao =
         db.lemmyFailedActionsDao()
+
+    @Provides
+    fun provideLemmyCompletedActionsDao(db: MainDatabase): LemmyCompletedActionsDao =
+        db.lemmyCompletedActionsDao()
 
     @Provides
     fun provideHistoryDao(db: MainDatabase): HistoryDao =

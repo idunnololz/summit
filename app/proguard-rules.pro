@@ -36,6 +36,11 @@
     <fields>;
 }
 
+-keepnames class com.idunnololz.summit.settings.navigation.NavBarConfig
+-keepclassmembers class com.idunnololz.summit.settings.navigation.NavBarConfig {
+    <fields>;
+}
+
 -keep class * extends androidx.fragment.app.Fragment{}
 
 

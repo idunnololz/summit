@@ -188,10 +188,19 @@ class AccountActionsManager @Inject constructor(
             get() = preferences.upvoteColor
         override val downvoteColor: Int
             get() = preferences.downvoteColor
-        override val neutralColor: Int
-            get() = context.getColorCompat(R.color.colorText)
-        override val controlColor: Int
-            get() = context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal)
+
+        private var neutralColor: Int? = null
+        private var controlColor: Int? = null
+
+        override fun neutralColor(context: Context): Int =
+            neutralColor ?: context.getColorCompat(R.color.colorText).also {
+                neutralColor = it
+            }
+
+        override fun controlColor(context: Context): Int =
+            controlColor ?: context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal).also {
+                controlColor = it
+            }
     }
 
     private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {

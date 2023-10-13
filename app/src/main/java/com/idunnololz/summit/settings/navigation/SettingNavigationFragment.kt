@@ -145,6 +145,18 @@ class SettingNavigationFragment :
             settings.navBarDest1.id -> {
                 viewModel.updateDestination(0, value as NavBarDestId)
             }
+            settings.navBarDest2.id -> {
+                viewModel.updateDestination(1, value as NavBarDestId)
+            }
+            settings.navBarDest3.id -> {
+                viewModel.updateDestination(2, value as NavBarDestId)
+            }
+            settings.navBarDest4.id -> {
+                viewModel.updateDestination(3, value as NavBarDestId)
+            }
+            settings.navBarDest5.id -> {
+                viewModel.updateDestination(4, value as NavBarDestId)
+            }
         }
 
         updateRendering()

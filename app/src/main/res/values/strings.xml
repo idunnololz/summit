@@ -645,6 +645,7 @@
     <string name="use_bottom_nav_bar">Use bottom navigation bar</string>
     <string name="use_bottom_nav_bar_desc">When enabled, a bottom navigation bar is shown at the bottom for easy access to top level screens. When disabled, navigation options will be shown in the overflow menu instead.</string>
     <string name="back_to_the_beginning">Back to the beginning</string>
+    <string name="search_settings">Search settings</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

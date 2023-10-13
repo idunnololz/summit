@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.utils
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.util.Log
 import android.view.View
@@ -42,8 +43,9 @@ interface VoteUiHandler {
 
     val upvoteColor: Int
     val downvoteColor: Int
-    val neutralColor: Int
-    val controlColor: Int
+
+    fun neutralColor(context: Context): Int
+    fun controlColor(context: Context): Int
 }
 
 fun VoteUiHandler.bind(
@@ -159,6 +161,9 @@ fun VoteUiHandler.bind(
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
 ) {
+    val context = scoreView.context
+    val controlColor = controlColor(context)
+    val neutralColor = neutralColor(context)
     fun update(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
         if (upVoteView is ImageView && downVoteView is ImageView) {
             if (vote < 0) {

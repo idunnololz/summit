@@ -200,6 +200,10 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     }
 
     private fun updateLoginButtonState() {
+        if (!isBindingAvailable()) {
+            return
+        }
+
         with(binding) {
             when (viewModel.state.value) {
                 LoginViewModel.State.Login -> {
