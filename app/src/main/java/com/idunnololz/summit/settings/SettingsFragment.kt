@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -21,7 +23,9 @@ import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
+import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,20 +75,28 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         requireMainActivity().apply {
             setupForFragment<SettingsFragment>()
 
+//            setSupportActionBar(binding.searchBar)
+
+//            supportActionBar?.setDisplayShowHomeEnabled(true)
+//            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//            supportActionBar?.title = context.getString(R.string.settings)
+
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.collapsingToolbarLayout)
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
-
-            setSupportActionBar(binding.searchBar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.settings)
+            insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
+            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
 
             binding.searchBar.setOnClickListener {
                 viewModel.showSearch.value = true
             }
         }
+
+
+//        binding.searchBar.runAfterLayout {
+//            binding.searchBar.updateLayoutParams<MarginLayoutParams> {
+//                topMargin = binding.collapsingToolbarContent.height +
+//                    context.getDimenFromAttribute(io.noties.markwon.R.attr.actionBarSize).toInt()
+//            }
+//        }
 
         with(binding) {
             recyclerView.layoutManager = LinearLayoutManager(context)

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
@@ -101,6 +102,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var accountInfoManager: AccountInfoManager
 
     private var viewPagerController: ViewPagerController? = null
 
@@ -372,7 +376,11 @@ class CommunityFragment :
         viewModel.updatePreferences()
         binding.loadingView.hideAll()
 
-        lemmyAppBarController = LemmyAppBarController(requireMainActivity(), binding.customAppBar)
+        lemmyAppBarController = LemmyAppBarController(
+            mainActivity = requireMainActivity(),
+            binding = binding.customAppBar,
+            accountInfoManager = accountInfoManager,
+        )
 
         viewModel.defaultCommunity.observe(viewLifecycleOwner) {
             lemmyAppBarController.setDefaultCommunity(it)

@@ -26,6 +26,8 @@ import com.idunnololz.summit.history.HistoryEntry
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
+import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
+import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.user.UserCommunitiesConverters
@@ -43,6 +45,7 @@ import com.idunnololz.summit.util.moshi
         Account::class,
         LemmyAction::class,
         LemmyFailedAction::class,
+        LemmyCompletedAction::class,
         AccountInfo::class,
         HiddenPostEntry::class,
         FilterEntry::class,
@@ -52,8 +55,9 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 20, to = 21),
         AutoMigration(from = 26, to = 27),
         AutoMigration(from = 27, to = 28),
+        AutoMigration(from = 29, to = 30),
     ],
-    version = 29,
+    version = 31,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -61,6 +65,7 @@ abstract class MainDatabase : RoomDatabase() {
 
     abstract fun lemmyActionsDao(): LemmyActionsDao
     abstract fun lemmyFailedActionsDao(): LemmyFailedActionsDao
+    abstract fun lemmyCompletedActionsDao(): LemmyCompletedActionsDao
     abstract fun userCommunitiesDao(): UserCommunitiesDao
     abstract fun historyDao(): HistoryDao
     abstract fun accountDao(): AccountDao
@@ -100,6 +105,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_24_26)
                 .addMigrations(MIGRATION_25_26)
                 .addMigrations(MIGRATION_28_29)
+                .addMigrations(MIGRATION_30_31)
                 .build()
         }
     }
@@ -151,5 +157,13 @@ val MIGRATION_28_29 = object : Migration(28, 29) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS drafts;")
         database.execSQL("CREATE TABLE IF NOT EXISTS `drafts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cts` INTEGER NOT NULL, `uts` INTEGER NOT NULL, `draft_type` INTEGER NOT NULL, `data` TEXT)")
+    }
+}
+
+
+val MIGRATION_30_31 = object : Migration(30, 31) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS lemmy_completed_actions;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `lemmy_completed_actions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `cts` INTEGER NOT NULL, `info` TEXT)")
     }
 }

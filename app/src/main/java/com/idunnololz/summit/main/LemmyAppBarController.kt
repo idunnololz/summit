@@ -11,13 +11,16 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.databinding.CustomAppBarBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
+import com.idunnololz.summit.lemmy.toCommunityRef
 
 class LemmyAppBarController(
     private val mainActivity: MainActivity,
     private val binding: CustomAppBarBinding,
+    private val accountInfoManager: AccountInfoManager,
 ) {
 
     private val TAG = "RedditAppBarController"
@@ -77,6 +80,9 @@ class LemmyAppBarController(
     private fun updateCommunityButton() {
         communityTextView.text = currentCommunity?.getName(context) ?: ""
         val isHome = currentCommunity == defaultCommunity
+        val isSubscribed = accountInfoManager.currentFullAccount.value?.accountInfo?.subscriptions?.any {
+            it.toCommunityRef() == currentCommunity
+        } == true
 
         if (isHome) {
             communityTextView.isChipIconVisible = true
@@ -84,6 +90,9 @@ class LemmyAppBarController(
         } else if (currentCommunity is CommunityRef.MultiCommunity) {
             communityTextView.isChipIconVisible = true
             communityTextView.setChipIconResource(R.drawable.baseline_dynamic_feed_24)
+        } else if (isSubscribed) {
+            communityTextView.isChipIconVisible = true
+            communityTextView.setChipIconResource(R.drawable.outline_mail_24)
         } else {
             communityTextView.isChipIconVisible = false
         }

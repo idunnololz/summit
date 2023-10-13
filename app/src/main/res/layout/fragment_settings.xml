@@ -2,15 +2,27 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/footer_spacer_height"/>
+        </FrameLayout>
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"
@@ -34,11 +46,13 @@
                     app:layout_collapseMode="pin">
 
                     <TextView
+                        android:id="@+id/title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/settings"
                         android:textAppearance="?textAppearanceHeadlineLarge"
-                        android:padding="@dimen/padding"
+                        android:paddingHorizontal="@dimen/padding"
+                        android:paddingTop="@dimen/padding"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"/>
@@ -47,24 +61,49 @@
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-            <com.google.android.material.search.SearchBar
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/search_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content">
+
+                <View
+                    android:id="@+id/search_bg"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/search_bar_bg"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:layout_marginVertical="@dimen/padding"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/search_icon"-->
+<!--                    android:layout_width="48dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:padding="12dp"-->
+<!--                    android:src="@drawable/baseline_search_18"-->
+<!--                    app:layout_constraintStart_toStartOf="@+id/search_bg"-->
+<!--                    app:layout_constraintTop_toTopOf="@+id/search_bg"-->
+<!--                    app:layout_constraintBottom_toBottomOf="@+id/search_bg"-->
+<!--                    app:tint="?colorControlNormal" />-->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:text="@string/search_settings"
+                    android:textAppearance="?textAppearanceTitleMedium"
+                    android:padding="@dimen/padding"
+                    android:textColor="@color/colorTextFaint"
+                    app:layout_constraintStart_toStartOf="@+id/search_bg"
+                    app:layout_constraintTop_toTopOf="@+id/search_bg"
+                    app:layout_constraintBottom_toBottomOf="@+id/search_bg"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.appbar.AppBarLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingBottom="@dimen/footer_spacer_height"/>
-        </FrameLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
     

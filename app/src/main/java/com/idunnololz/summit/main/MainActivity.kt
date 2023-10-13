@@ -846,11 +846,16 @@ class MainActivity : BaseActivity() {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
 
+            var bottomPadding = getBottomNavHeight()
+            if (bottomPadding == 0) {
+                bottomPadding = insets.bottomInset
+            }
+
             rootView.setPadding(
                 insets.leftInset,
                 insets.topInset,
                 insets.rightInset,
-                getBottomNavHeight() + additionalPaddingBottom,
+                bottomPadding + additionalPaddingBottom,
             )
         }
     }
@@ -863,11 +868,16 @@ class MainActivity : BaseActivity() {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
 
+            var bottomPadding = getBottomNavHeight()
+            if (bottomPadding == 0) {
+                bottomPadding = insets.bottomInset
+            }
+
             rootView.setPadding(
                 insets.leftInset,
                 0,
                 insets.rightInset,
-                getBottomNavHeight() + additionalPaddingBottom,
+                bottomPadding + additionalPaddingBottom,
             )
         }
     }
