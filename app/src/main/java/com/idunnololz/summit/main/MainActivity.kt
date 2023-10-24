@@ -341,7 +341,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchChangelog() {
-        launchPage(PostRef("lemmy.world", 6718871), switchToNativeInstance = true)
+        launchPage(PostRef("lemmy.world", 7249693), switchToNativeInstance = true)
     }
 
     private val bottomNavY

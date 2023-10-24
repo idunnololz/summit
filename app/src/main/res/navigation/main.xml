@@ -153,8 +153,8 @@
             app:argType="boolean"/>
         <argument
             android:name="switchToNativeInstance"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/communityInfoFragment"
