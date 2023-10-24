@@ -154,4 +154,12 @@
             android:name="url"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/actionsFragment"
+        android:name="com.idunnololz.summit.actions.ui.ActionsFragment"
+        android:label="ActionsFragment" >
+        <argument
+            android:name="actionType"
+            app:argType="com.idunnololz.summit.actions.ui.ActionsFragment$ActionType" />
+    </fragment>
 </navigation>

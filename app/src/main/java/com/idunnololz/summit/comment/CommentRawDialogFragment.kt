@@ -33,7 +33,7 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
 
         val inflater = LayoutInflater.from(context)
         val rootView = inflater.inflate(R.layout.dialog_fragment_comment_raw, null)
-        val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerView)
+        val recyclerView = rootView.findViewById<RecyclerView>(R.id.recycler_view)
 
         builder.setView(rootView)
 

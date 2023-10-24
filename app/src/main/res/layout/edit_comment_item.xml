@@ -6,7 +6,7 @@
     android:paddingBottom="@dimen/padding">
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:lines="4"
@@ -25,7 +25,7 @@
 
 
     <com.idunnololz.summit.view.LoadingView
-        android:id="@+id/loadingView"
+        android:id="@+id/loading_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"
@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <Button
-        android:id="@+id/cancelButton"
+        android:id="@+id/cancel_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -44,11 +44,11 @@
         android:layout_marginBottom="@dimen/padding"
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
-        app:layout_constraintEnd_toStartOf="@+id/saveEditsButton" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_text"
+        app:layout_constraintEnd_toStartOf="@+id/save_edits_button" />
 
     <Button
-        android:id="@+id/saveEditsButton"
+        android:id="@+id/save_edits_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.Button"
@@ -57,7 +57,7 @@
         android:layout_marginBottom="@dimen/padding"
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
+        app:layout_constraintTop_toBottomOf="@+id/edit_text"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

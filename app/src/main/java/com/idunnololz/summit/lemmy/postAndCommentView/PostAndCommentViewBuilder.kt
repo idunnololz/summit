@@ -1295,8 +1295,8 @@ class PostAndCommentViewBuilder @Inject constructor(
 
             if (leftHandMode) {
                 buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToBottom = R.id.bottomBarrier
-                    startToStart = R.id.startBarrier
+                    topToBottom = R.id.bottom_barrier
+                    startToStart = R.id.start_barrier
                     marginStart = paddingFull
                 }
                 buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
@@ -1309,7 +1309,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 lastView = buttons.downvoteButton
             } else {
                 buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToBottom = R.id.bottomBarrier
+                    topToBottom = R.id.bottom_barrier
                     endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
                     marginEnd = paddingFull
                 }
@@ -1346,9 +1346,9 @@ class PostAndCommentViewBuilder @Inject constructor(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ).apply {
-                    topToBottom = R.id.bottomBarrier
+                    topToBottom = R.id.bottom_barrier
                     if (leftHandMode) {
-                        startToStart = R.id.startBarrier
+                        startToStart = R.id.start_barrier
                         marginStart = context.getDimen(R.dimen.padding_quarter)
                     } else {
                         endToEnd = ConstraintLayout.LayoutParams.PARENT_ID

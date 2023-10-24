@@ -53,9 +53,9 @@ class StorageUsageView : ConstraintLayout {
     init {
         View.inflate(context, R.layout.storage_usage_view, this)
 
-        storageUsageTextView = findViewById(R.id.storageUsageTextView)
+        storageUsageTextView = findViewById(R.id.storage_usage_text_view)
         placeholder = findViewById(R.id.placeholder)
-        detailsContainer = findViewById(R.id.detailsContainer)
+        detailsContainer = findViewById(R.id.details_container)
 
         setWillNotDraw(false)
     }

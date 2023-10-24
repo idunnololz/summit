@@ -152,6 +152,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.navigation),
         context.getString(R.string.navigation_desc),
     )
+    val userActionsSettings = BasicSettingItem(
+        R.drawable.outline_play_arrow_24,
+        context.getString(R.string.user_actions),
+        context.getString(R.string.user_actions_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -180,6 +185,7 @@ class MainSettings @Inject constructor(
                 loggingSettings,
                 historySettings,
                 navigationSettings,
+                userActionsSettings,
                 settingAbout,
                 settingSummitCommunity,
                 patreonSettings,
@@ -885,6 +891,18 @@ class ThemeSettings @Inject constructor(
                 null,
                 null,
             ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.Fuchsia,
+                context.getString(R.string.fuchsia),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                ColorSchemes.Minty,
+                context.getString(R.string.minty),
+                null,
+                null,
+            ),
         ),
     )
 
@@ -1067,13 +1085,30 @@ class HiddenPostsSettings @Inject constructor(
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
     )
+    val enableHiddenPosts = OnOffSettingItem(
+        null,
+        context.getString(R.string.hide_posts),
+        context.getString(R.string.hide_posts_desc),
+    )
     val resetHiddenPosts = BasicSettingItem(
         null,
         context.getString(R.string.reset_hidden_posts),
         null,
     )
+    val hiddenPostsCount = BasicSettingItem(
+        null,
+        context.getString(R.string.hidden_posts_count),
+        null,
+    )
+    val viewHiddenPosts = BasicSettingItem(
+        null,
+        context.getString(R.string.view_hidden_posts),
+        null,
+    )
     override val allSettings: List<SettingItem> = listOf(
         resetHiddenPosts,
+        hiddenPostsCount,
+        viewHiddenPosts,
     )
 }
 
@@ -1180,6 +1215,17 @@ class MiscSettings @Inject constructor(
     )
 }
 
+@Singleton
+class ActionsSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+    override val allSettings: List<SettingItem> = listOf(
+    )
+}
+
 class AllSettings @Inject constructor(
     private val mainSettings: MainSettings,
     private val lemmyWebSettings: LemmyWebSettings,
@@ -1196,6 +1242,7 @@ class AllSettings @Inject constructor(
     private val loggingSettings: LoggingSettings,
     private val historySettings: HistorySettings,
     private val navigationSettings: NavigationSettings,
+    private val actionsSettings: ActionsSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -1213,6 +1260,7 @@ class AllSettings @Inject constructor(
         loggingSettings,
         historySettings,
         navigationSettings,
+        actionsSettings,
     )
 
     init {

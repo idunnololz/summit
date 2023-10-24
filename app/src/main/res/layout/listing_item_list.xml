@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <FrameLayout
-        android:id="@+id/headerView"
+        android:id="@+id/header_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_half"
@@ -31,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.idunnololz.summit.view.LemmyHeaderView
-            android:id="@+id/headerContainer"
+            android:id="@+id/header_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
@@ -49,11 +49,11 @@
         android:scaleType="centerCrop"
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerView" />
+        app:layout_constraintTop_toBottomOf="@+id/header_view" />
 
     <!-- Width set programatically -->
     <com.idunnololz.summit.view.ReactiveImageView
-        android:id="@+id/iconImage"
+        android:id="@+id/icon_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
@@ -63,17 +63,17 @@
         app:tint="?attr/colorControlNormal"
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerView" />
+        app:layout_constraintTop_toBottomOf="@+id/header_view" />
 
     <Space
-        android:id="@+id/iconGoneSpacer"
+        android:id="@+id/icon_gone_spacer"
         android:layout_width="@dimen/padding_half"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerView" />
+        app:layout_constraintTop_toBottomOf="@+id/header_view" />
 
     <ImageView
-        android:id="@+id/linkTypeImage"
+        android:id="@+id/link_type_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_quarter"
@@ -83,10 +83,10 @@
         app:layout_constraintEnd_toEndOf="@+id/image" />
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/leftBarrier"
+        android:id="@+id/left_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="image,iconImage,iconGoneSpacer"
+        app:constraint_referenced_ids="image,icon_image,icon_gone_spacer"
         app:barrierDirection="end" />
 
     <com.idunnololz.summit.view.LinkifyTextView
@@ -97,19 +97,19 @@
         android:layout_marginStart="@dimen/padding_half"
         android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_quarter"
-        app:layout_constraintTop_toBottomOf="@+id/headerView"
-        app:layout_constraintStart_toEndOf="@+id/leftBarrier"
+        app:layout_constraintTop_toBottomOf="@+id/header_view"
+        app:layout_constraintStart_toEndOf="@+id/left_barrier"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="title,image,iconImage"
+        app:constraint_referenced_ids="title,image,icon_image"
         app:barrierDirection="bottom" />
 
     <LinearLayout
-        android:id="@+id/fullContent"
+        android:id="@+id/full_content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -118,14 +118,14 @@
         app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/bottomBarrier"
+        android:id="@+id/bottom_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="fullContent"
+        app:constraint_referenced_ids="full_content"
         app:barrierDirection="bottom" />
 
 <!--    <com.google.android.material.button.MaterialButton-->
-<!--        android:id="@+id/commentButton"-->
+<!--        android:id="@+id/comment_button"-->
 <!--        style="@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
@@ -133,29 +133,29 @@
 <!--        android:paddingLeft="@dimen/reddit_content_horizontal_padding"-->
 <!--        app:icon="@drawable/baseline_comment_18"-->
 <!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/bottomBarrier" />-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/bottom_barrier" />-->
 
 <!--    <ImageButton-->
-<!--        android:id="@+id/upvoteButton"-->
+<!--        android:id="@+id/upvote_button"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:src="@drawable/baseline_arrow_upward_24"-->
 <!--        android:padding="@dimen/padding_half"-->
 <!--        android:background="?selectableItemBackgroundBorderless"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/commentButton"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/commentButton"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/upvoteCount" />-->
+<!--        app:layout_constraintTop_toTopOf="@+id/comment_button"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/comment_button"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/upvote_count" />-->
 
 <!--    <TextView-->
-<!--        android:id="@+id/upvoteCount"-->
+<!--        android:id="@+id/upvote_count"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/commentButton"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/commentButton"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/downvoteButton" />-->
+<!--        app:layout_constraintTop_toTopOf="@+id/comment_button"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/comment_button"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/downvote_button" />-->
 
 <!--    <ImageButton-->
-<!--        android:id="@+id/downvoteButton"-->
+<!--        android:id="@+id/downvote_button"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:src="@drawable/baseline_arrow_downward_24"-->
@@ -164,8 +164,8 @@
 <!--        android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"-->
 <!--        android:paddingRight="@dimen/reddit_content_horizontal_padding_for_downvote"-->
 <!--        android:background="?selectableItemBackgroundBorderless"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/commentButton"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/commentButton"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/comment_button"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/comment_button"-->
 <!--        app:layout_constraintEnd_toEndOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

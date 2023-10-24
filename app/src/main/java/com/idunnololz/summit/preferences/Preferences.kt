@@ -37,6 +37,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
@@ -592,6 +593,14 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_USE_BOTTOM_NAV_BAR, value)
+                .apply()
+        }
+
+    var isHiddenPostsEnabled: Boolean
+        get() = prefs.getBoolean(KEY_ENABLE_HIDDEN_POSTS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_ENABLE_HIDDEN_POSTS, value)
                 .apply()
         }
 

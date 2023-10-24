@@ -29,7 +29,7 @@
             android:textColor="@color/colorTextTitle"/>
 
         <ImageView
-            android:id="@+id/copyTextToSearchView"
+            android:id="@+id/copy_text_to_search_view"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="center"

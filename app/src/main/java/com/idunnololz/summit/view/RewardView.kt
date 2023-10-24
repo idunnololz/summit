@@ -25,7 +25,7 @@ class RewardView : LinearLayout {
         inflate(context, R.layout.reward_view, this)
 
         textView = findViewById(R.id.text)
-        rewardIcon = findViewById(R.id.rewardIcon)
+        rewardIcon = findViewById(R.id.reward_icon)
 
         setPadding(
             context.resources.getDimensionPixelOffset(R.dimen.padding_quarter),

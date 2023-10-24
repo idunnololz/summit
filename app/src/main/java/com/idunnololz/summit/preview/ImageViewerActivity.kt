@@ -140,17 +140,17 @@ class ImageViewerActivity : BaseActivity() {
 
         window.enterTransition = Fade(Fade.IN).apply {
             duration = 200
-            excludeTarget(R.id.dummyImageView, true)
+            excludeTarget(R.id.dummy_image_view, true)
             excludeTarget(R.id.imageView, true)
         }
         window.exitTransition = Fade(Fade.OUT).apply {
             duration = 200
-            excludeTarget(R.id.dummyImageView, true)
+            excludeTarget(R.id.dummy_image_view, true)
             excludeTarget(R.id.imageView, true)
         }
         window.returnTransition = Fade(Fade.OUT).apply {
             duration = 200
-            excludeTarget(R.id.dummyImageView, true)
+            excludeTarget(R.id.dummy_image_view, true)
             excludeTarget(R.id.imageView, true)
         }
         window.sharedElementEnterTransition = SharedElementTransition()

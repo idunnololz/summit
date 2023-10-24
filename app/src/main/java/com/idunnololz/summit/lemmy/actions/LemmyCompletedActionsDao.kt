@@ -10,9 +10,8 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.TypeConverters
-import com.idunnololz.summit.hidePosts.HiddenPostEntry
 
-private const val COMPLETED_ACTIONS_LIMIT = 100
+private const val COMPLETED_ACTIONS_LIMIT = 150
 
 @Dao
 interface LemmyCompletedActionsDao {

@@ -3,6 +3,7 @@ package com.idunnololz.summit.hidePosts
 import android.util.Log
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.preferences.Preferences
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -12,11 +13,15 @@ import javax.inject.Singleton
 class HiddenPostsManager @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val hiddenPostsDao: HiddenPostsDao,
+    private val preferences: Preferences,
 ) {
     private val coroutineScope = coroutineScopeFactory.create()
 
     private val onHiddenPostsChange = mutableMapOf<String, MutableSharedFlow<Unit>>()
     private val instanceToCache = mutableMapOf<String, MutableSet<PostId>>()
+
+    val hiddenPostsLimit: Int
+        get() = HIDDEN_POSTS_LIMIT
 
     init {
         coroutineScope.launch {
@@ -66,7 +71,21 @@ class HiddenPostsManager @Inject constructor(
     suspend fun getHiddenPostEntries(instance: String): Set<PostId> =
         getHiddenPostEntriesInternal(instance)
 
+    suspend fun getAllHiddenPostEntries(): List<HiddenPost> =
+        hiddenPostsDao.getAllHiddenPosts().map {
+            HiddenPost(
+                it.id,
+                it.postId,
+                it.instance,
+                it.ts,
+            )
+        }
+
     private suspend fun getHiddenPostEntriesInternal(instance: String): MutableSet<PostId> {
+        if (!preferences.isHiddenPostsEnabled) {
+            return mutableSetOf()
+        }
+
         instanceToCache[instance]?.let {
             return it
         }
@@ -76,4 +95,16 @@ class HiddenPostsManager @Inject constructor(
         instanceToCache[instance] = hiddenPosts
         return hiddenPosts
     }
+
+    suspend fun removeEntry(entryId: Long) {
+        hiddenPostsDao.deleteByEntryId(entryId)
+        instanceToCache.clear()
+    }
+
+    data class HiddenPost(
+        val id: Long,
+        val hiddenPostId: PostId,
+        val instance: String,
+        val ts: Long,
+    )
 }

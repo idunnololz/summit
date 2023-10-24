@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Space
-        android:id="@+id/threadLinesSpacer"
+        android:id="@+id/thread_lines_spacer"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="horizontal"
@@ -18,12 +18,12 @@
         android:id="@+id/start_guideline"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
+        app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <Button
-        android:id="@+id/moreButton"
+        android:id="@+id/more_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="start|center_vertical"

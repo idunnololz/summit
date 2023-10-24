@@ -12,4 +12,7 @@ object ColorSchemes {
     const val TalhaPink: ColorSchemeId = 102
 
     const val Peachie: ColorSchemeId = 200
+
+    const val Fuchsia: ColorSchemeId = 300
+    const val Minty: ColorSchemeId = 301
 }

@@ -2,7 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/externalContentView"
+    android:id="@+id/external_content_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
@@ -24,25 +24,25 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/externalContentText"
+            android:id="@+id/external_content_text"
             android:textAppearance="?textAppearanceBodyMedium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding"
             app:layout_constraintTop_toBottomOf="@+id/thumbnail"
-            app:layout_constraintEnd_toStartOf="@+id/externalContentIcon"
+            app:layout_constraintEnd_toStartOf="@+id/external_content_icon"
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
-            android:id="@+id/externalContentIcon"
+            android:id="@+id/external_content_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:padding="15dp"
             android:src="@drawable/baseline_open_in_new_24"
             android:layout_marginStart="@dimen/padding"
             app:tint="?attr/colorControlNormal"
-            app:layout_constraintTop_toTopOf="@+id/externalContentText"
-            app:layout_constraintBottom_toBottomOf="@+id/externalContentText"
+            app:layout_constraintTop_toTopOf="@+id/external_content_text"
+            app:layout_constraintBottom_toBottomOf="@+id/external_content_text"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

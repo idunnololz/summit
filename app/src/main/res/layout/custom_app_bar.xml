@@ -9,13 +9,13 @@
 
     <!-- Scrollflags set programatically -->
     <FrameLayout
-        android:id="@+id/customActionBar"
+        android:id="@+id/custom_action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_scrollFlags="scroll|enterAlways">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/customActionBarContent"
+            android:id="@+id/custom_action_bar_content"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="@dimen/custom_ab_height">
@@ -28,7 +28,7 @@
                 android:orientation="horizontal" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/communityTextView"
+                android:id="@+id/community_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:minWidth="0dp"
@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="start"
-                app:constraint_referenced_ids="community_sort_order,pageTextView"/>
+                app:constraint_referenced_ids="community_sort_order,page_text_view"/>
 
             <TextView
                 android:id="@+id/community_sort_order"
@@ -72,7 +72,7 @@
                 app:drawableTint="?colorControlNormal" />
 
             <TextView
-                android:id="@+id/pageTextView"
+                android:id="@+id/page_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:paddingStart="@dimen/padding"

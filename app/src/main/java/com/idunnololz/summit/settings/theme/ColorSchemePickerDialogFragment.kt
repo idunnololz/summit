@@ -172,6 +172,20 @@ class ColorSchemePickerDialogFragment :
                     context.getColorCompat(R.color.theme_peachie_md_theme_light_secondary),
                     context.getColorCompat(R.color.theme_peachie_md_theme_light_tertiary),
                 ),
+                Item.ColorSchemeItem(
+                    ColorSchemes.Fuchsia,
+                    context.getString(R.string.fuchsia),
+                    context.getColorCompat(R.color.theme_fuchsia_md_theme_light_primary),
+                    context.getColorCompat(R.color.theme_fuchsia_md_theme_light_secondary),
+                    context.getColorCompat(R.color.theme_fuchsia_md_theme_light_tertiary),
+                ),
+                Item.ColorSchemeItem(
+                    ColorSchemes.Minty,
+                    context.getString(R.string.minty),
+                    context.getColorCompat(R.color.theme_minty_md_theme_light_primary),
+                    context.getColorCompat(R.color.theme_minty_md_theme_light_secondary),
+                    context.getColorCompat(R.color.theme_minty_md_theme_light_tertiary),
+                ),
             )
 
             adapterHelper.setItems(newItems, this)

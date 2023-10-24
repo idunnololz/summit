@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <com.idunnololz.summit.view.LoadingView
-        android:id="@+id/loadingView"
+        android:id="@+id/loading_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/padding"

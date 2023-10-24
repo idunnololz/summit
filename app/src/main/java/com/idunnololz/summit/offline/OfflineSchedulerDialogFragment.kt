@@ -39,10 +39,10 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
 
         val inflater = LayoutInflater.from(context)
         val rootView = inflater.inflate(R.layout.dialog_fragment_offline_scheduler, null)
-        val enableSwitch: Switch = rootView.findViewById(R.id.enableSwitch)
-        val dayPicker: DayPicker = rootView.findViewById(R.id.dayPicker)
-        val timePicker: TimePicker = rootView.findViewById(R.id.timePicker)
-        val disableOverlay: View = rootView.findViewById(R.id.disableOverlay)
+        val enableSwitch: Switch = rootView.findViewById(R.id.enable_switch)
+        val dayPicker: DayPicker = rootView.findViewById(R.id.day_picker)
+        val timePicker: TimePicker = rootView.findViewById(R.id.time_picker)
+        val disableOverlay: View = rootView.findViewById(R.id.disable_overlay)
 
         val disableOverlayAnimationController =
             AnimationUtils.makeAnimationControllerFor(disableOverlay)

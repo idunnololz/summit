@@ -553,7 +553,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             childFragmentManager,
             newlySelectedItemTag,
             R.navigation.community,
-            R.id.innerNavHostContainer,
+            R.id.inner_nav_host_container,
             CommunityFragmentArgs(
                 tab = currentTab,
                 communityRef = communityRef,

@@ -236,7 +236,7 @@ class PostListViewBuilder @Inject constructor(
                     is ListingItemCard3Binding -> {
                         ensureActionButtons(rb.constraintLayout, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            topToBottom = R.id.headerView
+                            topToBottom = R.id.header_view
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
                             bottomToTop = ConstraintLayout.LayoutParams.UNSET
                         }
@@ -252,7 +252,7 @@ class PostListViewBuilder @Inject constructor(
                     is ListingItemFullBinding -> {
                         ensureActionButtons(rb.root, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            topToBottom = R.id.bottomBarrier
+                            topToBottom = R.id.bottom_barrier
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
                             bottomToTop = ConstraintLayout.LayoutParams.UNSET
                         }
@@ -260,7 +260,7 @@ class PostListViewBuilder @Inject constructor(
                     is SearchResultPostItemBinding -> {
                         ensureActionButtons(rb.root, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            topToBottom = R.id.bottomBarrier
+                            topToBottom = R.id.bottom_barrier
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
                             bottomToTop = ConstraintLayout.LayoutParams.UNSET
                         }
@@ -1012,7 +1012,7 @@ class PostListViewBuilder @Inject constructor(
                     } else {
                         startToStart = ConstraintLayout.LayoutParams.PARENT_ID
                     }
-                    topToBottom = R.id.bottomBarrier
+                    topToBottom = R.id.bottom_barrier
                 }
                 setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.baseline_comment_18,
@@ -1086,7 +1086,7 @@ class PostListViewBuilder @Inject constructor(
                     } else {
                         startToStart = ConstraintLayout.LayoutParams.PARENT_ID
                     }
-                    topToBottom = R.id.bottomBarrier
+                    topToBottom = R.id.bottom_barrier
                 }
                 setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.baseline_comment_18,

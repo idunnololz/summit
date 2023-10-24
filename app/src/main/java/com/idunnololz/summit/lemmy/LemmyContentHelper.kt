@@ -151,7 +151,7 @@ class LemmyContentHelper(
             if (postView.post.locked) {
                 val postRemovedView = getView<View>(R.layout.full_content_post_locked_view)
                 postRemovedView.setTag(R.id.is_footer, true)
-                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
+                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
                 textView.textSize = config.bodyTextSizeSp.toTextSize()
@@ -173,7 +173,7 @@ class LemmyContentHelper(
             if (postView.post.removed) {
                 val postRemovedView = getView<View>(R.layout.full_content_post_removed_view)
                 postRemovedView.setTag(R.id.is_footer, true)
-                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
+                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
                 textView.textSize = config.bodyTextSizeSp.toTextSize()
@@ -193,7 +193,7 @@ class LemmyContentHelper(
             } else if (postView.post.deleted) {
                 val postRemovedView = getView<View>(R.layout.full_content_post_removed_view)
                 postRemovedView.setTag(R.id.is_footer, true)
-                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.cardView)
+                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
                 val textView: TextView = postRemovedView.findViewById(R.id.text)
 
                 textView.textSize = config.bodyTextSizeSp.toTextSize()
@@ -212,7 +212,7 @@ class LemmyContentHelper(
 
         if (postView.shouldHideItem() && !reveal && !lazyUpdate) {
             val fullContentHiddenView = getView<View>(R.layout.full_content_hidden_view)
-            val fullImageView = fullContentHiddenView.findViewById<ImageView>(R.id.fullImage)
+            val fullImageView = fullContentHiddenView.findViewById<ImageView>(R.id.full_image)
             val textView = fullContentHiddenView.findViewById<TextView>(R.id.message)
             val button = fullContentHiddenView.findViewById<Button>(R.id.button)
 
@@ -364,7 +364,7 @@ class LemmyContentHelper(
                 getView<View>(R.layout.full_content_external_content_view)
             val thumbnailView = externalContentView.findViewById<ImageView>(R.id.thumbnail)
             val externalContentTextView =
-                externalContentView.findViewById<TextView>(R.id.externalContentText)
+                externalContentView.findViewById<TextView>(R.id.external_content_text)
 
             externalContentTextView.textSize = config.bodyTextSizeSp.toTextSize()
 
@@ -412,9 +412,9 @@ class LemmyContentHelper(
             if (!showImage) return
 
             val fullContentImageView = getView<View>(R.layout.full_content_image_view)
-            val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.fullImage)
+            val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.full_image)
             val loadingView =
-                fullContentImageView.findViewById<LoadingView>(R.id.loadingView)
+                fullContentImageView.findViewById<LoadingView>(R.id.loading_view)
 
             if (onlyImage) {
                 fullImageView.updateLayoutParams<MarginLayoutParams> {
@@ -525,7 +525,7 @@ class LemmyContentHelper(
                 }
                 PostType.Video -> {
                     val containerView = getView<View>(R.layout.full_content_video_view)
-                    val playerView = containerView.findViewById<CustomPlayerView>(R.id.playerView)
+                    val playerView = containerView.findViewById<CustomPlayerView>(R.id.player_view)
 
                     customPlayerView = playerView
 
@@ -688,7 +688,7 @@ class LemmyContentHelper(
             val viewId = c.getTag(R.id.view_type) as Int
 
             if (viewId == R.layout.full_content_video_view) {
-                val playerView = c.findViewById<CustomPlayerView>(R.id.playerView)
+                val playerView = c.findViewById<CustomPlayerView>(R.id.player_view)
                 stateBuilder.setVideoState(playerView?.player?.getVideoState())
 
                 if (recycle) {
