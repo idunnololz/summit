@@ -43,7 +43,7 @@ class CommentRawDialogFragment : BaseDialogFragment<DialogFragmentCommentRawBind
             setJsonNode(generateIntermediateTree(JsonParser().parse(args.commentItemStr)))
         }
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.setHasFixedSize(true)
+        recyclerView.setHasFixedSize(false)
 
         return builder.create().also { dialog ->
         }
