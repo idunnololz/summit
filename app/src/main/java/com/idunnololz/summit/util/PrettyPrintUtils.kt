@@ -31,8 +31,10 @@ private const val DAY_MILLIS = 24 * HOUR_MILLIS
 private const val MONTH_MILLIS = 30 * DAY_MILLIS
 private const val YEAR_MILLIS = 12 * MONTH_MILLIS
 
-fun dateStringToPretty(context: Context, dateStr: String): String {
-    val ts = dateStringToTs(dateStr)
+fun dateStringToPretty(context: Context, dateStr: String): String =
+    dateStringToPretty(context, dateStringToTs(dateStr))
+
+fun dateStringToPretty(context: Context, ts: Long): String {
     val now = System.currentTimeMillis()
     val diff: Long = now - ts
 

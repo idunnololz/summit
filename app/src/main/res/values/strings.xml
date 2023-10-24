@@ -646,6 +646,24 @@
     <string name="use_bottom_nav_bar_desc">When enabled, a bottom navigation bar is shown at the bottom for easy access to top level screens. When disabled, navigation options will be shown in the overflow menu instead.</string>
     <string name="back_to_the_beginning">Back to the beginning</string>
     <string name="search_settings">Search settings</string>
+    <string name="fuchsia">Fuchsia</string>
+    <string name="minty">Minty</string>
+    <string name="actions_history">Actions history</string>
+    <string name="user_actions">User actions</string>
+    <string name="user_actions_desc">See the state of user actions taken on this device.</string>
+    <string name="pending_actions">Pending actions</string>
+    <string name="completed_actions">Completed actions</string>
+    <string name="failed_actions">Failed actions</string>
+    <string name="error_unknown_action">Error. Unable to load this action.</string>
+    <string name="delete_completed_actions_history">Clear completed actions history?</string>
+    <string name="clear_pending_actions">Remove all pending actions?</string>
+    <string name="delete_failed_actions_history">Clear failed actions history?</string>
+    <string name="hidden_posts_count">Hidden posts count</string>
+    <string name="hidden_posts_format">%1$s / %2$s</string>
+    <string name="view_hidden_posts">View hidden posts</string>
+    <string name="post_hidden_format"><![CDATA[Post <b>%1$s</b> from instance <b>%2$s</b>.]]></string>
+    <string name="hide_posts">Hide posts</string>
+    <string name="hide_posts_desc">When enabled, posts will be hidden if they are on the hidden post list.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

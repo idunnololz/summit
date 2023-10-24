@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingHiddenPostsBinding
@@ -15,6 +16,8 @@ import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.PrettyPrintUtils
+import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +34,7 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
     lateinit var hiddenPostsManager: HiddenPostsManager
 
     @Inject
-    lateinit var hiddenPostsSettings: HiddenPostsSettings
+    lateinit var settings: HiddenPostsSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,14 +62,40 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = hiddenPostsSettings.getPageName(context)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         updateRendering()
     }
 
     private fun updateRendering() {
-        hiddenPostsSettings.resetHiddenPosts.bindTo(
+        val defaultDecimalFormat = PrettyPrintUtils.defaultDecimalFormat
+
+        lifecycleScope.launch {
+            val count = hiddenPostsManager.getHiddenPostsCount()
+
+            withContext(Dispatchers.Main) {
+                settings.hiddenPostsCount.copy(
+                    description = getString(R.string.hidden_posts_format,
+                        defaultDecimalFormat.format(count),
+                        defaultDecimalFormat.format(hiddenPostsManager.hiddenPostsLimit))
+                ).bindTo(
+                    b = binding.hiddenPostsStats,
+                    {}
+                )
+            }
+        }
+
+        settings.enableHiddenPosts.bindTo(
+            binding.hiddenPosts,
+            { preferences.isHiddenPostsEnabled },
+            {
+                preferences.isHiddenPostsEnabled = it
+                updateRendering()
+            }
+        )
+
+        settings.resetHiddenPosts.bindTo(
             b = binding.resetHiddenPosts,
             onValueChanged = {
                 lifecycleScope.launch {
@@ -84,6 +113,15 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
                         .show()
                 }
             },
+        )
+
+        settings.viewHiddenPosts.bindTo(
+            b = binding.viewHiddenPosts,
+            onValueChanged = {
+                val directions = SettingHiddenPostsFragmentDirections
+                    .actionSettingHiddenPostsFragmentToHiddenPostsFragment()
+                findNavController().navigateSafe(directions)
+            }
         )
     }
 }

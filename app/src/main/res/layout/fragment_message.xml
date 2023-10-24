@@ -192,7 +192,7 @@
             app:menu="@menu/menu_message"/>
 
         <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottomAppBar"
+            android:id="@+id/bottom_app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"

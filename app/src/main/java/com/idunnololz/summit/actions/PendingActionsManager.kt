@@ -112,6 +112,12 @@ class PendingActionsManager @Inject constructor(
 
     fun getAllPendingActions(): List<LemmyAction> = actions
 
+    suspend fun getAllCompletedActions(): List<LemmyCompletedAction> =
+        completedActionsDao.getAllCompletedActions()
+
+    suspend fun getAllFailedActions(): List<LemmyFailedAction> =
+        failedActionsDao.getAllFailedActions()
+
     inline fun <reified T : ActionInfo> getPendingActionInfo(): List<T> =
         getAllPendingActions().map { it.info }.filterIsInstance<T>()
 
@@ -327,7 +333,7 @@ class PendingActionsManager @Inject constructor(
         withContext(actionsContext) {
             actionsDao.delete(action)
 
-            completedActionsDao.insertAction(action.toLemmyCompletedAction())
+            completedActionsDao.insertActionRespectingTableLimit(action.toLemmyCompletedAction())
         }
         notifyActionComplete(action, result)
     }
@@ -358,4 +364,21 @@ class PendingActionsManager @Inject constructor(
             creationTs = creationTs,
             info = info
         )
+
+    suspend fun deleteCompletedActions() {
+        completedActionsDao.deleteAllActions()
+    }
+
+    suspend fun deleteFailedActions() {
+        failedActionsDao.deleteAllFailedActions()
+    }
+
+    suspend fun deleteAllPendingActions() {
+        withContext(actionsContext) {
+            pendingActionsRunner.stopPendingActions()
+            actions.clear()
+        }
+
+        actionsDao.deleteAllActions()
+    }
 }

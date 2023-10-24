@@ -7,13 +7,16 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 
-private const val HIDDEN_POSTS_LIMIT = 1000
+const val HIDDEN_POSTS_LIMIT = 1000
 
 @Dao
 interface HiddenPostsDao {
 
     @Query("SELECT * FROM hidden_posts WHERE instance = :instance")
     suspend fun getHiddenPosts(instance: String): List<HiddenPostEntry>
+
+    @Query("SELECT * FROM hidden_posts")
+    suspend fun getAllHiddenPosts(): List<HiddenPostEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHiddenPost(hiddenPostEntry: HiddenPostEntry): Long
@@ -29,6 +32,9 @@ interface HiddenPostsDao {
 
     @Delete
     suspend fun delete(entry: HiddenPostEntry)
+
+    @Query("DELETE FROM hidden_posts WHERE id = :entryId")
+    suspend fun deleteByEntryId(entryId: Long)
 
     @Query("DELETE FROM hidden_posts")
     suspend fun clear()

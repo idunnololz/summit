@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <com.idunnololz.summit.view.LinkifyTextView
-        android:id="@+id/textView1"
+        android:id="@+id/text_view1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTextFaint"
@@ -17,12 +17,12 @@
         tools:text="Hello" />
 
     <com.idunnololz.summit.view.FlairView
-        android:id="@+id/flairView"
+        android:id="@+id/flair_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <com.idunnololz.summit.view.LinkifyTextView
-        android:id="@+id/textView2"
+        android:id="@+id/text_view2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTextFaint"
@@ -35,7 +35,7 @@
         tools:text="Hello" />
 
     <com.idunnololz.summit.view.LinkifyTextView
-        android:id="@+id/textView3"
+        android:id="@+id/text_view3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTextFaint"

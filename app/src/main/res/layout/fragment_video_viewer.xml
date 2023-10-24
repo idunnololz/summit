@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/rootView">
+    android:id="@+id/root_view">
 
     <com.idunnololz.summit.view.CustomPlayerView
-        android:id="@+id/playerView"
+        android:id="@+id/player_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:repeat_toggle_modes="all"
@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.idunnololz.summit.view.LoadingView
-        android:id="@+id/loadingView"
+        android:id="@+id/loading_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"

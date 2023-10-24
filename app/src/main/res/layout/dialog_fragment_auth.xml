@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.idunnololz.summit.view.LoadingView
-        android:id="@+id/loadingView"
+        android:id="@+id/loading_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
-        android:id="@+id/successTextView"
+        android:id="@+id/success_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/padding"
@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/bodyTextView"
+        android:id="@+id/body_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/padding"
@@ -43,11 +43,11 @@
         android:id="@+id/barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="bodyTextView"
+        app:constraint_referenced_ids="body_text_view"
         app:barrierDirection="bottom" />
 
     <Button
-        android:id="@+id/positiveButton"
+        android:id="@+id/positive_button"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

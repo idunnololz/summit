@@ -41,6 +41,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
+import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.history.HistoryFragment
@@ -998,6 +999,11 @@ class MainActivity : BaseActivity() {
                 disableBottomNavViewScrolling()
                 showBottomNav(supportOpenness = true)
                 showNotificationBarBg()
+            }
+            ActionsTabbedFragment::class -> {
+                disableBottomNavViewScrolling()
+                hideBottomNav(animate)
+                hideNotificationBarBg()
             }
             else ->
                 throw RuntimeException("No setup instructions for type: ${t.java.canonicalName}")

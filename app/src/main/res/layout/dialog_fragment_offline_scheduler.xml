@@ -20,7 +20,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/enableText"
+            android:id="@+id/enable_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/enable"
@@ -29,12 +29,12 @@
             android:layout_marginStart="@dimen/padding"
             android:layout_marginEnd="@dimen/padding"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/enableSwitch"
-            app:layout_constraintBottom_toBottomOf="@+id/enableSwitch"
-            app:layout_constraintEnd_toEndOf="@+id/enableSwitch" />
+            app:layout_constraintTop_toTopOf="@+id/enable_switch"
+            app:layout_constraintBottom_toBottomOf="@+id/enable_switch"
+            app:layout_constraintEnd_toEndOf="@+id/enable_switch" />
 
         <Switch
-            android:id="@+id/enableSwitch"
+            android:id="@+id/enable_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding"
@@ -44,42 +44,42 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/enableRowBottom"
+            android:id="@+id/enable_row_bottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="enableText,enableSwitch" />
+            app:constraint_referenced_ids="enable_text,enable_switch" />
 
         <com.idunnololz.summit.view.DayPicker
-            android:id="@+id/dayPicker"
+            android:id="@+id/day_picker"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding"
             android:layout_marginEnd="@dimen/padding"
             android:layout_marginTop="@dimen/padding"
-            app:layout_constraintTop_toBottomOf="@+id/enableRowBottom"
+            app:layout_constraintTop_toBottomOf="@+id/enable_row_bottom"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TimePicker
-            android:id="@+id/timePicker"
+            android:id="@+id/time_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_half"
-            app:layout_constraintTop_toBottomOf="@+id/dayPicker"
+            app:layout_constraintTop_toBottomOf="@+id/day_picker"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Background set programatically -->
         <View
-            android:id="@+id/disableOverlay"
+            android:id="@+id/disable_overlay"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/colorSurface"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/dayPicker"
-            app:layout_constraintBottom_toBottomOf="@+id/timePicker" />
+            app:layout_constraintTop_toTopOf="@+id/day_picker"
+            app:layout_constraintBottom_toBottomOf="@+id/time_picker" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

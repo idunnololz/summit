@@ -71,6 +71,7 @@ sealed interface LemmyActionFailureReason {
     @TypeLabel("3")
     data class UnknownError(
         val errorCode: Int,
+        val errorMessage: String?,
     ) : LemmyActionFailureReason
 
     @JsonClass(generateAdapter = true)

@@ -38,7 +38,15 @@
     <fragment
         android:id="@+id/settingHiddenPostsFragment"
         android:name="com.idunnololz.summit.settings.hiddenPosts.SettingHiddenPostsFragment"
-        android:label="SettingHiddenPostsFragment" />
+        android:label="SettingHiddenPostsFragment" >
+        <action
+            android:id="@+id/action_settingHiddenPostsFragment_to_hiddenPostsFragment"
+            app:destination="@id/hiddenPostsFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.idunnololz.summit.settings.SettingsFragment"
@@ -159,6 +167,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"  />
+        <action
+            android:id="@+id/action_settingsFragment_to_actionsTabbedFragment"
+            app:destination="@id/actionsTabbedFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -246,4 +261,12 @@
         android:id="@+id/settingNavigationFragment"
         android:name="com.idunnololz.summit.settings.navigation.SettingNavigationFragment"
         android:label="SettingNavigationFragment" />
+    <fragment
+        android:id="@+id/actionsTabbedFragment"
+        android:name="com.idunnololz.summit.actions.ui.ActionsTabbedFragment"
+        android:label="ActionsTabbedFragment" />
+    <fragment
+        android:id="@+id/hiddenPostsFragment"
+        android:name="com.idunnololz.summit.settings.hiddenPosts.HiddenPostsFragment"
+        android:label="HiddenPostsFragment" />
 </navigation>

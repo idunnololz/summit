@@ -19,7 +19,7 @@
     android:layout_gravity="bottom"
     android:layoutDirection="ltr"
     android:background="@color/colorOverlay"
-    android:id="@+id/controllerRootView">
+    android:id="@+id/controller_root_view">
 
     <ImageButton
         android:id="@+id/exo_more"

@@ -33,7 +33,7 @@
 
     <!-- Width set programatically -->
     <com.idunnololz.summit.view.ReactiveImageView
-        android:id="@+id/iconImage"
+        android:id="@+id/icon_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
@@ -48,14 +48,14 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <Space
-        android:id="@+id/iconGoneSpacer"
+        android:id="@+id/icon_gone_spacer"
         android:layout_width="@dimen/padding_half"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
-        android:id="@+id/linkTypeImage"
+        android:id="@+id/link_type_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_quarter"
@@ -65,10 +65,10 @@
         app:layout_constraintEnd_toEndOf="@+id/image" />
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/leftBarrier"
+        android:id="@+id/left_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="image,iconImage,iconGoneSpacer"
+        app:constraint_referenced_ids="image,icon_image,icon_gone_spacer"
         app:barrierDirection="end" />
 
     <com.idunnololz.summit.view.LinkifyTextView
@@ -81,7 +81,7 @@
         android:layout_marginTop="@dimen/padding_half"
         android:includeFontPadding="false"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/leftBarrier"
+        app:layout_constraintStart_toEndOf="@+id/left_barrier"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.idunnololz.summit.view.LemmyHeaderView
@@ -123,11 +123,11 @@
         android:id="@+id/barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="comment_text,image,iconImage"
+        app:constraint_referenced_ids="comment_text,image,icon_image"
         app:barrierDirection="bottom" />
 
     <LinearLayout
-        android:id="@+id/fullContent"
+        android:id="@+id/full_content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -145,24 +145,24 @@
         android:paddingVertical="@dimen/padding_half"
         android:paddingHorizontal="@dimen/padding"
         android:background="?selectableItemBackgroundBorderless"
-        app:layout_constraintTop_toTopOf="@+id/downvoteButton"
-        app:layout_constraintBottom_toBottomOf="@+id/downvoteButton"
-        app:layout_constraintEnd_toStartOf="@+id/upvoteButton" />
+        app:layout_constraintTop_toTopOf="@+id/downvote_button"
+        app:layout_constraintBottom_toBottomOf="@+id/downvote_button"
+        app:layout_constraintEnd_toStartOf="@+id/upvote_button" />
 
     <ImageButton
-        android:id="@+id/upvoteButton"
+        android:id="@+id/upvote_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_arrow_upward_24"
         android:paddingVertical="@dimen/padding_half"
         android:paddingHorizontal="@dimen/padding"
         android:background="?selectableItemBackgroundBorderless"
-        app:layout_constraintTop_toTopOf="@+id/downvoteButton"
-        app:layout_constraintBottom_toBottomOf="@+id/downvoteButton"
-        app:layout_constraintEnd_toStartOf="@+id/downvoteButton" />
+        app:layout_constraintTop_toTopOf="@+id/downvote_button"
+        app:layout_constraintBottom_toBottomOf="@+id/downvote_button"
+        app:layout_constraintEnd_toStartOf="@+id/downvote_button" />
 
     <ImageButton
-        android:id="@+id/downvoteButton"
+        android:id="@+id/downvote_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_arrow_downward_24"
@@ -170,7 +170,7 @@
         android:paddingVertical="@dimen/padding_half"
         android:paddingHorizontal="@dimen/padding"
         android:background="?selectableItemBackgroundBorderless"
-        app:layout_constraintTop_toBottomOf="@+id/fullContent"
+        app:layout_constraintTop_toBottomOf="@+id/full_content"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

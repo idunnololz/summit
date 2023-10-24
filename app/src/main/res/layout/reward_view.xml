@@ -9,7 +9,7 @@
         android:layout_gravity="center_vertical" />
 
     <ImageView
-        android:id="@+id/rewardIcon"
+        android:id="@+id/reward_icon"
         android:layout_width="@dimen/reward_icon_size"
         android:layout_height="@dimen/reward_icon_size"
         android:layout_gravity="center_vertical" />

@@ -118,7 +118,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         parent.hideSystemUI()
 
         parent.windowInsets.observe(viewLifecycleOwner) {
-            binding.playerView.findViewById<View>(R.id.controllerRootView).setPadding(
+            binding.playerView.findViewById<View>(R.id.controller_root_view).setPadding(
                 it.left,
                 it.top,
                 it.right,

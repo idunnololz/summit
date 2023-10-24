@@ -33,6 +33,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -74,6 +75,8 @@ class PendingActionsRunner @AssistedInject constructor(
     private var isExecutingPendingActions = false
     private var connectionIssue = false
 
+    private var executePendingActionsJob: Job? = null
+
     fun executePendingActionsIfNeeded() {
         synchronized(lock) {
             if (isExecutingPendingActions) {
@@ -88,7 +91,7 @@ class PendingActionsRunner @AssistedInject constructor(
         isExecutingPendingActions = true
         connectionIssue = false
 
-        coroutineScope.launch a@{
+        executePendingActionsJob = coroutineScope.launch a@{
             val newIsExecutingPendingActions = withContext(actionsContext) {
                 actions.isNotEmpty()
             }
@@ -213,7 +216,7 @@ class PendingActionsRunner @AssistedInject constructor(
                                     Failure(TooManyRequests(retries + 1))
                                 }
                             } else {
-                                Failure(LemmyActionFailureReason.UnknownError(0))
+                                Failure(LemmyActionFailureReason.UnknownError(error.errorCode, ""))
                             }
                         }
                         is ServerApiException ->
@@ -223,7 +226,7 @@ class PendingActionsRunner @AssistedInject constructor(
                 is SocketTimeoutException ->
                     Failure(LemmyActionFailureReason.ServerError)
                 else -> {
-                    Failure(LemmyActionFailureReason.UnknownError(0))
+                    Failure(LemmyActionFailureReason.UnknownError(-1, error.javaClass.simpleName))
                 }
             }
 
@@ -390,5 +393,9 @@ class PendingActionsRunner @AssistedInject constructor(
             )
             .build()
         WorkManager.getInstance(context).enqueue(workRequest)
+    }
+
+    fun stopPendingActions() {
+        executePendingActionsJob?.cancel()
     }
 }

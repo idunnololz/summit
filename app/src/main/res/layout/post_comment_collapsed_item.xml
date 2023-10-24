@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <Space
-        android:id="@+id/threadLinesSpacer"
+        android:id="@+id/thread_lines_spacer"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="horizontal"
@@ -29,19 +29,19 @@
         android:id="@+id/start_guideline"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
+        app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <View
-        android:id="@+id/topHotspot"
+        android:id="@+id/top_hotspot"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="-16dp"
         android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/expandSectionButton"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
+        app:layout_constraintBottom_toBottomOf="@+id/expand_section_button"
+        app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <View
@@ -51,7 +51,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/headerView"/>
+        app:layout_constraintEnd_toStartOf="@+id/header_view"/>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progress_bar"
@@ -59,13 +59,13 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         app:indicatorSize="16dp"
-        app:layout_constraintTop_toTopOf="@+id/expandSectionButton"
-        app:layout_constraintBottom_toBottomOf="@+id/expandSectionButton"
+        app:layout_constraintTop_toTopOf="@+id/expand_section_button"
+        app:layout_constraintBottom_toBottomOf="@+id/expand_section_button"
         app:layout_constraintStart_toEndOf="@+id/start_guideline"
         style="@style/Widget.Material3.CircularProgressIndicator.ExtraSmall" />
 
     <com.idunnololz.summit.view.LemmyHeaderView
-        android:id="@+id/headerView"
+        android:id="@+id/header_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fadingEdge="horizontal"
@@ -78,10 +78,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/progress_bar"
-        app:layout_constraintEnd_toStartOf="@+id/expandSectionButton"/>
+        app:layout_constraintEnd_toStartOf="@+id/expand_section_button"/>
 
     <ImageButton
-        android:id="@+id/expandSectionButton"
+        android:id="@+id/expand_section_button"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:src="@drawable/baseline_expand_more_18"
@@ -89,7 +89,7 @@
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_half"
-        app:layout_constraintStart_toEndOf="@+id/headerView"
+        app:layout_constraintStart_toEndOf="@+id/header_view"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -102,6 +102,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer" />
+        app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

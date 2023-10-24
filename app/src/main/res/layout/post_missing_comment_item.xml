@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Space
-        android:id="@+id/threadLinesSpacer"
+        android:id="@+id/thread_lines_spacer"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="horizontal"
@@ -16,10 +16,10 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <View
-        android:id="@+id/startGuideLine"
+        android:id="@+id/start_guide_line"
         android:layout_width="@dimen/padding_quarter"
         android:layout_height="0dp"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
+        app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -33,7 +33,7 @@
         android:layout_marginEnd="@dimen/padding_half"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/threadLinesSpacer"
+        app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"
         app:layout_constraintEnd_toStartOf="@+id/state"/>
 
     <Space

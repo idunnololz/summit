@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/titleTextView"
+        android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceTitleMedium"
@@ -31,8 +31,8 @@
         android:src="@drawable/baseline_edit_24"
         android:background="?selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/titleTextView"
-        app:layout_constraintBottom_toBottomOf="@+id/titleTextView"
+        app:layout_constraintTop_toTopOf="@+id/title_text_view"
+        app:layout_constraintBottom_toBottomOf="@+id/title_text_view"
         app:tint="?colorControlNormal" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

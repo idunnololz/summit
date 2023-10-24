@@ -6,7 +6,7 @@
     android:orientation="horizontal">
 
     <ImageButton
-        android:id="@+id/moreButton"
+        android:id="@+id/more_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="12dp"
@@ -23,7 +23,7 @@
         android:layout_gravity="center_vertical"/>
 
     <ImageButton
-        android:id="@+id/commentButton"
+        android:id="@+id/comment_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="12dp"
@@ -32,7 +32,7 @@
         android:layout_gravity="center_vertical"/>
 
     <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/controlsDivider"
+        android:id="@+id/controls_divider"
         android:layout_height="match_parent"
         android:layout_width="1dp"
         android:layout_marginTop="@dimen/padding_half"
@@ -40,7 +40,7 @@
         android:layout_gravity="center_vertical"/>
 
     <ImageButton
-        android:id="@+id/upvoteButton"
+        android:id="@+id/upvote_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_arrow_upward_24"
@@ -49,13 +49,13 @@
         android:layout_gravity="center_vertical"/>
 
     <TextView
-        android:id="@+id/upvoteCount"
+        android:id="@+id/upvote_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"/>
 
     <ImageButton
-        android:id="@+id/downvoteButton"
+        android:id="@+id/downvote_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_arrow_downward_24"
