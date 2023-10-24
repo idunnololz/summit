@@ -83,6 +83,10 @@
             android:name="isSinglePage"
             android:defaultValue="false"
             app:argType="boolean"/>
+        <argument
+            android:name="switchToNativeInstance"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_postFragment_to_subredditFragment"
             app:destination="@id/communityFragment" />
