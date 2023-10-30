@@ -3,8 +3,10 @@ package com.idunnololz.summit.lemmy.mod
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentSortType
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -15,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ModActionsViewModel @Inject constructor(
+    private val accountInfoManager: AccountInfoManager,
     private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
@@ -30,6 +33,7 @@ class ModActionsViewModel @Inject constructor(
         ) : ModState
         data class UserModState(
             val isBannedFromCommunity: Boolean,
+            val isBannedFromSite: Boolean,
         ) : ModState
         data class CommunityModState(
             val isMod: Boolean,
@@ -44,11 +48,21 @@ class ModActionsViewModel @Inject constructor(
         get() = apiClient.accountForInstance()
     val currentModState = StatefulLiveData<FullModState>()
 
+
+    fun isAdmin(communityInstance: String): Boolean {
+        val fullAccount = accountInfoManager.currentFullAccount.value
+        val miscAccountInfo = fullAccount
+            ?.accountInfo
+            ?.miscAccountInfo
+        return fullAccount?.account?.instance == communityInstance &&
+            miscAccountInfo?.isAdmin == true
+    }
+
     fun loadModActionsState(
         communityId: Int,
         postId: Int,
         commentId: Int,
-        personId: Int,
+        personId: PersonId,
         force: Boolean = false,
     ) {
         currentModState.setIsLoading()
@@ -108,6 +122,7 @@ class ModActionsViewModel @Inject constructor(
                 allModState +=
                     ModState.UserModState(
                         isBannedFromCommunity = postResult.creator_banned_from_community,
+                        isBannedFromSite = postResult.creator.banned,
                     )
             }
             if (commentResult != null) {
@@ -127,6 +142,7 @@ class ModActionsViewModel @Inject constructor(
                     allModState +=
                         ModState.UserModState(
                             isBannedFromCommunity = comment.creator_banned_from_community,
+                            isBannedFromSite = comment.creator.banned,
                         )
                 }
             }

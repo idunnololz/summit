@@ -31,7 +31,8 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/footer_spacer_height">
 
                 <include
                     android:id="@+id/open_links_in_app"
@@ -78,6 +79,12 @@
                 <include
                     android:id="@+id/preview_links"
                     layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/use_predictive_back"
+                    layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

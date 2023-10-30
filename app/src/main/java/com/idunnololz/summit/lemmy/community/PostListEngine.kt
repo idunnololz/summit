@@ -29,18 +29,24 @@ sealed class Item {
 
     data class AutoLoadItem(val pageToLoad: Int) : Item()
 
+    data class ManualLoadItem(val pageToLoad: Int) : Item()
+
     data class ErrorItem(val message: String, val pageToLoad: Int, val isLoading: Boolean) : Item()
 
     data class PersistentErrorItem(val exception: Exception) : Item()
 
-    object EndItem : Item()
-    object FooterSpacerItem : Item()
+    data class PageTitle(val pageIndex: Int) : Item()
+
+    data object EndItem : Item()
+    data object FooterSpacerItem : Item()
 }
 
 class PostListEngine(
-    infinity: Boolean,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val offlineManager: OfflineManager,
+    infinity: Boolean,
+    autoLoadMoreItems: Boolean,
+    usePageIndicators: Boolean = false,
 ) {
 
     companion object {
@@ -59,6 +65,24 @@ class PostListEngine(
                 val firstPage = pages.first()
                 _pages.value = listOf(firstPage)
             }
+            createItems()
+        }
+
+    var autoLoadMoreItems: Boolean = autoLoadMoreItems
+        set(value) {
+            if (value == field) return
+
+            field = value
+
+            createItems()
+        }
+
+    var usePageIndicators: Boolean = usePageIndicators
+        set(value) {
+            if (value == field) return
+
+            field = value
+
             createItems()
         }
 
@@ -145,6 +169,10 @@ class PostListEngine(
             items.add(Item.AutoLoadItem(firstPage.pageIndex - 1))
         }
         for (page in pages) {
+            if (infinity && usePageIndicators) {
+                items.add(Item.PageTitle(pageIndex = page.pageIndex))
+            }
+
             if (page.error != null) {
                 items.add(
                     Item.ErrorItem(
@@ -176,7 +204,11 @@ class PostListEngine(
             if (lastPage.error != null) {
                 // add nothing!
             } else if (lastPage.hasMore) {
-                items.add(Item.AutoLoadItem(lastPage.pageIndex + 1))
+                if (autoLoadMoreItems) {
+                    items.add(Item.AutoLoadItem(lastPage.pageIndex + 1))
+                } else {
+                    items.add(Item.ManualLoadItem(lastPage.pageIndex + 1))
+                }
                 items += Item.FooterSpacerItem
             } else {
                 items.add(Item.EndItem)
@@ -237,6 +269,8 @@ class PostListEngine(
                 is Item.PostItem ->
                     it.postView.post.id == postToHighlight.id
                 is Item.PersistentErrorItem -> false
+                is Item.ManualLoadItem -> false
+                is Item.PageTitle -> false
             }
         }
     }
@@ -254,6 +288,8 @@ class PostListEngine(
                 is Item.PostItem ->
                     it.postView.post.id == postToHighlight.id
                 is Item.PersistentErrorItem -> false
+                is Item.ManualLoadItem -> false
+                is Item.PageTitle -> false
             }
         }
     }

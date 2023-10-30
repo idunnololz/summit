@@ -20,6 +20,7 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
@@ -45,6 +46,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
@@ -74,6 +76,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.putList
 import com.idunnololz.summit.util.Utils
@@ -601,6 +604,30 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_ENABLE_HIDDEN_POSTS, value)
+                .apply()
+        }
+
+    var usePredictiveBack: Boolean
+        get() = prefs.getBoolean(KEY_USE_PREDICTIVE_BACK, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_PREDICTIVE_BACK, value)
+                .apply()
+        }
+
+    var autoLoadMorePosts: Boolean
+        get() = prefs.getBoolean(KEY_AUTO_LOAD_MORE_POSTS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_AUTO_LOAD_MORE_POSTS, value)
+                .apply()
+        }
+
+    var infinityPageIndicator: Boolean
+        get() = prefs.getBoolean(KEY_INFINITY_PAGE_INDICATOR, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_INFINITY_PAGE_INDICATOR, value)
                 .apply()
         }
 

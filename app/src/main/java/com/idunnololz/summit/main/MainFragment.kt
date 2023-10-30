@@ -1,5 +1,6 @@
 package com.idunnololz.summit.main
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -55,6 +56,7 @@ import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.removeNavHostFragment
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.isPredictiveBackSupported
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -524,6 +526,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         requireMainActivity().registerOnNavigationItemReselectedListener(
             onNavigationItemReselectedListener,
         )
+
+        onBackPressedCallback.isEnabled = !(isPredictiveBackSupported() &&
+                preferences.usePredictiveBack)
     }
 
     override fun onPause() {

@@ -10,6 +10,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentPageResult
@@ -42,11 +43,24 @@ class PersonTabbedViewModel @Inject constructor(
     }
 
     val personData = StatefulLiveData<PersonDetailsData>()
-    val postsState = StatefulLiveData<Unit>()
-    val commentsState = StatefulLiveData<Unit>()
+    val postsState = StatefulLiveData<UpdateInfo>()
+    val commentsState = StatefulLiveData<UpdateInfo>()
 
-    val postListEngine = PostListEngine(infinity = true, coroutineScopeFactory, offlineManager)
+    val postListEngine = PostListEngine(
+        infinity = true,
+        autoLoadMoreItems = true,
+        coroutineScopeFactory = coroutineScopeFactory,
+        offlineManager = offlineManager
+    )
     var commentListEngine = CommentListEngine()
+
+    var sortType: SortType = SortType.New
+        set(value) {
+            field = value
+
+            reset()
+            fetchPage(pageIndex = 0, isPeronInfoFetch = true, force = true)
+        }
 
     val instance: String
         get() = apiClient.instance
@@ -89,6 +103,7 @@ class PersonTabbedViewModel @Inject constructor(
                         page = pageIndex.toLemmyPageIndex(),
                         limit = PAGE_SIZE,
                         force = force,
+                        sortType = sortType,
                     )
                 }
             }
@@ -129,8 +144,16 @@ class PersonTabbedViewModel @Inject constructor(
                         )
                     }
 
-                    postsState.postValue(Unit)
-                    commentsState.postValue(Unit)
+                    postsState.postValue(
+                        UpdateInfo(
+                            isReset = force && pageIndex == 0
+                        )
+                    )
+                    commentsState.postValue(
+                        UpdateInfo(
+                            isReset = force && pageIndex == 0
+                        )
+                    )
 
                     fetchingPages.remove(pageIndex)
                 }
@@ -180,6 +203,11 @@ class PersonTabbedViewModel @Inject constructor(
         fetchPage(commentListEngine.nextPage, false)
     }
 
+    private fun reset() {
+        postListEngine.clearPages()
+        commentListEngine.clear()
+    }
+
     data class PersonDetailsData(
         val personView: PersonView,
         val comments: List<CommentView>,
@@ -189,4 +217,8 @@ class PersonTabbedViewModel @Inject constructor(
 
     private fun Int.toLemmyPageIndex() =
         this + 1 // lemmy pages are 1 indexed
+
+    data class UpdateInfo(
+        val isReset: Boolean
+    )
 }

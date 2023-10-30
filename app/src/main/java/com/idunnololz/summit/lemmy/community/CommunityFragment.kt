@@ -797,10 +797,10 @@ class CommunityFragment :
 
                             AddOrEditCommentFragment().apply {
                                 arguments = AddOrEditCommentFragmentArgs(
-                                    viewModel.apiInstance,
-                                    null,
-                                    postView,
-                                    null,
+                                    instance = viewModel.apiInstance,
+                                    commentView = null,
+                                    postView = postView,
+                                    editCommentView = null,
                                 ).toBundle()
                             }.showAllowingStateLoss(childFragmentManager, "asdf")
                         }

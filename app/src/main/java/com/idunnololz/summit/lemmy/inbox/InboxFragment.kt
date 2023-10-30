@@ -512,7 +512,7 @@ class InboxFragment :
     }
 
     private class InboxItemAdapter(
-        var accountId: Int?,
+        var accountId: Long?,
         private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
         private val instance: String,
         private val lifecycleOwner: LifecycleOwner,

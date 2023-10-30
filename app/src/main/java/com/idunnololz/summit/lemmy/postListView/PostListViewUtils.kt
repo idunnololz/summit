@@ -74,9 +74,23 @@ fun BaseFragment<*>.showMorePostOptions(
         }
 
         val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
-        if (fullAccount
+        val miscAccountInfo = fullAccount
             ?.accountInfo
             ?.miscAccountInfo
+
+        if (fullAccount?.account?.instance == postView.community.instance &&
+            miscAccountInfo?.isAdmin == true) {
+
+            addDivider()
+
+            addItemWithIcon(
+                id = R.id.admin_tools,
+                title = R.string.admin_tools,
+                icon = R.drawable.outline_shield_24,
+            )
+
+            addDivider()
+        } else if (miscAccountInfo
             ?.modCommunityIds
             ?.contains(postView.community.id) == true
         ) {
@@ -262,6 +276,9 @@ fun BaseFragment<*>.showMorePostOptions(
                             ).toBundle()
                         }
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
+                }
+                R.id.admin_tools -> {
+                    ModActionsDialogFragment.show(postView, childFragmentManager)
                 }
                 R.id.mod_tools -> {
                     ModActionsDialogFragment.show(postView, childFragmentManager)

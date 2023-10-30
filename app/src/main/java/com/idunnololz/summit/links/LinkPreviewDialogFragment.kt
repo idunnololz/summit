@@ -93,7 +93,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
         }
     }
 
-    private fun setup(data: LinkPreviewViewModel.LinkMetadata) = with(binding) {
+    private fun setup(data: LinkMetadataHelper.LinkMetadata) = with(binding) {
         val context = requireContext()
         domain.text = data.host
         title.text = data.title

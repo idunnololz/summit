@@ -188,7 +188,7 @@ class AddOrEditCommentFragment :
 
                     val inboxItem = args.inboxItem
                     val personId = args.personId
-                    if (personId != 0) {
+                    if (personId != 0L) {
                         viewModel.sendComment(
                             personId,
                             binding.commentEditor.editText?.text.toString(),
@@ -268,7 +268,7 @@ class AddOrEditCommentFragment :
             binding.replyingTo.text = postView.post.body
         } else if (inboxItem != null) {
             binding.replyingTo.text = inboxItem.content
-        } else if (personId != 0) {
+        } else if (personId != 0L) {
             binding.scrollView.visibility = View.GONE
             binding.divider.visibility = View.GONE
         } else {
@@ -441,7 +441,7 @@ class AddOrEditCommentFragment :
                         ),
                         args.commentView?.comment?.id,
                         content,
-                        viewModel.currentAccount.value?.id ?: 0,
+                        viewModel.currentAccount.value?.id ?: 0L,
                         viewModel.currentAccount.value?.instance ?: "",
                     ),
                     showToast = true,

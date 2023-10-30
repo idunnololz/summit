@@ -54,7 +54,12 @@ class SavedViewModel @Inject constructor(
     val postsState = StatefulLiveData<Unit>()
     val commentsState = StatefulLiveData<Unit>()
 
-    val postListEngine = PostListEngine(infinity = true, coroutineScopeFactory, offlineManager)
+    val postListEngine = PostListEngine(
+        infinity = true,
+        autoLoadMoreItems = true,
+        coroutineScopeFactory = coroutineScopeFactory,
+        offlineManager = offlineManager,
+    )
     var commentListEngine = CommentListEngine()
 
     val instance: String

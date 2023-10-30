@@ -209,6 +209,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 findNavController().navigateSafe(directions)
                                 true
                             }
+                            mainSettings.settingAccount.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingAccountsFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
                             else -> false
                         }
                     },

@@ -12,9 +12,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.DialogFragmentModActionsBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
@@ -34,7 +37,8 @@ import kotlinx.parcelize.Parcelize
 @AndroidEntryPoint
 class ModActionsDialogFragment :
     BaseBottomSheetDialogFragment<DialogFragmentModActionsBinding>(),
-    FullscreenDialogFragment {
+    FullscreenDialogFragment,
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
 
@@ -50,6 +54,7 @@ class ModActionsDialogFragment :
                 commentId = -1,
                 postId = postView.post.id,
                 personId = postView.creator.id,
+                communityInstance = postView.community.instance,
                 fragmentManager = fragmentManager,
             )
         }
@@ -63,6 +68,7 @@ class ModActionsDialogFragment :
                 commentId = commentView.comment.id,
                 postId = -1,
                 personId = commentView.creator.id,
+                communityInstance = commentView.community.instance,
                 fragmentManager = fragmentManager,
             )
         }
@@ -71,16 +77,18 @@ class ModActionsDialogFragment :
             communityId: Int,
             commentId: Int,
             postId: Int,
-            personId: Int,
+            personId: PersonId,
+            communityInstance: String,
             fragmentManager: FragmentManager,
         ) {
             ModActionsDialogFragment()
                 .apply {
                     arguments = ModActionsDialogFragmentArgs(
-                        communityId,
-                        commentId,
-                        postId,
-                        personId,
+                        communityId = communityId,
+                        commentId = commentId,
+                        postId = postId,
+                        personId = personId,
+                        communityInstance = communityInstance,
                     ).toBundle()
                 }
                 .show(fragmentManager, "ModActionsDialogFragment")
@@ -124,7 +132,12 @@ class ModActionsDialogFragment :
         val context = requireContext()
         with(binding) {
             adapter = BottomMenu.BottomMenuAdapter(context).apply {
-                title = getString(R.string.mod_actions)
+                title =
+                    if (viewModel.isAdmin(args.communityInstance)) {
+                        getString(R.string.admin_actions)
+                    } else {
+                        getString(R.string.mod_actions)
+                    }
                 onMenuItemClickListener = {
                     when (it.id) {
                         R.id.feature_post -> {
@@ -204,6 +217,66 @@ class ModActionsDialogFragment :
                                 remove = false,
                             )
                         }
+                        R.id.ban_from_site -> {
+                            val accountId = viewModel.currentAccount?.id
+
+                            if (accountId != null) {
+                                BanUserDialogFragment()
+                                    .apply {
+                                        arguments = BanUserDialogFragmentArgs(
+                                            communityId = 0,
+                                            personId = args.personId,
+                                            accountId = accountId,
+                                        ).toBundle()
+                                    }
+                                    .showAllowingStateLoss(
+                                        parentFragmentManager,
+                                        "BanUserDialogFragment",
+                                    )
+                            }
+                            dismiss()
+                        }
+                        R.id.undo_ban_from_site -> {
+                            actionsViewModel.banUserFromSite(
+                                personId = args.personId,
+                                ban = false,
+                                removeData = false,
+                                reason = null,
+                                expiresDays = null,
+                            )
+                        }
+                        R.id.purge_community -> {
+                            AlertDialogFragment.Builder()
+                                .setTitle(R.string.purge_community_title)
+                                .setMessage(R.string.purge_community_body)
+                                .setPositiveButton(R.string.purge_community)
+                                .setNegativeButton(android.R.string.cancel)
+                                .createAndShow(childFragmentManager, "purge_community")
+                        }
+                        R.id.purge_post -> {
+                            AlertDialogFragment.Builder()
+                                .setTitle(R.string.purge_post_title)
+                                .setMessage(R.string.purge_community_body)
+                                .setPositiveButton(R.string.purge_post)
+                                .setNegativeButton(android.R.string.cancel)
+                                .createAndShow(childFragmentManager, "purge_post")
+                        }
+                        R.id.purge_user -> {
+                            AlertDialogFragment.Builder()
+                                .setTitle(R.string.purge_user_title)
+                                .setMessage(R.string.purge_community_body)
+                                .setPositiveButton(R.string.purge_user)
+                                .setNegativeButton(android.R.string.cancel)
+                                .createAndShow(childFragmentManager, "purge_user")
+                        }
+                        R.id.purge_comment -> {
+                            AlertDialogFragment.Builder()
+                                .setTitle(R.string.purge_comment_title)
+                                .setMessage(R.string.purge_community_body)
+                                .setPositiveButton(R.string.purge_comment)
+                                .setNegativeButton(android.R.string.cancel)
+                                .createAndShow(childFragmentManager, "purge_comment")
+                        }
                     }
                 }
             }
@@ -241,6 +314,7 @@ class ModActionsDialogFragment :
             actionsViewModel.featurePostAction.handleStateChange()
             actionsViewModel.lockPostAction.handleStateChange()
             actionsViewModel.removePostAction.handleStateChange()
+
             actionsViewModel.banUserResult.handleStateChange(
                 { getString(R.string.error_unable_to_ban_user) },
                 {
@@ -272,6 +346,35 @@ class ModActionsDialogFragment :
             actionsViewModel.removeCommentResult.handleStateChange(
                 { getString(R.string.error_unable_to_remove_comment) },
                 { UpdatedObject.CommentObject(args.commentId) },
+            )
+            actionsViewModel.banUserFromSiteResult.handleStateChange(
+                { getString(R.string.error_unable_to_ban_user) },
+                {
+                    if (args.postId != -1) {
+                        UpdatedObject.PostObject(args.postId)
+                    } else if (args.commentId != -1) {
+                        UpdatedObject.CommentObject(args.commentId)
+                    } else {
+                        null
+                    }
+                },
+            )
+
+            actionsViewModel.purgeCommunityResult.handleStateChange(
+                { getString(R.string.error_purge_community) },
+                { null }
+            )
+            actionsViewModel.purgeUserResult.handleStateChange(
+                { getString(R.string.error_purge_user) },
+                { null }
+            )
+            actionsViewModel.purgePostResult.handleStateChange(
+                { getString(R.string.error_purge_post) },
+                { UpdatedObject.PostObject(args.postId) }
+            )
+            actionsViewModel.purgeCommentResult.handleStateChange(
+                { getString(R.string.error_purge_comment) },
+                { UpdatedObject.CommentObject(args.commentId) }
             )
         }
     }
@@ -448,7 +551,7 @@ class ModActionsDialogFragment :
                     } else {
                         adapter?.addItemWithIcon(
                             id = R.id.ban,
-                            title = R.string.ban_user,
+                            title = R.string.ban_user_from_community,
                             icon = R.drawable.outline_person_remove_24,
                         )
                     }
@@ -457,8 +560,93 @@ class ModActionsDialogFragment :
             }
         }
 
+        if (viewModel.isAdmin(args.communityInstance)) {
+            adapter?.addDividerIfNeeded()
+
+            val userModState = data.modStates.filterIsInstance<UserModState>().firstOrNull()
+            if (userModState != null) {
+                if (userModState.isBannedFromSite) {
+                    adapter?.addItemWithIcon(
+                        id = R.id.undo_ban_from_site,
+                        title = R.string.unban_user_from_site,
+                        icon = R.drawable.baseline_person_add_alt_24,
+                    )
+                } else {
+                    adapter?.addItemWithIcon(
+                        id = R.id.ban_from_site,
+                        title = R.string.ban_user_from_site,
+                        icon = R.drawable.outline_person_remove_24,
+                    )
+                }
+            }
+
+            adapter?.addItemWithIcon(
+                id = R.id.purge_user,
+                title = R.string.purge_user,
+                icon = R.drawable.outline_person_remove_24,
+            )
+
+            if (data.modStates.any { it is PostModState }) {
+                adapter?.addItemWithIcon(
+                    id = R.id.purge_post,
+                    title = R.string.purge_post,
+                    icon = R.drawable.baseline_remove_24,
+                )
+            }
+
+            if (data.modStates.any { it is CommentModState }) {
+                adapter?.addItemWithIcon(
+                    id = R.id.purge_comment,
+                    title = R.string.purge_comment,
+                    icon = R.drawable.baseline_remove_24,
+                )
+            }
+
+            if (data.modStates.any { it is CommunityModState }) {
+                adapter?.addItemWithIcon(
+                    id = R.id.purge_community,
+                    title = R.string.purge_community,
+                    icon = R.drawable.baseline_remove_24,
+                )
+            }
+
+            adapter?.addDividerIfNeeded()
+        }
+
         adapter?.refreshItems {
             binding.recyclerView.requestLayout()
         }
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        when (tag) {
+            "purge_community" -> {
+                actionsViewModel.purgeCommunity(
+                    communityId = args.communityId,
+                    reason = null,
+                )
+            }
+            "purge_post" -> {
+                actionsViewModel.purgePost(
+                    postId = args.postId,
+                    reason = null,
+                )
+            }
+            "purge_user" -> {
+                actionsViewModel.purgePerson(
+                    personId = args.personId,
+                    reason = null,
+                )
+            }
+            "purge_comment" -> {
+                actionsViewModel.purgeComment(
+                    commentId = args.commentId,
+                    reason = null,
+                )
+            }
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 }

@@ -62,12 +62,18 @@ class MoreActionsViewModel @Inject constructor(
     val modUserResult = StatefulLiveData<Unit>()
     val distinguishCommentResult = StatefulLiveData<Unit>()
     val removeCommentResult = StatefulLiveData<Unit>()
+    val purgeCommunityResult = StatefulLiveData<Unit>()
+    val purgePostResult = StatefulLiveData<Unit>()
+    val purgeUserResult = StatefulLiveData<Unit>()
+    val purgeCommentResult = StatefulLiveData<Unit>()
 
     val deletePostAction = PostAction(actionType = PostActionType.DeletePost)
     val savePostAction = PostAction(actionType = PostActionType.SavePost)
     val featurePostAction = PostAction(actionType = PostActionType.FeaturePost)
     val lockPostAction = PostAction(actionType = PostActionType.LockPost)
     val removePostAction = PostAction(actionType = PostActionType.RemovePost)
+
+    val banUserFromSiteResult = StatefulLiveData<Unit>()
 
     private var currentPageInstance: String? = null
 
@@ -279,7 +285,7 @@ class MoreActionsViewModel @Inject constructor(
         }
     }
 
-    fun mod(communityId: Int, personId: Int, mod: Boolean) {
+    fun mod(communityId: Int, personId: PersonId, mod: Boolean) {
         modUserResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {
@@ -340,6 +346,117 @@ class MoreActionsViewModel @Inject constructor(
 
     fun setPageInstance(instance: String) {
         currentPageInstance = instance
+    }
+
+    fun banUserFromSite(
+        personId: PersonId,
+        ban: Boolean,
+        removeData: Boolean,
+        reason: String?,
+        expiresDays: Int?,
+    ) {
+        banUserFromSiteResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.banUserFromSite(
+                    personId,
+                    ban,
+                    removeData,
+                    reason,
+                    expiresDays,
+                )
+            }
+                .onSuccess {
+                    banUserFromSiteResult.postValue(Unit)
+                }
+                .onFailure {
+                    banUserFromSiteResult.postError(it)
+                }
+        }
+    }
+
+    fun purgeCommunity(
+        communityId: CommunityId,
+        reason: String?,
+    ) {
+        purgeCommunityResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.purgeCommunity(
+                    communityId = communityId,
+                    reason = reason,
+                )
+            }
+                .onSuccess {
+                    purgeCommunityResult.postValue(Unit)
+                }
+                .onFailure {
+                    purgeCommunityResult.postError(it)
+                }
+        }
+    }
+
+    fun purgePost(
+        postId: PostId,
+        reason: String?,
+    ) {
+        purgeCommunityResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.purgePost(
+                    postId = postId,
+                    reason = reason,
+                )
+            }
+                .onSuccess {
+                    purgeCommunityResult.postValue(Unit)
+                }
+                .onFailure {
+                    purgeCommunityResult.postError(it)
+                }
+        }
+    }
+
+    fun purgePerson(
+        personId: PersonId,
+        reason: String?,
+    ) {
+        purgeCommunityResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.purgePerson(
+                    personId = personId,
+                    reason = reason,
+                )
+            }
+                .onSuccess {
+                    purgeCommunityResult.postValue(Unit)
+                }
+                .onFailure {
+                    purgeCommunityResult.postError(it)
+                }
+        }
+    }
+
+    fun purgeComment(
+        commentId: CommentId,
+        reason: String?,
+    ) {
+        purgeCommunityResult.setIsLoading()
+        viewModelScope.launch {
+            ensureRightInstance {
+                apiClient.purgeComment(
+                    commentId = commentId,
+                    reason = reason,
+                )
+            }
+                .onSuccess {
+                    purgeCommunityResult.postValue(Unit)
+                }
+                .onFailure {
+                    purgeCommunityResult.postError(it)
+                }
+        }
     }
 
     private suspend fun <T> ensureRightInstance(

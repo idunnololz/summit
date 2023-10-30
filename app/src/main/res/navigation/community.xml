@@ -134,8 +134,8 @@
             app:destination="@id/previewCommentDialogFragment" />
         <argument
             android:name="person_id"
-            app:argType="integer"
-            android:defaultValue="0" />
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
     <dialog
         android:id="@+id/createOrEditPostFragment"
@@ -156,6 +156,16 @@
         <argument
             android:name="crosspost"
             app:argType="com.idunnololz.summit.api.dto.Post"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="extraText"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="extraStream"
+            app:argType="android.net.Uri"
             app:nullable="true"
             android:defaultValue="@null" />
     </dialog>

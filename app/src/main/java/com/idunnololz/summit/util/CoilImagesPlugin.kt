@@ -155,6 +155,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
                 object : CoilStore {
                     override fun load(drawable: AsyncDrawable): ImageRequest {
                         return ImageRequest.Builder(context)
+                            .allowHardware(false) // Needed for the "take screenshot" feature
                             .data(drawable.destination)
                             .build()
                     }

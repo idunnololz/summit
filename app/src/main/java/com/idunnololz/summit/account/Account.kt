@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 data class Account(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: Int,
+    val id: Long,
     @ColumnInfo(name = "current") val current: Boolean,
     @ColumnInfo(name = "instance") val instance: String,
     @ColumnInfo(name = "name") val name: String,

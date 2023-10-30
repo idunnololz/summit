@@ -3,7 +3,9 @@ package com.idunnololz.summit.main
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -41,6 +43,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
@@ -55,6 +58,8 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
@@ -134,6 +139,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var accountManager: AccountManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -327,7 +335,7 @@ class MainActivity : BaseActivity() {
         return prevVersion < curVersion
     }
 
-    fun onUpdateComplete() {
+    private fun onUpdateComplete() {
         Snackbar
             .make(
                 binding.snackbarContainer,
@@ -341,7 +349,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchChangelog() {
-        launchPage(PostRef("lemmy.world", 7249693), switchToNativeInstance = true)
+        launchPage(PostRef("lemmy.world", 7556576), switchToNativeInstance = true)
     }
 
     private val bottomNavY
@@ -500,7 +508,9 @@ class MainActivity : BaseActivity() {
 
     private fun showNotificationBarBgIfNeeded() {
         if (!showNotificationBarBg) return
-        if (binding.notificationBarBg.translationY == 0f && binding.notificationBarBg.visibility == View.VISIBLE) return
+        if (binding.notificationBarBg.translationY == 0f &&
+            binding.notificationBarBg.visibility == View.VISIBLE) return
+
         binding.notificationBarBg.visibility = View.VISIBLE
         binding.notificationBarBg.animate()
             .setDuration(250)
@@ -510,14 +520,14 @@ class MainActivity : BaseActivity() {
             .translationY(0f)
     }
 
-    fun enableBottomNavViewScrolling() {
+    private fun enableBottomNavViewScrolling() {
         if (!useBottomNavBar) return
 
         enableBottomNavViewScrolling = true
         binding.bottomNavigationView.visibility = View.VISIBLE
     }
 
-    fun disableBottomNavViewScrolling() {
+    private fun disableBottomNavViewScrolling() {
         enableBottomNavViewScrolling = false
     }
 
@@ -526,7 +536,7 @@ class MainActivity : BaseActivity() {
         bottomNavViewAnimationOffset.value = binding.bottomNavigationView.height * progress
     }
 
-    fun showBottomNav(supportOpenness: Boolean = false) {
+    private fun showBottomNav(supportOpenness: Boolean = false) {
         if (!useBottomNavBar) return
         if (enableBottomNavViewScrolling && binding.bottomNavigationView.visibility == View.VISIBLE) {
             return
@@ -566,7 +576,9 @@ class MainActivity : BaseActivity() {
         if (animate) {
             binding.bottomNavigationView.animate()
                 .translationY(binding.bottomNavigationView.height.toFloat())
-                .setDuration(250)
+                .apply {
+                    duration = 250
+                }
         } else {
             binding.bottomNavigationView.translationY =
                 binding.bottomNavigationView.height.toFloat()
@@ -576,8 +588,76 @@ class MainActivity : BaseActivity() {
     private fun handleIntent(intent: Intent?) {
         intent ?: return
 
+        when (intent.action) {
+            Intent.ACTION_SEND -> {
+                if ("text/plain" == intent.type) {
+                    handleSendText(intent) // Handle text being sent
+                } else if (intent.type?.startsWith("image/") == true) {
+                    handleSendImage(intent) // Handle single image being sent
+                }
+            }
+            Intent.ACTION_VIEW -> {
+                handleViewIntent(intent)
+            }
+            else -> {
+                // Handle other intents, such as being started from the home screen
+            }
+        }
+    }
+
+    private fun handleSendImage(intent: Intent) {
+        val account = accountManager.currentAccount.value
+
+        if (account == null) {
+            AlertDialogFragment.Builder()
+                .setMessage(R.string.you_must_sign_in_to_create_a_post)
+                .createAndShow(supportFragmentManager, "asdf")
+            return
+        }
+
+        CreateOrEditPostFragment()
+            .apply {
+                arguments = CreateOrEditPostFragmentArgs(
+                    account.instance,
+                    null,
+                    null,
+                    null,
+                    extraStream = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri,
+                ).toBundle()
+            }
+            .show(supportFragmentManager, "CreateOrEditPostFragment")
+    }
+
+    private fun handleSendText(intent: Intent) {
+        val account = accountManager.currentAccount.value
+
+        if (account == null) {
+            AlertDialogFragment.Builder()
+                .setMessage(R.string.you_must_sign_in_to_create_a_post)
+                .createAndShow(supportFragmentManager, "asdf")
+            return
+        }
+
+        CreateOrEditPostFragment()
+            .apply {
+                arguments = CreateOrEditPostFragmentArgs(
+                    account.instance,
+                    null,
+                    null,
+                    null,
+                    extraText = intent.getStringExtra(Intent.EXTRA_TEXT),
+                ).toBundle()
+            }
+            .show(supportFragmentManager, "CreateOrEditPostFragment")
+    }
+
+    private fun handleViewIntent(intent: Intent) {
         val data = intent.data ?: return
-        val page = LinkResolver.parseUrl(data.toString(), viewModel.currentInstance, mustHandle = true)
+        val page = LinkResolver.parseUrl(
+            url = data.toString(),
+            currentInstance = viewModel.currentInstance,
+            mustHandle = true
+        )
 
         if (page == null) {
             Log.d(TAG, "Unable to handle uri $data")

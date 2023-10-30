@@ -109,7 +109,7 @@ data class PendingCommentView(
     val commentId: CommentId?,
     val parentId: CommentId?,
     val content: String,
-    val accountId: Int,
+    val accountId: Long,
     val isActionDelete: Boolean = false,
     var error: LemmyActionFailureReason? = null,
     var complete: Boolean = false,

@@ -77,20 +77,20 @@ sealed interface LemmyActionFailureReason {
     @JsonClass(generateAdapter = true)
     @TypeLabel("4")
     data class AccountNotFoundError(
-        val accountId: Int,
+        val accountId: Long,
     ) : LemmyActionFailureReason
 
     @TypeLabel("5")
-    object ConnectionError : LemmyActionFailureReason
+    data object ConnectionError : LemmyActionFailureReason
 
     @TypeLabel("6")
-    object DeserializationError : LemmyActionFailureReason
+    data object DeserializationError : LemmyActionFailureReason
 
     @TypeLabel("7")
-    object ServerError : LemmyActionFailureReason
+    data object ServerError : LemmyActionFailureReason
 
     @TypeLabel("8")
-    object ActionOverwritten : LemmyActionFailureReason
+    data object ActionOverwritten : LemmyActionFailureReason
 }
 
 class LemmyActionFailureException(val reason: LemmyActionFailureReason) : RuntimeException(

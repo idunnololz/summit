@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -186,6 +188,10 @@ class CreateOrEditPostFragment :
                 }
                 else -> false
             }
+        }
+
+        binding.url.editText?.doOnTextChanged { text, start, before, count ->
+            viewModel.setUrl(text.toString())
         }
 
         val postEditor = binding.postEditor
@@ -408,6 +414,9 @@ class CreateOrEditPostFragment :
                 }
             }
         }
+        viewModel.linkMetadata.observe(viewLifecycleOwner) { linkMetadata ->
+            onLinkMetadataChanged()
+        }
 
         binding.communityEditText.setOnClickListener {
             viewModel.showSearch.value = true
@@ -506,8 +515,60 @@ class CreateOrEditPostFragment :
             }
         }
 
+        if (savedInstanceState == null) {
+            val extraText = args.extraText
+            val extraImage = args.extraStream
+
+            if (extraText != null) {
+                if (URLUtil.isValidUrl(extraText)) {
+                    binding.url.editText?.setText(extraText)
+                } else {
+                    binding.postEditor.editText?.setText(extraText)
+                }
+            }
+
+            if (extraImage != null) {
+                viewModel.uploadImageForUrl(args.instance, extraImage)
+            }
+        }
+
         hideSearch(animate = false)
         updateEnableState()
+    }
+
+    private fun onLinkMetadataChanged() {
+        val linkMetadata = viewModel.linkMetadata.value
+
+        when (linkMetadata) {
+            is StatefulData.Error -> {
+                binding.titleSuggestionContainer.visibility = View.GONE
+            }
+            is StatefulData.Loading -> {
+                binding.titleSuggestionContainer.visibility = View.GONE
+            }
+            is StatefulData.NotStarted -> {
+                binding.titleSuggestionContainer.visibility = View.GONE
+            }
+            is StatefulData.Success -> {
+                val title = linkMetadata.data.title
+
+                if (linkMetadata.data.url == binding.urlEditText.text.toString() &&
+                    title.isNotBlank() &&
+                    title != binding.titleEditText.text.toString()) {
+
+                    binding.titleSuggestionContainer.visibility = View.VISIBLE
+                    binding.titleSuggestion.text = getString(R.string.use_suggested_title_format,
+                        title
+                    )
+                    binding.titleSuggestionContainer.setOnClickListener {
+                        binding.titleEditText.setText(title)
+                        onLinkMetadataChanged()
+                    }
+                } else {
+                    binding.titleSuggestionContainer.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun updateEnableState() {

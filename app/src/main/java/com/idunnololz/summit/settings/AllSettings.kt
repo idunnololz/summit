@@ -90,6 +90,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.lemmy_web_preferences),
         context.getString(R.string.lemmy_web_preferences_desc),
     )
+    val settingAccount = BasicSettingItem(
+        R.drawable.outline_account_circle_24,
+        context.getString(R.string.summit_account_settings),
+        context.getString(R.string.summit_account_settings_desc),
+    )
     val settingGestures = BasicSettingItem(
         R.drawable.baseline_gesture_24,
         context.getString(R.string.gestures),
@@ -175,6 +180,7 @@ class MainSettings @Inject constructor(
             context.getString(R.string.account_settings),
             listOf(
                 settingLemmyWeb,
+                settingAccount,
             ),
         ),
         SubgroupItem(
@@ -561,6 +567,16 @@ class PostListSettings @Inject constructor(
         null,
         context.getString(R.string.lock_bottom_bar),
         context.getString(R.string.lock_bottom_bar_desc),
+    )
+    val autoLoadMorePosts = OnOffSettingItem(
+        null,
+        context.getString(R.string.auto_load_more_posts),
+        context.getString(R.string.auto_load_more_posts_desc),
+    )
+    val infinityPageIndicator = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_page_numbers),
+        context.getString(R.string.show_page_numbers_desc),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1204,6 +1220,12 @@ class MiscSettings @Inject constructor(
         ),
     )
 
+    val usePredictiveBack = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_predictive_back),
+        context.getString(R.string.use_predictive_back_desc),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
@@ -1212,6 +1234,7 @@ class MiscSettings @Inject constructor(
         leftHandMode,
         transparentNotificationBar,
         previewLinks,
+        usePredictiveBack,
     )
 }
 

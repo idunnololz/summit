@@ -97,7 +97,7 @@ class LemmyActionConverters(private val moshi: Moshi) {
 @JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface ActionInfo {
 
-    val accountId: Int?
+    val accountId: Long?
     val action: ActionType
     val isAffectedByRateLimit: Boolean
     val retries: Int
@@ -118,7 +118,7 @@ sealed interface ActionInfo {
          */
         val dir: Int,
         val rank: Int,
-        override val accountId: Int,
+        override val accountId: Long,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.VOTE,
     ) : ActionInfo {
@@ -135,7 +135,7 @@ sealed interface ActionInfo {
          */
         val content: String,
 
-        override val accountId: Int,
+        override val accountId: Long,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,
     ) : ActionInfo {
@@ -148,7 +148,7 @@ sealed interface ActionInfo {
         val postRef: PostRef,
         val commentId: CommentId,
 
-        override val accountId: Int,
+        override val accountId: Long,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.DELETE_COMMENT,
     ) : ActionInfo {
@@ -165,7 +165,7 @@ sealed interface ActionInfo {
          */
         val content: String,
 
-        override val accountId: Int,
+        override val accountId: Long,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,
     ) : ActionInfo {
@@ -178,7 +178,7 @@ sealed interface ActionInfo {
         val postRef: PostRef,
         val read: Boolean,
 
-        override val accountId: Int,
+        override val accountId: Long,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,
     ) : ActionInfo {

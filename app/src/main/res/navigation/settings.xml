@@ -174,6 +174,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_settingAccountsFragment"
+            app:destination="@id/settingAccountsFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -269,4 +276,25 @@
         android:id="@+id/hiddenPostsFragment"
         android:name="com.idunnololz.summit.settings.hiddenPosts.HiddenPostsFragment"
         android:label="HiddenPostsFragment" />
+    <fragment
+        android:id="@+id/settingAccountsFragment"
+        android:name="com.idunnololz.summit.settings.accounts.SettingAccountsFragment"
+        android:label="SettingAccountsFragment" >
+        <action
+            android:id="@+id/action_settingAccountsFragment_to_settingPerAccountFragment"
+            app:destination="@id/settingPerAccountFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
+    </fragment>
+    <fragment
+        android:id="@+id/settingPerAccountFragment"
+        android:name="com.idunnololz.summit.settings.accounts.perAccount.SettingPerAccountFragment"
+        android:label="SettingPerAccountFragment" >
+        <argument
+            android:name="accountId"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
 </navigation>

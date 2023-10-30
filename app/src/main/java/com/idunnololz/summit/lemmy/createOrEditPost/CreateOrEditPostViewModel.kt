@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Application
 import android.net.Uri
+import android.webkit.URLUtil
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -20,15 +21,19 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
+import com.idunnololz.summit.links.LinkMetadataHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class) // Flow.debounce()
 @HiltViewModel
 class CreateOrEditPostViewModel @Inject constructor(
     private val context: Application,
@@ -38,6 +43,8 @@ class CreateOrEditPostViewModel @Inject constructor(
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
+    private val linkMetadataHelper = LinkMetadataHelper()
+
     var postPrefilled: Boolean = false
     val createOrEditPostResult = StatefulLiveData<PostView>()
     val uploadImageResult = StatefulLiveData<UploadImageResult>()
@@ -46,6 +53,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     val showSearch = MutableStateFlow<Boolean>(false)
     val showSearchLiveData = showSearch.asLiveData()
     val query = MutableStateFlow("")
+    val linkMetadata = StatefulLiveData<LinkMetadataHelper.LinkMetadata>()
 
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
@@ -54,12 +62,23 @@ class CreateOrEditPostViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
+    private var urlFlow = MutableSharedFlow<String>()
+
     init {
         viewModelScope.launch {
             query
                 .debounce(300)
                 .collect {
                     doQuery(it)
+                }
+        }
+        viewModelScope.launch {
+            urlFlow
+                .debounce(500)
+                .collect {
+                    if (URLUtil.isValidUrl(it)) {
+                        loadLinkMetadata(it)
+                    }
                 }
         }
     }
@@ -162,6 +181,24 @@ class CreateOrEditPostViewModel @Inject constructor(
 
     fun uploadImageForUrl(instance: String, uri: Uri) {
         uploadImageInternal(instance, uri, uploadImageForUrlResult)
+    }
+
+    fun loadLinkMetadata(url: String) {
+        linkMetadata.setIsLoading()
+
+        viewModelScope.launch {
+            try {
+                linkMetadata.setValue(linkMetadataHelper.loadLinkMetadata(url))
+            } catch (e: Exception) {
+                linkMetadata.setError(e)
+            }
+        }
+    }
+
+    fun setUrl(url: String) {
+        viewModelScope.launch {
+            urlFlow.emit(url)
+        }
     }
 
     private fun doQuery(query: String) {

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -17,6 +18,7 @@ import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.isPredictiveBackSupported
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -136,6 +138,17 @@ class SettingMiscFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        if (isPredictiveBackSupported()) {
+            settings.usePredictiveBack.bindTo(
+                binding.usePredictiveBack,
+                { preferences.usePredictiveBack },
+                {
+                    preferences.usePredictiveBack = it
+                },
+            )
+        } else {
+            binding.usePredictiveBack.root.visibility = View.GONE
+        }
     }
 
     override fun updateValue(key: Int, value: Any?) {

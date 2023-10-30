@@ -10,6 +10,7 @@ import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
@@ -33,7 +34,7 @@ class PersonAdapter(
     private val onSinglePersonSelected: (
         PersonRef.PersonRefByName,
         icon: String?,
-        personId: Int,
+        personId: PersonId,
     ) -> Unit = { _, _, _ -> },
     private val maxSelectedPersons: Int = 100,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

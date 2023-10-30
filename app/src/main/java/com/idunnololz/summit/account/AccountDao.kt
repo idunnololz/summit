@@ -23,7 +23,7 @@ abstract class AccountDao {
     abstract suspend fun getFirstAccount(): Account?
 
     @Query("SELECT * FROM account WHERE id = :accountId")
-    abstract suspend fun getAccountById(accountId: Int): Account?
+    abstract suspend fun getAccountById(accountId: Long): Account?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE, entity = Account::class)
     abstract suspend fun insert(account: Account)
@@ -35,7 +35,7 @@ abstract class AccountDao {
     abstract suspend fun removeCurrent()
 
     @Query("UPDATE account set current = 1 where id = :accountId")
-    abstract suspend fun setCurrent(accountId: Int)
+    abstract suspend fun setCurrent(accountId: Long)
 
     @Delete(entity = Account::class)
     abstract suspend fun delete(account: Account)
@@ -44,7 +44,7 @@ abstract class AccountDao {
     abstract suspend fun count(): Int
 
     @Transaction
-    open suspend fun clearAndSetCurrent(accountId: Int) {
+    open suspend fun clearAndSetCurrent(accountId: Long) {
         removeCurrent()
         setCurrent(accountId)
     }

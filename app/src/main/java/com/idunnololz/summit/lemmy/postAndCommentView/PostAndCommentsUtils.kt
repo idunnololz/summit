@@ -6,6 +6,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -105,9 +106,23 @@ fun BaseFragment<*>.showMoreCommentOptions(
         }
 
         val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
-        if (fullAccount
+        val miscAccountInfo = fullAccount
             ?.accountInfo
             ?.miscAccountInfo
+
+        if (fullAccount?.account?.instance == commentView.community.instance &&
+            miscAccountInfo?.isAdmin == true) {
+
+            addDivider()
+
+            addItemWithIcon(
+                id = R.id.admin_tools,
+                title = R.string.admin_tools,
+                icon = R.drawable.outline_shield_24,
+            )
+
+            addDivider()
+        } else if (miscAccountInfo
             ?.modCommunityIds
             ?.contains(commentView.community.id) == true
         ) {
@@ -181,6 +196,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
                         }
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
+                R.id.admin_tools,
                 R.id.mod_tools -> {
                     ModActionsDialogFragment.show(commentView, childFragmentManager)
                 }

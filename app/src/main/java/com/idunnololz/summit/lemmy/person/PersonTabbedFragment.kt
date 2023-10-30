@@ -16,15 +16,19 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.SignInNavigator
+import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.FragmentPersonBinding
+import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
+import com.idunnololz.summit.lemmy.utils.SortTypeMenuHelper
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
@@ -220,6 +224,12 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
         val bottomMenu = BottomMenu(requireContext()).apply {
             addItemWithIcon(
+                id = R.id.sort,
+                title = getString(R.string.sort_by),
+                icon = R.drawable.baseline_sort_24,
+            )
+            addDivider()
+            addItemWithIcon(
                 id = R.id.block_user,
                 title = getString(R.string.block_this_user_format, person.name),
                 icon = R.drawable.baseline_person_off_24,
@@ -237,6 +247,14 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
             setOnMenuItemClickListener {
                 when (it.id) {
+                    R.id.sort -> {
+                        SortTypeMenuHelper(
+                            requireContext(),
+                            this@PersonTabbedFragment,
+                            { viewModel.sortType },
+                            { viewModel.sortType = it }
+                        ).show()
+                    }
                     R.id.block_user -> {
                         actionsViewModel.blockPerson(person.id)
                     }

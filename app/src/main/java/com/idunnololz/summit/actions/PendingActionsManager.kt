@@ -128,7 +128,7 @@ class PendingActionsManager @Inject constructor(
         instance: String,
         ref: VotableRef,
         dir: Int,
-        accountId: Int,
+        accountId: Long,
     ) {
         coroutineScope.launch {
             val action = ActionInfo.VoteActionInfo(
@@ -152,7 +152,7 @@ class PendingActionsManager @Inject constructor(
         postRef: PostRef,
         parentId: CommentId?,
         content: String,
-        accountId: Int,
+        accountId: Long,
     ): LemmyAction {
         val lemmyAction = coroutineScope.async {
             val action = ActionInfo.CommentActionInfo(
@@ -176,7 +176,7 @@ class PendingActionsManager @Inject constructor(
         postRef: PostRef,
         commentId: CommentId,
         content: String,
-        accountId: Int,
+        accountId: Long,
     ): LemmyAction {
         val lemmyAction = coroutineScope.async {
             val action = ActionInfo.EditActionInfo(
@@ -194,7 +194,7 @@ class PendingActionsManager @Inject constructor(
     suspend fun deleteComment(
         postRef: PostRef,
         commentId: CommentId,
-        accountId: Int,
+        accountId: Long,
     ): LemmyAction {
         val lemmyAction = coroutineScope.async {
             val action = ActionInfo.DeleteCommentActionInfo(
@@ -211,7 +211,7 @@ class PendingActionsManager @Inject constructor(
     suspend fun markPostAsRead(
         postRef: PostRef,
         read: Boolean,
-        accountId: Int,
+        accountId: Long,
     ): LemmyAction {
         val lemmyAction = coroutineScope.async {
             val action = ActionInfo.MarkPostAsReadActionInfo(

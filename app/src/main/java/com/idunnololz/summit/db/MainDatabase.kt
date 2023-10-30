@@ -56,8 +56,9 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 26, to = 27),
         AutoMigration(from = 27, to = 28),
         AutoMigration(from = 29, to = 30),
+        AutoMigration(from = 31, to = 32),
     ],
-    version = 31,
+    version = 32,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)

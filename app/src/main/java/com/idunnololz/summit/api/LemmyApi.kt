@@ -10,6 +10,8 @@ import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
+import com.idunnololz.summit.api.dto.BanPerson
+import com.idunnololz.summit.api.dto.BanPersonResponse
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockCommunityResponse
 import com.idunnololz.summit.api.dto.BlockInstance
@@ -62,6 +64,10 @@ import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostResponse
 import com.idunnololz.summit.api.dto.PrivateMessageResponse
 import com.idunnololz.summit.api.dto.PrivateMessagesResponse
+import com.idunnololz.summit.api.dto.PurgeComment
+import com.idunnololz.summit.api.dto.PurgeCommunity
+import com.idunnololz.summit.api.dto.PurgePerson
+import com.idunnololz.summit.api.dto.PurgePost
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.ResolveCommentReport
@@ -71,6 +77,7 @@ import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.SearchResponse
+import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.util.LinkUtils
 import okhttp3.Cache
 import okhttp3.CacheControl
@@ -626,6 +633,40 @@ interface LemmyApi {
         @Header("Authorization") authorization: String?,
         @QueryMap form: Map<String, String>,
     ): Call<ResolveObjectResponse>
+
+    /**
+     * Admin endpoints
+     */
+
+    @POST("user/ban")
+    fun banUserFromSite(
+        @Header("Authorization") authorization: String?,
+        @Body form: BanPerson,
+    ): Call<BanPersonResponse>
+
+    @POST("admin/purge/person")
+    fun purgePerson(
+        @Header("Authorization") authorization: String?,
+        @Body form: PurgePerson,
+    ): Call<SuccessResponse>
+
+    @POST("admin/purge/community")
+    fun purgeCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body form: PurgeCommunity,
+    ): Call<SuccessResponse>
+
+    @POST("admin/purge/post")
+    fun purgePost(
+        @Header("Authorization") authorization: String?,
+        @Body form: PurgePost,
+    ): Call<SuccessResponse>
+
+    @POST("admin/purge/comment")
+    fun purgeComment(
+        @Header("Authorization") authorization: String?,
+        @Body form: PurgeComment,
+    ): Call<SuccessResponse>
 
     companion object {
 
