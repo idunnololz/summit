@@ -140,18 +140,24 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         binding.loadingView.setOnRefreshClickListener {
             viewModel.refetchCommunityOrSite(force = true)
         }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refetchCommunityOrSite(force = true)
+        }
         viewModel.siteOrCommunity.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
                 }
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
                 is StatefulData.NotStarted -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
                 }
                 is StatefulData.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
                     val pageData = it.data.fold(
                         { it.toPageData() },
@@ -168,15 +174,18 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         viewModel.multiCommunity.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
                 }
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
                 is StatefulData.NotStarted -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
                 }
                 is StatefulData.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
 
                     adapter.multiCommunity = it.data

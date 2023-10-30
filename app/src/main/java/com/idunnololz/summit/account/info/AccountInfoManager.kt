@@ -150,10 +150,11 @@ class AccountInfoManager @Inject constructor(
                 ?.map { it.community.toAccountSubscription() }
                 ?: listOf(),
             miscAccountInfo = MiscAccountInfo(
-                response.my_user?.local_user_view?.person?.avatar,
-                response.my_user?.local_user_view?.local_user?.default_sort_type,
-                response.my_user?.local_user_view?.local_user?.show_read_posts,
-                response.my_user?.moderates?.map { it.community.id },
+                avatar = response.my_user?.local_user_view?.person?.avatar,
+                defaultCommunitySortType = response.my_user?.local_user_view?.local_user?.default_sort_type,
+                showReadPosts = response.my_user?.local_user_view?.local_user?.show_read_posts,
+                modCommunityIds = response.my_user?.moderates?.map { it.community.id },
+                isAdmin = response.admins.firstOrNull { it.person.id == account.id } != null,
             ),
         )
         val fullAccount = FullAccount(

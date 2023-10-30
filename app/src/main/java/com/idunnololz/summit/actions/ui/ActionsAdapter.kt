@@ -37,7 +37,7 @@ class ActionsAdapter(
         data object EmptyItem : Item
     }
 
-    var accountDictionary: Map<Int, Account?> = mapOf()
+    var accountDictionary: Map<Long, Account?> = mapOf()
     var actions: List<ActionsViewModel.Action> = listOf()
         set(value) {
             field = value
@@ -58,7 +58,7 @@ class ActionsAdapter(
         addItemType(Item.ActionItem::class, PendingActionItemBinding::inflate) { item, b, h ->
             val actionInfo = item.action.info
 
-            val accountId: Int? = actionInfo?.accountId
+            val accountId: Long? = actionInfo?.accountId
             val account = accountDictionary[accountId]
             val actionDate: Long = item.action.ts
             val actionDesc: String

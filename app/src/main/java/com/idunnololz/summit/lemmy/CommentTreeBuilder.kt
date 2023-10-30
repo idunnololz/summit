@@ -30,6 +30,7 @@ class CommentTreeBuilder(
         pendingComments: List<PendingCommentView>?,
         supplementaryComments: Map<Int, CommentView>,
         removedCommentIds: Set<Int>,
+        fullyLoadedCommentIds: Set<Int>,
         targetCommentRef: CommentRef?,
     ): List<CommentNodeData> {
         val map = LinkedHashMap<Number, CommentNodeData>()
@@ -85,11 +86,7 @@ class CommentTreeBuilder(
 
             parentId?.let { cParentId ->
                 if (map[cParentId] == null && commentView.comment.comment.id != targetCommentId) {
-                    val parentParentNodeId = commentView.comment.comment.path
-                        .split(".")
-                        .dropLast(2)
-                        .lastOrNull()
-                        ?.toIntOrNull()
+                    val parentParentNodeId = commentView.comment.comment.parentParentNodeId
 
                     Log.d(
                         TAG,
@@ -157,7 +154,7 @@ class CommentTreeBuilder(
         }
 
         if (post != null) {
-            addMoreItems(post, topNodes)
+            addMoreItems(post, topNodes, fullyLoadedCommentIds)
         }
 
         pendingComments?.forEach { pendingComment ->
@@ -205,20 +202,24 @@ class CommentTreeBuilder(
         return topNodes
     }
 
-    private fun addMoreItems(post: PostView, topNodes: MutableList<CommentNodeData>) {
+    private fun addMoreItems(
+        post: PostView,
+        topNodes: MutableList<CommentNodeData>,
+        fullyLoadedCommentIds: Set<Int>,
+    ) {
         val toVisit = LinkedList<CommentNodeData>()
         toVisit.addAll(topNodes)
 
         while (toVisit.isNotEmpty()) {
             val node = toVisit.pollFirst() ?: continue
 
-            val cv = node.commentView
-            if (cv !is PostViewModel.ListView.CommentListView) {
+            val commentView = node.commentView
+            if (commentView !is PostViewModel.ListView.CommentListView) {
                 continue
             }
 
             var childrenCount = 0
-            val expectedCount = cv.comment.counts.child_count
+            val expectedCount = commentView.comment.counts.child_count
 
             node.children.forEach {
                 when (val commentView = it.commentView) {
@@ -243,16 +244,35 @@ class CommentTreeBuilder(
             //
             // Jerboa just checks if the children is empty to differentiate so we'll do that too.
             if (childrenCount < expectedCount && node.children.isEmpty()) {
-                node.children.add(
-                    CommentNodeData(
-                        PostViewModel.ListView.MoreCommentsItem(
-                            cv.comment.comment.id,
+                if (fullyLoadedCommentIds.contains(commentView.comment.comment.id)) {
+                    val missingCount = expectedCount - childrenCount
+
+                    val parentParentNodeId = commentView.comment.comment.parentParentNodeId
+
+                    repeat(missingCount) {
+                        node.children.add(
+                            CommentNodeData(
+                                PostViewModel.ListView.MissingCommentItem(
+                                    commentView.comment.comment.id,
+                                    parentParentNodeId,
+                                    false,
+                                ),
+                                node.depth + 1,
+                            )
+                        )
+                    }
+                } else {
+                    node.children.add(
+                        CommentNodeData(
+                            PostViewModel.ListView.MoreCommentsItem(
+                                commentView.comment.comment.id,
+                                node.depth + 1,
+                                expectedCount - childrenCount,
+                            ),
                             node.depth + 1,
-                            expectedCount - childrenCount,
                         ),
-                        node.depth + 1,
-                    ),
-                )
+                    )
+                }
             }
         }
 
@@ -299,6 +319,13 @@ class CommentTreeBuilder(
         }
     }
 }
+
+private val Comment.parentParentNodeId
+    get() = path
+        .split(".")
+        .dropLast(2)
+        .lastOrNull()
+        ?.toIntOrNull()
 
 fun List<CommentNodeData>.flatten(): MutableList<CommentNodeData> {
     val result = mutableListOf<CommentNodeData>()

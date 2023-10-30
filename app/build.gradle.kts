@@ -17,9 +17,9 @@ android {
     defaultConfig {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
-        targetSdk = 33
-        versionCode = 104
-        versionName = "1.13.2"
+        targetSdk = 34
+        versionCode = 105
+        versionName = "1.14.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -121,21 +121,21 @@ dependencies {
 
     implementation(libs.flow.layout)
 
-    implementation("io.arrow-kt:arrow-core:1.2.0-RC")
+    implementation(libs.arrow.core)
 
     implementation(libs.hilt.common)
     implementation(libs.hilt.work)
     implementation(libs.core.splashscreen)
 
-    implementation("dev.zacsweers.moshix:moshi-sealed-runtime:0.22.1")
-    ksp("dev.zacsweers.moshix:moshi-sealed-codegen:0.22.1")
+    implementation(libs.moshi.sealed.runtime)
+    ksp(libs.moshi.sealed.codegen)
 
-    implementation("com.github.Commit451.coil-transformations:transformations:2.0.2")
-    implementation("com.github.Drjacky:ImagePicker:2.3.22")
-    implementation("info.debatty:java-string-similarity:2.0.0")
-    implementation("io.github.inflationx:calligraphy3:3.1.1")
-    implementation("io.github.inflationx:viewpump:2.0.3")
-    implementation("com.github.skydoves:colorpickerview:2.2.4")
+    implementation(libs.transformations)
+    implementation(libs.imagepicker)
+    implementation(libs.java.string.similarity)
+    implementation(libs.calligraphy3)
+    implementation(libs.viewpump)
+    implementation(libs.colorpickerview)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

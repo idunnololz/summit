@@ -73,23 +73,61 @@ class BanUserDialogFragment : BaseDialogFragment<DialogFragmentBanUserBinding>()
                     }
                 }
             }
+            actionsViewModel.banUserFromSiteResult.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> {
+                        binding.progressBar.visibility = View.GONE
+
+                        ErrorDialogFragment.show(
+                            getString(R.string.unable_to_ban_user),
+                            it.error,
+                            childFragmentManager,
+                        )
+                        disableViews(false)
+                    }
+                    is StatefulData.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                        disableViews(true)
+                    }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        disableViews(false)
+                        dismiss()
+                    }
+                }
+            }
 
             binding.cancel.setOnClickListener {
                 dismiss()
             }
             binding.banUser.setOnClickListener {
-                actionsViewModel.banUser(
-                    args.communityId,
-                    args.personId,
-                    true,
-                    removeContent.isChecked,
-                    reasonEditText.text.toString().let {
-                        it.ifBlank {
-                            null
-                        }
-                    },
-                    numberOfDaysEditText.text.toString().toIntOrNull(),
-                )
+                if (args.communityId == 0) {
+                    actionsViewModel.banUserFromSite(
+                        args.personId,
+                        true,
+                        removeContent.isChecked,
+                        reasonEditText.text.toString().let {
+                            it.ifBlank {
+                                null
+                            }
+                        },
+                        numberOfDaysEditText.text.toString().toIntOrNull(),
+                    )
+                } else {
+                    actionsViewModel.banUser(
+                        args.communityId,
+                        args.personId,
+                        true,
+                        removeContent.isChecked,
+                        reasonEditText.text.toString().let {
+                            it.ifBlank {
+                                null
+                            }
+                        },
+                        numberOfDaysEditText.text.toString().toIntOrNull(),
+                    )
+                }
             }
         }
     }

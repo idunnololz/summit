@@ -24,7 +24,7 @@ import com.squareup.moshi.Types
 data class AccountInfo(
     @PrimaryKey
     @ColumnInfo(name = "account_id")
-    val accountId: Int,
+    val accountId: Long,
     @ColumnInfo(name = "subscriptions")
     val subscriptions: List<AccountSubscription>?,
     @ColumnInfo(name = "misc_account_info")
@@ -40,6 +40,7 @@ data class MiscAccountInfo(
      * List of community ids that this account is the mod of.
      */
     val modCommunityIds: List<Int>? = null,
+    val isAdmin: Boolean? = null,
 )
 
 @JsonClass(generateAdapter = true)
@@ -64,13 +65,13 @@ data class AccountSubscription(
 @Dao
 abstract class AccountInfoDao {
     @Query("SELECT * FROM account_info WHERE account_id = :accountId")
-    abstract suspend fun getAccountInfo(accountId: Int): AccountInfo?
+    abstract suspend fun getAccountInfo(accountId: Long): AccountInfo?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = AccountInfo::class)
     abstract suspend fun insert(accountInfo: AccountInfo)
 
     @Query("DELETE FROM account_info WHERE account_id = :accountId")
-    abstract suspend fun delete(accountId: Int)
+    abstract suspend fun delete(accountId: Long)
 
     @Query("SELECT COUNT(*) FROM account_info")
     abstract suspend fun count(): Int

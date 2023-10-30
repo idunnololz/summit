@@ -111,7 +111,13 @@ class CommunityViewModel @Inject constructor(
     private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
 
     private var fetchingPages = mutableSetOf<Int>()
-    var postListEngine = PostListEngine(preferences.infinity, coroutineScopeFactory, offlineManager)
+    var postListEngine = PostListEngine(
+        coroutineScopeFactory = coroutineScopeFactory,
+        offlineManager = offlineManager,
+        infinity = preferences.infinity,
+        autoLoadMoreItems = preferences.autoLoadMorePosts,
+        usePageIndicators = preferences.infinityPageIndicator,
+    )
 
     val infinity: Boolean
         get() = postListEngine.infinity
@@ -218,6 +224,12 @@ class CommunityViewModel @Inject constructor(
         // check for inconsistency
         if (postListEngine.infinity != preferences.infinity) {
             postListEngine.infinity = preferences.infinity
+        }
+        if (postListEngine.usePageIndicators != preferences.infinityPageIndicator) {
+            postListEngine.usePageIndicators = preferences.infinityPageIndicator
+        }
+        if (postListEngine.autoLoadMoreItems != preferences.autoLoadMorePosts) {
+            postListEngine.autoLoadMoreItems = preferences.autoLoadMorePosts
         }
         lockBottomBar = preferences.lockBottomBar
     }

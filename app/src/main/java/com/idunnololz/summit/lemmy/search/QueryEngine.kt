@@ -46,8 +46,8 @@ sealed class Item {
 
     data class ErrorItem(val error: Throwable, val pageToLoad: Int) : Item()
 
-    object EndItem : Item()
-    object FooterSpacerItem : Item()
+    data object EndItem : Item()
+    data object FooterSpacerItem : Item()
 }
 
 class QueryEngine(
@@ -147,7 +147,7 @@ class QueryEngine(
     private var pages: List<QueryResultsPage> = listOf()
     private var _items: List<Item> = listOf()
 
-    private var personIdFilter: Int? = null
+    private var personIdFilter: Long? = null
     private var communityIdFilter: Int? = null
 
     private val trigram = NGram(3)
@@ -161,7 +161,7 @@ class QueryEngine(
         }
     }
 
-    fun setPersonFilter(personId: Int?) {
+    fun setPersonFilter(personId: Long?) {
         if (personIdFilter == personId) {
             return
         }
@@ -240,15 +240,15 @@ class QueryEngine(
 
             apiClient
                 .search(
-                    communityIdFilter,
-                    null,
-                    currentSortType,
-                    ListingType.All,
-                    type,
-                    pageIndex.toLemmyPageIndex(),
-                    currentQuery,
-                    MAX_QUERY_PAGE_LIMIT,
-                    personIdFilter,
+                    communityId = communityIdFilter,
+                    communityName = null,
+                    sortType = currentSortType,
+                    listingType = ListingType.All,
+                    searchType = type,
+                    page = pageIndex.toLemmyPageIndex(),
+                    query = currentQuery,
+                    limit = MAX_QUERY_PAGE_LIMIT,
+                    creatorId = personIdFilter,
                     force = force,
                 )
                 .onSuccess {

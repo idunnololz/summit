@@ -209,6 +209,20 @@ class SettingsPostListFragment :
                 preferences.lockBottomBar = it
             },
         )
+        settings.autoLoadMorePosts.bindTo(
+            binding.autoLoadMorePosts,
+            { preferences.autoLoadMorePosts },
+            {
+                preferences.autoLoadMorePosts = it
+            }
+        )
+        settings.infinityPageIndicator.bindTo(
+            binding.infinityPageIndicator,
+            { preferences.infinityPageIndicator },
+            {
+                preferences.infinityPageIndicator = it
+            }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

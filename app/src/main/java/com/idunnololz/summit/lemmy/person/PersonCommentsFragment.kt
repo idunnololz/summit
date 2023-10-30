@@ -192,6 +192,10 @@ class PersonCommentsFragment :
 
                     binding.root.post {
                         checkIfFetchNeeded()
+
+                        if (it.data.isReset) {
+                            layoutManager.scrollToPositionWithOffset(0, 0)
+                        }
                     }
                 }
             }

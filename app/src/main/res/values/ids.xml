@@ -133,4 +133,11 @@
     <item name="custom_nav_bar" type="id" />
     <item name="scroll_to_top" type="id"/>
     <item name="back_to_the_beginning" type="id" />
+    <item name="admin_tools" type="id" />
+    <item name="ban_from_site" type="id" />
+    <item name="purge_user" type="id" />
+    <item name="purge_post" type="id" />
+    <item name="purge_comment" type="id" />
+    <item name="purge_community" type="id" />
+    <item name="undo_ban_from_site" type="id" />
 </resources>

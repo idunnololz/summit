@@ -92,6 +92,13 @@ class PostViewModel @Inject constructor(
     private val additionalLoadedCommentIds = mutableSetOf<CommentId>()
     private val removedCommentIds = mutableSetOf<CommentId>()
 
+    /**
+     * This is used for the edge case where a comment is fully loaded and some of it's direct
+     * descendants are missing. This is can be used to check if comments are missing or just not
+     * loaded yet.
+     */
+    private val fullyLoadedCommentIds = mutableSetOf<CommentId>()
+
     val switchAccountState = StatefulLiveData<Unit>()
 
     /**
@@ -263,6 +270,18 @@ class PostViewModel @Inject constructor(
                     accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
                 }
             }
+
+            if (force) {
+                if (comments != null && fetchCommentData) {
+                    comments.forEach {
+                        accountActionsManager.setScore(it.toVotableRef(), it.counts.score)
+                    }
+                }
+                if (post != null && fetchPostData) {
+                    accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
+                }
+            }
+
 
             if (post == null || comments == null) {
                 postResult
@@ -592,6 +611,7 @@ class PostViewModel @Inject constructor(
                     pendingComments = pendingComments,
                     supplementaryComments = supplementaryComments,
                     removedCommentIds = removedCommentIds,
+                    fullyLoadedCommentIds = fullyLoadedCommentIds,
                     targetCommentRef = postOrCommentRef
                         ?.fold(
                             { null },
@@ -645,11 +665,30 @@ class PostViewModel @Inject constructor(
         additionalLoadedCommentIds.add(parentId)
 
         result.onSuccess { comments ->
-            if (comments.isEmpty() || comments.find { it.comment.id == parentId } == null) {
+            // A comment is likely removed if we are loading a specific comment and it's direct
+            // descendant is missing
+
+            val thisComment = comments.find { it.comment.id == parentId }
+
+            if (comments.isEmpty() || thisComment == null) {
                 removedCommentIds.add(parentId)
             } else {
                 removedCommentIds.remove(parentId)
             }
+
+            val depthIsMoreThanOne = depth == null || depth > 1
+            if (thisComment != null && depthIsMoreThanOne) {
+                fullyLoadedCommentIds.add(thisComment.comment.id)
+            }
+
+//            val commentChildCount = thisComment?.counts?.child_count ?: 0
+//            if (thisComment != null && commentChildCount > 0 && comments.size == 1 && depthIsMoreThanOne) {
+//                // This comment's child was deleted...
+//                val fakeComment = createFakeDeletedComment(thisComment.comment.path)
+//                removedCommentIds.add(fakeComment.comment.id)
+//                supplementaryComments[fakeComment.comment.id] = fakeComment
+//            }
+
             comments.forEach {
                 supplementaryComments[it.comment.id] = it
             }

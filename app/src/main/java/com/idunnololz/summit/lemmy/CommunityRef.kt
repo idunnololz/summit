@@ -12,6 +12,16 @@ import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
 
+/**
+ * Instances that don't support self references by fully qualified names.
+ *
+ * Eg. 'mycommunity' works but 'mycommunity@burggit.moe' doesn't work.
+ */
+private val CommunitiesNoAt = setOf(
+    "burggit.moe",
+    "lemmy.thesanewriter.com"
+)
+
 @JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface CommunityRef : PageRef, Parcelable {
 
@@ -63,7 +73,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
             }
 
         fun getServerId(apiInstance: String): String {
-            if (apiInstance == "burggit.moe" && instance == apiInstance) {
+            if (CommunitiesNoAt.contains(apiInstance) && instance == apiInstance) {
                 return name
             }
             if (instance == null) {

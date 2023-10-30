@@ -71,7 +71,7 @@ sealed interface DraftData : Parcelable {
         val body: String?,
         val url: String?,
         val isNsfw: Boolean,
-        val accountId: Int,
+        val accountId: Long,
         val accountInstance: String,
         val targetCommunityFullName: String,
     ) : DraftData
@@ -84,7 +84,7 @@ sealed interface DraftData : Parcelable {
         val postRef: PostRef,
         val parentCommentId: Int?,
         val content: String,
-        val accountId: Int,
+        val accountId: Long,
         val accountInstance: String,
     ) : DraftData
 }

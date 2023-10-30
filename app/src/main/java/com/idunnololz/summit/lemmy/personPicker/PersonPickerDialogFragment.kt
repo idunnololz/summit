@@ -52,7 +52,7 @@ class PersonPickerDialogFragment :
     data class Result(
         val personRef: PersonRef.PersonRefByName,
         val icon: String?,
-        val personId: Int,
+        val personId: Long,
     ) : Parcelable
 
     override fun onCreate(savedInstanceState: Bundle?) {

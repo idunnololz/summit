@@ -9,6 +9,8 @@ import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
+import com.idunnololz.summit.api.dto.BanPerson
+import com.idunnololz.summit.api.dto.BanPersonResponse
 import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockInstance
 import com.idunnololz.summit.api.dto.BlockInstanceResponse
@@ -81,6 +83,10 @@ import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
 import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.api.dto.PurgeComment
+import com.idunnololz.summit.api.dto.PurgeCommunity
+import com.idunnololz.summit.api.dto.PurgePerson
+import com.idunnololz.summit.api.dto.PurgePost
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.ResolveCommentReport
@@ -94,6 +100,7 @@ import com.idunnololz.summit.api.dto.Search
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -451,7 +458,7 @@ class LemmyApiClient @Inject constructor(
         page: Int? = null,
         query: String,
         limit: Int? = null,
-        creatorId: Int? = null,
+        creatorId: Long? = null,
         force: Boolean,
     ): Result<SearchResponse> {
         val form = Search(
@@ -754,7 +761,7 @@ class LemmyApiClient @Inject constructor(
         )
 
         return retrofitErrorHandler {
-            api.removeComment(authorization = account?.bearer, form)
+            api.removeComment(authorization = account.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -1067,10 +1074,12 @@ class LemmyApiClient @Inject constructor(
     suspend fun fetchPerson(
         personId: PersonId?,
         name: String?,
+        sort: SortType = SortType.New,
         page: Int? = null,
         limit: Int? = null,
         account: Account?,
         force: Boolean,
+        savedOnly: Boolean = false,
     ): Result<GetPersonDetailsResponse> {
         val form = GetPersonDetails(
             person_id = personId,
@@ -1078,6 +1087,8 @@ class LemmyApiClient @Inject constructor(
             auth = account?.jwt,
             page = page,
             limit = limit,
+            sort = sort,
+            saved_only = savedOnly,
         )
 
         return retrofitErrorHandler {
@@ -1549,6 +1560,107 @@ class LemmyApiClient @Inject constructor(
             onFailure = {
                 Result.failure(it)
             },
+        )
+    }
+
+    suspend fun banUserFromSite(
+        personId: PersonId,
+        ban: Boolean,
+        removeData: Boolean,
+        reason: String?,
+        expiresDays: Int?,
+        account: Account,
+    ): Result<BanPersonResponse> {
+        val form = BanPerson(
+            person_id = personId,
+            ban = ban,
+            remove_data = removeData,
+            reason = reason,
+            expires = expiresDays,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.banUserFromSite(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun purgePerson(
+        personId: PersonId,
+        reason: String?,
+        account: Account,
+    ): Result<SuccessResponse> {
+        val form = PurgePerson(
+            person_id = personId,
+            reason = reason,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.purgePerson(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun purgeCommunity(
+        communityId: CommunityId,
+        reason: String?,
+        account: Account,
+    ): Result<SuccessResponse> {
+        val form = PurgeCommunity(
+            community_id = communityId,
+            reason = reason,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.purgeCommunity(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun purgePost(
+        postId: PostId,
+        reason: String?,
+        account: Account,
+    ): Result<SuccessResponse> {
+        val form = PurgePost(
+            post_id = postId,
+            reason = reason,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.purgePost(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun purgeComment(
+        commentId: CommentId,
+        reason: String?,
+        account: Account,
+    ): Result<SuccessResponse> {
+        val form = PurgeComment(
+            comment_id = commentId,
+            reason = reason,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.purgeComment(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
         )
     }
 

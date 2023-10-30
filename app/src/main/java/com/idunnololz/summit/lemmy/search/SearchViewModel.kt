@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -147,7 +148,7 @@ class SearchViewModel @Inject constructor(
 
     @Parcelize
     data class PersonFilter(
-        val personId: Int,
+        val personId: PersonId,
         val personRef: PersonRef.PersonRefByName,
     ) : Parcelable
 

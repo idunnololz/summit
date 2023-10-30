@@ -128,12 +128,34 @@
                             android:hint="@string/title"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <FrameLayout
+                        android:id="@+id/title_suggestion_container"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/padding"
+                        android:paddingBottom="@dimen/padding_half"
+                        app:layout_constraintTop_toBottomOf="@+id/title"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/title_suggestion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="@dimen/padding"/>
+                        </com.google.android.material.card.MaterialCardView>
+                    </FrameLayout>
+
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/divider2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/title"/>
+                        app:layout_constraintTop_toBottomOf="@+id/title_suggestion_container"/>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/post_editor"

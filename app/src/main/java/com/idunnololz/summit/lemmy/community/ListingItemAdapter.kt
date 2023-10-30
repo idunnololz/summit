@@ -21,6 +21,8 @@ import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.databinding.MainFooterItemBinding
+import com.idunnololz.summit.databinding.ManualLoadItemBinding
+import com.idunnololz.summit.databinding.PageTitleItemBinding
 import com.idunnololz.summit.databinding.PersistentErrorItemBinding
 import com.idunnololz.summit.databinding.PostListEndItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -120,6 +122,8 @@ class ListingItemAdapter(
         Item.FooterSpacerItem -> R.layout.generic_space_footer_item
         is Item.ErrorItem -> R.layout.loading_view_item
         is Item.PersistentErrorItem -> R.layout.persistent_error_item
+        is Item.ManualLoadItem -> R.layout.manual_load_item
+        is Item.PageTitle -> R.layout.page_title_item
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -150,6 +154,10 @@ class ListingItemAdapter(
                 ViewBindingViewHolder(GenericSpaceFooterItemBinding.bind(v))
             R.layout.persistent_error_item ->
                 ViewBindingViewHolder(PersistentErrorItemBinding.bind(v))
+            R.layout.manual_load_item ->
+                ViewBindingViewHolder(ManualLoadItemBinding.bind(v))
+            R.layout.page_title_item ->
+                ViewBindingViewHolder(PageTitleItemBinding.bind(v))
             else -> throw RuntimeException("Unknown view type: $viewType")
         }
     }
@@ -313,6 +321,36 @@ class ListingItemAdapter(
                 val b = holder.getBinding<PersistentErrorItemBinding>()
                 b.errorText.text = item.exception.toErrorMessage(context)
             }
+
+            is Item.ManualLoadItem -> {
+                val b = holder.getBinding<ManualLoadItemBinding>()
+                b.loadMoreText.text = context.getString(
+                    R.string.load_more_page_format,
+                    (item.pageToLoad + 1).toString()
+                )
+
+                fun loadPage() {
+                    b.loadingView.showProgressBar()
+                    b.loadMoreText.visibility = View.GONE
+                    onLoadPage(item.pageToLoad)
+                }
+
+                b.loadMoreText.setOnClickListener {
+                    loadPage()
+                }
+                b.root.setOnClickListener {
+                    loadPage()
+                }
+            }
+
+            is Item.PageTitle -> {
+                val b = holder.getBinding<PageTitleItemBinding>()
+
+                b.title.text = context.getString(
+                    R.string.page_format,
+                    (item.pageIndex + 1).toString()
+                )
+            }
         }
     }
 
@@ -404,6 +442,14 @@ class ListingItemAdapter(
 
                         is Item.PersistentErrorItem ->
                             oldItem.exception == (newItem as Item.PersistentErrorItem).exception
+
+                        is Item.ManualLoadItem ->
+                            oldItem.pageToLoad ==
+                                (newItem as Item.ManualLoadItem).pageToLoad
+
+                        is Item.PageTitle ->
+                            oldItem.pageIndex ==
+                                (newItem as Item.PageTitle).pageIndex
                     }
                 }
 

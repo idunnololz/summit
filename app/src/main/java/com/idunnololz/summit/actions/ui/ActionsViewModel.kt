@@ -33,7 +33,7 @@ class ActionsViewModel @Inject constructor(
             val completedActions = pendingActionsManager.getAllCompletedActions().sortedByDescending { it.ts }
             val failedAccountInfo = pendingActionsManager.getAllFailedActions().sortedByDescending { it.ts }
 
-            val accountIds = mutableSetOf<Int>()
+            val accountIds = mutableSetOf<Long>()
 
             pendingActions.mapNotNullTo(accountIds) { it.info?.accountId }
             completedActions.mapNotNullTo(accountIds) { it.info?.accountId }
@@ -109,7 +109,7 @@ class ActionsViewModel @Inject constructor(
         val pendingActions: List<Action>,
         val completedActions: List<Action>,
         val failedActions: List<Action>,
-        val accountDictionary: Map<Int, Account?>,
+        val accountDictionary: Map<Long, Account?>,
     )
 
     data class Action(

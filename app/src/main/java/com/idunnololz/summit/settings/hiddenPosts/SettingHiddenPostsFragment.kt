@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingHiddenPostsBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.preferences.Preferences
@@ -25,7 +26,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBinding>() {
+class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBinding>(),
+AlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
     lateinit var preferences: Preferences
@@ -102,15 +104,16 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
                     val count = withContext(Dispatchers.Default) {
                         hiddenPostsManager.getHiddenPostsCount()
                     }
-                    hiddenPostsManager.clearHiddenPosts()
 
-                    Snackbar
-                        .make(
-                            binding.coordinatorLayout,
-                            getString(R.string.removed_hidden_posts_format, count.toString()),
-                            Snackbar.LENGTH_LONG,
-                        )
-                        .show()
+                    withContext(Dispatchers.Main) {
+                        AlertDialogFragment.Builder()
+                            .setTitle(R.string.reset_hidden_posts_confirm_title)
+                            .setMessage(getString(
+                                R.string.reset_hidden_posts_confirm_desc_format, count.toString()))
+                            .setPositiveButton(R.string.yes)
+                            .setNegativeButton(R.string.no)
+                            .createAndShow(childFragmentManager, "reset_hidden_posts")
+                    }
                 }
             },
         )
@@ -123,5 +126,30 @@ class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBindin
                 findNavController().navigateSafe(directions)
             }
         )
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        when (tag) {
+            "reset_hidden_posts" -> {
+                lifecycleScope.launch {
+                    val count = withContext(Dispatchers.Default) {
+                        hiddenPostsManager.getHiddenPostsCount()
+                    }
+                    hiddenPostsManager.clearHiddenPosts()
+
+                    Snackbar
+                        .make(
+                            binding.coordinatorLayout,
+                            getString(R.string.removed_hidden_posts_format, count.toString()),
+                            Snackbar.LENGTH_LONG,
+                        )
+                        .show()
+                }
+            }
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+
     }
 }

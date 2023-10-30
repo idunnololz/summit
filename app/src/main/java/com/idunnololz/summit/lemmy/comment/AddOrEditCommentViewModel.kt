@@ -16,6 +16,7 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
@@ -182,7 +183,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         }
     }
 
-    fun sendComment(personId: Int, content: String) {
+    fun sendComment(personId: PersonId, content: String) {
         viewModelScope.launch {
             authedApiClient
                 .createPrivateMessage(

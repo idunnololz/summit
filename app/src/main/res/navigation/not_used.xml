@@ -74,9 +74,9 @@
             app:argType="integer" />
         <argument
             android:name="personId"
-            app:argType="integer" />
+            app:argType="long" />
         <argument android:name="accountId"
-            app:argType="integer" />
+            app:argType="long" />
     </dialog>
     <dialog
         android:id="@+id/modActionsDialogFragment"
@@ -93,7 +93,10 @@
             app:argType="integer" />
         <argument
             android:name="personId"
-            app:argType="integer" />
+            app:argType="long" />
+        <argument
+            android:name="community_instance"
+            app:argType="string" />
     </dialog>
     <dialog
         android:id="@+id/multiCommunityEditorDialogFragment"

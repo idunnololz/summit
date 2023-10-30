@@ -98,7 +98,7 @@ class AccountManager @Inject constructor(
         this.currentAccount.emit(currentAccount)
     }
 
-    suspend fun getAccountById(id: Int): Account? {
+    suspend fun getAccountById(id: Long): Account? {
         return accountDao.getAccountById(id)
     }
 

@@ -175,6 +175,10 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
 
                     binding.recyclerView.post {
                         checkIfFetchNeeded()
+
+                        if (it.data.isReset) {
+                            layoutManager.scrollToPositionWithOffset(0, 0)
+                        }
                     }
                 }
             }
