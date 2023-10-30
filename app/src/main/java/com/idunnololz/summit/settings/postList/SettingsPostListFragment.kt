@@ -214,14 +214,14 @@ class SettingsPostListFragment :
             { preferences.autoLoadMorePosts },
             {
                 preferences.autoLoadMorePosts = it
-            }
+            },
         )
         settings.infinityPageIndicator.bindTo(
             binding.infinityPageIndicator,
             { preferences.infinityPageIndicator },
             {
                 preferences.infinityPageIndicator = it
-            }
+            },
         )
     }
 

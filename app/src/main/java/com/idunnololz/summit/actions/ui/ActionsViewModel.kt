@@ -19,7 +19,7 @@ import javax.inject.Inject
 class ActionsViewModel @Inject constructor(
     private val pendingActionsManager: PendingActionsManager,
     private val accountManager: AccountManager,
-): ViewModel() {
+) : ViewModel() {
 
     val actionsDataLiveData = StatefulLiveData<ActionsData>()
 
@@ -58,7 +58,7 @@ class ActionsViewModel @Inject constructor(
                 id = it.id,
                 info = it.info,
                 ts = it.ts,
-                details = ActionDetails.PendingDetails
+                details = ActionDetails.PendingDetails,
             )
         }
 
@@ -68,7 +68,7 @@ class ActionsViewModel @Inject constructor(
                 id = it.id,
                 info = it.info,
                 ts = it.ts,
-                details = ActionDetails.SuccessDetails
+                details = ActionDetails.SuccessDetails,
             )
         }
 
@@ -79,8 +79,8 @@ class ActionsViewModel @Inject constructor(
                 info = it.info,
                 ts = it.ts,
                 details = ActionDetails.FailureDetails(
-                    it.error
-                )
+                    it.error,
+                ),
             )
         }
 
@@ -121,9 +121,9 @@ class ActionsViewModel @Inject constructor(
 
     sealed interface ActionDetails {
         data object SuccessDetails : ActionDetails
-        data object PendingDetails: ActionDetails
+        data object PendingDetails : ActionDetails
         data class FailureDetails(
-            val reason: LemmyActionFailureReason
-        ): ActionDetails
+            val reason: LemmyActionFailureReason,
+        ) : ActionDetails
     }
 }

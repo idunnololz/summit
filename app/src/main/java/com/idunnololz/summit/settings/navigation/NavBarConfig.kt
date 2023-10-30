@@ -10,5 +10,5 @@ data class NavBarConfig(
         NavBarDestinations.Search,
         NavBarDestinations.History,
         NavBarDestinations.Inbox,
-    )
+    ),
 )

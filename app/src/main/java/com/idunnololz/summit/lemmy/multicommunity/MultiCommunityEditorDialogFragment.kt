@@ -449,7 +449,8 @@ class MultiCommunityEditorDialogFragment :
                         override fun afterTextChanged(p0: Editable?) {
                             onCommunityNameChanged(p0?.toString())
                         }
-                    },)
+                    },
+                    )
                 },
             ) { item, b, h ->
                 b.nameEditText.setText(item.communityName)

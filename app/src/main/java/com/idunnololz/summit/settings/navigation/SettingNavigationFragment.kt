@@ -6,18 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.databinding.FragmentSettingLoggingBinding
 import com.idunnololz.summit.databinding.FragmentSettingNavigationBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
-import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.LoggingSettings
 import com.idunnololz.summit.settings.NavigationSettings
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
@@ -121,7 +116,7 @@ class SettingNavigationFragment :
                 { navBarOptions?.getOrNull(index) ?: NavBarDestinations.None },
                 { s, currentValue ->
                     MultipleChoiceDialogFragment.newInstance(s, currentValue)
-                        .showAllowingStateLoss(childFragmentManager, "navBarDest${index}")
+                        .showAllowingStateLoss(childFragmentManager, "navBarDest$index")
                 },
             )
         }

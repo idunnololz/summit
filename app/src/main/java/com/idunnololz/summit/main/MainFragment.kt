@@ -1,6 +1,5 @@
 package com.idunnololz.summit.main
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -527,8 +526,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             onNavigationItemReselectedListener,
         )
 
-        onBackPressedCallback.isEnabled = !(isPredictiveBackSupported() &&
-                preferences.usePredictiveBack)
+        onBackPressedCallback.isEnabled = !(
+            isPredictiveBackSupported() &&
+                preferences.usePredictiveBack
+            )
     }
 
     override fun onPause() {

@@ -48,7 +48,6 @@ class ModActionsViewModel @Inject constructor(
         get() = apiClient.accountForInstance()
     val currentModState = StatefulLiveData<FullModState>()
 
-
     fun isAdmin(communityInstance: String): Boolean {
         val fullAccount = accountInfoManager.currentFullAccount.value
         val miscAccountInfo = fullAccount

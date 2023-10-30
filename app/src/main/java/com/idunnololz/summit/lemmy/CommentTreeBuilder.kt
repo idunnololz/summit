@@ -258,7 +258,7 @@ class CommentTreeBuilder(
                                     false,
                                 ),
                                 node.depth + 1,
-                            )
+                            ),
                         )
                     }
                 } else {

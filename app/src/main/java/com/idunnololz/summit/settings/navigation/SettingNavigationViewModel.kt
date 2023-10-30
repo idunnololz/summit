@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingNavigationViewModel @Inject constructor(
-    private val preferences: Preferences
+    private val preferences: Preferences,
 ) : ViewModel() {
     val navBarOptions = MutableLiveData<List<NavBarDestId>?>()
 
@@ -24,7 +24,7 @@ class SettingNavigationViewModel @Inject constructor(
     fun applyChanges() {
         val navBarOptions = navBarOptions.value ?: return
         preferences.navBarConfig = preferences.navBarConfig.copy(
-            navBarDestinations = navBarOptions.distinct()
+            navBarDestinations = navBarOptions.distinct(),
         )
     }
 

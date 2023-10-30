@@ -161,7 +161,6 @@ val MIGRATION_28_29 = object : Migration(28, 29) {
     }
 }
 
-
 val MIGRATION_30_31 = object : Migration(30, 31) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS lemmy_completed_actions;")

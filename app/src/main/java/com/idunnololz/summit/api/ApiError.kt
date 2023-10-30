@@ -20,7 +20,9 @@ class AccountInstanceMismatchException(
 )
 class RateLimitException(val timeout: Long) : ClientApiException("Rate limit timed out.", 429)
 class NewApiException(val minVersion: String) : ClientApiException(
-    "Server version is too low and does not support this API. API version required: $minVersion.", 400)
+    "Server version is too low and does not support this API. API version required: $minVersion.",
+    400,
+)
 
 /**
  * This is 99% a server error. For client side timeout errors, use a different error.

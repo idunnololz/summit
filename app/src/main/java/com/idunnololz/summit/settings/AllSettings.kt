@@ -1245,8 +1245,7 @@ class ActionsSettings @Inject constructor(
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
     )
-    override val allSettings: List<SettingItem> = listOf(
-    )
+    override val allSettings: List<SettingItem> = listOf()
 }
 
 class AllSettings @Inject constructor(

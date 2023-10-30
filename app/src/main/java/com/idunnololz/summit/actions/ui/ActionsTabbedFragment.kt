@@ -15,7 +15,8 @@ import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ActionsTabbedFragment : BaseFragment<TabbedFragmentActionsBinding>(),
+class ActionsTabbedFragment :
+    BaseFragment<TabbedFragmentActionsBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     val viewModel: ActionsViewModel by viewModels()
@@ -56,7 +57,6 @@ class ActionsTabbedFragment : BaseFragment<TabbedFragmentActionsBinding>(),
 
         with(binding) {
             viewModel.actionsDataLiveData.observe(viewLifecycleOwner) {
-
             }
 
             if (viewPager.adapter == null) {
@@ -68,7 +68,7 @@ class ActionsTabbedFragment : BaseFragment<TabbedFragmentActionsBinding>(),
                     adapter.addFrag(
                         clazz = ActionsFragment::class.java,
                         args = ActionsFragmentArgs(action).toBundle(),
-                        title = when(action) {
+                        title = when (action) {
                             ActionsFragment.ActionType.Completed ->
                                 getString(R.string.completed_actions)
                             ActionsFragment.ActionType.Pending ->

@@ -31,8 +31,8 @@ class ActionsAdapter(
 
     private sealed interface Item {
         data class ActionItem(
-            val action: ActionsViewModel.Action
-        ): Item
+            val action: ActionsViewModel.Action,
+        ) : Item
 
         data object EmptyItem : Item
     }
@@ -53,7 +53,7 @@ class ActionsAdapter(
 
                 Item.EmptyItem -> true
             }
-        }
+        },
     ).apply {
         addItemType(Item.ActionItem::class, PendingActionItemBinding::inflate) { item, b, h ->
             val actionInfo = item.action.info
