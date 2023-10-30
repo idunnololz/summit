@@ -843,7 +843,6 @@ class PostListViewBuilder @Inject constructor(
             }
             commentButton?.isEnabled = !postView.post.locked
 
-
             Log.d("HAHA", "s6: ${System.nanoTime() - start}")
             start = System.nanoTime()
             val scoreCount: TextView? = upvoteCount

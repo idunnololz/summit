@@ -71,7 +71,6 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
         }
 
         with(binding) {
-
             val adapter = HiddenPostsAdapter(
                 context,
                 removeHiddenPost = {
@@ -121,7 +120,7 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
                             ),
                         ),
                     )
-                }
+                },
             )
             fastScroller.setRecyclerView(binding.recyclerView)
         }
@@ -135,8 +134,8 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
 
         sealed interface Item {
             data class HiddenPostItem(
-                val hiddenPost: HiddenPostsManager.HiddenPost
-            ): Item
+                val hiddenPost: HiddenPostsManager.HiddenPost,
+            ) : Item
 
             data object EmptyItem : Item
         }
@@ -150,7 +149,6 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
 
         private val dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
 
-
         private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
@@ -159,7 +157,7 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
 
                     Item.EmptyItem -> true
                 }
-            }
+            },
         ).apply {
             addItemType(Item.HiddenPostItem::class, HiddenPostsItemBinding::inflate) { item, b, h ->
                 val hiddenPost = item.hiddenPost
@@ -174,7 +172,7 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
                         R.string.post_hidden_format,
                         hiddenPost.hiddenPostId.toString(),
                         hiddenPost.instance,
-                    )
+                    ),
                 )
 
                 b.root.setOnClickListener {

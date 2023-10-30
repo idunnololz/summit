@@ -1212,7 +1212,7 @@ class CommunityFragment :
                                     is CommunityRef.ModeratedCommunities,
                                     is CommunityRef.MultiCommunity,
                                     is CommunityRef.Subscribed,
-                    -> null
+                                    -> null
                                 },
                             )
                         }

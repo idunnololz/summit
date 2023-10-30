@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -16,16 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
-import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,7 +84,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 viewModel.showSearch.value = true
             }
         }
-
 
 //        binding.searchBar.runAfterLayout {
 //            binding.searchBar.updateLayoutParams<MarginLayoutParams> {

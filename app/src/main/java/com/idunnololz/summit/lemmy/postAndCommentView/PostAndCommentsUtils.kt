@@ -111,8 +111,8 @@ fun BaseFragment<*>.showMoreCommentOptions(
             ?.miscAccountInfo
 
         if (fullAccount?.account?.instance == commentView.community.instance &&
-            miscAccountInfo?.isAdmin == true) {
-
+            miscAccountInfo?.isAdmin == true
+        ) {
             addDivider()
 
             addItemWithIcon(
@@ -197,7 +197,8 @@ fun BaseFragment<*>.showMoreCommentOptions(
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
                 R.id.admin_tools,
-                R.id.mod_tools -> {
+                R.id.mod_tools,
+                -> {
                     ModActionsDialogFragment.show(commentView, childFragmentManager)
                 }
                 R.id.reply -> {

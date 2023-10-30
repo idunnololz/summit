@@ -1,16 +1,10 @@
 package com.idunnololz.summit.links
 
-import android.webkit.URLUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runInterruptible
-import org.jsoup.Connection
-import org.jsoup.Jsoup
 import java.net.URI
 import java.net.URISyntaxException
 import javax.inject.Inject

@@ -282,7 +282,6 @@ class PostViewModel @Inject constructor(
                 }
             }
 
-
             if (post == null || comments == null) {
                 postResult
                     .onFailure {

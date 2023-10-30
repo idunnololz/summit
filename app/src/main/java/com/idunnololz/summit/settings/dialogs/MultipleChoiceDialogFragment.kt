@@ -1,6 +1,5 @@
 package com.idunnololz.summit.settings.dialogs
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -88,7 +87,6 @@ class MultipleChoiceDialogFragment :
         } else {
             null
         }
-
 
         BottomMenu(requireContext())
             .apply {

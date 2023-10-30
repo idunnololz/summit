@@ -193,33 +193,34 @@ class CustomSearchSuggestionsAdapter(
     private fun setNewItems(newItems: List<Item>) {
         val oldItems = items
 
-        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem = oldItems[oldItemPosition]
-                val newItem = newItems[newItemPosition]
+        val diff = DiffUtil.calculateDiff(
+            object : DiffUtil.Callback() {
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    val oldItem = oldItems[oldItemPosition]
+                    val newItem = newItems[newItemPosition]
 
-                if (oldItem::class != newItem::class) {
-                    return false
+                    if (oldItem::class != newItem::class) {
+                        return false
+                    }
+
+                    return when (oldItem) {
+                        Item.FooterItem -> true
+                        is Item.SuggestionItem ->
+                            oldItem.suggestion == (newItem as Item.SuggestionItem).suggestion
+                    }
                 }
 
-                return when (oldItem) {
-                    Item.FooterItem -> true
-                    is Item.SuggestionItem ->
-                        oldItem.suggestion == (newItem as Item.SuggestionItem).suggestion
+                override fun getOldListSize(): Int = oldItems.size
+
+                override fun getNewListSize(): Int = newItems.size
+
+                override fun areContentsTheSame(
+                    oldItemPosition: Int,
+                    newItemPosition: Int,
+                ): Boolean {
+                    return oldItems[oldItemPosition] == newItems[newItemPosition]
                 }
-            }
-
-            override fun getOldListSize(): Int = oldItems.size
-
-            override fun getNewListSize(): Int = newItems.size
-
-            override fun areContentsTheSame(
-                oldItemPosition: Int,
-                newItemPosition: Int,
-            ): Boolean {
-                return oldItems[oldItemPosition] == newItems[newItemPosition]
-            }
-        },
+            },
         )
         items = newItems
         diff.dispatchUpdatesTo(this)

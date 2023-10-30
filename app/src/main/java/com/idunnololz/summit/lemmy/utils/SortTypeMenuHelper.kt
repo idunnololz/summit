@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.utils
 import android.content.Context
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -63,7 +62,6 @@ class SortTypeMenuHelper(
         }
     }
 
-
     private fun getSortByMenu(): BottomMenu {
         when (getCurrentSortType()) {
             SortType.Active -> _sortByMenu.setChecked(R.id.sort_order_active)
@@ -85,14 +83,14 @@ class SortTypeMenuHelper(
             SortType.TopTwelveHour,
             SortType.TopThreeMonths,
             SortType.TopSixMonths,
-            SortType.TopNineMonths -> _sortByMenu.setChecked(R.id.sort_order_top)
+            SortType.TopNineMonths,
+            -> _sortByMenu.setChecked(R.id.sort_order_top)
         }
 
         return _sortByMenu
     }
     private fun getSortByTopMenu(): BottomMenu {
         when (getCurrentSortType()) {
-
             SortType.Active,
             SortType.Hot,
             SortType.New,
@@ -100,7 +98,8 @@ class SortTypeMenuHelper(
             SortType.MostComments,
             SortType.NewComments,
             SortType.Controversial,
-            SortType.Scaled -> {/* do nothing */}
+            SortType.Scaled,
+            -> { /* do nothing */ }
 
             SortType.TopDay ->
                 _sortByTopMenu.setChecked(R.id.sort_order_top_day)

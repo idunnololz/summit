@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SortType
 import com.squareup.moshi.JsonClass

@@ -43,6 +43,7 @@ interface LemmyCompletedActionsDao {
         insertAction(newEntry)
     }
 }
+
 @Entity(tableName = "lemmy_completed_actions")
 @TypeConverters(LemmyActionConverters::class)
 data class LemmyCompletedAction(

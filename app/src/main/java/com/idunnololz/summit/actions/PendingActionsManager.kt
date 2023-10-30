@@ -362,7 +362,7 @@ class PendingActionsManager @Inject constructor(
             id = 0L,
             ts = ts,
             creationTs = creationTs,
-            info = info
+            info = info,
         )
 
     suspend fun deleteCompletedActions() {

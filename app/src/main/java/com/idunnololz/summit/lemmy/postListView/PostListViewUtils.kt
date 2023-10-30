@@ -79,8 +79,8 @@ fun BaseFragment<*>.showMorePostOptions(
             ?.miscAccountInfo
 
         if (fullAccount?.account?.instance == postView.community.instance &&
-            miscAccountInfo?.isAdmin == true) {
-
+            miscAccountInfo?.isAdmin == true
+        ) {
             addDivider()
 
             addItemWithIcon(

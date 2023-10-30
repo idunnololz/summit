@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.LemmyTextHelper

@@ -554,11 +554,12 @@ class CreateOrEditPostFragment :
 
                 if (linkMetadata.data.url == binding.urlEditText.text.toString() &&
                     title.isNotBlank() &&
-                    title != binding.titleEditText.text.toString()) {
-
+                    title != binding.titleEditText.text.toString()
+                ) {
                     binding.titleSuggestionContainer.visibility = View.VISIBLE
-                    binding.titleSuggestion.text = getString(R.string.use_suggested_title_format,
-                        title
+                    binding.titleSuggestion.text = getString(
+                        R.string.use_suggested_title_format,
+                        title,
                     )
                     binding.titleSuggestionContainer.setOnClickListener {
                         binding.titleEditText.setText(title)

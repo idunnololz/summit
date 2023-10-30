@@ -50,7 +50,7 @@ class PersonTabbedViewModel @Inject constructor(
         infinity = true,
         autoLoadMoreItems = true,
         coroutineScopeFactory = coroutineScopeFactory,
-        offlineManager = offlineManager
+        offlineManager = offlineManager,
     )
     var commentListEngine = CommentListEngine()
 
@@ -146,13 +146,13 @@ class PersonTabbedViewModel @Inject constructor(
 
                     postsState.postValue(
                         UpdateInfo(
-                            isReset = force && pageIndex == 0
-                        )
+                            isReset = force && pageIndex == 0,
+                        ),
                     )
                     commentsState.postValue(
                         UpdateInfo(
-                            isReset = force && pageIndex == 0
-                        )
+                            isReset = force && pageIndex == 0,
+                        ),
                     )
 
                     fetchingPages.remove(pageIndex)
@@ -219,6 +219,6 @@ class PersonTabbedViewModel @Inject constructor(
         this + 1 // lemmy pages are 1 indexed
 
     data class UpdateInfo(
-        val isReset: Boolean
+        val isReset: Boolean,
     )
 }

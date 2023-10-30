@@ -362,19 +362,19 @@ class ModActionsDialogFragment :
 
             actionsViewModel.purgeCommunityResult.handleStateChange(
                 { getString(R.string.error_purge_community) },
-                { null }
+                { null },
             )
             actionsViewModel.purgeUserResult.handleStateChange(
                 { getString(R.string.error_purge_user) },
-                { null }
+                { null },
             )
             actionsViewModel.purgePostResult.handleStateChange(
                 { getString(R.string.error_purge_post) },
-                { UpdatedObject.PostObject(args.postId) }
+                { UpdatedObject.PostObject(args.postId) },
             )
             actionsViewModel.purgeCommentResult.handleStateChange(
                 { getString(R.string.error_purge_comment) },
-                { UpdatedObject.CommentObject(args.commentId) }
+                { UpdatedObject.CommentObject(args.commentId) },
             )
         }
     }

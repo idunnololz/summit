@@ -24,7 +24,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
     enum class ActionType {
         Completed,
         Pending,
-        Failed
+        Failed,
     }
 
     override fun onCreateView(
@@ -122,7 +122,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
                         ),
                     ),
                 )
-            }
+            },
         )
         binding.fastScroller.setRecyclerView(binding.recyclerView)
     }

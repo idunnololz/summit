@@ -26,8 +26,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingHiddenPostsFragment : BaseFragment<FragmentSettingHiddenPostsBinding>(),
-AlertDialogFragment.AlertDialogFragmentListener {
+class SettingHiddenPostsFragment :
+    BaseFragment<FragmentSettingHiddenPostsBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
     lateinit var preferences: Preferences
@@ -78,12 +79,14 @@ AlertDialogFragment.AlertDialogFragmentListener {
 
             withContext(Dispatchers.Main) {
                 settings.hiddenPostsCount.copy(
-                    description = getString(R.string.hidden_posts_format,
+                    description = getString(
+                        R.string.hidden_posts_format,
                         defaultDecimalFormat.format(count),
-                        defaultDecimalFormat.format(hiddenPostsManager.hiddenPostsLimit))
+                        defaultDecimalFormat.format(hiddenPostsManager.hiddenPostsLimit),
+                    ),
                 ).bindTo(
                     b = binding.hiddenPostsStats,
-                    {}
+                    {},
                 )
             }
         }
@@ -94,7 +97,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
             {
                 preferences.isHiddenPostsEnabled = it
                 updateRendering()
-            }
+            },
         )
 
         settings.resetHiddenPosts.bindTo(
@@ -108,8 +111,12 @@ AlertDialogFragment.AlertDialogFragmentListener {
                     withContext(Dispatchers.Main) {
                         AlertDialogFragment.Builder()
                             .setTitle(R.string.reset_hidden_posts_confirm_title)
-                            .setMessage(getString(
-                                R.string.reset_hidden_posts_confirm_desc_format, count.toString()))
+                            .setMessage(
+                                getString(
+                                    R.string.reset_hidden_posts_confirm_desc_format,
+                                    count.toString(),
+                                ),
+                            )
                             .setPositiveButton(R.string.yes)
                             .setNegativeButton(R.string.no)
                             .createAndShow(childFragmentManager, "reset_hidden_posts")
@@ -124,7 +131,7 @@ AlertDialogFragment.AlertDialogFragmentListener {
                 val directions = SettingHiddenPostsFragmentDirections
                     .actionSettingHiddenPostsFragmentToHiddenPostsFragment()
                 findNavController().navigateSafe(directions)
-            }
+            },
         )
     }
 
@@ -150,6 +157,5 @@ AlertDialogFragment.AlertDialogFragmentListener {
     }
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
-
     }
 }

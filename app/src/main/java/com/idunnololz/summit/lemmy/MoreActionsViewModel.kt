@@ -9,7 +9,6 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
-import com.idunnololz.summit.api.dto.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
@@ -483,4 +482,3 @@ data class BlockPersonResult(
 data class BlockInstanceResult(
     val blocked: Boolean,
 )
-

@@ -10,17 +10,13 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
-import android.widget.PopupMenu
 import androidx.activity.viewModels
-import androidx.appcompat.view.menu.ActionMenuItem
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Pair
@@ -36,8 +32,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.BuildConfig
@@ -77,7 +71,6 @@ import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
-import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
@@ -509,7 +502,10 @@ class MainActivity : BaseActivity() {
     private fun showNotificationBarBgIfNeeded() {
         if (!showNotificationBarBg) return
         if (binding.notificationBarBg.translationY == 0f &&
-            binding.notificationBarBg.visibility == View.VISIBLE) return
+            binding.notificationBarBg.visibility == View.VISIBLE
+        ) {
+            return
+        }
 
         binding.notificationBarBg.visibility = View.VISIBLE
         binding.notificationBarBg.animate()
@@ -656,7 +652,7 @@ class MainActivity : BaseActivity() {
         val page = LinkResolver.parseUrl(
             url = data.toString(),
             currentInstance = viewModel.currentInstance,
-            mustHandle = true
+            mustHandle = true,
         )
 
         if (page == null) {

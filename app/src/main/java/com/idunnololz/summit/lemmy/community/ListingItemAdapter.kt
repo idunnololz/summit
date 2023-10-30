@@ -326,7 +326,7 @@ class ListingItemAdapter(
                 val b = holder.getBinding<ManualLoadItemBinding>()
                 b.loadMoreText.text = context.getString(
                     R.string.load_more_page_format,
-                    (item.pageToLoad + 1).toString()
+                    (item.pageToLoad + 1).toString(),
                 )
 
                 fun loadPage() {
@@ -348,7 +348,7 @@ class ListingItemAdapter(
 
                 b.title.text = context.getString(
                     R.string.page_format,
-                    (item.pageIndex + 1).toString()
+                    (item.pageIndex + 1).toString(),
                 )
             }
         }

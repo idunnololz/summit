@@ -8,7 +8,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.button.MaterialButton
-import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.NotAuthenticatedException
@@ -16,8 +15,6 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
-import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 

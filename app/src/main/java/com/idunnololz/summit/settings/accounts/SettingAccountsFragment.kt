@@ -55,12 +55,12 @@ class SettingAccountsFragment : BaseFragment<FragmentSettingAccountsBinding>() {
             isSimple = true,
             signOut = {},
             onAccountClick = {
-                             onAccountClick(it.account.id)
+                onAccountClick(it.account.id)
             },
             onAddAccountClick = {},
             onSettingClick = {},
             onPersonClick = {
-                            onAccountClick(it.account.id)
+                onAccountClick(it.account.id)
             },
         )
 
@@ -90,7 +90,7 @@ class SettingAccountsFragment : BaseFragment<FragmentSettingAccountsBinding>() {
     private fun onAccountClick(accountId: PersonId) {
         val direction = SettingAccountsFragmentDirections
             .actionSettingAccountsFragmentToSettingPerAccountFragment(
-                accountId
+                accountId,
             )
         findNavController().navigateSafe(direction)
     }

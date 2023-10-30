@@ -16,16 +16,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.FragmentPersonBinding
-import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.ViewPagerController
-import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.SortTypeMenuHelper
@@ -252,7 +249,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                             requireContext(),
                             this@PersonTabbedFragment,
                             { viewModel.sortType },
-                            { viewModel.sortType = it }
+                            { viewModel.sortType = it },
                         ).show()
                     }
                     R.id.block_user -> {

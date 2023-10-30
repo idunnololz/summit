@@ -7,10 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.accountUi.AccountAdapter
-import com.idunnololz.summit.databinding.FragmentSettingAccountsBinding
 import com.idunnololz.summit.databinding.FragmentSettingPerAccountBinding
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.BaseFragment
@@ -73,6 +70,5 @@ class SettingPerAccountFragment : BaseFragment<FragmentSettingPerAccountBinding>
 
             viewModel.loadAccount(args.accountId)
         }
-
     }
 }

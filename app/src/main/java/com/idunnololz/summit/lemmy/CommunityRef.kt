@@ -19,7 +19,7 @@ import kotlinx.parcelize.Parcelize
  */
 private val CommunitiesNoAt = setOf(
     "burggit.moe",
-    "lemmy.thesanewriter.com"
+    "lemmy.thesanewriter.com",
 )
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
