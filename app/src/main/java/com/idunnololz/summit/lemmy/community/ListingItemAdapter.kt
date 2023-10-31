@@ -329,8 +329,11 @@ class ListingItemAdapter(
                     (item.pageToLoad + 1).toString(),
                 )
 
+                b.loadingView.visibility = View.GONE
+                b.loadMoreText.visibility = View.VISIBLE
+
                 fun loadPage() {
-                    b.loadingView.showProgressBar()
+                    b.loadingView.visibility = View.VISIBLE
                     b.loadMoreText.visibility = View.GONE
                     onLoadPage(item.pageToLoad)
                 }

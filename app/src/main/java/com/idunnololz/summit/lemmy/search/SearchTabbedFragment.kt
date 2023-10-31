@@ -4,6 +4,7 @@ import android.app.SearchManager
 import android.app.SearchableInfo
 import android.content.ContentResolver
 import android.content.Context
+import android.database.DatabaseUtils
 import android.net.Uri
 import android.os.Bundle
 import android.provider.SearchRecentSuggestions
@@ -578,8 +579,8 @@ class SearchTabbedFragment :
             // finally, make the query
             context.contentResolver.delete(
                 uri,
-                "query = '$suggestionToDelete'",
-                null,
+                "query = ?",
+                arrayOf(suggestionToDelete),
             )
 
             searchSuggestionsAdapter?.refreshSuggestions()

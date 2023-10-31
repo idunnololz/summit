@@ -434,22 +434,23 @@ class MultiCommunityEditorDialogFragment :
                 clazz = Item.HeaderItem::class,
                 inflateFn = MultiCommunityHeaderItemBinding::inflate,
                 onViewCreated = { b ->
-                    b.nameEditText.addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(
-                            p0: CharSequence?,
-                            p1: Int,
-                            p2: Int,
-                            p3: Int,
-                        ) {
-                        }
+                    b.nameEditText.addTextChangedListener(
+                        object : TextWatcher {
+                            override fun beforeTextChanged(
+                                p0: CharSequence?,
+                                p1: Int,
+                                p2: Int,
+                                p3: Int,
+                            ) {
+                            }
 
-                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                        }
+                            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                            }
 
-                        override fun afterTextChanged(p0: Editable?) {
-                            onCommunityNameChanged(p0?.toString())
-                        }
-                    },
+                            override fun afterTextChanged(p0: Editable?) {
+                                onCommunityNameChanged(p0?.toString())
+                            }
+                        },
                     )
                 },
             ) { item, b, h ->
