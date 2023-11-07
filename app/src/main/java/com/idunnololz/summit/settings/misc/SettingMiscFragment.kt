@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
+import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -25,6 +28,10 @@ import javax.inject.Inject
 class SettingMiscFragment :
     BaseFragment<FragmentSettingMiscBinding>(),
     SettingValueUpdateCallback {
+
+    companion object {
+        private const val A_DAY_MS = 1000L * 60L * 60L * 24L
+    }
 
     @Inject
     lateinit var preferences: Preferences
@@ -148,7 +155,54 @@ class SettingMiscFragment :
         } else {
             binding.usePredictiveBack.root.visibility = View.GONE
         }
+        settings.shareImagesDirectly.bindTo(
+            binding.shareImagesDirectly,
+            { preferences.shareImagesDirectly },
+            {
+                preferences.shareImagesDirectly = it
+            },
+        )
+        settings.warnReplyToOldContentThresholdMs.bindTo(
+            binding.warnReplyToOldContentThresholdMs,
+            { convertThresholdMsToOptionId(preferences.warnReplyToOldContentThresholdMs) },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            },
+        )
     }
+
+    private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {
+        if (!preferences.warnReplyToOldContent) {
+            return R.id.warn_reply_to_old_dont_warn
+        }
+
+        return when {
+            warnReplyToOldContentThresholdMs <= A_DAY_MS -> R.id.warn_reply_to_old_1_day
+            warnReplyToOldContentThresholdMs <= A_DAY_MS * 2 -> R.id.warn_reply_to_old_2_day
+            warnReplyToOldContentThresholdMs <= A_DAY_MS * 3 -> R.id.warn_reply_to_old_3_day
+            warnReplyToOldContentThresholdMs <= A_DAY_MS * 4 -> R.id.warn_reply_to_old_4_day
+            warnReplyToOldContentThresholdMs <= A_DAY_MS * 5 -> R.id.warn_reply_to_old_5_day
+            warnReplyToOldContentThresholdMs <= A_DAY_MS * 7 -> R.id.warn_reply_to_old_week
+            warnReplyToOldContentThresholdMs <= A_DAY_MS * 30 -> R.id.warn_reply_to_old_month
+            else -> R.id.warn_reply_to_old_year
+        }
+    }
+
+
+    private fun convertOptionIdToThresholdMs(@IdRes id: Int) =
+        when (id) {
+            R.id.warn_reply_to_old_dont_warn -> 0L
+            R.id.warn_reply_to_old_1_day -> A_DAY_MS
+            R.id.warn_reply_to_old_2_day -> A_DAY_MS * 2
+            R.id.warn_reply_to_old_3_day -> A_DAY_MS * 3
+            R.id.warn_reply_to_old_4_day -> A_DAY_MS * 4
+            R.id.warn_reply_to_old_5_day -> A_DAY_MS * 5
+            R.id.warn_reply_to_old_week -> A_DAY_MS * 7
+            R.id.warn_reply_to_old_month -> A_DAY_MS * 30
+            R.id.warn_reply_to_old_year -> A_DAY_MS * 365
+            else -> null
+        }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {
@@ -157,6 +211,14 @@ class SettingMiscFragment :
             }
             settings.previewLinks.id -> {
                 preferences.previewLinks = value as Int
+            }
+            settings.warnReplyToOldContentThresholdMs.id -> {
+                val threshold = convertOptionIdToThresholdMs(value as Int)
+
+                if (threshold != null) {
+                    preferences.warnReplyToOldContent = threshold != 0L
+                    preferences.warnReplyToOldContentThresholdMs = threshold
+                }
             }
         }
 

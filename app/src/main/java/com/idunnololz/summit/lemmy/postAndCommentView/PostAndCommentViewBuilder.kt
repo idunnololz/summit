@@ -195,6 +195,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onRevealContentClickedFn: () -> Unit,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+        onVideoLongClickListener: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         onPostMoreClick: (PostView) -> Unit,
@@ -297,6 +298,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onImageClick(Either.Left(postView), null, url)
             },
             onVideoClickListener = onVideoClick,
+            onVideoLongClickListener = onVideoLongClickListener,
             onRevealContentClickedFn = onRevealContentClickedFn,
             onItemClickListener = {},
             onLemmyUrlClick = onPageClick,

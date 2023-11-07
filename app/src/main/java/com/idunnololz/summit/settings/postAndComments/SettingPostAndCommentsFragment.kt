@@ -308,6 +308,7 @@ class SettingPostAndCommentsFragment :
                     onRevealContentClickedFn = {},
                     onImageClick = { _, _, _ -> },
                     onVideoClick = { _, _, _ -> },
+                    onVideoLongClickListener = { _ -> },
                     onPageClick = {},
                     onSignInRequired = {},
                     onInstanceMismatch = { _, _ -> },

@@ -88,6 +88,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <include
+                    android:id="@+id/share_images_directly"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/warn_reply_to_old_content_threshold_ms"
+                    layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>

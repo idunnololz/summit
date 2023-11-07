@@ -143,6 +143,7 @@ dependencies {
     implementation(libs.threeten.abp)
     implementation(libs.zoom.layout)
     implementation(libs.process.phoenix)
+    implementation("androidx.media3:media3-transformer:1.1.1")
 }
 
 // Allow references to generated code

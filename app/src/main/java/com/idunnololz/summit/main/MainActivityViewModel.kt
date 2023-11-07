@@ -1,5 +1,8 @@
 package com.idunnololz.summit.main
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +17,7 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
@@ -21,6 +25,7 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -28,10 +33,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.BufferedSink
+import okio.buffer
+import okio.sink
+import okio.source
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val offlineManager: OfflineManager,
@@ -48,6 +59,7 @@ class MainActivityViewModel @Inject constructor(
     val communities = StatefulLiveData<List<CommunityView>>()
     val currentAccount = MutableLiveData<AccountView?>(null)
     val unreadCount = accountInfoManager.unreadCount.asLiveData()
+    val downloadAndShareFile = StatefulLiveData<Uri>()
 
     private var communityRef: CommunityRef? = null
 
@@ -223,5 +235,22 @@ class MainActivityViewModel @Inject constructor(
     fun refetchCommunityOrSite(force: Boolean) {
         val communityRef = communityRef ?: return
         fetchCommunityOrSiteInfo(communityRef, force)
+    }
+
+    fun downloadAndShareImage(url: String) {
+        downloadAndShareFile.setIsLoading()
+
+        offlineManager.fetchImage(
+            url = url,
+            listener = { file ->
+                val fileUri = FileProviderHelper(context)
+                    .openTempFile("img_${file.name}") {
+                        it.sink().buffer().use {
+                            it.writeAll(file.source())
+                        }
+                    }
+                downloadAndShareFile.postValue(fileUri)
+            }
+        )
     }
 }

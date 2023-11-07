@@ -65,6 +65,7 @@ import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
@@ -341,26 +342,11 @@ class PostFragment :
                         return@PostsAdapter
                     }
 
-                    AddOrEditCommentFragment().apply {
-                        arguments = postOrComment.fold(
-                            {
-                                AddOrEditCommentFragmentArgs(
-                                    getInstance(),
-                                    null,
-                                    it,
-                                    null,
-                                )
-                            },
-                            {
-                                AddOrEditCommentFragmentArgs(
-                                    getInstance(),
-                                    it,
-                                    null,
-                                    null,
-                                )
-                            },
-                        ).toBundle()
-                    }.show(childFragmentManager, "asdf")
+                    AddOrEditCommentFragment.showReplyDialog(
+                        instance = getInstance(),
+                        postOrCommentView = postOrComment,
+                        fragmentManager = childFragmentManager,
+                    )
                 },
                 onImageClick = { postOrCommentView, imageView, url ->
                     getMainActivity()?.openImage(
@@ -380,6 +366,9 @@ class PostFragment :
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
+                },
+                onVideoLongClickListener = { url ->
+                    showMoreVideoOptions(url, actionsViewModel)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -919,14 +908,11 @@ class PostFragment :
                         }
 
                         CommentGestureAction.Reply -> {
-                            AddOrEditCommentFragment().apply {
-                                arguments = AddOrEditCommentFragmentArgs(
-                                    getInstance(),
-                                    commentView,
-                                    null,
-                                    null,
-                                ).toBundle()
-                            }.show(childFragmentManager, "asdf")
+                            AddOrEditCommentFragment.showReplyDialog(
+                                instance = getInstance(),
+                                postOrCommentView = Either.Right(commentView),
+                                fragmentManager = childFragmentManager,
+                            )
                         }
 
                         CommentGestureAction.CollapseOrExpand -> {
@@ -979,14 +965,11 @@ class PostFragment :
                     return
                 }
 
-                AddOrEditCommentFragment().apply {
-                    arguments = AddOrEditCommentFragmentArgs(
-                        viewModel.apiInstance,
-                        null,
-                        postView,
-                        null,
-                    ).toBundle()
-                }.show(childFragmentManager, "asdf")
+                AddOrEditCommentFragment.showReplyDialog(
+                    instance = viewModel.apiInstance,
+                    postOrCommentView = Either.Left(postView),
+                    fragmentManager = childFragmentManager,
+                )
             }
 
             PostGestureAction.Hide -> {
@@ -1042,29 +1025,21 @@ class PostFragment :
         when (tag) {
             R.id.action_add_comment -> {
                 val postView = viewModel.postData.valueOrNull?.postView ?: return
-                AddOrEditCommentFragment().apply {
-                    arguments =
-                        AddOrEditCommentFragmentArgs(
-                            getInstance(),
-                            null,
-                            postView.post,
-                            null,
-                        )
-                            .toBundle()
-                }.show(childFragmentManager, "asdf")
+
+                AddOrEditCommentFragment.showReplyDialog(
+                    instance = getInstance(),
+                    postOrCommentView = Either.Left(postView.post),
+                    fragmentManager = childFragmentManager,
+                )
             }
             R.id.action_edit_comment -> {
                 val postView = viewModel.postData.valueOrNull?.postView ?: return
-                AddOrEditCommentFragment().apply {
-                    arguments =
-                        AddOrEditCommentFragmentArgs(
-                            getInstance(),
-                            null,
-                            postView.post,
-                            null,
-                        )
-                            .toBundle()
-                }.show(childFragmentManager, "asdf")
+
+                AddOrEditCommentFragment.showReplyDialog(
+                    instance = getInstance(),
+                    postOrCommentView = Either.Left(postView.post),
+                    fragmentManager = childFragmentManager,
+                )
             }
         }
     }

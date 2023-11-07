@@ -156,6 +156,7 @@ class PostListViewBuilder @Inject constructor(
         onRevealContentClickedFn: () -> Unit,
         onImageClick: (PostView, sharedElementView: View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+        onVideoLongClickListener: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onItemClick: (
             instance: String,
@@ -711,6 +712,7 @@ class PostListViewBuilder @Inject constructor(
                             onImageClick(postView, null, it)
                         },
                         onVideoClickListener = onVideoClick,
+                        onVideoLongClickListener = onVideoLongClickListener,
                         onItemClickListener = {
                             onItemClick()
                         },

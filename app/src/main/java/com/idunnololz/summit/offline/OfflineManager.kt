@@ -12,6 +12,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.cache.MoshiDiskCache
+import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.util.*
@@ -90,18 +91,18 @@ class OfflineManager @Inject constructor(
         var purgedFiles = 0
         val thresholdTime = System.currentTimeMillis() - Duration.ofDays(1).toMillis()
 
-        imagesDir.listFiles()?.forEach {
-            if (it.lastModified() < thresholdTime) {
-                it.delete()
-                purgedFiles++
+        fun File.cleanupDir() {
+            this.listFiles()?.forEach {
+                if (it.lastModified() < thresholdTime) {
+                    it.delete()
+                    purgedFiles++
+                }
             }
         }
-        videosDir.listFiles()?.forEach {
-            if (it.lastModified() < thresholdTime) {
-                it.delete()
-                purgedFiles++
-            }
-        }
+
+        imagesDir.cleanupDir()
+        videosDir.cleanupDir()
+        FileProviderHelper(context).fileProviderDir.cleanupDir()
 
         Log.d(TAG, "Deleted $purgedFiles files.")
     }
@@ -320,7 +321,7 @@ class OfflineManager @Inject constructor(
         return Result.success(downloadedFile)
     }
 
-    private fun fetchImage(
+    fun fetchImage(
         url: String,
         listener: TaskListener,
         errorListener: TaskFailedListener? = null,

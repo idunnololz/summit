@@ -59,6 +59,7 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
@@ -141,6 +142,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
+                onVideoLongClickListener = { url ->
+                    showMoreVideoOptions(url, actionsViewModel)
+                },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
@@ -151,23 +155,11 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         return@SearchResultAdapter
                     }
 
-                    AddOrEditCommentFragment().apply {
-                        arguments = postOrComment.fold({
-                            AddOrEditCommentFragmentArgs(
-                                parentFragment.viewModel.instance,
-                                null,
-                                it,
-                                null,
-                            )
-                        }, {
-                            AddOrEditCommentFragmentArgs(
-                                parentFragment.viewModel.instance,
-                                it,
-                                null,
-                                null,
-                            )
-                        },).toBundle()
-                    }.show(childFragmentManager, "asdf")
+                    AddOrEditCommentFragment.showReplyDialog(
+                        instance = parentFragment.viewModel.instance,
+                        postOrCommentView = postOrComment,
+                        fragmentManager = childFragmentManager,
+                    )
                 },
                 onCommentMoreClick = {
                     showMoreCommentOptions(
@@ -348,6 +340,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private val onImageClick: (View?, String) -> Unit,
         private val onPostImageClick: (PostView, View?, String) -> Unit,
         private val onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+        private val onVideoLongClickListener: (url: String) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
         private val onCommentMoreClick: (CommentView) -> Unit,
@@ -612,6 +605,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         onPostMoreClick(item.postView)
                     },
                     onVideoClick = onVideoClick,
+                    onVideoLongClickListener = onVideoLongClickListener,
                     onPageClick = onPageClick,
                     onItemClick = onItemClick,
                     toggleItem = {},

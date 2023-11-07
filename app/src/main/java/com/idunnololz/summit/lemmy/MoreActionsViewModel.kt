@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
@@ -19,7 +20,9 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.video.VideoDownloadManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,6 +36,7 @@ class MoreActionsViewModel @Inject constructor(
     val accountActionsManager: AccountActionsManager,
     private val hiddenPostsManager: HiddenPostsManager,
     private val savedManager: SavedManager,
+    private val videoDownloadManager: VideoDownloadManager,
 ) : ViewModel() {
 
     enum class PostActionType {
@@ -73,6 +77,8 @@ class MoreActionsViewModel @Inject constructor(
     val removePostAction = PostAction(actionType = PostActionType.RemovePost)
 
     val banUserFromSiteResult = StatefulLiveData<Unit>()
+
+    val downloadVideoResult = StatefulLiveData<FileDownloadHelper.DownloadResult>()
 
     private var currentPageInstance: String? = null
 
@@ -454,6 +460,34 @@ class MoreActionsViewModel @Inject constructor(
                 }
                 .onFailure {
                     purgeCommunityResult.postError(it)
+                }
+        }
+    }
+
+    fun downloadVideo(
+        context: Context,
+        url: String) {
+        downloadVideoResult.setIsLoading()
+
+        viewModelScope.launch {
+            videoDownloadManager.downloadVideo(url)
+                .onSuccess { file ->
+                    FileDownloadHelper
+                        .downloadFile(
+                            c = context,
+                            destFileName = file.name,
+                            url = url,
+                            cacheFile = file,
+                        )
+                        .onSuccess {
+                            downloadVideoResult.postValue(it)
+                        }
+                        .onFailure {
+                            downloadVideoResult.postError(it)
+                        }
+                }
+                .onFailure {
+                    downloadVideoResult.postError(it)
                 }
         }
     }

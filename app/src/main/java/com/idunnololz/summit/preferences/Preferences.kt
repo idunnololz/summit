@@ -61,6 +61,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
@@ -77,12 +78,15 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
+import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
+import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.fromJsonSafe
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.threeten.bp.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -626,6 +630,30 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_INFINITY_PAGE_INDICATOR, value)
+                .apply()
+        }
+
+    var shareImagesDirectly: Boolean
+        get() = prefs.getBoolean(KEY_SHARE_IMAGES_DIRECTLY, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SHARE_IMAGES_DIRECTLY, value)
+                .apply()
+        }
+
+    var warnReplyToOldContent: Boolean
+        get() = prefs.getBoolean(KEY_WARN_REPLY_TO_OLD_CONTENT, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_WARN_REPLY_TO_OLD_CONTENT, value)
+                .apply()
+        }
+
+    var warnReplyToOldContentThresholdMs: Long
+        get() = prefs.getLong(KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS, Duration.ofDays(2).toMillis())
+        set(value) {
+            prefs.edit()
+                .putLong(KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS, value)
                 .apply()
         }
 

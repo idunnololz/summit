@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentColorSchemePickerBinding
+import com.idunnololz.summit.databinding.DialogFragmentFontPickerBinding
 import com.idunnololz.summit.databinding.FontItemBinding
 import com.idunnololz.summit.preferences.FontId
 import com.idunnololz.summit.preferences.FontIds
@@ -20,11 +21,12 @@ import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.inflationx.calligraphy3.CalligraphyUtils
+import io.github.inflationx.viewpump.ViewPump
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class FontPickerDialogFragment :
-    BaseBottomSheetDialogFragment<DialogFragmentColorSchemePickerBinding>(),
+    BaseBottomSheetDialogFragment<DialogFragmentFontPickerBinding>(),
     FullscreenDialogFragment {
 
     @Inject
@@ -40,7 +42,7 @@ class FontPickerDialogFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentColorSchemePickerBinding.inflate(inflater, container, false))
+        setBinding(DialogFragmentFontPickerBinding.inflate(inflater, container, false))
 
         return binding.root
     }
@@ -50,10 +52,12 @@ class FontPickerDialogFragment :
 
         val context = requireContext()
 
+        ViewPump.init(null)
+
         with(binding) {
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = FontAdapter(context) {
+            recyclerView.adapter = FontAdapter(context, preferences) {
                 preferences.globalFont = it
 
                 dismiss()
@@ -63,8 +67,15 @@ class FontPickerDialogFragment :
         }
     }
 
+    override fun onDestroyView() {
+        themeManager.applyThemeFromPreferences()
+
+        super.onDestroyView()
+    }
+
     private class FontAdapter(
         private val context: Context,
+        private val preferences: Preferences,
         private val onFontSelected: (FontId) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -92,6 +103,22 @@ class FontPickerDialogFragment :
 
                 CalligraphyUtils.applyFontToTextView(context, b.title, item.fontId.toFontAsset())
                 CalligraphyUtils.applyFontToTextView(context, b.sampleText, item.fontId.toFontAsset())
+
+                if (preferences.globalFont == item.fontId) {
+                    b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        0,
+                        0,
+                        R.drawable.baseline_check_18,
+                        0
+                    )
+                } else {
+                    b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        0,
+                        0,
+                        0,
+                        0
+                    )
+                }
 
                 b.root.setOnClickListener {
                     onFontSelected(item.fontId)

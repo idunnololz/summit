@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
+import arrow.core.Either
+import arrow.core.left
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -51,6 +53,7 @@ import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
@@ -260,6 +263,9 @@ class CommunityFragment :
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
+                },
+                onVideoLongClickListener = { url ->
+                    showMoreVideoOptions(url, actionsViewModel)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -795,14 +801,11 @@ class CommunityFragment :
                                 videoState = null,
                             )
 
-                            AddOrEditCommentFragment().apply {
-                                arguments = AddOrEditCommentFragmentArgs(
-                                    instance = viewModel.apiInstance,
-                                    commentView = null,
-                                    postView = postView,
-                                    editCommentView = null,
-                                ).toBundle()
-                            }.showAllowingStateLoss(childFragmentManager, "asdf")
+                            AddOrEditCommentFragment.showReplyDialog(
+                                viewModel.apiInstance,
+                                Either.Left(postView),
+                                childFragmentManager,
+                            )
                         }
 
                         PostGestureAction.Hide -> {

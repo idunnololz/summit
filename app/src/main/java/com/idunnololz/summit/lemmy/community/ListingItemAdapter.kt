@@ -48,6 +48,7 @@ class ListingItemAdapter(
     private val onInstanceMismatch: (String, String) -> Unit,
     private val onImageClick: (PostView, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
+    private val onVideoLongClickListener: (url: String) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onItemClick: (
         instance: String,
@@ -200,6 +201,7 @@ class ListingItemAdapter(
                         },
                         onImageClick = onImageClick,
                         onVideoClick = onVideoClick,
+                        onVideoLongClickListener = onVideoLongClickListener,
                         onPageClick = onPageClick,
                         onItemClick = onItemClick,
                         onShowMoreOptions = onShowMoreActions,
@@ -281,6 +283,7 @@ class ListingItemAdapter(
                     onImageClick = onImageClick,
                     onShowMoreOptions = onShowMoreActions,
                     onVideoClick = onVideoClick,
+                    onVideoLongClickListener = onVideoLongClickListener,
                     onPageClick = onPageClick,
                     onItemClick = onItemClick,
                     toggleItem = this::toggleItem,

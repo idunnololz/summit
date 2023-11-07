@@ -1226,6 +1226,74 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.use_predictive_back_desc),
     )
 
+    val shareImagesDirectly = OnOffSettingItem(
+        null,
+        context.getString(R.string.share_images_directly),
+        context.getString(R.string.share_images_directly_desc),
+    )
+
+    val warnReplyToOldContentThresholdMs = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.warn_when_replying_to_old_post_or_comment),
+        context.getString(R.string.warn_when_replying_to_old_post_or_comment_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_dont_warn,
+                context.getString(R.string.dont_warn),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_1_day,
+                context.resources.getQuantityString(R.plurals.day_format, 1, "1"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_2_day,
+                context.resources.getQuantityString(R.plurals.day_format, 2, "2"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_3_day,
+                context.resources.getQuantityString(R.plurals.day_format, 3, "3"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_4_day,
+                context.resources.getQuantityString(R.plurals.day_format, 4, "4"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_5_day,
+                context.resources.getQuantityString(R.plurals.day_format, 5, "5"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_week,
+                context.getString(R.string.a_week),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_month,
+                context.getString(R.string.a_month),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.warn_reply_to_old_year,
+                context.getString(R.string.a_year),
+                null,
+                null,
+            ),
+        ),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
@@ -1235,6 +1303,7 @@ class MiscSettings @Inject constructor(
         transparentNotificationBar,
         previewLinks,
         usePredictiveBack,
+        shareImagesDirectly,
     )
 }
 

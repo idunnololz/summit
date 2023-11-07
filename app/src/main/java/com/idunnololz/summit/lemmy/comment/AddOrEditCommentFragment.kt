@@ -3,15 +3,18 @@ package com.idunnololz.summit.lemmy.comment
 import android.app.Activity
 import android.os.Bundle
 import android.os.Parcelable
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import arrow.core.Either
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -19,6 +22,8 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
@@ -28,11 +33,14 @@ import com.idunnololz.summit.drafts.OriginalCommentData
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
+import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -51,7 +59,20 @@ class AddOrEditCommentFragment :
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
         const val REQUEST_KEY_RESULT = "result"
 
-        private const val SIS_TEXT = "SIS_TEXT"
+        fun showReplyDialog(
+            instance: String,
+            postOrCommentView: Either<PostView, CommentView>,
+            fragmentManager: FragmentManager,
+        ) {
+            AddOrEditCommentFragment().apply {
+                arguments = AddOrEditCommentFragmentArgs(
+                    instance = instance,
+                    commentView = postOrCommentView.getOrNull(),
+                    postView = postOrCommentView.leftOrNull(),
+                    editCommentView = null,
+                ).toBundle()
+            }.showAllowingStateLoss(fragmentManager, "AddOrEditCommentFragment")
+        }
     }
 
     private val args by navArgs<AddOrEditCommentFragmentArgs>()
@@ -163,6 +184,10 @@ class AddOrEditCommentFragment :
                 }
         }
 
+        viewModel.messages.observe(viewLifecycleOwner) {
+            refreshMessage()
+        }
+
         binding.toolbar.title = getString(R.string.comment)
         if (isEdit()) {
             binding.toolbar.inflateMenu(R.menu.menu_edit_comment)
@@ -238,6 +263,51 @@ class AddOrEditCommentFragment :
                 }
                 else -> false
             }
+        }
+
+        if (savedInstanceState == null) {
+            val replyTargetTs =
+                args.commentView?.let {
+                    dateStringToTs(it.comment.updated ?: it.comment.published)
+                } ?: args.postView?.let {
+                    dateStringToTs(it.post.updated ?: it.post.published)
+                }
+            val thresholdMs = GlobalSettings.warnReplyToOldContentThresholdMs ?: Long.MAX_VALUE
+
+            if (replyTargetTs != null &&
+                (System.currentTimeMillis() - replyTargetTs) > thresholdMs
+            ) {
+                viewModel.addMessage(AddOrEditCommentViewModel.Message.ReplyTargetTooOld(replyTargetTs))
+            }
+        }
+    }
+
+    private fun refreshMessage() {
+        if (!isBindingAvailable()) {
+            return
+        }
+
+        TransitionManager.beginDelayedTransition(binding.root)
+
+        val context = requireContext()
+        val messageView = when (val message = viewModel.messages.value?.firstOrNull()) {
+            is AddOrEditCommentViewModel.Message.ReplyTargetTooOld -> {
+                val b = ErrorMessageOldReplyTargetBinding.inflate(
+                    LayoutInflater.from(requireContext()), binding.messageContainer, false)
+                b.message.text = getString(
+                    R.string.error_retry_target_too_old_format,
+                    dateStringToPretty(context, message.replyTargetTs))
+                b.close.setOnClickListener {
+                    viewModel.dismissMessage(message)
+                }
+                b.root
+            }
+            null -> null
+        }
+        binding.messageContainer.removeAllViews()
+
+        if (messageView != null) {
+            binding.messageContainer.addView(messageView)
         }
     }
 

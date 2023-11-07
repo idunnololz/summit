@@ -9,8 +9,10 @@ import java.io.OutputStream
 class FileProviderHelper(
     private val context: Context,
 ) {
+    val fileProviderDir = File(context.cacheDir, "fileprovider")
+
     fun openTempFile(fileName: String, writeFn: (OutputStream) -> Unit): Uri {
-        val file = File(context.cacheDir, "fileprovider/$fileName")
+        val file = File(fileProviderDir, fileName)
 
         if (file.isDirectory) {
             file.delete()

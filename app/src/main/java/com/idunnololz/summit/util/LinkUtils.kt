@@ -10,6 +10,8 @@ import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.preferences.GlobalSettings
+import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import okhttp3.CacheControl
 import okhttp3.Request
 import okhttp3.Response
@@ -135,7 +137,11 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
                 R.drawable.baseline_content_copy_24,
             )
         }
-        addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
+        if (GlobalSettings.shareImagesDirectly && isUrlImage(url)) {
+            addItemWithIcon(R.id.share_image, R.string.share_image, R.drawable.baseline_share_24)
+        } else {
+            addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
+        }
         addItemWithIcon(R.id.open_in_browser, R.string.open_in_browser, R.drawable.baseline_public_24)
         addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
         addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
@@ -150,6 +156,9 @@ fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
                 }
                 R.id.share_link -> {
                     Utils.shareLink(context, url)
+                }
+                R.id.share_image -> {
+                    downloadAndShareImage(url)
                 }
                 R.id.open_in_browser -> {
                     onLinkClick(url, null, LinkType.Action)

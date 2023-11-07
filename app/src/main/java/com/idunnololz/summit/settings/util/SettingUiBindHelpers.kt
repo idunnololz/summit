@@ -154,6 +154,14 @@ fun RadioGroupSettingItem.bindTo(
     onSettingClick: (setting: RadioGroupSettingItem, currentValue: Int) -> Unit,
 ) {
     b.title.text = this.title
+
+    if (this.description == null) {
+        b.desc.visibility = View.GONE
+    } else {
+        b.desc.text = this.description
+        b.desc.visibility = View.VISIBLE
+    }
+
     b.value.text = this.options.firstOrNull { it.id == getCurrentValue() }?.title
 
     b.root.tag = this

@@ -140,4 +140,16 @@
     <item name="purge_comment" type="id" />
     <item name="purge_community" type="id" />
     <item name="undo_ban_from_site" type="id" />
+    <item name="download" type="id" />
+    <item name="share_image" type="id" />
+    <item name="warn_reply_to_old_1_day" type="id" />
+    <item name="warn_reply_to_old_2_day" type="id" />
+    <item name="warn_reply_to_old_3_day" type="id" />
+    <item name="warn_reply_to_old_4_day" type="id" />
+    <item name="warn_reply_to_old_5_day" type="id" />
+    <item name="warn_reply_to_old_week" type="id" />
+    <item name="warn_reply_to_old_month" type="id" />
+    <item name="warn_reply_to_old_year" type="id" />
+    <item name="warn_reply_to_old_heat_death_of_universe" type="id" />
+    <item name="warn_reply_to_old_dont_warn" type="id" />
 </resources>
