@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
@@ -11,11 +12,13 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.community.Item
 import com.idunnololz.summit.lemmy.community.ListingItemAdapter
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
@@ -34,6 +37,8 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
 
     @Inject
     lateinit var preferences: Preferences
+
+    private val actionsViewModel: MoreActionsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +84,9 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
             },
             onVideoClick = { url, videoType, state ->
                 getMainActivity()?.openVideo(url, videoType, state)
+            },
+            onVideoLongClickListener = { url ->
+                showMoreVideoOptions(url, actionsViewModel)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)

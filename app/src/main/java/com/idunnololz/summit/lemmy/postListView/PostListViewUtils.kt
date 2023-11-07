@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.postListView
 
 import androidx.fragment.app.FragmentManager
+import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
@@ -188,15 +189,11 @@ fun BaseFragment<*>.showMorePostOptions(
         setOnMenuItemClickListener {
             when (it.id) {
                 R.id.action_add_comment -> {
-                    AddOrEditCommentFragment().apply {
-                        arguments =
-                            AddOrEditCommentFragmentArgs(
-                                instance = instance,
-                                commentView = null,
-                                postView = postView,
-                                editCommentView = null,
-                            ).toBundle()
-                    }.show(childFragmentManager, "asdf")
+                    AddOrEditCommentFragment.showReplyDialog(
+                        instance = instance,
+                        postOrCommentView = Either.Left(postView),
+                        fragmentManager = childFragmentManager,
+                    )
                 }
                 R.id.edit_post -> {
                     CreateOrEditPostFragment()

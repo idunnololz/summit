@@ -16,6 +16,7 @@ import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
+import android.webkit.MimeTypeMap
 import androidx.activity.viewModels
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -61,6 +62,7 @@ import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.login.LoginFragment
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity
@@ -76,6 +78,7 @@ import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
@@ -148,6 +151,24 @@ class MainActivity : BaseActivity() {
 
         viewModel.communities.observe(this) {
             communitySelectorController?.setCommunities(it)
+        }
+        viewModel.downloadAndShareFile.observe(this) {
+            when (it) {
+                is StatefulData.Error -> {}
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    val mimeType = MimeTypeMap.getSingleton()
+                        .getMimeTypeFromExtension(it.data.toString())
+                        ?: "image/jpeg"
+
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = mimeType
+                        putExtra(Intent.EXTRA_STREAM, it.data)
+                    }
+                    startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                }
+            }
         }
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
@@ -1193,5 +1214,9 @@ class MainActivity : BaseActivity() {
         val currentNavController = currentNavController ?: return
         val menuItem = binding.bottomNavigationView.menu.findItem(menuId) ?: return
         NavigationUI.onNavDestinationSelected(menuItem, currentNavController)
+    }
+
+    fun downloadAndShareImage(url: String) {
+        viewModel.downloadAndShareImage(url)
     }
 }

@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -202,14 +203,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
                     ModActionsDialogFragment.show(commentView, childFragmentManager)
                 }
                 R.id.reply -> {
-                    AddOrEditCommentFragment().apply {
-                        arguments = AddOrEditCommentFragmentArgs(
-                            instance = instance,
-                            commentView = commentView,
-                            postView = null,
-                            editCommentView = null,
-                        ).toBundle()
-                    }.show(childFragmentManager, "asdf")
+                    AddOrEditCommentFragment.showReplyDialog(
+                        instance = instance,
+                        postOrCommentView = Either.Right(commentView),
+                        fragmentManager = childFragmentManager,
+                    )
                 }
                 R.id.block_user -> {
                     actionsViewModel.blockPerson(commentView.creator.id)

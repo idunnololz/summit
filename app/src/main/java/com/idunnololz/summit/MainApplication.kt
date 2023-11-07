@@ -19,6 +19,7 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.offline.OfflineScheduleManager
+import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
@@ -208,6 +209,8 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         hiltEntryPoint.themeManager().applyThemeFromPreferences()
         Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInExternalApp
         LemmyTextHelper.autoLinkPhoneNumbers = hiltEntryPoint.preferences().autoLinkPhoneNumbers
+
+        GlobalSettings.refresh(hiltEntryPoint.preferences())
 
         if (hiltEntryPoint.preferences().useFirebase) {
             FirebaseApp.initializeApp(this)

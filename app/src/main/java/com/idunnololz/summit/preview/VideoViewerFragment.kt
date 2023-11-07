@@ -2,6 +2,7 @@ package com.idunnololz.summit.preview
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
@@ -14,17 +15,25 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.media3.common.Player
+import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.video.ExoPlayerManager
+import com.idunnololz.summit.video.VideoDownloadManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
+import dagger.hilt.android.AndroidEntryPoint
+import java.io.IOException
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     companion object {
@@ -124,6 +133,43 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 it.right,
                 it.bottom,
             )
+        }
+
+        viewModel.downloadVideoResult.observe(this) {
+            when (it) {
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Error -> {
+                    FirebaseCrashlytics.getInstance().recordException(it.error)
+                    Snackbar.make(parent.getSnackbarContainer(), R.string.error_downloading_image, Snackbar.LENGTH_LONG)
+                        .show()
+                }
+                is StatefulData.Loading -> {}
+                is StatefulData.Success -> {
+                    try {
+                        val downloadResult = it.data
+                        val uri = downloadResult.uri
+                        val mimeType = downloadResult.mimeType
+
+                        val snackbarMsg = getString(R.string.video_saved_format, downloadResult.uri)
+                        Snackbar.make(
+                            parent.getSnackbarContainer(),
+                            snackbarMsg,
+                            Snackbar.LENGTH_LONG,
+                        ).setAction(R.string.view) {
+                            Utils.safeLaunchExternalIntentWithErrorDialog(
+                                context,
+                                childFragmentManager,
+                                Intent(Intent.ACTION_VIEW).apply {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    setDataAndType(uri, mimeType)
+                                },
+                            )
+                        }.show()
+                    } catch (e: IOException) { /* do nothing */
+                    }
+                }
+            }
         }
 
         binding.playerView.setControllerVisibilityListener(
@@ -251,9 +297,10 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.save -> {
-                            AlertDialogFragment.Builder()
-                                .setMessage(R.string.coming_soon)
-                                .createAndShow(childFragmentManager, "asdf")
+                            viewModel.downloadVideo(requireContext(), url)
+//                            AlertDialogFragment.Builder()
+//                                .setMessage(R.string.coming_soon)
+//                                .createAndShow(childFragmentManager, "asdf")
                             true
                         }
                         else -> false

@@ -23,9 +23,6 @@ class CustomPlayerView : PlayerView {
     private var canRotate = false
     private var rotationLocked = false
 
-    init {
-    }
-
     override fun setPlayer(player: Player?) {
         super.setPlayer(player)
 

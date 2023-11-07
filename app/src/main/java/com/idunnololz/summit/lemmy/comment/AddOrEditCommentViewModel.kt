@@ -38,12 +38,21 @@ class AddOrEditCommentViewModel @Inject constructor(
     private val state: SavedStateHandle,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
+
+    sealed interface Message {
+        data class ReplyTargetTooOld(
+            val replyTargetTs: Long,
+        ): Message
+    }
+
     val currentAccount = accountManager.currentAccount.asLiveData()
 
     val commentSentEvent = MutableLiveData<Event<Result<Unit>>>()
     val uploadImageEvent = StatefulLiveData<UploadImageResult>()
 
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
+
+    val messages =  MutableLiveData<List<Message>>(listOf())
 
     fun editComment() {
         accountActionsManager
@@ -198,5 +207,13 @@ class AddOrEditCommentViewModel @Inject constructor(
                     commentSentEvent.postValue(Event(Result.success(Unit)))
                 }
         }
+    }
+
+    fun addMessage(message: Message) {
+        messages.value = (messages.value ?: listOf()) + message
+    }
+
+    fun dismissMessage(message: Message) {
+        messages.value = (messages.value ?: listOf()).filter { it != message }
     }
 }

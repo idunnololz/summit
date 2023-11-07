@@ -295,6 +295,7 @@ class SettingViewTypeFragment :
             onRevealContentClickedFn = {},
             onImageClick = { _, _, _ -> },
             onVideoClick = { _, _, _ -> },
+            onVideoLongClickListener = { _ -> },
             onPageClick = {},
             onItemClick = { _, _, _, _, _, _, _ -> },
             onShowMoreOptions = {},

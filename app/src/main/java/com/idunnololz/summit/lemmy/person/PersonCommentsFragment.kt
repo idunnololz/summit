@@ -23,6 +23,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
@@ -51,6 +52,9 @@ class PersonCommentsFragment :
 
     @Inject
     lateinit var accountManager: AccountManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,23 +87,11 @@ class PersonCommentsFragment :
                     return@CommentListAdapter
                 }
 
-                AddOrEditCommentFragment().apply {
-                    arguments = postOrComment.fold({
-                        AddOrEditCommentFragmentArgs(
-                            parentFragment.viewModel.instance,
-                            null,
-                            it,
-                            null,
-                        )
-                    }, {
-                        AddOrEditCommentFragmentArgs(
-                            parentFragment.viewModel.instance,
-                            it,
-                            null,
-                            null,
-                        )
-                    },).toBundle()
-                }.show(childFragmentManager, "asdf")
+                AddOrEditCommentFragment.showReplyDialog(
+                    instance = parentFragment.viewModel.instance,
+                    postOrCommentView = postOrComment,
+                    fragmentManager = childFragmentManager,
+                )
             },
             onImageClick = { view, url ->
                 getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)

@@ -101,6 +101,7 @@ class LemmyContentHelper(
         onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
         onVideoClickListener: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+        onVideoLongClickListener: (url: String) -> Unit,
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
@@ -564,23 +565,7 @@ class LemmyContentHelper(
                         rootView.requestLayout()
 
                         playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
-                            PopupMenu(context, it).apply {
-                                inflate(R.menu.video_menu)
-
-                                setOnMenuItemClickListener {
-                                    when (it.itemId) {
-                                        R.id.save -> {
-                                            AlertDialog.Builder(context)
-                                                .setMessage(R.string.coming_soon)
-                                                .show()
-                                            true
-                                        }
-                                        else -> false
-                                    }
-                                }
-
-                                show()
-                            }
+                            onVideoLongClickListener(videoInfo.videoUrl)
                         }
                         playerView.setFullscreenButtonClickListener {
                             onVideoClickListener(
@@ -591,7 +576,6 @@ class LemmyContentHelper(
                                 },
                             )
                         }
-//                        playerView.s
 
                         playerView.setup()
 

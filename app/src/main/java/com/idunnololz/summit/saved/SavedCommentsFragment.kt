@@ -83,23 +83,11 @@ class SavedCommentsFragment :
                     return@CommentListAdapter
                 }
 
-                AddOrEditCommentFragment().apply {
-                    arguments = postOrComment.fold({
-                        AddOrEditCommentFragmentArgs(
-                            parentFragment.viewModel.instance,
-                            null,
-                            it,
-                            null,
-                        )
-                    }, {
-                        AddOrEditCommentFragmentArgs(
-                            parentFragment.viewModel.instance,
-                            it,
-                            null,
-                            null,
-                        )
-                    },).toBundle()
-                }.show(childFragmentManager, "asdf")
+                AddOrEditCommentFragment.showReplyDialog(
+                    instance = parentFragment.viewModel.instance,
+                    postOrCommentView = postOrComment,
+                    fragmentManager = childFragmentManager,
+                )
             },
             onImageClick = { view, url ->
                 getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)

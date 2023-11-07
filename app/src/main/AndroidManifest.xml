@@ -126,7 +126,7 @@
 
 
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name="com.idunnololz.summit.SummitFileProvider"
             android:authorities="com.idunnololz.summit.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">

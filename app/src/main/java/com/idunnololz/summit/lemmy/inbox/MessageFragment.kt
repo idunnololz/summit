@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -33,6 +34,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -445,29 +447,20 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         return@PostsAdapter
                     }
 
-                    AddOrEditCommentFragment().apply {
-                        arguments = postOrComment.fold({
-                            AddOrEditCommentFragmentArgs(
-                                args.instance,
-                                null,
-                                it,
-                                null,
-                            )
-                        }, {
-                            AddOrEditCommentFragmentArgs(
-                                args.instance,
-                                it,
-                                null,
-                                null,
-                            )
-                        },).toBundle()
-                    }.show(childFragmentManager, "asdf")
+                    AddOrEditCommentFragment.showReplyDialog(
+                        instance = args.instance,
+                        postOrCommentView = postOrComment,
+                        fragmentManager = childFragmentManager,
+                    )
                 },
                 onImageClick = { _, view, url ->
                     getMainActivity()?.openImage(view, binding.appBar, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
+                },
+                onVideoLongClickListener = { url ->
+                    showMoreVideoOptions(url, actionsViewModel)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
