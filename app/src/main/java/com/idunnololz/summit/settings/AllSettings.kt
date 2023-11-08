@@ -55,6 +55,8 @@ object SettingPath {
                 context.getString(R.string.history)
             NavigationSettings::class ->
                 context.getString(R.string.navigation)
+            BackupAndRestoreSettings::class ->
+                context.getString(R.string.backup_and_restore_settings)
 
             else -> error("No name for $this")
         }
@@ -162,6 +164,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.user_actions),
         context.getString(R.string.user_actions_desc),
     )
+    val backupAndRestoreSettings = BasicSettingItem(
+        R.drawable.baseline_settings_backup_restore_24,
+        context.getString(R.string.backup_and_restore_settings),
+        context.getString(R.string.backup_and_restore_settings_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -192,6 +199,7 @@ class MainSettings @Inject constructor(
                 historySettings,
                 navigationSettings,
                 userActionsSettings,
+//                backupAndRestoreSettings,
                 settingAbout,
                 settingSummitCommunity,
                 patreonSettings,
@@ -1339,6 +1347,7 @@ class AllSettings @Inject constructor(
     private val historySettings: HistorySettings,
     private val navigationSettings: NavigationSettings,
     private val actionsSettings: ActionsSettings,
+    private val backupAndRestoreSettings: BackupAndRestoreSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -1357,6 +1366,7 @@ class AllSettings @Inject constructor(
         historySettings,
         navigationSettings,
         actionsSettings,
+        backupAndRestoreSettings,
     )
 
     init {
@@ -1623,5 +1633,32 @@ class NavigationSettings @Inject constructor(
         navBarDest3,
         navBarDest4,
         navBarDest5,
+    )
+}
+
+@Singleton
+class BackupAndRestoreSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val backupSettings = BasicSettingItem(
+        null,
+        context.getString(R.string.backup_settings),
+        null,
+    )
+
+    val restoreSettings = BasicSettingItem(
+        null,
+        context.getString(R.string.restore_settings),
+        null,
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+//        backupSettings,
+//        restoreSettings,
     )
 }

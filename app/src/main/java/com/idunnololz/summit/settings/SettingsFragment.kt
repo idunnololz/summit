@@ -209,6 +209,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 findNavController().navigateSafe(directions)
                                 true
                             }
+                            mainSettings.backupAndRestoreSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingBackupAndRestoreFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
                             else -> false
                         }
                     },
@@ -336,6 +342,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                         is ActionsSettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToActionsTabbedFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+
+                        is BackupAndRestoreSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingBackupAndRestoreFragment()
                             findNavController().navigateSafe(directions)
                         }
 

@@ -201,7 +201,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         childFragmentManager.setFragmentResultListener(
             CommunityPickerDialogFragment.REQUEST_KEY,
             this,
-        ) { key, bundle ->
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<CommunityPickerDialogFragment.Result>(
                 CommunityPickerDialogFragment.REQUEST_KEY_RESULT,
             )

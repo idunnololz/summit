@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -1150,10 +1149,13 @@ class MainActivity : BaseActivity() {
             if (appBar != null) {
                 sharedElements += Pair.create(appBar, SharedElementNames.AppBar)
             }
-            sharedElements += Pair.create(
-                binding.bottomNavigationView,
-                SharedElementNames.NavBar,
-            )
+
+            if (useBottomNavBar) {
+                sharedElements += Pair.create(
+                    binding.bottomNavigationView,
+                    SharedElementNames.NavBar,
+                )
+            }
 
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this,
