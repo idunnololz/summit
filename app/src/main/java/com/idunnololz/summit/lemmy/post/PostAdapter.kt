@@ -222,12 +222,19 @@ class PostsAdapter(
             }
             field = value
 
+            val indentationPerLevelPx = Utils.convertDpToPixel(
+                postAndCommentViewBuilder.commentUiConfig.indentationPerLevelDp.toFloat(),
+            )
+            maxDepth = ((contentMaxWidth / 2) / indentationPerLevelPx).toInt()
+
             for (i in 0..items.lastIndex) {
                 if (items[i] is HeaderItem) {
                     notifyItemChanged(i)
                 }
             }
         }
+
+    var maxDepth: Int = Int.MAX_VALUE
 
     var isScreenshoting: Boolean = false
     var screenshotMaxWidth: Int = 0
@@ -504,6 +511,7 @@ class PostsAdapter(
                         holder = b,
                         baseDepth = item.baseDepth,
                         depth = item.depth,
+                        maxDepth = maxDepth,
                         commentView = item.comment,
                         isDeleting = item.isDeleting,
                         isRemoved = item.isRemoved,
@@ -549,18 +557,19 @@ class PostsAdapter(
                     val highlightForever = highlightedCommentForever == item.commentId
 
                     postAndCommentViewBuilder.bindCommentViewCollapsed(
-                        holder,
-                        b,
-                        item.baseDepth,
-                        item.depth,
-                        item.childrenCount,
-                        highlight,
-                        highlightForever,
-                        item.isUpdating,
-                        item.comment,
-                        instance,
-                        ::expandSection,
-                        onPageClick,
+                        h = holder,
+                        binding = b,
+                        baseDepth = item.baseDepth,
+                        depth = item.depth,
+                        maxDepth = maxDepth,
+                        childrenCount = item.childrenCount,
+                        highlight = highlight,
+                        highlightForever = highlightForever,
+                        isUpdating = item.isUpdating,
+                        commentView = item.comment,
+                        instance = instance,
+                        expandSection = ::expandSection,
+                        onPageClick = onPageClick,
                         onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                     )
@@ -579,21 +588,22 @@ class PostsAdapter(
                     val highlightForever = highlightedCommentForever == item.commentId
 
                     postAndCommentViewBuilder.bindPendingCommentViewExpanded(
-                        holder,
-                        b,
-                        item.baseDepth,
-                        item.depth,
-                        item.content,
-                        instance,
-                        item.author,
-                        highlight,
-                        highlightForever,
-                        onImageClick,
-                        onVideoClick,
-                        onPageClick,
+                        h = holder,
+                        binding = b,
+                        baseDepth = item.baseDepth,
+                        depth = item.depth,
+                        maxDepth = maxDepth,
+                        content = item.content,
+                        instance = instance,
+                        author = item.author,
+                        highlight = highlight,
+                        highlightForever = highlightForever,
+                        onImageClick = onImageClick,
+                        onVideoClick = onVideoClick,
+                        onPageClick = onPageClick,
                         onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
-                        ::collapseSection,
+                        collapseSection = ::collapseSection,
                     )
 
                     updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
@@ -604,14 +614,15 @@ class PostsAdapter(
                     val highlightForever = highlightedCommentForever == item.commentId
 
                     postAndCommentViewBuilder.bindPendingCommentViewCollapsed(
-                        holder,
-                        b,
-                        item.baseDepth,
-                        item.depth,
-                        item.author,
-                        highlight,
-                        highlightForever,
-                        ::collapseSection,
+                        holder = holder,
+                        binding = b,
+                        baseDepth = item.baseDepth,
+                        depth = item.depth,
+                        maxDepth = maxDepth,
+                        author = item.author,
+                        highlight = highlight,
+                        highlightForever = highlightForever,
+                        expandSection = ::collapseSection,
                     )
 
                     updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
@@ -632,7 +643,12 @@ class PostsAdapter(
             is MoreCommentsItem -> {
                 val b = holder.getBinding<PostMoreCommentsItemBinding>()
 
-                postAndCommentViewBuilder.bindMoreCommentsItem(b, item.depth, item.baseDepth)
+                postAndCommentViewBuilder.bindMoreCommentsItem(
+                    b = b,
+                    depth = item.depth,
+                    baseDepth = item.baseDepth,
+                    maxDepth = maxDepth,
+                )
                 b.moreButton.text = context.resources.getQuantityString(
                     R.plurals.replies_format,
                     item.moreCount,
@@ -663,6 +679,7 @@ class PostsAdapter(
                     b = b,
                     depth = item.depth,
                     baseDepth = item.baseDepth,
+                    maxDepth = maxDepth,
                     isExpanded = item.isExpanded,
                     onToggleClick = {
                         toggleSection(holder.absoluteAdapterPosition)

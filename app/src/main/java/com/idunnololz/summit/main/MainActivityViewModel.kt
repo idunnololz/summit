@@ -1,7 +1,6 @@
 package com.idunnololz.summit.main
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -33,11 +32,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import okio.source
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -250,7 +247,7 @@ class MainActivityViewModel @Inject constructor(
                         }
                     }
                 downloadAndShareFile.postValue(fileUri)
-            }
+            },
         )
     }
 }

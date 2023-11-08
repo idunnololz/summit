@@ -466,7 +466,8 @@ class MoreActionsViewModel @Inject constructor(
 
     fun downloadVideo(
         context: Context,
-        url: String) {
+        url: String,
+    ) {
         downloadVideoResult.setIsLoading()
 
         viewModelScope.launch {

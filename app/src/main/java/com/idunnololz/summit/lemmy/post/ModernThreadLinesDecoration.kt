@@ -4,12 +4,14 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.view.ScreenshotLayout
@@ -34,6 +36,9 @@ class ModernThreadLinesDecoration(
         Color.parseColor("#7B1FA2"),
     )
 
+    private val backgroundPaint: Paint = Paint().apply {
+        color = context.getColorFromAttribute(com.google.android.material.R.attr.backgroundColor)
+    }
     private val linePaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.colorThreadLines)
         strokeWidth = Utils.convertDpToPixel(2f)
@@ -45,7 +50,13 @@ class ModernThreadLinesDecoration(
         color = ColorUtils.blendARGB(color1, color2, 0.88f)
         strokeWidth = Utils.convertDpToPixel(1f)
     }
+    private val textPaint = Paint().apply {
+        color = context.getColorCompat(R.color.colorTextFaint)
+        textSize = context.getDimen(R.dimen.label_text_size).toFloat()
+        isAntiAlias = true
+    }
     private val screenshotWidth = context.getDimen(R.dimen.screenshot_options_size)
+    private val tempRect = Rect()
 
     private fun getColorForDepth(depth: Int): Int {
         if (depth == 0) {
@@ -99,9 +110,30 @@ class ModernThreadLinesDecoration(
             threadLinesData ?: continue
 
             val totalDepth = threadLinesData.depth - threadLinesData.baseDepth
-            val indent = (totalDepth.toFloat() - 1f) * distanceBetweenLinesUnit *
+            val indent = ((totalDepth.coerceAtMost(threadLinesData.maxDepth)).toFloat() - 1f) * distanceBetweenLinesUnit *
                 threadLinesData.indentationPerLevel
             val x = view.left + indent + startingPadding + (linePaint.strokeWidth / 2)
+
+            // Prevent overlap of decoration on animation
+            c.drawRect(
+                0f,
+                view.top.toFloat() + translationY + lineMargin,
+                x + translationX,
+                view.bottom.toFloat() + translationY - lineMargin,
+                backgroundPaint,
+            )
+
+            if (totalDepth >= threadLinesData.maxDepth) {
+                // If we are approaching the max depth, draw the depth
+
+                val textToDraw = threadLinesData.depth.toString()
+                textPaint.getTextBounds(textToDraw, 0, textToDraw.length, tempRect)
+                val textX = x + translationX - tempRect.width() -
+                    Utils.convertDpToPixel(8f)
+                val textY = view.top.toFloat() + tempRect.height() + Utils.convertDpToPixel(8f)
+
+                c.drawText(textToDraw, textX, textY, textPaint)
+            }
 
             if (totalDepth > 0) {
                 linePaint.color = getColorForDepth(totalDepth)

@@ -16,7 +16,7 @@
         app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/value"
+        app:layout_constraintBottom_toTopOf="@+id/desc"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceBodyMedium"
         android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toTopOf="@+id/value"
@@ -38,7 +39,7 @@
         android:textColor="@color/colorTextFaint"
         android:singleLine="true"
         android:maxLines="1"
-        android:layout_marginTop="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_goneMarginTop="0dp"
         app:layout_constraintStart_toStartOf="@+id/title"
         app:layout_constraintTop_toBottomOf="@+id/desc"

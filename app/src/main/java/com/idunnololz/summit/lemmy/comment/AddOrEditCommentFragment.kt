@@ -293,10 +293,14 @@ class AddOrEditCommentFragment :
         val messageView = when (val message = viewModel.messages.value?.firstOrNull()) {
             is AddOrEditCommentViewModel.Message.ReplyTargetTooOld -> {
                 val b = ErrorMessageOldReplyTargetBinding.inflate(
-                    LayoutInflater.from(requireContext()), binding.messageContainer, false)
+                    LayoutInflater.from(requireContext()),
+                    binding.messageContainer,
+                    false,
+                )
                 b.message.text = getString(
                     R.string.error_retry_target_too_old_format,
-                    dateStringToPretty(context, message.replyTargetTs))
+                    dateStringToPretty(context, message.replyTargetTs),
+                )
                 b.close.setOnClickListener {
                     viewModel.dismissMessage(message)
                 }

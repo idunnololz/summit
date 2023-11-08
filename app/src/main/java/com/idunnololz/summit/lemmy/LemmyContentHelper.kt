@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy
 
-import android.app.AlertDialog
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
@@ -15,7 +14,6 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.core.view.get

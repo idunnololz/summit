@@ -88,6 +88,11 @@
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/less_dark_background_theme"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
 
 

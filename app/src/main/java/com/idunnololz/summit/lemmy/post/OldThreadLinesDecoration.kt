@@ -4,10 +4,14 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import arrow.core.left
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 
 class OldThreadLinesDecoration(
@@ -40,7 +44,18 @@ class OldThreadLinesDecoration(
         color = ContextCompat.getColor(context, R.color.colorThreadLines)
         strokeWidth = Utils.convertDpToPixel(2f)
     }
+    private val textPaint = Paint().apply {
+        color = context.getColorCompat(R.color.colorTextFaint)
+        textSize = context.getDimen(R.dimen.label_text_size).toFloat()
+        isAntiAlias = true
+    }
+    private val textBackgroundPaint = Paint().apply {
+        color = context.getColorFromAttribute(com.google.android.material.R.attr.colorSurface)
+        isAntiAlias = true
+    }
     private val screenshotWidth = context.getDimen(R.dimen.screenshot_options_size)
+
+    private val tempRect = Rect()
 
     private fun getColorForDepth(depth: Int): Int {
         return lineColors[depth % lineColors.size]
@@ -86,7 +101,7 @@ class OldThreadLinesDecoration(
 
             val totalDepth = threadLinesData.depth - threadLinesData.baseDepth
 
-            for (lineIndex in 0 until totalDepth) {
+            for (lineIndex in 0 until totalDepth.coerceAtMost(threadLinesData.maxDepth)) {
                 if (colorful) {
                     linePaint.color = getColorForDepth(lineIndex)
                     linePaint.alpha = (view.alpha * 255).toInt()
@@ -101,6 +116,31 @@ class OldThreadLinesDecoration(
                     view.bottom.toFloat() + translationY,
                     linePaint,
                 )
+            }
+
+            if (totalDepth > threadLinesData.maxDepth) {
+                // If we are approaching the max depth, draw the depth
+
+                val textToDraw = threadLinesData.depth.toString()
+                textPaint.getTextBounds(textToDraw, 0, textToDraw.length, tempRect)
+                val x = view.left + (threadLinesData.maxDepth - 1) * distanceBetweenLinesUnit *
+                    threadLinesData.indentationPerLevel + startingPadding
+                val textX = x + translationX - tempRect.width() +
+                    Utils.convertDpToPixel(8f)
+                val textY = view.top.toFloat() + tempRect.height() + Utils.convertDpToPixel(22f)
+                val textPadding = Utils.convertDpToPixel(4f)
+                val cornerRadius = Utils.convertDpToPixel(4f)
+
+                c.drawRoundRect(
+                    textX - textPadding,
+                    textY - tempRect.height() - textPadding,
+                    textX + tempRect.width() + textPadding,
+                    textY + textPadding,
+                    cornerRadius,
+                    cornerRadius,
+                    textBackgroundPaint,
+                )
+                c.drawText(textToDraw, textX, textY, textPaint)
             }
         }
     }

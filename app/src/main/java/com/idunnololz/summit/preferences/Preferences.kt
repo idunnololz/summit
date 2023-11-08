@@ -76,6 +76,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -202,6 +203,12 @@ class Preferences @Inject constructor(
     fun setUseBlackTheme(b: Boolean) {
         prefs.edit().putBoolean(PreferenceUtil.KEY_USE_BLACK_THEME, b).apply()
     }
+
+    var useLessDarkBackgroundTheme: Boolean
+        get() = prefs.getBoolean(KEY_USE_LESS_DARK_BACKGROUND, false)
+        set(value) {
+            prefs.edit().putBoolean(KEY_USE_LESS_DARK_BACKGROUND, value).apply()
+        }
 
     var markPostsAsReadOnScroll: Boolean
         get() = prefs.getBoolean(KEY_MARK_POSTS_AS_READ_ON_SCROLL, false)

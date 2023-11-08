@@ -69,6 +69,7 @@ class ScreenshotModeViewModel @Inject constructor(
         Full,
         ImageOnly,
         TextOnly,
+        TitleOnly,
         Compact,
     }
 }

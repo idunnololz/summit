@@ -61,7 +61,7 @@
 
         <item name="actionOverflowMenuStyle">@style/Widget.Material3.PopupMenu.Overflow</item>
 
-        <item name="elevationOverlayColor">@color/white10</item>
+<!--        <item name="elevationOverlayColor">@color/white10</item>-->
 
         <item name="materialCardViewStyle">@style/MyApp.Widget.Material3.CardView</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>
@@ -265,6 +265,12 @@
     </style>
     <style name="TextColor.HighContrast">
         <item name="textColorNormal">@color/colorTextTitle</item>
+    </style>
+
+
+    <style name="LessDarkBackground">
+        <item name="backgroundColor">@color/colorSurface</item>
+        <item name="elevationOverlayEnabled">true</item>
     </style>
 
     <style name="Theme.App.Dialog.Alert.Transparent">

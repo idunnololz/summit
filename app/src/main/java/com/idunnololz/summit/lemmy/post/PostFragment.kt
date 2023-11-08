@@ -47,7 +47,6 @@ import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
@@ -307,14 +306,14 @@ class PostFragment :
         if (adapter == null) {
             adapter = PostsAdapter(
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
-                context,
-                binding.recyclerView,
-                this,
-                getInstance(),
-                args.reveal,
+                context = context,
+                containerView = binding.recyclerView,
+                lifecycleOwner = this,
+                instance = getInstance(),
+                revealAll = args.reveal,
                 useFooter = false,
                 isEmbedded = false,
-                args.videoState,
+                videoState = args.videoState,
                 autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
                 onRefreshClickCb = {
                     forceRefresh()
@@ -387,6 +386,10 @@ class PostFragment :
                         commentView = commentView,
                         actionsViewModel = actionsViewModel,
                         fragmentManager = childFragmentManager,
+                        onLoadComment = {
+                            viewModel.updatePostOrCommentRef(Either.Right(CommentRef(getInstance(), it)))
+                            viewModel.fetchPostData()
+                        },
                     )
                 },
                 onFetchComments = {

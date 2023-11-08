@@ -144,6 +144,14 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     themeManager.onThemeOverlayChanged()
                 },
             )
+            settings.lessDarkBackgroundTheme.bindTo(
+                binding.lessDarkBackgroundTheme,
+                { preferences.useLessDarkBackgroundTheme },
+                {
+                    preferences.useLessDarkBackgroundTheme = it
+                    themeManager.onThemeOverlayChanged()
+                },
+            )
 
             binding.fontStyle.title.text = getString(R.string.font_style)
 

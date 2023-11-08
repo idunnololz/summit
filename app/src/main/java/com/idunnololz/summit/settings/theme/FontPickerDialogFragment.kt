@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.DialogFragmentColorSchemePickerBinding
 import com.idunnololz.summit.databinding.DialogFragmentFontPickerBinding
 import com.idunnololz.summit.databinding.FontItemBinding
 import com.idunnololz.summit.preferences.FontId
@@ -109,14 +108,14 @@ class FontPickerDialogFragment :
                         0,
                         0,
                         R.drawable.baseline_check_18,
-                        0
+                        0,
                     )
                 } else {
                     b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
                         0,
                         0,
                         0,
-                        0
+                        0,
                     )
                 }
 

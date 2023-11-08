@@ -927,6 +927,11 @@ class ThemeSettings @Inject constructor(
         context.getString(R.string.black_theme),
         context.getString(R.string.black_theme_desc),
     )
+    val lessDarkBackgroundTheme = OnOffSettingItem(
+        null,
+        context.getString(R.string.less_dark_background_theme),
+        context.getString(R.string.less_dark_background_theme_desc),
+    )
 
     val font = RadioGroupSettingItem(
         null,

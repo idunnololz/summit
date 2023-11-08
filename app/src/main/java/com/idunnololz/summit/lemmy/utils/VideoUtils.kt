@@ -1,32 +1,16 @@
 package com.idunnololz.summit.lemmy.utils
 
 import android.content.Intent
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
-import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
-import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
-import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
-import com.idunnololz.summit.lemmy.postAndCommentView.CONFIRM_DELETE_COMMENT_TAG
-import com.idunnololz.summit.lemmy.postAndCommentView.EXTRA_COMMENT_ID
-import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FileDownloadHelper
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import java.io.IOException
 
 fun BaseFragment<*>.showMoreVideoOptions(
