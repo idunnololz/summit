@@ -49,7 +49,7 @@ class MainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        private val TAG = "MainActivityViewModel"
+        private const val TAG = "MainActivityViewModel"
     }
     private val readyCount = MutableStateFlow<Int>(0)
 
@@ -67,13 +67,6 @@ class MainActivityViewModel @Inject constructor(
 
     val currentInstance: String
         get() = apiClient.instance
-
-    fun Flow<Int>.completeWhenDone(): Flow<Int> =
-        transformWhile { readyCount ->
-            emit(readyCount) // always emit progress
-
-            readyCount < 2
-        }
 
     init {
         viewModelScope.launch {
@@ -135,7 +128,7 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun loadCommunities(force: Boolean = false) {
+    fun loadCommunities() {
         communities.setIsLoading()
         viewModelScope.launch {
             apiClient.fetchCommunitiesWithRetry(
@@ -241,8 +234,8 @@ class MainActivityViewModel @Inject constructor(
             url = url,
             listener = { file ->
                 val fileUri = FileProviderHelper(context)
-                    .openTempFile("img_${file.name}") {
-                        it.sink().buffer().use {
+                    .openTempFile("img_${file.name}") { os ->
+                        os.sink().buffer().use {
                             it.writeAll(file.source())
                         }
                     }
@@ -250,4 +243,11 @@ class MainActivityViewModel @Inject constructor(
             },
         )
     }
+
+    private fun Flow<Int>.completeWhenDone(): Flow<Int> =
+        transformWhile { readyCount ->
+            emit(readyCount) // always emit progress
+
+            readyCount < 2
+        }
 }

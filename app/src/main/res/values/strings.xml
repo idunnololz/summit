@@ -716,6 +716,10 @@
     <string name="less_dark_background_theme_desc">Uses a brighter color as the background color</string>
     <string name="post_title_only">Post title only</string>
     <string name="open_comment">Open comment</string>
+    <string name="backup_and_restore_settings"><![CDATA[Backup & restore settings]]></string>
+    <string name="backup_and_restore_settings_desc">Or move your settings between devices</string>
+    <string name="backup_settings">Backup settings</string>
+    <string name="restore_settings">Restore settings</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

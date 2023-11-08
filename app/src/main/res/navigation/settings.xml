@@ -181,6 +181,13 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_settingBackupAndRestoreFragment"
+            app:destination="@id/settingBackupAndRestoreFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -297,4 +304,8 @@
             app:argType="long"
             android:defaultValue="0L" />
     </fragment>
+    <fragment
+        android:id="@+id/settingBackupAndRestoreFragment"
+        android:name="com.idunnololz.summit.settings.backupAndRestore.SettingBackupAndRestoreFragment"
+        android:label="SettingBackupAndRestoreFragment" />
 </navigation>
