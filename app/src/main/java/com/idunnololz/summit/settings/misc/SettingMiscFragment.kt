@@ -9,7 +9,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -188,7 +187,6 @@ class SettingMiscFragment :
             else -> R.id.warn_reply_to_old_year
         }
     }
-
 
     private fun convertOptionIdToThresholdMs(@IdRes id: Int) =
         when (id) {

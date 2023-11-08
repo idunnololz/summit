@@ -42,7 +42,7 @@ class AddOrEditCommentViewModel @Inject constructor(
     sealed interface Message {
         data class ReplyTargetTooOld(
             val replyTargetTs: Long,
-        ): Message
+        ) : Message
     }
 
     val currentAccount = accountManager.currentAccount.asLiveData()
@@ -52,7 +52,7 @@ class AddOrEditCommentViewModel @Inject constructor(
 
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
-    val messages =  MutableLiveData<List<Message>>(listOf())
+    val messages = MutableLiveData<List<Message>>(listOf())
 
     fun editComment() {
         accountActionsManager

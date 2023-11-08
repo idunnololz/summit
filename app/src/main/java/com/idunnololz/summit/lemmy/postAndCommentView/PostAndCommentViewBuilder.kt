@@ -114,7 +114,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val inflater = LayoutInflater.from(activity)
 
     private var postUiConfig: PostUiConfig = uiConfig.postUiConfig
-    private var commentUiConfig: CommentUiConfig = uiConfig.commentUiConfig
+    var commentUiConfig: CommentUiConfig = uiConfig.commentUiConfig
     private var globalFontSizeMultiplier: Float =
         GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
 
@@ -343,6 +343,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
                 title.visibility = View.VISIBLE
                 headerView.visibility = View.VISIBLE
+                fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.ImageOnly -> {
                 moreButton.visibility = View.GONE
@@ -352,12 +353,24 @@ class PostAndCommentViewBuilder @Inject constructor(
 
                 title.visibility = View.GONE
                 headerView.visibility = View.GONE
+                fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.TextOnly -> {
                 moreButton.visibility = View.GONE
                 controlsDivider2.visibility = View.GONE
                 addCommentButton.visibility = View.GONE
                 controlsDivider.visibility = View.GONE
+
+                title.visibility = View.VISIBLE
+                headerView.visibility = View.VISIBLE
+                fullContent.visibility = View.VISIBLE
+            }
+            ScreenshotModeViewModel.PostViewType.TitleOnly -> {
+                moreButton.visibility = View.GONE
+                controlsDivider2.visibility = View.GONE
+                addCommentButton.visibility = View.GONE
+                controlsDivider.visibility = View.GONE
+                fullContent.visibility = View.GONE
 
                 title.visibility = View.VISIBLE
                 headerView.visibility = View.VISIBLE
@@ -370,6 +383,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
                 title.visibility = View.VISIBLE
                 headerView.visibility = View.VISIBLE
+                fullContent.visibility = View.VISIBLE
             }
             null -> {
             }
@@ -595,6 +609,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         holder: CommentExpandedViewHolder,
         baseDepth: Int,
         depth: Int,
+        maxDepth: Int,
         commentView: CommentView,
         isDeleting: Boolean,
         isRemoved: Boolean,
@@ -657,7 +672,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         val commentButton = commentButton
         val moreButton = moreButton
 
-        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
         lemmyHeaderHelper.populateHeaderSpan(
             headerContainer = headerView,
             commentView = commentView,
@@ -833,9 +848,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         root.tag = ThreadLinesData(
-            depth,
-            baseDepth,
-            commentUiConfig.indentationPerLevelDp,
+            depth = depth,
+            baseDepth = baseDepth,
+            maxDepth = maxDepth,
+            indentationPerLevel = commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -844,6 +860,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         binding: PostCommentCollapsedItemBinding,
         baseDepth: Int,
         depth: Int,
+        maxDepth: Int,
         childrenCount: Int,
         highlight: Boolean,
         highlightForever: Boolean,
@@ -857,7 +874,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     ) = with(binding) {
         scaleTextSizes()
 
-        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
         lemmyHeaderHelper.populateHeaderSpan(
             headerContainer = headerView,
             commentView = commentView,
@@ -899,9 +916,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         root.tag = ThreadLinesData(
-            depth,
-            baseDepth,
-            commentUiConfig.indentationPerLevelDp,
+            depth = depth,
+            baseDepth = baseDepth,
+            maxDepth = maxDepth,
+            indentationPerLevel = commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -910,6 +928,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         binding: PostPendingCommentExpandedItemBinding,
         baseDepth: Int,
         depth: Int,
+        maxDepth: Int,
         content: String,
         instance: String,
         author: String?,
@@ -926,7 +945,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         val context = binding.root.context
 
-        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
         headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown))
         headerContainer.setTextSecondPart("")
 
@@ -955,9 +974,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesData(
-            depth,
-            baseDepth,
-            commentUiConfig.indentationPerLevelDp,
+            depth = depth,
+            baseDepth = baseDepth,
+            maxDepth = maxDepth,
+            indentationPerLevel = commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -966,6 +986,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         binding: PostPendingCommentCollapsedItemBinding,
         baseDepth: Int,
         depth: Int,
+        maxDepth: Int,
         author: String?,
         highlight: Boolean,
         highlightForever: Boolean,
@@ -974,7 +995,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         scaleTextSizes()
 
         val context = holder.itemView.context
-        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
         headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown))
         headerContainer.setTextSecondPart("")
 
@@ -989,9 +1010,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightComment(highlight, highlightForever, highlightBg)
 
         root.tag = ThreadLinesData(
-            depth,
-            baseDepth,
-            commentUiConfig.indentationPerLevelDp,
+            depth = depth,
+            baseDepth = baseDepth,
+            maxDepth = maxDepth,
+            indentationPerLevel = commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -1579,13 +1601,15 @@ class PostAndCommentViewBuilder @Inject constructor(
         b: PostMoreCommentsItemBinding,
         depth: Int,
         baseDepth: Int,
+        maxDepth: Int,
     ) = with(b) {
-        threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
 
         b.root.tag = ThreadLinesData(
             depth = depth,
             baseDepth = baseDepth,
-            commentUiConfig.indentationPerLevelDp,
+            maxDepth = maxDepth,
+            indentationPerLevel = commentUiConfig.indentationPerLevelDp,
         )
     }
 
@@ -1593,6 +1617,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         b: PostMissingCommentItemBinding,
         depth: Int,
         baseDepth: Int,
+        maxDepth: Int,
         isExpanded: Boolean,
         onToggleClick: () -> Unit,
     ) {
@@ -1601,11 +1626,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             append(context.getString(R.string.missing_comment_special))
             setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
         }
-        b.threadLinesSpacer.updateThreadSpacer(depth, baseDepth)
+        b.threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
         b.root.tag = ThreadLinesData(
             depth = depth,
             baseDepth = baseDepth,
-            commentUiConfig.indentationPerLevelDp,
+            maxDepth = maxDepth,
+            indentationPerLevel = commentUiConfig.indentationPerLevelDp,
         )
 
         if (isExpanded) {
@@ -1714,8 +1740,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         headerContainer.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
     }
 
-    private fun Space.updateThreadSpacer(depth: Int, baseDepth: Int) {
-        val absoluteDepth = depth - baseDepth
+    private fun Space.updateThreadSpacer(depth: Int, baseDepth: Int, maxDepth: Int) {
+        val absoluteDepth = (depth - baseDepth).coerceAtMost(maxDepth)
 
         updateLayoutParams {
             width = if (absoluteDepth == 0) {

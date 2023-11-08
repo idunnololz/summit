@@ -68,7 +68,7 @@ class VideoDownloadManager @Inject constructor(
             ) {
                 super.onDownloadChanged(downloadManager, download, finalException)
 
-                Log.d("HAHA", "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - ${finalException}")
+                Log.d("HAHA", "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException")
 
                 if (download.state == Download.STATE_COMPLETED) {
                     onDownloadComplete(download.request)
@@ -109,7 +109,7 @@ class VideoDownloadManager @Inject constructor(
                 super.onRequirementsStateChanged(downloadManager, requirements, notMetRequirements)
                 Log.d("HAHA", "onRequirementsStateChanged()")
             }
-        })
+        },)
         downloadManager.requirements = Requirements(Requirements.NETWORK)
         downloadManager.maxParallelDownloads = 3
     }
@@ -132,7 +132,7 @@ class VideoDownloadManager @Inject constructor(
                         object : Transformer.Listener {
                             override fun onCompleted(
                                 composition: Composition,
-                                exportResult: ExportResult
+                                exportResult: ExportResult,
                             ) {
                                 Log.d("HAHA", "onCompleted()")
                                 continuation.resume(Result.success(outputFile))
@@ -146,7 +146,7 @@ class VideoDownloadManager @Inject constructor(
                                 Log.d("HAHA", "onError()")
                                 continuation.resume(Result.failure(exportException))
                             }
-                        }
+                        },
                     )
                     transformer.start(mediaItem, outputFile.absolutePath)
                 }

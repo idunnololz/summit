@@ -706,12 +706,16 @@
     <string name="share_images_directly_desc">When enabled, tapping share on an image will download and share the image file instead of sharing the URL of the image.</string>
     <string name="share_image">Share image</string>
     <string name="error_retry_target_too_old_format">You are commenting on/replying to an old post/comment. It was published %1$s ago.</string>
-    <string name="warn_when_replying_to_old_post_or_comment">Show warning when reviving old post</string>
+    <string name="warn_when_replying_to_old_post_or_comment">Warn when reviving old posts</string>
     <string name="warn_when_replying_to_old_post_or_comment_desc">When enabled, a warning is shown when adding a comment to an old post or comment. This is helpful to avoid an accidental revival of a post.</string>
     <string name="a_week">A week</string>
     <string name="a_month">A month</string>
     <string name="a_year">A year</string>
     <string name="dont_warn">Don\'t warn</string>
+    <string name="less_dark_background_theme">Less dark background theme</string>
+    <string name="less_dark_background_theme_desc">Uses a brighter color as the background color</string>
+    <string name="post_title_only">Post title only</string>
+    <string name="open_comment">Open comment</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

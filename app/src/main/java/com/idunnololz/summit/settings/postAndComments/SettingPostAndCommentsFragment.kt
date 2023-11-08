@@ -352,6 +352,7 @@ class SettingPostAndCommentsFragment :
                                 2
                             }
                         },
+                        maxDepth = Integer.MAX_VALUE,
                         commentView = item,
                         isDeleting = false,
                         isRemoved = false,
@@ -398,6 +399,7 @@ class SettingPostAndCommentsFragment :
                                 2
                             }
                         },
+                        maxDepth = Integer.MAX_VALUE,
                         commentView = item,
                         isDeleting = false,
                         isRemoved = false,

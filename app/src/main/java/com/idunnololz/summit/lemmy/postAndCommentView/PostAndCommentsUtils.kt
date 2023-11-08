@@ -6,6 +6,7 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.CommentRef
@@ -50,6 +51,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
     commentView: CommentView,
     actionsViewModel: MoreActionsViewModel,
     fragmentManager: FragmentManager,
+    onLoadComment: ((CommentId) -> Unit)? = null,
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
 
@@ -144,6 +146,13 @@ fun BaseFragment<*>.showMoreCommentOptions(
             getString(R.string.share_source_link),
             R.drawable.ic_fediverse_24,
         )
+        if (onLoadComment != null) {
+            addItemWithIcon(
+                R.id.open_comment_in_new_screen,
+                R.string.open_comment,
+                R.drawable.baseline_open_in_new_24,
+            )
+        }
 
         addDivider()
         addItemWithIcon(
@@ -221,6 +230,9 @@ fun BaseFragment<*>.showMoreCommentOptions(
                             commentView.comment.id,
                         ),
                     )
+                }
+                R.id.open_comment_in_new_screen -> {
+                    onLoadComment?.invoke(commentView.comment.id)
                 }
             }
         }

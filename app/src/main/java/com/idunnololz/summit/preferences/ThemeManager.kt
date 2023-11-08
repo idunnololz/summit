@@ -98,12 +98,16 @@ class ThemeManager @Inject constructor(
     }
 
     fun applyThemeForActivity(activity: BaseActivity) {
-        if (preferences.isBlackTheme()) {
-            if (activity.isLightTheme()) {
+        if (activity.isLightTheme()) {
+            if (preferences.isBlackTheme()) {
                 activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
             }
         } else {
-            activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
+            if (preferences.useLessDarkBackgroundTheme) {
+                activity.theme.applyStyle(R.style.LessDarkBackground, true)
+            } else if (!preferences.isBlackTheme()) {
+                activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
+            }
         }
 
         when (preferences.globalFontSize) {

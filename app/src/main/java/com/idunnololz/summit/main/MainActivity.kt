@@ -19,6 +19,7 @@ import android.view.ViewTreeObserver
 import android.webkit.MimeTypeMap
 import androidx.activity.viewModels
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
@@ -62,7 +63,6 @@ import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.login.LoginFragment
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity
@@ -363,7 +363,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun launchChangelog() {
-        launchPage(PostRef("lemmy.world", 7556576), switchToNativeInstance = true)
+        launchPage(PostRef("lemmy.world", 7950170), switchToNativeInstance = true)
     }
 
     private val bottomNavY
@@ -635,11 +635,12 @@ class MainActivity : BaseActivity() {
         CreateOrEditPostFragment()
             .apply {
                 arguments = CreateOrEditPostFragmentArgs(
-                    account.instance,
-                    null,
-                    null,
-                    null,
-                    extraStream = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri,
+                    instance = account.instance,
+                    communityName = null,
+                    post = null,
+                    crosspost = null,
+                    extraStream = IntentCompat.getParcelableExtra(
+                        intent, Intent.EXTRA_STREAM, Uri::class.java),
                 ).toBundle()
             }
             .show(supportFragmentManager, "CreateOrEditPostFragment")

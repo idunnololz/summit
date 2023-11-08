@@ -15,23 +15,19 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.media3.common.Player
-import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.video.ExoPlayerManager
-import com.idunnololz.summit.video.VideoDownloadManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
