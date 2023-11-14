@@ -105,10 +105,7 @@ class PostListViewBuilder @Inject constructor(
     private var displayInstanceStyle = preferences.displayInstanceStyle
     private var leftHandMode: Boolean = preferences.leftHandMode
 
-    private val upvoteColor = preferences.upvoteColor
-    private val downvoteColor = preferences.downvoteColor
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
-    private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
 
     private val selectableItemBackground =
         context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackground)
@@ -595,7 +592,6 @@ class PostListViewBuilder @Inject constructor(
                         }
 
                         offlineManager.fetchImageWithError(itemView, urlToLoad, {
-                            offlineManager.calculateImageMaxSizeIfNeeded(it)
                             offlineManager.getMaxImageSizeHint(it, tempSize)
 
                             var w: Int? = null
@@ -786,17 +782,24 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
 
-                image?.updateLayoutParams {
-                    width = postImageWidth
+                if (image != null && image.width != postImageWidth) {
+                    image.updateLayoutParams {
+                        width = postImageWidth
+                    }
                 }
-                iconImage?.updateLayoutParams {
-                    width = postImageWidth
+                if (iconImage != null && iconImage.width != postImageWidth) {
+                    iconImage.updateLayoutParams {
+                        width = postImageWidth
+                    }
                 }
 
                 if (layoutShowsFullContent) {
                     showFullContent()
                 }
             }
+
+            Log.d("HAHA", "s5: ${System.nanoTime() - start}")
+            start = System.nanoTime()
 
             LemmyTextHelper.bindText(
                 title,
@@ -813,7 +816,7 @@ class PostListViewBuilder @Inject constructor(
                 onLinkLongClick = onLinkLongClick,
             )
 
-            Log.d("HAHA", "s5: ${System.nanoTime() - start}")
+            Log.d("HAHA", "s6: ${System.nanoTime() - start}")
             start = System.nanoTime()
 
             if (postView.read && !alwaysRenderAsUnread) {
@@ -845,7 +848,7 @@ class PostListViewBuilder @Inject constructor(
             }
             commentButton?.isEnabled = !postView.post.locked
 
-            Log.d("HAHA", "s6: ${System.nanoTime() - start}")
+            Log.d("HAHA", "s7: ${System.nanoTime() - start}")
             start = System.nanoTime()
             val scoreCount: TextView? = upvoteCount
             if (scoreCount != null) {
@@ -875,7 +878,7 @@ class PostListViewBuilder @Inject constructor(
                 )
             }
 
-            Log.d("HAHA", "s7: ${System.nanoTime() - start}")
+            Log.d("HAHA", "s8: ${System.nanoTime() - start}")
             start = System.nanoTime()
 
             if (highlightForever) {
@@ -967,7 +970,7 @@ class PostListViewBuilder @Inject constructor(
                 }
             }
 
-            Log.d("HAHA", "s8: ${System.nanoTime() - start}")
+            Log.d("HAHA", "s9: ${System.nanoTime() - start}")
             start = System.nanoTime()
         }
     }

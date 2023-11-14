@@ -11,6 +11,65 @@ import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COLOR_SCHEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_ENABLE_HIDDEN_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
+import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BLACK_THEME
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MATERIAL_YOU
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
+import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
+import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
 import com.idunnololz.summit.util.PrettyPrintUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -55,7 +114,7 @@ object SettingPath {
                 context.getString(R.string.history)
             NavigationSettings::class ->
                 context.getString(R.string.navigation)
-            BackupAndRestoreSettings::class ->
+            ImportAndExportSettings::class ->
                 context.getString(R.string.backup_and_restore_settings)
 
             else -> error("No name for $this")
@@ -165,7 +224,7 @@ class MainSettings @Inject constructor(
         context.getString(R.string.user_actions_desc),
     )
     val backupAndRestoreSettings = BasicSettingItem(
-        R.drawable.baseline_settings_backup_restore_24,
+        R.drawable.baseline_import_export_24,
         context.getString(R.string.backup_and_restore_settings),
         context.getString(R.string.backup_and_restore_settings_desc),
     )
@@ -199,7 +258,7 @@ class MainSettings @Inject constructor(
                 historySettings,
                 navigationSettings,
                 userActionsSettings,
-//                backupAndRestoreSettings,
+                backupAndRestoreSettings,
                 settingAbout,
                 settingSummitCommunity,
                 patreonSettings,
@@ -411,30 +470,35 @@ class GestureSettings @Inject constructor(
         null,
         context.getString(R.string.use_gesture_actions),
         context.getString(R.string.use_gesture_actions_desc),
+        relatedKeys = listOf(KEY_USE_GESTURE_ACTIONS),
     )
     val postGestureAction1 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_1),
         null,
         postGestureActionOptions,
+        relatedKeys = listOf(KEY_POST_GESTURE_ACTION_1),
     )
     val postGestureAction2 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_2),
         null,
         postGestureActionOptions,
+        relatedKeys = listOf(KEY_POST_GESTURE_ACTION_2),
     )
     val postGestureAction3 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_3),
         null,
         postGestureActionOptions,
+        relatedKeys = listOf(KEY_POST_GESTURE_ACTION_3),
     )
     val postGestureSize = SliderSettingItem(
         context.getString(R.string.post_gesture_size),
         0f,
         1f,
         0.01f,
+        relatedKeys = listOf(KEY_POST_GESTURE_SIZE),
     )
 
     val commentGestureAction1 = RadioGroupSettingItem(
@@ -442,24 +506,28 @@ class GestureSettings @Inject constructor(
         context.getString(R.string.gesture_action_1),
         null,
         commentGestureActionOptions,
+        relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_1),
     )
     val commentGestureAction2 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_2),
         null,
         commentGestureActionOptions,
+        relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_2),
     )
     val commentGestureAction3 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_3),
         null,
         commentGestureActionOptions,
+        relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_3),
     )
     val commentGestureSize = SliderSettingItem(
         context.getString(R.string.comment_gesture_size),
         0f,
         1f,
         0.01f,
+        relatedKeys = listOf(KEY_COMMENT_GESTURE_SIZE),
     )
     override val allSettings: List<SettingItem> = listOf(
         postGestureAction1,
@@ -485,16 +553,19 @@ class PostListSettings @Inject constructor(
         null,
         context.getString(R.string.infinity),
         context.getString(R.string.no_your_limits),
+        relatedKeys = listOf(KEY_INFINITY),
     )
     val markPostsAsReadOnScroll = OnOffSettingItem(
         null,
         context.getString(R.string.mark_posts_as_read_on_scroll),
         context.getString(R.string.mark_posts_as_read_on_scroll_desc),
+        relatedKeys = listOf(KEY_MARK_POSTS_AS_READ_ON_SCROLL),
     )
     val blurNsfwPosts = OnOffSettingItem(
         null,
         context.getString(R.string.blur_nsfw_posts),
         null,
+        relatedKeys = listOf(KEY_BLUR_NSFW_POSTS),
     )
     val defaultCommunitySortOrder = RadioGroupSettingItem(
         null,
@@ -507,24 +578,28 @@ class PostListSettings @Inject constructor(
                 null,
                 null,
             ),
+        relatedKeys = listOf(KEY_DEFAULT_COMMUNITY_SORT_ORDER),
     )
 
     val viewImageOnSingleTap = OnOffSettingItem(
         null,
         context.getString(R.string.view_image_on_single_tap),
         context.getString(R.string.view_image_on_single_tap_desc),
+        relatedKeys = listOf(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP),
     )
 
     val compatibilityMode = OnOffSettingItem(
         null,
         context.getString(R.string.compatibility_mode),
         context.getString(R.string.compatibility_mode_desc),
+        relatedKeys = listOf(KEY_COMPATIBILITY_MODE),
     )
 
     val hidePostScores = OnOffSettingItem(
         null,
         context.getString(R.string.hide_post_scores),
         null,
+        relatedKeys = listOf(KEY_HIDE_POST_SCORES),
     )
     val keywordFilters = BasicSettingItem(
         null,
@@ -550,41 +625,49 @@ class PostListSettings @Inject constructor(
         R.drawable.baseline_link_24,
         context.getString(R.string.show_link_posts),
         null,
+        relatedKeys = listOf(KEY_SHOW_LINK_POSTS),
     )
     val showImagePosts = OnOffSettingItem(
         R.drawable.baseline_image_24,
         context.getString(R.string.show_image_posts),
         null,
+        relatedKeys = listOf(KEY_SHOW_IMAGE_POSTS),
     )
     val showVideoPosts = OnOffSettingItem(
         R.drawable.baseline_videocam_24,
         context.getString(R.string.show_video_posts),
         null,
+        relatedKeys = listOf(KEY_SHOW_VIDEO_POSTS),
     )
     val showTextPosts = OnOffSettingItem(
         R.drawable.baseline_text_fields_24,
         context.getString(R.string.show_text_posts),
         null,
+        relatedKeys = listOf(KEY_SHOW_TEXT_POSTS),
     )
     val showNsfwPosts = OnOffSettingItem(
         R.drawable.ic_nsfw_24,
         context.getString(R.string.show_nsfw_posts),
         null,
+        relatedKeys = listOf(KEY_SHOW_NSFW_POSTS),
     )
     val lockBottomBar = OnOffSettingItem(
         null,
         context.getString(R.string.lock_bottom_bar),
         context.getString(R.string.lock_bottom_bar_desc),
+        relatedKeys = listOf(KEY_LOCK_BOTTOM_BAR),
     )
     val autoLoadMorePosts = OnOffSettingItem(
         null,
         context.getString(R.string.auto_load_more_posts),
         context.getString(R.string.auto_load_more_posts_desc),
+        relatedKeys = listOf(KEY_AUTO_LOAD_MORE_POSTS),
     )
     val infinityPageIndicator = OnOffSettingItem(
         null,
         context.getString(R.string.show_page_numbers),
         context.getString(R.string.show_page_numbers_desc),
+        relatedKeys = listOf(KEY_INFINITY_PAGE_INDICATOR),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -651,26 +734,31 @@ class CommentListSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(KEY_DEFAULT_COMMENTS_SORT_ORDER),
     )
     val relayStyleNavigation = OnOffSettingItem(
         null,
         context.getString(R.string.relay_style_navigation),
         context.getString(R.string.relay_style_navigation_desc),
+        relatedKeys = listOf(KEY_COMMENTS_NAVIGATION_FAB),
     )
     val hideCommentScores = OnOffSettingItem(
         null,
         context.getString(R.string.hide_comment_scores),
         null,
+        relatedKeys = listOf(KEY_HIDE_COMMENT_SCORES),
     )
     val useVolumeButtonNavigation = OnOffSettingItem(
         null,
         context.getString(R.string.use_volume_button_navigation),
         context.getString(R.string.use_volume_button_navigation_desc),
+        relatedKeys = listOf(KEY_USE_VOLUME_BUTTON_NAVIGATION),
     )
     val collapseChildCommentsByDefault = OnOffSettingItem(
         null,
         context.getString(R.string.collapse_child_comments),
         context.getString(R.string.collapse_child_comments_desc),
+        relatedKeys = listOf(KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT),
     )
     val autoCollapseCommentThreshold = RadioGroupSettingItem(
         null,
@@ -714,6 +802,7 @@ class CommentListSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -749,6 +838,7 @@ class PostAndCommentsSettings @Inject constructor(
         0.2f,
         3f,
         0.1f,
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
     val commentFontSize = SliderSettingItem(
@@ -756,6 +846,7 @@ class PostAndCommentsSettings @Inject constructor(
         0.2f,
         3f,
         0.1f,
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
     val commentIndentationLevel = SliderSettingItem(
@@ -763,12 +854,14 @@ class PostAndCommentsSettings @Inject constructor(
         0f,
         32f,
         stepSize = 1f,
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
     val showCommentActions = OnOffSettingItem(
         null,
         context.getString(R.string.show_comment_actions),
         null,
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
     val commentsThreadStyle = RadioGroupSettingItem(
@@ -795,18 +888,21 @@ class PostAndCommentsSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
     val tapCommentToCollapse = OnOffSettingItem(
         null,
         context.getString(R.string.tap_comment_to_collapse),
         context.getString(R.string.tap_comment_to_collapse_desc),
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
     val alwaysShowLinkBelowPost = OnOffSettingItem(
         null,
         context.getString(R.string.always_show_link_below_post),
         context.getString(R.string.always_show_link_below_post_desc),
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -854,12 +950,14 @@ class ThemeSettings @Inject constructor(
                 R.drawable.baseline_dark_mode_24,
             ),
         ),
+        relatedKeys = listOf(KEY_BASE_THEME),
     )
 
     val materialYou = OnOffSettingItem(
         null,
         context.getString(R.string.material_you),
         context.getString(R.string.personalized_theming_based_on_your_wallpaper),
+        relatedKeys = listOf(KEY_USE_MATERIAL_YOU),
     )
 
     val colorScheme = RadioGroupSettingItem(
@@ -928,17 +1026,20 @@ class ThemeSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(KEY_COLOR_SCHEME),
     )
 
     val blackTheme = OnOffSettingItem(
         null,
         context.getString(R.string.black_theme),
         context.getString(R.string.black_theme_desc),
+        relatedKeys = listOf(KEY_USE_BLACK_THEME),
     )
     val lessDarkBackgroundTheme = OnOffSettingItem(
         null,
         context.getString(R.string.less_dark_background_theme),
         context.getString(R.string.less_dark_background_theme_desc),
+        relatedKeys = listOf(KEY_USE_LESS_DARK_BACKGROUND),
     )
 
     val font = RadioGroupSettingItem(
@@ -971,28 +1072,33 @@ class ThemeSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(KEY_GLOBAL_FONT),
     )
 
     val fontSize = TextOnlySettingItem(
         context.getString(R.string.font_size),
         "",
+        relatedKeys = listOf(KEY_GLOBAL_FONT_SIZE),
     )
 
     val fontColor = TextOnlySettingItem(
         context.getString(R.string.font_color),
         "",
+        relatedKeys = listOf(KEY_GLOBAL_FONT_COLOR),
     )
 
     val upvoteColor = ColorSettingItem(
         null,
         context.getString(R.string.upvote_color),
         context.getString(R.string.updoot_color),
+        relatedKeys = listOf(KEY_UPVOTE_COLOR),
     )
 
     val downvoteColor = ColorSettingItem(
         null,
         context.getString(R.string.downvote_color),
         context.getString(R.string.downdoot_color),
+        relatedKeys = listOf(KEY_DOWNVOTE_COLOR),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1118,6 +1224,7 @@ class HiddenPostsSettings @Inject constructor(
         null,
         context.getString(R.string.hide_posts),
         context.getString(R.string.hide_posts_desc),
+        relatedKeys = listOf(KEY_ENABLE_HIDDEN_POSTS),
     )
     val resetHiddenPosts = BasicSettingItem(
         null,
@@ -1152,16 +1259,19 @@ class MiscSettings @Inject constructor(
         null,
         context.getString(R.string.open_links_in_external_browser),
         context.getString(R.string.open_links_in_external_browser_desc),
+        relatedKeys = listOf(KEY_OPEN_LINKS_IN_APP),
     )
     val autoLinkPhoneNumbers = OnOffSettingItem(
         null,
         context.getString(R.string.auto_convert_phone_numbers_to_links),
         null,
+        relatedKeys = listOf(KEY_AUTO_LINK_PHONE_NUMBERS),
     )
     val showUpAndDownVotes = OnOffSettingItem(
         null,
         context.getString(R.string.show_up_and_down_votes),
         context.getString(R.string.show_up_and_down_votes_desc),
+        relatedKeys = listOf(KEY_SHOW_UP_AND_DOWN_VOTES),
     )
     val instanceNameStyle = RadioGroupSettingItem(
         null,
@@ -1187,24 +1297,28 @@ class MiscSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(KEY_DISPLAY_INSTANCE_STYLE),
     )
 
     val retainLastPost = OnOffSettingItem(
         null,
         context.getString(R.string.retain_last_post),
         context.getString(R.string.retain_last_post_desc),
+        relatedKeys = listOf(KEY_RETAIN_LAST_POST),
     )
 
     val leftHandMode = OnOffSettingItem(
         null,
         context.getString(R.string.left_hand_mode),
         context.getString(R.string.left_hand_mode_desc),
+        relatedKeys = listOf(KEY_LEFT_HAND_MODE),
     )
 
     val transparentNotificationBar = OnOffSettingItem(
         null,
         context.getString(R.string.transparent_notification_bar),
         null,
+        relatedKeys = listOf(KEY_TRANSPARENT_NOTIFICATION_BAR),
     )
 
     val previewLinks = RadioGroupSettingItem(
@@ -1231,18 +1345,21 @@ class MiscSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(KEY_PREVIEW_LINKS),
     )
 
     val usePredictiveBack = OnOffSettingItem(
         null,
         context.getString(R.string.use_predictive_back),
         context.getString(R.string.use_predictive_back_desc),
+        relatedKeys = listOf(KEY_USE_PREDICTIVE_BACK),
     )
 
     val shareImagesDirectly = OnOffSettingItem(
         null,
         context.getString(R.string.share_images_directly),
         context.getString(R.string.share_images_directly_desc),
+        relatedKeys = listOf(KEY_SHARE_IMAGES_DIRECTLY),
     )
 
     val warnReplyToOldContentThresholdMs = RadioGroupSettingItem(
@@ -1305,6 +1422,10 @@ class MiscSettings @Inject constructor(
                 null,
             ),
         ),
+        relatedKeys = listOf(
+            KEY_WARN_REPLY_TO_OLD_CONTENT,
+            KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
+        ),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1330,24 +1451,213 @@ class ActionsSettings @Inject constructor(
     override val allSettings: List<SettingItem> = listOf()
 }
 
+@Singleton
+class LoggingSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val useFirebase = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_firebase),
+        context.getString(R.string.use_firebase_desc),
+        relatedKeys = listOf(KEY_USE_FIREBASE),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        useFirebase,
+    )
+}
+
+@Singleton
+class HistorySettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val recordBrowsingHistory = OnOffSettingItem(
+        null,
+        context.getString(R.string.record_browsing_history),
+        context.getString(R.string.record_browsing_history_desc),
+        relatedKeys = listOf(KEY_TRACK_BROWSING_HISTORY),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        recordBrowsingHistory,
+    )
+}
+
+@Singleton
+class NavigationSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    private val navBarDestOptions =
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Home,
+                context.getString(R.string.home),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.History,
+                context.getString(R.string.history),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Inbox,
+                context.getString(R.string.inbox),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Saved,
+                context.getString(R.string.save),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Search,
+                context.getString(R.string.search),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.None,
+                context.getString(R.string.none),
+                null,
+                null,
+            ),
+        )
+
+    val useCustomNavBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_custom_navigation_bar),
+        context.getString(R.string.use_custom_navigation_bar_desc),
+        relatedKeys = listOf(KEY_USE_CUSTOM_NAV_BAR),
+    )
+
+    val navBarDest1 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "1"),
+        null,
+        navBarDestOptions,
+        relatedKeys = listOf(KEY_NAV_BAR_ITEMS),
+    )
+
+    val navBarDest2 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "2"),
+        null,
+        navBarDestOptions,
+        relatedKeys = listOf(KEY_NAV_BAR_ITEMS),
+    )
+
+    val navBarDest3 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "3"),
+        null,
+        navBarDestOptions,
+        relatedKeys = listOf(KEY_NAV_BAR_ITEMS),
+    )
+
+    val navBarDest4 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "4"),
+        null,
+        navBarDestOptions,
+        relatedKeys = listOf(KEY_NAV_BAR_ITEMS),
+    )
+
+    val navBarDest5 = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.nav_bar_option_format, "5"),
+        null,
+        navBarDestOptions,
+        relatedKeys = listOf(KEY_NAV_BAR_ITEMS),
+    )
+
+    val useBottomNavBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_bottom_nav_bar),
+        context.getString(R.string.use_bottom_nav_bar_desc),
+        relatedKeys = listOf(KEY_USE_BOTTOM_NAV_BAR),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        navBarDest1,
+        navBarDest2,
+        navBarDest3,
+        navBarDest4,
+        navBarDest5,
+    )
+}
+
+@Singleton
+class ImportAndExportSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val importSettings = BasicSettingItem(
+        null,
+        context.getString(R.string.restore_settings),
+        context.getString(R.string.restore_settings_desc),
+    )
+
+    val exportSettings = BasicSettingItem(
+        null,
+        context.getString(R.string.backup_settings),
+        context.getString(R.string.backup_settings_desc),
+    )
+
+    val manageInternalSettingsBackups = BasicSettingItem(
+        null,
+        context.getString(R.string.manage_internal_settings_backups),
+        null,
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        importSettings,
+        exportSettings,
+        manageInternalSettingsBackups,
+    )
+}
+
+
 class AllSettings @Inject constructor(
-    private val mainSettings: MainSettings,
-    private val lemmyWebSettings: LemmyWebSettings,
-    private val gestureSettings: GestureSettings,
-    private val postListSettings: PostListSettings,
-    private val commentListSettings: CommentListSettings,
-    private val aboutSettings: AboutSettings,
-    private val cacheSettings: CacheSettings,
-    private val hiddenPostsSettings: HiddenPostsSettings,
-    private val postAndCommentsSettings: PostAndCommentsSettings,
-    private val themeSettings: ThemeSettings,
-    private val viewTypeSettings: ViewTypeSettings,
-    private val miscSettings: MiscSettings,
-    private val loggingSettings: LoggingSettings,
-    private val historySettings: HistorySettings,
-    private val navigationSettings: NavigationSettings,
-    private val actionsSettings: ActionsSettings,
-    private val backupAndRestoreSettings: BackupAndRestoreSettings,
+    mainSettings: MainSettings,
+    lemmyWebSettings: LemmyWebSettings,
+    gestureSettings: GestureSettings,
+    postListSettings: PostListSettings,
+    commentListSettings: CommentListSettings,
+    aboutSettings: AboutSettings,
+    cacheSettings: CacheSettings,
+    hiddenPostsSettings: HiddenPostsSettings,
+    postAndCommentsSettings: PostAndCommentsSettings,
+    themeSettings: ThemeSettings,
+    viewTypeSettings: ViewTypeSettings,
+    miscSettings: MiscSettings,
+    loggingSettings: LoggingSettings,
+    historySettings: HistorySettings,
+    navigationSettings: NavigationSettings,
+    actionsSettings: ActionsSettings,
+    importAndExportSettings: ImportAndExportSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -1366,7 +1676,7 @@ class AllSettings @Inject constructor(
         historySettings,
         navigationSettings,
         actionsSettings,
-        backupAndRestoreSettings,
+        importAndExportSettings,
     )
 
     init {
@@ -1381,6 +1691,20 @@ class AllSettings @Inject constructor(
                 "Some setting pages not added: $classes"
             }
         }
+    }
+
+    fun generateMapFromKeysToRelatedSettingItems(): MutableMap<String, MutableList<SettingItem>> {
+        val keyToSettingItems = mutableMapOf<String, MutableList<SettingItem>>()
+
+        allSearchableSettings.forEach {
+            it.allSettings.forEach { settingItem ->
+                for (key in settingItem.relatedKeys) {
+                    val list = keyToSettingItems.getOrPut(key) { mutableListOf() }
+                    list.add(settingItem)
+                }
+            }
+        }
+        return keyToSettingItems
     }
 }
 
@@ -1490,175 +1814,3 @@ fun makeCommunitySortOrderChoices(context: Context) =
             null,
         ),
     )
-
-@Singleton
-class LoggingSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
-) : SearchableSettings {
-
-    val useFirebase = OnOffSettingItem(
-        null,
-        context.getString(R.string.use_firebase),
-        context.getString(R.string.use_firebase_desc),
-    )
-
-    override val parents: List<KClass<out SearchableSettings>> = listOf(
-        MainSettings::class,
-    )
-
-    override val allSettings: List<SettingItem> = listOf(
-        useFirebase,
-    )
-}
-
-@Singleton
-class HistorySettings @Inject constructor(
-    @ApplicationContext private val context: Context,
-) : SearchableSettings {
-
-    val recordBrowsingHistory = OnOffSettingItem(
-        null,
-        context.getString(R.string.record_browsing_history),
-        context.getString(R.string.record_browsing_history_desc),
-    )
-
-    override val parents: List<KClass<out SearchableSettings>> = listOf(
-        MainSettings::class,
-    )
-
-    override val allSettings: List<SettingItem> = listOf(
-        recordBrowsingHistory,
-    )
-}
-
-@Singleton
-class NavigationSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
-) : SearchableSettings {
-
-    val navBarDestOptions =
-        listOf(
-            RadioGroupSettingItem.RadioGroupOption(
-                NavBarDestinations.Home,
-                context.getString(R.string.home),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                NavBarDestinations.History,
-                context.getString(R.string.history),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                NavBarDestinations.Inbox,
-                context.getString(R.string.inbox),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                NavBarDestinations.Saved,
-                context.getString(R.string.save),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                NavBarDestinations.Search,
-                context.getString(R.string.search),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                NavBarDestinations.None,
-                context.getString(R.string.none),
-                null,
-                null,
-            ),
-        )
-
-    val useCustomNavBar = OnOffSettingItem(
-        null,
-        context.getString(R.string.use_custom_navigation_bar),
-        context.getString(R.string.use_custom_navigation_bar_desc),
-    )
-
-    val navBarDest1 = RadioGroupSettingItem(
-        null,
-        context.getString(R.string.nav_bar_option_format, "1"),
-        null,
-        navBarDestOptions,
-    )
-
-    val navBarDest2 = RadioGroupSettingItem(
-        null,
-        context.getString(R.string.nav_bar_option_format, "2"),
-        null,
-        navBarDestOptions,
-    )
-
-    val navBarDest3 = RadioGroupSettingItem(
-        null,
-        context.getString(R.string.nav_bar_option_format, "3"),
-        null,
-        navBarDestOptions,
-    )
-
-    val navBarDest4 = RadioGroupSettingItem(
-        null,
-        context.getString(R.string.nav_bar_option_format, "4"),
-        null,
-        navBarDestOptions,
-    )
-
-    val navBarDest5 = RadioGroupSettingItem(
-        null,
-        context.getString(R.string.nav_bar_option_format, "5"),
-        null,
-        navBarDestOptions,
-    )
-
-    val useBottomNavBar = OnOffSettingItem(
-        null,
-        context.getString(R.string.use_bottom_nav_bar),
-        context.getString(R.string.use_bottom_nav_bar_desc),
-    )
-
-    override val parents: List<KClass<out SearchableSettings>> = listOf(
-        MainSettings::class,
-    )
-
-    override val allSettings: List<SettingItem> = listOf(
-        navBarDest1,
-        navBarDest2,
-        navBarDest3,
-        navBarDest4,
-        navBarDest5,
-    )
-}
-
-@Singleton
-class BackupAndRestoreSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
-) : SearchableSettings {
-
-    val backupSettings = BasicSettingItem(
-        null,
-        context.getString(R.string.backup_settings),
-        null,
-    )
-
-    val restoreSettings = BasicSettingItem(
-        null,
-        context.getString(R.string.restore_settings),
-        null,
-    )
-
-    override val parents: List<KClass<out SearchableSettings>> = listOf(
-        MainSettings::class,
-    )
-
-    override val allSettings: List<SettingItem> = listOf(
-//        backupSettings,
-//        restoreSettings,
-    )
-}

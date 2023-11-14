@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +44,7 @@ class MainActivityViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val offlineManager: OfflineManager,
+    private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
     val communitySelectorControllerFactory: CommunitySelectorController.Factory,
     val userCommunitiesManager: UserCommunitiesManager,
@@ -122,7 +124,7 @@ class MainActivityViewModel @Inject constructor(
 
             launch {
                 withContext(Dispatchers.IO) {
-                    offlineManager.cleanup()
+                    directoryHelper.cleanup()
                 }
             }
         }

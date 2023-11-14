@@ -182,7 +182,7 @@ object LemmyTextHelper {
                 if (!spoilerTitle.isNullOrBlank() && !spoilerText.isNullOrBlank()) {
                     matcher.appendReplacement(
                         sb,
-                        "<br><details><summary>$spoilerTitle</summary>$spoilerText</details>",
+                        "<br><details><summary>$spoilerTitle</summary>$spoilerText<br></details>",
                     )
                     continue
                 }
@@ -280,17 +280,6 @@ object LemmyTextHelper {
                 SimpleExtPlugin.create().apply {
                     addExtension(1, '^') { _, _ ->
                         SuperScriptSpan()
-                    }
-                    addExtension(2, '+') { configuration, _ ->
-                        configuration.theme()
-
-                        val spoilerSpan = SpoilerSpan(
-                            context.getColorCompat(R.color.colorTextTitle),
-                            context.getColorCompat(R.color.colorSpoilerRevealed),
-                            context.getColorCompat(R.color.colorTextTitle),
-                        )
-
-                        spoilerSpan
                     }
                 },
             )

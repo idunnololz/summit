@@ -7,7 +7,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.DirectoryHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -43,7 +43,7 @@ sealed class Item {
 
 class PostListEngine(
     private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val offlineManager: OfflineManager,
+    private val directoryHelper: DirectoryHelper,
     infinity: Boolean,
     autoLoadMoreItems: Boolean,
     usePageIndicators: Boolean = false,
@@ -116,7 +116,7 @@ class PostListEngine(
 
     fun tryRestore() {
         Log.d(TAG, "Attempting to restore. Using keys $key, $secondaryKey")
-        val cachedPages = offlineManager.getPages(key, secondaryKey)
+        val cachedPages = directoryHelper.getPages(key, secondaryKey)
 
         cachedPages?.let {
             // We need to use let here because Google's lint rule doesn't support smart cast
@@ -148,7 +148,7 @@ class PostListEngine(
         }
 
         coroutineScope.launch(Dispatchers.IO) {
-            offlineManager.addPage(key, secondaryKey, data, pages.size)
+            directoryHelper.addPage(key, secondaryKey, data, pages.size)
         }
     }
 
@@ -336,7 +336,7 @@ class PostListEngine(
     fun clearPages() {
         _pages.value = listOf()
         coroutineScope.launch(Dispatchers.IO) {
-            offlineManager.clearPages(key, secondaryKey)
+            directoryHelper.clearPages(key, secondaryKey)
         }
     }
 

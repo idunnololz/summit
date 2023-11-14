@@ -545,6 +545,18 @@ object Utils {
         clipboard.setPrimaryClip(clip)
     }
 
+    fun getFromClipboard(context: Context): CharSequence? {
+        val clipboard: ClipboardManager =
+            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val primaryClip = clipboard.primaryClip ?: return null
+
+        return if (primaryClip.itemCount > 0) {
+            primaryClip.getItemAt(0).coerceToText(context)
+        } else {
+            null
+        }
+    }
+
     fun shareLink(context: Context, link: String) {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND

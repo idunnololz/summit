@@ -345,7 +345,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             findNavController().navigateSafe(directions)
                         }
 
-                        is BackupAndRestoreSettings -> {
+                        is ImportAndExportSettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingBackupAndRestoreFragment()
                             findNavController().navigateSafe(directions)

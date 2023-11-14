@@ -244,7 +244,6 @@ class LemmyContentHelper(
                     rootView,
                     imageUrl,
                     b@{
-                        offlineManager.calculateImageMaxSizeIfNeeded(it)
                         offlineManager.getMaxImageSizeHint(it, tempSize)
 
                         Log.d(TAG, "image size: $tempSize")
@@ -335,7 +334,6 @@ class LemmyContentHelper(
             if (!previewInfo?.getUrl().isNullOrBlank()) {
                 val url = checkNotNull(previewInfo).getUrl()
                 offlineManager.fetchImage(rootView, url) {
-                    offlineManager.calculateImageMaxSizeIfNeeded(it)
                     offlineManager.getMaxImageSizeHint(it, tempSize)
 
                     imageView.load(it) {
@@ -449,7 +447,6 @@ class LemmyContentHelper(
                     imageUrl,
                     b@{
                         loadingView?.hideAll(animate = false)
-                        offlineManager.calculateImageMaxSizeIfNeeded(it)
                         offlineManager.getMaxImageSizeHint(it, tempSize)
 
                         Log.d(TAG, "image size: $tempSize")

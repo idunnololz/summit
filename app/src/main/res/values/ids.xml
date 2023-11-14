@@ -153,4 +153,5 @@
     <item name="warn_reply_to_old_heat_death_of_universe" type="id" />
     <item name="warn_reply_to_old_dont_warn" type="id" />
     <item name="open_comment_in_new_screen" type="id" />
+    <item name="detailed_view" type="id" />
 </resources>

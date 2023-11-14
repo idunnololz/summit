@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+
+This file defines destinations that are only accessed in code. The purpose of this is to leverage
+safeargs.
+
+-->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/not_used.xml"
@@ -165,4 +171,18 @@
             android:name="actionType"
             app:argType="com.idunnololz.summit.actions.ui.ActionsFragment$ActionType" />
     </fragment>
+    <dialog
+        android:id="@+id/importSettingItemPreviewDialogFragment"
+        android:name="com.idunnololz.summit.settings.backupAndRestore.ImportSettingItemPreviewDialogFragment"
+        android:label="ImportSettingItemPreviewDialogFragment" >
+        <argument
+            android:name="settingKey"
+            app:argType="string" />
+        <argument
+            android:name="stringValue"
+            app:argType="string" />
+        <argument
+            android:name="type"
+            app:argType="string" />
+    </dialog>
 </navigation>

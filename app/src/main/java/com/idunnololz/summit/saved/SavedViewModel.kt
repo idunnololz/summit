@@ -22,6 +22,7 @@ import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +40,7 @@ class SavedViewModel @Inject constructor(
     private val accountInfoManager: AccountInfoManager,
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val offlineManager: OfflineManager,
+    private val directoryHelper: DirectoryHelper,
     private val savedManager: SavedManager,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
@@ -58,7 +59,7 @@ class SavedViewModel @Inject constructor(
         infinity = true,
         autoLoadMoreItems = true,
         coroutineScopeFactory = coroutineScopeFactory,
-        offlineManager = offlineManager,
+        directoryHelper = directoryHelper,
     )
     var commentListEngine = CommentListEngine()
 
