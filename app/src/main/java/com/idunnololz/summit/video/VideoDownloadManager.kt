@@ -17,6 +17,7 @@ import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.DirectoryHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,13 +39,13 @@ private typealias DownloadId = String
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class VideoDownloadManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val offlineManager: OfflineManager,
+    private val directoryHelper: DirectoryHelper,
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
     private val databaseProvider = StandaloneDatabaseProvider(context)
 
-    private val downloadCache = SimpleCache(offlineManager.videosDir, NoOpCacheEvictor(), databaseProvider)
+    private val downloadCache = SimpleCache(directoryHelper.videosDir, NoOpCacheEvictor(), databaseProvider)
 
     private val dataSourceFactory = DefaultHttpDataSource.Factory()
     private val downloadExecutor = Executor(Runnable::run)
@@ -124,7 +125,7 @@ class VideoDownloadManager @Inject constructor(
             val mediaItem = exoDownloadRequest.toMediaItem()
             val transformer = Transformer.Builder(context)
                 .build()
-            val outputFile = File(offlineManager.videosDir, downloadRequest.finalFileName)
+            val outputFile = File(directoryHelper.videosDir, downloadRequest.finalFileName)
 
             withContext(Dispatchers.Main) {
                 suspendCancellableCoroutine<Result<File>> { continuation ->

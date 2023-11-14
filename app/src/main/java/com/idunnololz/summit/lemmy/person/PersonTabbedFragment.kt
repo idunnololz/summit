@@ -319,8 +319,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     )
                 }
                 offlineManager.fetchImage(root, bannerUrl) {
-                    offlineManager.calculateImageMaxSizeIfNeeded(it)
-
                     banner.load(it) {
                         allowHardware(false)
                     }

@@ -14,6 +14,7 @@ import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.view.StorageUsageItem
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,9 @@ import javax.inject.Inject
 class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
 
     private var progressListener: OfflineDownloadProgressListener? = null
+
+    @Inject
+    lateinit var directoryHelper: DirectoryHelper
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -103,22 +107,26 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
             ContextCompat.getColor(context, R.color.style_orange),
         )
 
+        val totalSize = Utils.getSizeOfFile(context.cacheDir)
+        val imageDirSize = Utils.getSizeOfFile(directoryHelper.imagesDir)
+        val videoDirSize = Utils.getSizeOfFile(directoryHelper.videosDir) +
+            Utils.getSizeOfFile(directoryHelper.videoCacheDir)
+
         binding.storageUsageView.setStorageUsage(
             listOf(
                 StorageUsageItem(
                     "Images",
-                    Utils.getSizeOfFile(offlineManager.imagesDir),
+                    imageDirSize,
                     colors[0],
                 ),
                 StorageUsageItem(
                     "Videos",
-                    Utils.getSizeOfFile(offlineManager.videosDir) +
-                        Utils.getSizeOfFile(offlineManager.videoCacheDir),
+                    videoDirSize,
                     colors[1],
                 ),
                 StorageUsageItem(
                     "Other",
-                    Utils.getSizeOfFile(offlineManager.tabsDir),
+                    totalSize - (imageDirSize + videoDirSize),
                     colors[2],
                 ),
             ),

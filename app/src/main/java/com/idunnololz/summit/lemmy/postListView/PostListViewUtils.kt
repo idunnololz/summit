@@ -184,6 +184,7 @@ fun BaseFragment<*>.showMorePostOptions(
 //            R.string.switch_account_for_post,
 //            R.drawable.baseline_account_circle_24)
         addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
+//        addItemWithIcon(R.id.detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -272,6 +273,9 @@ fun BaseFragment<*>.showMorePostOptions(
                             ).toBundle()
                         }
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
+                }
+                R.id.detailed_view -> {
+
                 }
                 R.id.admin_tools -> {
                     ModActionsDialogFragment.show(postView, childFragmentManager)

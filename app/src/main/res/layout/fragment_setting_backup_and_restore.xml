@@ -34,6 +34,15 @@
                 android:layout_height="wrap_content">
 
                 <include
+                    android:id="@+id/restore_settings"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <include
                     android:id="@+id/backup_settings"
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
@@ -43,7 +52,7 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <include
-                    android:id="@+id/restore_settings"
+                    android:id="@+id/manage_internal_settings_backups"
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

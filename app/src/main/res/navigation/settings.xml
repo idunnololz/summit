@@ -307,5 +307,13 @@
     <fragment
         android:id="@+id/settingBackupAndRestoreFragment"
         android:name="com.idunnololz.summit.settings.backupAndRestore.SettingBackupAndRestoreFragment"
-        android:label="SettingBackupAndRestoreFragment" />
+        android:label="SettingBackupAndRestoreFragment" >
+        <action
+            android:id="@+id/action_settingBackupAndRestoreFragment_to_manageInternalSettingsBackupsDialogFragment"
+            app:destination="@id/manageInternalSettingsBackupsDialogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageInternalSettingsBackupsDialogFragment"
+        android:name="com.idunnololz.summit.settings.backupAndRestore.ManageInternalSettingsBackupsFragment"
+        android:label="ManageInternalSettingsBackupsDialogFragment" />
 </navigation>

@@ -4,15 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.FragmentSettingAboutBinding
+import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.databinding.FragmentSettingBackupAndRestoreBinding
-import com.idunnololz.summit.settings.AboutSettings
-import com.idunnololz.summit.settings.BackupAndRestoreSettings
+import com.idunnololz.summit.settings.ImportAndExportSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,7 +19,7 @@ import javax.inject.Inject
 class SettingBackupAndRestoreFragment : BaseFragment<FragmentSettingBackupAndRestoreBinding>() {
 
     @Inject
-    lateinit var settings: BackupAndRestoreSettings
+    lateinit var settings: ImportAndExportSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,19 +55,25 @@ class SettingBackupAndRestoreFragment : BaseFragment<FragmentSettingBackupAndRes
 
     private fun updateRendering() {
         with(binding) {
-            settings.backupSettings.bindTo(
-                backupSettings,
-                {
+            settings.exportSettings.bindTo(
+                backupSettings
+            ) {
+                ExportSettingsDialogFragment.show(childFragmentManager)
+            }
 
-                }
-            )
+            settings.importSettings.bindTo(
+                restoreSettings
+            ) {
+                ImportSettingsDialogFragment.show(childFragmentManager)
+            }
 
-            settings.restoreSettings.bindTo(
-                restoreSettings,
-                {
-
-                }
-            )
+            settings.manageInternalSettingsBackups.bindTo(
+                manageInternalSettingsBackups
+            ) {
+                val direction = SettingBackupAndRestoreFragmentDirections
+                    .actionSettingBackupAndRestoreFragmentToManageInternalSettingsBackupsDialogFragment()
+                findNavController().navigateSafe(direction)
+            }
         }
     }
 }

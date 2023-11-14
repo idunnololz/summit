@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="false"
+    android:background="?backgroundColor">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:id="@+id/import_settings_view"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="@dimen/padding">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/import_settings_text_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/settings_code"
+                        app:errorEnabled="true"
+                        app:endIconDrawable="@drawable/baseline_content_paste_24"
+                        app:endIconTint="?colorControlNormal"
+                        app:endIconMode="custom">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/import_settings_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!--            <CheckBox-->
+                    <!--                android:layout_marginTop="16dp"-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backupPreferencesCb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_preferences"/>-->
+
+                    <!--            <CheckBox-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backupFavoritesCb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_favorites"/>-->
+
+                    <!--            <CheckBox-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backupBuildsCb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_builds"/>-->
+
+                    <!--            <CheckBox-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backup_tft_data_cb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_tft_data"/>-->
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:layout_marginBottom="@dimen/padding"
+                    android:layout_marginTop="@dimen/padding">
+
+                    <Button
+                        android:id="@+id/import_from_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.Icon"
+                        android:text="@string/import_settings_from_code"
+                        android:layout_gravity="end"
+                        app:icon="@drawable/baseline_code_24"/>
+
+                    <Button
+                        android:id="@+id/import_from_file"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.Icon"
+                        android:text="@string/import_settings_from_file"
+                        android:layout_gravity="end"
+                        app:icon="@drawable/baseline_file_open_24"/>
+
+                    <Button
+                        android:id="@+id/import_from_internal_backup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                        android:text="@string/import_settings_from_internal_backup"
+                        android:layout_gravity="end"
+                        app:icon="@drawable/baseline_settings_backup_restore_24"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/confirm_import_view"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceBodyMedium"
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingVertical="@dimen/padding"
+                    android:text="@string/please_review_settings_import"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:fadingEdge="vertical"
+                    android:requiresFadingEdge="vertical"
+                    android:scrollbars="vertical"/>
+
+                <Button
+                    android:id="@+id/confirm_import"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button"
+                    android:text="@string/proceed_with_import"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:layout_marginVertical="@dimen/padding_half"/>
+            </LinearLayout>
+
+            <com.idunnololz.summit.view.LoadingView
+                android:id="@+id/loading_view"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

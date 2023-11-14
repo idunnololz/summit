@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.ViewPagerController
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,7 @@ class PersonTabbedViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val offlineManager: OfflineManager,
+    private val directoryHelper: DirectoryHelper,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -50,7 +51,7 @@ class PersonTabbedViewModel @Inject constructor(
         infinity = true,
         autoLoadMoreItems = true,
         coroutineScopeFactory = coroutineScopeFactory,
-        offlineManager = offlineManager,
+        directoryHelper = directoryHelper,
     )
     var commentListEngine = CommentListEngine()
 

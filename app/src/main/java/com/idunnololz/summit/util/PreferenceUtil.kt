@@ -25,6 +25,8 @@ object PreferenceUtil {
     const val WHICH_GAME_LAYOUT_TFT = 0x1 shl 3
     const val WHICH_GAME_LAYOUT_LOL_AND_TFT = WHICH_GAME_LAYOUT_LOL or WHICH_GAME_LAYOUT_TFT
 
+    const val PREFERENCE_VERSION_CODE = "PREFERENCE_VERSION_CODE"
+
     /**
      * Value representing the next time to check if disabled_ads is still purchased.
      */
@@ -36,20 +38,6 @@ object PreferenceUtil {
      * Value representing the next time to check if a new version of LoL is available.
      */
     const val NEXT_PATCH_UPDATE_CHECK = "next_patch_update_check"
-
-    const val LAST_AD_STATUS_SYNC = "last_ad_status_sync"
-
-    /**
-     * Timestamp based off of [System.currentTimeMillis] of when to turn off ads until.
-     */
-    const val HALT_ADS_UNTIL = "aaaa_bbbb"
-
-    /**
-     * Ad status. See [SyncAdResult].
-     */
-    const val KEY_AD_STATUS = "aaaa_dddd"
-
-    const val ADS_TRACKER_DATA = "aaaa_cccc"
 
     const val KEY_OAUTH_TOKEN = "aaaa_dddd"
     const val KEY_REFRESH_TOKEN = "aaaa_ddde"

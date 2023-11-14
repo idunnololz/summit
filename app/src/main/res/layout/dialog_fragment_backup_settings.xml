@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="false"
+    android:background="?backgroundColor">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent">
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:id="@+id/contentView"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="@dimen/padding">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/backup_name_text_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/backup_name">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/backup_name_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!--            <CheckBox-->
+                    <!--                android:layout_marginTop="16dp"-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backupPreferencesCb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_preferences"/>-->
+
+                    <!--            <CheckBox-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backupFavoritesCb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_favorites"/>-->
+
+                    <!--            <CheckBox-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backupBuildsCb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_builds"/>-->
+
+                    <!--            <CheckBox-->
+                    <!--                android:checked="true"-->
+                    <!--                android:id="@+id/backup_tft_data_cb"-->
+                    <!--                android:layout_width="wrap_content"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:text="@string/backup_tft_data"/>-->
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:layout_marginBottom="@dimen/padding">
+
+                    <Button
+                        android:id="@+id/save"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.Icon"
+                        android:text="@string/save_backup"
+                        android:layout_gravity="end"
+                        app:icon="@drawable/baseline_save_24"/>
+
+                    <Button
+                        android:id="@+id/share"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                        android:text="@string/share_backup"
+                        android:layout_gravity="end"
+                        app:icon="@drawable/baseline_share_24"/>
+
+                    <Button
+                        android:id="@+id/copy_to_clipboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                        android:text="@string/copy_to_clipboard"
+                        android:layout_gravity="end"
+                        app:icon="@drawable/baseline_content_copy_24"/>
+
+                    <Button
+                        android:id="@+id/save_to_internal_backups"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                        android:text="@string/save_to_internal_backups"
+                        android:layout_gravity="end"
+                        app:icon="@drawable/baseline_save_24"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

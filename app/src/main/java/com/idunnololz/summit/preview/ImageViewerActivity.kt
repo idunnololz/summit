@@ -511,7 +511,6 @@ class ImageViewerActivity : BaseActivity() {
 //            if (!isBindingAvailable()) return@fetchImageWithError
 
             val tempSize = Size()
-            offlineManager.calculateImageMaxSizeIfNeeded(it)
             offlineManager.getMaxImageSizeHint(it, tempSize)
 
             val request = ImageRequest.Builder(binding.imageView.context)

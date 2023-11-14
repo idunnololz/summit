@@ -354,8 +354,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
 
             offlineManager.fetchImage(root, data.bannerUrl) {
-                offlineManager.calculateImageMaxSizeIfNeeded(it)
-
                 banner.load(it) {
                     allowHardware(false)
                 }

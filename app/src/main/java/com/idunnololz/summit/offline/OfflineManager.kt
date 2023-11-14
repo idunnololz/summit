@@ -37,22 +37,12 @@ import kotlin.collections.LinkedHashMap
 @Singleton
 class OfflineManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val moshi: Moshi,
+    private val directoryHelper: DirectoryHelper,
 ) {
 
     companion object {
-
         private val TAG = OfflineManager::class.java.simpleName
     }
-
-    private val downloadInProgressDir = File(context.filesDir, "dl")
-    val imagesDir = File(context.filesDir, "imgs")
-    val videosDir = File(context.filesDir, "videos")
-    val videoCacheDir = File(context.cacheDir, "videos")
-    val tabsDir = File(context.cacheDir, "tabs")
-
-    val tabsDiskCache = MoshiDiskCache
-        .create(moshi, tabsDir, 1, 10L * 1024L * 1024L /* 10MB */)
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -64,12 +54,10 @@ class OfflineManager @Inject constructor(
 
     private var offlineDownloadProgressListeners = ArrayList<OfflineDownloadProgressListener>()
 
-    private val exoDatabaseProvider by lazy {
-        ExoDatabaseProvider(context)
-    }
-    val exoCache by lazy {
-        SimpleCache(videosDir, NoOpCacheEvictor(), exoDatabaseProvider)
-    }
+    private val downloadInProgressDir = directoryHelper.downloadInProgressDir
+    private val imagesDir = directoryHelper.imagesDir
+    private val videosDir = directoryHelper.videosDir
+    private val videoCacheDir = directoryHelper.videoCacheDir
 
     private data class DownloadTask(
         val url: String,
@@ -85,26 +73,6 @@ class OfflineManager @Inject constructor(
         fun cancel(offlineManager: OfflineManager) {
             offlineManager.cancelFetch(key, listener)
         }
-    }
-
-    fun cleanup() {
-        var purgedFiles = 0
-        val thresholdTime = System.currentTimeMillis() - Duration.ofDays(1).toMillis()
-
-        fun File.cleanupDir() {
-            this.listFiles()?.forEach {
-                if (it.lastModified() < thresholdTime) {
-                    it.delete()
-                    purgedFiles++
-                }
-            }
-        }
-
-        imagesDir.cleanupDir()
-        videosDir.cleanupDir()
-        FileProviderHelper(context).fileProviderDir.cleanupDir()
-
-        Log.d(TAG, "Deleted $purgedFiles files.")
     }
 
     fun fetchImage(rootView: View, url: String?, listener: TaskListener) {
@@ -153,10 +121,6 @@ class OfflineManager @Inject constructor(
             )?.forEach {
             it.cancel(this)
         }
-    }
-
-    fun deleteOfflineImages() {
-        imagesDir.deleteRecursively()
     }
 
     fun setImageSizeHint(url: String, w: Int, h: Int) {
@@ -215,6 +179,7 @@ class OfflineManager @Inject constructor(
         saveToFileFn: (File) -> Result<Unit>,
         listener: TaskListener,
         errorListener: TaskFailedListener?,
+        onComplete: (File) -> Unit,
     ): Registration {
         assertMainThread()
         check(!destDir.exists() || destDir.isDirectory)
@@ -271,6 +236,10 @@ class OfflineManager @Inject constructor(
                     null
                 },
             ) ?: return@launch
+
+            withContext(Dispatchers.Default) {
+                onComplete(file)
+            }
 
             withContext(Dispatchers.Main) {
                 downloadTasks.remove(url)?.listeners?.forEach {
@@ -364,6 +333,9 @@ class OfflineManager @Inject constructor(
         },
         listener = listener,
         errorListener = errorListener,
+        onComplete = {
+            calculateImageMaxSizeIfNeeded(it)
+        }
     )
 
     fun calculateImageMaxSizeIfNeeded(file: File) {
@@ -581,66 +553,9 @@ class OfflineManager @Inject constructor(
         Utils.deleteDir(imagesDir)
         Utils.deleteDir(videosDir)
         Utils.deleteDir(videoCacheDir)
+
         imagesDir.mkdirs()
         videosDir.mkdirs()
         videoCacheDir.mkdirs()
-    }
-
-    @JsonClass(generateAdapter = true)
-    data class PostListEngineCacheInfo(
-        val totalPages: Int,
-    )
-
-    fun addPage(key: String?, secondaryKey: String?, data: LoadedPostsData, totalPages: Int) {
-        key ?: return
-
-        tabsDir.mkdirs()
-
-        val keyPrefix = "$key|$secondaryKey"
-        val infoKey = "$keyPrefix|info"
-
-        tabsDiskCache.cacheObject(infoKey, PostListEngineCacheInfo(totalPages))
-
-        val pageKey = "$keyPrefix|${data.pageIndex}"
-
-        tabsDiskCache.cacheObject(pageKey, data)
-
-        tabsDiskCache.printDebugInfo()
-    }
-
-    fun clearPages(key: String?, secondaryKey: String?) {
-        key ?: return
-
-        tabsDir.mkdirs()
-
-        val keyPrefix = "$key|$secondaryKey"
-        val infoKey = "$keyPrefix|info"
-
-        tabsDiskCache.evict(infoKey)
-    }
-
-    fun getPages(key: String?, secondaryKey: String?): List<LoadedPostsData>? {
-        key ?: return null
-
-        tabsDir.mkdirs()
-
-        val keyPrefix = "$key|$secondaryKey"
-        val infoKey = "$keyPrefix|info"
-
-        val pageCacheInfo = tabsDiskCache.getCachedObject<PostListEngineCacheInfo>(infoKey)
-
-        if (pageCacheInfo == null || pageCacheInfo.totalPages == 0) {
-            return null
-        }
-
-        val pages = mutableListOf<LoadedPostsData>()
-        for (i in 0 until pageCacheInfo.totalPages) {
-            val pageKey = "$keyPrefix|$i"
-            val postData = tabsDiskCache.getCachedObject<LoadedPostsData>(pageKey)
-                ?: return null
-            pages.add(postData)
-        }
-
-        return pages
     }
 }

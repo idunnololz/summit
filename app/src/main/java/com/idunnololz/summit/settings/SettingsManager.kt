@@ -12,12 +12,14 @@ sealed class SettingItem : Parcelable {
     abstract val title: String
     abstract val description: String?
     open val isEnabled: Boolean = true
+    open val relatedKeys: List<String> = listOf()
 }
 
 @Parcelize
 data class SubgroupItem(
     override val title: String,
     val settings: List<SettingItem>,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem() {
     override val description: String? = null
 }
@@ -27,12 +29,14 @@ data class BasicSettingItem(
     @DrawableRes val icon: Int?,
     override val title: String,
     override val description: String?,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem()
 
 @Parcelize
 data class TextOnlySettingItem(
     override val title: String,
     override val description: String?,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem()
 
 @Parcelize
@@ -41,6 +45,7 @@ data class TextValueSettingItem(
     val supportsRichText: Boolean,
     override val isEnabled: Boolean = true,
     val hint: String? = null,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem() {
     override val description: String? = null
 }
@@ -51,6 +56,7 @@ data class SliderSettingItem(
     val minValue: Float,
     val maxValue: Float,
     val stepSize: Float? = null,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem() {
     override val description: String? = null
 }
@@ -60,6 +66,7 @@ data class OnOffSettingItem(
     @DrawableRes val icon: Int?,
     override val title: String,
     override val description: String?,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem()
 
 @Parcelize
@@ -67,6 +74,7 @@ data class ColorSettingItem(
     @DrawableRes val icon: Int?,
     override val title: String,
     override val description: String?,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem()
 
 @Parcelize
@@ -75,6 +83,7 @@ data class RadioGroupSettingItem(
     override val title: String,
     override val description: String?,
     val options: List<RadioGroupOption>,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem() {
     @Parcelize
     data class RadioGroupOption(
@@ -90,4 +99,5 @@ data class ImageValueSettingItem(
     override val title: String,
     override val description: String?,
     val isSquare: Boolean,
+    override val relatedKeys: List<String> = listOf(),
 ) : SettingItem()

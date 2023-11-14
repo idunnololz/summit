@@ -2,7 +2,9 @@ package com.idunnololz.summit.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 import android.util.Log
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -87,6 +89,7 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.json.JSONObject
 import org.threeten.bp.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -101,6 +104,9 @@ class Preferences @Inject constructor(
     }
 
     private val prefs = PreferenceUtil.preferences
+
+    val all
+        get() = prefs.all
 
     fun getDefaultPage(): CommunityRef {
         val communityJson = prefs.getString(PreferenceUtil.KEY_DEFAULT_PAGE, null)
@@ -668,6 +674,29 @@ class Preferences @Inject constructor(
         prefs.edit().remove(key).apply()
     }
 
+    fun asJson(): JSONObject {
+        val json = JSONObject()
+
+        for ((key, value) in all.entries) {
+            when (value) {
+                is String -> json.put(key, value)
+                is Boolean -> json.put(key, value)
+                is Number -> json.put(key, value)
+                null -> json.put(key, null)
+                else -> Log.d(TAG, "Unsupported type ${value::class}. Key was $key.")
+            }
+        }
+
+        json.put(PreferenceUtil.PREFERENCE_VERSION_CODE, BuildConfig.VERSION_CODE)
+
+        return json
+    }
+
+    fun generateCode(): String {
+        val json = this.asJson()
+        return Utils.compress(json.toString(), Base64.NO_WRAP)
+    }
+
     private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
         return try {
             val json = this.getString(key, null)
@@ -685,5 +714,25 @@ class Preferences @Inject constructor(
         this.edit()
             .putString(key, moshi.adapter(T::class.java).toJson(value))
             .apply()
+    }
+
+    fun importSettings(settingsToImport: JSONObject, excludeKeys: Set<String>) {
+        val allKeys = settingsToImport.keys().asSequence()
+        val editor = prefs.edit()
+
+        for (key in allKeys) {
+            if (excludeKeys.contains(key)) continue
+
+            when (val value = settingsToImport.opt(key)) {
+                is Float -> editor.putFloat(key, value)
+                is Long -> editor.putLong(key, value)
+                is String -> editor.putString(key, value)
+                is Boolean -> editor.putBoolean(key, value)
+                is Int -> editor.putInt(key, value)
+                null -> editor.remove(key)
+            }
+        }
+
+        editor.apply()
     }
 }

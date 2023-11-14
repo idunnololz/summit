@@ -34,6 +34,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.toErrorMessage
@@ -61,7 +62,7 @@ class CommunityViewModel @Inject constructor(
     private val preferences: Preferences,
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val offlineManager: OfflineManager,
+    private val directoryHelper: DirectoryHelper,
     private val hiddenPostsManager: HiddenPostsManager,
     private val tabsManager: TabsManager,
     private val apiClient: AccountAwareLemmyClient,
@@ -113,7 +114,7 @@ class CommunityViewModel @Inject constructor(
     private var fetchingPages = mutableSetOf<Int>()
     var postListEngine = PostListEngine(
         coroutineScopeFactory = coroutineScopeFactory,
-        offlineManager = offlineManager,
+        directoryHelper = directoryHelper,
         infinity = preferences.infinity,
         autoLoadMoreItems = preferences.autoLoadMorePosts,
         usePageIndicators = preferences.infinityPageIndicator,
