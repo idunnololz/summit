@@ -13,6 +13,7 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.contentDetails.ContentDetailsDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
@@ -168,7 +169,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
         addDivider()
 
         addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
-//        addItemWithIcon(R.id.detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
+        addItemWithIcon(R.id.detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -208,7 +209,8 @@ fun BaseFragment<*>.showMoreCommentOptions(
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
                 R.id.detailed_view -> {
-
+                    ContentDetailsDialogFragment
+                        .show(childFragmentManager, instance, commentView)
                 }
                 R.id.admin_tools,
                 R.id.mod_tools,

@@ -8,6 +8,7 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.contentDetails.ContentDetailsDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
@@ -184,7 +185,7 @@ fun BaseFragment<*>.showMorePostOptions(
 //            R.string.switch_account_for_post,
 //            R.drawable.baseline_account_circle_24)
         addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
-//        addItemWithIcon(R.id.detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
+        addItemWithIcon(R.id.detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -275,7 +276,8 @@ fun BaseFragment<*>.showMorePostOptions(
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
                 R.id.detailed_view -> {
-
+                    ContentDetailsDialogFragment
+                        .show(childFragmentManager, instance, postView)
                 }
                 R.id.admin_tools -> {
                     ModActionsDialogFragment.show(postView, childFragmentManager)

@@ -49,6 +49,7 @@
         android:layout_height="24dp"
         android:layout_marginEnd="@dimen/padding"
         android:background="@color/colorTextTitle"
+        android:layout_marginVertical="@dimen/padding_half"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

@@ -54,16 +54,31 @@
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/post_gesture_action_1_color"
+                    layout="@layout/setting_color_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/post_gesture_action_2"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/post_gesture_action_2_color"
+                    layout="@layout/setting_color_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/post_gesture_action_3"
                     layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/post_gesture_action_3_color"
+                    layout="@layout/setting_color_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -89,15 +104,33 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <include
+                    android:id="@+id/comment_gesture_action_1_color"
+                    layout="@layout/setting_color_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/comment_gesture_action_2"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <include
+                    android:id="@+id/comment_gesture_action_2_color"
+                    layout="@layout/setting_color_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/comment_gesture_action_3"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/comment_gesture_action_3_color"
+                    layout="@layout/setting_color_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <include
                     android:id="@+id/comment_gesture_size"
                     layout="@layout/slider_setting_item"

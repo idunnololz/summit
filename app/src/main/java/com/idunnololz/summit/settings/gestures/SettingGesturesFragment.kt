@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingGesturesBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preferences.Preferences
@@ -15,6 +16,7 @@ import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -70,6 +72,8 @@ class SettingGesturesFragment :
     }
 
     private fun updateRendering() {
+        val context = requireContext()
+
         settings.useGestureActions.bindTo(
             binding.gestureActions,
             { preferences.useGestureActions },
@@ -91,6 +95,14 @@ class SettingGesturesFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        settings.postGestureActionColor1.bindTo(
+            binding.postGestureAction1Color,
+            { preferences.postGestureActionColor1 },
+            {
+                preferences.postGestureActionColor1 = it
+            },
+            { context.getColorCompat(R.color.style_red) },
+        )
 
         settings.postGestureAction2.bindTo(
             binding.postGestureAction2,
@@ -99,6 +111,14 @@ class SettingGesturesFragment :
                 MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
+        )
+        settings.postGestureActionColor2.bindTo(
+            binding.postGestureAction2Color,
+            { preferences.postGestureActionColor2 },
+            {
+                preferences.postGestureActionColor2 = it
+            },
+            { context.getColorCompat(R.color.style_blue) },
         )
 
         settings.postGestureAction3.bindTo(
@@ -109,6 +129,15 @@ class SettingGesturesFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        settings.postGestureActionColor3.bindTo(
+            binding.postGestureAction3Color,
+            { preferences.postGestureActionColor3 },
+            {
+                preferences.postGestureActionColor3 = it
+            },
+            { context.getColorCompat(R.color.style_amber) },
+        )
+
         settings.postGestureSize.bindTo(
             binding.postGestureSize,
             { preferences.postGestureSize },
@@ -125,6 +154,14 @@ class SettingGesturesFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        settings.commentGestureActionColor1.bindTo(
+            binding.commentGestureAction1Color,
+            { preferences.commentGestureActionColor1 },
+            {
+                preferences.commentGestureActionColor1 = it
+            },
+            { context.getColorCompat(R.color.style_red) },
+        )
 
         settings.commentGestureAction2.bindTo(
             binding.commentGestureAction2,
@@ -133,6 +170,14 @@ class SettingGesturesFragment :
                 MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
+        )
+        settings.commentGestureActionColor2.bindTo(
+            binding.commentGestureAction2Color,
+            { preferences.commentGestureActionColor2 },
+            {
+                preferences.commentGestureActionColor2 = it
+            },
+            { context.getColorCompat(R.color.style_blue) },
         )
 
         settings.commentGestureAction3.bindTo(
@@ -143,6 +188,15 @@ class SettingGesturesFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        settings.commentGestureActionColor3.bindTo(
+            binding.commentGestureAction3Color,
+            { preferences.commentGestureActionColor3 },
+            {
+                preferences.commentGestureActionColor3 = it
+            },
+            { context.getColorCompat(R.color.style_amber) },
+        )
+
         settings.commentGestureSize.bindTo(
             binding.commentGestureSize,
             { preferences.commentGestureSize },

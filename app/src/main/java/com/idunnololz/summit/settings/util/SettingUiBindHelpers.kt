@@ -216,9 +216,9 @@ fun RadioGroupSettingItem.bindToMultiView(
 
 fun ColorSettingItem.bindTo(
     b: SettingColorItemBinding,
-    getCurrentValue: () -> Int,
+    getCurrentValue: () -> Int?,
     onValueChanged: (Int) -> Unit,
-    defaultValue: (() -> Int)? = null,
+    defaultValue: (() -> Int),
 ) {
     val context = b.title.context
 
@@ -238,7 +238,9 @@ fun ColorSettingItem.bindTo(
         b.desc.visibility = View.VISIBLE
     }
 
-    b.colorInner.setBackgroundColor(getCurrentValue())
+    b.colorInner.setBackgroundColor(
+        getCurrentValue() ?: defaultValue()
+    )
 
     b.root.setOnClickListener {
         ColorPickerDialog.Builder(context)
@@ -248,7 +250,7 @@ fun ColorSettingItem.bindTo(
                 ColorEnvelopeListener { envelope, _ ->
                     onValueChanged(envelope.color)
 
-                    b.colorInner.setBackgroundColor(getCurrentValue())
+                    b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
                 },
             )
             .setNegativeButton(
@@ -264,7 +266,7 @@ fun ColorSettingItem.bindTo(
 
                         onValueChanged(defaultValue())
 
-                        b.colorInner.setBackgroundColor(getCurrentValue())
+                        b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
                     }
                 }
             }

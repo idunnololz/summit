@@ -31,7 +31,7 @@ class SettingCommentListFragment :
     lateinit var preferences: Preferences
 
     @Inject
-    lateinit var commentListSettings: CommentListSettings
+    lateinit var settings: CommentListSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,14 +59,14 @@ class SettingCommentListFragment :
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = commentListSettings.getPageName(context)
+            supportActionBar?.title = settings.getPageName(context)
         }
 
         updateRendering()
     }
 
     private fun updateRendering() {
-        commentListSettings.defaultCommentsSortOrder.bindTo(
+        settings.defaultCommentsSortOrder.bindTo(
             binding.defaultCommentsSortOrder,
             {
                 preferences.defaultCommentsSortOrder?.toApiSortOrder()?.toId()
@@ -78,35 +78,42 @@ class SettingCommentListFragment :
             },
         )
 
-        commentListSettings.relayStyleNavigation.bindTo(
+        settings.relayStyleNavigation.bindTo(
             binding.relayStyleNavigation,
             { preferences.commentsNavigationFab },
             { preferences.commentsNavigationFab = it },
         )
-        commentListSettings.useVolumeButtonNavigation.bindTo(
+        settings.useVolumeButtonNavigation.bindTo(
             binding.useVolumeButtonNavigation,
             { preferences.useVolumeButtonNavigation },
             { preferences.useVolumeButtonNavigation = it },
         )
-        commentListSettings.collapseChildCommentsByDefault.bindTo(
+        settings.collapseChildCommentsByDefault.bindTo(
             binding.collapseChildCommentsByDefault,
             { preferences.collapseChildCommentsByDefault },
             { preferences.collapseChildCommentsByDefault = it },
         )
-        commentListSettings.hideCommentScores.bindTo(
+        settings.hideCommentScores.bindTo(
             binding.hideCommentScores,
             { preferences.hideCommentScores },
             {
                 preferences.hideCommentScores = it
             },
         )
-        commentListSettings.autoCollapseCommentThreshold.bindTo(
+        settings.autoCollapseCommentThreshold.bindTo(
             binding.autoCollapseComments,
             { convertAutoCollapseCommentToOptionId(preferences.autoCollapseCommentThreshold) },
             { setting, currentValue ->
                 MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
+        )
+        settings.showCommentUpvotePercentage.bindTo(
+            binding.showCommentUpvotePercentage,
+            { preferences.showCommentUpvotePercentage },
+            {
+                preferences.showCommentUpvotePercentage = it
+            }
         )
     }
 
@@ -145,10 +152,10 @@ class SettingCommentListFragment :
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {
-            commentListSettings.defaultCommentsSortOrder.id -> {
+            settings.defaultCommentsSortOrder.id -> {
                 preferences.defaultCommentsSortOrder = idToCommentsSortOrder(value as Int)
             }
-            commentListSettings.autoCollapseCommentThreshold.id -> {
+            settings.autoCollapseCommentThreshold.id -> {
                 val threshold = convertOptionIdToAutoCollapseCommentThreshold(value as Int)
 
                 if (threshold != null) {

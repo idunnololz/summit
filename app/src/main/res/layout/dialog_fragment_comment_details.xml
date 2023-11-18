@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdge="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/dialog_padding"
+            android:paddingBottom="@dimen/dialog_padding">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                style="@style/CircleImageView"
+                android:id="@+id/icon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                app:border_color="@color/colorOnSurface"
+                app:border_width="1dp"
+                app:fill_color="@color/style_blue"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"/>
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleMedium"
+                android:layout_marginTop="@dimen/padding_half"
+                app:layout_constraintTop_toBottomOf="@+id/icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                style="@style/RoundImageView"
+                android:id="@+id/image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintHeight_min="100dp"
+                app:layout_constraintHeight_max="1000dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/name"
+                />
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding"
+                android:textAppearance="?textAppearanceBodyLarge"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/image"/>
+
+            <LinearLayout
+                android:id="@+id/upvotes_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="@dimen/padding"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constraintTop_toBottomOf="@+id/text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/downvotes_view">
+
+                <TextView
+                    android:id="@+id/upvotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceTitleLarge"/>
+
+                <TextView
+                    android:text="@string/upvotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceLabelMedium"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/downvotes_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="@dimen/padding"
+                app:layout_constraintTop_toTopOf="@+id/upvotes_view"
+                app:layout_constraintStart_toEndOf="@+id/upvotes_view"
+                app:layout_constraintEnd_toStartOf="@+id/upvoted_view">
+
+                <TextView
+                    android:id="@+id/downvotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceTitleLarge"/>
+
+                <TextView
+                    android:text="@string/downvotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceLabelMedium"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/upvoted_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="@+id/upvotes_view"
+                app:layout_constraintStart_toEndOf="@+id/downvotes_view"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/upvoted"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceTitleLarge"/>
+
+                <TextView
+                    android:text="@string/upvoted"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceLabelMedium"/>
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="upvotes_view,downvotes_view,upvoted_view"/>
+
+            <Button
+                android:id="@+id/show_more_details"
+                android:text="@string/show_more_details"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/barrier"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/full_details_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding"
+                android:visibility="gone"
+                style="?attr/materialCardViewElevatedStyle"
+                app:cardBackgroundColor="@color/colorSurfaceDarker"
+                app:cardCornerRadius="24dp"
+                app:layout_constrainedHeight="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/show_more_details">
+
+                <TextView
+                    android:id="@+id/full_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceBodyMedium"
+                    android:gravity="start"
+                    android:padding="@dimen/padding"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>

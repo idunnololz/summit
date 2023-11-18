@@ -753,6 +753,16 @@
     <string name="restore_settings_desc">Load/restore settings from a file, setting code or an internal setting backup.</string>
     <string name="backup_settings_desc">Generate a code from all of your settings. This code can be saved to a file or shared and used to restore your settings at a later date or on another device.</string>
     <string name="delete_backup">Delete backup</string>
+    <string name="upvotes">Upvotes</string>
+    <string name="downvotes">Downvotes</string>
+    <string name="upvoted">Upvoted</string>
+    <string name="na">N/A</string>
+    <string name="show_more_details">Show more details</string>
+    <string name="gesture_action_1_color">Gesture action 1 color</string>
+    <string name="gesture_action_2_color">Gesture action 2 color</string>
+    <string name="gesture_action_3_color">Gesture action 3 color</string>
+    <string name="show_post_upvote_percentage">Show post upvote percentage</string>
+    <string name="show_comment_upvote_percentage">Show comment upvote percentage</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

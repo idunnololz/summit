@@ -223,6 +223,13 @@ class SettingsPostListFragment :
                 preferences.infinityPageIndicator = it
             },
         )
+        settings.showPostUpvotePercentage.bindTo(
+            binding.showPostUpvotePercentage,
+            { preferences.showPostUpvotePercentage },
+            {
+                preferences.showPostUpvotePercentage = it
+            }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {
