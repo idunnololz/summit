@@ -50,12 +50,6 @@
             app:labelVisibilityMode="labeled" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <FrameLayout
-        android:id="@+id/overlay_container"
-        android:fitsSystemWindows="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></FrameLayout>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/bottom_sheet_container"
         android:layout_width="match_parent"

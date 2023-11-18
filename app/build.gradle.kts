@@ -45,6 +45,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+
+        isCoreLibraryDesugaringEnabled = true
+
     }
     kotlin {
         jvmToolchain(17)
@@ -140,10 +143,13 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
-    implementation(libs.threeten.abp)
+//    implementation(libs.threeten.abp)
     implementation(libs.zoom.layout)
     implementation(libs.process.phoenix)
     implementation("androidx.media3:media3-transformer:1.1.1")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
 }
 
 // Allow references to generated code

@@ -54,16 +54,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <ImageView
-        android:id="@+id/link_type_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/padding_quarter"
-        android:background="@color/colorSurface"
-        app:tint="?attr/colorControlNormal"
-        app:layout_constraintBottom_toBottomOf="@+id/image"
-        app:layout_constraintEnd_toEndOf="@+id/image" />
-
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/left_barrier"
         android:layout_width="wrap_content"

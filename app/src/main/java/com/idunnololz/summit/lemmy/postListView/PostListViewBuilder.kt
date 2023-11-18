@@ -47,6 +47,7 @@ import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
@@ -574,71 +575,20 @@ class PostListViewBuilder @Inject constructor(
                             imageUrl
                         }
 
-                        offlineManager.getImageSizeHint(imageUrl, tempSize)
-                        if (state.preferFullSizeImages) {
-                            if (tempSize.width > 0 && tempSize.height > 0) {
-                                val thumbnailMaxHeight =
-                                    (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+                        urlToLoad ?: return
 
-                                Log.d(TAG, "Reserving space for image ${thumbnailMaxHeight}h")
-                                image.updateLayoutParams<LayoutParams> {
-                                    this.height = thumbnailMaxHeight
-                                }
-                            } else {
-                                image.updateLayoutParams<LayoutParams> {
-                                    this.height = LayoutParams.WRAP_CONTENT
-                                }
-                            }
-                        }
-
-                        offlineManager.fetchImageWithError(itemView, urlToLoad, {
-                            offlineManager.getMaxImageSizeHint(it, tempSize)
-
-                            var w: Int? = null
-                            var h: Int? = null
-                            if (tempSize.height > 0 && tempSize.width > 0) {
-                                val heightToWidthRatio = tempSize.height / tempSize.width
-
-                                if (heightToWidthRatio > 10) {
-                                    // shrink the image if needed
-                                    w = tempSize.width
-                                    h = tempSize.height
-                                }
-                            }
-
-                            image.load(it) {
-                                if (image is ShapeableImageView) {
-                                    allowHardware(false)
-                                }
-
-                                if (w != null && h != null) {
-                                    this.size(w, h)
-                                }
-//                                fallback(R.drawable.thumbnail_placeholder_16_9)
-//                                placeholder(R.drawable.thumbnail_placeholder_16_9)
-
-                                if (!isRevealed && postView.post.nsfw) {
-                                    val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-
-                                    transformations(BlurTransformation(context, sampling = sampling))
-                                }
-
-                                listener { _, result ->
-                                    val d = result.drawable
-                                    if (d is BitmapDrawable) {
-                                        offlineManager.setImageSizeHint(
-                                            imageUrl,
-                                            d.bitmap.width,
-                                            d.bitmap.height,
-                                        )
-                                    }
-                                }
-                            }
-                        }, {
+                        loadImage(
+                            itemView,
+                            image,
+                            urlToLoad,
+                            state.preferFullSizeImages,
+                            contentMaxWidth,
+                            !isRevealed && postView.post.nsfw,
+                        ) {
                             if (!useBackupUrl && backupImageUrl != null) {
                                 loadImage(true)
                             }
-                        },)
+                        }
                     }
 
                     loadImage()
@@ -680,7 +630,6 @@ class PostListViewBuilder @Inject constructor(
                 Log.d("HAHA", "s4: ${System.nanoTime() - start}")
                 start = System.nanoTime()
 
-                linkTypeImage?.visibility = View.GONE
                 iconImage?.visibility = View.GONE
                 iconImage?.setOnClickListener(null)
                 iconImage?.isClickable = false
@@ -776,9 +725,6 @@ class PostListViewBuilder @Inject constructor(
                         if (isExpanded) {
                             showFullContent()
                         }
-
-                        linkTypeImage?.visibility = View.GONE
-                        linkTypeImage?.setImageResource(R.drawable.baseline_open_in_new_24)
                     }
                 }
 
@@ -1193,5 +1139,85 @@ class PostListViewBuilder @Inject constructor(
                 downvoteButton = button1
             }
         }
+    }
+
+    fun loadImage(
+        rootView: View,
+        imageView: ImageView,
+        imageUrl: String,
+        preferFullSizeImage: Boolean,
+        contentMaxWidth: Int,
+        shouldBlur: Boolean,
+        errorListener: TaskFailedListener?
+    ) {
+        val urlToLoad = imageUrl
+
+        offlineManager.getImageSizeHint(imageUrl, tempSize)
+
+        if (preferFullSizeImage) {
+            if (tempSize.width > 0 && tempSize.height > 0) {
+                val thumbnailMaxHeight =
+                    (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+
+                Log.d(TAG, "Reserving space for image ${thumbnailMaxHeight}h")
+                imageView.updateLayoutParams<LayoutParams> {
+                    this.height = thumbnailMaxHeight
+                }
+            } else {
+                imageView.updateLayoutParams<LayoutParams> {
+                    this.height = LayoutParams.WRAP_CONTENT
+                }
+            }
+        }
+
+        offlineManager.fetchImageWithError(
+            rootView = rootView,
+            url = urlToLoad,
+            listener = {
+                offlineManager.getMaxImageSizeHint(it, tempSize)
+
+                var w: Int? = null
+                var h: Int? = null
+                if (tempSize.height > 0 && tempSize.width > 0) {
+                    val heightToWidthRatio = tempSize.height / tempSize.width
+
+                    if (heightToWidthRatio > 10) {
+                        // shrink the image if needed
+                        w = tempSize.width
+                        h = tempSize.height
+                    }
+                }
+
+                imageView.load(it) {
+                    if (imageView is ShapeableImageView) {
+                        allowHardware(false)
+                    }
+
+                    if (w != null && h != null) {
+                        this.size(w, h)
+                    }
+            //                                fallback(R.drawable.thumbnail_placeholder_16_9)
+            //                                placeholder(R.drawable.thumbnail_placeholder_16_9)
+
+                    if (shouldBlur) {
+                        val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+
+                        transformations(BlurTransformation(context, sampling = sampling))
+                    }
+
+                    listener { _, result ->
+                        val d = result.drawable
+                        if (d is BitmapDrawable) {
+                            offlineManager.setImageSizeHint(
+                                imageUrl,
+                                d.bitmap.width,
+                                d.bitmap.height,
+                            )
+                        }
+                    }
+                }
+            },
+            errorListener = errorListener,
+        )
     }
 }

@@ -22,6 +22,9 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
@@ -45,14 +48,19 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
@@ -479,6 +487,12 @@ class GestureSettings @Inject constructor(
         postGestureActionOptions,
         relatedKeys = listOf(KEY_POST_GESTURE_ACTION_1),
     )
+    val postGestureActionColor1 = ColorSettingItem(
+        null,
+        context.getString(R.string.gesture_action_1_color),
+        null,
+        relatedKeys = listOf(KEY_POST_GESTURE_ACTION_COLOR_1),
+    )
     val postGestureAction2 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_2),
@@ -486,12 +500,24 @@ class GestureSettings @Inject constructor(
         postGestureActionOptions,
         relatedKeys = listOf(KEY_POST_GESTURE_ACTION_2),
     )
+    val postGestureActionColor2 = ColorSettingItem(
+        null,
+        context.getString(R.string.gesture_action_2_color),
+        null,
+        relatedKeys = listOf(KEY_POST_GESTURE_ACTION_COLOR_2),
+    )
     val postGestureAction3 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_3),
         null,
         postGestureActionOptions,
         relatedKeys = listOf(KEY_POST_GESTURE_ACTION_3),
+    )
+    val postGestureActionColor3 = ColorSettingItem(
+        null,
+        context.getString(R.string.gesture_action_3_color),
+        null,
+        relatedKeys = listOf(KEY_POST_GESTURE_ACTION_COLOR_3),
     )
     val postGestureSize = SliderSettingItem(
         context.getString(R.string.post_gesture_size),
@@ -508,6 +534,12 @@ class GestureSettings @Inject constructor(
         commentGestureActionOptions,
         relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_1),
     )
+    val commentGestureActionColor1 = ColorSettingItem(
+        null,
+        context.getString(R.string.gesture_action_1_color),
+        null,
+        relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_COLOR_1),
+    )
     val commentGestureAction2 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_2),
@@ -515,12 +547,24 @@ class GestureSettings @Inject constructor(
         commentGestureActionOptions,
         relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_2),
     )
+    val commentGestureActionColor2 = ColorSettingItem(
+        null,
+        context.getString(R.string.gesture_action_2_color),
+        null,
+        relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_COLOR_2),
+    )
     val commentGestureAction3 = RadioGroupSettingItem(
         null,
         context.getString(R.string.gesture_action_3),
         null,
         commentGestureActionOptions,
         relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_3),
+    )
+    val commentGestureActionColor3 = ColorSettingItem(
+        null,
+        context.getString(R.string.gesture_action_3_color),
+        null,
+        relatedKeys = listOf(KEY_COMMENT_GESTURE_ACTION_COLOR_3),
     )
     val commentGestureSize = SliderSettingItem(
         context.getString(R.string.comment_gesture_size),
@@ -669,6 +713,12 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.show_page_numbers_desc),
         relatedKeys = listOf(KEY_INFINITY_PAGE_INDICATOR),
     )
+    val showPostUpvotePercentage = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_post_upvote_percentage),
+        null,
+        relatedKeys = listOf(KEY_SHOW_POST_UPVOTE_PERCENTAGE),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -803,6 +853,12 @@ class CommentListSettings @Inject constructor(
             ),
         ),
         relatedKeys = listOf(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD),
+    )
+    val showCommentUpvotePercentage = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_comment_upvote_percentage),
+        null,
+        relatedKeys = listOf(KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE),
     )
 
     override val allSettings: List<SettingItem> = listOf(

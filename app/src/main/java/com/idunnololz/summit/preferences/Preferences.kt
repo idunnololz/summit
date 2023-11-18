@@ -32,6 +32,9 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
@@ -57,6 +60,9 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_1
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
@@ -64,9 +70,11 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
@@ -264,6 +272,30 @@ class Preferences @Inject constructor(
             prefs.edit().putInt(KEY_POST_GESTURE_ACTION_3, value).apply()
         }
 
+    var postGestureActionColor1: Int?
+        get() = prefs.getIntOrNull(KEY_POST_GESTURE_ACTION_COLOR_1)
+        set(value) {
+            if (value != null) {
+                prefs.edit().putInt(KEY_POST_GESTURE_ACTION_COLOR_1, value).apply()
+            }
+        }
+
+    var postGestureActionColor2: Int?
+        get() = prefs.getIntOrNull(KEY_POST_GESTURE_ACTION_COLOR_2)
+        set(value) {
+            if (value != null) {
+                prefs.edit().putInt(KEY_POST_GESTURE_ACTION_COLOR_2, value).apply()
+            }
+        }
+
+    var postGestureActionColor3: Int?
+        get() = prefs.getIntOrNull(KEY_POST_GESTURE_ACTION_COLOR_3)
+        set(value) {
+            if (value != null) {
+                prefs.edit().putInt(KEY_POST_GESTURE_ACTION_COLOR_3, value).apply()
+            }
+        }
+
     var postGestureSize: Float
         get() = prefs.getFloat(KEY_POST_GESTURE_SIZE, 0.5f)
         set(value) {
@@ -286,6 +318,30 @@ class Preferences @Inject constructor(
         get() = prefs.getInt(KEY_COMMENT_GESTURE_ACTION_3, CommentGestureAction.Reply)
         set(value) {
             prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_3, value).apply()
+        }
+
+    var commentGestureActionColor1: Int?
+        get() = prefs.getIntOrNull(KEY_COMMENT_GESTURE_ACTION_COLOR_1)
+        set(value) {
+            if (value != null) {
+                prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_COLOR_1, value).apply()
+            }
+        }
+
+    var commentGestureActionColor2: Int?
+        get() = prefs.getIntOrNull(KEY_COMMENT_GESTURE_ACTION_COLOR_2)
+        set(value) {
+            if (value != null) {
+                prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_COLOR_2, value).apply()
+            }
+        }
+
+    var commentGestureActionColor3: Int?
+        get() = prefs.getIntOrNull(KEY_COMMENT_GESTURE_ACTION_COLOR_3)
+        set(value) {
+            if (value != null) {
+                prefs.edit().putInt(KEY_COMMENT_GESTURE_ACTION_COLOR_3, value).apply()
+            }
         }
 
     var commentGestureSize: Float
@@ -670,6 +726,22 @@ class Preferences @Inject constructor(
                 .apply()
         }
 
+    var showPostUpvotePercentage: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_POST_UPVOTE_PERCENTAGE, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SHOW_POST_UPVOTE_PERCENTAGE, value)
+                .apply()
+        }
+
+    var showCommentUpvotePercentage: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE, value)
+                .apply()
+        }
+
     fun reset(key: String) {
         prefs.edit().remove(key).apply()
     }
@@ -715,6 +787,13 @@ class Preferences @Inject constructor(
             .putString(key, moshi.adapter(T::class.java).toJson(value))
             .apply()
     }
+
+    private fun SharedPreferences.getIntOrNull(key: String) =
+        if (this.contains(key)) {
+            this.getInt(key, 0)
+        } else {
+            null
+        }
 
     fun importSettings(settingsToImport: JSONObject, excludeKeys: Set<String>) {
         val allKeys = settingsToImport.keys().asSequence()

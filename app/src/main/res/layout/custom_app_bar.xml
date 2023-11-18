@@ -60,7 +60,7 @@
             <TextView
                 android:id="@+id/community_sort_order"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:textAppearance="?textAppearanceTitleSmall"
                 android:layout_marginStart="@dimen/padding"
                 android:gravity="center_vertical"

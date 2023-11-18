@@ -5,7 +5,13 @@ import android.icu.text.CompactDecimalFormat
 import android.os.Build
 import com.idunnololz.summit.R
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
+import java.text.DateFormat
 import java.text.NumberFormat
+import java.util.Date
 import java.util.Locale
 
 object PrettyPrintUtils {
@@ -61,6 +67,13 @@ fun dateStringToPretty(context: Context, ts: Long): String {
     } else {
         context.getString(R.string.elapsed_time_years_ago, diff / YEAR_MILLIS)
     }
+}
+
+fun dateStringToFullDateTime(dateStr: String): String {
+    val epochSecond = dateStringToTs(dateStr) / 1000
+    val localDateTime = LocalDateTime.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
+
+    return localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
 }
 
 fun dateStringToTs(dateString: String): Long =

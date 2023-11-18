@@ -185,4 +185,20 @@ safeargs.
             android:name="type"
             app:argType="string" />
     </dialog>
+    <dialog
+        android:id="@+id/commentDetailsDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.contentDetails.ContentDetailsDialogFragment"
+        android:label="CommentDetailsDialogFragment" >
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="commentView"
+            app:argType="com.idunnololz.summit.api.dto.CommentView"
+            app:nullable="true"  />
+        <argument
+            android:name="postView"
+            app:argType="com.idunnololz.summit.api.dto.PostView"
+            app:nullable="true" />
+    </dialog>
 </navigation>
