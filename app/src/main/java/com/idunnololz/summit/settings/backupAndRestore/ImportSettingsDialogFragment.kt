@@ -137,7 +137,6 @@ class ImportSettingsDialogFragment :
                         showRecyclerViewWithData(it.preview)
                     }
                     is ImportSettingsViewModel.State.Error -> {
-
                         val errorMessage: String = when (it.error) {
                             ImportSettingsViewModel.ErrorType.UnableToDecipherInput -> {
                                 getString(R.string.error_unable_to_decipher_input)
@@ -160,7 +159,8 @@ class ImportSettingsDialogFragment :
                     }
                     is ImportSettingsViewModel.State.DecodeInputString,
                     is ImportSettingsViewModel.State.GeneratePreviewFromSettingsJson,
-                    is ImportSettingsViewModel.State.PerformImportSettings -> {
+                    is ImportSettingsViewModel.State.PerformImportSettings,
+                    -> {
                         loadingView.showProgressBar()
                     }
                     ImportSettingsViewModel.State.NotStarted -> {}
@@ -184,14 +184,14 @@ class ImportSettingsDialogFragment :
         val b = ImportSettingsFromBackupsBinding.inflate(LayoutInflater.from(context))
         val dialog = Dialog(context, R.style.Theme_App_Dialog)
 
-        with (b) {
+        with(b) {
             recyclerView.apply {
                 adapter = BackupsAdapter(
                     backups,
                     onBackupClick = {
                         viewModel.generatePreviewFromFile(it.file.toUri())
                         dialog.dismiss()
-                    }
+                    },
                 )
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(context)
@@ -241,7 +241,7 @@ class ImportSettingsDialogFragment :
                         settingsDataPreview.settingsPreview[settingKey] ?: "",
                         settingsDataPreview.keyToType[settingKey] ?: "?",
                     )
-                }
+                },
             )
 
             recyclerView.setHasFixedSize(true)
@@ -272,11 +272,11 @@ class ImportSettingsDialogFragment :
             /**
              * A single setting within the imported setting data.
              */
-            data class ImportSettingItem (
+            data class ImportSettingItem(
                 val settingKey: String,
                 val value: Any,
                 val isExcluded: Boolean,
-            ): Item
+            ) : Item
         }
 
         var excludeKeys = mutableSetOf<String>()
@@ -287,11 +287,11 @@ class ImportSettingsDialogFragment :
                     is Item.ImportSettingItem ->
                         oldItem.settingKey == (newItem as Item.ImportSettingItem).settingKey
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.ImportSettingItem::class,
-                inflateFn = ImportSettingItemBinding::inflate
+                inflateFn = ImportSettingItemBinding::inflate,
             ) { item, b, h ->
                 b.settingKey.text = item.settingKey.lowercase()
                 b.settingValue.text = item.value.toString()
@@ -390,8 +390,8 @@ class ImportSettingsDialogFragment :
 
         private sealed interface Item {
             data class BackupItem(
-                val backupInfo: SettingsBackupManager.BackupInfo
-            ): Item
+                val backupInfo: SettingsBackupManager.BackupInfo,
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -401,7 +401,7 @@ class ImportSettingsDialogFragment :
                         oldItem.backupInfo.file.path ==
                             (newItem as Item.BackupItem).backupInfo.file.path
                 }
-            }
+            },
         ).apply {
             addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->
                 b.text.text = item.backupInfo.file.name
@@ -432,6 +432,5 @@ class ImportSettingsDialogFragment :
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
-
     }
 }

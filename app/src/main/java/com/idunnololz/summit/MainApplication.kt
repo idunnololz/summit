@@ -31,7 +31,6 @@ import com.idunnololz.summit.util.NotificationHelper
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.video.ExoPlayerManager
-import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import java.util.Locale
@@ -149,8 +148,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         }
 
         NotificationHelper.registerNotificationChannels(context)
-
-        AndroidThreeTen.init(context)
 
         // Needs to be initialized first
         ExoPlayerManager.initialize(context)

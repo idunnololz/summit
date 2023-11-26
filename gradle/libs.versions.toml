@@ -3,6 +3,7 @@ androidGradlePlugin = "8.1.3"
 arrowCore = "1.2.0"
 colorpickerview = "2.2.4"
 calligraphy3 = "3.1.1"
+desugar_jdk_libs = "2.0.4"
 hilt = "2.46.1"
 javaStringSimilarity = "2.0.0"
 imagepicker = "2.3.22"
@@ -11,7 +12,7 @@ ksp = "1.9.0-1.0.13"
 kotlinx = "1.7.1"
 moshiSealedCodegen = "0.22.1"
 moshiSealedRuntime = "0.22.1"
-navigation = "2.7.4"
+navigation = "2.7.5"
 markwon = "4.6.2"
 room = "2.6.0"
 lifecycle = "2.6.2"
@@ -27,6 +28,7 @@ coil = "2.4.0"
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
 colorpickerview = { module = "com.github.skydoves:colorpickerview", version.ref = "colorpickerview" }
 calligraphy3 = { module = "io.github.inflationx:calligraphy3", version.ref = "calligraphy3" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 
@@ -61,8 +63,9 @@ moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", ver
 media3-core = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3"}
+media3-transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
 
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.4.0" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.6.0" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 
@@ -94,13 +97,12 @@ rx-rxandroid = { module = "io.reactivex.rxjava2:rxandroid", version = "2.1.1" }
 rx-rxjava = { module = "io.reactivex.rxjava2:rxjava", version = "2.2.9" }
 
 json = { module = "org.json:json", version = "20230227" }
-threeten-abp = { module = "com.jakewharton.threetenabp:threetenabp", version = "1.4.6" }
 jsoup = { module = "org.jsoup:jsoup", version = "1.16.1" }
 flow-layout = { module = "com.nex3z:flow-layout", version = "1.3.3" }
 material = { module = "com.google.android.material:material", version = "1.10.0" }
 mp-android-chart = { module = "com.github.PhilJay:MPAndroidChart", version = "v3.0.3" }
 disklrucache = { module = "com.jakewharton:disklrucache", version = "2.0.2" }
-billing-ktx = { module = "com.android.billingclient:billing-ktx", version = "6.0.1" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version = "6.1.0" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coil" }
 coil-video = { module = "io.coil-kt:coil-video", version.ref = "coil" }
@@ -122,13 +124,13 @@ recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.2
 preference-ktx = { module = "androidx.preference:preference-ktx", version = "1.2.1" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.1.4" }
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.1.0" }
-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.6.1" }
-activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.8.0" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.6.2" }
+activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.8.1" }
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version = "1.1.0" }
 transition = { module = "androidx.transition:transition", version = "1.4.1" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1"}
-hilt-common = { module = "androidx.hilt:hilt-common", version = "1.0.0"}
-hilt-work = { module = "androidx.hilt:hilt-work", version = "1.0.0" }
+hilt-common = { module = "androidx.hilt:hilt-common", version = "1.1.0"}
+hilt-work = { module = "androidx.hilt:hilt-work", version = "1.1.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

@@ -169,6 +169,20 @@ class SettingMiscFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        settings.indicatePostsAndCommentsCreatedByCurrentUser.bindTo(
+            binding.indicatePostsAndCommentsCreatedByCurrentUser,
+            { preferences.indicatePostsAndCommentsCreatedByCurrentUser },
+            {
+                preferences.indicatePostsAndCommentsCreatedByCurrentUser = it
+            },
+        )
+        settings.saveDraftsAutomatically.bindTo(
+            binding.saveDraftsAutomatically,
+            { preferences.saveDraftsAutomatically },
+            {
+                preferences.saveDraftsAutomatically = it
+            },
+        )
     }
 
     private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {

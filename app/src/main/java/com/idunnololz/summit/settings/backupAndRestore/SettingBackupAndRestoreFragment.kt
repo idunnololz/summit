@@ -56,19 +56,19 @@ class SettingBackupAndRestoreFragment : BaseFragment<FragmentSettingBackupAndRes
     private fun updateRendering() {
         with(binding) {
             settings.exportSettings.bindTo(
-                backupSettings
+                backupSettings,
             ) {
                 ExportSettingsDialogFragment.show(childFragmentManager)
             }
 
             settings.importSettings.bindTo(
-                restoreSettings
+                restoreSettings,
             ) {
                 ImportSettingsDialogFragment.show(childFragmentManager)
             }
 
             settings.manageInternalSettingsBackups.bindTo(
-                manageInternalSettingsBackups
+                manageInternalSettingsBackups,
             ) {
                 val direction = SettingBackupAndRestoreFragmentDirections
                     .actionSettingBackupAndRestoreFragmentToManageInternalSettingsBackupsDialogFragment()

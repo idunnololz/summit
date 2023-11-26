@@ -16,7 +16,6 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.DirectoryHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -110,7 +109,8 @@ class VideoDownloadManager @Inject constructor(
                 super.onRequirementsStateChanged(downloadManager, requirements, notMetRequirements)
                 Log.d("HAHA", "onRequirementsStateChanged()")
             }
-        },)
+        },
+        )
         downloadManager.requirements = Requirements(Requirements.NETWORK)
         downloadManager.maxParallelDownloads = 3
     }

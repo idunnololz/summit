@@ -179,3 +179,6 @@ object LemmyUtils {
         return matches
     }
 }
+
+fun Int.toLemmyPageIndex() =
+    this + 1 // lemmy pages are 1 indexed

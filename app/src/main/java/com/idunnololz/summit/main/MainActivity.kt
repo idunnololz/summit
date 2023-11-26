@@ -50,6 +50,7 @@ import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.communities.CommunitiesFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
@@ -75,6 +76,7 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.Changelog.launchChangelog
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
@@ -361,10 +363,6 @@ class MainActivity : BaseActivity() {
             .show()
     }
 
-    fun launchChangelog() {
-        launchPage(PostRef("lemmy.world", 8229801), switchToNativeInstance = true)
-    }
-
     private val bottomNavY
         get() = bottomNavViewOffset.value!!.toFloat() + bottomNavViewAnimationOffset.value!!.toFloat()
 
@@ -639,7 +637,10 @@ class MainActivity : BaseActivity() {
                     post = null,
                     crosspost = null,
                     extraStream = IntentCompat.getParcelableExtra(
-                        intent, Intent.EXTRA_STREAM, Uri::class.java),
+                        intent,
+                        Intent.EXTRA_STREAM,
+                        Uri::class.java,
+                    ),
                 ).toBundle()
             }
             .show(supportFragmentManager, "CreateOrEditPostFragment")
@@ -1101,6 +1102,11 @@ class MainActivity : BaseActivity() {
                 disableBottomNavViewScrolling()
                 hideBottomNav(animate)
                 hideNotificationBarBg()
+            }
+            CommunitiesFragment::class -> {
+                disableBottomNavViewScrolling()
+                showBottomNav()
+                showNotificationBarBg()
             }
             else ->
                 throw RuntimeException("No setup instructions for type: ${t.java.canonicalName}")

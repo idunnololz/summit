@@ -763,6 +763,14 @@
     <string name="gesture_action_3_color">Gesture action 3 color</string>
     <string name="show_post_upvote_percentage">Show post upvote percentage</string>
     <string name="show_comment_upvote_percentage">Show comment upvote percentage</string>
+    <string name="use_multiline_post_header">Use multiline headers</string>
+    <string name="indicate_posts_and_comments_created_by_current_user">Indicate posts and comments created by current user</string>
+    <string name="you">You</string>
+    <string name="instance_info">Instance info</string>
+    <string name="subscribers_format">%1$s Subs</string>
+    <string name="save_draft">Safe draft</string>
+    <string name="save_drafts_automatically">Save drafts automatically</string>
+    <string name="save_drafts_automatically_desc">When enabled, drafts of posts/comments are saved automatically if you navigate away from the create/edit post/comment screen without pressing send.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

@@ -28,10 +28,10 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @AndroidEntryPoint
 class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {

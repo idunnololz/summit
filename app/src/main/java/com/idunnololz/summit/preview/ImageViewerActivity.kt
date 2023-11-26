@@ -13,6 +13,7 @@ import android.transition.Transition
 import android.util.Log
 import android.view.*
 import android.view.ViewGroup.MarginLayoutParams
+import android.webkit.MimeTypeMap
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -32,6 +33,7 @@ import com.idunnololz.summit.databinding.FragmentImageViewerBinding
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.*
@@ -218,6 +220,25 @@ class ImageViewerActivity : BaseActivity() {
         binding.toolbar.setNavigationOnClickListener {
             supportFinishAfterTransition()
         }
+
+        viewModel.downloadAndShareFile.observe(this) {
+            when (it) {
+                is StatefulData.Error -> {}
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    val mimeType = MimeTypeMap.getSingleton()
+                        .getMimeTypeFromExtension(it.data.toString())
+                        ?: "image/jpeg"
+
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = mimeType
+                        putExtra(Intent.EXTRA_STREAM, it.data)
+                    }
+                    startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                }
+            }
+        }
     }
 
     fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -302,7 +323,11 @@ class ImageViewerActivity : BaseActivity() {
                             true
                         }
                         R.id.share -> {
-                            Utils.shareLink(this@ImageViewerActivity, args.url)
+                            if (GlobalSettings.shareImagesDirectly) {
+                                downloadAndShareImage(args.url)
+                            } else {
+                                Utils.shareLink(this@ImageViewerActivity, args.url)
+                            }
                             true
                         }
                         R.id.copy_link -> {
@@ -587,4 +612,8 @@ class ImageViewerActivity : BaseActivity() {
         binding.statusBarBg.animate().alpha(0f)
     }
     fun getSnackbarContainer(): View = binding.contentView
+
+    fun downloadAndShareImage(url: String) {
+        viewModel.downloadAndShareImage(url)
+    }
 }

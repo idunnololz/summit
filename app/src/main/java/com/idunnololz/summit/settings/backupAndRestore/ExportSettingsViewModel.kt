@@ -7,7 +7,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.fileprovider.FileProviderHelper
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +22,7 @@ import javax.inject.Inject
 class ExportSettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferences: Preferences,
-    private val settingsBackupManager: SettingsBackupManager
+    private val settingsBackupManager: SettingsBackupManager,
 ) : ViewModel() {
 
     companion object {
@@ -58,8 +57,8 @@ class ExportSettingsViewModel @Inject constructor(
                 backupFile.postValue(
                     BackupResult(
                         uri = uri,
-                        config = backupConfig
-                    )
+                        config = backupConfig,
+                    ),
                 )
             } catch (e: Exception) {
                 backupFile.postError(e)
@@ -81,14 +80,14 @@ class ExportSettingsViewModel @Inject constructor(
                 file.toUri(),
                 BackupConfig(
                     BackupOption.SaveInternal,
-                )
-            )
+                ),
+            ),
         )
     }
 
     data class BackupConfig(
         val backupOption: BackupOption,
-        val dest: Uri? = null
+        val dest: Uri? = null,
     )
 
     enum class BackupOption {
@@ -102,5 +101,4 @@ class ExportSettingsViewModel @Inject constructor(
         val uri: Uri,
         val config: BackupConfig,
     )
-
 }

@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ManageInternalSettingsBackupsViewModel @Inject constructor(
-    private val settingsBackupManager: SettingsBackupManager
+    private val settingsBackupManager: SettingsBackupManager,
 ) : ViewModel() {
 
     val backupsInfo = StatefulLiveData<List<SettingsBackupManager.BackupInfo>>()
@@ -32,5 +32,4 @@ class ManageInternalSettingsBackupsViewModel @Inject constructor(
     private suspend fun loadBackupsData() = withContext(Dispatchers.Default) {
         backupsInfo.postValue(settingsBackupManager.getBackups())
     }
-
 }

@@ -156,7 +156,7 @@ class LemmyContentHelper(
                 textView.textSize = config.bodyTextSizeSp.toTextSize()
 
                 postRemovedView.layoutParams =
-                    (postRemovedView.layoutParams as ViewGroup.MarginLayoutParams).apply {
+                    (postRemovedView.layoutParams as MarginLayoutParams).apply {
                         topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
                     }
 
@@ -178,7 +178,7 @@ class LemmyContentHelper(
                 textView.textSize = config.bodyTextSizeSp.toTextSize()
 
                 postRemovedView.layoutParams =
-                    (postRemovedView.layoutParams as ViewGroup.MarginLayoutParams).apply {
+                    (postRemovedView.layoutParams as MarginLayoutParams).apply {
                         topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
                     }
 
@@ -198,7 +198,7 @@ class LemmyContentHelper(
                 textView.textSize = config.bodyTextSizeSp.toTextSize()
 
                 postRemovedView.layoutParams =
-                    (postRemovedView.layoutParams as ViewGroup.MarginLayoutParams).apply {
+                    (postRemovedView.layoutParams as MarginLayoutParams).apply {
                         topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
                     }
 

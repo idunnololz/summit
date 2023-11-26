@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 34
-        versionCode = 110
-        versionName = "1.16.0"
+        versionCode = 111
+        versionName = "1.17.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -47,7 +47,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
 
         isCoreLibraryDesugaringEnabled = true
-
     }
     kotlin {
         jvmToolchain(17)
@@ -143,13 +142,11 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
-//    implementation(libs.threeten.abp)
     implementation(libs.zoom.layout)
     implementation(libs.process.phoenix)
-    implementation("androidx.media3:media3-transformer:1.1.1")
+    implementation(libs.media3.transformer)
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
 
 // Allow references to generated code

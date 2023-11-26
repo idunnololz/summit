@@ -14,7 +14,7 @@ data class PostAggregates(
     val upvotes: Int,
     val downvotes: Int,
     val published: String,
-    val newest_comment_time_necro: String,
+    val newest_comment_time_necro: String? = null,
     val newest_comment_time: String,
     val featured_community: Boolean,
     val featured_local: Boolean,

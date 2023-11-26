@@ -5,27 +5,18 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.View
-import androidx.media3.database.ExoDatabaseProvider
-import androidx.media3.datasource.cache.NoOpCacheEvictor
-import androidx.media3.datasource.cache.SimpleCache
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.ServerApiException
-import com.idunnololz.summit.cache.MoshiDiskCache
-import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.util.*
 import com.idunnololz.summit.util.LinkUtils.USER_AGENT
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import okhttp3.Request
 import okio.BufferedSink
 import okio.buffer
 import okio.sink
-import org.threeten.bp.Duration
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -335,7 +326,7 @@ class OfflineManager @Inject constructor(
         errorListener = errorListener,
         onComplete = {
             calculateImageMaxSizeIfNeeded(it)
-        }
+        },
     )
 
     fun calculateImageMaxSizeIfNeeded(file: File) {

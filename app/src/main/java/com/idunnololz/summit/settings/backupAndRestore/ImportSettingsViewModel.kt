@@ -64,7 +64,7 @@ class ImportSettingsViewModel @Inject constructor(
         // before we overwrite existing settings, create a backup just in case
         settingsBackupManager.saveBackup(
             backup = preferences.generateCode(),
-            backupName = "import_settings_backup_%datetime%"
+            backupName = "import_settings_backup_%datetime%",
         )
 
         val settingsToImport = JSONObject(settingsData.rawData)
@@ -90,7 +90,7 @@ class ImportSettingsViewModel @Inject constructor(
                 next(string)
                 return@withContext
             }
-        } catch (e: Exception) {/* do nothing */}
+        } catch (e: Exception) { /* do nothing */ }
 
         try {
             val unb64 = Base64.decode(settings, Base64.DEFAULT).toString(Charsets.UTF_32)
@@ -98,14 +98,14 @@ class ImportSettingsViewModel @Inject constructor(
                 next(unb64)
                 return@withContext
             }
-        } catch (e: Exception) {/* do nothing */}
+        } catch (e: Exception) { /* do nothing */ }
 
         try {
             if (settings.isJson()) {
                 next(settings)
                 return@withContext
             }
-        } catch (e: Exception) {/* do nothing */}
+        } catch (e: Exception) { /* do nothing */ }
 
         state.postValue(State.Error(ErrorType.UnableToDecipherInput, RuntimeException()))
     }
@@ -143,20 +143,23 @@ class ImportSettingsViewModel @Inject constructor(
             } else if (currentValue != null && importValue == null) {
                 diffs.add(Diff(DiffType.Removed, currentValue.toString(), "null"))
             } else if (currentValue != importValue) {
-                diffs.add(Diff(
-                    type = DiffType.Changed,
-                    currentValue = currentValue?.toString() ?: "null",
-                    importValue = importValue?.toString() ?: "null",
-                ))
+                diffs.add(
+                    Diff(
+                        type = DiffType.Changed,
+                        currentValue = currentValue?.toString() ?: "null",
+                        importValue = importValue?.toString() ?: "null",
+                    ),
+                )
             } else {
-                diffs.add(Diff(
-                    type = DiffType.Unchanged,
-                    currentValue = currentValue?.toString() ?: "null",
-                    importValue = importValue?.toString() ?: "null",
-                ))
+                diffs.add(
+                    Diff(
+                        type = DiffType.Unchanged,
+                        currentValue = currentValue?.toString() ?: "null",
+                        importValue = importValue?.toString() ?: "null",
+                    ),
+                )
             }
         }
-
 
         val settingsPreview = json.keys().asSequence()
             .associateWith { (json.opt(it)?.toString() ?: "null") }
@@ -172,8 +175,8 @@ class ImportSettingsViewModel @Inject constructor(
                     settingsPreview = settingsPreview,
                     keyToType = keyToType,
                     rawData = settingsJson,
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -204,10 +207,14 @@ class ImportSettingsViewModel @Inject constructor(
         val currentState = state.value as? State.ConfirmImportSettings
             ?: return
 
-        state.postValue(State.PerformImportSettings(SettingsData(
-            currentState.preview.rawData,
-            excludeKeys,
-        )))
+        state.postValue(
+            State.PerformImportSettings(
+                SettingsData(
+                    currentState.preview.rawData,
+                    excludeKeys,
+                ),
+            ),
+        )
     }
 
     sealed interface State : Parcelable {
@@ -217,29 +224,29 @@ class ImportSettingsViewModel @Inject constructor(
 
         @Parcelize
         data class DecodeInputString(
-            val input: String
-        ): State
+            val input: String,
+        ) : State
 
         @Parcelize
         data class GeneratePreviewFromSettingsJson(
-            val settingsJson: String
-        ): State
+            val settingsJson: String,
+        ) : State
 
         @Parcelize
         data class ConfirmImportSettings(
-            val preview: SettingsDataPreview
-        ): State
+            val preview: SettingsDataPreview,
+        ) : State
 
         @Parcelize
         data class PerformImportSettings(
-            val settingsData: SettingsData
-        ): State
+            val settingsData: SettingsData,
+        ) : State
 
         @Parcelize
         data class Error(
             val error: ErrorType,
-            val e: Throwable
-        ): State
+            val e: Throwable,
+        ) : State
 
         @Parcelize
         data object ImportSettingsCompleted : State
@@ -252,27 +259,27 @@ class ImportSettingsViewModel @Inject constructor(
     }
 
     @Parcelize
-    data class SettingsDataPreview (
+    data class SettingsDataPreview(
         val keys: List<String>,
         val keyToSettingItems: Map<String, List<SettingItem>>,
         val diffs: List<Diff>,
         val settingsPreview: Map<String, String>,
         val keyToType: Map<String, String>,
         val rawData: String,
-    ): Parcelable
+    ) : Parcelable
 
     @Parcelize
     data class Diff(
         val type: DiffType,
         val currentValue: String,
         val importValue: String,
-    ): Parcelable
+    ) : Parcelable
 
     @Parcelize
     data class SettingsData(
         val rawData: String,
-        val excludeKeys: Set<String>
-    ): Parcelable
+        val excludeKeys: Set<String>,
+    ) : Parcelable
 
     enum class DiffType {
         Added,
@@ -280,5 +287,4 @@ class ImportSettingsViewModel @Inject constructor(
         Changed,
         Unchanged,
     }
-
 }

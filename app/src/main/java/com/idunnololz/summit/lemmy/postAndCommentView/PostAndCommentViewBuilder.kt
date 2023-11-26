@@ -7,7 +7,6 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
@@ -27,10 +26,14 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
@@ -83,6 +86,7 @@ import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ActivityScoped
@@ -92,8 +96,11 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val offlineManager: OfflineManager,
     private val accountActionsManager: AccountActionsManager,
     private val preferences: Preferences,
+    private val accountManager: AccountManager,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
-    private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
+
+    private val coroutineScope = coroutineScopeFactory.create()
 
     var uiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()
         set(value) {
@@ -110,8 +117,6 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     var tapCommentToCollapse = preferences.tapCommentToCollapse
         private set
-
-    private val inflater = LayoutInflater.from(activity)
 
     private var postUiConfig: PostUiConfig = uiConfig.postUiConfig
     var commentUiConfig: CommentUiConfig = uiConfig.commentUiConfig
@@ -135,6 +140,10 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var showUpAndDownVotes: Boolean = preferences.showUpAndDownVotes
     private var displayInstanceStyle = preferences.displayInstanceStyle
     private var leftHandMode = preferences.leftHandMode
+    private var showPostUpvotePercentage: Boolean = preferences.showPostUpvotePercentage
+    private var showCommentUpvotePercentage: Boolean = preferences.showCommentUpvotePercentage
+    private var useMultilinePostHeaders: Boolean = preferences.useMultilinePostHeaders
+    private var indicateCurrentUser: Boolean = preferences.indicatePostsAndCommentsCreatedByCurrentUser
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -148,8 +157,16 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val paddingHalf = context.getDimen(R.dimen.padding_half)
     private val paddingFull = context.getDimen(R.dimen.padding)
 
+    private var currentUser: Account? = null
+
     init {
         lemmyContentHelper.config = uiConfig.postUiConfig.fullContentConfig
+
+        coroutineScope.launch {
+            accountManager.currentAccount.collect {
+                currentUser = it
+            }
+        }
     }
 
     fun onPreferencesChanged() {
@@ -160,6 +177,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
         lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
         displayInstanceStyle = preferences.displayInstanceStyle
+        showPostUpvotePercentage = preferences.showPostUpvotePercentage
+        showCommentUpvotePercentage = preferences.showCommentUpvotePercentage
+        useMultilinePostHeaders = preferences.useMultilinePostHeaders
+        indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
@@ -233,6 +254,15 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
             listAuthor = true,
+            showUpvotePercentage = showPostUpvotePercentage,
+            useMultilineHeader = false,
+            wrapHeader = useMultilinePostHeaders,
+            isCurrentUser = if (indicateCurrentUser) {
+                currentUser?.id == postView.creator.id &&
+                    currentUser?.instance == postView.creator.instance
+            } else {
+                false
+            },
         )
 
         LemmyTextHelper.bindText(
@@ -682,6 +712,13 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
+            showUpvotePercentage = showCommentUpvotePercentage,
+            isCurrentUser = if (indicateCurrentUser) {
+                currentUser?.id == commentView.creator.id &&
+                    currentUser?.instance == commentView.creator.instance
+            } else {
+                false
+            },
         )
 
         if (commentView.comment.deleted || isDeleting) {
@@ -886,6 +923,13 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
+            showUpvotePercentage = showCommentUpvotePercentage,
+            isCurrentUser = if (indicateCurrentUser) {
+                currentUser?.id == commentView.creator.id &&
+                    currentUser?.instance == commentView.creator.instance
+            } else {
+                false
+            },
         )
 
         expandSectionButton.setOnClickListener {
@@ -1687,6 +1731,13 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
+            showUpvotePercentage = showCommentUpvotePercentage,
+            isCurrentUser = if (indicateCurrentUser) {
+                currentUser?.id == commentView.creator.id &&
+                    currentUser?.instance == commentView.creator.instance
+            } else {
+                false
+            },
         )
     }
 

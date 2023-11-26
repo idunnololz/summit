@@ -29,7 +29,7 @@ class ImportSettingItemPreviewDialogFragment : BaseDialogFragment<DialogFragment
                 arguments = ImportSettingItemPreviewDialogFragmentArgs(
                     settingKey = settingKey,
                     stringValue = stringValue,
-                    type = type
+                    type = type,
                 ).toBundle()
             }.show(fragmentManager, "ImportSettingItemPreviewDialogFragment")
         }
@@ -75,7 +75,6 @@ class ImportSettingItemPreviewDialogFragment : BaseDialogFragment<DialogFragment
         val relatedSettingItems = keyToSettingItems[args.settingKey]
 
         with(binding) {
-
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
                 context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),

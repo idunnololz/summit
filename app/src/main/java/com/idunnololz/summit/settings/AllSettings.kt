@@ -37,6 +37,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
@@ -55,6 +56,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
@@ -74,6 +76,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MATERIAL_YOU
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MULTILINE_POST_HEADERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -718,6 +721,12 @@ class PostListSettings @Inject constructor(
         context.getString(R.string.show_post_upvote_percentage),
         null,
         relatedKeys = listOf(KEY_SHOW_POST_UPVOTE_PERCENTAGE),
+    )
+    val useMultilinePostHeaders = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_multiline_post_header),
+        null,
+        relatedKeys = listOf(KEY_USE_MULTILINE_POST_HEADERS),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1480,8 +1489,22 @@ class MiscSettings @Inject constructor(
         ),
         relatedKeys = listOf(
             KEY_WARN_REPLY_TO_OLD_CONTENT,
-            KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
+            KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS,
         ),
+    )
+
+    val indicatePostsAndCommentsCreatedByCurrentUser = OnOffSettingItem(
+        null,
+        context.getString(R.string.indicate_posts_and_comments_created_by_current_user),
+        null,
+        relatedKeys = listOf(KEY_INDICATE_CONTENT_FROM_CURRENT_USER),
+    )
+
+    val saveDraftsAutomatically = OnOffSettingItem(
+        null,
+        context.getString(R.string.save_drafts_automatically),
+        context.getString(R.string.save_drafts_automatically_desc),
+        relatedKeys = listOf(KEY_SAVE_DRAFTS_AUTOMATICALLY),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1694,7 +1717,6 @@ class ImportAndExportSettings @Inject constructor(
         manageInternalSettingsBackups,
     )
 }
-
 
 class AllSettings @Inject constructor(
     mainSettings: MainSettings,
