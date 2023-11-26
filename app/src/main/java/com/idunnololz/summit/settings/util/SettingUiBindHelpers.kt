@@ -239,7 +239,7 @@ fun ColorSettingItem.bindTo(
     }
 
     b.colorInner.setBackgroundColor(
-        getCurrentValue() ?: defaultValue()
+        getCurrentValue() ?: defaultValue(),
     )
 
     b.root.setOnClickListener {

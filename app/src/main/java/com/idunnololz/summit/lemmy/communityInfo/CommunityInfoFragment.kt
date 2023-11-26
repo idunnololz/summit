@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -53,6 +54,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showBottomMenuForLink
 import com.idunnololz.summit.video.VideoState
@@ -216,6 +218,13 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is CommunityRef.CommunityRefByName -> {
                     subscribe.visibility = View.VISIBLE
                 }
+            }
+
+            if (args.communityRef is CommunityRef.Local) {
+                instanceInfo.visibility = View.GONE
+                subscribe.visibility = View.VISIBLE
+            } else {
+                instanceInfo.visibility = View.VISIBLE
             }
 
             banner.transitionName = "banner_image"
@@ -397,14 +406,36 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 binding.fab.setOnClickListener {
                     showOverflowMenu(communityView)
                 }
+
+                binding.instanceInfo.visibility = View.VISIBLE
+                binding.instanceInfo.setOnClickListener {
+                    getMainActivity()?.showCommunityInfo(
+                        CommunityRef.Local(
+                            communityView.community.instance,
+                        ),
+                    )
+                }
             } else if (siteView != null) {
                 binding.fab.visibility = View.VISIBLE
                 binding.fab.setOnClickListener {
                     showOverflowMenu(siteView)
                 }
+
+                binding.instanceInfo.visibility = View.GONE
+
+                subscribe.visibility = View.VISIBLE
+                subscribe.text = getString(R.string.communities)
+                subscribe.setOnClickListener {
+                    val directions = CommunityInfoFragmentDirections
+                        .actionCommunityInfoFragmentToCommunitiesFragment(
+                            siteView.site.instance,
+                        )
+                    findNavController().navigateSafe(directions)
+                }
             } else {
                 binding.fab.visibility = View.GONE
                 subscribe.visibility = View.GONE
+                binding.instanceInfo.visibility = View.GONE
             }
             binding.fab.setup(preferences)
         }

@@ -10,11 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BackupItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentManageInternalSettingsBackupsBinding
-import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,8 +29,13 @@ class ManageInternalSettingsBackupsFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentManageInternalSettingsBackupsBinding.inflate(
-            inflater, container, false))
+        setBinding(
+            DialogFragmentManageInternalSettingsBackupsBinding.inflate(
+                inflater,
+                container,
+                false,
+            ),
+        )
 
         return binding.root
     }
@@ -59,7 +62,7 @@ class ManageInternalSettingsBackupsFragment :
                         addItemWithIcon(
                             id = R.id.delete,
                             title = R.string.delete_backup,
-                            icon = R.drawable.baseline_delete_24
+                            icon = R.drawable.baseline_delete_24,
                         )
 
                         setOnMenuItemClickListener {
@@ -72,7 +75,7 @@ class ManageInternalSettingsBackupsFragment :
                     }
 
                     getMainActivity()?.showBottomMenu(bottomMenu)
-                }
+                },
             )
 
             recyclerView.setHasFixedSize(true)
@@ -109,8 +112,8 @@ class ManageInternalSettingsBackupsFragment :
 
         private sealed interface Item {
             data class BackupItem(
-                val backupInfo: SettingsBackupManager.BackupInfo
-            ): Item
+                val backupInfo: SettingsBackupManager.BackupInfo,
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -120,7 +123,7 @@ class ManageInternalSettingsBackupsFragment :
                         oldItem.backupInfo.file.path ==
                             (newItem as Item.BackupItem).backupInfo.file.path
                 }
-            }
+            },
         ).apply {
             addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->
                 b.text.text = item.backupInfo.file.name
@@ -158,6 +161,5 @@ class ManageInternalSettingsBackupsFragment :
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
-
     }
 }

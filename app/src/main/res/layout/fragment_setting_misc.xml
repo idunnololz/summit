@@ -100,6 +100,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <include
+                    android:id="@+id/indicate_posts_and_comments_created_by_current_user"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/save_drafts_automatically"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>

@@ -128,6 +128,19 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/subtitle"/>
 
+                <Button
+                    android:id="@+id/instance_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/instance_info"
+                    android:layout_marginTop="@dimen/padding_half"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    style="?attr/materialButtonOutlinedStyle"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/subscribe"/>
+
                 <Space
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/padding_half"

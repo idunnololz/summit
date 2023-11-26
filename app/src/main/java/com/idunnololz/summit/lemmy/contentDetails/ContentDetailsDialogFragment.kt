@@ -38,7 +38,6 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             instance: String,
             commentView: CommentView,
         ) {
-
             ContentDetailsDialogFragment().apply {
                 arguments = ContentDetailsDialogFragmentArgs(
                     instance = instance,
@@ -53,7 +52,6 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             instance: String,
             postView: PostView,
         ) {
-
             ContentDetailsDialogFragment().apply {
                 arguments = ContentDetailsDialogFragmentArgs(
                     instance = instance,
@@ -106,11 +104,15 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 creator = commentView.creator,
                 content = commentView.comment.toContent(),
                 fullDetails = buildString {
-                    appendLine("Published on ${
-                        dateStringToFullDateTime(commentView.comment.published)}")
+                    appendLine(
+                        "Published on ${
+                        dateStringToFullDateTime(commentView.comment.published)}",
+                    )
                     if (commentView.comment.updated != null) {
-                        appendLine("Updated on ${
-                            dateStringToFullDateTime(commentView.comment.updated)}")
+                        appendLine(
+                            "Updated on ${
+                            dateStringToFullDateTime(commentView.comment.updated)}",
+                        )
                     }
 
                     appendLine()
@@ -130,11 +132,15 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 creator = postView.creator,
                 content = postView.post.toContent(),
                 fullDetails = buildString {
-                    appendLine("Published on ${
-                        dateStringToFullDateTime(postView.post.published)}")
+                    appendLine(
+                        "Published on ${
+                        dateStringToFullDateTime(postView.post.published)}",
+                    )
                     if (postView.post.updated != null) {
-                        appendLine("Updated on ${
-                            dateStringToFullDateTime(postView.post.updated)}")
+                        appendLine(
+                            "Updated on ${
+                            dateStringToFullDateTime(postView.post.updated)}",
+                        )
                     }
 
                     appendLine()
@@ -191,7 +197,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                             false,
                         ) {}
                     }
-                })
+                },)
             }
 
             if (o.content.content.isNullOrBlank()) {
@@ -227,7 +233,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             upvoted.text =
                 if (voteCount > 0) {
                     PrettyPrintUtils.defaultPercentFormat.format(
-                        o.counts.upvotes / voteCount.toDouble()
+                        o.counts.upvotes / voteCount.toDouble(),
                     )
                 } else {
                     getString(R.string.na)
@@ -283,7 +289,6 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             content = body,
             imageUrl = this.thumbnail_url ?: this.url,
         )
-
 
     data class ObjectView(
         val counts: Counts,

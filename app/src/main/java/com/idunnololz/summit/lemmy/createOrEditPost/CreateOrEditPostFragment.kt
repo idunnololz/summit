@@ -33,6 +33,7 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -67,6 +68,9 @@ class CreateOrEditPostFragment :
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -151,12 +155,14 @@ class CreateOrEditPostFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.content)
         }
 
+        binding.toolbar.inflateMenu(R.menu.menu_create_or_edit_post)
+
         if (isEdit()) {
             binding.toolbar.title = getString(R.string.edit_post)
-            binding.toolbar.inflateMenu(R.menu.menu_edit_post)
+            binding.toolbar.menu.findItem(R.id.create_post)?.isVisible = false
         } else {
             binding.toolbar.title = getString(R.string.create_post)
-            binding.toolbar.inflateMenu(R.menu.menu_add_post)
+            binding.toolbar.menu.findItem(R.id.update_post)?.isVisible = false
         }
         binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
         binding.toolbar.setNavigationIconTint(context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
@@ -184,6 +190,10 @@ class CreateOrEditPostFragment :
                         isNsfw = binding.nsfwSwitch.isChecked,
                         postId = requireNotNull(args.post?.id) { "POST ID WAS NULL!" },
                     )
+                    true
+                }
+                R.id.save_draft -> {
+                    saveDraft(overwriteExistingDraft = false)
                     true
                 }
                 else -> false
@@ -644,7 +654,9 @@ class CreateOrEditPostFragment :
         }
 
         try {
-            saveDraft()
+            if (preferences.saveDraftsAutomatically) {
+                saveDraft()
+            }
 
             dismiss()
         } catch (e: IllegalStateException) {
@@ -653,7 +665,7 @@ class CreateOrEditPostFragment :
         return true
     }
 
-    private fun saveDraft() {
+    private fun saveDraft(overwriteExistingDraft: Boolean = true) {
         val title = binding.titleEditText.text?.toString()
         val body = binding.postEditText.text?.toString()
         val url = binding.urlEditText.text?.toString()
@@ -663,7 +675,8 @@ class CreateOrEditPostFragment :
 
         if (!title.isNullOrBlank() || !body.isNullOrBlank() || !url.isNullOrBlank()) {
             if (currentDraftEntry?.data != null &&
-                currentDraftEntry.data is DraftData.PostDraftData
+                currentDraftEntry.data is DraftData.PostDraftData &&
+                overwriteExistingDraft
             ) {
                 viewModel.draftsManager.updateDraftAsync(
                     currentDraftEntry.id,

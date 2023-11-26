@@ -113,7 +113,7 @@ class SettingCommentListFragment :
             { preferences.showCommentUpvotePercentage },
             {
                 preferences.showCommentUpvotePercentage = it
-            }
+            },
         )
     }
 

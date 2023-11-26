@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <!-- programmatically, only one of the "send" buttons is shown -->
+    <item
+        android:id="@+id/create_post"
+        android:title="@string/create_post"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_send_24"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
+    <item
+        android:id="@+id/update_post"
+        android:title="@string/update_post"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_send_24"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
+
+
+    <item
+        android:id="@+id/save_draft"
+        android:title="@string/save_draft"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_save_24"
+        app:showAsAction="never"
+        app:iconTint="?attr/colorControlNormal"/>
+</menu>

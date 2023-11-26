@@ -228,7 +228,14 @@ class SettingsPostListFragment :
             { preferences.showPostUpvotePercentage },
             {
                 preferences.showPostUpvotePercentage = it
-            }
+            },
+        )
+        settings.useMultilinePostHeaders.bindTo(
+            binding.useMultilinePostHeaders,
+            { preferences.useMultilinePostHeaders },
+            {
+                preferences.useMultilinePostHeaders = it
+            },
         )
     }
 

@@ -24,10 +24,14 @@ import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
+import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
@@ -60,6 +64,7 @@ import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ActivityScoped
@@ -70,7 +75,11 @@ class PostListViewBuilder @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val preferences: Preferences,
     private val themeManager: ThemeManager,
+    private val accountManager: AccountManager,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
+
+    private val coroutineScope = coroutineScopeFactory.create()
 
     companion object {
         private const val TAG = "PostListViewBuilder"
@@ -105,6 +114,9 @@ class PostListViewBuilder @Inject constructor(
     private var showUpAndDownVotes: Boolean = preferences.showUpAndDownVotes
     private var displayInstanceStyle = preferences.displayInstanceStyle
     private var leftHandMode: Boolean = preferences.leftHandMode
+    private var showPostUpvotePercentage: Boolean = preferences.showPostUpvotePercentage
+    private var useMultilinePostHeaders: Boolean = preferences.useMultilinePostHeaders
+    private var indicateCurrentUser: Boolean = preferences.indicatePostsAndCommentsCreatedByCurrentUser
 
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
 
@@ -115,8 +127,16 @@ class PostListViewBuilder @Inject constructor(
 
     private val tempSize = Size()
 
+    private var currentUser: Account? = null
+
     init {
         onPostUiConfigUpdated()
+
+        coroutineScope.launch {
+            accountManager.currentAccount.collect {
+                currentUser = it
+            }
+        }
     }
 
     fun onPostUiConfigUpdated() {
@@ -132,6 +152,9 @@ class PostListViewBuilder @Inject constructor(
         showUpAndDownVotes = preferences.showUpAndDownVotes
         displayInstanceStyle = preferences.displayInstanceStyle
         leftHandMode = preferences.leftHandMode
+        showPostUpvotePercentage = preferences.showPostUpvotePercentage
+        useMultilinePostHeaders = preferences.useMultilinePostHeaders
+        indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
     }
 
     /**
@@ -511,6 +534,15 @@ class PostListViewBuilder @Inject constructor(
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                     displayInstanceStyle = displayInstanceStyle,
+                    showUpvotePercentage = showPostUpvotePercentage,
+                    useMultilineHeader = false,
+                    wrapHeader = useMultilinePostHeaders,
+                    isCurrentUser = if (indicateCurrentUser) {
+                        currentUser?.id == postView.creator.id &&
+                            currentUser?.instance == postView.creator.instance
+                    } else {
+                        false
+                    },
                 )
 
                 fun showDefaultImage() {
@@ -922,7 +954,8 @@ class PostListViewBuilder @Inject constructor(
     }
 
     private fun ListingItemViewHolder.scaleTextSizes() {
-        headerContainer.textSize = postUiConfig.headerTextSizeSp.toTextSize()
+        headerContainer.textSize = postUiConfig.headerTextSizeSp.toTextSize() * 0.9f
+
         title.textSize = postUiConfig.titleTextSizeSp.toTextSize()
         commentText?.textSize = postUiConfig.footerTextSizeSp.toTextSize()
         upvoteCount?.textSize = postUiConfig.footerTextSizeSp.toTextSize()
@@ -1148,7 +1181,7 @@ class PostListViewBuilder @Inject constructor(
         preferFullSizeImage: Boolean,
         contentMaxWidth: Int,
         shouldBlur: Boolean,
-        errorListener: TaskFailedListener?
+        errorListener: TaskFailedListener?,
     ) {
         val urlToLoad = imageUrl
 
@@ -1196,8 +1229,8 @@ class PostListViewBuilder @Inject constructor(
                     if (w != null && h != null) {
                         this.size(w, h)
                     }
-            //                                fallback(R.drawable.thumbnail_placeholder_16_9)
-            //                                placeholder(R.drawable.thumbnail_placeholder_16_9)
+                    //                                fallback(R.drawable.thumbnail_placeholder_16_9)
+                    //                                placeholder(R.drawable.thumbnail_placeholder_16_9)
 
                     if (shouldBlur) {
                         val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)

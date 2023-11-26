@@ -5,11 +5,10 @@ import android.util.Log
 import com.idunnololz.summit.cache.MoshiDiskCache
 import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
-import com.idunnololz.summit.offline.OfflineManager
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.threeten.bp.Duration
 import java.io.File
+import java.time.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,7 +31,6 @@ class DirectoryHelper @Inject constructor(
 
     val tabsDiskCache = MoshiDiskCache
         .create(moshi, tabsDir, 1, 10L * 1024L * 1024L /* 10MB */)
-
 
     fun cleanup() {
         var purgedFiles = 0

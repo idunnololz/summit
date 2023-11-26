@@ -16,6 +16,7 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.Changelog.launchChangelog
 import com.idunnololz.summit.util.startFeedbackIntent
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,9 +64,9 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
     }
 
     private fun updateRendering() {
-        aboutSettings.version.bindTo(binding.version, {
-            getMainActivity()?.launchChangelog()
-        },)
+        aboutSettings.version.bindTo(binding.version) {
+            launchChangelog()
+        }
 
         aboutSettings.googlePlayLink.bindTo(binding.playStoreListing) {
             try {

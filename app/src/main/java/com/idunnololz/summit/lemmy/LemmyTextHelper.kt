@@ -13,7 +13,6 @@ import coil.imageLoader
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.links.LinkType
-import com.idunnololz.summit.spans.SpoilerSpan
 import com.idunnololz.summit.util.CoilImagesPlugin
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.CustomLinkMovementMethod

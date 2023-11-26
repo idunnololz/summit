@@ -34,6 +34,7 @@ import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.preferences.GlobalSettings
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -47,6 +48,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddOrEditCommentFragment :
@@ -91,6 +93,9 @@ class AddOrEditCommentFragment :
                 }
             }
         }
+
+    @Inject
+    lateinit var preferences: Preferences
 
     @Parcelize
     enum class Result : Parcelable {
@@ -188,11 +193,13 @@ class AddOrEditCommentFragment :
             refreshMessage()
         }
 
+        binding.toolbar.inflateMenu(R.menu.menu_add_or_edit_comment)
+
         binding.toolbar.title = getString(R.string.comment)
         if (isEdit()) {
-            binding.toolbar.inflateMenu(R.menu.menu_edit_comment)
+            binding.toolbar.menu.findItem(R.id.send_comment)?.isVisible = false
         } else {
-            binding.toolbar.inflateMenu(R.menu.menu_add_comment)
+            binding.toolbar.menu.findItem(R.id.update_comment)?.isVisible = false
         }
         binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
         binding.toolbar.setNavigationIconTint(
@@ -259,6 +266,10 @@ class AddOrEditCommentFragment :
                         requireNotNull(args.editCommentView?.comment?.id),
                         binding.commentEditor.editText?.text.toString(),
                     )
+                    true
+                }
+                R.id.save_draft -> {
+                    saveDraft(overwriteExistingDraft = false)
                     true
                 }
                 else -> false
@@ -479,7 +490,9 @@ class AddOrEditCommentFragment :
         }
 
         try {
-            saveDraft()
+            if (preferences.saveDraftsAutomatically) {
+                saveDraft()
+            }
 
             dismiss()
         } catch (e: IllegalStateException) {
@@ -488,13 +501,14 @@ class AddOrEditCommentFragment :
         return true
     }
 
-    private fun saveDraft() {
+    private fun saveDraft(overwriteExistingDraft: Boolean = true) {
         val content = binding.commentEditText.text?.toString()
 
         val currentDraftEntry = viewModel.currentDraftEntry.value
         if (!content.isNullOrBlank()) {
             if (currentDraftEntry?.data != null &&
-                currentDraftEntry.data is DraftData.CommentDraftData
+                currentDraftEntry.data is DraftData.CommentDraftData &&
+                overwriteExistingDraft
             ) {
                 viewModel.draftsManager.updateDraftAsync(
                     currentDraftEntry.id,

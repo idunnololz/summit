@@ -49,6 +49,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
@@ -68,6 +69,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SIN
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
@@ -87,6 +89,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MULTILINE_POST_HEADERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -98,7 +101,7 @@ import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
-import org.threeten.bp.Duration
+import java.time.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -739,6 +742,30 @@ class Preferences @Inject constructor(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE, value)
+                .apply()
+        }
+
+    var useMultilinePostHeaders: Boolean
+        get() = prefs.getBoolean(KEY_USE_MULTILINE_POST_HEADERS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_MULTILINE_POST_HEADERS, value)
+                .apply()
+        }
+
+    var indicatePostsAndCommentsCreatedByCurrentUser: Boolean
+        get() = prefs.getBoolean(KEY_INDICATE_CONTENT_FROM_CURRENT_USER, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_INDICATE_CONTENT_FROM_CURRENT_USER, value)
+                .apply()
+        }
+
+    var saveDraftsAutomatically: Boolean
+        get() = prefs.getBoolean(KEY_SAVE_DRAFTS_AUTOMATICALLY, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SAVE_DRAFTS_AUTOMATICALLY, value)
                 .apply()
         }
 

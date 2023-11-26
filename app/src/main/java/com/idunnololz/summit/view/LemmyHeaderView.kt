@@ -1,13 +1,17 @@
 package com.idunnololz.summit.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.idunnololz.summit.databinding.LemmyHeaderViewBinding
+import androidx.core.widget.TextViewCompat
+import com.google.android.material.R
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.R as R2
 
 class LemmyHeaderView : LinearLayout {
 
@@ -32,12 +36,18 @@ class LemmyHeaderView : LinearLayout {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
 
-        val binding = LemmyHeaderViewBinding.inflate(LayoutInflater.from(context), this)
+        textView1 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
+            .style()
+        textView2 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
+            .style()
+        textView3 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
+            .style()
+        flairView = FlairView(context)
 
-        textView1 = binding.textView1
-        textView2 = binding.textView2
-        textView3 = binding.textView3
-        flairView = binding.flairView
+        addView(textView1)
+        addView(flairView)
+        addView(textView2)
+        addView(textView3)
 
         flairView.visibility = View.GONE
     }
@@ -60,4 +70,32 @@ class LemmyHeaderView : LinearLayout {
         }
 
     fun getFlairView(): FlairView = flairView
+
+    override fun setOrientation(orientation: Int) {
+        if (orientation == this.orientation) {
+            return
+        }
+
+        super.setOrientation(orientation)
+
+        if (orientation == VERTICAL) {
+            textView3.visibility = View.GONE
+        } else {
+            textView3.visibility = View.VISIBLE
+        }
+    }
+
+    private fun LinkifyTextView.style(): LinkifyTextView {
+        maxLines = 1
+        isSingleLine = true
+        setTextColor(context.getColorCompat(R2.color.colorTextFaint))
+        TextViewCompat.setCompoundDrawableTintList(
+            this,
+            ColorStateList.valueOf(
+                context.getColorFromAttribute(R.attr.colorControlNormal),
+            ),
+        )
+
+        return this
+    }
 }

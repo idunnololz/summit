@@ -3,11 +3,14 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.graphics.text.LineBreaker
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
@@ -25,6 +28,7 @@ import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.dateStringToPretty
@@ -63,9 +67,50 @@ class LemmyHeaderHelper(
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
         listAuthor: Boolean = true,
+        showUpvotePercentage: Boolean,
+        useMultilineHeader: Boolean,
+        wrapHeader: Boolean,
+        isCurrentUser: Boolean,
     ) {
+        fun makeMovementMethod() =
+            CustomLinkMovementMethod().apply {
+                onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
+                onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+                    override fun onClick(
+                        textView: TextView,
+                        url: String,
+                        text: String,
+                        rect: RectF,
+                    ): Boolean {
+                        val pageRef = LinkResolver.parseUrl(url, instance)
+
+                        if (pageRef != null) {
+                            onPageClick(pageRef)
+                        } else {
+                            onLinkClick(url, text, LinkType.Text)
+                        }
+                        return true
+                    }
+                }
+            }
+
+        var currentTextView = headerContainer.textView1
+
         val context = headerContainer.context
-        val sb = SpannableStringBuilder()
+        var sb = SpannableStringBuilder()
+
+        if (isCurrentUser) {
+            val s = sb.length
+            sb.append(context.getString(R.string.you))
+            val e = sb.length
+            sb.setSpan(
+                RoundedBackgroundSpan(infoColor, emphasisColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.append(" ")
+        }
 
         if (postView.post.nsfw) {
             val s = sb.length
@@ -182,8 +227,31 @@ class LemmyHeaderHelper(
         dateStringToPretty(context, postView.post.updated ?: postView.post.published).let {
             sb.append(it)
         }
+
+        if (wrapHeader) {
+            currentTextView.isSingleLine = false
+            currentTextView.maxLines = 2
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
+            }
+            headerContainer.orientation = LinearLayout.HORIZONTAL
+        } else if (useMultilineHeader) {
+            currentTextView.text = sb
+            currentTextView.movementMethod = makeMovementMethod()
+            currentTextView.isSingleLine = true
+            headerContainer.orientation = LinearLayout.VERTICAL
+
+            currentTextView = headerContainer.textView2
+            sb = SpannableStringBuilder()
+        } else {
+            headerContainer.orientation = LinearLayout.HORIZONTAL
+        }
+
         if (listAuthor) {
-            sb.appendSeparator()
+            if (sb.isNotEmpty()) {
+                sb.appendSeparator()
+            }
+
             if (postView.creator.admin) {
                 val s = sb.length
                 sb.appendLink(
@@ -236,6 +304,14 @@ class LemmyHeaderHelper(
                 )
             }
         }
+        if (showUpvotePercentage) {
+            sb.appendSeparator()
+            sb.append(
+                PrettyPrintUtils.defaultShortPercentFormat.format(
+                    postView.counts.upvotes / (postView.counts.upvotes + postView.counts.downvotes).toFloat(),
+                ),
+            )
+        }
 //        if (listingItem.linkFlairText != null) {
 //            appendSeparator(sb)
 //            run {
@@ -257,28 +333,8 @@ class LemmyHeaderHelper(
 //
 //        appendAwards(headerContainer, listingItem.allAwardings, sb)
 
-        val textView = headerContainer.getChildAt(0) as TextView
-        textView.text = sb
-        textView.movementMethod = CustomLinkMovementMethod().apply {
-            onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
-            onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
-                override fun onClick(
-                    textView: TextView,
-                    url: String,
-                    text: String,
-                    rect: RectF,
-                ): Boolean {
-                    val pageRef = LinkResolver.parseUrl(url, instance)
-
-                    if (pageRef != null) {
-                        onPageClick(pageRef)
-                    } else {
-                        onLinkClick(url, text, LinkType.Text)
-                    }
-                    return true
-                }
-            }
-        }
+        currentTextView.text = sb
+        currentTextView.movementMethod = makeMovementMethod()
     }
 
     fun populateHeaderSpan(
@@ -292,6 +348,8 @@ class LemmyHeaderHelper(
         displayInstanceStyle: Int,
         detailed: Boolean = false,
         childrenCount: Int? = null,
+        showUpvotePercentage: Boolean,
+        isCurrentUser: Boolean,
     ) {
         val creatorInstance = commentView.creator.instance
 
@@ -315,6 +373,19 @@ class LemmyHeaderHelper(
 //                )
 //            }
 //        } else
+
+        if (isCurrentUser) {
+            val s = sb.length
+            sb.append(context.getString(R.string.you))
+            val e = sb.length
+            sb.setSpan(
+                RoundedBackgroundSpan(infoColor, emphasisColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.append(" ")
+        }
 
         val creatorName = commentView.creator.name.trim()
         if (commentView.creator.admin) {
@@ -492,6 +563,14 @@ class LemmyHeaderHelper(
                 maxLines = 2
                 isSingleLine = false
             }
+        }
+        if (showUpvotePercentage) {
+            sb.appendSeparator()
+            sb.append(
+                PrettyPrintUtils.defaultShortPercentFormat.format(
+                    commentView.counts.upvotes / (commentView.counts.upvotes + commentView.counts.downvotes).toFloat(),
+                ),
+            )
         }
 
         headerContainer.setTextFirstPart(sb)

@@ -4,14 +4,12 @@ import android.content.Context
 import android.icu.text.CompactDecimalFormat
 import android.os.Build
 import com.idunnololz.summit.R
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
-import java.text.DateFormat
 import java.text.NumberFormat
-import java.util.Date
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Locale
 
 object PrettyPrintUtils {
@@ -28,6 +26,11 @@ object PrettyPrintUtils {
 
     val defaultPercentFormat: NumberFormat
         get() = pf
+
+    val defaultShortPercentFormat: NumberFormat
+        get() = NumberFormat.getPercentInstance().apply {
+            maximumFractionDigits = 0
+        }
 }
 
 private const val SECOND_MILLIS: Long = 1000

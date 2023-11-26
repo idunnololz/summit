@@ -163,6 +163,9 @@
         <argument
             android:name="communityRef"
             app:argType="com.idunnololz.summit.lemmy.CommunityRef" />
+        <action
+            android:id="@+id/action_communityInfoFragment_to_communitiesFragment"
+            app:destination="@id/communitiesFragment" />
     </fragment>
     <action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
     <include app:graph="@navigation/settings"/>
@@ -191,5 +194,13 @@
             app:argType="com.idunnololz.summit.lemmy.search.SearchViewModel$CommunityFilter"
             app:nullable="true"
             android:defaultValue="@null" />
+    </fragment>
+    <fragment
+        android:id="@+id/communitiesFragment"
+        android:name="com.idunnololz.summit.lemmy.communities.CommunitiesFragment"
+        android:label="CommunitiesFragment" >
+        <argument
+            android:name="instance"
+            app:argType="string" />
     </fragment>
 </navigation>

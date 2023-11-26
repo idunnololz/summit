@@ -59,8 +59,8 @@ class ExportSettingsDialogFragment :
                 viewModel.createBackupAndSave(
                     ExportSettingsViewModel.BackupConfig(
                         backupOption = ExportSettingsViewModel.BackupOption.Save,
-                        dest = uri
-                    )
+                        dest = uri,
+                    ),
                 )
             }
         }
@@ -187,17 +187,21 @@ class ExportSettingsDialogFragment :
             }
 
             share.setOnClickListener {
-                viewModel.createBackupAndSave(ExportSettingsViewModel.BackupConfig(
-                    ExportSettingsViewModel.BackupOption.Share
-                ))
+                viewModel.createBackupAndSave(
+                    ExportSettingsViewModel.BackupConfig(
+                        ExportSettingsViewModel.BackupOption.Share,
+                    ),
+                )
             }
             save.setOnClickListener {
                 chooseSaveLocationLauncher.launch(viewModel.getBackupFileName())
             }
             copyToClipboard.setOnClickListener {
-                viewModel.createBackupAndSave(ExportSettingsViewModel.BackupConfig(
-                    ExportSettingsViewModel.BackupOption.Copy
-                ))
+                viewModel.createBackupAndSave(
+                    ExportSettingsViewModel.BackupConfig(
+                        ExportSettingsViewModel.BackupOption.Copy,
+                    ),
+                )
             }
             saveToInternalBackups.setOnClickListener {
                 viewModel.saveToInternalBackups()

@@ -48,7 +48,4 @@ class SinglePostsDataSource @AssistedInject constructor(
         DEFAULT_PAGE_SIZE,
         force,
     )
-
-    private fun Int.toLemmyPageIndex() =
-        this + 1 // lemmy pages are 1 indexed
 }
