@@ -496,6 +496,8 @@ class CreateOrEditPostFragment :
                 binding.urlEditText.setText(data.url)
                 binding.nsfwSwitch.isChecked = data.isNsfw
             }
+
+            viewModel.currentDraftEntry.postValue(null)
         }
 
         if (savedInstanceState == null && !viewModel.postPrefilled) {

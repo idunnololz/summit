@@ -79,7 +79,7 @@ fun BaseFragment<*>.showMorePostOptions(
             ?.accountInfo
             ?.miscAccountInfo
 
-        if (fullAccount?.account?.instance == postView.community.instance &&
+        if (instance == fullAccount?.account?.instance &&
             miscAccountInfo?.isAdmin == true
         ) {
             addDivider()

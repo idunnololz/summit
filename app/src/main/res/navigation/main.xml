@@ -202,5 +202,8 @@
         <argument
             android:name="instance"
             app:argType="string" />
+        <action
+            android:id="@+id/action_communitiesFragment_to_communityInfoFragment"
+            app:destination="@id/communityInfoFragment" />
     </fragment>
 </navigation>

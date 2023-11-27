@@ -771,6 +771,7 @@
     <string name="save_draft">Safe draft</string>
     <string name="save_drafts_automatically">Save drafts automatically</string>
     <string name="save_drafts_automatically_desc">When enabled, drafts of posts/comments are saved automatically if you navigate away from the create/edit post/comment screen without pressing send.</string>
+    <string name="community_actions">Community actions</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

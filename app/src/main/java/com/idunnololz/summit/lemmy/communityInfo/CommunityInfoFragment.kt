@@ -220,7 +220,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 }
             }
 
-            if (args.communityRef is CommunityRef.Local) {
+            if (args.communityRef is CommunityRef.Local || args.communityRef is CommunityRef.All) {
                 instanceInfo.visibility = View.GONE
                 subscribe.visibility = View.VISIBLE
             } else {
@@ -228,6 +228,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
 
             banner.transitionName = "banner_image"
+            instanceInfo.visibility = View.GONE
         }
 
         val actionBarHeight = context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize)

@@ -1,8 +1,11 @@
 package com.idunnololz.summit.lemmy.comment
 
 import android.app.Activity
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -176,7 +179,10 @@ class AddOrEditCommentFragment :
 
             result
                 .onSuccess {
-                    setFragmentResult(REQUEST_KEY, bundleOf(REQUEST_KEY_RESULT to Result.CommentSent))
+                    setFragmentResult(
+                        requestKey = REQUEST_KEY,
+                        result = bundleOf(REQUEST_KEY_RESULT to Result.CommentSent)
+                    )
 
                     dismiss()
                 }
@@ -350,7 +356,14 @@ class AddOrEditCommentFragment :
         } else if (commentView != null) {
             binding.replyingTo.text = commentView.comment.content
         } else if (postView != null) {
-            binding.replyingTo.text = postView.post.body
+            binding.replyingTo.text = SpannableStringBuilder().apply {
+                append(postView.post.name, StyleSpan(Typeface.BOLD), 0)
+                if (!postView.post.body.isNullOrBlank()) {
+                    appendLine()
+                    appendLine()
+                    appendLine(postView.post.body)
+                }
+            }
         } else if (inboxItem != null) {
             binding.replyingTo.text = inboxItem.content
         } else if (personId != 0L) {
@@ -466,6 +479,8 @@ class AddOrEditCommentFragment :
             if (data is DraftData.CommentDraftData) {
                 binding.commentEditText.setText(data.content)
             }
+
+            viewModel.currentDraftEntry.postValue(null)
         }
     }
 

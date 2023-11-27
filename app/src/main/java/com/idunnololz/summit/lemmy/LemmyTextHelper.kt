@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.RectF
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
@@ -84,6 +85,11 @@ object LemmyTextHelper {
                 }
             }
         }
+    }
+    fun getSpannable(context: Context, text: String,): Spanned {
+        val markwon = getMarkwon(context)
+
+        return markwon.toMarkdown(text)
     }
 
     private fun bindLemmyText(
