@@ -114,9 +114,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
             ?.accountInfo
             ?.miscAccountInfo
 
-        if (fullAccount?.account?.instance == commentView.community.instance &&
+        if (instance == fullAccount?.account?.instance &&
             miscAccountInfo?.isAdmin == true
         ) {
+            // Apparently if the user is an admin, they can ignore mod rules and perform any actions
+            // they wish on their instance.
             addDivider()
 
             addItemWithIcon(

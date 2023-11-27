@@ -57,5 +57,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <com.idunnololz.summit.view.LinkifyTextView
+            android:id="@+id/description_measurement_object"
+            android:visibility="invisible"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?textAppearanceBodyMedium"
+            android:layout_marginTop="@dimen/padding"
+            android:maxLines="5"
+            android:ellipsize="end"
+            android:layout_marginHorizontal="@dimen/padding"
+            android:scrollHorizontally="false"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

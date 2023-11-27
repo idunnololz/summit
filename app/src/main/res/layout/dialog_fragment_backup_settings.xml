@@ -125,8 +125,9 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <ProgressBar
+            <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progressBar"
+                android:indeterminate="true"
                 android:layout_gravity="center"
                 android:visibility="gone"
                 android:layout_width="wrap_content"

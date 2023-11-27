@@ -2,11 +2,14 @@ package com.idunnololz.summit.lemmy.communities
 
 import android.content.Context
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.StaticLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitiesLoadItemBinding
 import com.idunnololz.summit.databinding.CommunityDetailsItemBinding
@@ -26,9 +30,12 @@ import com.idunnololz.summit.lemmy.search.Item
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,17 +90,55 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             viewModel.fetchCommunities(0)
         }
 
+        runAfterLayout {
+            setupView()
+        }
+    }
+
+    private fun setupView() {
+        val context = context ?: return
+
         with(binding) {
+
+            val params = TextMeasurementUtils.TextMeasurementParams.Builder
+                .from(descriptionMeasurementObject).build()
+
             val adapter = CommunitiesEngineAdapter(
                 context = context,
                 rootView = root,
                 offlineManager = offlineManager,
                 instance = viewModel.apiInstance,
+                params = params,
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
                 onLoadPageClick = {
                     viewModel.fetchCommunities(it)
+                },
+                showMoreOptionsMenu = { communityView ->
+                    val bottomMenu = BottomMenu(requireContext()).apply {
+                        setTitle(R.string.community_actions)
+
+                        addItemWithIcon(
+                            id = R.id.community_info,
+                            title = R.string.community_info,
+                            icon = R.drawable.ic_community_24
+                        )
+
+                        setOnMenuItemClickListener {
+                            when (it.id) {
+                                R.id.community_info -> {
+                                    val direction = CommunitiesFragmentDirections
+                                        .actionCommunitiesFragmentToCommunityInfoFragment(
+                                            communityView.community.toCommunityRef()
+                                        )
+                                    findNavController().navigateSafe(direction)
+                                }
+                            }
+                        }
+                    }
+
+                    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
                 },
             )
             val layoutManager = LinearLayoutManager(context)
@@ -161,8 +206,10 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
         private val rootView: View,
         private val offlineManager: OfflineManager,
         private val instance: String,
+        private val params: TextMeasurementUtils.TextMeasurementParams,
         private val onPageClick: (PageRef) -> Unit,
         private val onLoadPageClick: (Int) -> Unit,
+        private val showMoreOptionsMenu: (CommunityView) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         var items: List<CommunitiesEngine.Item> = listOf()
@@ -213,8 +260,20 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
                 if (community.community.description == null) {
                     b.description.visibility = View.GONE
+                    b.descriptionFade.visibility = View.GONE
                 } else {
                     b.description.visibility = View.VISIBLE
+
+                    val lineCount = TextMeasurementUtils.getTextLines(
+                        LemmyTextHelper.getSpannable(context, community.community.description),
+                        params,
+                    ).size
+
+                    if (lineCount > 4) {
+                        b.descriptionFade.visibility = View.VISIBLE
+                    } else {
+                        b.descriptionFade.visibility = View.GONE
+                    }
 
                     LemmyTextHelper.bindText(
                         textView = b.description,
@@ -268,6 +327,9 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
                 h.itemView.setOnClickListener {
                     onPageClick(community.community.toCommunityRef())
+                }
+                b.moreButton.setOnClickListener {
+                    showMoreOptionsMenu(item.community)
                 }
             }
             addItemType(
