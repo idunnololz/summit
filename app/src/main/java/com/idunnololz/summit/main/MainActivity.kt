@@ -57,6 +57,7 @@ import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
+import com.idunnololz.summit.lemmy.modlogs.ModLogsFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
@@ -1104,6 +1105,11 @@ class MainActivity : BaseActivity() {
                 hideNotificationBarBg()
             }
             CommunitiesFragment::class -> {
+                disableBottomNavViewScrolling()
+                showBottomNav()
+                showNotificationBarBg()
+            }
+            ModLogsFragment::class -> {
                 disableBottomNavViewScrolling()
                 showBottomNav()
                 showNotificationBarBg()

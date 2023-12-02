@@ -16,12 +16,14 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
+import com.idunnololz.summit.api.dto.GetModlogResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetRepliesResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionId
 import com.idunnololz.summit.api.dto.PersonMentionView
@@ -828,6 +830,31 @@ class AccountAwareLemmyClient @Inject constructor(
                 .purgeComment(
                     commentId = commentId,
                     reason = reason,
+                    account = account,
+                )
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+
+    suspend fun fetchModLogs(
+        personId: PersonId? = null,
+        communityId: CommunityId? = null,
+        page: Int? = null,
+        limit: Int? = null,
+        actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ = null,
+        otherPersonId: PersonId? = null,
+        account: Account? = accountForInstance(),
+    ): Result<GetModlogResponse> =
+        if (account != null) {
+            apiClient
+                .fetchModLogs(
+                    personId = personId,
+                    communityId = communityId,
+                    page = page,
+                    limit = limit,
+                    actionType = actionType,
+                    otherPersonId = otherPersonId,
                     account = account,
                 )
                 .autoSignOut(account)

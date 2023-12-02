@@ -304,6 +304,11 @@ class CommunityViewModel @Inject constructor(
         } else {
             listOf(requireNotNull(currentPageIndex.value))
         }
+
+        if (clearPages) {
+            postsRepository.reset()
+        }
+
         if (pages.isEmpty()) {
             if (postListEngine.infinity) {
                 fetchPage(

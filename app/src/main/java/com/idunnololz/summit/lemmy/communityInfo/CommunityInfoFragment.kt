@@ -466,6 +466,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 title = getString(R.string.unblock_this_instance_format, communityView.community.instance),
                 icon = R.drawable.baseline_public_24,
             )
+            addDivider()
+            addItemWithIcon(
+                id = R.id.view_mod_log,
+                title = R.string.view_mod_logs,
+                icon = R.drawable.baseline_notes_24,
+            )
 
             setOnMenuItemClickListener {
                 when (it.id) {
@@ -480,6 +486,14 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     }
                     R.id.unblock_instance -> {
                         actionsViewModel.blockInstance(communityView.community.instance_id, false)
+                    }
+                    R.id.view_mod_log -> {
+                        val directions = CommunityInfoFragmentDirections
+                            .actionCommunityInfoFragmentToModLogsFragment(
+                                communityView.community.instance,
+                                communityView.community.toCommunityRef(),
+                            )
+                        findNavController().navigateSafe(directions)
                     }
                 }
             }
@@ -502,6 +516,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 title = getString(R.string.unblock_this_instance_format, siteView.site.instance),
                 icon = R.drawable.baseline_public_24,
             )
+            addDivider()
+            addItemWithIcon(
+                id = R.id.view_mod_log,
+                title = R.string.view_mod_logs,
+                icon = R.drawable.baseline_notes_24,
+            )
 
             setOnMenuItemClickListener {
                 when (it.id) {
@@ -510,6 +530,14 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     }
                     R.id.unblock_instance -> {
                         actionsViewModel.blockInstance(siteView.site.instance_id, false)
+                    }
+                    R.id.view_mod_log -> {
+                        val directions = CommunityInfoFragmentDirections
+                            .actionCommunityInfoFragmentToModLogsFragment(
+                                siteView.site.instance,
+                                null,
+                            )
+                        findNavController().navigateSafe(directions)
                     }
                 }
             }

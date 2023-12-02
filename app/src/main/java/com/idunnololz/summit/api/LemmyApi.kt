@@ -37,6 +37,7 @@ import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetCommentsResponse
 import com.idunnololz.summit.api.dto.GetCommunityResponse
+import com.idunnololz.summit.api.dto.GetModlogResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetPersonMentionsResponse
 import com.idunnololz.summit.api.dto.GetPostResponse
@@ -667,6 +668,12 @@ interface LemmyApi {
         @Header("Authorization") authorization: String?,
         @Body form: PurgeComment,
     ): Call<SuccessResponse>
+
+    @GET("modlog")
+    fun getModLogs(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetModlogResponse>
 
     companion object {
 

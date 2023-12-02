@@ -28,6 +28,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.search.Item
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -40,6 +41,7 @@ import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 @AndroidEntryPoint
 class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
@@ -144,7 +146,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             val layoutManager = LinearLayoutManager(context)
 
             fun fetchPageIfLoadItem(position: Int) {
-                (adapter.items.getOrNull(position) as? CommunitiesEngine.Item.LoadItem)
+                (adapter.items.getOrNull(position) as? ListEngine.Item.LoadItem)
                     ?.pageIndex
                     ?.let {
                         viewModel.fetchCommunities(it)
@@ -212,38 +214,38 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
         private val showMoreOptionsMenu: (CommunityView) -> Unit,
     ) : Adapter<ViewHolder>() {
 
-        var items: List<CommunitiesEngine.Item> = listOf()
+        var items: List<ListEngine.Item<CommunityView>> = listOf()
             set(value) {
                 field = value
 
                 updateItems()
             }
 
-        private val adapterHelper = AdapterHelper<CommunitiesEngine.Item>(
+        private val adapterHelper = AdapterHelper<ListEngine.Item<CommunityView>>(
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
-                    is CommunitiesEngine.Item.CommunityItem -> {
-                        old.community.community.id ==
-                            (new as CommunitiesEngine.Item.CommunityItem).community.community.id
+                    is ListEngine.Item.DataItem -> {
+                        old.data.community.id ==
+                            (new as ListEngine.Item.DataItem).data.community.id
                     }
-                    CommunitiesEngine.Item.EmptyItem -> true
-                    is CommunitiesEngine.Item.ErrorItem ->
-                        old.pageIndex == (new as CommunitiesEngine.Item.ErrorItem).pageIndex
-                    is CommunitiesEngine.Item.LoadItem ->
-                        old.pageIndex == (new as CommunitiesEngine.Item.LoadItem).pageIndex
+                    is ListEngine.Item.ErrorItem ->
+                        old.pageIndex == (new as ListEngine.Item.ErrorItem).pageIndex
+                    is ListEngine.Item.LoadItem ->
+                        old.pageIndex == (new as ListEngine.Item.LoadItem).pageIndex
+                    is ListEngine.Item.EmptyItem -> true
                 }
             },
         ).apply {
             addItemType(
-                clazz = CommunitiesEngine.Item.EmptyItem::class,
+                clazz = ListEngine.Item.EmptyItem<CommunityView>()::class,
                 inflateFn = EmptyItemBinding::inflate,
             ) { item, b, h ->
             }
             addItemType(
-                clazz = CommunitiesEngine.Item.CommunityItem::class,
+                clazz = ListEngine.Item.DataItem<CommunityView>(null)::class,
                 inflateFn = CommunityDetailsItemBinding::inflate,
             ) { item, b, h ->
-                val community = item.community
+                val community = item.data
 
                 b.overtext.text = "c/${community.community.name}@${community.community.instance}"
                 b.title.text = community.community.title
@@ -329,17 +331,17 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                     onPageClick(community.community.toCommunityRef())
                 }
                 b.moreButton.setOnClickListener {
-                    showMoreOptionsMenu(item.community)
+                    showMoreOptionsMenu(item.data)
                 }
             }
             addItemType(
-                clazz = CommunitiesEngine.Item.LoadItem::class,
+                clazz = ListEngine.Item.LoadItem<CommunityView>()::class,
                 inflateFn = CommunitiesLoadItemBinding::inflate,
             ) { item, b, h ->
                 b.loadingView.showProgressBar()
             }
             addItemType(
-                clazz = CommunitiesEngine.Item.ErrorItem::class,
+                clazz = ListEngine.Item.ErrorItem<CommunityView>()::class,
                 inflateFn = CommunitiesLoadItemBinding::inflate,
             ) { item, b, h ->
                 b.loadingView.showDefaultErrorMessageFor(item.error)

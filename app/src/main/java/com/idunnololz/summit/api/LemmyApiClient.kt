@@ -5,102 +5,7 @@ import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.api.dto.AddModToCommunity
-import com.idunnololz.summit.api.dto.AddModToCommunityResponse
-import com.idunnololz.summit.api.dto.BanFromCommunity
-import com.idunnololz.summit.api.dto.BanFromCommunityResponse
-import com.idunnololz.summit.api.dto.BanPerson
-import com.idunnololz.summit.api.dto.BanPersonResponse
-import com.idunnololz.summit.api.dto.BlockCommunity
-import com.idunnololz.summit.api.dto.BlockInstance
-import com.idunnololz.summit.api.dto.BlockInstanceResponse
-import com.idunnololz.summit.api.dto.BlockPerson
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentReplyId
-import com.idunnololz.summit.api.dto.CommentReplyView
-import com.idunnololz.summit.api.dto.CommentReportId
-import com.idunnololz.summit.api.dto.CommentReportResponse
-import com.idunnololz.summit.api.dto.CommentResponse
-import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.CreateComment
-import com.idunnololz.summit.api.dto.CreateCommentLike
-import com.idunnololz.summit.api.dto.CreateCommentReport
-import com.idunnololz.summit.api.dto.CreatePost
-import com.idunnololz.summit.api.dto.CreatePostLike
-import com.idunnololz.summit.api.dto.CreatePostReport
-import com.idunnololz.summit.api.dto.CreatePrivateMessage
-import com.idunnololz.summit.api.dto.DeleteComment
-import com.idunnololz.summit.api.dto.DeletePost
-import com.idunnololz.summit.api.dto.DistinguishComment
-import com.idunnololz.summit.api.dto.EditComment
-import com.idunnololz.summit.api.dto.EditPost
-import com.idunnololz.summit.api.dto.FeaturePost
-import com.idunnololz.summit.api.dto.FollowCommunity
-import com.idunnololz.summit.api.dto.GetComments
-import com.idunnololz.summit.api.dto.GetCommunity
-import com.idunnololz.summit.api.dto.GetCommunityResponse
-import com.idunnololz.summit.api.dto.GetPersonDetails
-import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.GetPersonMentions
-import com.idunnololz.summit.api.dto.GetPost
-import com.idunnololz.summit.api.dto.GetPosts
-import com.idunnololz.summit.api.dto.GetPrivateMessages
-import com.idunnololz.summit.api.dto.GetReplies
-import com.idunnololz.summit.api.dto.GetRepliesResponse
-import com.idunnololz.summit.api.dto.GetReportCount
-import com.idunnololz.summit.api.dto.GetReportCountResponse
-import com.idunnololz.summit.api.dto.GetSite
-import com.idunnololz.summit.api.dto.GetSiteResponse
-import com.idunnololz.summit.api.dto.GetUnreadCount
-import com.idunnololz.summit.api.dto.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.InstanceId
-import com.idunnololz.summit.api.dto.ListCommentReports
-import com.idunnololz.summit.api.dto.ListCommentReportsResponse
-import com.idunnololz.summit.api.dto.ListCommunities
-import com.idunnololz.summit.api.dto.ListPostReports
-import com.idunnololz.summit.api.dto.ListPostReportsResponse
-import com.idunnololz.summit.api.dto.ListPrivateMessageReports
-import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.LockPost
-import com.idunnololz.summit.api.dto.Login
-import com.idunnololz.summit.api.dto.MarkAllAsRead
-import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
-import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
-import com.idunnololz.summit.api.dto.MarkPostAsRead
-import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PersonMentionId
-import com.idunnololz.summit.api.dto.PersonMentionView
-import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.dto.PostFeatureType
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostReportId
-import com.idunnololz.summit.api.dto.PostReportResponse
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.PrivateMessageId
-import com.idunnololz.summit.api.dto.PrivateMessageView
-import com.idunnololz.summit.api.dto.PurgeComment
-import com.idunnololz.summit.api.dto.PurgeCommunity
-import com.idunnololz.summit.api.dto.PurgePerson
-import com.idunnololz.summit.api.dto.PurgePost
-import com.idunnololz.summit.api.dto.RemoveComment
-import com.idunnololz.summit.api.dto.RemovePost
-import com.idunnololz.summit.api.dto.ResolveCommentReport
-import com.idunnololz.summit.api.dto.ResolveObject
-import com.idunnololz.summit.api.dto.ResolveObjectResponse
-import com.idunnololz.summit.api.dto.ResolvePostReport
-import com.idunnololz.summit.api.dto.SaveComment
-import com.idunnololz.summit.api.dto.SavePost
-import com.idunnololz.summit.api.dto.SaveUserSettings
-import com.idunnololz.summit.api.dto.Search
-import com.idunnololz.summit.api.dto.SearchResponse
-import com.idunnololz.summit.api.dto.SearchType
-import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.api.dto.SuccessResponse
+import com.idunnololz.summit.api.dto.*
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -1658,6 +1563,37 @@ class LemmyApiClient @Inject constructor(
 
         return retrofitErrorHandler {
             api.purgeComment(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    /**
+     * @param personId the id of the mod
+     * @param otherPersonId the id of the person that the action was against
+     */
+    suspend fun fetchModLogs(
+        personId: PersonId? = null,
+        communityId: CommunityId? = null,
+        page: Int? = null,
+        limit: Int? = null,
+        actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ = null,
+        otherPersonId: PersonId? = null,
+        account: Account? = null,
+    ): Result<GetModlogResponse> {
+        val form = GetModlog(
+            personId,
+            communityId,
+            page,
+            limit,
+            actionType,
+            otherPersonId,
+            account?.jwt
+        )
+
+        return retrofitErrorHandler {
+            api.getModLogs(authorization = account?.bearer, form.serializeToMap())
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
