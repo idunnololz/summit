@@ -166,6 +166,9 @@
         <action
             android:id="@+id/action_communityInfoFragment_to_communitiesFragment"
             app:destination="@id/communitiesFragment" />
+        <action
+            android:id="@+id/action_communityInfoFragment_to_modLogsFragment"
+            app:destination="@id/modLogsFragment" />
     </fragment>
     <action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
     <include app:graph="@navigation/settings"/>
@@ -205,5 +208,17 @@
         <action
             android:id="@+id/action_communitiesFragment_to_communityInfoFragment"
             app:destination="@id/communityInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/modLogsFragment"
+        android:name="com.idunnololz.summit.lemmy.modlogs.ModLogsFragment"
+        android:label="ModLogsFragment" >
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="communityRef"
+            app:argType="com.idunnololz.summit.lemmy.CommunityRef"
+            app:nullable="true"/>
     </fragment>
 </navigation>

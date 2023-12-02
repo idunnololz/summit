@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.toLemmyPageIndex
+import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,7 +26,7 @@ class CommunitiesViewModel @Inject constructor(
 
     val apiInstance: String
         get() = apiClient.instance
-    private val communitiesEngine = CommunitiesEngine()
+    private val communitiesEngine = ListEngine<CommunityView>()
 
     val communitiesData = StatefulLiveData<CommunitiesData>()
 
@@ -75,6 +77,6 @@ class CommunitiesViewModel @Inject constructor(
     }
 
     data class CommunitiesData(
-        val data: List<CommunitiesEngine.Item>,
+        val data: List<ListEngine.Item<CommunityView>>,
     )
 }

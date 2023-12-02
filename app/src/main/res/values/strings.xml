@@ -772,6 +772,8 @@
     <string name="save_drafts_automatically">Save drafts automatically</string>
     <string name="save_drafts_automatically_desc">When enabled, drafts of posts/comments are saved automatically if you navigate away from the create/edit post/comment screen without pressing send.</string>
     <string name="community_actions">Community actions</string>
+    <string name="view_mod_logs">View mod logs</string>
+    <string name="mod_logs">Mod logs</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
