@@ -787,7 +787,7 @@ class PostListViewBuilder @Inject constructor(
                     onImageClick(postView, null, it)
                 },
                 onVideoClick = {
-                    onVideoClick(it, VideoType.UNKNOWN, null)
+                    onVideoClick(it, VideoType.Unknown, null)
                 },
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,

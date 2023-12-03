@@ -96,6 +96,10 @@ class PersonTabbedViewModel @Inject constructor(
         commentsState.setIsLoading()
 
         viewModelScope.launch {
+            if (force) {
+                reset()
+            }
+
             val result = when (personRef) {
                 is PersonRef.PersonRefByName -> {
                     apiClient.fetchPersonByNameWithRetry(

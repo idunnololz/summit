@@ -278,7 +278,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onImageClick(Either.Left(postView), null, it)
             },
             onVideoClick = { url ->
-                onVideoClick(url, VideoType.UNKNOWN, null)
+                onVideoClick(url, VideoType.Unknown, null)
             },
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
@@ -731,7 +731,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onImageClick(Either.Right(commentView), null, it)
                 },
                 onVideoClick = { url ->
-                    onVideoClick(url, VideoType.UNKNOWN, null)
+                    onVideoClick(url, VideoType.Unknown, null)
                 },
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,
@@ -747,7 +747,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onImageClick(Either.Right(commentView), null, it)
                 },
                 onVideoClick = { url ->
-                    onVideoClick(url, VideoType.UNKNOWN, null)
+                    onVideoClick(url, VideoType.Unknown, null)
                 },
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,
@@ -763,7 +763,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onImageClick(Either.Right(commentView), null, it)
                 },
                 onVideoClick = { url ->
-                    onVideoClick(url, VideoType.UNKNOWN, null)
+                    onVideoClick(url, VideoType.Unknown, null)
                 },
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,
@@ -1001,7 +1001,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onImageClick(null, null, it)
             },
             onVideoClick = { url ->
-                onVideoClick(url, VideoType.UNKNOWN, null)
+                onVideoClick(url, VideoType.Unknown, null)
             },
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
@@ -1251,7 +1251,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onImageClick(it)
             },
             onVideoClick = { url ->
-                onVideoClick(url, VideoType.UNKNOWN, null)
+                onVideoClick(url, VideoType.Unknown, null)
             },
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
@@ -1277,7 +1277,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     onImageClick(it)
                 },
                 onVideoClick = { url ->
-                    onVideoClick(url, VideoType.UNKNOWN, null)
+                    onVideoClick(url, VideoType.Unknown, null)
                 },
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,

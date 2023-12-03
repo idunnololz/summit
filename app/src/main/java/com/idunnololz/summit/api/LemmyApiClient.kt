@@ -1581,19 +1581,24 @@ class LemmyApiClient @Inject constructor(
         actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ = null,
         otherPersonId: PersonId? = null,
         account: Account? = null,
+        force: Boolean,
     ): Result<GetModlogResponse> {
         val form = GetModlog(
-            personId,
-            communityId,
-            page,
-            limit,
-            actionType,
-            otherPersonId,
-            account?.jwt
+            mod_person_id = personId,
+            community_id = communityId,
+            page = page,
+            limit = limit,
+            type_ = actionType,
+            other_person_id = otherPersonId,
+            auth = account?.jwt
         )
 
         return retrofitErrorHandler {
-            api.getModLogs(authorization = account?.bearer, form.serializeToMap())
+            if (force) {
+                api.getModLogsNoCache(authorization = account?.bearer, form.serializeToMap())
+            } else {
+                api.getModLogs(authorization = account?.bearer, form.serializeToMap())
+            }
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },

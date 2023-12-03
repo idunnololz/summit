@@ -844,6 +844,7 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int? = null,
         actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ = null,
         otherPersonId: PersonId? = null,
+        force: Boolean,
         account: Account? = accountForInstance(),
     ): Result<GetModlogResponse> =
         if (account != null) {
@@ -856,6 +857,7 @@ class AccountAwareLemmyClient @Inject constructor(
                     actionType = actionType,
                     otherPersonId = otherPersonId,
                     account = account,
+                    force = force,
                 )
                 .autoSignOut(account)
         } else {

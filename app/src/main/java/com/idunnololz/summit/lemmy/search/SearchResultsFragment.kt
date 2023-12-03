@@ -502,7 +502,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     },
                     onPageClick = onPageClick,
                     onVideoClick = {
-                        onVideoClick(it, VideoType.UNKNOWN, null)
+                        onVideoClick(it, VideoType.Unknown, null)
                     },
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,

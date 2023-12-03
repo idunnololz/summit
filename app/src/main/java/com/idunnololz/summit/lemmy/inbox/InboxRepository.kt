@@ -196,10 +196,9 @@ class InboxRepository @Inject constructor(
     }
 
     private fun makeRepliesSource(unreadOnly: Boolean) = InboxSource(
-        apiClient,
         CommentSortType.New,
     ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
-        fetchReplies(
+        apiClient.fetchReplies(
             sort = sortOrder,
             page = page,
             limit = limit,
@@ -216,10 +215,9 @@ class InboxRepository @Inject constructor(
     }
 
     private fun makeMentionsSource(unreadOnly: Boolean) = InboxSource(
-        apiClient,
         CommentSortType.New,
     ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
-        fetchMentions(
+        apiClient.fetchMentions(
             sort = sortOrder,
             page = page,
             limit = limit,
@@ -236,10 +234,9 @@ class InboxRepository @Inject constructor(
     }
 
     private fun makeMessagesSource(unreadOnly: Boolean) = InboxSource(
-        apiClient,
         Unit,
     ) { page: Int, _: Unit, limit: Int, force: Boolean ->
-        fetchPrivateMessages(
+        apiClient.fetchPrivateMessages(
             page = page,
             limit = limit,
             unreadOnly = unreadOnly,
@@ -255,10 +252,9 @@ class InboxRepository @Inject constructor(
     }
 
     private fun makePostReportsSource(unresolvedOnly: Boolean) = InboxSource(
-        apiClient,
         Unit,
     ) { page: Int, _: Unit, limit: Int, force: Boolean ->
-        fetchPostReports(
+        apiClient.fetchPostReports(
             page = page,
             limit = limit,
             unresolvedOnly = unresolvedOnly,
@@ -274,10 +270,9 @@ class InboxRepository @Inject constructor(
     }
 
     private fun makeCommentReportsSource(unresolvedOnly: Boolean) = InboxSource(
-        apiClient,
         Unit,
     ) { page: Int, _: Unit, limit: Int, force: Boolean ->
-        fetchCommentReports(
+        apiClient.fetchCommentReports(
             page = page,
             limit = limit,
             unresolvedOnly = unresolvedOnly,

@@ -675,6 +675,13 @@ interface LemmyApi {
         @QueryMap form: Map<String, String>,
     ): Call<GetModlogResponse>
 
+    @GET("modlog")
+    @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+    fun getModLogsNoCache(
+        @Header("Authorization") authorization: String?,
+        @QueryMap form: Map<String, String>,
+    ): Call<GetModlogResponse>
+
     companion object {
 
         private val apis = mutableMapOf<String, LemmyApiWithSite>()

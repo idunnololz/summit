@@ -9,7 +9,8 @@ object ContentUtils {
             url.endsWith(".gif")
 
     fun isUrlVideo(url: String) =
-        url.endsWith(".mp4")
+        url.endsWith(".mp4") ||
+            url.endsWith(".webm")
 
     fun isUrlMp4(url: String) =
         url.endsWith(".mp4")

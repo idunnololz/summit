@@ -378,7 +378,7 @@ class LemmyContentHelper(
                 } else if (uri.path?.endsWith(".gifv") == true ||
                     uri.path?.endsWith(".mp4") == true
                 ) {
-                    onVideoClickListener(url, VideoType.UNKNOWN, customPlayerView?.getVideoState())
+                    onVideoClickListener(url, VideoType.Unknown, customPlayerView?.getVideoState())
                 } else if (uri.host == "gfycat.com") {
                     val keyLowerCase = uri.path?.substring(1)?.split("-")?.get(0) ?: ""
                     val thumbnailUrl = requireNotNull(targetPostView.post.thumbnail_url)
@@ -388,7 +388,7 @@ class LemmyContentHelper(
                             thumbnailUrl.substring(startIndex, startIndex + keyLowerCase.length)
                         onVideoClickListener(
                             "https://thumbs.gfycat.com/$key-mobile.mp4",
-                            VideoType.UNKNOWN,
+                            VideoType.Unknown,
                             customPlayerView?.getVideoState(),
                         )
                     } else {
@@ -528,9 +528,9 @@ class LemmyContentHelper(
                     val videoInfo = targetPostView.getVideoInfo()
                     if (videoInfo != null) {
                         val videoType = if (isUrlMp4(videoInfo.videoUrl)) {
-                            VideoType.MP4
+                            VideoType.Mp4
                         } else {
-                            VideoType.DASH
+                            VideoType.Dash
                         }
 
                         val bestSize = LemmyUtils.calculateBestVideoSize(
@@ -637,7 +637,7 @@ class LemmyContentHelper(
                 highlight = highlight,
                 onImageClick = onImageClickListener,
                 onVideoClick = {
-                    onVideoClickListener(it, VideoType.UNKNOWN, null)
+                    onVideoClickListener(it, VideoType.Unknown, null)
                 },
                 onPageClick = onLemmyUrlClick,
                 onLinkClick = onLinkClick,

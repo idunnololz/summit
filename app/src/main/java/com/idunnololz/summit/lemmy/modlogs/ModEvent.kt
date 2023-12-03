@@ -24,6 +24,9 @@ sealed interface ModEvent {
     val actionType: ActionType
     val ts: Long
 
+    /**
+     * When a moderator removes a post.
+     */
     data class ModRemovePostViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -31,6 +34,9 @@ sealed interface ModEvent {
         val event: ModRemovePostView,
     ) : ModEvent
 
+    /**
+     * When a moderator locks a post (prevents new comments being made).
+     */
     data class ModLockPostViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -38,6 +44,9 @@ sealed interface ModEvent {
         val event: ModLockPostView
     ) : ModEvent
 
+    /**
+     * When a moderator features a post on a community (pins it to the top).
+     */
     data class ModFeaturePostViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -45,6 +54,9 @@ sealed interface ModEvent {
         val event: ModFeaturePostView
     ) : ModEvent
 
+    /**
+     * When a moderator removes a comment.
+     */
     data class ModRemoveCommentViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -52,6 +64,9 @@ sealed interface ModEvent {
         val event: ModRemoveCommentView
     ) : ModEvent
 
+    /**
+     * When a moderator removes a community.
+     */
     data class ModRemoveCommunityViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -59,6 +74,9 @@ sealed interface ModEvent {
         val event: ModRemoveCommunityView
     ) : ModEvent
 
+    /**
+     * When someone is banned from a community.
+     */
     data class ModBanFromCommunityViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -66,6 +84,9 @@ sealed interface ModEvent {
         val event: ModBanFromCommunityView
     ) : ModEvent
 
+    /**
+     * When someone is banned from the site.
+     */
     data class ModBanViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -73,6 +94,9 @@ sealed interface ModEvent {
         val event: ModBanView
     ) : ModEvent
 
+    /**
+     * When someone is added as a community moderator.
+     */
     data class ModAddCommunityViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -80,6 +104,9 @@ sealed interface ModEvent {
         val event: ModAddCommunityView
     ) : ModEvent
 
+    /**
+     * When a moderator transfers a community to a new owner.
+     */
     data class ModTransferCommunityViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -87,6 +114,9 @@ sealed interface ModEvent {
         val event: ModTransferCommunityView
     ) : ModEvent
 
+    /**
+     * When someone is added as a site moderator.
+     */
     data class ModAddViewEvent(
         override val id: Int,
         override val actionType: ActionType,
@@ -122,6 +152,9 @@ sealed interface ModEvent {
         val event: AdminPurgeCommentView
     ) : ModEvent
 
+    /**
+     * When a community is hidden from public view.
+     */
     data class ModHideCommunityViewEvent(
         override val id: Int,
         override val actionType: ActionType,
