@@ -205,11 +205,12 @@ class ExoPlayerManager(
         val uri = Uri.parse(config.url)
         val mediaItem = MediaItem.fromUri(uri)
         val mediaSource = when (config.videoType) {
-            VideoType.UNKNOWN -> throw RuntimeException("Unknown video type")
-            VideoType.DASH ->
+            VideoType.Unknown -> throw RuntimeException("Unknown video type")
+            VideoType.Dash ->
                 DashMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(mediaItem)
-            VideoType.MP4 ->
+            VideoType.Mp4,
+            VideoType.Webm ->
                 ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(mediaItem)
         }

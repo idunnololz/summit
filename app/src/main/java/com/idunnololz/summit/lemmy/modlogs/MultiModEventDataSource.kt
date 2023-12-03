@@ -1,69 +1,86 @@
-package com.idunnololz.summit.lemmy.multicommunity
+package com.idunnololz.summit.lemmy.modlogs
 
 import android.util.Log
-import arrow.core.Either
-import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.util.dateStringToTs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class MultiCommunityDataSource(
+class MultiModEventDataSource(
     private val instance: String,
-    private val sources: List<LemmyListSource<PostView, SortType>>,
-) : PostsDataSource {
-
+    private val sources: List<LemmyListSource<ModEvent, Unit>>,
+    private val pageSize: Int,
+) {
     companion object {
-        private const val TAG = "MultiCommunityDataS"
 
-        private const val DEFAULT_PAGE_SIZE = 10
+        private const val TAG = "MultiModEventDataSource"
 
-        /**
-         * Maximum number of communities that can be added into one multi-community.
-         */
-        const val MULTI_COMMUNITY_DATA_SOURCE_LIMIT = 30
-    }
-
-    class Factory @Inject constructor(
-        private val apiClient: AccountAwareLemmyClient,
-    ) {
         fun create(
+            apiClient: LemmyApiClient,
+            communityIdOrNull: Int?,
             instance: String,
-            communities: List<CommunityRef.CommunityRefByName>,
-        ): MultiCommunityDataSource {
-            val sources = communities.map { communityRef ->
-                LemmyListSource<PostView, SortType>(
-                    { post.id },
-                    SortType.Active,
-                    { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
-                        apiClient.fetchPosts(
-                            Either.Right(communityRef.getServerId(apiClient.instance)),
-                            sortOrder,
-                            ListingType.All,
-                            page,
-                            limit,
-                            force,
+            limit: Int,
+        ): MultiModEventDataSource {
+            val types = listOf(
+                ModlogActionType.ModRemovePost,
+                ModlogActionType.ModLockPost,
+                ModlogActionType.ModFeaturePost,
+                ModlogActionType.ModRemoveComment,
+                ModlogActionType.ModRemoveCommunity,
+                ModlogActionType.ModBanFromCommunity,
+                ModlogActionType.ModAddCommunity,
+                ModlogActionType.ModTransferCommunity,
+                ModlogActionType.ModAdd,
+                ModlogActionType.ModBan,
+                ModlogActionType.ModHideCommunity,
+                ModlogActionType.AdminPurgePerson,
+                ModlogActionType.AdminPurgeCommunity,
+                ModlogActionType.AdminPurgePost,
+                ModlogActionType.AdminPurgeComment,
+            )
+
+
+            val sources = types.map { type ->
+                LemmyListSource<ModEvent, Unit>(
+                    { this.id },
+                    Unit,
+                    { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->
+                        apiClient.fetchModLogs(
+                            personId = null,
+                            communityId = communityIdOrNull,
+                            page = page,
+                            limit = limit,
+                            actionType = type,
+                            otherPersonId = null,
+                            account = null,
+                            force = force,
+                        ).fold(
+                            {
+                                Result.success(it.toModEvents().sortedByDescending { it.ts })
+                            },
+                            {
+                                Result.failure(it)
+                            }
                         )
                     },
-                    DEFAULT_PAGE_SIZE,
-                    communityRef,
+                    10,
+                    type,
                 )
-            }.take(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
+            }
 
-            return MultiCommunityDataSource(instance, sources)
+            return MultiModEventDataSource(instance, sources, limit)
         }
     }
 
     data class Page(
-        val posts: List<PostView>,
+        val events: List<ModEvent>,
         val pageIndex: Int,
         val instance: String,
         val hasMore: Boolean,
@@ -78,16 +95,13 @@ class MultiCommunityDataSource(
     private val validSources
         get() = sources.filter { !communityNotFoundOnInstance.contains(it.source) }
 
-    override suspend fun fetchPosts(
-        sortType: SortType?,
+    suspend fun fetchModEvents(
         page: Int,
         force: Boolean,
-    ): Result<List<PostView>> = withContext(Dispatchers.Default) {
+    ): Result<List<ModEvent>> = withContext(Dispatchers.Default) {
         if (force) {
             reset()
         }
-
-        setSortType(sortType)
 
         // prefetch if needed
         val prefetchJobs = validSources.map {
@@ -101,7 +115,7 @@ class MultiCommunityDataSource(
             page,
         ).fold(
             onSuccess = {
-                Result.success(it.posts)
+                Result.success(it.events)
             },
             onFailure = {
                 if (it is EndReachedException) {
@@ -144,7 +158,7 @@ class MultiCommunityDataSource(
 
     private suspend fun fetchNextPage(): Result<Page> = withContext(pagesContext) a@{
         var hasMore = true
-        val pageItems = mutableListOf<PostView>()
+        val pageItems = mutableListOf<ModEvent>()
 
         while (true) {
             val validSources = validSources
@@ -165,38 +179,9 @@ class MultiCommunityDataSource(
             sourceToResult = sourceToResult.filter { it.second.isSuccess }
 
             val nextSourceAndResult = sourceToResult.maxBy { (_, result) ->
-                val postView = result.getOrThrow() ?: return@maxBy -1.0
+                val modEvent = result.getOrThrow() ?: return@maxBy 0
 
-                if (postView.post.featured_local || postView.post.featured_community) {
-                    return@maxBy Double.MAX_VALUE
-                }
-
-                when (sortType) {
-                    SortType.Active -> postView.counts.hot_rank_active ?: 0.0
-                    SortType.Hot -> postView.counts.hot_rank ?: 0.0
-                    SortType.New -> dateStringToTs(postView.counts.published).toDouble()
-                    SortType.Old -> -dateStringToTs(postView.counts.published).toDouble()
-                    SortType.MostComments -> postView.counts.comments.toDouble()
-                    SortType.NewComments -> postView.counts.newest_comment_time.let {
-                        dateStringToTs(it).toDouble()
-                    }
-                    SortType.TopDay,
-                    SortType.TopWeek,
-                    SortType.TopMonth,
-                    SortType.TopYear,
-                    SortType.TopAll,
-                    SortType.TopHour,
-                    SortType.TopSixHour,
-                    SortType.TopTwelveHour,
-                    SortType.TopThreeMonths,
-                    SortType.TopSixMonths,
-                    SortType.TopNineMonths,
-                    -> postView.counts.score.toDouble()
-                    SortType.Controversial -> postView.counts.controversy_rank ?: 0.0
-                    SortType.Scaled -> postView.counts.scaled_rank ?: 0.0
-                    null ->
-                        postView.counts.score.toDouble() ?: 0.0
-                }
+                modEvent.ts
             }
             val nextItem = nextSourceAndResult.second.getOrNull()
 
@@ -206,9 +191,8 @@ class MultiCommunityDataSource(
                 break
             }
 
-            Log.d(
-                TAG,
-                "Adding item ${nextItem.post.id} from source ${nextItem::class.java}",
+            Log.d(TAG,
+                "Adding item ${nextItem.id} from source ${nextSourceAndResult.first.source}",
             )
 
             pageItems.add(nextItem)
@@ -216,7 +200,7 @@ class MultiCommunityDataSource(
             // increment the max item
             nextSourceAndResult.first.next()
 
-            if (pageItems.size >= LemmyListSource.DEFAULT_PAGE_SIZE) {
+            if (pageItems.size >= pageSize) {
                 break
             }
         }
@@ -229,19 +213,6 @@ class MultiCommunityDataSource(
                 hasMore,
             ),
         )
-    }
-
-    private fun setSortType(sortType: SortType?) {
-        if (this.sortType == sortType) {
-            return
-        }
-
-        this.sortType = sortType
-        sources.forEach {
-            it.invalidate()
-            it.sortOrder = sortType ?: SortType.Active
-        }
-        reset()
     }
 
     private fun reset() {

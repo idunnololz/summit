@@ -15,7 +15,7 @@ class CommentListEngine {
         val newPages = commentPages.toMutableList()
         val existingPage = newPages.getOrNull(commentPageResult.pageIndex)
         if (existingPage != null) {
-            newPages[commentPageResult.pageIndex] = existingPage
+            newPages[commentPageResult.pageIndex] = commentPageResult
         } else {
             newPages.add(commentPageResult)
         }

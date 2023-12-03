@@ -249,14 +249,14 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         videoState: VideoState?,
     ) {
         when (videoType) {
-            VideoType.UNKNOWN -> {
+            VideoType.Unknown -> {
                 val uri = Uri.parse(url)
                 if (uri.host?.endsWith("imgur.com", ignoreCase = true) == true) {
                     if (uri.path?.endsWith(".gifv", ignoreCase = true) == true) {
                         loadVideo(
                             context,
                             url.replace(".gifv", ".mp4"),
-                            VideoType.MP4,
+                            VideoType.Mp4,
                             videoState,
                         )
                     } else {
@@ -264,19 +264,22 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                         (activity as? MainActivity)?.showSystemUI(animate = true)
                     }
                 } else if (uri.path?.endsWith("mp4", ignoreCase = true) == true) {
-                    loadVideo(context, url, VideoType.MP4, videoState)
+                    loadVideo(context, url, VideoType.Mp4, videoState)
+                } else if (uri.path?.endsWith("webm", ignoreCase = true) == true) {
+                    loadVideo(context, url, VideoType.Webm, videoState)
                 } else {
                     binding.loadingView.showErrorText(R.string.unsupported_video_type)
                     (activity as? MainActivity)?.showSystemUI(animate = true)
                 }
             }
-            VideoType.DASH -> {
+            VideoType.Dash -> {
                 @Suppress("UnsafeOptInUsageError")
                 binding.playerView.player = ExoPlayerManager.get(viewLifecycleOwner)
                     .getPlayerForUrl(url, videoType, videoState)
                 setupMoreButton(context, url, videoType)
             }
-            VideoType.MP4 -> {
+            VideoType.Mp4,
+            VideoType.Webm -> {
                 @Suppress("UnsafeOptInUsageError")
                 binding.playerView.player = ExoPlayerManager.get(viewLifecycleOwner)
                     .getPlayerForUrl(url, videoType, videoState)

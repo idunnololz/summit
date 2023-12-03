@@ -633,7 +633,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         onImageClick("", null, it)
                     },
                     onVideoClick = {
-                        onVideoClick(it, VideoType.UNKNOWN, null)
+                        onVideoClick(it, VideoType.Unknown, null)
                     },
                     onPageClick = onPageClick,
                     onLinkClick = onLinkClick,

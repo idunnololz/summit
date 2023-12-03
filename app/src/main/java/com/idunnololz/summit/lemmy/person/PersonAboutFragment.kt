@@ -98,7 +98,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                 )
             },
             onVideoClick = { url ->
-                getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
+                getMainActivity()?.openVideo(url, VideoType.Unknown, null)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)

@@ -7,16 +7,14 @@ import com.idunnololz.summit.util.retry
 import kotlin.math.min
 
 class InboxSource<O>(
-    private val apiClient: AccountAwareLemmyClient,
     defaultSortOrder: O,
-    private val fetchObjects: suspend AccountAwareLemmyClient.(
+    private val fetchObjects: suspend (
         pageIndex: Int,
         sortOrder: O,
         limit: Int,
         force: Boolean,
     ) -> Result<List<InboxItem>>,
 ) : LemmyListSource<InboxItem, O>(
-    apiClient,
     {
         id
     },
@@ -65,10 +63,9 @@ class InboxSource<O>(
 }
 
 open class LemmyListSource<T, O>(
-    private val apiClient: AccountAwareLemmyClient,
     private val id: T.() -> Int,
     defaultSortOrder: O,
-    private val fetchObjects: suspend AccountAwareLemmyClient.(
+    private val fetchObjects: suspend (
         pageIndex: Int,
         sortOrder: O,
         limit: Int,
@@ -236,8 +233,7 @@ open class LemmyListSource<T, O>(
         limit: Int,
         force: Boolean,
     ): Result<Boolean> {
-        val result =
-            apiClient.fetchObjects(pageIndex, sortOrder, limit, force)
+        val result = fetchObjects(pageIndex, sortOrder, limit, force)
 
         return result.fold(
             onSuccess = { newObjects ->

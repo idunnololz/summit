@@ -3,6 +3,7 @@ package com.idunnololz.summit.util
 import android.net.Uri
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toUrl
@@ -122,6 +123,12 @@ object LinkUtils {
 
     fun getLinkForComment(instance: String, commentId: CommentId): String =
         "https://$instance/comment/$commentId"
+
+    fun getLinkForInstance(instance: String): String =
+        "https://$instance/"
+
+    fun getLinkForCommunity(instance: String, communityName: String): String =
+        "https://$instance/c/$communityName"
 }
 
 fun MainActivity.showBottomMenuForLink(url: String, text: String?) {

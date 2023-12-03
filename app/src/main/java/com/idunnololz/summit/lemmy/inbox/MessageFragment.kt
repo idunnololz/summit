@@ -135,7 +135,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         getMainActivity()?.openImage(null, binding.appBar, null, url, null)
                     },
                     onVideoClick = { url ->
-                        getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
+                        getMainActivity()?.openVideo(url, VideoType.Unknown, null)
                     },
                     onPageClick = {
                         getMainActivity()?.launchPage(it)
@@ -166,7 +166,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 getMainActivity()?.openImage(null, binding.appBar, null, url, null)
             },
             onVideoClick = { url ->
-                getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
+                getMainActivity()?.openVideo(url, VideoType.Unknown, null)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)

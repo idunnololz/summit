@@ -19,6 +19,7 @@ import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.databinding.FragmentModLogsBinding
 import com.idunnololz.summit.databinding.ModEventItemBinding
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.communities.CommunitiesFragmentDirections
@@ -27,8 +28,10 @@ import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.TextMeasurementUtils
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -102,6 +105,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 rootView = root,
                 offlineManager = offlineManager,
                 instance = viewModel.apiInstance,
+                availableWidth = binding.recyclerView.width,
                 params = params,
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -200,6 +204,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         private val rootView: View,
         private val offlineManager: OfflineManager,
         private val instance: String,
+        private val availableWidth: Int,
         private val params: TextMeasurementUtils.TextMeasurementParams,
         private val onPageClick: (PageRef) -> Unit,
         private val onLoadPageClick: (Int) -> Unit,
@@ -212,6 +217,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
                 updateItems()
             }
+
+        private val summaryCharLength: Int
 
         private val adapterHelper = AdapterHelper<ListEngine.Item<ModEvent>>(
             areItemsTheSame = { old, new ->
@@ -239,61 +246,125 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             ) { item, b, h ->
                 val modEvent = item.data
 
-                val timestampString: String
+                var description: String = modEvent::class.simpleName ?: ""
 
                 when (modEvent) {
                     is ModEvent.AdminPurgeCommentViewEvent -> {
-                        timestampString = modEvent.event.admin_purge_comment.when_
+                        description = context.getString(
+                            R.string.purged_comment_format,
+                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
+                        )
                     }
                     is ModEvent.AdminPurgeCommunityViewEvent -> {
-                        timestampString = modEvent.event.admin_purge_community.when_
+                        description = context.getString(
+                            R.string.purged_community,
+                        )
                     }
                     is ModEvent.AdminPurgePersonViewEvent -> {
-                        timestampString = modEvent.event.admin_purge_person.when_
+                        description = context.getString(
+                            R.string.purged_person,
+                        )
                     }
                     is ModEvent.AdminPurgePostViewEvent -> {
-                        timestampString = modEvent.event.admin_purge_post.when_
+                        description = context.getString(
+                            R.string.purged_post_format,
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
+                        )
                     }
                     is ModEvent.ModAddCommunityViewEvent -> {
-                        timestampString = modEvent.event.mod_add_community.when_
+                        description = context.getString(
+                            R.string.added_moderator_for_community_format,
+                            "[${modEvent.event.modded_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
+                        )
                     }
                     is ModEvent.ModAddViewEvent -> {
-                        timestampString = modEvent.event.mod_add.when_
+                        description = context.getString(
+                            R.string.added_moderator_for_site_format,
+                            "[${modEvent.event.modded_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
+                        )
                     }
                     is ModEvent.ModBanFromCommunityViewEvent -> {
-                        timestampString = modEvent.event.mod_ban_from_community.when_
+                        description = context.getString(
+                            R.string.banned_person_from_community_format,
+                            "[${modEvent.event.banned_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.banned_person.name)})",
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
+                        )
                     }
                     is ModEvent.ModBanViewEvent -> {
-                        timestampString = modEvent.event.mod_ban.when_
+                        description = context.getString(
+                            R.string.banned_person_from_site_format,
+                            "[${modEvent.event.banned_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.banned_person.name)})",
+                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
+                        )
                     }
                     is ModEvent.ModFeaturePostViewEvent -> {
-                        timestampString = modEvent.event.mod_feature_post.when_
+                        description = context.getString(
+                            R.string.featured_post_in_community_format,
+                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
+                        )
                     }
                     is ModEvent.ModHideCommunityViewEvent -> {
-                        timestampString = modEvent.event.mod_hide_community.when_
+                        description = context.getString(
+                            R.string.hidden_community_format,
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
+                        )
                     }
                     is ModEvent.ModLockPostViewEvent -> {
-                        timestampString = modEvent.event.mod_lock_post.when_
+                        description = context.getString(
+                            R.string.locked_post_format,
+                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
+                        )
                     }
                     is ModEvent.ModRemoveCommentViewEvent -> {
-                        timestampString = modEvent.event.mod_remove_comment.when_
+                        description = context.getString(
+                            R.string.removed_comment_format,
+                            "[${modEvent.event.comment.content}](${LinkUtils.getLinkForComment(instance, modEvent.event.comment.id)})",
+                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
+                        )
                     }
                     is ModEvent.ModRemoveCommunityViewEvent -> {
-                        timestampString = modEvent.event.mod_remove_community.when_
+                        description = context.getString(
+                            R.string.removed_community_format,
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
+                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
+                        )
                     }
                     is ModEvent.ModRemovePostViewEvent -> {
-                        timestampString = modEvent.event.mod_remove_post.when_
+                        description = context.getString(
+                            R.string.removed_community_format,
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
+                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
+                        )
                     }
                     is ModEvent.ModTransferCommunityViewEvent -> {
-                        timestampString = modEvent.event.mod_transfer_community.when_
+                        description = context.getString(
+                            R.string.transferred_ownership_of_community_format,
+                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
+                            "[${modEvent.event.modded_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                        )
                     }
                 }
 
                 b.overtext.text = SpannableStringBuilder().apply {
                     append(dateStringToPretty(context, modEvent.ts))
                     appendSeparator()
-                    append(modEvent.actionType.toString())
+                    append(context.getString(
+                        R.string.mod_action_format, modEvent.actionType.toString()))
                 }
+                LemmyTextHelper.bindText(
+                    textView = b.title,
+                    text = description,
+                    instance = instance,
+                    onImageClick = {},
+                    onVideoClick = {},
+                    onPageClick = {},
+                    onLinkClick = { _, _, _ -> },
+                    onLinkLongClick = { _, _ -> },
+                )
             }
             addItemType(
                 clazz = ListEngine.Item.LoadItem<ModEvent>()::class,
@@ -308,6 +379,22 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 b.loadingView.showDefaultErrorMessageFor(item.error)
                 b.loadingView.setOnRefreshClickListener {
                     onLoadPageClick(item.pageIndex)
+                }
+            }
+        }
+
+        init {
+            val widthDp = Utils.convertPixelsToDp(availableWidth.toFloat())
+
+            summaryCharLength = when {
+                widthDp < 400f -> {
+                    60
+                }
+                widthDp < 600f -> {
+                    80
+                }
+                else -> {
+                    100
                 }
             }
         }

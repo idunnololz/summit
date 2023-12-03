@@ -774,6 +774,22 @@
     <string name="community_actions">Community actions</string>
     <string name="view_mod_logs">View mod logs</string>
     <string name="mod_logs">Mod logs</string>
+    <string name="purged_comment_format">Purged a comment on post %1$s.</string>
+    <string name="mod_action_format">%1$s action</string>
+    <string name="purged_community">Purged a community.</string>
+    <string name="purged_person">Purged person.</string>
+    <string name="purged_post_format">Purged post from community %1$s.</string>
+    <string name="added_moderator_for_community_format">Added %1$s as moderator for the community %2$s.</string>
+    <string name="added_moderator_for_site_format">Added %1$s as moderator for the instance %2$s.</string>
+    <string name="banned_person_from_community_format">Banned %1$s from the community %2$s.</string>
+    <string name="banned_person_from_site_format">Banned %1$s from the instance %2$s.</string>
+    <string name="featured_post_in_community_format">Featured post %1$s in community %2$s.</string>
+    <string name="hidden_community_format">Hidden community %1$s.</string>
+    <string name="locked_post_format">Locked post %1$s in community %2$s.</string>
+    <string name="removed_comment_format">Removed comment %1$s from post %2$s.</string>
+    <string name="removed_community_format">Removed community %1$s from instance %2$s.</string>
+    <string name="removed_post_format">Removed post %1$s from community %2$s.</string>
+    <string name="transferred_ownership_of_community_format">Transferred ownership of the community %1$s to %2$s.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
