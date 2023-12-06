@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.text.Spanned
+import android.util.Log
 import android.widget.TextView
 import coil.Coil.imageLoader
 import coil.ImageLoader
@@ -15,7 +16,6 @@ import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableLoader
-import io.noties.markwon.image.AsyncDrawableScheduler
 import io.noties.markwon.image.DrawableUtils
 import io.noties.markwon.image.ImageSpanFactory
 import org.commonmark.node.Image
@@ -48,21 +48,22 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
     }
 
     override fun beforeSetText(textView: TextView, markdown: Spanned) {
-        AsyncDrawableScheduler.unschedule(textView)
+        AsyncDrawableSchedulerFixed.unschedule(textView)
     }
 
     override fun afterSetText(textView: TextView) {
-        AsyncDrawableScheduler.schedule(textView)
+        AsyncDrawableSchedulerFixed.schedule(textView)
     }
 
-    private class CoilAsyncDrawableLoader internal constructor(
+    private class CoilAsyncDrawableLoader(
         private val coilStore: CoilStore,
         private val imageLoader: ImageLoader,
     ) : AsyncDrawableLoader() {
         private val cache: MutableMap<AsyncDrawable, Disposable?> = HashMap(2)
         override fun load(drawable: AsyncDrawable) {
+            Log.d("HAHA2", "Loading image ${drawable.destination}")
             val loaded = AtomicBoolean(false)
-            val target: Target = AsyncDrawableTarget(drawable, loaded)
+            val target: Target = AsyncDrawableTarget(drawable, loaded, drawable.destination)
             val request = coilStore.load(drawable).newBuilder()
                 .target(target)
                 .build()
@@ -79,6 +80,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
         }
 
         override fun cancel(drawable: AsyncDrawable) {
+            Log.d("HAHA2", "canceled ${drawable.destination}")
             val disposable = cache.remove(drawable)
             if (disposable != null) {
                 coilStore.cancel(disposable)
@@ -92,26 +94,29 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
         private inner class AsyncDrawableTarget(
             private val drawable: AsyncDrawable,
             private val loaded: AtomicBoolean,
+            private val source: String,
         ) : Target {
             override fun onSuccess(loadedDrawable: Drawable) {
+                Log.d("HAHA2", "onSuccess() image $source. hasknown: ${drawable.hasKnownDimensions()}")
                 // @since 4.5.1 check finished flag (result can be delivered _before_ disposable is created)
                 if (cache.remove(drawable) != null ||
                     !loaded.get()
                 ) {
                     // mark
                     loaded.set(true)
-//                    if (drawable.isAttached) {
-                    DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
-                    drawable.result = loadedDrawable
+                    if (drawable.isAttached) {
+                        DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
+                        drawable.result = loadedDrawable
 
-                    if (loadedDrawable is Animatable) {
-                        loadedDrawable.start()
+                        if (loadedDrawable is Animatable) {
+                            loadedDrawable.start()
+                        }
                     }
-//                    }
                 }
             }
 
             override fun onStart(placeholder: Drawable?) {
+                Log.d("HAHA2", "onStart() image $source")
                 if (placeholder != null && drawable.isAttached) {
                     DrawableUtils.applyIntrinsicBoundsIfEmpty(placeholder)
                     drawable.result = placeholder
@@ -119,6 +124,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             }
 
             override fun onError(errorDrawable: Drawable?) {
+                Log.d("HAHA2", "onError() image $source")
                 if (cache.remove(drawable) != null) {
                     if (errorDrawable != null && drawable.isAttached) {
                         DrawableUtils.applyIntrinsicBoundsIfEmpty(errorDrawable)

@@ -5,8 +5,23 @@ import android.animation.ValueAnimator
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.*
-import android.graphics.drawable.*
+import android.graphics.Bitmap
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.Matrix
+import android.graphics.Outline
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Rect
+import android.graphics.RectF
+import android.graphics.Shader
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.RippleDrawable
+import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.net.Uri
 import android.os.Build
@@ -82,7 +97,6 @@ class CircleImageView : AppCompatImageView {
             initializeBitmap()
         }
 
-    private val isRipple = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
     private var drawOverlay = false
     private val paint: Paint
 
@@ -167,23 +181,20 @@ class CircleImageView : AppCompatImageView {
         loadingDrawable =
             null // ContextCompat.getDrawable(context, R.drawable.ic_image_black_24dp)!!.mutate()
 
-        @Suppress("NewApi") // isRipple will ensure the that the API level req is met
-        if (isRipple) {
-            val circle = ShapeDrawable(OvalShape())
-            val color = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white97))
-            rippleDrawable = RippleDrawable(color, null, circle)
-            rippleDrawable?.callback = this
+        val circle = ShapeDrawable(OvalShape())
+        val color = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white97))
+        rippleDrawable = RippleDrawable(color, null, circle)
+        rippleDrawable?.callback = this
 
-            val viewOutlineProvider = object : ViewOutlineProvider() {
-                override fun getOutline(view: View, outline: Outline) {
-                    outline.setOval(0, 0, borderRect.right.toInt(), borderRect.bottom.toInt())
-                }
+        val viewOutlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setOval(0, 0, borderRect.right.toInt(), borderRect.bottom.toInt())
             }
-            outlineProvider = viewOutlineProvider
         }
+        outlineProvider = viewOutlineProvider
 
         paint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.white50)
+            this.color = ContextCompat.getColor(context, R.color.white50)
         }
 
         captionPaint = Paint()
@@ -222,11 +233,9 @@ class CircleImageView : AppCompatImageView {
     override fun drawableStateChanged() {
         super.drawableStateChanged()
 
-        if (isRipple) {
-            val drawable = rippleDrawable
-            if (drawable != null && drawable.isStateful && drawable.setState(drawableState)) {
-                invalidateDrawable(drawable)
-            }
+        val drawable = rippleDrawable
+        if (drawable != null && drawable.isStateful && drawable.setState(drawableState)) {
+            invalidateDrawable(drawable)
         }
     }
 
@@ -235,22 +244,14 @@ class CircleImageView : AppCompatImageView {
         if (isClickable && drawable != null) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    if (isRipple) {
-                        rippleDrawable?.setHotspot(event.x, event.y)
-                        rippleDrawable?.state =
-                            intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
-                    } else {
-                        drawOverlay = true
-                    }
+                    rippleDrawable?.setHotspot(event.x, event.y)
+                    rippleDrawable?.state =
+                        intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
                     invalidate()
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     Log.d("On", "destroy")
-                    if (isRipple) {
-                        rippleDrawable?.state = intArrayOf()
-                    } else {
-                        drawOverlay = false
-                    }
+                    rippleDrawable?.state = intArrayOf()
                     invalidate()
                 }
             }
@@ -317,7 +318,7 @@ class CircleImageView : AppCompatImageView {
 
         if (drawOverlay) {
             canvas.drawCircle(drawableRect.centerX(), drawableRect.centerY(), drawableRadius, paint)
-        } else if (isRipple && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isAttachedToWindow) {
+        } else if (isAttachedToWindow) {
             rippleDrawable!!.draw(canvas)
         }
 
@@ -520,14 +521,12 @@ class CircleImageView : AppCompatImageView {
         drawableRadius =
             (drawableRect.height() / 2.0f).coerceAtMost(drawableRect.width() / 2.0f) + if (inset < 0) inset else 0
 
-        if (isRipple) {
-            rippleDrawable?.setBounds(
-                borderRect.left.toInt(),
-                borderRect.top.toInt(),
-                borderRect.right.toInt(),
-                borderRect.bottom.toInt(),
-            )
-        }
+        rippleDrawable?.setBounds(
+            borderRect.left.toInt(),
+            borderRect.top.toInt(),
+            borderRect.right.toInt(),
+            borderRect.bottom.toInt(),
+        )
 
         clippingPath = Path()
         clippingPath.addCircle(

@@ -1,11 +1,11 @@
 package com.idunnololz.summit.lemmy.utils
 
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 class ListEngine<T> {
     private val pages = mutableMapOf<Int, Page<T>>()
 
-    val items = MutableStateFlow<List<Item<T>>>(listOf())
+    val items = MutableSharedFlow<List<Item<T>>>()
 
     suspend fun addPage(page: Int, communities: Result<List<T>>, hasMore: Boolean) {
         pages[page] = Page(
@@ -29,7 +29,13 @@ class ListEngine<T> {
 
         val pages = pages.values.sortedBy { it.pageIndex }
 
-        if (pages.isEmpty()) {
+        if (pages.isEmpty() || pages.all {
+            it.data.fold(
+                    onSuccess = { it.items.isEmpty() },
+                    onFailure = { false },
+                )
+        }
+        ) {
             @Suppress("UNCHECKED_CAST")
             items.add(Item.EmptyItem())
             this.items.emit(items)
@@ -51,8 +57,8 @@ class ListEngine<T> {
 
             page.data
                 .onSuccess {
-                    for (community in it.communities) {
-                        items.add(Item.DataItem(community))
+                    for (item in it.items) {
+                        items.add(Item.DataItem(item))
                     }
                 }
                 .onFailure {
@@ -101,6 +107,6 @@ class ListEngine<T> {
     )
 
     data class Data<T>(
-        val communities: List<T>,
+        val items: List<T>,
     )
 }

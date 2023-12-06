@@ -1,7 +1,16 @@
 package com.idunnololz.summit.user
 
 import android.os.Parcelable
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
+import androidx.room.ProvidedTypeConverter
+import androidx.room.Query
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.squareup.moshi.Moshi

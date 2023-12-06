@@ -16,7 +16,7 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.Changelog.launchChangelog
+import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.util.startFeedbackIntent
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint

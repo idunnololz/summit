@@ -77,11 +77,11 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.Changelog.launchChangelog
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
@@ -858,7 +858,7 @@ class MainActivity : BaseActivity() {
 
     // Shows the system bars by removing all the flags
     // except for the ones that make the content appear under the system bars.
-    fun showSystemUI(animate: Boolean) {
+    fun showSystemUI() {
         window.decorView.systemUiVisibility = (
             SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION

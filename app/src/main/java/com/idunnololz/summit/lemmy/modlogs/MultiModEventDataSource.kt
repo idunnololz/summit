@@ -1,14 +1,10 @@
 package com.idunnololz.summit.lemmy.modlogs
 
 import android.util.Log
-import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
-import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
-import com.idunnololz.summit.util.dateStringToTs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -29,29 +25,29 @@ class MultiModEventDataSource(
             limit: Int,
         ): MultiModEventDataSource {
             val types = listOf(
-                ModlogActionType.ModRemovePost,
-                ModlogActionType.ModLockPost,
-                ModlogActionType.ModFeaturePost,
-                ModlogActionType.ModRemoveComment,
-                ModlogActionType.ModRemoveCommunity,
-                ModlogActionType.ModBanFromCommunity,
-                ModlogActionType.ModAddCommunity,
-                ModlogActionType.ModTransferCommunity,
-                ModlogActionType.ModAdd,
-                ModlogActionType.ModBan,
-                ModlogActionType.ModHideCommunity,
-                ModlogActionType.AdminPurgePerson,
-                ModlogActionType.AdminPurgeCommunity,
-                ModlogActionType.AdminPurgePost,
-                ModlogActionType.AdminPurgeComment,
+                ModlogActionType.ModRemovePost, //
+                ModlogActionType.ModLockPost, //
+                ModlogActionType.ModFeaturePost, //
+                ModlogActionType.ModRemoveComment, //
+                ModlogActionType.ModRemoveCommunity, //
+                ModlogActionType.ModBanFromCommunity, //
+                ModlogActionType.ModAddCommunity, //
+                ModlogActionType.ModTransferCommunity, //
+                ModlogActionType.ModAdd, //
+                ModlogActionType.ModBan, //
+                ModlogActionType.ModHideCommunity, //
+                ModlogActionType.AdminPurgePerson, //
+                ModlogActionType.AdminPurgeCommunity, //
+                ModlogActionType.AdminPurgePost, //
+                ModlogActionType.AdminPurgeComment, //
             )
-
 
             val sources = types.map { type ->
                 LemmyListSource<ModEvent, Unit>(
                     { this.id },
                     Unit,
                     { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->
+                        Log.d("HAHA", "[$type] fetchModLogs...")
                         apiClient.fetchModLogs(
                             personId = null,
                             communityId = communityIdOrNull,
@@ -67,8 +63,10 @@ class MultiModEventDataSource(
                             },
                             {
                                 Result.failure(it)
-                            }
-                        )
+                            },
+                        ).also {
+                            Log.d("HAHA", "[$type] fetchModLogs...complete")
+                        }
                     },
                     10,
                     type,
@@ -88,12 +86,11 @@ class MultiModEventDataSource(
 
     private var pagesCache = mutableListOf<Page>()
     private var sortType: SortType? = null
-    private var communityNotFoundOnInstance = mutableSetOf<CommunityRef.CommunityRefByName>()
 
     private val pagesContext = Dispatchers.Default.limitedParallelism(1)
 
     private val validSources
-        get() = sources.filter { !communityNotFoundOnInstance.contains(it.source) }
+        get() = sources
 
     suspend fun fetchModEvents(
         page: Int,
@@ -105,7 +102,9 @@ class MultiModEventDataSource(
 
         // prefetch if needed
         val prefetchJobs = validSources.map {
-            async { it.peekNextItem() }
+            async {
+                it.peekNextItem()
+            }
         }
         prefetchJobs.forEach {
             it.await()
@@ -125,12 +124,6 @@ class MultiModEventDataSource(
                 }
             },
         )
-    }
-
-    fun getPersistentErrors(): List<Exception> {
-        return communityNotFoundOnInstance.map {
-            CommunityNotFoundException(instance, it)
-        }
     }
 
     val sourcesCount: Int
@@ -168,13 +161,7 @@ class MultiModEventDataSource(
 
             if (sourceAndError != null) {
                 val exception = requireNotNull(sourceAndError.second.exceptionOrNull())
-                if (exception is ClientApiException && exception.errorCode == 404) {
-                    communityNotFoundOnInstance.add(
-                        sourceAndError.first.source as CommunityRef.CommunityRefByName,
-                    )
-                } else {
-                    return@a Result.failure(exception)
-                }
+                return@a Result.failure(exception)
             }
             sourceToResult = sourceToResult.filter { it.second.isSuccess }
 
@@ -191,7 +178,8 @@ class MultiModEventDataSource(
                 break
             }
 
-            Log.d(TAG,
+            Log.d(
+                TAG,
                 "Adding item ${nextItem.id} from source ${nextSourceAndResult.first.source}",
             )
 
@@ -220,12 +208,7 @@ class MultiModEventDataSource(
             it.invalidate()
         }
         pagesCache.clear()
-        communityNotFoundOnInstance.clear()
     }
 
     class EndReachedException : Exception()
-    class CommunityNotFoundException(
-        val instance: String,
-        val communityRef: CommunityRef.CommunityRefByName,
-    ) : Exception()
 }

@@ -541,7 +541,7 @@ class PostViewModel @Inject constructor(
                 if (pendingComment.complete) {
                     // Looks like commits on the server is async. Refreshing a comment immediately
                     // after we post it may not get us the latest value.
-                    delay(300)
+                    delay(1000)
 
                     val result = commentsFetcher.fetchCommentsWithRetry(
                         Either.Left(pendingComment.postRef.id),
@@ -705,33 +705,44 @@ class PostViewModel @Inject constructor(
     )
 
     sealed interface ListView {
+        val id: Long
+
+        companion object {
+            private const val POST_FLAG = 0x100000000L
+            private const val COMMENT_FLAG = 0x200000000L
+            private const val PENDING_COMMENT_FLAG = 0x300000000L
+            private const val MORE_COMMENTS_FLAG = 0x400000000L
+        }
+
         data class PostListView(
             val post: PostView,
+            override val id: Long = post.post.id.toLong() or POST_FLAG,
         ) : ListView
 
         data class CommentListView(
             val comment: CommentView,
             val pendingCommentView: PendingCommentView? = null,
-            var isCollapsed: Boolean = false,
             var isRemoved: Boolean = false,
+            override val id: Long = comment.comment.id.toLong() or COMMENT_FLAG,
         ) : ListView
 
         data class PendingCommentListView(
             val pendingCommentView: PendingCommentView,
-            var isCollapsed: Boolean = false,
             var author: String?,
+            override val id: Long = pendingCommentView.id or PENDING_COMMENT_FLAG,
         ) : ListView
 
         data class MoreCommentsItem(
             val parentCommentId: CommentId?,
             val depth: Int,
             val moreCount: Int,
+            override val id: Long = (parentCommentId?.toLong() ?: 0L) or MORE_COMMENTS_FLAG,
         ) : ListView
 
         data class MissingCommentItem(
             val commentId: CommentId,
             val parentCommentId: CommentId?,
-            var isCollapsed: Boolean = false,
+            override val id: Long = commentId.toLong() or COMMENT_FLAG,
         ) : ListView
     }
 

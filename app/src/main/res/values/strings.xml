@@ -780,16 +780,27 @@
     <string name="purged_person">Purged person.</string>
     <string name="purged_post_format">Purged post from community %1$s.</string>
     <string name="added_moderator_for_community_format">Added %1$s as moderator for the community %2$s.</string>
+    <string name="removed_moderator_for_community_format">Removed %1$s as moderator for the community %2$s.</string>
     <string name="added_moderator_for_site_format">Added %1$s as moderator for the instance %2$s.</string>
+    <string name="removed_moderator_for_site_format">Removed %1$s as moderator for the instance %2$s.</string>
     <string name="banned_person_from_community_format">Banned %1$s from the community %2$s.</string>
+    <string name="unbanned_person_from_community_format">Undo ban on %1$s from the community %2$s.</string>
     <string name="banned_person_from_site_format">Banned %1$s from the instance %2$s.</string>
+    <string name="unbanned_person_from_site_format">Undo ban on %1$s from the instance %2$s.</string>
     <string name="featured_post_in_community_format">Featured post %1$s in community %2$s.</string>
+    <string name="unfeatured_post_in_community_format">Unfeatured post %1$s in community %2$s.</string>
     <string name="hidden_community_format">Hidden community %1$s.</string>
+    <string name="unhidden_community_format">Unhide community %1$s.</string>
     <string name="locked_post_format">Locked post %1$s in community %2$s.</string>
+    <string name="unlocked_post_format">Unlocked post %1$s in community %2$s.</string>
     <string name="removed_comment_format">Removed comment %1$s from post %2$s.</string>
+    <string name="unremoved_comment_format">Undo remove comment %1$s from post %2$s.</string>
     <string name="removed_community_format">Removed community %1$s from instance %2$s.</string>
+    <string name="unremoved_community_format">Undo remove community %1$s from instance %2$s.</string>
     <string name="removed_post_format">Removed post %1$s from community %2$s.</string>
+    <string name="unremoved_post_format">Undo remove post %1$s from community %2$s.</string>
     <string name="transferred_ownership_of_community_format">Transferred ownership of the community %1$s to %2$s.</string>
+    <string name="error_unable_to_upload_image">Unable to upload image due to an unknown issue.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

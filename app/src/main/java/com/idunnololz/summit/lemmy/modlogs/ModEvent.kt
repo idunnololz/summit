@@ -16,6 +16,7 @@ import com.idunnololz.summit.api.dto.ModRemoveCommentView
 import com.idunnololz.summit.api.dto.ModRemoveCommunityView
 import com.idunnololz.summit.api.dto.ModRemovePostView
 import com.idunnololz.summit.api.dto.ModTransferCommunityView
+import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.util.dateStringToTs
 
 sealed interface ModEvent {
@@ -25,12 +26,18 @@ sealed interface ModEvent {
     val ts: Long
 
     /**
+     * The person who performed the action is called the "agent".
+     */
+    val agent: Person?
+
+    /**
      * When a moderator removes a post.
      */
     data class ModRemovePostViewEvent(
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
+        override val agent: Person?,
         val event: ModRemovePostView,
     ) : ModEvent
 
@@ -41,7 +48,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModLockPostView
+        override val agent: Person?,
+        val event: ModLockPostView,
     ) : ModEvent
 
     /**
@@ -51,7 +59,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModFeaturePostView
+        override val agent: Person?,
+        val event: ModFeaturePostView,
     ) : ModEvent
 
     /**
@@ -61,7 +70,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModRemoveCommentView
+        override val agent: Person?,
+        val event: ModRemoveCommentView,
     ) : ModEvent
 
     /**
@@ -71,7 +81,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModRemoveCommunityView
+        override val agent: Person?,
+        val event: ModRemoveCommunityView,
     ) : ModEvent
 
     /**
@@ -81,7 +92,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModBanFromCommunityView
+        override val agent: Person?,
+        val event: ModBanFromCommunityView,
     ) : ModEvent
 
     /**
@@ -91,7 +103,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModBanView
+        override val agent: Person?,
+        val event: ModBanView,
     ) : ModEvent
 
     /**
@@ -101,7 +114,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModAddCommunityView
+        override val agent: Person?,
+        val event: ModAddCommunityView,
     ) : ModEvent
 
     /**
@@ -111,7 +125,8 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModTransferCommunityView
+        override val agent: Person?,
+        val event: ModTransferCommunityView,
     ) : ModEvent
 
     /**
@@ -121,35 +136,40 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModAddView
+        override val agent: Person?,
+        val event: ModAddView,
     ) : ModEvent
 
     data class AdminPurgePersonViewEvent(
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: AdminPurgePersonView
+        override val agent: Person?,
+        val event: AdminPurgePersonView,
     ) : ModEvent
 
     data class AdminPurgeCommunityViewEvent(
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: AdminPurgeCommunityView
+        override val agent: Person?,
+        val event: AdminPurgeCommunityView,
     ) : ModEvent
 
     data class AdminPurgePostViewEvent(
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: AdminPurgePostView
+        override val agent: Person?,
+        val event: AdminPurgePostView,
     ) : ModEvent
 
     data class AdminPurgeCommentViewEvent(
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: AdminPurgeCommentView
+        override val agent: Person?,
+        val event: AdminPurgeCommentView,
     ) : ModEvent
 
     /**
@@ -159,10 +179,10 @@ sealed interface ModEvent {
         override val id: Int,
         override val actionType: ActionType,
         override val ts: Long,
-        val event: ModHideCommunityView
+        override val agent: Person?,
+        val event: ModHideCommunityView,
     ) : ModEvent
 }
-
 
 fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
     val events = mutableListOf<ModEvent>()
@@ -172,6 +192,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_remove_post.id,
             ActionType.Mod,
             dateStringToTs(it.mod_remove_post.when_),
+            it.moderator,
             it,
         )
     }
@@ -180,6 +201,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_lock_post.id,
             ActionType.Mod,
             dateStringToTs(it.mod_lock_post.when_),
+            it.moderator,
             it,
         )
     }
@@ -188,6 +210,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_feature_post.id,
             ActionType.Mod,
             dateStringToTs(it.mod_feature_post.when_),
+            it.moderator,
             it,
         )
     }
@@ -196,6 +219,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_remove_comment.id,
             ActionType.Mod,
             dateStringToTs(it.mod_remove_comment.when_),
+            it.moderator,
             it,
         )
     }
@@ -204,6 +228,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_remove_community.id,
             ActionType.Mod,
             dateStringToTs(it.mod_remove_community.when_),
+            it.moderator,
             it,
         )
     }
@@ -212,6 +237,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_ban_from_community.id,
             ActionType.Mod,
             dateStringToTs(it.mod_ban_from_community.when_),
+            it.moderator,
             it,
         )
     }
@@ -220,6 +246,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_ban.id,
             ActionType.Mod,
             dateStringToTs(it.mod_ban.when_),
+            it.moderator,
             it,
         )
     }
@@ -228,6 +255,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_add_community.id,
             ActionType.Mod,
             dateStringToTs(it.mod_add_community.when_),
+            it.moderator,
             it,
         )
     }
@@ -236,6 +264,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_transfer_community.id,
             ActionType.Mod,
             dateStringToTs(it.mod_transfer_community.when_),
+            it.moderator,
             it,
         )
     }
@@ -244,6 +273,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_add.id,
             ActionType.Mod,
             dateStringToTs(it.mod_add.when_),
+            it.moderator,
             it,
         )
     }
@@ -252,6 +282,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.admin_purge_person.id,
             ActionType.Admin,
             dateStringToTs(it.admin_purge_person.when_),
+            it.admin,
             it,
         )
     }
@@ -260,6 +291,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.admin_purge_community.id,
             ActionType.Admin,
             dateStringToTs(it.admin_purge_community.when_),
+            it.admin,
             it,
         )
     }
@@ -268,6 +300,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.admin_purge_post.id,
             ActionType.Admin,
             dateStringToTs(it.admin_purge_post.when_),
+            it.admin,
             it,
         )
     }
@@ -276,6 +309,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.admin_purge_comment.id,
             ActionType.Admin,
             dateStringToTs(it.admin_purge_comment.when_),
+            it.admin,
             it,
         )
     }
@@ -284,6 +318,7 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
             it.mod_hide_community.id,
             ActionType.Mod,
             dateStringToTs(it.mod_hide_community.when_),
+            it.admin,
             it,
         )
     }

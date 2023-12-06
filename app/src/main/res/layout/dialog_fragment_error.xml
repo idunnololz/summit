@@ -18,90 +18,119 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0"/>
 
-    <TextView
-        android:id="@+id/message"
-        android:textAppearance="?textAppearanceBodyMedium"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/padding"
-        android:paddingHorizontal="@dimen/dialog_padding"
+        app:layout_constrainedHeight="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintHorizontal_bias="0"/>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/details_card"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dialog_padding"
-        android:layout_marginHorizontal="@dimen/dialog_padding"
-        android:layout_marginBottom="@dimen/padding"
-        app:strokeWidth="1dp"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/message"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/ok">
-
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/context"
-                android:text="@string/error_details"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?textAppearanceTitleSmall"
-                android:paddingHorizontal="@dimen/padding"
-                android:paddingVertical="@dimen/padding_half"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/indicator"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <ImageView
-                android:id="@+id/indicator"
+                android:id="@+id/message"
+                android:textAppearance="?textAppearanceBodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/padding"
+                android:paddingTop="@dimen/padding"
+                android:paddingHorizontal="@dimen/dialog_padding"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/context"
-                app:layout_constraintBottom_toBottomOf="@+id/context"
-                app:tint="?colorControlNormal" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintHorizontal_bias="0"/>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/context_container"
-                android:layout_width="match_parent"
+                android:id="@+id/details_card"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/padding_half"
-                android:layout_marginBottom="@dimen/padding_half"
-                style="?attr/materialCardViewElevatedStyle"
+                android:layout_marginTop="@dimen/dialog_padding"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginBottom="@dimen/padding"
+                app:strokeWidth="1dp"
                 app:layout_constrainedHeight="true"
-                app:cardBackgroundColor="@color/colorSurfaceDarker"
-                app:layout_constraintTop_toBottomOf="@+id/context"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/message"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
-                <androidx.core.widget.NestedScrollView
+
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/error_details"
+                        android:id="@+id/context"
+                        android:text="@string/error_details"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?textAppearanceTitleSmall"
+                        android:paddingHorizontal="@dimen/padding"
+                        android:paddingVertical="@dimen/padding_half"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/indicator"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <ImageView
+                        android:id="@+id/indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/padding"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/context"
+                        app:layout_constraintBottom_toBottomOf="@+id/context"
+                        app:tint="?colorControlNormal" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/context_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?textAppearanceBodySmall"
-                        android:padding="@dimen/padding"
+                        android:layout_marginHorizontal="@dimen/padding_half"
+                        android:layout_marginBottom="@dimen/padding_half"
+                        style="?attr/materialCardViewElevatedStyle"
+                        app:layout_constrainedHeight="true"
+                        app:cardBackgroundColor="@color/colorSurfaceDarker"
                         app:layout_constraintTop_toBottomOf="@+id/context"
-                        app:layout_constraintStart_toStartOf="parent"/>
-                </androidx.core.widget.NestedScrollView>
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <androidx.core.widget.NestedScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/error_details"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?textAppearanceBodySmall"
+                                android:padding="@dimen/padding"
+                                app:layout_constraintTop_toBottomOf="@+id/context"
+                                app:layout_constraintStart_toStartOf="parent"/>
+                        </androidx.core.widget.NestedScrollView>
+                    </com.google.android.material.card.MaterialCardView>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/copy"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/baseline_content_copy_24"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ok"
+        app:layout_constraintBottom_toBottomOf="@+id/ok"
+        app:tint="?colorControlNormal" />
 
     <Button
         style="@style/Widget.Material3.Button.TextButton"
@@ -111,8 +140,10 @@
         android:text="@android:string/ok"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginBottom="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/details_card"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintTop_toBottomOf="@+id/scroll_view"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/copy"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

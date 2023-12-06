@@ -26,6 +26,7 @@ import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.OriginalPostData
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -376,15 +377,12 @@ class CreateOrEditPostFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
-                    AlertDialogFragment.Builder()
-                        .setMessage(
-                            getString(
-                                R.string.error_unable_to_send_post,
-                                it.error::class.qualifiedName,
-                                it.error.message,
-                            ),
-                        )
-                        .createAndShow(childFragmentManager, "ASDS")
+
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_upload_image),
+                        it.error,
+                        childFragmentManager,
+                    )
                 }
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
@@ -402,15 +400,12 @@ class CreateOrEditPostFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
-                    AlertDialogFragment.Builder()
-                        .setMessage(
-                            getString(
-                                R.string.error_unable_to_send_post,
-                                it.error::class.qualifiedName,
-                                it.error.message,
-                            ),
-                        )
-                        .createAndShow(childFragmentManager, "ASDS")
+
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_upload_image),
+                        it.error,
+                        childFragmentManager,
+                    )
                 }
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()

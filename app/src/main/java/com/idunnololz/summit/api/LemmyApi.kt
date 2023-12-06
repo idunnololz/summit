@@ -624,8 +624,8 @@ interface LemmyApi {
     @POST
     fun uploadImage(
         @Header("Authorization") authorization: String?,
-        @Url url: String,
         @Header("Cookie") token: String,
+        @Url url: String,
         @Part filePart: MultipartBody.Part,
     ): Call<PictrsImages>
 
@@ -707,19 +707,23 @@ interface LemmyApi {
             }
         }
 
-        fun okHttpClient(context: Context) =
-            okHttpClient ?: getOkHttpClient(context).also {
+        fun okHttpClient(context: Context, userAgent: String = LinkUtils.USER_AGENT) =
+            okHttpClient ?: getOkHttpClient(context, userAgent).also {
                 okHttpClient = it
             }
 
         private fun buildInstance(
             context: Context,
             instance: String = DEFAULT_INSTANCE,
+            userAgent: String = LinkUtils.USER_AGENT,
         ): LemmyApiWithSite {
-            return buildApi(context, instance)
+            return buildApi(context, instance, userAgent)
         }
 
-        private fun getOkHttpClient(context: Context): OkHttpClient {
+        private fun getOkHttpClient(
+            context: Context,
+            userAgent: String,
+        ): OkHttpClient {
             okHttpClient?.let {
                 return it
             }
@@ -803,7 +807,7 @@ interface LemmyApi {
                 }
                 .addInterceptor { chain ->
                     val requestBuilder = chain.request().newBuilder()
-                        .header("User-Agent", LinkUtils.USER_AGENT)
+                        .header("User-Agent", userAgent)
                     val newRequest = requestBuilder.build()
                     chain.proceed(newRequest)
                 }
@@ -819,12 +823,16 @@ interface LemmyApi {
             return okHttpClient
         }
 
-        private fun buildApi(context: Context, instance: String): LemmyApiWithSite {
+        private fun buildApi(
+            context: Context,
+            instance: String,
+            userAgent: String,
+        ): LemmyApiWithSite {
             return LemmyApiWithSite(
                 Retrofit.Builder()
                     .baseUrl("https://$instance/api/$API_VERSION/")
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getOkHttpClient(context))
+                    .client(getOkHttpClient(context, userAgent))
                     .build()
                     .create(LemmyApi::class.java),
                 instance,

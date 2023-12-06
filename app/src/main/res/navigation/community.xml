@@ -91,20 +91,9 @@
             android:id="@+id/action_postFragment_to_subredditFragment"
             app:destination="@id/communityFragment" />
         <action
-            android:id="@+id/action_postFragment_to_commentRawDialogFragment"
-            app:destination="@id/commentRawDialogFragment" />
-        <action
             android:id="@+id/action_postFragment_to_login"
             app:destination="@id/login" />
     </fragment>
-    <dialog
-        android:id="@+id/commentRawDialogFragment"
-        android:name="com.idunnololz.summit.comment.CommentRawDialogFragment"
-        android:label="CommentRawDialogFragment">
-        <argument
-            android:name="commentItemStr"
-            app:argType="string" />
-    </dialog>
     <fragment
         android:id="@+id/addOrEditCommentFragment"
         android:name="com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment"

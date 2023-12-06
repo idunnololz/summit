@@ -184,20 +184,22 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             } else {
                 image.visibility = View.VISIBLE
 
-                image.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-                    override fun onGlobalLayout() {
-                        image.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                image.viewTreeObserver.addOnGlobalLayoutListener(
+                    object : OnGlobalLayoutListener {
+                        override fun onGlobalLayout() {
+                            image.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
-                        postListViewBuilder.loadImage(
-                            root,
-                            image,
-                            o.content.imageUrl,
-                            true,
-                            binding.image.width,
-                            false,
-                        ) {}
-                    }
-                },)
+                            postListViewBuilder.loadImage(
+                                root,
+                                image,
+                                o.content.imageUrl,
+                                true,
+                                binding.image.width,
+                                false,
+                            ) {}
+                        }
+                    },
+                )
             }
 
             if (o.content.content.isNullOrBlank()) {

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +15,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedCommentsBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
@@ -25,6 +27,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
@@ -161,7 +164,22 @@ class SavedCommentsFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
-                    binding.loadingView.showDefaultErrorMessageFor(it.error)
+
+                    if (it.error is NotAuthenticatedException) {
+                        binding.loadingView.showErrorWithRetry(
+                            getString(R.string.please_sign_in_to_view_your_inbox),
+                            getString(R.string.sign_in),
+                        )
+                        binding.loadingView.setOnRefreshClickListener {
+                            val direction = SavedTabbedFragmentDirections.actionGlobalLogin()
+                            findNavController().navigateSafe(direction)
+                        }
+                    } else {
+                        binding.loadingView.showDefaultErrorMessageFor(it.error)
+                        binding.loadingView.setOnRefreshClickListener {
+                            parentFragment.viewModel.fetchCommentPage(0, true)
+                        }
+                    }
                 }
                 is StatefulData.Loading ->
                     binding.loadingView.showProgressBar()

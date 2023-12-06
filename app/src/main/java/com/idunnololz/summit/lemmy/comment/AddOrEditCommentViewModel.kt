@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.comment
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,10 @@ class AddOrEditCommentViewModel @Inject constructor(
     private val state: SavedStateHandle,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "AddOrEditCommentViewModel"
+    }
 
     sealed interface Message {
         data class ReplyTargetTooOld(
@@ -163,6 +168,9 @@ class AddOrEditCommentViewModel @Inject constructor(
 
         viewModelScope.launch {
             apiClient.changeInstance(instance)
+
+            Log.d(TAG, "Uploading onto instance $instance")
+
             var result = uri.path
             val cut: Int? = result?.lastIndexOf('/')
             if (cut != null && cut != -1) {
