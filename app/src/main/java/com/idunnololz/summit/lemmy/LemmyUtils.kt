@@ -8,19 +8,20 @@ import android.icu.text.DecimalFormat
 import android.net.Uri
 import android.os.Build
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.util.*
+import com.idunnololz.summit.util.NumberFormatUtil
+import com.idunnololz.summit.util.PreviewInfo
+import com.idunnololz.summit.util.Size
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.video.VideoSizeHint
-import java.util.*
+import java.util.Locale
 import java.util.regex.Pattern
 
 object LemmyUtils {
 
     private val TAG = LemmyUtils::class.java.canonicalName
-
-    private val SUBREDDIT_NAME_MAX_LENGTH = 20
 
     private val GIPHY_REGEX = Pattern.compile("\\(giphy\\|([^\\s]*)\\)")
 

@@ -11,6 +11,7 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentErrorBinding
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -67,6 +68,8 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
+
         with(binding) {
             title.text = args.message
             message.text = args.errorMessage
@@ -82,6 +85,9 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
 
             ok.setOnClickListener {
                 dismiss()
+            }
+            copy.setOnClickListener {
+                Utils.copyToClipboard(context, args.errorMessage)
             }
         }
     }

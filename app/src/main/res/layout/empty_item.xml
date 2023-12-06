@@ -4,5 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textAppearance="?textAppearanceBodyMedium"
+    android:text="@string/there_doesnt_seem_to_be_anything_here"
     android:gravity="center"
     android:padding="@dimen/padding"/>

@@ -2,8 +2,6 @@ package com.idunnololz.summit.lemmy.communities
 
 import android.content.Context
 import android.os.Bundle
-import android.text.SpannableStringBuilder
-import android.text.StaticLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,7 +39,6 @@ import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.reflect.typeOf
 
 @AndroidEntryPoint
 class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
@@ -101,7 +98,6 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
         val context = context ?: return
 
         with(binding) {
-
             val params = TextMeasurementUtils.TextMeasurementParams.Builder
                 .from(descriptionMeasurementObject).build()
 
@@ -124,7 +120,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                         addItemWithIcon(
                             id = R.id.community_info,
                             title = R.string.community_info,
-                            icon = R.drawable.ic_community_24
+                            icon = R.drawable.ic_community_24,
                         )
 
                         setOnMenuItemClickListener {
@@ -132,7 +128,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                                 R.id.community_info -> {
                                     val direction = CommunitiesFragmentDirections
                                         .actionCommunitiesFragmentToCommunityInfoFragment(
-                                            communityView.community.toCommunityRef()
+                                            communityView.community.toCommunityRef(),
                                         )
                                     findNavController().navigateSafe(direction)
                                 }

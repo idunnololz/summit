@@ -1,7 +1,11 @@
 package com.idunnololz.summit.util
 
 import android.app.Activity
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
@@ -9,7 +13,9 @@ import android.graphics.Point
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Looper
+import android.os.Parcelable
 import android.text.Html
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -17,12 +23,11 @@ import android.text.Spanned
 import android.util.Base64
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.*
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
@@ -36,11 +41,27 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.StringWriter
 import java.security.MessageDigest
 import java.text.NumberFormat
-import java.util.*
-import java.util.zip.*
+import java.util.LinkedList
+import java.util.Locale
+import java.util.Stack
+import java.util.zip.DataFormatException
+import java.util.zip.Deflater
+import java.util.zip.GZIPInputStream
+import java.util.zip.Inflater
+import java.util.zip.ZipInputStream
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext
@@ -404,30 +425,6 @@ object Utils {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    fun getRemovableExternalCacheDir(context: Context): File? {
-        val externalCacheDirs = ContextCompat.getExternalCacheDirs(context)
-        for (f in externalCacheDirs) {
-            if (f == null) continue
-            if (Environment.isExternalStorageRemovable(f)) {
-                return f
-            }
-        }
-        return null
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    fun getRemovableExternalFilesDir(context: Context): File? {
-        val externalCacheDirs = ContextCompat.getExternalFilesDirs(context, null)
-        for (f in externalCacheDirs) {
-            if (f == null) continue
-            if (Environment.isExternalStorageRemovable(f)) {
-                return f
-            }
-        }
-        return null
-    }
-
     fun trimSpannable(spannable: Spanned): SpannableStringBuilder {
         val sb: SpannableStringBuilder = if (spannable is SpannableStringBuilder) {
             spannable
@@ -535,7 +532,8 @@ object Utils {
         val appLocale = resources.configuration.locale
         val systemLocale = Resources.getSystem().getConfiguration().locale
 
-        return systemLocale.language == Locale.ENGLISH.language || appLocale.language == Locale.ENGLISH.language
+        return systemLocale.language == Locale.ENGLISH.language ||
+            appLocale.language == Locale.ENGLISH.language
     }
 
     fun copyToClipboard(context: Context, toCopy: String) {

@@ -15,6 +15,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.util.CoilImagesPlugin
+import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
@@ -68,7 +69,11 @@ object LemmyTextHelper {
                 ): Boolean {
                     val pageRef = LinkResolver.parseUrl(url, instance)
 
-                    if (pageRef != null) {
+                    if (isUrlVideo(url)) {
+                        onVideoClick(url)
+                    } else if (isUrlImage(url)) {
+                        onImageClick(url)
+                    } else if (pageRef != null) {
                         onPageClick(pageRef)
                     } else {
                         onLinkClick(url, text, LinkType.Text)
@@ -86,7 +91,7 @@ object LemmyTextHelper {
             }
         }
     }
-    fun getSpannable(context: Context, text: String,): Spanned {
+    fun getSpannable(context: Context, text: String): Spanned {
         val markwon = getMarkwon(context)
 
         return markwon.toMarkdown(text)

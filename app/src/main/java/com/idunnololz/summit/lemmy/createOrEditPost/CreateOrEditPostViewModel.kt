@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import android.webkit.URLUtil
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.api.dto.CommunityView
@@ -42,6 +44,12 @@ class CreateOrEditPostViewModel @Inject constructor(
     private val state: SavedStateHandle,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "CreateOrEditPostViewModel"
+    }
+
+    private val uploaderApi = LemmyApiClient(context, "Jerboa")
 
     private val linkMetadataHelper = LinkMetadataHelper()
 
@@ -236,6 +244,10 @@ class CreateOrEditPostViewModel @Inject constructor(
         imageLiveData.setIsLoading()
 
         viewModelScope.launch {
+            apiClient.changeInstance(instance)
+
+            Log.d(TAG, "Uploading onto instance $instance")
+
             var result = uri.path
             val cut: Int? = result?.lastIndexOf('/')
             if (cut != null && cut != -1) {

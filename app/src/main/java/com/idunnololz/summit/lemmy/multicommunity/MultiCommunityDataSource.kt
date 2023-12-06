@@ -178,7 +178,11 @@ class MultiCommunityDataSource(
                     SortType.Old -> -dateStringToTs(postView.counts.published).toDouble()
                     SortType.MostComments -> postView.counts.comments.toDouble()
                     SortType.NewComments -> postView.counts.newest_comment_time.let {
-                        dateStringToTs(it).toDouble()
+                        if (it == null) {
+                            0.0
+                        } else {
+                            dateStringToTs(it).toDouble()
+                        }
                     }
                     SortType.TopDay,
                     SortType.TopWeek,

@@ -1,40 +1,44 @@
 package com.idunnololz.summit.lemmy.modlogs
 
 import android.content.Context
+import android.graphics.RectF
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.URLSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.databinding.CommunitiesLoadItemBinding
 import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.databinding.FragmentModLogsBinding
 import com.idunnololz.summit.databinding.ModEventItemBinding
-import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
-import com.idunnololz.summit.lemmy.communities.CommunitiesFragmentDirections
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.ListEngine
+import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.CustomLinkMovementMethod
+import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToPretty
-import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.escapeMarkdown
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.showBottomMenuForLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -96,7 +100,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         val context = context ?: return
 
         with(binding) {
-
             val params = TextMeasurementUtils.TextMeasurementParams.Builder
                 .from(descriptionMeasurementObject).build()
 
@@ -104,7 +107,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 context = context,
                 rootView = root,
                 offlineManager = offlineManager,
-                instance = viewModel.apiInstance,
+                instance = args.instance,
                 availableWidth = binding.recyclerView.width,
                 params = params,
                 onPageClick = {
@@ -113,30 +116,11 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 onLoadPageClick = {
                     viewModel.fetchModLogs(it)
                 },
-                showMoreOptionsMenu = { communityView ->
-                    val bottomMenu = BottomMenu(requireContext()).apply {
-                        setTitle(R.string.community_actions)
-
-                        addItemWithIcon(
-                            id = R.id.community_info,
-                            title = R.string.community_info,
-                            icon = R.drawable.ic_community_24
-                        )
-
-                        setOnMenuItemClickListener {
-                            when (it.id) {
-                                R.id.community_info -> {
-                                    val direction = CommunitiesFragmentDirections
-                                        .actionCommunitiesFragmentToCommunityInfoFragment(
-                                            communityView.community.toCommunityRef()
-                                        )
-                                    findNavController().navigateSafe(direction)
-                                }
-                            }
-                        }
-                    }
-
-                    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
+                onLinkClick = { url: String, text: String, linkType: LinkType ->
+                    onLinkClick(url, text, linkType)
+                },
+                onLinkLongClick = { url: String, text: String ->
+                    getMainActivity()?.showBottomMenuForLink(url, text)
                 },
             )
             val layoutManager = LinearLayoutManager(context)
@@ -208,7 +192,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         private val params: TextMeasurementUtils.TextMeasurementParams,
         private val onPageClick: (PageRef) -> Unit,
         private val onLoadPageClick: (Int) -> Unit,
-        private val showMoreOptionsMenu: (CommunityView) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        private val onLinkLongClick: (url: String, text: String) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var items: List<ListEngine.Item<ModEvent>> = listOf()
@@ -219,6 +204,22 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             }
 
         private val summaryCharLength: Int
+
+        init {
+            val widthDp = Utils.convertPixelsToDp(availableWidth.toFloat())
+
+            summaryCharLength = when {
+                widthDp < 400f -> {
+                    40
+                }
+                widthDp < 600f -> {
+                    60
+                }
+                else -> {
+                    80
+                }
+            }
+        }
 
         private val adapterHelper = AdapterHelper<ListEngine.Item<ModEvent>>(
             areItemsTheSame = { old, new ->
@@ -250,101 +251,370 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
                 when (modEvent) {
                     is ModEvent.AdminPurgeCommentViewEvent -> {
+                        b.icon.setImageResource(R.drawable.baseline_delete_24)
+
                         description = context.getString(
                             R.string.purged_comment_format,
-                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
+                            "[${modEvent.event.post.name.summarize()}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
                         )
                     }
                     is ModEvent.AdminPurgeCommunityViewEvent -> {
+                        b.icon.setImageResource(R.drawable.baseline_delete_24)
+
                         description = context.getString(
                             R.string.purged_community,
                         )
                     }
                     is ModEvent.AdminPurgePersonViewEvent -> {
+                        b.icon.setImageResource(R.drawable.baseline_delete_24)
+
                         description = context.getString(
                             R.string.purged_person,
                         )
                     }
                     is ModEvent.AdminPurgePostViewEvent -> {
+                        b.icon.setImageResource(R.drawable.baseline_delete_24)
+
                         description = context.getString(
                             R.string.purged_post_format,
                             "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
                         )
                     }
                     is ModEvent.ModAddCommunityViewEvent -> {
-                        description = context.getString(
-                            R.string.added_moderator_for_community_format,
-                            "[${modEvent.event.modded_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
-                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
-                        )
+                        if (modEvent.event.mod_add_community.removed) {
+                            b.icon.setImageResource(R.drawable.outline_remove_moderator_24)
+
+                            description = context.getString(
+                                R.string.removed_moderator_for_community_format,
+                                "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                                "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.outline_add_moderator_24)
+
+                            description = context.getString(
+                                R.string.added_moderator_for_community_format,
+                                "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                                "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
+                            )
+                        }
                     }
                     is ModEvent.ModAddViewEvent -> {
-                        description = context.getString(
-                            R.string.added_moderator_for_site_format,
-                            "[${modEvent.event.modded_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
-                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
-                        )
+                        if (modEvent.event.mod_add.removed) {
+                            b.icon.setImageResource(R.drawable.outline_remove_moderator_24)
+
+                            description = context.getString(
+                                R.string.removed_moderator_for_site_format,
+                                "[${modEvent.event.modded_person.name}](${
+                                LinkUtils.getLinkForPerson(
+                                    instance,
+                                    modEvent.event.modded_person.name,
+                                )
+                                })",
+                                "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.outline_add_moderator_24)
+
+                            description = context.getString(
+                                R.string.added_moderator_for_site_format,
+                                "[${modEvent.event.modded_person.name}](${
+                                LinkUtils.getLinkForPerson(
+                                    instance,
+                                    modEvent.event.modded_person.name,
+                                )
+                                })",
+                                "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                            )
+                        }
                     }
                     is ModEvent.ModBanFromCommunityViewEvent -> {
-                        description = context.getString(
-                            R.string.banned_person_from_community_format,
-                            "[${modEvent.event.banned_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.banned_person.name)})",
-                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
-                        )
+                        if (modEvent.event.mod_ban_from_community.banned) {
+                            b.icon.setImageResource(R.drawable.outline_person_remove_24)
+
+                            description = context.getString(
+                                R.string.banned_person_from_community_format,
+                                "[${modEvent.event.banned_person.name}](${
+                                LinkUtils.getLinkForPerson(
+                                    instance,
+                                    modEvent.event.banned_person.name,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForCommunity(
+                                    instance,
+                                    modEvent.event.community.name,
+                                )
+                                })",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.baseline_person_add_alt_24)
+
+                            description = context.getString(
+                                R.string.unbanned_person_from_community_format,
+                                "[${modEvent.event.banned_person.name}](${
+                                LinkUtils.getLinkForPerson(
+                                    instance,
+                                    modEvent.event.banned_person.name,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForCommunity(
+                                    instance,
+                                    modEvent.event.community.name,
+                                )
+                                })",
+                            )
+                        }
                     }
                     is ModEvent.ModBanViewEvent -> {
-                        description = context.getString(
-                            R.string.banned_person_from_site_format,
-                            "[${modEvent.event.banned_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.banned_person.name)})",
-                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
-                        )
+                        if (modEvent.event.mod_ban.banned) {
+                            b.icon.setImageResource(R.drawable.outline_person_remove_24)
+
+                            description = context.getString(
+                                R.string.banned_person_from_site_format,
+                                "[${modEvent.event.banned_person.name}](${
+                                LinkUtils.getLinkForPerson(
+                                    instance,
+                                    modEvent.event.banned_person.name,
+                                )
+                                })",
+                                "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.baseline_person_add_alt_24)
+
+                            description = context.getString(
+                                R.string.unbanned_person_from_site_format,
+                                "[${modEvent.event.banned_person.name}](${
+                                LinkUtils.getLinkForPerson(
+                                    instance,
+                                    modEvent.event.banned_person.name,
+                                )
+                                })",
+                                "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                            )
+                        }
                     }
                     is ModEvent.ModFeaturePostViewEvent -> {
-                        description = context.getString(
-                            R.string.featured_post_in_community_format,
-                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
-                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
-                        )
+                        if (modEvent.event.mod_feature_post.featured) {
+                            b.icon.setImageResource(R.drawable.baseline_push_pin_24)
+
+                            description = context.getString(
+                                R.string.featured_post_in_community_format,
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.community.id,
+                                )
+                                })",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.ic_unpin_24)
+
+                            description = context.getString(
+                                R.string.unfeatured_post_in_community_format,
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.community.id,
+                                )
+                                })",
+                            )
+                        }
                     }
                     is ModEvent.ModHideCommunityViewEvent -> {
-                        description = context.getString(
-                            R.string.hidden_community_format,
-                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
-                        )
+                        if (modEvent.event.mod_hide_community.hidden) {
+                            b.icon.setImageResource(R.drawable.baseline_hide_24)
+
+                            description = context.getString(
+                                R.string.hidden_community_format,
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.community.id,
+                                )
+                                })",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.baseline_expand_content_24)
+
+                            description = context.getString(
+                                R.string.unhidden_community_format,
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.community.id,
+                                )
+                                })",
+                            )
+                        }
                     }
                     is ModEvent.ModLockPostViewEvent -> {
-                        description = context.getString(
-                            R.string.locked_post_format,
-                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
-                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForComment(instance, modEvent.event.community.id)})",
-                        )
+                        if (modEvent.event.mod_lock_post.locked) {
+                            b.icon.setImageResource(R.drawable.outline_lock_24)
+
+                            description = context.getString(
+                                R.string.locked_post_format,
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.community.id,
+                                )
+                                })",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.baseline_lock_open_24)
+
+                            description = context.getString(
+                                R.string.unlocked_post_format,
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.community.id,
+                                )
+                                })",
+                            )
+                        }
                     }
                     is ModEvent.ModRemoveCommentViewEvent -> {
-                        description = context.getString(
-                            R.string.removed_comment_format,
-                            "[${modEvent.event.comment.content}](${LinkUtils.getLinkForComment(instance, modEvent.event.comment.id)})",
-                            "[${modEvent.event.post.name}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
-                        )
+                        if (modEvent.event.mod_remove_comment.removed) {
+                            b.icon.setImageResource(R.drawable.baseline_remove_circle_outline_24)
+
+                            description = context.getString(
+                                R.string.removed_comment_format,
+                                "[${modEvent.event.comment.content.summarize()}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.comment.id,
+                                )
+                                })",
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.baseline_undo_24)
+
+                            description = context.getString(
+                                R.string.unremoved_comment_format,
+                                "[${modEvent.event.comment.content.summarize()}](${
+                                LinkUtils.getLinkForComment(
+                                    instance,
+                                    modEvent.event.comment.id,
+                                )
+                                })",
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                            )
+                        }
                     }
                     is ModEvent.ModRemoveCommunityViewEvent -> {
-                        description = context.getString(
-                            R.string.removed_community_format,
-                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
-                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
-                        )
+                        if (modEvent.event.mod_remove_community.removed) {
+                            b.icon.setImageResource(R.drawable.baseline_remove_circle_outline_24)
+
+                            description = context.getString(
+                                R.string.removed_community_format,
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForCommunity(
+                                    instance,
+                                    modEvent.event.community.name,
+                                )
+                                })",
+                                "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.baseline_undo_24)
+
+                            description = context.getString(
+                                R.string.unremoved_community_format,
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForCommunity(
+                                    instance,
+                                    modEvent.event.community.name,
+                                )
+                                })",
+                                "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                            )
+                        }
                     }
                     is ModEvent.ModRemovePostViewEvent -> {
-                        description = context.getString(
-                            R.string.removed_community_format,
-                            "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
-                            "[${instance}](${LinkUtils.getLinkForInstance(instance)})",
-                        )
+                        if (modEvent.event.mod_remove_post.removed) {
+                            b.icon.setImageResource(R.drawable.baseline_remove_circle_outline_24)
+
+                            description = context.getString(
+                                R.string.removed_post_format,
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForCommunity(
+                                    instance,
+                                    modEvent.event.community.name,
+                                )
+                                })",
+                            )
+                        } else {
+                            b.icon.setImageResource(R.drawable.baseline_undo_24)
+
+                            description = context.getString(
+                                R.string.unremoved_post_format,
+                                "[${modEvent.event.post.name.summarize()}](${
+                                LinkUtils.getLinkForPost(
+                                    instance,
+                                    modEvent.event.post.id,
+                                )
+                                })",
+                                "[${modEvent.event.community.name}](${
+                                LinkUtils.getLinkForCommunity(
+                                    instance,
+                                    modEvent.event.community.name,
+                                )
+                                })",
+                            )
+                        }
                     }
                     is ModEvent.ModTransferCommunityViewEvent -> {
+                        b.icon.setImageResource(R.drawable.baseline_swap_horiz_24)
+
                         description = context.getString(
                             R.string.transferred_ownership_of_community_format,
                             "[${modEvent.event.community.name}](${LinkUtils.getLinkForCommunity(instance, modEvent.event.community.name)})",
-                            "[${modEvent.event.modded_person.display_name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                            "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
                         )
                     }
                 }
@@ -352,8 +622,49 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 b.overtext.text = SpannableStringBuilder().apply {
                     append(dateStringToPretty(context, modEvent.ts))
                     appendSeparator()
-                    append(context.getString(
-                        R.string.mod_action_format, modEvent.actionType.toString()))
+                    append(
+                        context.getString(
+                            R.string.mod_action_format,
+                            modEvent.actionType.toString(),
+                        ),
+                    )
+
+                    val agent = modEvent.agent
+                    if (agent != null) {
+                        appendSeparator()
+                        val s = length
+                        append(agent.name)
+                        val e = length
+                        setSpan(
+                            URLSpan(LinkUtils.getLinkForPerson(instance, agent.name)),
+                            s,
+                            e,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                    }
+                }
+                b.overtext.movementMethod = CustomLinkMovementMethod().apply {
+                    onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+                        override fun onClick(
+                            textView: TextView,
+                            url: String,
+                            text: String,
+                            rect: RectF,
+                        ): Boolean {
+                            val pageRef = LinkResolver.parseUrl(url, instance)
+
+                            if (pageRef != null) {
+                                onPageClick(pageRef)
+                            } else {
+                                onLinkClick(url, text, LinkType.Text)
+                            }
+                            return true
+                        }
+                    }
+                    onLinkLongClickListener = DefaultLinkLongClickListener(
+                        b.root.context,
+                        onLinkLongClick,
+                    )
                 }
                 LemmyTextHelper.bindText(
                     textView = b.title,
@@ -361,9 +672,15 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                     instance = instance,
                     onImageClick = {},
                     onVideoClick = {},
-                    onPageClick = {},
-                    onLinkClick = { _, _, _ -> },
-                    onLinkLongClick = { _, _ -> },
+                    onPageClick = {
+                        onPageClick(it)
+                    },
+                    onLinkClick = { url, text, linkType ->
+                        onLinkClick(url, text, linkType)
+                    },
+                    onLinkLongClick = { url, text ->
+                        onLinkLongClick(url, text)
+                    },
                 )
             }
             addItemType(
@@ -383,22 +700,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             }
         }
 
-        init {
-            val widthDp = Utils.convertPixelsToDp(availableWidth.toFloat())
-
-            summaryCharLength = when {
-                widthDp < 400f -> {
-                    60
-                }
-                widthDp < 600f -> {
-                    80
-                }
-                else -> {
-                    100
-                }
-            }
-        }
-
         override fun getItemViewType(position: Int): Int =
             adapterHelper.getItemViewType(position)
 
@@ -413,5 +714,12 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         fun updateItems() {
             adapterHelper.setItems(items, this)
         }
+
+        private fun String.summarize() =
+            if (this.length > summaryCharLength + 3) {
+                this.take(summaryCharLength) + "…"
+            } else {
+                this
+            }.escapeMarkdown()
     }
 }

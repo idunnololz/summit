@@ -60,56 +60,57 @@ class VideoDownloadManager @Inject constructor(
     private val coroutineScope = coroutineScopeFactory.create()
 
     init {
-        downloadManager.addListener(object : DownloadManager.Listener {
-            override fun onDownloadChanged(
-                downloadManager: DownloadManager,
-                download: Download,
-                finalException: Exception?,
-            ) {
-                super.onDownloadChanged(downloadManager, download, finalException)
+        downloadManager.addListener(
+            object : DownloadManager.Listener {
+                override fun onDownloadChanged(
+                    downloadManager: DownloadManager,
+                    download: Download,
+                    finalException: Exception?,
+                ) {
+                    super.onDownloadChanged(downloadManager, download, finalException)
 
-                Log.d("HAHA", "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException")
+                    Log.d("HAHA", "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException")
 
-                if (download.state == Download.STATE_COMPLETED) {
-                    onDownloadComplete(download.request)
+                    if (download.state == Download.STATE_COMPLETED) {
+                        onDownloadComplete(download.request)
+                    }
                 }
-            }
 
-            override fun onWaitingForRequirementsChanged(
-                downloadManager: DownloadManager,
-                waitingForRequirements: Boolean,
-            ) {
-                super.onWaitingForRequirementsChanged(downloadManager, waitingForRequirements)
-                Log.d("HAHA", "onWaitingForRequirementsChanged()")
-            }
+                override fun onWaitingForRequirementsChanged(
+                    downloadManager: DownloadManager,
+                    waitingForRequirements: Boolean,
+                ) {
+                    super.onWaitingForRequirementsChanged(downloadManager, waitingForRequirements)
+                    Log.d("HAHA", "onWaitingForRequirementsChanged()")
+                }
 
-            override fun onDownloadsPausedChanged(
-                downloadManager: DownloadManager,
-                downloadsPaused: Boolean,
-            ) {
-                super.onDownloadsPausedChanged(downloadManager, downloadsPaused)
-                Log.d("HAHA", "onDownloadsPausedChanged()")
-            }
+                override fun onDownloadsPausedChanged(
+                    downloadManager: DownloadManager,
+                    downloadsPaused: Boolean,
+                ) {
+                    super.onDownloadsPausedChanged(downloadManager, downloadsPaused)
+                    Log.d("HAHA", "onDownloadsPausedChanged()")
+                }
 
-            override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
-                super.onDownloadRemoved(downloadManager, download)
-                Log.d("HAHA", "onDownloadRemoved()")
-            }
+                override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
+                    super.onDownloadRemoved(downloadManager, download)
+                    Log.d("HAHA", "onDownloadRemoved()")
+                }
 
-            override fun onIdle(downloadManager: DownloadManager) {
-                super.onIdle(downloadManager)
-                Log.d("HAHA", "onIdle()")
-            }
+                override fun onIdle(downloadManager: DownloadManager) {
+                    super.onIdle(downloadManager)
+                    Log.d("HAHA", "onIdle()")
+                }
 
-            override fun onRequirementsStateChanged(
-                downloadManager: DownloadManager,
-                requirements: Requirements,
-                notMetRequirements: Int,
-            ) {
-                super.onRequirementsStateChanged(downloadManager, requirements, notMetRequirements)
-                Log.d("HAHA", "onRequirementsStateChanged()")
-            }
-        },
+                override fun onRequirementsStateChanged(
+                    downloadManager: DownloadManager,
+                    requirements: Requirements,
+                    notMetRequirements: Int,
+                ) {
+                    super.onRequirementsStateChanged(downloadManager, requirements, notMetRequirements)
+                    Log.d("HAHA", "onRequirementsStateChanged()")
+                }
+            },
         )
         downloadManager.requirements = Requirements(Requirements.NETWORK)
         downloadManager.maxParallelDownloads = 3

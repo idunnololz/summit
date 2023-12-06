@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.inbox.repository
 
 import android.util.Log
-import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.util.retry
 import kotlin.math.min

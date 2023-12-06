@@ -22,7 +22,11 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.util.*
+import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
@@ -171,7 +175,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         binding.playerView.setControllerVisibilityListener(
             ControllerVisibilityListener {
                 if (it == View.VISIBLE) {
-                    parent.showSystemUI(animate = true)
+                    parent.showSystemUI()
                 } else {
                     parent.hideSystemUI()
                 }
@@ -217,7 +221,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     }
 
     override fun onDestroyView() {
-        requireMainActivity().showSystemUI(animate = true)
+        requireMainActivity().showSystemUI()
         binding.playerView.player?.removeListener(playerListener)
 
         super.onDestroyView()
@@ -261,7 +265,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                         )
                     } else {
                         binding.loadingView.showErrorText(R.string.unsupported_video_type)
-                        (activity as? MainActivity)?.showSystemUI(animate = true)
+                        (activity as? MainActivity)?.showSystemUI()
                     }
                 } else if (uri.path?.endsWith("mp4", ignoreCase = true) == true) {
                     loadVideo(context, url, VideoType.Mp4, videoState)
@@ -269,7 +273,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                     loadVideo(context, url, VideoType.Webm, videoState)
                 } else {
                     binding.loadingView.showErrorText(R.string.unsupported_video_type)
-                    (activity as? MainActivity)?.showSystemUI(animate = true)
+                    (activity as? MainActivity)?.showSystemUI()
                 }
             }
             VideoType.Dash -> {
@@ -279,7 +283,8 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 setupMoreButton(context, url, videoType)
             }
             VideoType.Mp4,
-            VideoType.Webm -> {
+            VideoType.Webm,
+            -> {
                 @Suppress("UnsafeOptInUsageError")
                 binding.playerView.player = ExoPlayerManager.get(viewLifecycleOwner)
                     .getPlayerForUrl(url, videoType, videoState)
@@ -297,9 +302,6 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                     when (it.itemId) {
                         R.id.save -> {
                             viewModel.downloadVideo(requireContext(), url)
-//                            AlertDialogFragment.Builder()
-//                                .setMessage(R.string.coming_soon)
-//                                .createAndShow(childFragmentManager, "asdf")
                             true
                         }
                         else -> false

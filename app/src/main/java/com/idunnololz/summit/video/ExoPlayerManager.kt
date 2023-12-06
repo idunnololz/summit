@@ -210,7 +210,8 @@ class ExoPlayerManager(
                 DashMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(mediaItem)
             VideoType.Mp4,
-            VideoType.Webm ->
+            VideoType.Webm,
+            ->
                 ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(mediaItem)
         }

@@ -3,7 +3,6 @@ package com.idunnololz.summit.util
 import android.net.Uri
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toUrl

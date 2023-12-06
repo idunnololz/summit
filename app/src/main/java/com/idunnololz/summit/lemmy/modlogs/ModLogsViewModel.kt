@@ -9,16 +9,12 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.toLemmyPageIndex
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.max
 
 @HiltViewModel
 class ModLogsViewModel @Inject constructor(
@@ -47,7 +43,7 @@ class ModLogsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            modLogEngine.items.drop(1).collect {
+            modLogEngine.items.collect {
                 modLogData.postValue(ModLogData(it))
             }
         }
@@ -83,7 +79,7 @@ class ModLogsViewModel @Inject constructor(
                             },
                             {
                                 Result.failure(it)
-                            }
+                            },
                         )
                     }
                 } else {
@@ -94,7 +90,6 @@ class ModLogsViewModel @Inject constructor(
                 modLogData.postError(communityIdOrNull.exceptionOrNull()!!)
                 return@launch
             }
-
 
             val modSource = modSource ?: MultiModEventDataSource.create(
                 noAuthApiClient,
@@ -109,11 +104,11 @@ class ModLogsViewModel @Inject constructor(
 
             val modEvents = result.fold(
                 onSuccess = {
-                    it
+                    it.sortedByDescending { it.ts }
                 },
                 onFailure = {
                     null
-                }
+                },
             )
 
             modLogEngine.addPage(
@@ -124,11 +119,11 @@ class ModLogsViewModel @Inject constructor(
                     },
                     onFailure = {
                         Result.failure(it)
-                    }
+                    },
                 ),
                 hasMore = result.fold(
                     onSuccess = {
-                        it.size == PAGE_ENTRIES_LIMIT
+                        it.isNotEmpty()
                     },
                     onFailure = {
                         true
@@ -146,12 +141,11 @@ class ModLogsViewModel @Inject constructor(
     fun reset() {
         viewModelScope.launch {
             modLogData.clear()
-            fetchModLogs(0)
+            fetchModLogs(0, force = true)
         }
     }
 
     data class ModLogData(
         val data: List<ListEngine.Item<ModEvent>>,
     )
-
 }

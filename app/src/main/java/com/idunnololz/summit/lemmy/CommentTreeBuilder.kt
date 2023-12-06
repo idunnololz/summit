@@ -100,7 +100,6 @@ class CommentTreeBuilder(
                         PostViewModel.ListView.MissingCommentItem(
                             cParentId,
                             parentParentNodeId,
-                            false,
                         ),
                         node.depth - 1,
                     )
@@ -255,7 +254,6 @@ class CommentTreeBuilder(
                                 PostViewModel.ListView.MissingCommentItem(
                                     commentView.comment.comment.id,
                                     parentParentNodeId,
-                                    false,
                                 ),
                                 node.depth + 1,
                             ),
@@ -327,7 +325,9 @@ private val Comment.parentParentNodeId
         .lastOrNull()
         ?.toIntOrNull()
 
-fun List<CommentNodeData>.flatten(): MutableList<CommentNodeData> {
+fun List<CommentNodeData>.flatten(
+    collapsedItemIds: Set<Long>,
+): MutableList<CommentNodeData> {
     val result = mutableListOf<CommentNodeData>()
 
     fun CommentNodeData.flattenRecursive() {
@@ -335,12 +335,12 @@ fun List<CommentNodeData>.flatten(): MutableList<CommentNodeData> {
 
         when (val commentView = this.commentView) {
             is PostViewModel.ListView.CommentListView -> {
-                if (commentView.isCollapsed) {
+                if (collapsedItemIds.contains(commentView.id)) {
                     return
                 }
             }
             is PostViewModel.ListView.PendingCommentListView -> {
-                if (commentView.isCollapsed) {
+                if (collapsedItemIds.contains(commentView.id)) {
                     return
                 }
             }
@@ -353,7 +353,7 @@ fun List<CommentNodeData>.flatten(): MutableList<CommentNodeData> {
             }
 
             is PostViewModel.ListView.MissingCommentItem -> {
-                if (commentView.isCollapsed) {
+                if (collapsedItemIds.contains(commentView.id)) {
                     return
                 }
             }

@@ -15,7 +15,7 @@ import com.idunnololz.summit.databinding.BlockListCommunityItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsCommunityBlockListBinding
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel
-import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel.*
+import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel.BlockedCommunityItem
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.recyclerView.AdapterHelper

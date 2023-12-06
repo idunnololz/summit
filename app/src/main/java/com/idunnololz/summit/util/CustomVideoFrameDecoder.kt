@@ -43,7 +43,7 @@ import kotlin.math.roundToLong
 
 class CustomVideoFrameDecoder(
     private val source: ImageSource,
-    private val options: Options
+    private val options: Options,
 ) : Decoder {
 
     private val overlay by lazy {
@@ -76,7 +76,7 @@ class CustomVideoFrameDecoder(
                 srcHeight = srcHeight,
                 dstWidth = dstWidth,
                 dstHeight = dstHeight,
-                scale = options.scale
+                scale = options.scale,
             )
             val scale = if (options.allowInexactSize) {
                 rawScale.coerceAtMost(1.0)
@@ -115,7 +115,7 @@ class CustomVideoFrameDecoder(
                 srcHeight = srcHeight,
                 dstWidth = bitmap.width,
                 dstHeight = bitmap.height,
-                scale = options.scale
+                scale = options.scale,
             ) < 1.0
         } else {
             // We were unable to determine the original size of the video. Assume it is sampled.
@@ -142,7 +142,7 @@ class CustomVideoFrameDecoder(
 
         DecodeResult(
             drawable = bitmap.toDrawable(options.context.resources),
-            isSampled = isSampled
+            isSampled = isSampled,
         )
     }
 
@@ -174,7 +174,7 @@ class CustomVideoFrameDecoder(
             srcHeight = inBitmap.height,
             dstWidth = size.width.pxOrElse { inBitmap.width },
             dstHeight = size.height.pxOrElse { inBitmap.height },
-            scale = options.scale
+            scale = options.scale,
         ).toFloat()
         val dstWidth = (scale * inBitmap.width).roundToInt()
         val dstHeight = (scale * inBitmap.height).roundToInt()
@@ -207,7 +207,7 @@ class CustomVideoFrameDecoder(
             srcHeight = bitmap.height,
             dstWidth = size.width.pxOrElse { bitmap.width },
             dstHeight = size.height.pxOrElse { bitmap.height },
-            scale = options.scale
+            scale = options.scale,
         )
         return multiplier == 1.0
     }
@@ -253,8 +253,6 @@ class CustomVideoFrameDecoder(
         const val VIDEO_FRAME_PERCENT_KEY = "coil#video_frame_percent"
         const val VIDEO_FRAME_OPTION_KEY = "coil#video_frame_option"
     }
-
-
 
     private fun MediaMetadataRetriever.getFrameAtTime(
         timeUs: Long,

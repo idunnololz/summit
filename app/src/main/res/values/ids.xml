@@ -33,6 +33,9 @@
     <item name="block_user" type="id"/>
     <item name="block_community" type="id"/>
 
+    <item name="markwon_drawables_scheduler_last_text_hashcode" type="id"/>
+    <item name="markwon_drawables_scheduler" type="id"/>
+
 
     <item name="setting_theme" type="id"/>
     <item name="setting_base_theme" type="id"/>

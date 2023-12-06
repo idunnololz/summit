@@ -43,7 +43,7 @@ object TextMeasurementUtils {
                 params.alignment,
                 params.lineSpacingMultiplier,
                 params.lineSpacingExtra,
-                params.includeFontPadding
+                params.includeFontPadding,
             )
         }
         val result: MutableList<CharSequence> = ArrayList()
@@ -183,7 +183,7 @@ object TextMeasurementUtils {
                         .alignment(layout.alignment)
                         .width(
                             view.width -
-                                    view.compoundPaddingLeft - view.compoundPaddingRight
+                                view.compoundPaddingLeft - view.compoundPaddingRight,
                         )
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                         result.lineSpacingExtra(view.lineSpacingExtra)

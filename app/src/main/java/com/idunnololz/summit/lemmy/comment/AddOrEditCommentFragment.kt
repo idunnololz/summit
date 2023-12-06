@@ -23,7 +23,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
@@ -181,7 +180,7 @@ class AddOrEditCommentFragment :
                 .onSuccess {
                     setFragmentResult(
                         requestKey = REQUEST_KEY,
-                        result = bundleOf(REQUEST_KEY_RESULT to Result.CommentSent)
+                        result = bundleOf(REQUEST_KEY_RESULT to Result.CommentSent),
                     )
 
                     dismiss()
@@ -450,15 +449,12 @@ class AddOrEditCommentFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
-                    AlertDialogFragment.Builder()
-                        .setMessage(
-                            getString(
-                                R.string.error_unable_to_send_post,
-                                it.error::class.qualifiedName,
-                                it.error.message,
-                            ),
-                        )
-                        .createAndShow(childFragmentManager, "ASDS")
+
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_upload_image),
+                        it.error,
+                        childFragmentManager,
+                    )
                 }
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
