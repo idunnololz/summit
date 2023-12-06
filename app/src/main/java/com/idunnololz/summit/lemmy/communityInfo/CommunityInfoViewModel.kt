@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CommunityInfoViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
+    private val noAuthApiClient: LemmyApiClient,
     private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
@@ -69,7 +71,12 @@ class CommunityInfoViewModel @Inject constructor(
                     )
                 }
                 is CommunityRef.Local -> {
-                    Either.Left(apiClient.fetchSiteWithRetry(force))
+                    if (apiClient.instance != communityRef.instance && communityRef.instance != null) {
+                        noAuthApiClient.changeInstance(communityRef.instance)
+                        Either.Left(noAuthApiClient.fetchSiteWithRetry(null, force))
+                    } else {
+                        Either.Left(apiClient.fetchSiteWithRetry(force))
+                    }
                 }
                 is CommunityRef.Subscribed -> {
                     Either.Left(apiClient.fetchSiteWithRetry(force))
