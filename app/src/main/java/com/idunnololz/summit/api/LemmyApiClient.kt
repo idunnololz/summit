@@ -1775,6 +1775,9 @@ class LemmyApiClient(
             if (errMsg == "rate_limit_error") {
                 return Result.failure(RateLimitException(0L))
             }
+            if (errMsg == "not_a_mod_or_admin") {
+                return Result.failure(NotAModOrAdmin())
+            }
             // TODO: Remove these checks once v0.19 is out for everyone.
             if (errMsg?.contains("unknown variant") == true || (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))) {
                 return Result.failure(NewApiException("v0.19"))
