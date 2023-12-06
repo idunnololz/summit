@@ -40,3 +40,5 @@ class SocketTimeoutException() :
 class NoInternetException() : NetworkException("No internet")
 
 sealed class NetworkException(msg: String) : RuntimeException(msg)
+
+class NotAModOrAdmin() : ClientApiException("Rate limit timed out.", 400)

@@ -126,7 +126,7 @@ class ModernThreadLinesDecoration(
             if (totalDepth >= threadLinesData.maxDepth) {
                 // If we are approaching the max depth, draw the depth
 
-                val textToDraw = threadLinesData.depth.toString()
+                val textToDraw = (threadLinesData.depth + 1).toString()
                 textPaint.getTextBounds(textToDraw, 0, textToDraw.length, tempRect)
                 val textX = x + translationX - tempRect.width() -
                     Utils.convertDpToPixel(8f)

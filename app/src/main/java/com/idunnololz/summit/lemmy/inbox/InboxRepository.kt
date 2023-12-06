@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.inbox
 import android.util.Log
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.NotAModOrAdmin
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.lemmy.inbox.repository.InboxSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
@@ -264,7 +265,11 @@ class InboxRepository @Inject constructor(
                 Result.success(it.post_reports.map { InboxItem.ReportPostInboxItem(it) })
             },
             onFailure = {
-                Result.failure(it)
+                if (it is NotAModOrAdmin) {
+                    Result.success(listOf())
+                } else {
+                    Result.failure(it)
+                }
             },
         )
     }
@@ -282,7 +287,11 @@ class InboxRepository @Inject constructor(
                 Result.success(it.comment_reports.map { InboxItem.ReportCommentInboxItem(it) })
             },
             onFailure = {
-                Result.failure(it)
+                if (it is NotAModOrAdmin) {
+                    Result.success(listOf())
+                } else {
+                    Result.failure(it)
+                }
             },
         )
     }
