@@ -569,6 +569,7 @@
     <string name="only_for_different_instances">Only for different instances</string>
     <string name="always">Always</string>
     <string name="classic_but_with_colors">Classic but with colors</string>
+    <string name="classic_but_with_colors_and_dividers">Classic but with colors and dividers</string>
     <string name="find_in_page">Find in page</string>
     <string name="choose_a_font">Choose a font</string>
 

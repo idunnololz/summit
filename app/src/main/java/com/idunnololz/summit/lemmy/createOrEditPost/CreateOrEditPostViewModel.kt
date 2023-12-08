@@ -49,7 +49,7 @@ class CreateOrEditPostViewModel @Inject constructor(
         private const val TAG = "CreateOrEditPostViewModel"
     }
 
-    private val uploaderApi = LemmyApiClient(context, "Jerboa")
+    private val uploaderApiClient = LemmyApiClient(context)
 
     private val linkMetadataHelper = LinkMetadataHelper()
 
@@ -244,10 +244,6 @@ class CreateOrEditPostViewModel @Inject constructor(
         imageLiveData.setIsLoading()
 
         viewModelScope.launch {
-            apiClient.changeInstance(instance)
-
-            Log.d(TAG, "Uploading onto instance $instance")
-
             var result = uri.path
             val cut: Int? = result?.lastIndexOf('/')
             if (cut != null && cut != -1) {
@@ -260,13 +256,18 @@ class CreateOrEditPostViewModel @Inject constructor(
                 imageLiveData.postError(NotAuthenticatedException())
                 return@launch
             }
+
+            val uploadInstance = account.instance
+            Log.d(TAG, "Uploading onto instance $uploadInstance")
+            uploaderApiClient.changeInstance(uploadInstance)
+
             context.contentResolver
                 .openInputStream(uri)
                 .use {
                     if (it == null) {
                         return@use Result.failure(RuntimeException("file_not_found"))
                     }
-                    return@use apiClient.uploadImage(result ?: "image", it)
+                    return@use uploaderApiClient.uploadImage(account, result ?: "image", it)
                 }
                 .onFailure {
                     imageLiveData.postError(it)

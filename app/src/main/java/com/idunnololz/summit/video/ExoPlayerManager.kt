@@ -15,6 +15,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.idunnololz.summit.preview.VideoType
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
 
 /**
@@ -33,6 +34,7 @@ class ExoPlayerManager(
 
         private val players = LinkedList<ExoPlayer>()
 
+        @ApplicationContext
         private lateinit var context: Context
 
         /**
@@ -42,7 +44,7 @@ class ExoPlayerManager(
         const val CONVENIENCE_REWIND_TIME_MS = 500L
 
         fun initialize(context: Context) {
-            this.context = context
+            this.context = context.applicationContext
         }
 
         fun get(lifecycleOwner: LifecycleOwner): ExoPlayerManager {
@@ -224,9 +226,9 @@ class ExoPlayerManager(
         val videoState = config.videoState
         if (videoState != null) {
             player.seekTo(videoState.currentTime)
-            player.audioComponent?.volume = videoState.volume
+            player.volume = videoState.volume
         } else {
-            player.audioComponent?.volume = 0.0f
+            player.volume = 0.0f
         }
 
         player.playWhenReady = config.playing
