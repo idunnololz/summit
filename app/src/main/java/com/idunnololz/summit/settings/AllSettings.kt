@@ -952,6 +952,12 @@ class PostAndCommentsSettings @Inject constructor(
                 null,
                 null,
             ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentsThreadStyle.LegacyWithColorsAndDividers,
+                context.getString(R.string.classic_but_with_colors_and_dividers),
+                null,
+                null,
+            ),
         ),
         relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )

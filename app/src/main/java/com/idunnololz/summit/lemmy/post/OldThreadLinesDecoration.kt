@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.left
 import com.idunnololz.summit.R
@@ -18,6 +19,7 @@ class OldThreadLinesDecoration(
     private val context: Context,
     private val isCompactView: Boolean,
     private val colorful: Boolean = false,
+    private val dividers: Boolean = false,
 ) : RecyclerView.ItemDecoration() {
 
     private val distanceBetweenLinesUnit =
@@ -43,6 +45,13 @@ class OldThreadLinesDecoration(
     private val linePaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.colorThreadLines)
         strokeWidth = Utils.convertDpToPixel(2f)
+    }
+    private val dividerPaint = Paint().apply {
+        val color1 = context.getColorFromAttribute(com.google.android.material.R.attr.colorOnSurface)
+        val color2 = context.getColorFromAttribute(com.google.android.material.R.attr.backgroundColor)
+
+        color = ColorUtils.blendARGB(color1, color2, 0.88f)
+        strokeWidth = Utils.convertDpToPixel(1f)
     }
     private val textPaint = Paint().apply {
         color = context.getColorCompat(R.color.colorTextFaint)
@@ -76,6 +85,8 @@ class OldThreadLinesDecoration(
             val screenshotMode = view.getTag(R.id.screenshot_mode) as? Boolean == true
             var translationX = view.translationX
             val translationY = view.translationY
+            val drawDividerAbove =
+                !(previousChild != null && previousTag !is ThreadLinesData) && dividers
 
             if (screenshotMode) {
                 translationX += screenshotWidth
@@ -111,7 +122,7 @@ class OldThreadLinesDecoration(
                     threadLinesData.indentationPerLevel + startingPadding
                 c.drawLine(
                     indent + translationX,
-                    view.top.toFloat() - topOverdraw + translationY,
+                    view.top.toFloat() + translationY,
                     indent + translationX,
                     view.bottom.toFloat() + translationY,
                     linePaint,
@@ -141,6 +152,26 @@ class OldThreadLinesDecoration(
                     textBackgroundPaint,
                 )
                 c.drawText(textToDraw, textX, textY, textPaint)
+            }
+
+            if (drawDividerAbove) {
+                dividerPaint.alpha = (view.alpha * 255).toInt()
+
+                val x = view.left + (totalDepth - 1) * distanceBetweenLinesUnit *
+                    threadLinesData.indentationPerLevel + startingPadding +
+                    (linePaint.strokeWidth)
+                val y = view.top.toFloat() + translationY
+                // Don't transform dividers by X due to swipe actions
+                val start = x - (linePaint.strokeWidth / 2)
+                val end = view.right.toFloat()
+                dividerPaint.alpha = 255
+                c.drawLine(
+                    start,
+                    y,
+                    end,
+                    y,
+                    dividerPaint,
+                )
             }
         }
     }

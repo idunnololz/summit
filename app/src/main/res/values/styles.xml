@@ -34,6 +34,8 @@
 
         <!-- Customize your theme here. -->
         <item name="backgroundColor">@color/colorBackground</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
@@ -88,6 +90,7 @@
         <item name="android:colorBackground">@color/md_theme_light_background</item>
         <item name="backgroundColor">@color/md_theme_light_background</item>
         <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="android:windowBackground">@color/md_theme_light_onBackground</item>
         <item name="colorSurface">@color/md_theme_light_surface</item>
         <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
         <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
@@ -270,6 +273,8 @@
 
     <style name="LessDarkBackground">
         <item name="backgroundColor">@color/colorSurface</item>
+        <item name="android:colorBackground">@color/colorSurface</item>
+        <item name="android:windowBackground">@color/colorSurface</item>
         <item name="elevationOverlayEnabled">true</item>
     </style>
 

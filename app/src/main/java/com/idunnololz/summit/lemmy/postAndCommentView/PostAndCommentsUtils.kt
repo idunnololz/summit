@@ -40,6 +40,8 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
                 OldThreadLinesDecoration(context, preferences.hideCommentActions)
             CommentsThreadStyle.LegacyWithColors ->
                 OldThreadLinesDecoration(context, preferences.hideCommentActions, colorful = true)
+            CommentsThreadStyle.LegacyWithColorsAndDividers ->
+                OldThreadLinesDecoration(context, preferences.hideCommentActions, colorful = true, dividers = true)
             else -> {
                 ModernThreadLinesDecoration(context, preferences.hideCommentActions)
             }

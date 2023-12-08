@@ -10,6 +10,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -75,29 +76,29 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as MainApplication).themeManager.applyThemeForActivity(this)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val key = getString(R.string.pref_key_navigation_bar_color)
-            if (PreferenceUtil.preferences.contains(key)) {
-                customNavigationBar = true
-                navigationBarColor = PreferenceUtil.preferences.getInt(key, 0)
-            } else {
-                customNavigationBar = false
-            }
+        window.decorView.setBackgroundColor(getColorFromAttribute(android.R.attr.windowBackground))
 
-            if (customNavigationBar) {
-                window.navigationBarColor = navigationBarColor
+        val key = getString(R.string.pref_key_navigation_bar_color)
+        if (PreferenceUtil.preferences.contains(key)) {
+            customNavigationBar = true
+            navigationBarColor = PreferenceUtil.preferences.getInt(key, 0)
+        } else {
+            customNavigationBar = false
+        }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val red = Color.red(navigationBarColor)
-                    val green = Color.green(navigationBarColor)
-                    val blue = Color.blue(navigationBarColor)
+        if (customNavigationBar) {
+            window.navigationBarColor = navigationBarColor
 
-                    if (red * 0.299 + green * 0.587 + blue * 0.114 > 186) {
-                        requestWindowFeature(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                        var flags = window.decorView.systemUiVisibility
-                        flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                        window.decorView.systemUiVisibility = flags
-                    }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val red = Color.red(navigationBarColor)
+                val green = Color.green(navigationBarColor)
+                val blue = Color.blue(navigationBarColor)
+
+                if (red * 0.299 + green * 0.587 + blue * 0.114 > 186) {
+                    requestWindowFeature(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                    var flags = window.decorView.systemUiVisibility
+                    flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                    window.decorView.systemUiVisibility = flags
                 }
             }
         }

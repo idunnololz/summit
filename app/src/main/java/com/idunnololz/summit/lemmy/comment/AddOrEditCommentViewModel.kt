@@ -21,6 +21,7 @@ import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostViewModel
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.util.Event
@@ -32,7 +33,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AddOrEditCommentViewModel @Inject constructor(
     private val context: Application,
-    private val apiClient: LemmyApiClient,
     private val authedApiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val accountActionsManager: AccountActionsManager,
@@ -43,6 +43,8 @@ class AddOrEditCommentViewModel @Inject constructor(
     companion object {
         private const val TAG = "AddOrEditCommentViewModel"
     }
+
+    private val uploaderApiClient = LemmyApiClient(context)
 
     sealed interface Message {
         data class ReplyTargetTooOld(
@@ -132,8 +134,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                     is InboxItem.ReportPostInboxItem,
                     -> error("Should never happen!")
                     is InboxItem.MessageInboxItem -> {
-                        apiClient.changeInstance(instance)
-                        apiClient
+                        authedApiClient
                             .createPrivateMessage(
                                 content = content,
                                 recipient = inboxItem.authorId,
@@ -167,10 +168,6 @@ class AddOrEditCommentViewModel @Inject constructor(
         uploadImageEvent.setIsLoading()
 
         viewModelScope.launch {
-            apiClient.changeInstance(instance)
-
-            Log.d(TAG, "Uploading onto instance $instance")
-
             var result = uri.path
             val cut: Int? = result?.lastIndexOf('/')
             if (cut != null && cut != -1) {
@@ -183,13 +180,18 @@ class AddOrEditCommentViewModel @Inject constructor(
                 uploadImageEvent.postError(NotAuthenticatedException())
                 return@launch
             }
+
+            val uploadInstance = account.instance
+            Log.d(TAG, "Uploading onto instance $uploadInstance")
+            uploaderApiClient.changeInstance(uploadInstance)
+
             context.contentResolver
                 .openInputStream(uri)
                 .use {
                     if (it == null) {
                         return@use Result.failure(RuntimeException("file_not_found"))
                     }
-                    return@use apiClient.uploadImage(account, result ?: "image", it)
+                    return@use uploaderApiClient.uploadImage(account, result ?: "image", it)
                 }
                 .onFailure {
                     uploadImageEvent.postError(it)

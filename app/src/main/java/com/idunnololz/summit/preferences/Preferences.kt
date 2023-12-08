@@ -105,16 +105,14 @@ import java.time.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class Preferences @Inject constructor(
+class Preferences(
     @ApplicationContext private val context: Context,
+    private val prefs: SharedPreferences,
 ) {
 
     companion object {
         private const val TAG = "Preferences"
     }
-
-    private val prefs = PreferenceUtil.preferences
 
     val all
         get() = prefs.all
