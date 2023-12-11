@@ -14,7 +14,6 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commitNow
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -39,8 +38,8 @@ import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
-import com.idunnololz.summit.main.communities_pane.CommunitiesPaneController
-import com.idunnololz.summit.main.communities_pane.CommunitiesPaneViewModel
+import com.idunnololz.summit.main.communitiesPane.CommunitiesPaneController
+import com.idunnololz.summit.main.communitiesPane.CommunitiesPaneViewModel
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef

@@ -330,7 +330,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             }
             if (data.personView.person.avatar == null) {
                 profileIcon.setImageDrawable(
-                    accountImageGenerator.generateDrawableForPerson(data.personView.person))
+                    accountImageGenerator.generateDrawableForPerson(data.personView.person),
+                )
             } else {
                 profileIcon.load(data.personView.person.avatar) {
                     fallback(R.drawable.thumbnail_placeholder_square)

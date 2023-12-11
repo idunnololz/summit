@@ -20,7 +20,6 @@ import com.idunnololz.summit.lemmy.multicommunity.ModeratedCommunitiesDataSource
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -101,7 +100,7 @@ class PostsRepository @Inject constructor(
         coroutineScope.launch {
             accountInfoManager.currentFullAccount.collect { fullAccount ->
                 val preferences = preferenceManager.getComposedPreferencesForAccount(
-                    fullAccount?.account
+                    fullAccount?.account,
                 )
 
                 if (fullAccount != null) {

@@ -210,17 +210,17 @@ class SettingsWebFragment :
                     addItemWithIcon(
                         id = R.id.generate_lemming,
                         title = R.string.generate_your_own_lemming,
-                        icon = R.drawable.ic_lemmy_24
+                        icon = R.drawable.ic_lemmy_24,
                     )
                     addItemWithIcon(
                         id = R.id.from_camera,
                         title = R.string.take_a_photo,
-                        icon = R.drawable.baseline_photo_camera_24
+                        icon = R.drawable.baseline_photo_camera_24,
                     )
                     addItemWithIcon(
                         id = R.id.from_gallery,
                         title = R.string.choose_from_gallery,
-                        icon = R.drawable.baseline_image_24
+                        icon = R.drawable.baseline_image_24,
                     )
                     addItemWithIcon(R.id.clear, R.string.clear_image, R.drawable.baseline_clear_24)
 

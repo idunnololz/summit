@@ -16,7 +16,6 @@ import com.idunnololz.summit.preferences.BaseTheme
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.GlobalFontColorId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
-import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.PreferencesViewModel

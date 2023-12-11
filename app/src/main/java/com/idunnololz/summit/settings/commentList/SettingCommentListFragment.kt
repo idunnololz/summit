@@ -120,7 +120,7 @@ class SettingCommentListFragment :
             { preferences.showProfileIcons },
             {
                 preferences.showProfileIcons = it
-            }
+            },
         )
     }
 

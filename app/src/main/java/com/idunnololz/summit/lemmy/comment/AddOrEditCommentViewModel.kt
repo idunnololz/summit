@@ -21,7 +21,6 @@ import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostViewModel
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.util.Event

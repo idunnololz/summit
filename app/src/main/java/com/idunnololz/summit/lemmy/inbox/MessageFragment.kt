@@ -26,8 +26,8 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
-import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.post.PostAdapter
+import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions

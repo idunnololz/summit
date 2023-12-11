@@ -239,12 +239,12 @@ class SettingsWebViewModel @Inject constructor(
 
         viewModelScope.launch {
             val drawable = accountImageGenerator.generateDrawableForKey(
-                "${account.name}@${account.id}@${account.instance}"
+                "${account.name}@${account.id}@${account.instance}",
             ) as BitmapDrawable
 
             val file = File(
                 directoryHelper.imagesDir,
-                "${account.name}@${account.id}@${account.instance}.png"
+                "${account.name}@${account.id}@${account.instance}.png",
             )
 
             drawable.bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())

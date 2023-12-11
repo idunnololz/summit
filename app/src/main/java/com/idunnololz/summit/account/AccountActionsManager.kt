@@ -27,7 +27,6 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.preferences.PreferenceManager
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import dagger.hilt.android.qualifiers.ApplicationContext

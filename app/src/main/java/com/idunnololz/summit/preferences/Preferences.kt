@@ -103,8 +103,6 @@ import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
 import java.time.Duration
-import javax.inject.Inject
-import javax.inject.Singleton
 
 class Preferences(
     @ApplicationContext private val context: Context,

@@ -3,10 +3,7 @@ package com.idunnololz.summit.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,7 +28,7 @@ class PreferenceManager @Inject constructor(
         val prefs = if (account != null) {
             listOf(
                 getSharedPreferencesForAccount(account),
-                baseSharedPreferences
+                baseSharedPreferences,
             )
         } else {
             listOf(baseSharedPreferences)
@@ -40,7 +37,7 @@ class PreferenceManager @Inject constructor(
         currentAccount = account
         _currentPreferences = Preferences(
             context = context,
-            prefs = ComposedPreferences(prefs)
+            prefs = ComposedPreferences(prefs),
         )
 
         return _currentPreferences!!
@@ -54,5 +51,4 @@ class PreferenceManager @Inject constructor(
         val key = "account@${account.instance}@${account.id}"
         return context.getSharedPreferences(key, Context.MODE_PRIVATE)
     }
-
 }

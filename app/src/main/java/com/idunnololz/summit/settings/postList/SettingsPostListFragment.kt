@@ -20,10 +20,8 @@ import com.idunnololz.summit.settings.PostListSettings
 import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.theme.FontPickerDialogFragmentArgs
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe

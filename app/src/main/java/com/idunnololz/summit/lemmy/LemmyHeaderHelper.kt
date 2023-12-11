@@ -10,7 +10,6 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
@@ -219,7 +218,7 @@ class LemmyHeaderHelper(
                 instance = instance,
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,
-                onLinkLongClick = onLinkLongClick
+                onLinkLongClick = onLinkLongClick,
             )
             currentTextView.isSingleLine = true
             headerContainer.multiline = true
@@ -321,7 +320,7 @@ class LemmyHeaderHelper(
             instance = instance,
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick
+            onLinkLongClick = onLinkLongClick,
         )
     }
 
@@ -501,7 +500,7 @@ class LemmyHeaderHelper(
             instance = instance,
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick
+            onLinkLongClick = onLinkLongClick,
         )
     }
 
@@ -624,7 +623,6 @@ class LemmyHeaderHelper(
 
         headerContainer.setTextSecondPart(sb)
     }
-
 
     private fun makeMovementMethod(
         instance: String,

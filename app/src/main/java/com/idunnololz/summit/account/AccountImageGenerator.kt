@@ -128,7 +128,6 @@ class AccountImageGenerator @Inject constructor(
     private fun getColorForKey(key: String): Int {
         // Ported from https://dev.to/admitkard/auto-generate-avatar-colors-randomly-138j
 
-
         fun hash(key: String): Int {
             var hash = 0
             for (char in key) {

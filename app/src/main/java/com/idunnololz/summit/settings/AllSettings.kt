@@ -1835,7 +1835,7 @@ class PerAccountSettings @Inject constructor(
     )
     val desc = DescriptionSettingItem(
         "",
-        context.getString(R.string.per_account_settings_desc)
+        context.getString(R.string.per_account_settings_desc),
     )
 
     override val parents: List<KClass<out SearchableSettings>> = listOf(
