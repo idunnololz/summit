@@ -33,12 +33,12 @@ import com.idunnololz.summit.databinding.ViewAllCommentsBinding
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.flatten
-import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.CommentItem
-import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.FooterItem
-import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.HeaderItem
-import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.MoreCommentsItem
-import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.PendingCommentItem
-import com.idunnololz.summit.lemmy.post.PostsAdapter.Item.ProgressOrErrorItem
+import com.idunnololz.summit.lemmy.post.PostAdapter.Item.CommentItem
+import com.idunnololz.summit.lemmy.post.PostAdapter.Item.FooterItem
+import com.idunnololz.summit.lemmy.post.PostAdapter.Item.HeaderItem
+import com.idunnololz.summit.lemmy.post.PostAdapter.Item.MoreCommentsItem
+import com.idunnololz.summit.lemmy.post.PostAdapter.Item.PendingCommentItem
+import com.idunnololz.summit.lemmy.post.PostAdapter.Item.ProgressOrErrorItem
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.QueryResult
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
@@ -54,7 +54,7 @@ import com.idunnololz.summit.util.recyclerView.isBinding
 import com.idunnololz.summit.video.VideoState
 import java.util.LinkedList
 
-class PostsAdapter(
+class PostAdapter(
     private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
     private val context: Context,
     private val containerView: View,
@@ -305,9 +305,6 @@ class PostsAdapter(
                         )
                         headerView.textView2.compoundDrawablePadding =
                             Utils.convertDpToPixel(4f).toInt()
-                        headerView.textView2.updatePaddingRelative(
-                            start = Utils.convertDpToPixel(8f).toInt(),
-                        )
 
                         headerView.textView3.setCompoundDrawablesRelativeWithIntrinsicBounds(
                             R.drawable.baseline_arrow_downward_16,

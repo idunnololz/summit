@@ -330,41 +330,50 @@ fun List<CommentNodeData>.flatten(
 ): MutableList<CommentNodeData> {
     val result = mutableListOf<CommentNodeData>()
 
-    fun CommentNodeData.flattenRecursive() {
-        result.add(this)
+    fun CommentNodeData.flatten(result: MutableList<CommentNodeData>) {
+        val toVisit = LinkedList<CommentNodeData>()
 
-        when (val commentView = this.commentView) {
-            is PostViewModel.ListView.CommentListView -> {
-                if (collapsedItemIds.contains(commentView.id)) {
-                    return
+        toVisit.add(this)
+
+        while (toVisit.isNotEmpty()) {
+            val currentNode = toVisit.pollLast()!!
+
+            result.add(currentNode)
+
+            when (val commentView = currentNode.commentView) {
+                is PostViewModel.ListView.CommentListView -> {
+                    if (collapsedItemIds.contains(commentView.id)) {
+                        continue
+                    }
+                }
+                is PostViewModel.ListView.PendingCommentListView -> {
+                    if (collapsedItemIds.contains(commentView.id)) {
+                        continue
+                    }
+                }
+                is PostViewModel.ListView.PostListView -> {
+                    // this should never happen
+                }
+
+                is PostViewModel.ListView.MoreCommentsItem -> {
+                    // shouldnt happen
+                }
+
+                is PostViewModel.ListView.MissingCommentItem -> {
+                    if (collapsedItemIds.contains(commentView.id)) {
+                        continue
+                    }
                 }
             }
-            is PostViewModel.ListView.PendingCommentListView -> {
-                if (collapsedItemIds.contains(commentView.id)) {
-                    return
-                }
-            }
-            is PostViewModel.ListView.PostListView -> {
-                // this should never happen
-            }
 
-            is PostViewModel.ListView.MoreCommentsItem -> {
-                // shouldnt happen
+            currentNode.children.reversed().forEach {
+                toVisit.addLast(it)
             }
-
-            is PostViewModel.ListView.MissingCommentItem -> {
-                if (collapsedItemIds.contains(commentView.id)) {
-                    return
-                }
-            }
-        }
-
-        this.children.forEach {
-            it.flattenRecursive()
         }
     }
+
     this.forEach {
-        it.flattenRecursive()
+        it.flatten(result)
     }
 
     return result

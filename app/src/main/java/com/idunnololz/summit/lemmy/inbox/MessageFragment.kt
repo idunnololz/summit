@@ -27,7 +27,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostViewModel
-import com.idunnololz.summit.lemmy.post.PostsAdapter
+import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -409,7 +409,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         val context = requireContext()
 
         with(binding) {
-            val adapter = PostsAdapter(
+            val adapter = PostAdapter(
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
                 context = context,
                 containerView = binding.recyclerView,
@@ -443,7 +443,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     if (viewModel.accountManager.currentAccount.value == null) {
                         PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                             .show(childFragmentManager, "asdf")
-                        return@PostsAdapter
+                        return@PostAdapter
                     }
 
                     AddOrEditCommentFragment.showReplyDialog(
@@ -473,7 +473,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 onFetchComments = {
                     val postId = when (val inboxItem = args.inboxItem) {
                         is InboxItem.MentionInboxItem -> inboxItem.postId
-                        is InboxItem.MessageInboxItem -> return@PostsAdapter
+                        is InboxItem.MessageInboxItem -> return@PostAdapter
                         is InboxItem.ReplyInboxItem -> inboxItem.postId
                         is InboxItem.ReportMessageInboxItem -> TODO()
                         is InboxItem.ReportCommentInboxItem -> inboxItem.postId

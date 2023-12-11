@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
@@ -51,6 +52,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.ReportItem
@@ -60,6 +62,7 @@ import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -700,6 +703,20 @@ class PostAndCommentViewBuilder @Inject constructor(
                             holder.downvoteCount = null
                         }
 
+                        if (showProfileIcons) {
+                            // We are displaying the score on it's own line so no padding needed.
+                            headerView.textView2.updatePaddingRelative(
+                                start = 0
+                            )
+                            headerView.updatePaddingRelative(
+                                bottom = Utils.convertDpToPixel(8f).toInt(),
+                            )
+                        } else {
+                            headerView.textView2.updatePaddingRelative(
+                                start = Utils.convertDpToPixel(8f).toInt(),
+                            )
+                        }
+
                         if (isActionsExpanded) {
                             ensureActionButtons(root, isCompactView, leftHandMode)
                         } else {
@@ -739,18 +756,23 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         if (showProfileIcons) {
             (headerView.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
+            val iconImageView = headerView.getIconImageView()
 
             if (commentView.creator.avatar != null) {
-                headerView.getIconImageView().load(commentView.creator.avatar)
+                iconImageView.load(commentView.creator.avatar)
             } else {
                 val job = coroutineScope.launch {
                     val d = accountImageGenerator.generateDrawableForPerson(commentView.creator)
 
                     withContext(Dispatchers.Main) {
-                        headerView.getIconImageView().load(d)
+                        iconImageView.load(d)
                     }
                 }
                 headerView.setTag(R.id.generate_profile_icon_job, job)
+            }
+
+            iconImageView.setOnClickListener {
+                onPageClick(commentView.creator.toPersonRef())
             }
         }
 

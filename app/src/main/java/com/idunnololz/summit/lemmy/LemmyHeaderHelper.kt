@@ -212,7 +212,7 @@ class LemmyHeaderHelper(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
             }
-            headerContainer.orientation = LinearLayout.HORIZONTAL
+            headerContainer.multiline = false
         } else if (useMultilineHeader) {
             currentTextView.text = sb
             currentTextView.movementMethod = makeMovementMethod(
@@ -222,12 +222,12 @@ class LemmyHeaderHelper(
                 onLinkLongClick = onLinkLongClick
             )
             currentTextView.isSingleLine = true
-            headerContainer.orientation = LinearLayout.VERTICAL
+            headerContainer.multiline = true
 
             currentTextView = headerContainer.textView2
             sb = SpannableStringBuilder()
         } else {
-            headerContainer.orientation = LinearLayout.HORIZONTAL
+            headerContainer.multiline = false
         }
 
         if (listAuthor) {
@@ -341,9 +341,9 @@ class LemmyHeaderHelper(
         isCurrentUser: Boolean,
     ) {
         val creatorInstance = commentView.creator.instance
-        var currentTextView = headerContainer.textView1
+        val currentTextView = headerContainer.textView1
 
-        var sb = SpannableStringBuilder()
+        val sb = SpannableStringBuilder()
 
         if (isCurrentUser) {
             val s = sb.length
@@ -443,24 +443,9 @@ class LemmyHeaderHelper(
             }
         }
 
-        if (useMultilineHeader) {
-            currentTextView.text = sb
-            currentTextView.movementMethod = makeMovementMethod(
-                instance = instance,
-                onPageClick = onPageClick,
-                onLinkClick = onLinkClick,
-                onLinkLongClick = onLinkLongClick
-            )
-            currentTextView.isSingleLine = true
-            headerContainer.orientation = LinearLayout.VERTICAL
-
-            currentTextView = headerContainer.textView2
-            sb = SpannableStringBuilder()
-        } else {
-            headerContainer.orientation = LinearLayout.HORIZONTAL
+        if (sb.isNotEmpty()) {
+            sb.append("  ")
         }
-
-        sb.append("  ")
         sb.append(
             dateStringToPretty(context, commentView.comment.updated ?: commentView.comment.published),
         )
@@ -500,6 +485,13 @@ class LemmyHeaderHelper(
                     commentView.counts.upvotes / (commentView.counts.upvotes + commentView.counts.downvotes).toFloat(),
                 ),
             )
+        }
+
+        if (useMultilineHeader) {
+            currentTextView.isSingleLine = true
+            headerContainer.multiline = true
+        } else {
+            headerContainer.multiline = false
         }
 
 //        headerContainer.setTextFirstPart(sb)

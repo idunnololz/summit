@@ -27,7 +27,7 @@ import com.idunnololz.summit.databinding.ScreenshotSizeConfigBinding
 import com.idunnololz.summit.databinding.ScreenshotStageBinding
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostFragment
-import com.idunnololz.summit.lemmy.post.PostsAdapter
+import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -274,7 +274,7 @@ class ScreenshotModeDialogFragment :
         }
     }
 
-    private fun generateScreenshot(adapter: PostsAdapter) {
+    private fun generateScreenshot(adapter: PostAdapter) {
         val context = requireContext()
 
         val screenshotStage = ScreenshotStageBinding.inflate(
