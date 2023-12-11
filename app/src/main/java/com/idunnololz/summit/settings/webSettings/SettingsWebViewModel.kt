@@ -1,12 +1,16 @@
 package com.idunnololz.summit.settings.webSettings
 
 import android.app.Application
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.LemmyApiClient
@@ -17,9 +21,11 @@ import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingItem
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,10 +36,13 @@ class SettingsWebViewModel @Inject constructor(
     private val lemmyApiClient: LemmyApiClient,
     private val lemmyWebSettings: LemmyWebSettings,
     private val state: SavedStateHandle,
+    private val accountImageGenerator: AccountImageGenerator,
+    private val directoryHelper: DirectoryHelper,
 ) : ViewModel() {
 
     var imagePickerKey: MutableLiveData<Int?> = state.getLiveData("imagePickerKey", null)
     val accountData = StatefulLiveData<AccountData>()
+    val generatedLemming = StatefulLiveData<BitmapDrawable>()
 
     val saveUserSettings = StatefulLiveData<Unit>()
     val uploadImageStatus = StatefulLiveData<Pair<Int, String>>()
@@ -222,6 +231,27 @@ class SettingsWebViewModel @Inject constructor(
                 .onFailure {
                     uploadImageStatus.postError(it)
                 }
+        }
+    }
+
+    fun generateLemming(account: Account) {
+        generatedLemming.setIsLoading()
+
+        viewModelScope.launch {
+            val drawable = accountImageGenerator.generateDrawableForKey(
+                "${account.name}@${account.id}@${account.instance}"
+            ) as BitmapDrawable
+
+            val file = File(
+                directoryHelper.imagesDir,
+                "${account.name}@${account.id}@${account.instance}.png"
+            )
+
+            drawable.bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
+
+            uploadImage(file.toUri())
+
+            generatedLemming.postValue(drawable)
         }
     }
 

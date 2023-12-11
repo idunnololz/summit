@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
@@ -110,7 +109,7 @@ class PostFragment :
     private val viewModel: PostViewModel by viewModels()
     private val actionsViewModel: MoreActionsViewModel by viewModels()
 
-    private var adapter: PostsAdapter? = null
+    private var adapter: PostAdapter? = null
 
     private var hasConsumedJumpToComments: Boolean = false
 
@@ -304,7 +303,7 @@ class PostFragment :
 
         val context = requireContext()
         if (adapter == null) {
-            adapter = PostsAdapter(
+            adapter = PostAdapter(
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
                 context = context,
                 containerView = binding.recyclerView,
@@ -338,7 +337,7 @@ class PostFragment :
                     if (accountManager.currentAccount.value == null) {
                         PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                             .show(childFragmentManager, "asdf")
-                        return@PostsAdapter
+                        return@PostAdapter
                     }
 
                     AddOrEditCommentFragment.showReplyDialog(

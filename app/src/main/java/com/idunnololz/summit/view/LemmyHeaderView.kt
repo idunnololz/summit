@@ -3,24 +3,25 @@ package com.idunnololz.summit.view
 import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
-import android.view.Gravity
+import android.util.Log
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import com.google.android.material.R
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.CornerSize
 import com.google.android.material.shape.RelativeCornerSize
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import kotlin.math.max
 import com.idunnololz.summit.R as R2
 
-class LemmyHeaderView : LinearLayout {
+
+class LemmyHeaderView : FrameLayout {
 
     companion object {
         const val STATIC_VIEW_COUNT = 3
@@ -32,18 +33,22 @@ class LemmyHeaderView : LinearLayout {
     val textView3: TextView
     private val flairView: FlairView
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+    var multiline: Boolean = false
+        set(value) {
+            field = value
+
+            requestLayout()
+        }
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr,
     )
 
     init {
-        orientation = HORIZONTAL
-        gravity = Gravity.CENTER_VERTICAL
-
         textView1 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
             .style()
         textView2 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
@@ -84,20 +89,6 @@ class LemmyHeaderView : LinearLayout {
         return iconImageView!!
     }
 
-    override fun setOrientation(orientation: Int) {
-        if (orientation == this.orientation) {
-            return
-        }
-
-        super.setOrientation(orientation)
-
-        if (orientation == VERTICAL) {
-            textView3.visibility = View.GONE
-        } else {
-            textView3.visibility = View.VISIBLE
-        }
-    }
-
     private fun LinkifyTextView.style(): LinkifyTextView {
         maxLines = 1
         isSingleLine = true
@@ -129,7 +120,8 @@ class LemmyHeaderView : LinearLayout {
         iconImageView.scaleType = ImageView.ScaleType.CENTER_CROP
         iconImageView.strokeWidth = strokeWidth
         iconImageView.strokeColor = ColorStateList.valueOf(
-            context.getColorFromAttribute(R.attr.colorOnSurface))
+            context.getColorFromAttribute(R.attr.colorOnSurface),
+        )
         iconImageView.setPadding(strokeWidthHalf, strokeWidthHalf, strokeWidthHalf, strokeWidthHalf)
 
         iconImageView.updateLayoutParams<LayoutParams> {
@@ -139,4 +131,119 @@ class LemmyHeaderView : LinearLayout {
         }
         this.iconImageView = iconImageView
     }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+//        super.onLayout(changed, left, top, right, bottom)
+
+        val children = children
+        val isRtl = layoutDirection == LAYOUT_DIRECTION_RTL
+        val height = bottom - top
+        val childSpace = height - paddingTop - paddingBottom
+
+        if (!multiline) {
+            if (isRtl) {
+                var start = paddingRight
+                for (child in children) {
+                    if (child.visibility == View.GONE) continue
+
+                    val layoutParams = child.layoutParams as LayoutParams
+                    val childTop = (paddingTop + (childSpace - child.measuredHeight) / 2
+                        + layoutParams.topMargin) - layoutParams.bottomMargin
+
+                    start -= layoutParams.rightMargin
+                    child.layout(
+                        start - child.measuredWidth,
+                        childTop,
+                        start,
+                        childTop + child.measuredHeight,
+                    )
+                    start -= child.measuredWidth - layoutParams.rightMargin
+                }
+            } else {
+                var start = paddingLeft
+                for (child in children) {
+                    if (child.visibility == View.GONE) continue
+
+                    Log.d("ASDF", "Child ${child} has height: ${child.measuredHeight}")
+
+                    val layoutParams = child.layoutParams as LayoutParams
+                    val childTop = (paddingTop + (childSpace - child.measuredHeight) / 2
+                        + layoutParams.topMargin) - layoutParams.bottomMargin
+
+                    start += layoutParams.leftMargin
+                    child.layout(
+                        start,
+                        childTop,
+                        start + child.measuredWidth,
+                        childTop + child.measuredHeight,
+                    )
+                    start += child.measuredWidth + layoutParams.rightMargin
+                }
+            }
+        } else {
+            var start = paddingLeft
+            val iconImageView = iconImageView
+
+            if (iconImageView != null) {
+                val child = iconImageView
+                val layoutParams = child.layoutParams as LayoutParams
+                val childTop = (paddingTop + (childSpace - child.measuredHeight) / 2
+                    + layoutParams.topMargin) - layoutParams.bottomMargin
+
+                start += layoutParams.leftMargin
+                child.layout(
+                    start,
+                    childTop,
+                    start + child.measuredWidth,
+                    childTop + child.measuredHeight,
+                )
+                start += child.measuredWidth + layoutParams.rightMargin
+            }
+
+            val textChildrenTotalHeight =
+                textView1.measuredHeight + max(textView2.measuredHeight, textView3.measuredHeight)
+
+            var top: Int
+            run {
+                val child = textView1
+                val layoutParams = child.layoutParams as LayoutParams
+                top = (paddingTop + (childSpace - textChildrenTotalHeight) / 2
+                    + layoutParams.topMargin) - layoutParams.bottomMargin
+                child.layout(
+                    start + layoutParams.leftMargin,
+                    top,
+                    start + child.measuredWidth + layoutParams.leftMargin,
+                    top + child.measuredHeight,
+                )
+                top += child.measuredHeight
+            }
+            run {
+                val child = textView2
+                val layoutParams = child.layoutParams as LayoutParams
+                child.layout(
+                    start + layoutParams.leftMargin,
+                    top + layoutParams.topMargin,
+                    start + child.measuredWidth + layoutParams.leftMargin,
+                    top + child.measuredHeight,
+                )
+                start += child.measuredWidth + layoutParams.leftMargin
+            }
+            run {
+                val child = textView3
+                val layoutParams = child.layoutParams as LayoutParams
+                child.layout(
+                    start + layoutParams.leftMargin,
+                    top + layoutParams.topMargin,
+                    start + child.measuredWidth + layoutParams.leftMargin,
+                    top + child.measuredHeight,
+                )
+            }
+        }
+    }
+
+    override fun generateDefaultLayoutParams(): LayoutParams =
+        LayoutParams(
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT,
+        )
 }

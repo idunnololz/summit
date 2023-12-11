@@ -769,7 +769,7 @@ class Preferences(
         }
 
     var showProfileIcons: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_PROFILE_ICONS, true)
+        get() = prefs.getBoolean(KEY_SHOW_PROFILE_ICONS, false)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_PROFILE_ICONS, value)

@@ -159,4 +159,5 @@
     <item name="detailed_view" type="id" />
     <item name="view_mod_log" type="id" />
     <item name="generate_profile_icon_job" type="id" />
+    <item name="generate_lemming" type="id" />
 </resources>

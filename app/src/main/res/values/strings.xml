@@ -803,12 +803,13 @@
     <string name="transferred_ownership_of_community_format">Transferred ownership of the community %1$s to %2$s.</string>
     <string name="error_unable_to_upload_image">Unable to upload image due to an unknown issue.</string>
     <string name="show_profile_icons">Show profile icons</string>
-    <string name="show_profile_icons_desc">When enabled, profile icons will be shown for comments. May introduce FPS lag.</string>
+    <string name="show_profile_icons_desc">When enabled, profile icons will be shown for comments. May cause FPS lag.</string>
     <string name="delete_setting_override_for_setting_format">Delete setting override for setting \"%1$s\"?</string>
     <string name="delete">Delete</string>
     <string name="manage_settings">Manage settings</string>
     <string name="manage_settings_desc">See what settings are overridden and reset overridden settings.</string>
     <string name="per_account_settings_desc">Settings you change here will override the settings set outside of the per-account page. These overrides will only take effect when the associated account is the current account. You can reset any overridden settings in the \"Manage settings\" page.</string>
+    <string name="generate_your_own_lemming">Generate your own lemming avatar!</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

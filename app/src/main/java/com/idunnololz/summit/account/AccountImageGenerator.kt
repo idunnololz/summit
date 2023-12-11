@@ -18,6 +18,7 @@ import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.abs
 
 @Singleton
 class AccountImageGenerator @Inject constructor(
@@ -54,6 +55,24 @@ class AccountImageGenerator @Inject constructor(
         with(Canvas(bitmap)) {
             val bgPaint = Paint().apply {
                 color = getColorForKey("${person.name}@${person.id}@${person.instance}")
+            }
+
+            drawRect(0f, 0f, accountImageSize.toFloat(), accountImageSize.toFloat(), bgPaint)
+
+            personDrawable?.setBounds(0, 0, accountImageSize, accountImageSize)
+            personDrawable?.draw(this)
+        }
+        return BitmapDrawable(context.resources, bitmap)
+    }
+
+    fun generateDrawableForKey(key: String): Drawable {
+        val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
+        val bitmap = Bitmap.createBitmap(accountImageSize, accountImageSize, Bitmap.Config.ARGB_8888)
+        val personDrawable = context.getDrawableCompat(R.drawable.lemmy_profile_4)
+
+        with(Canvas(bitmap)) {
+            val bgPaint = Paint().apply {
+                color = getColorForKey(key)
             }
 
             drawRect(0f, 0f, accountImageSize.toFloat(), accountImageSize.toFloat(), bgPaint)
@@ -108,24 +127,32 @@ class AccountImageGenerator @Inject constructor(
 
     private fun getColorForKey(key: String): Int {
         // Ported from https://dev.to/admitkard/auto-generate-avatar-colors-randomly-138j
-        val hRange = 0 until 360
-        val sRange = 10 until 100
-        val lRange = 70 until 100
 
-        val accountHash = key.hashCode()
+
+        fun hash(key: String): Int {
+            var hash = 0
+            for (char in key) {
+                hash = char.code + ((hash shl 5) - hash)
+            }
+            hash = abs(hash)
+
+            return hash
+        }
+
+        val accountHash = hash(key)
 
         fun normalizeHash(hash: Int, min: Int, max: Int) =
             hash % (max - min) + min
 
-        val h = normalizeHash(accountHash, hRange.first, hRange.last)
-        val s = normalizeHash(accountHash, sRange.first, sRange.last)
-        val l = normalizeHash(accountHash, lRange.first, lRange.last)
+        val h = normalizeHash(accountHash, 0, 3600)
+        val s = normalizeHash(accountHash / 100, 500, 800)
+        val l = normalizeHash(accountHash * 31, 600, 900)
 
         return Color.HSVToColor(
             floatArrayOf(
-                h.toFloat(),
-                s / 100f,
-                l / 100f,
+                h.toFloat() / 10f,
+                s / 1000f,
+                l / 1000f,
             ),
         )
     }
