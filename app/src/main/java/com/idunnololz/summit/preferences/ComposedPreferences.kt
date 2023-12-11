@@ -3,7 +3,7 @@ package com.idunnololz.summit.preferences
 import android.content.SharedPreferences
 
 class ComposedPreferences(
-    private val preferences: List<SharedPreferences>
+    private val preferences: List<SharedPreferences>,
 ) : SharedPreferences {
 
     override fun getAll(): MutableMap<String, *> =
@@ -60,12 +60,12 @@ class ComposedPreferences(
         throw RuntimeException("Edit is not supported by ComposedPreferences.")
 
     override fun registerOnSharedPreferenceChangeListener(
-        listener: SharedPreferences.OnSharedPreferenceChangeListener?
+        listener: SharedPreferences.OnSharedPreferenceChangeListener?,
     ) =
         throw RuntimeException("registerOnSharedPreferenceChangeListener is not supported by ComposedPreferences.")
 
     override fun unregisterOnSharedPreferenceChangeListener(
-        listener: SharedPreferences.OnSharedPreferenceChangeListener?
+        listener: SharedPreferences.OnSharedPreferenceChangeListener?,
     ) =
         throw RuntimeException("unregisterOnSharedPreferenceChangeListener is not supported by ComposedPreferences.")
 }

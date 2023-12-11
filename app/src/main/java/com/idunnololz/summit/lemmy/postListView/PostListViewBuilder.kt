@@ -54,7 +54,6 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PreferenceManager
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
@@ -87,7 +86,8 @@ class PostListViewBuilder @Inject constructor(
     }
 
     private var preferences = preferenceManager.getComposedPreferencesForAccount(
-        accountManager.currentAccount.value)
+        accountManager.currentAccount.value,
+    )
 
     var postUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
         set(value) {

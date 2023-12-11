@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingPerAccountViewModel @Inject constructor(
     private val accountManager: AccountManager,
-    private val preferenceManager: PreferenceManager
+    private val preferenceManager: PreferenceManager,
 ) : ViewModel() {
 
     val preferenceData = StatefulLiveData<PreferenceData>()
@@ -33,8 +33,8 @@ class SettingPerAccountViewModel @Inject constructor(
                 preferenceData.setValue(
                     PreferenceData(
                         account,
-                        preferenceManager.getOnlyPreferencesForAccount(account)
-                    )
+                        preferenceManager.getOnlyPreferencesForAccount(account),
+                    ),
                 )
             } else {
                 this@SettingPerAccountViewModel.preferenceData.setError(NoAccountError())

@@ -52,7 +52,6 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.ReportItem
@@ -70,7 +69,6 @@ import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PreferenceManager
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
@@ -706,7 +704,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                         if (showProfileIcons) {
                             // We are displaying the score on it's own line so no padding needed.
                             headerView.textView2.updatePaddingRelative(
-                                start = 0
+                                start = 0,
                             )
                             headerView.updatePaddingRelative(
                                 bottom = Utils.convertDpToPixel(8f).toInt(),

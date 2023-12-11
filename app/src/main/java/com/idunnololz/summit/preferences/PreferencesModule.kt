@@ -2,7 +2,6 @@ package com.idunnololz.summit.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.idunnololz.summit.db.MainDatabase
 import com.idunnololz.summit.util.PreferenceUtil
 import dagger.Module
 import dagger.Provides
@@ -18,7 +17,7 @@ class PreferencesModule {
     @Singleton
     fun providePreferences(
         @ApplicationContext context: Context,
-        sharedPreferences: SharedPreferences
+        sharedPreferences: SharedPreferences,
     ): Preferences =
         Preferences(context, sharedPreferences)
 

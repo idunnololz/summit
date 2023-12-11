@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragmentArgs
 import com.idunnololz.summit.databinding.ColorSchemeItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentColorSchemePickerBinding
 import com.idunnololz.summit.preferences.ColorSchemeId

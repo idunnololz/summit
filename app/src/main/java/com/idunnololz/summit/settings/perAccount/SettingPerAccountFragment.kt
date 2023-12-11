@@ -116,7 +116,7 @@ class SettingPerAccountFragment : BaseFragment<FragmentSettingPerAccountBinding>
                             settings.settingTheme.id -> {
                                 val directions = SettingPerAccountFragmentDirections
                                     .actionSettingPerAccountFragmentToSettingThemeFragment(
-                                        data.account
+                                        data.account,
                                     )
                                 findNavController().navigateSafe(directions)
                                 true
@@ -142,7 +142,7 @@ class SettingPerAccountFragment : BaseFragment<FragmentSettingPerAccountBinding>
                             settings.settingPostList.id -> {
                                 val directions = SettingPerAccountFragmentDirections
                                     .actionSettingPerAccountFragmentToSettingsContentFragment(
-                                        data.account
+                                        data.account,
                                     )
                                 findNavController().navigateSafe(directions)
                                 true
@@ -224,7 +224,8 @@ class SettingPerAccountFragment : BaseFragment<FragmentSettingPerAccountBinding>
                             settings.manageSettings.id -> {
                                 val directions = SettingPerAccountFragmentDirections
                                     .actionSettingPerAccountFragmentToManageSettingsFragment(
-                                        data.account)
+                                        data.account,
+                                    )
                                 findNavController().navigateSafe(directions)
                                 true
                             }
@@ -239,6 +240,5 @@ class SettingPerAccountFragment : BaseFragment<FragmentSettingPerAccountBinding>
                 this.setData(settings.allSettings)
             }
         }
-
     }
 }

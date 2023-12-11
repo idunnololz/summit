@@ -1,6 +1,5 @@
 package com.idunnololz.summit.settings.perAccount
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
@@ -51,16 +50,16 @@ class ManageSettingsViewModel @Inject constructor(
                         ImportSettingsViewModel.Diff(
                             ImportSettingsViewModel.DiffType.Added,
                             "null",
-                            importValue.toString()
-                        )
+                            importValue.toString(),
+                        ),
                     )
                 } else if (currentValue != null && importValue == null) {
                     diffs.add(
                         ImportSettingsViewModel.Diff(
                             ImportSettingsViewModel.DiffType.Removed,
                             currentValue.toString(),
-                            "null"
-                        )
+                            "null",
+                        ),
                     )
                 } else if (currentValue != importValue) {
                     diffs.add(

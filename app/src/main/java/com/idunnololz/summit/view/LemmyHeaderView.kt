@@ -20,7 +20,6 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import kotlin.math.max
 import com.idunnololz.summit.R as R2
 
-
 class LemmyHeaderView : FrameLayout {
 
     companion object {
@@ -147,8 +146,10 @@ class LemmyHeaderView : FrameLayout {
                     if (child.visibility == View.GONE) continue
 
                     val layoutParams = child.layoutParams as LayoutParams
-                    val childTop = (paddingTop + (childSpace - child.measuredHeight) / 2
-                        + layoutParams.topMargin) - layoutParams.bottomMargin
+                    val childTop = (
+                        paddingTop + (childSpace - child.measuredHeight) / 2 +
+                            layoutParams.topMargin
+                        ) - layoutParams.bottomMargin
 
                     start -= layoutParams.rightMargin
                     child.layout(
@@ -164,11 +165,13 @@ class LemmyHeaderView : FrameLayout {
                 for (child in children) {
                     if (child.visibility == View.GONE) continue
 
-                    Log.d("ASDF", "Child ${child} has height: ${child.measuredHeight}")
+                    Log.d("ASDF", "Child $child has height: ${child.measuredHeight}")
 
                     val layoutParams = child.layoutParams as LayoutParams
-                    val childTop = (paddingTop + (childSpace - child.measuredHeight) / 2
-                        + layoutParams.topMargin) - layoutParams.bottomMargin
+                    val childTop = (
+                        paddingTop + (childSpace - child.measuredHeight) / 2 +
+                            layoutParams.topMargin
+                        ) - layoutParams.bottomMargin
 
                     start += layoutParams.leftMargin
                     child.layout(
@@ -187,8 +190,10 @@ class LemmyHeaderView : FrameLayout {
             if (iconImageView != null) {
                 val child = iconImageView
                 val layoutParams = child.layoutParams as LayoutParams
-                val childTop = (paddingTop + (childSpace - child.measuredHeight) / 2
-                    + layoutParams.topMargin) - layoutParams.bottomMargin
+                val childTop = (
+                    paddingTop + (childSpace - child.measuredHeight) / 2 +
+                        layoutParams.topMargin
+                    ) - layoutParams.bottomMargin
 
                 start += layoutParams.leftMargin
                 child.layout(
@@ -207,8 +212,10 @@ class LemmyHeaderView : FrameLayout {
             run {
                 val child = textView1
                 val layoutParams = child.layoutParams as LayoutParams
-                top = (paddingTop + (childSpace - textChildrenTotalHeight) / 2
-                    + layoutParams.topMargin) - layoutParams.bottomMargin
+                top = (
+                    paddingTop + (childSpace - textChildrenTotalHeight) / 2 +
+                        layoutParams.topMargin
+                    ) - layoutParams.bottomMargin
                 child.layout(
                     start + layoutParams.leftMargin,
                     top,

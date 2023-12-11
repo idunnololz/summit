@@ -15,12 +15,10 @@ import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ScaleGestureDetectorCompat
-import com.google.common.math.Quantiles.scale
 import com.idunnololz.summit.util.Utils
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-
 
 class GalleryImageView : AppCompatImageView {
 
@@ -151,11 +149,15 @@ class GalleryImageView : AppCompatImageView {
                     velocityX: Float,
                     velocityY: Float,
                 ): Boolean {
-                    if (e1 != null && (abs(
-                            e1.x - e2.x,
-                        ) > 50 || abs(e1.y - e2.y) > 50) && (abs(velocityX) > 500 || Math.abs(
-                            velocityY,
-                        ) > 500) && !isZooming
+                    if (e1 != null && (
+                        abs(
+                                e1.x - e2.x,
+                            ) > 50 || abs(e1.y - e2.y) > 50
+                        ) && (
+                            abs(velocityX) > 500 || Math.abs(
+                                    velocityY,
+                                ) > 500
+                            ) && !isZooming
                     ) {
                         val scrollSpeedX: Float = -velocityX * 0.2f
                         val scrollSpeedY: Float = -velocityY * 0.2f
@@ -340,7 +342,7 @@ class GalleryImageView : AppCompatImageView {
 //                refreshRequiredTiles(eagerLoadingEnabled)
 //                consumed = true
             }
-        } else if(event.actionMasked == MotionEvent.ACTION_DOWN) {
+        } else if (event.actionMasked == MotionEvent.ACTION_DOWN) {
             flingAnimation?.cancel()
         }
 
@@ -412,10 +414,11 @@ class GalleryImageView : AppCompatImageView {
         var lastValue = 0f
         val absX = x / curZoom - offX
         val absY = y / curZoom - offY
-        val zoomDelta = if (curZoom < maxZoom - 0.1f)
+        val zoomDelta = if (curZoom < maxZoom - 0.1f) {
             curZoom
-        else
+        } else {
             minZoom - curZoom
+        }
         ValueAnimator.ofFloat(0f, 1f).apply {
             duration = ANIMATION_DURATION
             addUpdateListener {

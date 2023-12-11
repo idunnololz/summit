@@ -24,12 +24,12 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ManageSettingsFragment : BaseFragment<FragmentManageSettingsBinding>(),
+class ManageSettingsFragment :
+    BaseFragment<FragmentManageSettingsBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     private val args: ManageSettingsFragmentArgs by navArgs()
     private val viewModel: ManageSettingsViewModel by viewModels()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,14 +73,14 @@ class ManageSettingsFragment : BaseFragment<FragmentManageSettingsBinding>(),
                                 getString(
                                     R.string.delete_setting_override_for_setting_format,
                                     settingKey,
-                                )
+                                ),
                             )
                             .setNegativeButton(R.string.cancel)
                             .setPositiveButton(R.string.delete)
                             .setExtra("setting_key", settingKey)
                             .createAndShow(childFragmentManager, "delete_confirm")
                     }
-                }
+                },
             )
 
             viewModel.manageSettingsData.observe(viewLifecycleOwner) {
@@ -140,7 +140,8 @@ class ManageSettingsFragment : BaseFragment<FragmentManageSettingsBinding>(),
                         oldItem.settingKey == (newItem as Item.SettingListItem).settingKey
 
                     Item.EmptyItem,
-                    Item.InstructionItem -> true
+                    Item.InstructionItem,
+                    -> true
                 }
             },
         ).apply {

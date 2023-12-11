@@ -256,7 +256,7 @@ class SettingItemsAdapter(
         }
         addItemType(
             clazz = Item.DescriptionItem::class,
-            inflateFn = SettingDescriptionItemBinding::inflate
+            inflateFn = SettingDescriptionItemBinding::inflate,
         ) { item, b, h ->
             val settingItem = item.settingItem
 
