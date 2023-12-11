@@ -15,7 +15,7 @@ class PreferenceManager @Inject constructor(
 ) {
 
     private var currentAccount: Account? = null
-    private var _currentPreferences: Preferences? = null
+    private var _currentPreferences: Preferences? = basePreferences
 
     val currentPreferences: Preferences
         get() = _currentPreferences ?: basePreferences
