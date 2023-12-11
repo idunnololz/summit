@@ -266,7 +266,7 @@ class ImportSettingsDialogFragment :
     private class SettingDataAdapter(
         private val settingsDataPreview: SettingsDataPreview,
         private val onSettingPreviewClick: (settingKey: String, settingsDataPreview: SettingsDataPreview) -> Unit,
-    ) : RecyclerView.Adapter<ViewHolder>() {
+    ) : Adapter<ViewHolder>() {
 
         private sealed interface Item {
             /**

@@ -5,10 +5,17 @@ import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import com.google.android.material.R
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.CornerSize
+import com.google.android.material.shape.RelativeCornerSize
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.R as R2
@@ -19,6 +26,7 @@ class LemmyHeaderView : LinearLayout {
         const val STATIC_VIEW_COUNT = 3
     }
 
+    private var iconImageView: ImageView? = null
     val textView1: TextView
     val textView2: TextView
     val textView3: TextView
@@ -71,6 +79,11 @@ class LemmyHeaderView : LinearLayout {
 
     fun getFlairView(): FlairView = flairView
 
+    fun getIconImageView(): ImageView {
+        ensureIconView()
+        return iconImageView!!
+    }
+
     override fun setOrientation(orientation: Int) {
         if (orientation == this.orientation) {
             return
@@ -97,5 +110,33 @@ class LemmyHeaderView : LinearLayout {
         )
 
         return this
+    }
+
+    private fun ensureIconView() {
+        if (iconImageView != null) {
+            return
+        }
+
+        val strokeWidth = Utils.convertDpToPixel(2f)
+        val strokeWidthHalf = (strokeWidth / 2f).toInt()
+
+        val iconImageView = ShapeableImageView(context, null, R2.style.CircleImageView)
+        addView(iconImageView, 0)
+        iconImageView.shapeAppearanceModel = iconImageView.shapeAppearanceModel
+            .toBuilder()
+            .setAllCornerSizes(RelativeCornerSize(0.5f))
+            .build()
+        iconImageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        iconImageView.strokeWidth = strokeWidth
+        iconImageView.strokeColor = ColorStateList.valueOf(
+            context.getColorFromAttribute(R.attr.colorOnSurface))
+        iconImageView.setPadding(strokeWidthHalf, strokeWidthHalf, strokeWidthHalf, strokeWidthHalf)
+
+        iconImageView.updateLayoutParams<LayoutParams> {
+            width = Utils.convertDpToPixel(36f).toInt()
+            height = Utils.convertDpToPixel(36f).toInt()
+            marginEnd = Utils.convertDpToPixel(8f).toInt()
+        }
+        this.iconImageView = iconImageView
     }
 }

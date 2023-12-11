@@ -201,4 +201,24 @@ safeargs.
             app:argType="com.idunnololz.summit.api.dto.PostView"
             app:nullable="true" />
     </dialog>
+    <dialog
+        android:id="@+id/colorSchemePickerDialogFragment"
+        android:name="com.idunnololz.summit.settings.theme.ColorSchemePickerDialogFragment"
+        android:label="ColorSchemePickerDialogFragment" >
+        <argument
+            android:name="account"
+            app:argType="com.idunnololz.summit.account.Account"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </dialog>
+    <dialog
+        android:id="@+id/fontPickerDialogFragment"
+        android:name="com.idunnololz.summit.settings.theme.FontPickerDialogFragment"
+        android:label="FontPickerDialogFragment" >
+        <argument
+            android:name="account"
+            app:argType="com.idunnololz.summit.account.Account"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </dialog>
 </navigation>

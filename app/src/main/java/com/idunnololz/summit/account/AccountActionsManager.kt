@@ -26,6 +26,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -42,13 +43,14 @@ class AccountActionsManager @Inject constructor(
     private val pendingActionsManager: PendingActionsManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val postReadManager: PostReadManager,
-    private val preferences: Preferences,
+    private val preferenceManager: PreferenceManager,
 ) {
 
     companion object {
         private const val TAG = "AccountActionsManager"
     }
 
+    private var preferences = preferenceManager.currentPreferences
     private val votesManager = VotesManager(context, preferences)
     private val pendingCommentsManager = PendingCommentsManager()
     private var nextId: Long = 1
@@ -376,7 +378,7 @@ class AccountActionsManager @Inject constructor(
         accountManager.addOnAccountChangedListener(
             object : AccountManager.OnAccountChangedListener {
                 override suspend fun onAccountChanged(newAccount: Account?) {
-                    votesManager.reset()
+                    votesManager.onAccountChanged(preferenceManager.currentPreferences)
                 }
             },
         )

@@ -2,6 +2,7 @@ package com.idunnololz.summit.account
 
 import android.util.Log
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.preferences.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import javax.inject.Singleton
 class AccountManager @Inject constructor(
     private val accountDao: AccountDao,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val preferenceManager: PreferenceManager,
 ) {
 
     interface OnAccountChangedListener {
@@ -33,7 +35,9 @@ class AccountManager @Inject constructor(
 
     init {
         runBlocking {
-            currentAccount.emit(accountDao.getCurrentAccount()?.fix())
+            val curAccount = accountDao.getCurrentAccount()?.fix()
+            preferenceManager.getComposedPreferencesForAccount(curAccount)
+            currentAccount.emit(curAccount)
         }
         coroutineScope.launch {
             Log.d("dbdb", "accountDao: ${accountDao.count()}")
@@ -107,6 +111,10 @@ class AccountManager @Inject constructor(
     }
 
     private suspend fun doSwitchAccountWork(newAccount: Account?) {
+        // Do pre-switch work here...
+
+        preferenceManager.getComposedPreferencesForAccount(newAccount)
+
         val listeners = withContext(Dispatchers.Main) {
             onAccountChangeListeners.toList()
         }

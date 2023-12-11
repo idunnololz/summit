@@ -126,7 +126,6 @@ class PostFragment :
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
-    @Inject
     lateinit var preferences: Preferences
 
     private var swipeActionCallback: LemmySwipeActionCallback? = null
@@ -157,6 +156,7 @@ class PostFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        preferences = viewModel.preferences
         actionsViewModel.apiClient = viewModel.lemmyApiClient
 
         if (savedInstanceState == null) {

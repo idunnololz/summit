@@ -77,6 +77,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
@@ -764,6 +765,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SAVE_DRAFTS_AUTOMATICALLY, value)
+                .apply()
+        }
+
+    var showProfileIcons: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_PROFILE_ICONS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SHOW_PROFILE_ICONS, value)
                 .apply()
         }
 

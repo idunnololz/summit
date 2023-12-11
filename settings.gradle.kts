@@ -1,5 +1,6 @@
 include(":app")
 include(":overlappingPane")
+include(":calligraphy")
 
 rootProject.name = "summit"
 

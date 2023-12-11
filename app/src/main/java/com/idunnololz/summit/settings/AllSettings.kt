@@ -63,6 +63,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
@@ -868,6 +869,12 @@ class CommentListSettings @Inject constructor(
         context.getString(R.string.show_comment_upvote_percentage),
         null,
         relatedKeys = listOf(KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE),
+    )
+    val showProfileIcons = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_profile_icons),
+        context.getString(R.string.show_profile_icons_desc),
+        relatedKeys = listOf(KEY_SHOW_PROFILE_ICONS),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1724,6 +1731,125 @@ class ImportAndExportSettings @Inject constructor(
     )
 }
 
+@Singleton
+class PerAccountSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val settingTheme = BasicSettingItem(
+        R.drawable.baseline_palette_24,
+        context.getString(R.string.theme),
+        context.getString(R.string.theme_settings_desc),
+    )
+    val settingViewType = BasicSettingItem(
+        R.drawable.baseline_view_agenda_24,
+        context.getString(R.string.view_type),
+        context.getString(R.string.view_type_settings_desc),
+    )
+    val settingPostAndComment = BasicSettingItem(
+        R.drawable.baseline_mode_comment_24,
+        context.getString(R.string.post_and_comments),
+        context.getString(R.string.post_and_comments_settings_desc),
+    )
+    val settingAccount = BasicSettingItem(
+        R.drawable.outline_account_circle_24,
+        context.getString(R.string.summit_account_settings),
+        context.getString(R.string.summit_account_settings_desc),
+    )
+    val settingGestures = BasicSettingItem(
+        R.drawable.baseline_gesture_24,
+        context.getString(R.string.gestures),
+        context.getString(R.string.gestures_desc),
+    )
+    val settingCache = BasicSettingItem(
+        R.drawable.baseline_cached_24,
+        context.getString(R.string.cache),
+        context.getString(R.string.cache_info_and_preferences),
+    )
+    val settingHiddenPosts = BasicSettingItem(
+        R.drawable.baseline_hide_24,
+        context.getString(R.string.hidden_posts),
+        context.getString(R.string.hidden_posts_desc),
+    )
+    val settingPostList = BasicSettingItem(
+        R.drawable.baseline_pages_24,
+        context.getString(R.string.post_list),
+        context.getString(R.string.setting_post_list_desc),
+    )
+    val settingAbout = BasicSettingItem(
+        R.drawable.outline_info_24,
+        context.getString(R.string.about_summit),
+        context.getString(R.string.about_summit_desc),
+    )
+    val settingSummitCommunity = BasicSettingItem(
+        R.drawable.ic_logo_mono_24,
+        context.getString(R.string.c_summit),
+        context.getString(R.string.summit_community_desc),
+    )
+
+    val commentListSettings = BasicSettingItem(
+        R.drawable.baseline_comment_24,
+        context.getString(R.string.comment_list),
+        context.getString(R.string.comment_list_desc),
+    )
+
+    val patreonSettings = BasicSettingItem(
+        R.drawable.baseline_attach_money_24,
+        context.getString(R.string.patreon_supporters),
+        context.getString(R.string.patreon_supporters_desc),
+    )
+    val miscSettings = BasicSettingItem(
+        R.drawable.baseline_miscellaneous_services_24,
+        context.getString(R.string.misc),
+        context.getString(R.string.misc_desc),
+    )
+    val loggingSettings = BasicSettingItem(
+        R.drawable.outline_analytics_24,
+        context.getString(R.string.logging),
+        context.getString(R.string.logging_desc),
+    )
+    val historySettings = BasicSettingItem(
+        R.drawable.baseline_history_24,
+        context.getString(R.string.history),
+        context.getString(R.string.history_desc),
+    )
+    val navigationSettings = BasicSettingItem(
+        R.drawable.outline_navigation_24,
+        context.getString(R.string.navigation),
+        context.getString(R.string.navigation_desc),
+    )
+    val userActionsSettings = BasicSettingItem(
+        R.drawable.outline_play_arrow_24,
+        context.getString(R.string.user_actions),
+        context.getString(R.string.user_actions_desc),
+    )
+    val backupAndRestoreSettings = BasicSettingItem(
+        R.drawable.baseline_import_export_24,
+        context.getString(R.string.backup_and_restore_settings),
+        context.getString(R.string.backup_and_restore_settings_desc),
+    )
+    val manageSettings = BasicSettingItem(
+        R.drawable.outline_settings_applications_24,
+        context.getString(R.string.manage_settings),
+        context.getString(R.string.manage_settings_desc),
+    )
+    val desc = DescriptionSettingItem(
+        "",
+        context.getString(R.string.per_account_settings_desc)
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        desc,
+        settingTheme,
+        settingPostList,
+        manageSettings,
+    )
+}
+
 class AllSettings @Inject constructor(
     mainSettings: MainSettings,
     lemmyWebSettings: LemmyWebSettings,
@@ -1742,6 +1868,7 @@ class AllSettings @Inject constructor(
     navigationSettings: NavigationSettings,
     actionsSettings: ActionsSettings,
     importAndExportSettings: ImportAndExportSettings,
+    perAccountSettings: PerAccountSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -1761,6 +1888,7 @@ class AllSettings @Inject constructor(
         navigationSettings,
         actionsSettings,
         importAndExportSettings,
+        perAccountSettings,
     )
 
     init {

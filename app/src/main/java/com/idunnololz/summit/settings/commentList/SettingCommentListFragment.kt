@@ -115,6 +115,13 @@ class SettingCommentListFragment :
                 preferences.showCommentUpvotePercentage = it
             },
         )
+        settings.showProfileIcons.bindTo(
+            binding.showProfileIcons,
+            { preferences.showProfileIcons },
+            {
+                preferences.showProfileIcons = it
+            }
+        )
     }
 
     private fun convertAutoCollapseCommentToOptionId(value: Float) =

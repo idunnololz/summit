@@ -8,6 +8,19 @@
     android:background="?selectableItemBackground">
 
     <TextView
+        android:id="@+id/setting_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceTitleSmall"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginHorizontal="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/remove"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
         android:id="@+id/setting_key"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -18,7 +31,7 @@
         android:layout_marginHorizontal="@dimen/padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/remove"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/setting_title"/>
 
     <TextView
         android:id="@+id/setting_value"

@@ -4,17 +4,23 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Matrix
+import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ScaleGestureDetectorCompat
+import com.google.common.math.Quantiles.scale
+import com.idunnololz.summit.util.Utils
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+
 
 class GalleryImageView : AppCompatImageView {
 
@@ -23,6 +29,7 @@ class GalleryImageView : AppCompatImageView {
         private const val TAG = "GalleryImageView"
 
         private const val ANIMATION_DURATION = 250L
+        private const val MAX_ZOOM_MULTIPLIER = 4f
     }
 
     interface Callback {
@@ -47,10 +54,21 @@ class GalleryImageView : AppCompatImageView {
      * Minimum zoom possible. This is variable and depends on the size of the image.
      */
     private var minZoom = 0f
-    private var maxZoom = 3f
+    private var maxZoom = 3f // see RELATIVE_MAX_ZOOM
     private val zoomIncrement = 1f
 
     private var curZoom = 1f
+
+    private var startZoom = 0f
+    private var isQuickScaling = false
+    private var isZooming = false
+    private var quickScaleLastDistance: Float = 0f
+    private val quickScaleCenter = PointF(0f, 0f)
+    private var quickScaleMoved = false
+    private val quickScaleVLastPoint = PointF(0f, 0f)
+//    quickScaleSCenter = viewToSourceCoord(vCenterStart)
+//    quickScaleVStart = PointF(e.x, e.y)
+//    quickScaleVLastPoint = PointF(quickScaleSCenter.x, quickScaleSCenter.y)
 
     /**
      * Absolute X offset. This is not affected by the scale/zoom. Multiply with curZoom to get scaled offset.
@@ -69,6 +87,12 @@ class GalleryImageView : AppCompatImageView {
     var callback: Callback? = null
 
     private var drawableDirty = true
+
+    private var outputSrcCoords = PointF(0f, 0f)
+
+    private var quickScaleThreshold = Utils.convertDpToPixel(20f)
+
+    private var flingAnimation: ValueAnimator? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -127,6 +151,35 @@ class GalleryImageView : AppCompatImageView {
                     velocityX: Float,
                     velocityY: Float,
                 ): Boolean {
+                    if (e1 != null && (abs(
+                            e1.x - e2.x,
+                        ) > 50 || abs(e1.y - e2.y) > 50) && (abs(velocityX) > 500 || Math.abs(
+                            velocityY,
+                        ) > 500) && !isZooming
+                    ) {
+                        val scrollSpeedX: Float = -velocityX * 0.2f
+                        val scrollSpeedY: Float = -velocityY * 0.2f
+
+                        var lastValue = 0f
+
+                        flingAnimation?.cancel()
+                        flingAnimation = ValueAnimator.ofFloat(0f, 1f).apply {
+                            duration = 1000
+                            interpolator = DecelerateInterpolator(2f)
+                            addUpdateListener {
+                                val delta = (it.animatedFraction - lastValue)
+                                scrollByAndCommit(
+                                    scrollSpeedX * delta,
+                                    scrollSpeedY * delta,
+                                )
+
+                                lastValue = it.animatedFraction
+                            }
+                        }.also {
+                            it.start()
+                        }
+                        return true
+                    }
                     return false
                 }
 
@@ -155,9 +208,27 @@ class GalleryImageView : AppCompatImageView {
             object : GestureDetector.OnDoubleTapListener {
                 override fun onDoubleTap(e: MotionEvent): Boolean {
                     e.let {
-                        zoomInToAnimated(it.x, it.y)
+                        // Store quick scale params. This will become either a double tap zoom or a
+                        // quick scale depending on whether the user swipes.
+
+                        // Store quick scale params. This will become either a double tap zoom or a
+                        // quick scale depending on whether the user swipes.
+//                        vCenterStart = PointF(e.x, e.y)
+//                        vTranslateStart = PointF(vTranslate.x, vTranslate.y)
+                        startZoom = curZoom
+                        isQuickScaling = true
+                        isZooming = true
+                        quickScaleLastDistance = -1f
+                        quickScaleCenter.set(it.x, it.y)
+//                        quickScaleSCenter = viewToSourceCoord(vCenterStart)
+//                        quickScaleVStart = PointF(e.x, e.y)
+                        quickScaleVLastPoint.set(quickScaleCenter.x, quickScaleCenter.y)
+                        quickScaleMoved = false
+                        // We need to get events in onTouchEvent after this.
+//                        zoomInToAnimated(it.x, it.y)
                     }
-                    return true
+                    // We need to get events in onTouchEvent after this.
+                    return false
                 }
 
                 override fun onDoubleTapEvent(e: MotionEvent): Boolean {
@@ -197,6 +268,7 @@ class GalleryImageView : AppCompatImageView {
 
         if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
             val keepOverscroll = callback?.overScrollEnd()
+
             if (keepOverscroll != true) {
                 ValueAnimator.ofFloat(1f, 0f).apply {
                     duration = ANIMATION_DURATION
@@ -210,6 +282,66 @@ class GalleryImageView : AppCompatImageView {
                     it.start()
                 }
             }
+
+            if (isQuickScaling) {
+                isQuickScaling = false
+                if (!quickScaleMoved) {
+                    zoomInToAnimated(event.x, event.y)
+                }
+            }
+            isZooming = false
+        } else if (event.actionMasked == MotionEvent.ACTION_MOVE) {
+            if (isQuickScaling) {
+                // One finger zoom
+                // Stole Google's Magical Formula™ to make sure it feels the exact same
+                var dist: Float = Math.abs(quickScaleCenter.y - event.y) * 2 + quickScaleThreshold
+                if (quickScaleLastDistance == -1f) {
+                    quickScaleLastDistance = dist
+                }
+                val isUpwards: Boolean = event.y > quickScaleVLastPoint.y
+                quickScaleVLastPoint.set(0f, event.y)
+                val spanDiff = abs(1 - dist / quickScaleLastDistance) * 0.5f
+                if (spanDiff > 0.03f || quickScaleMoved) {
+                    quickScaleMoved = true
+                    var multiplier = 1f
+                    if (quickScaleLastDistance > 0) {
+                        multiplier = if (isUpwards) 1 + spanDiff else 1 - spanDiff
+                    }
+                    val newZoom = minZoom.coerceAtLeast(maxZoom.coerceAtMost(curZoom * multiplier))
+
+                    convertViewToSourceCoord(quickScaleCenter.x, quickScaleCenter.y)
+                    zoomInToAbs(outputSrcCoords.x, outputSrcCoords.y, newZoom)
+//                    if (panEnabled) {
+//                        val vLeftStart: Float = vCenterStart.x - vTranslateStart.x
+//                        val vTopStart: Float = vCenterStart.y - vTranslateStart.y
+//                        val vLeftNow: Float = vLeftStart * (scale / scaleStart)
+//                        val vTopNow: Float = vTopStart * (scale / scaleStart)
+//                        vTranslate.x = vCenterStart.x - vLeftNow
+//                        vTranslate.y = vCenterStart.y - vTopNow
+//                        if (previousScale * sHeight() < height && scale * sHeight() >= height || previousScale * sWidth() < width && scale * sWidth() >= width) {
+//                            fitToBounds(true)
+//                            vCenterStart.set(sourceToViewCoord(quickScaleSCenter))
+//                            vTranslateStart.set(vTranslate)
+//                            scaleStart = scale
+//                            dist = 0f
+//                        }
+//                    } else if (sRequestedCenter != null) {
+//                        // With a center specified from code, zoom around that point.
+//                        vTranslate.x = width / 2 - scale * sRequestedCenter.x
+//                        vTranslate.y = height / 2 - scale * sRequestedCenter.y
+//                    } else {
+//                        // With no requested center, scale around the image center.
+//                        vTranslate.x = width / 2 - scale * (sWidth() / 2)
+//                        vTranslate.y = height / 2 - scale * (sHeight() / 2)
+//                    }
+                }
+                quickScaleLastDistance = dist
+//                fitToBounds(true)
+//                refreshRequiredTiles(eagerLoadingEnabled)
+//                consumed = true
+            }
+        } else if(event.actionMasked == MotionEvent.ACTION_DOWN) {
+            flingAnimation?.cancel()
         }
 
         if (gestureDetected) {
@@ -256,7 +388,7 @@ class GalleryImageView : AppCompatImageView {
         }
 
         curZoom = minZoom
-        maxZoom = minZoom + 2f
+        maxZoom = minZoom * MAX_ZOOM_MULTIPLIER
 
         imageW = d.intrinsicWidth.toFloat()
         imageH = d.intrinsicHeight.toFloat()
@@ -269,11 +401,21 @@ class GalleryImageView : AppCompatImageView {
         super.setImageDrawable(drawable)
     }
 
-    fun zoomInToAnimated(x: Float, y: Float) {
+    private fun convertViewToSourceCoord(x: Float, y: Float) {
+        val absX = x / curZoom - offX
+        val absY = y / curZoom - offY
+
+        outputSrcCoords.set(absX, absY)
+    }
+
+    private fun zoomInToAnimated(x: Float, y: Float) {
         var lastValue = 0f
         val absX = x / curZoom - offX
         val absY = y / curZoom - offY
-        val zoomDelta = if (curZoom < maxZoom - 0.1f) zoomIncrement else minZoom - curZoom
+        val zoomDelta = if (curZoom < maxZoom - 0.1f)
+            curZoom
+        else
+            minZoom - curZoom
         ValueAnimator.ofFloat(0f, 1f).apply {
             duration = ANIMATION_DURATION
             addUpdateListener {
@@ -291,7 +433,7 @@ class GalleryImageView : AppCompatImageView {
     }
 
     fun zoomInToAbs(absX: Float, absY: Float, zoomAmount: Float) {
-        Log.d(TAG, "absX $absX absY $absY w $width h $height")
+        Log.d(TAG, "absX $absX absY $absY w $width h $height curZoom $curZoom")
         val prevZoom = curZoom
         curZoom = max(min(zoomAmount, maxZoom), minZoom)
 

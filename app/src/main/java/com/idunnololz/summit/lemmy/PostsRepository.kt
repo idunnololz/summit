@@ -19,6 +19,7 @@ import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.multicommunity.ModeratedCommunitiesDataSource
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.utils.toVotableRef
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -39,7 +40,7 @@ class PostsRepository @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val hiddenPostsManager: HiddenPostsManager,
     private val contentFiltersManager: ContentFiltersManager,
-    private val preferences: Preferences,
+    private val preferenceManager: PreferenceManager,
     private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
     private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
     private val moderatedCommunitiesDataSourceFactory: ModeratedCommunitiesDataSource.Factory,
@@ -99,6 +100,10 @@ class PostsRepository @Inject constructor(
     init {
         coroutineScope.launch {
             accountInfoManager.currentFullAccount.collect { fullAccount ->
+                val preferences = preferenceManager.getComposedPreferencesForAccount(
+                    fullAccount?.account
+                )
+
                 if (fullAccount != null) {
                     sortOrder =
                         preferences.defaultCommunitySortOrder

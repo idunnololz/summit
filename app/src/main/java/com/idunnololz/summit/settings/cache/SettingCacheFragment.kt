@@ -42,7 +42,7 @@ class SettingCacheFragment : BaseFragment<FragmentCacheBinding>() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         requireMainActivity().apply {
-            setupForFragment<SettingCacheFragment>()
+            setupForFragment<SettingsFragment>()
         }
 
         setBinding(FragmentCacheBinding.inflate(inflater, container, false))

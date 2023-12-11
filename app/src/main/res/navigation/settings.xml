@@ -212,7 +212,13 @@
     <fragment
         android:id="@+id/settingThemeFragment"
         android:name="com.idunnololz.summit.settings.theme.SettingThemeFragment"
-        android:label="SettingThemeFragment" />
+        android:label="SettingThemeFragment" >
+        <argument
+            android:name="account"
+            app:argType="com.idunnololz.summit.account.Account"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
     <fragment
         android:id="@+id/settingPostAndCommentsFragment"
         android:name="com.idunnololz.summit.settings.postAndComments.SettingPostAndCommentsFragment"
@@ -228,6 +234,11 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <argument
+            android:name="account"
+            app:argType="com.idunnololz.summit.account.Account"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/settingsCommunityBlockListFragment"
@@ -297,12 +308,29 @@
     </fragment>
     <fragment
         android:id="@+id/settingPerAccountFragment"
-        android:name="com.idunnololz.summit.settings.accounts.perAccount.SettingPerAccountFragment"
+        android:name="com.idunnololz.summit.settings.perAccount.SettingPerAccountFragment"
         android:label="SettingPerAccountFragment" >
         <argument
             android:name="accountId"
             app:argType="long"
             android:defaultValue="0L" />
+        <action
+            android:id="@+id/action_settingPerAccountFragment_to_settingThemeFragment"
+            app:destination="@id/settingThemeFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingPerAccountFragment_to_settingsContentFragment"
+            app:destination="@id/settingsContentFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
+        <action
+            android:id="@+id/action_settingPerAccountFragment_to_manageSettingsFragment"
+            app:destination="@id/manageSettingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingBackupAndRestoreFragment"
@@ -310,10 +338,24 @@
         android:label="SettingBackupAndRestoreFragment" >
         <action
             android:id="@+id/action_settingBackupAndRestoreFragment_to_manageInternalSettingsBackupsDialogFragment"
-            app:destination="@id/manageInternalSettingsBackupsDialogFragment" />
+            app:destination="@id/manageInternalSettingsBackupsDialogFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
     </fragment>
     <fragment
         android:id="@+id/manageInternalSettingsBackupsDialogFragment"
         android:name="com.idunnololz.summit.settings.backupAndRestore.ManageInternalSettingsBackupsFragment"
         android:label="ManageInternalSettingsBackupsDialogFragment" />
+    <fragment
+        android:id="@+id/manageSettingsFragment"
+        android:name="com.idunnololz.summit.settings.perAccount.ManageSettingsFragment"
+        android:label="ManageSettingsFragment" >
+        <argument
+            android:name="account"
+            app:argType="com.idunnololz.summit.account.Account"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 </navigation>

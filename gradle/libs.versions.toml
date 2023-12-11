@@ -2,7 +2,6 @@
 androidGradlePlugin = "8.1.3"
 arrowCore = "1.2.0"
 colorpickerview = "2.2.4"
-calligraphy3 = "3.1.1"
 desugar_jdk_libs = "2.0.4"
 hilt = "2.48"
 javaStringSimilarity = "2.0.0"
@@ -27,7 +26,6 @@ coil = "2.4.0"
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
 colorpickerview = { module = "com.github.skydoves:colorpickerview", version.ref = "colorpickerview" }
-calligraphy3 = { module = "io.github.inflationx:calligraphy3", version.ref = "calligraphy3" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }

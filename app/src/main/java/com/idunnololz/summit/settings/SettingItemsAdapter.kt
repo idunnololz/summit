@@ -16,6 +16,7 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
+import com.idunnololz.summit.databinding.SettingDescriptionItemBinding
 import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingOnOffBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
@@ -51,6 +52,10 @@ class SettingItemsAdapter(
         data class TitleItem(
             override val settingItem: SubgroupItem,
             val hasTopMargin: Boolean,
+        ) : Item
+
+        data class DescriptionItem(
+            override val settingItem: DescriptionSettingItem,
         ) : Item
 
         data class RadioGroupItem(
@@ -138,6 +143,8 @@ class SettingItemsAdapter(
                 }
                 is ColorSettingItem -> {
                 }
+
+                is DescriptionSettingItem -> {}
             }
         }
     }
@@ -190,6 +197,13 @@ class SettingItemsAdapter(
                 b.value.alpha = 0.66f
             }
 
+            if (settingItem.description != null) {
+                b.desc.visibility = View.VISIBLE
+                b.desc.text = settingItem.description
+            } else {
+                b.desc.visibility = View.GONE
+            }
+
             b.root.isEnabled = settingItem.isEnabled
             b.root.tag = settingItem
             b.root.setOnClickListener(onSettingClickListener)
@@ -239,6 +253,25 @@ class SettingItemsAdapter(
 
             b.root.tag = settingItem
             settingItem.bindTo(b, { item.value ?: settingItem.minValue }, { onSettingClickListener })
+        }
+        addItemType(
+            clazz = Item.DescriptionItem::class,
+            inflateFn = SettingDescriptionItemBinding::inflate
+        ) { item, b, h ->
+            val settingItem = item.settingItem
+
+            if (settingItem.title.isBlank()) {
+                b.title.visibility = View.GONE
+            } else {
+                b.title.visibility = View.VISIBLE
+                b.title.text = settingItem.title
+            }
+            if (settingItem.description.isNullOrBlank()) {
+                b.desc.visibility = View.GONE
+            } else {
+                b.desc.visibility = View.VISIBLE
+                b.desc.text = settingItem.description
+            }
         }
     }
 
@@ -321,6 +354,10 @@ class SettingItemsAdapter(
                 val value = getCurrentValue(settingItem.id)
 
                 out.add(Item.ColorItem(settingItem, value as Int?))
+            }
+
+            is DescriptionSettingItem -> {
+                out.add(Item.DescriptionItem(settingItem))
             }
         }
     }

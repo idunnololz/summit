@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pref_key_app_language">app_language</string>
-    <string name="pref_key_navigation_bar_color">navigation_bar_color</string>
 
 
     <string name="pref_key_account">pref_key_account</string>

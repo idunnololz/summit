@@ -589,11 +589,13 @@ class MainActivity : BaseActivity() {
         Log.d(TAG, "bottomNavigationView.height: ${binding.bottomNavigationView.height}")
 
         if (animate) {
-            binding.bottomNavigationView.animate()
-                .translationY(binding.bottomNavigationView.height.toFloat())
-                .apply {
-                    duration = 250
-                }
+            if (binding.bottomNavigationView.translationY < binding.bottomNavigationView.height.toFloat()) {
+                binding.bottomNavigationView.animate()
+                    .translationY(binding.bottomNavigationView.height.toFloat())
+                    .apply {
+                        duration = 250
+                    }
+            }
         } else {
             binding.bottomNavigationView.translationY =
                 binding.bottomNavigationView.height.toFloat()

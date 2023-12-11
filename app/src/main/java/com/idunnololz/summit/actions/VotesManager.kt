@@ -6,7 +6,7 @@ import com.idunnololz.summit.preferences.Preferences
 
 class VotesManager(
     private val context: Context,
-    private val preferences: Preferences,
+    private var preferences: Preferences,
 ) {
 
     companion object {
@@ -127,5 +127,10 @@ class VotesManager(
         scores.clear()
         upvotes.clear()
         downvotes.clear()
+    }
+
+    fun onAccountChanged(accountPreferences: Preferences) {
+        preferences = accountPreferences
+        reset()
     }
 }

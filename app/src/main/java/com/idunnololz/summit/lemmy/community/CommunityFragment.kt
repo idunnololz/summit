@@ -102,10 +102,9 @@ class CommunityFragment :
     lateinit var postListViewBuilder: PostListViewBuilder
 
     @Inject
-    lateinit var preferences: Preferences
-
-    @Inject
     lateinit var accountInfoManager: AccountInfoManager
+
+    lateinit var preferences: Preferences
 
     private var viewPagerController: ViewPagerController? = null
 
@@ -211,6 +210,8 @@ class CommunityFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        preferences = viewModel.preferences
 
         viewModel.setTag(parentFragment?.tag)
 
