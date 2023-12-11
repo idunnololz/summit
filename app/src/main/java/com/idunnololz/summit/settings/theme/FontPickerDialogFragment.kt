@@ -5,9 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.databinding.DialogFragmentFontPickerBinding
 import com.idunnololz.summit.databinding.FontItemBinding
 import com.idunnololz.summit.preferences.FontId
@@ -15,6 +18,7 @@ import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preferences.toFontAsset
+import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -28,11 +32,26 @@ class FontPickerDialogFragment :
     BaseBottomSheetDialogFragment<DialogFragmentFontPickerBinding>(),
     FullscreenDialogFragment {
 
-    @Inject
+    companion object {
+        fun newInstance(account: Account?) =
+            FontPickerDialogFragment().apply {
+                arguments = FontPickerDialogFragmentArgs(account).toBundle()
+            }
+    }
+
+    private val args: FontPickerDialogFragmentArgs by navArgs()
+    private val preferencesViewModel: PreferencesViewModel by viewModels()
+
     lateinit var preferences: Preferences
 
     @Inject
     lateinit var themeManager: ThemeManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        preferences = preferencesViewModel.getPreferences(args.account)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

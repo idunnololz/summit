@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingThemeBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
@@ -13,8 +16,10 @@ import com.idunnololz.summit.preferences.BaseTheme
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.GlobalFontColorId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
+import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.ThemeSettings
@@ -28,7 +33,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
-    @Inject
+    private val args: SettingThemeFragmentArgs by navArgs()
+
+    private val preferencesViewModel: PreferencesViewModel by viewModels()
+
     lateinit var preferences: Preferences
 
     @Inject
@@ -39,6 +47,12 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        preferences = preferencesViewModel.getPreferences(args.account)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,6 +80,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
         val context = requireContext()
         val parentActivity = requireMainActivity()
 
+        val account = args.account
         requireMainActivity().apply {
             setupForFragment<SettingsFragment>(animate = false)
 
@@ -77,6 +92,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = settings.getPageName(context)
+            supportActionBar?.subtitle = account?.fullName
         }
 
         with(binding) {
@@ -130,7 +146,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 binding.colorScheme,
                 { preferences.colorScheme },
                 { setting, currentValue ->
-                    ColorSchemePickerDialogFragment()
+                    ColorSchemePickerDialogFragment.newInstance(account)
                         .show(childFragmentManager, "asdaa")
                 },
             )
@@ -159,7 +175,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 binding.font,
                 { preferences.globalFont },
                 { setting, currentValue ->
-                    FontPickerDialogFragment()
+                    FontPickerDialogFragment.newInstance(account)
                         .show(childFragmentManager, "FontPickerDialogFragment")
                 },
             )

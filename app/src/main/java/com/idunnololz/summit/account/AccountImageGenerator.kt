@@ -6,8 +6,13 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.Person
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getDrawableCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.util.Locale
@@ -39,6 +44,24 @@ class AccountImageGenerator @Inject constructor(
         imageDir.mkdirs()
 
         return File(imageDir, "${account.id}_profile_image.jpg")
+    }
+
+    fun generateDrawableForPerson(person: Person): Drawable {
+        val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
+        val bitmap = Bitmap.createBitmap(accountImageSize, accountImageSize, Bitmap.Config.ARGB_8888)
+        val personDrawable = context.getDrawableCompat(R.drawable.lemmy_profile_4)
+
+        with(Canvas(bitmap)) {
+            val bgPaint = Paint().apply {
+                color = getColorForKey("${person.name}@${person.id}@${person.instance}")
+            }
+
+            drawRect(0f, 0f, accountImageSize.toFloat(), accountImageSize.toFloat(), bgPaint)
+
+            personDrawable?.setBounds(0, 0, accountImageSize, accountImageSize)
+            personDrawable?.draw(this)
+        }
+        return BitmapDrawable(context.resources, bitmap)
     }
 
     private fun generateImageForAccount(account: Account): Bitmap {
@@ -80,12 +103,16 @@ class AccountImageGenerator @Inject constructor(
     }
 
     private fun getColorForAccount(account: Account): Int {
+        return getColorForKey("${account.name}_${account.id}")
+    }
+
+    private fun getColorForKey(key: String): Int {
         // Ported from https://dev.to/admitkard/auto-generate-avatar-colors-randomly-138j
         val hRange = 0 until 360
-        val sRange = 0 until 100
-        val lRange = 0 until 100
+        val sRange = 10 until 100
+        val lRange = 70 until 100
 
-        val accountHash = "${account.name}_${account.id}".hashCode()
+        val accountHash = key.hashCode()
 
         fun normalizeHash(hash: Int, min: Int, max: Int) =
             hash % (max - min) + min
@@ -99,6 +126,26 @@ class AccountImageGenerator @Inject constructor(
                 h.toFloat(),
                 s / 100f,
                 l / 100f,
+            ),
+        )
+    }
+
+    private fun getPastelColorForKey(key: String): Int {
+        // Ported from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
+        val hRange = 0 until 360
+
+        val accountHash = key.hashCode()
+
+        fun normalizeHash(hash: Int, min: Int, max: Int) =
+            hash % (max - min) + min
+
+        val h = normalizeHash(accountHash, hRange.first, hRange.last)
+
+        return Color.HSVToColor(
+            floatArrayOf(
+                h.toFloat(),
+                30f,
+                80f,
             ),
         )
     }

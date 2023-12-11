@@ -23,13 +23,10 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/account_settings_will_be_added_soon"
-            android:textAppearance="?textAppearanceBodyMedium"
-            android:padding="@dimen/padding"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
         <com.idunnololz.summit.view.LoadingView
             android:id="@+id/loading_view"

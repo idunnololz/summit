@@ -39,6 +39,16 @@ data class TextOnlySettingItem(
     override val relatedKeys: List<String> = listOf(),
 ) : SettingItem()
 
+/**
+ * This is not a real setting item. Its purpose is to describe a setting pager.
+ */
+@Parcelize
+data class DescriptionSettingItem(
+    override val title: String,
+    override val description: String?,
+    override val relatedKeys: List<String> = listOf(),
+) : SettingItem()
+
 @Parcelize
 data class TextValueSettingItem(
     override val title: String,

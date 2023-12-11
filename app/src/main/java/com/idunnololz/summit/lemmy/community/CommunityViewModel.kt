@@ -30,6 +30,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -58,7 +59,7 @@ class CommunityViewModel @Inject constructor(
     private val accountInfoManager: AccountInfoManager,
     private val accountActionsManager: AccountActionsManager,
     private val postReadManager: PostReadManager,
-    private val preferences: Preferences,
+    private val preferenceManager: PreferenceManager,
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
@@ -110,6 +111,8 @@ class CommunityViewModel @Inject constructor(
 
     private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
 
+    var preferences: Preferences = preferenceManager.currentPreferences
+
     private var fetchingPages = mutableSetOf<Int>()
     var postListEngine = PostListEngine(
         coroutineScopeFactory = coroutineScopeFactory,
@@ -130,6 +133,7 @@ class CommunityViewModel @Inject constructor(
     private var fetchPageJob: Job? = null
 
     init {
+
         isHideReadEnabled.value?.let {
             postsRepository.hideRead = it
         }
@@ -146,6 +150,12 @@ class CommunityViewModel @Inject constructor(
                     postsRepository.onAccountChanged()
 
                     onCommunityOrInstanceChange()
+
+                    preferences = preferenceManager.getComposedPreferencesForAccount(newAccount)
+
+                    withContext(Dispatchers.Main) {
+                        recheckPreferences()
+                    }
                 }
             },
         )

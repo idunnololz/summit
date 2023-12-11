@@ -15,6 +15,7 @@ import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.FragmentPersonBinding
@@ -59,6 +60,9 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var accountImageGenerator: AccountImageGenerator
 
     val viewModel: PersonTabbedViewModel by viewModels()
     var viewPagerController: ViewPagerController? = null
@@ -324,9 +328,14 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     }
                 }
             }
-            profileIcon.load(data.personView.person.avatar) {
-                fallback(R.drawable.thumbnail_placeholder_square)
-                allowHardware(false)
+            if (data.personView.person.avatar == null) {
+                profileIcon.setImageDrawable(
+                    accountImageGenerator.generateDrawableForPerson(data.personView.person))
+            } else {
+                profileIcon.load(data.personView.person.avatar) {
+                    fallback(R.drawable.thumbnail_placeholder_square)
+                    allowHardware(false)
+                }
             }
             name.text = displayName
             subtitle.text = data.personView.person.fullName

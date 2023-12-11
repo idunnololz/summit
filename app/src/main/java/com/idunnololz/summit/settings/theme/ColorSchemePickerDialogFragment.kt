@@ -7,16 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
+import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragmentArgs
 import com.idunnololz.summit.databinding.ColorSchemeItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentColorSchemePickerBinding
 import com.idunnololz.summit.preferences.ColorSchemeId
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
+import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -29,11 +35,28 @@ class ColorSchemePickerDialogFragment :
     BaseBottomSheetDialogFragment<DialogFragmentColorSchemePickerBinding>(),
     FullscreenDialogFragment {
 
-    @Inject
+    companion object {
+        fun newInstance(account: Account?) =
+            ColorSchemePickerDialogFragment().apply {
+                arguments = ColorSchemePickerDialogFragmentArgs(account)
+                    .toBundle()
+            }
+    }
+
+    private val args: ColorSchemePickerDialogFragmentArgs by navArgs()
+
+    private val preferencesViewModel: PreferencesViewModel by viewModels()
+
     lateinit var preferences: Preferences
 
     @Inject
     lateinit var themeManager: ThemeManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        preferences = preferencesViewModel.getPreferences(args.account)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

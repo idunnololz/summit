@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.databinding.FragmentSettingsContentBinding
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
@@ -14,11 +17,13 @@ import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.PostListSettings
+import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
+import com.idunnololz.summit.settings.theme.FontPickerDialogFragmentArgs
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -31,11 +36,19 @@ class SettingsPostListFragment :
     BaseFragment<FragmentSettingsContentBinding>(),
     SettingValueUpdateCallback {
 
-    @Inject
+    private val args: SettingsPostListFragmentArgs by navArgs()
+    private val preferencesViewModel: PreferencesViewModel by viewModels()
+
     lateinit var preferences: Preferences
 
     @Inject
     lateinit var settings: PostListSettings
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        preferences = preferencesViewModel.getPreferences(args.account)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,7 +58,7 @@ class SettingsPostListFragment :
         super.onCreateView(inflater, container, savedInstanceState)
 
         requireMainActivity().apply {
-            setupForFragment<SettingCacheFragment>()
+            setupForFragment<SettingsFragment>()
         }
 
         setBinding(FragmentSettingsContentBinding.inflate(inflater, container, false))
@@ -68,6 +81,7 @@ class SettingsPostListFragment :
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = settings.getPageName(context)
+            supportActionBar?.subtitle = args.account?.fullName
         }
 
         updateRendering()
@@ -113,6 +127,18 @@ class SettingsPostListFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+
+        if (args.account != null) {
+            binding.keywordFilters.root.visibility = View.GONE
+            binding.instanceFilters.root.visibility = View.GONE
+            binding.communityFilters.root.visibility = View.GONE
+            binding.userFilters.root.visibility = View.GONE
+        } else {
+            binding.keywordFilters.root.visibility = View.VISIBLE
+            binding.instanceFilters.root.visibility = View.VISIBLE
+            binding.communityFilters.root.visibility = View.VISIBLE
+            binding.userFilters.root.visibility = View.VISIBLE
+        }
 
         settings.keywordFilters.bindTo(binding.keywordFilters) {
             val direction = SettingsPostListFragmentDirections

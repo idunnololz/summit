@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat.recreate
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.PreferenceUtil
@@ -28,7 +29,9 @@ import javax.inject.Singleton
 @Singleton
 class ThemeManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val preferences: Preferences,
+    private val preferenceManager: PreferenceManager,
+    private val accountManager: AccountManager,
+    private var preferences: Preferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
@@ -45,6 +48,23 @@ class ThemeManager @Inject constructor(
             BaseTheme.Dark -> false
         }
         private set
+
+    init {
+        coroutineScope.launch {
+            accountManager.currentAccount.collect {
+                preferences = preferenceManager.getComposedPreferencesForAccount(it)
+
+                withContext(Dispatchers.Main) {
+                    onPreferencesChanged()
+                }
+            }
+        }
+    }
+
+    private fun onPreferencesChanged() {
+        applyThemeFromPreferences()
+        onThemeOverlayChanged()
+    }
 
     fun updateTextConfig() {
         isLightTheme =

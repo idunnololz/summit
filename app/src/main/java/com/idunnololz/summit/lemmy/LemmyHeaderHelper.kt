@@ -72,28 +72,6 @@ class LemmyHeaderHelper(
         wrapHeader: Boolean,
         isCurrentUser: Boolean,
     ) {
-        fun makeMovementMethod() =
-            CustomLinkMovementMethod().apply {
-                onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
-                onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
-                    override fun onClick(
-                        textView: TextView,
-                        url: String,
-                        text: String,
-                        rect: RectF,
-                    ): Boolean {
-                        val pageRef = LinkResolver.parseUrl(url, instance)
-
-                        if (pageRef != null) {
-                            onPageClick(pageRef)
-                        } else {
-                            onLinkClick(url, text, LinkType.Text)
-                        }
-                        return true
-                    }
-                }
-            }
-
         var currentTextView = headerContainer.textView1
 
         val context = headerContainer.context
@@ -237,7 +215,12 @@ class LemmyHeaderHelper(
             headerContainer.orientation = LinearLayout.HORIZONTAL
         } else if (useMultilineHeader) {
             currentTextView.text = sb
-            currentTextView.movementMethod = makeMovementMethod()
+            currentTextView.movementMethod = makeMovementMethod(
+                instance = instance,
+                onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
+                onLinkLongClick = onLinkLongClick
+            )
             currentTextView.isSingleLine = true
             headerContainer.orientation = LinearLayout.VERTICAL
 
@@ -334,7 +317,12 @@ class LemmyHeaderHelper(
 //        appendAwards(headerContainer, listingItem.allAwardings, sb)
 
         currentTextView.text = sb
-        currentTextView.movementMethod = makeMovementMethod()
+        currentTextView.movementMethod = makeMovementMethod(
+            instance = instance,
+            onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
+            onLinkLongClick = onLinkLongClick
+        )
     }
 
     fun populateHeaderSpan(
@@ -349,30 +337,13 @@ class LemmyHeaderHelper(
         detailed: Boolean = false,
         childrenCount: Int? = null,
         showUpvotePercentage: Boolean,
+        useMultilineHeader: Boolean,
         isCurrentUser: Boolean,
     ) {
         val creatorInstance = commentView.creator.instance
+        var currentTextView = headerContainer.textView1
 
         var sb = SpannableStringBuilder()
-//        if (item.creator.mode) {
-//            run {
-//                val s = sb.length
-//                sb.append(item.creator.name)
-//                val e = sb.length
-//                sb.setSpan(
-//                    ForegroundColorSpan(modColor),
-//                    s,
-//                    e,
-//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//                )
-//                sb.setSpan(
-//                    StyleSpan(Typeface.BOLD),
-//                    s,
-//                    e,
-//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//                )
-//            }
-//        } else
 
         if (isCurrentUser) {
             val s = sb.length
@@ -472,69 +443,27 @@ class LemmyHeaderHelper(
             }
         }
 
+        if (useMultilineHeader) {
+            currentTextView.text = sb
+            currentTextView.movementMethod = makeMovementMethod(
+                instance = instance,
+                onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
+                onLinkLongClick = onLinkLongClick
+            )
+            currentTextView.isSingleLine = true
+            headerContainer.orientation = LinearLayout.VERTICAL
+
+            currentTextView = headerContainer.textView2
+            sb = SpannableStringBuilder()
+        } else {
+            headerContainer.orientation = LinearLayout.HORIZONTAL
+        }
+
         sb.append("  ")
         sb.append(
             dateStringToPretty(context, commentView.comment.updated ?: commentView.comment.published),
         )
-
-//        if (item.comment.distinguished) {
-//            appendSeparator(sb)
-//            val d = Utils.tint(context, R.drawable.ic_pinned, R.color.style_green)
-//            val size: Int = Utils.convertDpToPixel(16f).toInt()
-//            d.setBounds(0, 0, size, size)
-//            val s = sb.length
-//            sb.append("  ")
-//            val e = sb.length
-//            sb.setSpan(
-//                CenteredImageSpan(d),
-//                s,
-//                e,
-//                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//            )
-//        }
-
-//        if (item.locked) {
-//            appendSeparator(sb)
-//            val d = Utils.tint(context, R.drawable.baseline_lock_black_18, R.color.style_amber)
-//            val size: Int = Utils.convertDpToPixel(16f).toInt()
-//            d.setBounds(0, 0, size, size)
-//            val s = sb.length
-//            sb.append("  ")
-//            val e = sb.length
-//            sb.setSpan(
-//                CenteredImageSpan(d),
-//                s,
-//                e,
-//                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//            )
-//        }
-
-//        if (item.creator. != null) {
-//            if (item.authorFlairRichtext is List<*> && item.authorFlairRichtext.isNotEmpty()) {
-//                appendSeparator(sb)
-//                headerContainer.getFlairView().apply {
-//                    setFlairRichText(item.authorFlairRichtext)
-//
-//                    visibility = View.VISIBLE
-//                }
-//            } else if (item.authorFlairText.isNotBlank()) {
-//                appendSeparator(sb)
-//                headerContainer.getFlairView().visibility = View.GONE
-//                val s = sb.length
-//                sb.append(item.authorFlairText ?: "")
-//                val e = sb.length
-//                sb.setSpan(
-//                    ForegroundColorSpan(accentColor),
-//                    s,
-//                    e,
-//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//                )
-//            } else {
-//                headerContainer.getFlairView().visibility = View.GONE
-//            }
-//        } else {
-//            headerContainer.getFlairView().visibility = View.GONE
-//        }
         headerContainer.getFlairView().visibility = View.GONE
 
         if (detailed) {
@@ -573,29 +502,15 @@ class LemmyHeaderHelper(
             )
         }
 
-        headerContainer.setTextFirstPart(sb)
+//        headerContainer.setTextFirstPart(sb)
+        currentTextView.text = sb
 
-        val textView = headerContainer.getChildAt(0) as TextView
-        textView.movementMethod = CustomLinkMovementMethod().apply {
-            onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
-            onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
-                override fun onClick(
-                    textView: TextView,
-                    url: String,
-                    text: String,
-                    rect: RectF,
-                ): Boolean {
-                    val pageRef = LinkResolver.parseUrl(url, instance)
-
-                    if (pageRef != null) {
-                        onPageClick(pageRef)
-                    } else {
-                        onLinkClick(url, text, LinkType.Text)
-                    }
-                    return true
-                }
-            }
-        }
+        currentTextView.movementMethod = makeMovementMethod(
+            instance = instance,
+            onPageClick = onPageClick,
+            onLinkClick = onLinkClick,
+            onLinkLongClick = onLinkLongClick
+        )
     }
 
     fun populateHeaderSpan(
@@ -717,6 +632,34 @@ class LemmyHeaderHelper(
 
         headerContainer.setTextSecondPart(sb)
     }
+
+
+    private fun makeMovementMethod(
+        instance: String,
+        onPageClick: (PageRef) -> Unit,
+        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkLongClick: (url: String, text: String) -> Unit,
+    ) =
+        CustomLinkMovementMethod().apply {
+            onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
+            onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+                override fun onClick(
+                    textView: TextView,
+                    url: String,
+                    text: String,
+                    rect: RectF,
+                ): Boolean {
+                    val pageRef = LinkResolver.parseUrl(url, instance)
+
+                    if (pageRef != null) {
+                        onPageClick(pageRef)
+                    } else {
+                        onLinkClick(url, text, LinkType.Text)
+                    }
+                    return true
+                }
+            }
+        }
 }
 
 @Suppress("NOTHING_TO_INLINE")

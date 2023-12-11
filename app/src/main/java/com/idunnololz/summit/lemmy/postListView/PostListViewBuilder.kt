@@ -53,6 +53,7 @@ import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
@@ -73,7 +74,7 @@ class PostListViewBuilder @Inject constructor(
     @ActivityContext private val context: Context,
     private val offlineManager: OfflineManager,
     private val accountActionsManager: AccountActionsManager,
-    private val preferences: Preferences,
+    private val preferenceManager: PreferenceManager,
     private val themeManager: ThemeManager,
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
@@ -84,6 +85,9 @@ class PostListViewBuilder @Inject constructor(
     companion object {
         private const val TAG = "PostListViewBuilder"
     }
+
+    private var preferences = preferenceManager.getComposedPreferencesForAccount(
+        accountManager.currentAccount.value)
 
     var postUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
         set(value) {
@@ -135,6 +139,10 @@ class PostListViewBuilder @Inject constructor(
         coroutineScope.launch {
             accountManager.currentAccount.collect {
                 currentUser = it
+
+                preferences = preferenceManager.getComposedPreferencesForAccount(it)
+
+                onPostUiConfigUpdated()
             }
         }
     }

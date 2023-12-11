@@ -78,14 +78,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
         window.decorView.setBackgroundColor(getColorFromAttribute(android.R.attr.windowBackground))
 
-        val key = getString(R.string.pref_key_navigation_bar_color)
-        if (PreferenceUtil.preferences.contains(key)) {
-            customNavigationBar = true
-            navigationBarColor = PreferenceUtil.preferences.getInt(key, 0)
-        } else {
-            customNavigationBar = false
-        }
-
         if (customNavigationBar) {
             window.navigationBarColor = navigationBarColor
 

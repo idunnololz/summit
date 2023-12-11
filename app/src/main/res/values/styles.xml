@@ -67,6 +67,7 @@
 
         <item name="materialCardViewStyle">@style/MyApp.Widget.Material3.CardView</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/isLightTheme</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
 

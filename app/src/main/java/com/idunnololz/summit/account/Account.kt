@@ -27,3 +27,6 @@ data class Account(
     )
     val defaultSortType: Int,
 ) : Parcelable
+
+val Account.fullName
+    get() = "${this.name}@${this.instance}"

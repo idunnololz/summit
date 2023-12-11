@@ -30,6 +30,7 @@ import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.utils.toVotableRef
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
@@ -51,7 +52,7 @@ class PostViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
     private val postReadManager: PostReadManager,
-    private val preferences: Preferences,
+    private val preferenceManager: PreferenceManager,
     private val state: SavedStateHandle,
     private val unauthedApiClient: LemmyApiClient,
     val queryMatchHelper: QueryMatchHelper,
@@ -108,6 +109,8 @@ class PostViewModel @Inject constructor(
 
     private val commentsFetcher = CommentsFetcher(lemmyApiClient, accountActionsManager)
 
+    var preferences: Preferences = preferenceManager.currentPreferences
+
     val commentsSortOrderLiveData = MutableLiveData(
         preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top,
     )
@@ -140,6 +143,8 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             accountManager.currentAccount.collect {
                 withContext(Dispatchers.Main) {
+                    preferences = preferenceManager.currentPreferences
+
                     if (it != null) {
                         currentAccountView.value = accountInfoManager.getAccountViewForAccount(it)
                     } else {

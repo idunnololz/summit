@@ -56,6 +56,7 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":overlappingPane"))
+    implementation(project(":calligraphy"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)
@@ -135,7 +136,6 @@ dependencies {
     implementation(libs.transformations)
     implementation(libs.imagepicker)
     implementation(libs.java.string.similarity)
-    implementation(libs.calligraphy3)
     implementation(libs.viewpump)
     implementation(libs.colorpickerview)
 

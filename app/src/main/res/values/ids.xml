@@ -158,4 +158,5 @@
     <item name="open_comment_in_new_screen" type="id" />
     <item name="detailed_view" type="id" />
     <item name="view_mod_log" type="id" />
+    <item name="generate_profile_icon_job" type="id" />
 </resources>

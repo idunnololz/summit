@@ -24,10 +24,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
+import coil.load
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
+import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
@@ -64,6 +66,7 @@ import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.CustomLinkMovementMethod
@@ -86,7 +89,10 @@ import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ActivityScoped
@@ -95,12 +101,15 @@ class PostAndCommentViewBuilder @Inject constructor(
     @ActivityContext private val context: Context,
     private val offlineManager: OfflineManager,
     private val accountActionsManager: AccountActionsManager,
-    private val preferences: Preferences,
+    private val preferenceManager: PreferenceManager,
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val accountImageGenerator: AccountImageGenerator,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
+
+    private var preferences = preferenceManager.currentPreferences
 
     var uiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()
         set(value) {
@@ -144,6 +153,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var showCommentUpvotePercentage: Boolean = preferences.showCommentUpvotePercentage
     private var useMultilinePostHeaders: Boolean = preferences.useMultilinePostHeaders
     private var indicateCurrentUser: Boolean = preferences.indicatePostsAndCommentsCreatedByCurrentUser
+    private var showProfileIcons: Boolean = preferences.showProfileIcons
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -165,6 +175,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         coroutineScope.launch {
             accountManager.currentAccount.collect {
                 currentUser = it
+
+                preferences = preferenceManager.getComposedPreferencesForAccount(it)
+
+                onPreferencesChanged()
             }
         }
     }
@@ -181,6 +195,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         showCommentUpvotePercentage = preferences.showCommentUpvotePercentage
         useMultilinePostHeaders = preferences.useMultilinePostHeaders
         indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
+        showProfileIcons = preferences.showProfileIcons
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
@@ -713,6 +728,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
             showUpvotePercentage = showCommentUpvotePercentage,
+            useMultilineHeader = showProfileIcons,
             isCurrentUser = if (indicateCurrentUser) {
                 currentUser?.id == commentView.creator.id &&
                     currentUser?.instance == commentView.creator.instance
@@ -720,6 +736,23 @@ class PostAndCommentViewBuilder @Inject constructor(
                 false
             },
         )
+
+        if (showProfileIcons) {
+            (headerView.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
+
+            if (commentView.creator.avatar != null) {
+                headerView.getIconImageView().load(commentView.creator.avatar)
+            } else {
+                val job = coroutineScope.launch {
+                    val d = accountImageGenerator.generateDrawableForPerson(commentView.creator)
+
+                    withContext(Dispatchers.Main) {
+                        headerView.getIconImageView().load(d)
+                    }
+                }
+                headerView.setTag(R.id.generate_profile_icon_job, job)
+            }
+        }
 
         if (commentView.comment.deleted || isDeleting) {
             LemmyTextHelper.bindText(
@@ -924,6 +957,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
             showUpvotePercentage = showCommentUpvotePercentage,
+            useMultilineHeader = false,
             isCurrentUser = if (indicateCurrentUser) {
                 currentUser?.id == commentView.creator.id &&
                     currentUser?.instance == commentView.creator.instance
@@ -1732,6 +1766,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
             showUpvotePercentage = showCommentUpvotePercentage,
+            useMultilineHeader = false,
             isCurrentUser = if (indicateCurrentUser) {
                 currentUser?.id == commentView.creator.id &&
                     currentUser?.instance == commentView.creator.instance

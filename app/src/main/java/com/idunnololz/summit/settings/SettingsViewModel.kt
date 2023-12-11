@@ -94,6 +94,7 @@ class SettingsViewModel @Inject constructor(
             is TextOnlySettingItem,
             is TextValueSettingItem,
             is ColorSettingItem,
+            is DescriptionSettingItem,
             -> {
                 addItem()
             }
