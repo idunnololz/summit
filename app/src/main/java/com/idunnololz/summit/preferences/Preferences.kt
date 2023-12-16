@@ -55,6 +55,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
+import com.idunnololz.summit.util.PreferenceUtil.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -771,6 +772,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_PROFILE_ICONS, value)
+                .apply()
+        }
+
+    var navigationRailMode: Int
+        get() = prefs.getInt(KEY_NAVIGATION_RAIL_MODE, NavigationRailModeId.ManualOff)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_NAVIGATION_RAIL_MODE, value)
                 .apply()
         }
 

@@ -4,12 +4,14 @@ import android.util.Log
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.PreferenceManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,6 +34,9 @@ class AccountManager @Inject constructor(
 
     val currentAccount = MutableStateFlow<Account?>(null)
     val currentAccountOnChange = currentAccount.asSharedFlow().drop(1)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val mutex = Mutex()
 
     init {
         runBlocking {

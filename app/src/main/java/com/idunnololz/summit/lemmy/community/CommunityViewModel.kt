@@ -537,7 +537,12 @@ class CommunityViewModel @Inject constructor(
     fun setSortOrder(newSortOrder: CommunitySortOrder) {
         postsRepository.sortOrder = newSortOrder
 
-        reset(resetScrollPosition = preferences.infinity)
+        fetchCurrentPage(
+            force = true,
+            resetHideRead = true,
+            clearPages = true,
+            scrollToTop = true,
+        )
     }
 
     fun getCurrentSortOrder(): CommunitySortOrder = postsRepository.sortOrder
@@ -582,7 +587,11 @@ class CommunityViewModel @Inject constructor(
         currentCommunityRef.removeObserver(communityRefChangeObserver)
     }
 
-    private fun reset(resetScrollPosition: Boolean = false) {
+    private fun reset(
+        resetScrollPosition: Boolean = false,
+        resetHideRead: Boolean = false,
+        force: Boolean = false,
+    ) {
         assertMainThread()
 
         postListEngine.clearPages()
@@ -598,7 +607,11 @@ class CommunityViewModel @Inject constructor(
         loadedPostsData.setValue(PostUpdateInfo())
         currentPageIndex.value = 0
         setPagePositionAtTop(0)
-        fetchCurrentPage(scrollToTop = resetScrollPosition)
+        fetchCurrentPage(
+            resetHideRead = resetHideRead,
+            scrollToTop = resetScrollPosition,
+            force = force,
+        )
     }
 
     fun onPostRead(postView: PostView, delayMs: Long = 0) {

@@ -411,6 +411,9 @@ class CommunityFragment :
                 view = binding.customAppBar.customActionBar,
             )
 
+            if (navBarController.useNavigationRail) {
+                navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
+            }
             binding.customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
                 if (viewModel.lockBottomBar) {
                     return@addOnOffsetChangedListener
@@ -418,7 +421,7 @@ class CommunityFragment :
 
                 val percentShown = -verticalOffset.toFloat() / binding.customAppBar.root.height
 
-                bottomNavViewOffset.value =
+                navBarController.bottomNavViewOffset.value =
                     (percentShown * getBottomNavHeight()).toInt()
 
                 isCustomAppBarExpandedPercent = 1f - percentShown
@@ -527,6 +530,10 @@ class CommunityFragment :
                 viewLifecycleOwner,
                 binding.recyclerView,
             )
+            insetViewStartAndEndByPadding(
+                viewLifecycleOwner,
+                binding.fastScroller,
+            )
         }
 
         (parentFragment?.parentFragment as? MainFragment)?.updateCommunityInfoPane(
@@ -540,7 +547,6 @@ class CommunityFragment :
                 clearPages = true,
                 scrollToTop = true,
             )
-            binding.recyclerView.scrollToPosition(0)
         }
         binding.loadingView.setOnRefreshClickListener {
             viewModel.fetchCurrentPage(true)

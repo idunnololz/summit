@@ -12,6 +12,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ApiListenerManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
@@ -42,6 +43,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val state: SavedStateHandle,
+    private val apiListenerManager: ApiListenerManager,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
@@ -49,7 +51,7 @@ class CreateOrEditPostViewModel @Inject constructor(
         private const val TAG = "CreateOrEditPostViewModel"
     }
 
-    private val uploaderApiClient = LemmyApiClient(context)
+    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager)
 
     private val linkMetadataHelper = LinkMetadataHelper()
 

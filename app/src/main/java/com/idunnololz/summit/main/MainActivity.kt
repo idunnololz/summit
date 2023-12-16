@@ -25,7 +25,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -101,8 +100,6 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    val bottomNavViewOffset = MutableLiveData<Int>(0)
-    val bottomNavViewAnimationOffset = MutableLiveData<Float>(0f)
     val windowInsets = MutableLiveData<Rect>(Rect())
 
     private var enableBottomNavViewScrolling = false
@@ -114,6 +111,8 @@ class MainActivity : BaseActivity() {
     private var currentNavController: NavController? = null
 
     private var showNotificationBarBg: Boolean = true
+
+    internal lateinit var navBarController: NavBarController
 
     val keyPressRegistrationManager = KeyPressRegistrationManager()
 
@@ -127,7 +126,8 @@ class MainActivity : BaseActivity() {
 
     var lockUiOpenness = false
 
-    var useBottomNavBar = true
+    val useBottomNavBar: Boolean
+        get() = navBarController.useBottomNavBar
 
     @Inject
     lateinit var themeManager: ThemeManager
@@ -174,26 +174,21 @@ class MainActivity : BaseActivity() {
         }
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
+
+        navBarController = NavBarController(
+            this,
+            binding.contentView,
+            this,
+        )
+
         setContentView(binding.root)
 
         registerInsetsHandler()
 
-        fun updateBottomTranslationY() {
-            if (!useBottomNavBar) return
-            binding.bottomNavigationView.translationY = bottomNavY
-        }
-
-        bottomNavViewOffset.observe(this) {
-            updateBottomTranslationY()
-        }
-        bottomNavViewAnimationOffset.observe(this) {
-            updateBottomTranslationY()
-        }
-
         viewModel.unreadCount.observe(this) { unreadCount ->
-            if (!useBottomNavBar) return@observe
+            if (!navBarController.useBottomNavBar) return@observe
 
-            binding.bottomNavigationView.getOrCreateBadge(R.id.inboxTabbedFragment).apply {
+            navBarController.navBar.getOrCreateBadge(R.id.inboxTabbedFragment).apply {
                 val allUnreads =
                     unreadCount.totalUnreadCount +
                         unreadCount.totalUnresolvedReportsCount
@@ -245,6 +240,8 @@ class MainActivity : BaseActivity() {
 
         onPreferencesChanged()
 
+        navBarController.setup()
+
         val newInstall = preferences.appVersionLastLaunch == 0
         val isVersionUpdate = isVersionUpdate()
         if (isVersionUpdate) {
@@ -264,13 +261,13 @@ class MainActivity : BaseActivity() {
             binding.notificationBarBgContainer.visibility = View.VISIBLE
         }
 
-        useBottomNavBar = preferences.useBottomNavBar
+        navBarController.onPreferencesChanged(preferences)
 
-        if (!useBottomNavBar) {
-            binding.bottomNavigationView.visibility = View.GONE
+        if (!navBarController.useBottomNavBar) {
+            navBarController.navBar.visibility = View.GONE
         } else if (preferences.useCustomNavBar) {
-            binding.bottomNavigationView.setTag(R.id.custom_nav_bar, true)
-            binding.bottomNavigationView.menu.apply {
+            navBarController.navBar.setTag(R.id.custom_nav_bar, true)
+            navBarController.navBar.menu.apply {
                 clear()
                 val navBarDestinations = preferences.navBarConfig.navBarDestinations
                 for (dest in navBarDestinations) {
@@ -331,10 +328,10 @@ class MainActivity : BaseActivity() {
                 }
             }
         } else {
-            if (binding.bottomNavigationView.getTag(R.id.custom_nav_bar) == true) {
-                binding.bottomNavigationView.menu.clear()
-                binding.bottomNavigationView.inflateMenu(R.menu.bottom_navigation_menu)
-                binding.bottomNavigationView.setTag(R.id.custom_nav_bar, false)
+            if (navBarController.navBar.getTag(R.id.custom_nav_bar) == true) {
+                navBarController.navBar.menu.clear()
+                navBarController.navBar.inflateMenu(R.menu.bottom_navigation_menu)
+                navBarController.navBar.setTag(R.id.custom_nav_bar, false)
             }
         }
     }
@@ -363,9 +360,6 @@ class MainActivity : BaseActivity() {
             }
             .show()
     }
-
-    private val bottomNavY
-        get() = bottomNavViewOffset.value!!.toFloat() + bottomNavViewAnimationOffset.value!!.toFloat()
 
     override fun onResume() {
         super.onResume()
@@ -407,9 +401,9 @@ class MainActivity : BaseActivity() {
 
         val navController = navHostFragment.navController
 
-        binding.bottomNavigationView.setupWithNavController(navController)
+        navBarController.navBar.setupWithNavController(navController)
 
-        binding.bottomNavigationView.setOnItemReselectedListener { menuItem ->
+        navBarController.navBar.setOnItemReselectedListener { menuItem ->
             Log.d(TAG, "Reselected nav item: ${menuItem.itemId}")
 
             onNavigationItemReselectedListeners.forEach {
@@ -444,6 +438,15 @@ class MainActivity : BaseActivity() {
             val leftInset = systemBarsInsets.left
             val rightInset = systemBarsInsets.right
 
+            Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
+
+            navBarController.onInsetsChanged(
+                leftInset = leftInset,
+                topInset = topInset,
+                rightInset = rightInset,
+                bottomInset = bottomInset,
+            )
+
             lastInsets = MainActivityInsets(
                 imeHeight = imeHeight,
                 topInset = topInset,
@@ -452,14 +455,6 @@ class MainActivity : BaseActivity() {
                 rightInset = rightInset,
             )
 
-            Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
-
-            binding.bottomNavigationView.layoutParams =
-                (binding.bottomNavigationView.layoutParams as MarginLayoutParams).apply {
-                    leftMargin = leftInset
-                    rightMargin = rightInset
-                }
-
             // Move our RecyclerView below toolbar + 10dp
             windowInsets.value = checkNotNull(windowInsets.value).apply {
                 left = leftInset
@@ -467,14 +462,8 @@ class MainActivity : BaseActivity() {
                 right = rightInset
                 bottom = bottomInset
             }
-            binding.bottomNavigationView.layoutParams =
-                (binding.bottomNavigationView.layoutParams as MarginLayoutParams).apply {
-                    leftMargin = leftInset
-                    rightMargin = rightInset
-                }
-            binding.bottomNavigationView.updatePadding(bottom = bottomInset)
             binding.snackbarContainer.updateLayoutParams<MarginLayoutParams> {
-                bottomMargin = binding.bottomNavigationView.height
+                bottomMargin = navBarController.navBar.height
             }
 
             onStatusBarHeightChanged(topInset)
@@ -535,71 +524,9 @@ class MainActivity : BaseActivity() {
             .translationY(0f)
     }
 
-    private fun enableBottomNavViewScrolling() {
-        if (!useBottomNavBar) return
-
-        enableBottomNavViewScrolling = true
-        binding.bottomNavigationView.visibility = View.VISIBLE
-    }
-
-    private fun disableBottomNavViewScrolling() {
-        enableBottomNavViewScrolling = false
-    }
-
     fun setNavUiOpenness(progress: Float) {
         if (lockUiOpenness) return
-        bottomNavViewAnimationOffset.value = binding.bottomNavigationView.height * progress
-    }
-
-    private fun showBottomNav(supportOpenness: Boolean = false) {
-        if (!useBottomNavBar) return
-        if (enableBottomNavViewScrolling && binding.bottomNavigationView.visibility == View.VISIBLE) {
-            return
-        }
-
-        val finalY =
-            if (supportOpenness) {
-                bottomNavY
-            } else {
-                0f
-            }
-
-        bottomNavViewOffset.value = 0
-        if (binding.bottomNavigationView.visibility != View.VISIBLE) {
-            binding.bottomNavigationView.visibility = View.VISIBLE
-            binding.bottomNavigationView.translationY =
-                binding.bottomNavigationView.height.toFloat()
-            Log.d(TAG, "bottomNavigationView.height: ${binding.bottomNavigationView.height}")
-
-            binding.bottomNavigationView.post {
-                binding.bottomNavigationView.animate()
-                    .translationY(finalY).duration = 250
-            }
-        } else {
-            if (binding.bottomNavigationView.translationY == 0f) return
-
-            binding.bottomNavigationView.animate()
-                .translationY(finalY).duration = 250
-        }
-    }
-
-    fun hideBottomNav(animate: Boolean) {
-        if (!useBottomNavBar) return
-
-        Log.d(TAG, "bottomNavigationView.height: ${binding.bottomNavigationView.height}")
-
-        if (animate) {
-            if (binding.bottomNavigationView.translationY < binding.bottomNavigationView.height.toFloat()) {
-                binding.bottomNavigationView.animate()
-                    .translationY(binding.bottomNavigationView.height.toFloat())
-                    .apply {
-                        duration = 250
-                    }
-            }
-        } else {
-            binding.bottomNavigationView.translationY =
-                binding.bottomNavigationView.height.toFloat()
-        }
+        navBarController.bottomNavViewAnimationOffset.value = navBarController.navBar.height * progress
     }
 
     private fun handleIntent(intent: Intent?) {
@@ -689,23 +616,6 @@ class MainActivity : BaseActivity() {
         } else {
             launchPage(page)
         }
-
-//        if (LinkResolver.isLemmyUrl(data)) {
-//            if (RedditUtils.isUriGallery(data) && data.pathSegments.size >= 2) {
-//                RedirectHandlerDialogFragment.newInstance(LinkUtils.getRedirectLink(data.pathSegments[1]))
-//                    .show(supportFragmentManager, "asd")
-//            } else if (RedditUtils.isUriRedirect(data)) {
-//                RedirectHandlerDialogFragment.newInstance(data.toString())
-//                    .show(supportFragmentManager, "asd")
-//            } else {
-//                if (binding.bottomNavigationView.selectedItemId != R.id.main) {
-//                    binding.bottomNavigationView.selectedItemId = R.id.main
-//                }
-//                executeWhenMainFragmentAvailable { mainFragment ->
-//                    mainFragment.navigateToUri(data)
-//                }
-//            }
-//        }
     }
 
     fun launchPage(
@@ -713,12 +623,12 @@ class MainActivity : BaseActivity() {
         switchToNativeInstance: Boolean = false,
         preferMainFragment: Boolean = false,
     ) {
-        val isMainFragment = binding.bottomNavigationView.selectedItemId == R.id.mainFragment &&
+        val isMainFragment = navBarController.navBar.selectedItemId == R.id.mainFragment &&
             currentNavController?.currentDestination?.id == R.id.mainFragment
 
         fun handleWithMainFragment() {
-            if (binding.bottomNavigationView.selectedItemId != R.id.mainFragment) {
-                binding.bottomNavigationView.selectedItemId = R.id.mainFragment
+            if (navBarController.navBar.selectedItemId != R.id.mainFragment) {
+                navBarController.navBar.selectedItemId = R.id.mainFragment
             }
             executeWhenMainFragmentAvailable { mainFragment ->
                 mainFragment.navigateToPage(page, switchToNativeInstance)
@@ -791,7 +701,7 @@ class MainActivity : BaseActivity() {
                     fn(currentFragment)
                 } else {
                     // super hacky :x
-                    binding.bottomNavigationView.post(this)
+                    navBarController.navBar.post(this)
                 }
             }
         }
@@ -954,9 +864,9 @@ class MainActivity : BaseActivity() {
             }
 
             rootView.setPadding(
-                insets.leftInset,
+                navBarController.newLeftInset,
                 insets.topInset,
-                insets.rightInset,
+                navBarController.newRightInset,
                 bottomPadding + additionalPaddingBottom,
             )
         }
@@ -980,6 +890,28 @@ class MainActivity : BaseActivity() {
                 0,
                 insets.rightInset,
                 bottomPadding + additionalPaddingBottom,
+            )
+        }
+    }
+
+    fun insetViewStartAndEndByPadding(
+        lifecycleOwner: LifecycleOwner,
+        rootView: View,
+        additionalPaddingBottom: Int = 0,
+    ) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = lastInsets
+
+            var bottomPadding = getBottomNavHeight()
+            if (bottomPadding == 0) {
+                bottomPadding = insets.bottomInset
+            }
+
+            rootView.setPadding(
+                insets.leftInset,
+                0,
+                insets.rightInset,
+                0,
             )
         }
     }
@@ -1042,78 +974,78 @@ class MainActivity : BaseActivity() {
 
         when (t) {
             CommunityFragment::class -> {
-                enableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.enableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             PostFragment::class -> {
-                disableBottomNavViewScrolling()
-                hideBottomNav(animate)
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.hideNavBar(animate)
                 showNotificationBarBg()
             }
             VideoViewerFragment::class -> {
-                disableBottomNavViewScrolling()
-                hideBottomNav(animate)
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.hideNavBar(animate)
                 hideNotificationBarBg()
             }
             ImageViewerActivity::class -> {
-                disableBottomNavViewScrolling()
-                hideBottomNav(animate)
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.hideNavBar(animate)
                 hideNotificationBarBg()
             }
             SettingCacheFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             HistoryFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             LoginFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             SettingsFragment::class -> {
-                disableBottomNavViewScrolling()
-                hideBottomNav(animate)
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.hideNavBar(animate)
                 hideNotificationBarBg()
             }
             PersonTabbedFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             CommunityInfoFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             SavedTabbedFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             InboxTabbedFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav(supportOpenness = true)
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav(supportOpenness = true)
                 showNotificationBarBg()
             }
             ActionsTabbedFragment::class -> {
-                disableBottomNavViewScrolling()
-                hideBottomNav(animate)
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.hideNavBar(animate)
                 hideNotificationBarBg()
             }
             CommunitiesFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             ModLogsFragment::class -> {
-                disableBottomNavViewScrolling()
-                showBottomNav()
+                navBarController.disableBottomNavViewScrolling()
+                navBarController.showBottomNav()
                 showNotificationBarBg()
             }
             else ->
@@ -1122,12 +1054,8 @@ class MainActivity : BaseActivity() {
     }
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
-    fun getBottomNavHeight() =
-        if (useBottomNavBar) {
-            binding.bottomNavigationView.height
-        } else {
-            0
-        }
+    fun getBottomNavHeight() = navBarController.bottomNavHeight
+    fun getNavRailWidth() = navBarController.navRailWidth
 
     fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {
         viewModel.isReady.observe(lifecycleOwner) {
@@ -1164,9 +1092,9 @@ class MainActivity : BaseActivity() {
                 sharedElements += Pair.create(appBar, SharedElementNames.AppBar)
             }
 
-            if (useBottomNavBar) {
+            if (navBarController.useBottomNavBar) {
                 sharedElements += Pair.create(
-                    binding.bottomNavigationView,
+                    navBarController.navBar,
                     SharedElementNames.NavBar,
                 )
             }
@@ -1229,7 +1157,7 @@ class MainActivity : BaseActivity() {
 
     fun navigateTopLevel(menuId: Int) {
         val currentNavController = currentNavController ?: return
-        val menuItem = binding.bottomNavigationView.menu.findItem(menuId) ?: return
+        val menuItem = navBarController.navBar.menu.findItem(menuId) ?: return
         NavigationUI.onNavDestinationSelected(menuItem, currentNavController)
     }
 

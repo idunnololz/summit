@@ -1,7 +1,10 @@
 package com.idunnololz.summit.api
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import arrow.core.Either
+import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
@@ -39,24 +42,31 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.retry
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AccountAwareLemmyClient @Inject constructor(
+    @ApplicationContext private val context: Context,
     val apiClient: LemmyApiClient,
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
     class Factory @Inject constructor(
+        @ApplicationContext private val context: Context,
         val apiClient: LemmyApiClient,
         private val accountManager: AccountManager,
         private val coroutineScopeFactory: CoroutineScopeFactory,
     ) {
-        fun create() = AccountAwareLemmyClient(apiClient, accountManager, coroutineScopeFactory)
+        fun create() = AccountAwareLemmyClient(context, apiClient, accountManager, coroutineScopeFactory)
     }
 
     companion object {
@@ -933,15 +943,35 @@ class AccountAwareLemmyClient @Inject constructor(
 
         val error = requireNotNull(this.exceptionOrNull())
         if (error is NotAuthenticatedException) {
-            if (account.instance == apiClient.instance) {
-                Log.d(TAG, "Account token expired. Signing user '${account.name}' out.")
-                // sign this account out
-                coroutineScope.launch {
-                    accountManager.signOut(account)
-                }
-            }
+            signOutIfNeeded(account)
         }
 
         return this
+    }
+
+    private fun signOutIfNeeded(account: Account) {
+        if (account.instance == apiClient.instance) {
+            Log.d(TAG, "Account token expired. Signing user '${account.name}' out.")
+            // sign this account out
+            coroutineScope.launch {
+                accountManager.mutex.withLock {
+                    val accountExists = accountManager.getAccountById(account.id) != null
+
+                    if (!accountExists) {
+                        return@launch
+                    }
+
+                    accountManager.signOut(account)
+
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.account_token_expired_format, account.name),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
     }
 }

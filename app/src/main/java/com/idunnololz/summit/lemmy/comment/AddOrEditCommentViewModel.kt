@@ -13,6 +13,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
+import com.idunnololz.summit.api.ApiListenerManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
@@ -36,6 +37,7 @@ class AddOrEditCommentViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val accountActionsManager: AccountActionsManager,
     private val state: SavedStateHandle,
+    private val apiListenerManager: ApiListenerManager,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
@@ -43,7 +45,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         private const val TAG = "AddOrEditCommentViewModel"
     }
 
-    private val uploaderApiClient = LemmyApiClient(context)
+    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager)
 
     sealed interface Message {
         data class ReplyTargetTooOld(

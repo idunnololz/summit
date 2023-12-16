@@ -116,7 +116,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     }
 
                     binding.root.post {
-                        themeManager.applyThemeFromPreferences()
+                        themeManager.onPreferencesChanged()
                     }
                 },
             )
@@ -129,7 +129,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     if (DynamicColors.isDynamicColorAvailable()) {
                         preferences.setUseMaterialYou(it)
                         preferences.colorScheme = ColorSchemes.Default
-                        themeManager.applyThemeFromPreferences()
+                        themeManager.onPreferencesChanged()
                     } else if (it) {
                         AlertDialogFragment.Builder()
                             .setMessage(R.string.error_dynamic_color_not_supported)
@@ -156,7 +156,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 { preferences.isBlackTheme() },
                 {
                     preferences.setUseBlackTheme(it)
-                    themeManager.onThemeOverlayChanged()
+                    themeManager.onPreferencesChanged()
                 },
             )
             settings.lessDarkBackgroundTheme.bindTo(
@@ -164,7 +164,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 { preferences.useLessDarkBackgroundTheme },
                 {
                     preferences.useLessDarkBackgroundTheme = it
-                    themeManager.onThemeOverlayChanged()
+                    themeManager.onPreferencesChanged()
                 },
             )
 
@@ -211,7 +211,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
                 onChoiceSelected = {
                     preferences.globalFontSize = it
-                    themeManager.onThemeOverlayChanged()
+                    themeManager.onPreferencesChanged()
                 },
             )
 
@@ -227,7 +227,7 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
                 onChoiceSelected = {
                     preferences.globalFontColor = it
-                    themeManager.onThemeOverlayChanged()
+                    themeManager.onPreferencesChanged()
                 },
             )
 

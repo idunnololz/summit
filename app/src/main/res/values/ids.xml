@@ -160,4 +160,7 @@
     <item name="view_mod_log" type="id" />
     <item name="generate_profile_icon_job" type="id" />
     <item name="generate_lemming" type="id" />
+    <item name="auto" type="id" />
+    <item name="on" type="id" />
+    <item name="off" type="id" />
 </resources>

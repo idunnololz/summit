@@ -8,9 +8,11 @@ import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
+import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
+import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
@@ -1520,6 +1522,35 @@ class MiscSettings @Inject constructor(
         relatedKeys = listOf(KEY_SAVE_DRAFTS_AUTOMATICALLY),
     )
 
+    val navigationRailMode = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.navigation_rail_mode),
+        context.getString(R.string.navigation_rail_mode_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                NavigationRailModeId.Auto,
+                context.getString(R.string.auto),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavigationRailModeId.ManualOn,
+                context.getString(R.string.on),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavigationRailModeId.ManualOff,
+                context.getString(R.string.off),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(
+            PreferenceUtil.KEY_NAVIGATION_RAIL_MODE,
+        ),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
@@ -1530,6 +1561,7 @@ class MiscSettings @Inject constructor(
         previewLinks,
         usePredictiveBack,
         shareImagesDirectly,
+        navigationRailMode,
     )
 }
 

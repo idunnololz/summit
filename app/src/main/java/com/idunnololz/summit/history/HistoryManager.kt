@@ -97,9 +97,7 @@ class HistoryManager @Inject constructor(
             }
 
             withContext(dbContext) {
-                if (state.communityState.communityRef is CommunityRef.MultiCommunity ||
-                    state.communityState.communityRef is CommunityRef.ModeratedCommunities
-                ) {
+                if (state.communityState.communityRef is CommunityRef.MultiCommunity) {
                     // Multi-communities are purely client sided so we cannot record history for them.
                     return@withContext
                 }

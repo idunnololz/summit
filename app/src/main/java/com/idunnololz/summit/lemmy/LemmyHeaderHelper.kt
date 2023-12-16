@@ -8,6 +8,7 @@ import android.os.Build
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.view.View
 import android.widget.TextView
@@ -234,13 +235,27 @@ class LemmyHeaderHelper(
                 sb.appendSeparator()
             }
 
-            if (postView.creator.admin) {
-                val s = sb.length
-                sb.appendLink(
-                    postView.creator.name,
-                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
+            val s = sb.length
+            sb.appendLink(
+                LemmyUtils.formatAuthor(postView.creator.name),
+                LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
+            )
+            val e = sb.length
+
+            if (postView.creator_is_admin == true) {
+                sb.setSpan(
+                    ForegroundColorSpan(adminColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
-                val e = sb.length
+                sb.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            } else if (postView.creator_is_moderator == true) {
                 sb.setSpan(
                     ForegroundColorSpan(modColor),
                     s,
@@ -253,33 +268,18 @@ class LemmyHeaderHelper(
                     e,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
-//            } else if (listingItem.distinguished == "admin") {
-//                run {
-//                    val s = sb.length
-//                    sb.append(listingItem.author)
-//                    val e = sb.length
-//                    sb.setSpan(
-//                        ForegroundColorSpan(adminColor),
-//                        s,
-//                        e,
-//                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//                    )
-//                    sb.setSpan(
-//                        StyleSpan(Typeface.BOLD),
-//                        s,
-//                        e,
-//                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//                    )
-//                }
             } else {
-                val s = sb.length
-                sb.appendLink(
-                    LemmyUtils.formatAuthor(postView.creator.name),
-                    LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
-                )
-                val e = sb.length
                 sb.setSpan(
                     ForegroundColorSpan(regularColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
+
+            if (postView.creator_banned_from_community) {
+                sb.setSpan(
+                    StrikethroughSpan(),
                     s,
                     e,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
@@ -358,37 +358,54 @@ class LemmyHeaderHelper(
         }
 
         val creatorName = commentView.creator.name.trim()
-        if (commentView.creator.admin) {
-            run {
-                val s = sb.length
-                sb.appendLink(
-                    creatorName,
-                    LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
-                )
-                val e = sb.length
-                sb.setSpan(
-                    ForegroundColorSpan(adminColor),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-                sb.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
-        } else {
-            val s = sb.length
-            sb.appendLink(
-                text = creatorName,
-                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
-                underline = false,
-            )
-            val e = sb.length
+
+        val s = sb.length
+        sb.appendLink(
+            text = creatorName,
+            url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
+            underline = false,
+        )
+        val e = sb.length
+
+
+        if (commentView.creator_is_admin == true) {
             sb.setSpan(
-                ForegroundColorSpan(emphasisColor),
+                ForegroundColorSpan(adminColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.setSpan(
+                StyleSpan(Typeface.BOLD),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        } else if (commentView.creator_is_moderator == true) {
+            sb.setSpan(
+                ForegroundColorSpan(modColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.setSpan(
+                StyleSpan(Typeface.BOLD),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        } else {
+            sb.setSpan(
+                ForegroundColorSpan(regularColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
+
+        if (commentView.creator_banned_from_community) {
+            sb.setSpan(
+                StrikethroughSpan(),
                 s,
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,

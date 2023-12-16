@@ -20,11 +20,4 @@ class CommentsFetcher(
         force: Boolean,
     ): Result<List<CommentView>> =
         apiClient.fetchCommentsWithRetry(id, sort, maxDepth = maxDepth, force = force)
-            .onSuccess {
-                if (force) {
-                    it.forEach {
-                        accountActionsManager.setScore(it.toVotableRef(), it.counts.score)
-                    }
-                }
-            }
 }

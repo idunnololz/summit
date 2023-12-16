@@ -37,6 +37,8 @@ class ThemeManager @Inject constructor(
 
     private val coroutineScope = coroutineScopeFactory.create()
 
+    private var currentThemeOverlay: ThemeOverlayConfig? = null
+
     val useMaterialYou = MutableStateFlow<Boolean>(preferences.isUseMaterialYou())
     val themeOverlayChanged = MutableSharedFlow<Unit>()
     val useCustomFont = MutableStateFlow<Boolean>(preferences.globalFont != 0)
@@ -61,22 +63,43 @@ class ThemeManager @Inject constructor(
         }
     }
 
-    private fun onPreferencesChanged() {
-        applyThemeFromPreferences()
-        onThemeOverlayChanged()
+    fun onPreferencesChanged() {
+        val currentConfig = ThemeOverlayConfig(
+            baseTheme = preferences.getBaseTheme(),
+            isBlackTheme = preferences.isBlackTheme(),
+            useLessDarkBackgroundTheme = preferences.useLessDarkBackgroundTheme,
+            isMaterialYou = preferences.isUseMaterialYou(),
+            colorScheme = preferences.colorScheme,
+            globalFontSize = preferences.globalFontSize,
+            globalFontColor = preferences.globalFontColor,
+            globalFont = preferences.globalFont,
+        )
+
+        if (currentThemeOverlay == currentConfig) {
+            return
+        }
+        currentThemeOverlay = currentConfig
+
+        applyThemeFromPreferences(currentConfig)
+        onThemeOverlayChanged(currentConfig)
     }
 
     fun updateTextConfig() {
+        val currentConfig = currentThemeOverlay ?: return
+        updateTextConfig(currentConfig)
+    }
+
+    fun updateTextConfig(currentConfig: ThemeOverlayConfig) {
         isLightTheme =
-            when (preferences.getBaseTheme()) {
+            when (currentConfig.baseTheme) {
                 BaseTheme.UseSystem -> context.isLightTheme()
                 BaseTheme.Light -> true
                 BaseTheme.Dark -> false
             }
     }
 
-    fun applyThemeFromPreferences() {
-        val fontAsset = preferences.globalFont.toFontAsset()
+    fun applyThemeFromPreferences(currentConfig: ThemeOverlayConfig) {
+        val fontAsset = currentConfig.globalFont.toFontAsset()
         fontAsset?.let {
             ViewPump.init(
                 ViewPump.builder()
@@ -93,7 +116,7 @@ class ThemeManager @Inject constructor(
             ViewPump.init(null)
         }
 
-        val themeValue = when (preferences.getBaseTheme()) {
+        val themeValue = when (currentConfig.baseTheme) {
             BaseTheme.UseSystem -> MODE_NIGHT_FOLLOW_SYSTEM
             BaseTheme.Light -> MODE_NIGHT_NO
             BaseTheme.Dark -> MODE_NIGHT_YES
@@ -104,16 +127,16 @@ class ThemeManager @Inject constructor(
         }
 
         coroutineScope.launch {
-            useMaterialYou.emit(preferences.isUseMaterialYou())
-            useCustomFont.emit(preferences.globalFont != 0)
+            useMaterialYou.emit(currentConfig.isMaterialYou)
+            useCustomFont.emit(currentConfig.globalFont != 0)
             PreferenceUtil.usingCustomFont = useCustomFont.value
         }
     }
 
-    fun onThemeOverlayChanged() {
+    fun onThemeOverlayChanged(currentConfig: ThemeOverlayConfig) {
         coroutineScope.launch {
             themeOverlayChanged.emit(Unit)
-            updateTextConfig()
+            updateTextConfig(currentConfig)
         }
     }
 
@@ -193,4 +216,15 @@ class ThemeManager @Inject constructor(
             }
         }
     }
+
+    data class ThemeOverlayConfig(
+        val baseTheme: BaseTheme,
+        val isBlackTheme: Boolean,
+        val useLessDarkBackgroundTheme: Boolean,
+        val isMaterialYou: Boolean,
+        val colorScheme: ColorSchemeId,
+        val globalFontSize: Int,
+        val globalFontColor: Int,
+        val globalFont: Int,
+    )
 }

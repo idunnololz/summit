@@ -709,6 +709,9 @@ class PostAndCommentViewBuilder @Inject constructor(
                             headerView.updatePaddingRelative(
                                 bottom = Utils.convertDpToPixel(8f).toInt(),
                             )
+                            collapseSectionButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                bottomMargin = Utils.convertDpToPixel(8f).toInt()
+                            }
                         } else {
                             headerView.textView2.updatePaddingRelative(
                                 start = Utils.convertDpToPixel(8f).toInt(),

@@ -810,6 +810,13 @@
     <string name="manage_settings_desc">See what settings are overridden and reset overridden settings.</string>
     <string name="per_account_settings_desc">Settings you change here will override the settings set outside of the per-account page. These overrides will only take effect when the associated account is the current account. You can reset any overridden settings in the \"Manage settings\" page.</string>
     <string name="generate_your_own_lemming">Generate your own lemming avatar!</string>
+    <string name="account_token_expired_format">Account token has expired for account %1$s. Please sign in again.</string>
+    <string name="mod">Mod</string>
+    <string name="navigation_rail_mode">Navigation rail mode</string>
+    <string name="navigation_rail_mode_desc">Determines when the navigation rail is used instead of the bottom navigation menu.</string>
+    <string name="auto">Auto</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

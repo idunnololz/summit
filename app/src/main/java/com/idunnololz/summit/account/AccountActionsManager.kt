@@ -13,9 +13,18 @@ import com.idunnololz.summit.actions.PendingCommentsManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.actions.VotesManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
+import com.idunnololz.summit.api.ApiListenerManager
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.GetCommentsResponse
+import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.GetPersonMentionsResponse
+import com.idunnololz.summit.api.dto.GetPostResponse
+import com.idunnololz.summit.api.dto.GetPostsResponse
 import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PostRef
@@ -26,12 +35,14 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
+import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,6 +54,7 @@ class AccountActionsManager @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val postReadManager: PostReadManager,
     private val preferenceManager: PreferenceManager,
+    private val apiListenerManager: ApiListenerManager,
 ) {
 
     companion object {
@@ -382,6 +394,10 @@ class AccountActionsManager @Inject constructor(
             },
         )
 
+        apiListenerManager.registerListener {
+            handleApiResponse(it)
+        }
+
         pendingActionsManager.addActionCompleteListener(onActionChangedListener)
     }
 
@@ -491,4 +507,82 @@ class AccountActionsManager @Inject constructor(
 
     fun getVote(ref: VotableRef) =
         votesManager.getVote(ref)
+
+    private fun handleApiResponse(response: Response<*>) {
+        if (!response.isSuccessful) return
+        if (response.raw().networkResponse == null)  return
+
+        fun updateScore(item: Any?) {
+            when (item) {
+                is CommentView -> {
+                    val votableRef = item.toVotableRef()
+                    setScore(votableRef, item.counts.score)
+                    votesManager.setUpvotes(votableRef, item.counts.upvotes)
+                    votesManager.setDownvotes(votableRef, item.counts.downvotes)
+                    votesManager.setVote(votableRef, item.my_vote ?: 0)
+                }
+                is PostView -> {
+                    val votableRef = item.toVotableRef()
+                    setScore(votableRef, item.counts.score)
+                    votesManager.setUpvotes(votableRef, item.counts.upvotes)
+                    votesManager.setDownvotes(votableRef, item.counts.downvotes)
+                    votesManager.setVote(votableRef, item.my_vote ?: 0)
+                }
+            }
+        }
+
+        fun updateScores(result: List<*>) {
+            for (item in result) {
+                updateScore(item)
+            }
+        }
+
+        when (val result = response.body()) {
+            is List<*> -> {
+                if (result.isNotEmpty()) {
+                    when (result.first()) {
+                        is CommentView -> {
+                            updateScores(result)
+                        }
+                        is PostView -> {
+                            updateScores(result)
+                        }
+                    }
+                }
+            }
+            is GetPostResponse -> {
+                updateScore(result.post_view)
+            }
+            is GetPostsResponse -> {
+                for (post in result.posts) {
+                    updateScore(post)
+                }
+            }
+            is GetCommentsResponse -> {
+                for (comment in result.comments) {
+                    updateScore(comment)
+                }
+            }
+            is GetPersonDetailsResponse -> {
+                for (comment in result.comments) {
+                    updateScore(comment)
+                }
+                for (post in result.posts) {
+                    updateScore(post)
+                }
+            }
+            is SearchResponse -> {
+                for (comment in result.comments) {
+                    updateScore(comment)
+                }
+                for (post in result.posts) {
+                    updateScore(post)
+                }
+            }
+            else -> {
+//                Log.d("ASDF", "${result?.javaClass?.simpleName}")
+            // do nothing
+            }
+        }
+    }
 }

@@ -305,8 +305,11 @@ class PostsRepository @Inject constructor(
                 apiClient.defaultInstance()
             }
             is CommunityRef.ModeratedCommunities -> {
-                currentDataSource = moderatedCommunitiesDataSourceFactory.create()
-                postsPerPage = 15
+                currentDataSource = singlePostsDataSourceFactory.create(
+                    communityName = null,
+                    listingType = ListingType.ModeratorView,
+                )
+                postsPerPage = DEFAULT_POSTS_PER_PAGE
 
                 apiClient.defaultInstance()
             }
@@ -429,9 +432,6 @@ class PostsRepository @Inject constructor(
         for (post in newPosts) {
             val uniquePostKey = post.getUniqueKey()
 
-            if (force) {
-                accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
-            }
             if (hideRead && (post.read || postReadManager.isPostRead(apiInstance, post.post.id))) {
                 continue
             }
