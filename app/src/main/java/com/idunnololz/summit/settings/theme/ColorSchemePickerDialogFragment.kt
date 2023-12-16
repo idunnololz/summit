@@ -80,8 +80,7 @@ class ColorSchemePickerDialogFragment :
                 preferences.colorScheme = it
                 preferences.setUseMaterialYou(false)
 
-                themeManager.onThemeOverlayChanged()
-                themeManager.applyThemeFromPreferences()
+                themeManager.onPreferencesChanged()
 
                 dismiss()
             }

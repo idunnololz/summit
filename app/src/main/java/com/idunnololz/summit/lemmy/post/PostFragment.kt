@@ -990,7 +990,9 @@ class PostFragment :
         if (args.isSinglePage) {
             requireMainActivity().apply {
                 setupForFragment<PostFragment>()
-                hideBottomNav(animate = true)
+                if (!navBarController.useNavigationRail) {
+                    navBarController.hideNavBar(animate = true)
+                }
                 lockUiOpenness = true
             }
         }

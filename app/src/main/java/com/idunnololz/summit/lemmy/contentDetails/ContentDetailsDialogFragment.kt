@@ -121,7 +121,17 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
 
                     appendLine()
 
-                    appendAuthorInfo(commentView.creator)
+                    appendAuthorInfo(
+                        commentView.creator,
+                        commentView.creator_is_moderator == true,
+                        commentView.creator_is_admin == true,
+                        commentView.creator_banned_from_community,
+                    )
+
+                    appendLine()
+
+                    appendLine("Raw content")
+                    appendLine(commentView.comment.content)
                 },
             )
 
@@ -149,7 +159,25 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
 
                     appendLine()
 
-                    appendAuthorInfo(postView.creator)
+                    appendAuthorInfo(
+                        postView.creator,
+                        postView.creator_is_moderator == true,
+                        postView.creator_is_admin == true,
+                        postView.creator_banned_from_community,
+                    )
+
+                    appendLine()
+
+                    appendLine("Raw content")
+                    appendLine(postView.post.name)
+                    if (!postView.post.body.isNullOrBlank()) {
+                        appendLine()
+                        appendLine(postView.post.body)
+                    }
+                    if (!postView.post.url.isNullOrBlank()) {
+                        appendLine()
+                        appendLine(postView.post.url)
+                    }
                 },
             )
 
@@ -244,6 +272,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             showMoreDetails.setOnClickListener {
                 TransitionManager.beginDelayedTransition(root)
 
+                fullDetails.setTextIsSelectable(true)
                 fullDetails.text = o.fullDetails.trim()
                 fullDetailsContainer.visibility = View.VISIBLE
 
@@ -256,8 +285,22 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
         appendLine("Posted on ${community.instance}")
     }
 
-    private fun StringBuilder.appendAuthorInfo(person: Person) {
+    private fun StringBuilder.appendAuthorInfo(
+        person: Person,
+        isMod: Boolean,
+        isAdmin: Boolean,
+        isBanned: Boolean,
+    ) {
         appendLine("Posted from ${person.instance}")
+        if (isMod) {
+            appendLine("Posted by a moderator.")
+        }
+        if (isAdmin) {
+            appendLine("Posted by an admin.")
+        }
+        if (isBanned) {
+            appendLine("Poster is banned from this community.")
+        }
     }
 
     private fun CommentAggregates.toCounts(): Counts =

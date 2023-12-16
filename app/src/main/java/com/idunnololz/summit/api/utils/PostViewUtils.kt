@@ -71,6 +71,9 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
 }
 
 fun PostView.getType(): PostType {
+    if (post.embed_video_url != null && isUrlVideo(post.embed_video_url)) {
+        return PostType.Video
+    }
     if (post.url != null && isUrlImage(post.url)) {
         return PostType.Image
     }
@@ -81,6 +84,9 @@ fun PostView.getType(): PostType {
 }
 
 fun PostView.getDominantType(): PostType {
+    if (post.embed_video_url != null && isUrlVideo(post.embed_video_url)) {
+        return PostType.Video
+    }
     if (post.url != null) {
         if (isUrlImage(post.url)) {
             return PostType.Image

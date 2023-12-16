@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 34
-        versionCode = 118
-        versionName = "1.19.1"
+        versionCode = 119
+        versionName = "1.20.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -87,6 +87,8 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+    implementation(libs.window)
 
     implementation(libs.coil)
     implementation(libs.coil.gif)

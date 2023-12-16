@@ -35,6 +35,7 @@
                 android:id="@+id/icon"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
+                android:scaleType="centerCrop"
                 app:border_color="@color/colorOnSurface"
                 app:border_width="1dp"
                 app:fill_color="@color/style_blue"

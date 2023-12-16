@@ -79,14 +79,14 @@ class FontPickerDialogFragment :
                 preferences.globalFont = it
 
                 dismiss()
-                themeManager.applyThemeFromPreferences()
+                themeManager.onPreferencesChanged()
                 getMainActivity()?.recreate()
             }
         }
     }
 
     override fun onDestroyView() {
-        themeManager.applyThemeFromPreferences()
+        themeManager.onPreferencesChanged()
 
         super.onDestroyView()
     }

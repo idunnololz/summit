@@ -81,7 +81,8 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = getString(R.string.communities)
 
-            binding.contentContainer.updatePadding(bottom = getBottomNavHeight())
+            navBarController.updatePaddingForNavBar(binding.contentContainer)
+//            binding.contentContainer.updatePadding(bottom = getBottomNavHeight())
         }
 
         viewModel.setCommunitiesInstance(args.instance)

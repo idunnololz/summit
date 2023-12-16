@@ -183,6 +183,14 @@ class SettingMiscFragment :
                 preferences.saveDraftsAutomatically = it
             },
         )
+        settings.navigationRailMode.bindTo(
+            binding.navigationRailMode,
+            { preferences.navigationRailMode },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            },
+        )
     }
 
     private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {
@@ -231,6 +239,10 @@ class SettingMiscFragment :
                     preferences.warnReplyToOldContent = threshold != 0L
                     preferences.warnReplyToOldContentThresholdMs = threshold
                 }
+            }
+            settings.navigationRailMode.id -> {
+                preferences.navigationRailMode = value as Int
+                getMainActivity()?.onPreferencesChanged()
             }
         }
 

@@ -165,8 +165,6 @@ class LemmyHeaderView : FrameLayout {
                 for (child in children) {
                     if (child.visibility == View.GONE) continue
 
-                    Log.d("ASDF", "Child $child has height: ${child.measuredHeight}")
-
                     val layoutParams = child.layoutParams as LayoutParams
                     val childTop = (
                         paddingTop + (childSpace - child.measuredHeight) / 2 +

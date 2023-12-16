@@ -93,14 +93,17 @@ class HistoryFragment :
         requireMainActivity().apply {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+            insetViewStartAndEndByPadding(viewLifecycleOwner, binding.fastScroller)
+
+            if (navBarController.useNavigationRail) {
+                navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
+            }
 
             setSupportActionBar(binding.toolbar)
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = getString(R.string.history)
-
-            binding.contentContainer.updatePadding(bottom = getBottomNavHeight())
         }
 
         historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)

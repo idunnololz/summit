@@ -203,7 +203,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
-        hiltEntryPoint.themeManager().applyThemeFromPreferences()
+        hiltEntryPoint.themeManager().onPreferencesChanged()
         Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInExternalApp
         LemmyTextHelper.autoLinkPhoneNumbers = hiltEntryPoint.preferences().autoLinkPhoneNumbers
 

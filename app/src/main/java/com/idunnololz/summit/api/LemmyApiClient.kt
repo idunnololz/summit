@@ -125,6 +125,7 @@ const val COMMENTS_DEPTH_MAX = 6
 
 class LemmyApiClient(
     @ApplicationContext private val context: Context,
+    private val apiListenerManager: ApiListenerManager,
     private val userAgent: String,
 ) {
 
@@ -162,7 +163,8 @@ class LemmyApiClient(
 
     @Inject constructor(
         @ApplicationContext context: Context,
-    ) : this(context, LinkUtils.USER_AGENT)
+        apiListenerManager: ApiListenerManager,
+    ) : this(context, apiListenerManager, LinkUtils.USER_AGENT)
 
     fun changeInstance(newInstance: String) {
         api = LemmyApi.getInstance(context, newInstance)
@@ -1740,6 +1742,9 @@ class LemmyApiClient(
             Log.e(TAG, "Exception fetching url", e)
             return Result.failure(e)
         }
+
+        apiListenerManager.onRequestComplete(res)
+
         if (res.isSuccessful) {
             return Result.success(requireNotNull(res.body()))
         } else {
