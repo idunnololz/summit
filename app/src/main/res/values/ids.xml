@@ -163,4 +163,6 @@
     <item name="auto" type="id" />
     <item name="on" type="id" />
     <item name="off" type="id" />
+    <item name="per_community_settings" type="id" />
+    <item name="reset_settings" type="id" />
 </resources>

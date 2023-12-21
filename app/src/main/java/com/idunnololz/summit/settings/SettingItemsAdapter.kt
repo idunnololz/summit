@@ -146,6 +146,7 @@ class SettingItemsAdapter(
 
                 is DescriptionSettingItem -> {}
             }
+        } else {
         }
     }
 
@@ -168,9 +169,9 @@ class SettingItemsAdapter(
             b.title.text = settingItem.title
 
             if (item.hasTopMargin) {
-                b.title.updatePadding(top = context.getDimen(R.dimen.padding_two))
+                b.title.updatePadding(top = context.getDimen(R.dimen.padding_three))
             } else {
-                b.title.updatePadding(top = context.getDimen(R.dimen.padding_half))
+                b.title.updatePadding(top = context.getDimen(R.dimen.padding))
             }
         }
         addItemType(Item.TextValueItem::class, SettingTextValueBinding::inflate) { item, b, h ->

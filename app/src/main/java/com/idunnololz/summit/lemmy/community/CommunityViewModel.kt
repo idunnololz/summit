@@ -66,6 +66,7 @@ class CommunityViewModel @Inject constructor(
     private val hiddenPostsManager: HiddenPostsManager,
     private val tabsManager: TabsManager,
     private val apiClient: AccountAwareLemmyClient,
+    val basePreferences: Preferences,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {

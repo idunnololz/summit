@@ -18,7 +18,6 @@ import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.multicommunity.ModeratedCommunitiesDataSource
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
-import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped

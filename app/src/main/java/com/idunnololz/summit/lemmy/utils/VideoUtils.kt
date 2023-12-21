@@ -42,9 +42,27 @@ fun BaseFragment<*>.showMoreVideoOptions(
         when (it) {
             is StatefulData.NotStarted -> {}
             is StatefulData.Error -> {
-                FirebaseCrashlytics.getInstance().recordException(it.error)
-                Snackbar.make(parent.getSnackbarContainer(), R.string.error_downloading_image, Snackbar.LENGTH_LONG)
-                    .show()
+                if (it.error is FileDownloadHelper.CustomDownloadLocationException) {
+                    Snackbar
+                        .make(
+                            parent.getSnackbarContainer(),
+                            R.string.error_downloading_image,
+                            Snackbar.LENGTH_LONG,
+                        )
+                        .setAction(R.string.downloads_settings) {
+                            getMainActivity()?.showDownloadsSettings()
+                        }
+                        .show()
+                } else {
+                    FirebaseCrashlytics.getInstance().recordException(it.error)
+                    Snackbar
+                        .make(
+                            parent.getSnackbarContainer(),
+                            R.string.error_downloading_image,
+                            Snackbar.LENGTH_LONG,
+                        )
+                        .show()
+                }
             }
             is StatefulData.Loading -> {}
             is StatefulData.Success -> {

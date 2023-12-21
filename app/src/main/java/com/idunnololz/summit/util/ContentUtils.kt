@@ -6,7 +6,8 @@ object ContentUtils {
             url.endsWith(".jpeg") ||
             url.endsWith(".png") ||
             url.endsWith(".webp") ||
-            url.endsWith(".gif")
+            url.endsWith(".gif") ||
+            url.endsWith(".svg")
 
     fun isUrlVideo(url: String) =
         url.endsWith(".mp4") ||

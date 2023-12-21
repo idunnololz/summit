@@ -215,6 +215,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 findNavController().navigateSafe(directions)
                                 true
                             }
+                            mainSettings.downloadSettings.id -> {
+                                launchDownloadsSettings()
+                                true
+                            }
                             else -> false
                         }
                     },
@@ -351,14 +355,24 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             findNavController().navigateSafe(directions)
                         }
 
-                        null -> {
-                            // do nothing
-                        }
-
                         is PerAccountSettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingAccountsFragment()
                             findNavController().navigateSafe(directions)
+                        }
+
+                        is DownloadSettings -> {
+                            launchDownloadsSettings()
+                        }
+
+                        is PerCommunitySettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingPerCommunityFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+
+                        null -> {
+                            // do nothing
                         }
                     }
                     true
@@ -380,6 +394,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 "web" -> {
                     launchWebSettings()
                 }
+                "downloads" -> {
+                    launchDownloadsSettings()
+                }
             }
         }
     }
@@ -387,6 +404,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     private fun launchWebSettings() {
         val directions = SettingsFragmentDirections
             .actionSettingsFragmentToSettingWebFragment()
+        findNavController().navigateSafe(directions)
+    }
+
+    private fun launchDownloadsSettings() {
+        val directions = SettingsFragmentDirections
+            .actionSettingsFragmentToSettingDownloadsFragment()
         findNavController().navigateSafe(directions)
     }
 

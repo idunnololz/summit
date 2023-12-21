@@ -23,6 +23,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.StatefulData
@@ -139,9 +140,27 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             when (it) {
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Error -> {
-                    FirebaseCrashlytics.getInstance().recordException(it.error)
-                    Snackbar.make(parent.getSnackbarContainer(), R.string.error_downloading_image, Snackbar.LENGTH_LONG)
-                        .show()
+                    if (it.error is FileDownloadHelper.CustomDownloadLocationException) {
+                        Snackbar
+                            .make(
+                                parent.getSnackbarContainer(),
+                                R.string.error_downloading_image,
+                                Snackbar.LENGTH_LONG,
+                            )
+                            .setAction(R.string.downloads_settings) {
+                                getMainActivity()?.showDownloadsSettings()
+                            }
+                            .show()
+                    } else {
+                        FirebaseCrashlytics.getInstance().recordException(it.error)
+                        Snackbar
+                            .make(
+                                parent.getSnackbarContainer(),
+                                R.string.error_downloading_image,
+                                Snackbar.LENGTH_LONG,
+                            )
+                            .show()
+                    }
                 }
                 is StatefulData.Loading -> {}
                 is StatefulData.Success -> {

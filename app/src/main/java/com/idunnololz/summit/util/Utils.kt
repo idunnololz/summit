@@ -23,6 +23,7 @@ import android.text.Spanned
 import android.util.Base64
 import android.util.DisplayMetrics
 import android.util.Log
+import android.util.TypedValue
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -733,9 +734,12 @@ fun assertMainThread() {
     }
 }
 
-fun convertSpToPixel(sp: Float): Float {
-    return sp * Utils.displayMetrics.scaledDensity
-}
+fun convertSpToPixel(sp: Float): Float =
+    TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_SP,
+        sp,
+        Utils.displayMetrics,
+    )
 
 fun Context.isLightTheme(): Boolean =
     resources.getBoolean(R.bool.isLightTheme)

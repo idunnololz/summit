@@ -41,6 +41,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
@@ -92,6 +93,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MULTILINE_POST_HEADERS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PER_COMMUNITY_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -99,6 +101,9 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT_T
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.fromJsonSafe
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getIntOrNull
+import com.idunnololz.summit.util.ext.getMoshiValue
+import com.idunnololz.summit.util.ext.putMoshiValue
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -159,12 +164,16 @@ class Preferences(
     }
 
     fun getPostInListUiConfig(): PostInListUiConfig {
-        return prefs.getMoshiValue<PostInListUiConfig>(getPostUiConfigKey())
-            ?: getPostsLayout().getDefaultPostUiConfig()
+        return getPostInListUiConfig(getPostsLayout())
     }
 
     fun setPostInListUiConfig(config: PostInListUiConfig) {
-        prefs.putMoshiValue(getPostUiConfigKey(), config)
+        prefs.putMoshiValue(getPostUiConfigKey(getPostsLayout()), config)
+    }
+
+    fun getPostInListUiConfig(layout: CommunityLayout): PostInListUiConfig {
+        return prefs.getMoshiValue<PostInListUiConfig>(getPostUiConfigKey(layout))
+            ?: layout.getDefaultPostUiConfig()
     }
 
     fun getPostAndCommentsUiConfig(): PostAndCommentsUiConfig {
@@ -176,8 +185,8 @@ class Preferences(
         prefs.putMoshiValue(KEY_POST_AND_COMMENTS_UI_CONFIG, config)
     }
 
-    private fun getPostUiConfigKey() =
-        when (getPostsLayout()) {
+    private fun getPostUiConfigKey(layout: CommunityLayout) =
+        when (layout) {
             CommunityLayout.Compact ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_COMPACT
             CommunityLayout.List ->
@@ -783,6 +792,22 @@ class Preferences(
                 .apply()
         }
 
+    var downloadDirectory: String?
+        get() = prefs.getString(KEY_DOWNLOAD_DIRECTORY, null)
+        set(value) {
+            prefs.edit()
+                .putString(KEY_DOWNLOAD_DIRECTORY, value)
+                .apply()
+        }
+
+    var usePerCommunitySettings: Boolean
+        get() = prefs.getBoolean(KEY_USE_PER_COMMUNITY_SETTINGS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_PER_COMMUNITY_SETTINGS, value)
+                .apply()
+        }
+
     fun reset(key: String) {
         prefs.edit().remove(key).apply()
     }
@@ -809,32 +834,6 @@ class Preferences(
         val json = this.asJson()
         return Utils.compress(json.toString(), Base64.NO_WRAP)
     }
-
-    private inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
-        return try {
-            val json = this.getString(key, null)
-                ?: return null
-            moshi.adapter(T::class.java).fromJson(
-                json,
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "", e)
-            null
-        }
-    }
-
-    private inline fun <reified T> SharedPreferences.putMoshiValue(key: String, value: T) {
-        this.edit()
-            .putString(key, moshi.adapter(T::class.java).toJson(value))
-            .apply()
-    }
-
-    private fun SharedPreferences.getIntOrNull(key: String) =
-        if (this.contains(key)) {
-            this.getInt(key, 0)
-        } else {
-            null
-        }
 
     fun importSettings(settingsToImport: JSONObject, excludeKeys: Set<String>) {
         val allKeys = settingsToImport.keys().asSequence()

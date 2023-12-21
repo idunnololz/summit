@@ -209,4 +209,160 @@
     <style name="TextAppearance.App.ExtraLarge.LabelSmall" parent="TextAppearance.App.LabelSmall">
         <item name="android:textSize">14sp</item>
     </style>
+
+
+
+    <style name="TextAppearance.App.Xxl.DisplayLarge" parent="TextAppearance.App.DisplayLarge">
+        <item name="android:textSize">66sp</item>
+        <item name="lineHeight">99sp</item>
+        <item name="android:lineHeight">99sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.DisplayMedium" parent="TextAppearance.App.DisplayMedium">
+        <item name="android:textSize">55sp</item>
+        <item name="lineHeight">82sp</item>
+        <item name="android:lineHeight">82sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.DisplaySmall" parent="TextAppearance.App.DisplaySmall">
+        <item name="android:textSize">44sp</item>
+        <item name="lineHeight">66sp</item>
+        <item name="android:lineHeight">66sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.HeadlineLarge" parent="TextAppearance.App.HeadlineLarge">
+        <item name="android:textSize">39sp</item>
+        <item name="lineHeight">58sp</item>
+        <item name="android:lineHeight">58sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.HeadlineMedium" parent="TextAppearance.App.HeadlineMedium">
+        <item name="android:textSize">35sp</item>
+        <item name="lineHeight">52sp</item>
+        <item name="android:lineHeight">52sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.HeadlineSmall" parent="TextAppearance.App.HeadlineSmall">
+        <item name="android:textSize">33sp</item>
+        <item name="lineHeight">49sp</item>
+        <item name="android:lineHeight">49sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.TitleLarge" parent="TextAppearance.App.TitleLarge">
+        <item name="android:textSize">31sp</item>
+        <item name="lineHeight">46sp</item>
+        <item name="android:lineHeight">46sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.TitleMedium" parent="TextAppearance.App.TitleMedium">
+        <item name="android:textSize">24sp</item>
+        <item name="lineHeight">36sp</item>
+        <item name="android:lineHeight">36sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.TitleSmall" parent="TextAppearance.App.TitleSmall">
+        <item name="android:textSize">21sp</item>
+        <item name="lineHeight">31sp</item>
+        <item name="android:lineHeight">31sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.BodyLarge" parent="TextAppearance.App.BodyLarge">
+        <item name="android:textSize">24sp</item>
+        <item name="lineHeight">36sp</item>
+        <item name="android:lineHeight">36sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.BodyMedium" parent="TextAppearance.App.BodyMedium">
+        <item name="android:textSize">21sp</item>
+        <item name="lineHeight">31sp</item>
+        <item name="android:lineHeight">31sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.BodySmall" parent="TextAppearance.App.BodySmall">
+        <item name="android:textSize">18sp</item>
+        <item name="lineHeight">26sp</item>
+        <item name="android:lineHeight">26sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.LabelLarge" parent="TextAppearance.App.LabelLarge">
+        <item name="android:textSize">20sp</item>
+        <item name="lineHeight">30sp</item>
+        <item name="android:lineHeight">30sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.LabelMedium" parent="TextAppearance.App.LabelMedium">
+        <item name="android:textSize">18sp</item>
+        <item name="lineHeight">26sp</item>
+        <item name="android:lineHeight">26sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxl.LabelSmall" parent="TextAppearance.App.LabelSmall">
+        <item name="android:textSize">16sp</item>
+        <item name="lineHeight">22sp</item>
+        <item name="android:lineHeight">22sp</item>
+    </style>
+
+
+
+    <style name="TextAppearance.App.Xxxl.DisplayLarge" parent="TextAppearance.App.DisplayLarge">
+        <item name="android:textSize">102sp</item>
+        <item name="lineHeight">153sp</item>
+        <item name="android:lineHeight">153sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.DisplayMedium" parent="TextAppearance.App.DisplayMedium">
+        <item name="android:textSize">80sp</item>
+        <item name="lineHeight">120sp</item>
+        <item name="android:lineHeight">120sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.DisplaySmall" parent="TextAppearance.App.DisplaySmall">
+        <item name="android:textSize">64sp</item>
+        <item name="lineHeight">96sp</item>
+        <item name="android:lineHeight">96sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.HeadlineLarge" parent="TextAppearance.App.HeadlineLarge">
+        <item name="android:textSize">56sp</item>
+        <item name="lineHeight">78sp</item>
+        <item name="android:lineHeight">78sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.HeadlineMedium" parent="TextAppearance.App.HeadlineMedium">
+        <item name="android:textSize">50sp</item>
+        <item name="lineHeight">75sp</item>
+        <item name="android:lineHeight">75sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.HeadlineSmall" parent="TextAppearance.App.HeadlineSmall">
+        <item name="android:textSize">43sp</item>
+        <item name="lineHeight">64sp</item>
+        <item name="android:lineHeight">64sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.TitleLarge" parent="TextAppearance.App.TitleLarge">
+        <item name="android:textSize">40sp</item>
+        <item name="lineHeight">60sp</item>
+        <item name="android:lineHeight">60sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.TitleMedium" parent="TextAppearance.App.TitleMedium">
+        <item name="android:textSize">29sp</item>
+        <item name="lineHeight">43sp</item>
+        <item name="android:lineHeight">43sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.TitleSmall" parent="TextAppearance.App.TitleSmall">
+        <item name="android:textSize">25sp</item>
+        <item name="lineHeight">38sp</item>
+        <item name="android:lineHeight">38sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.BodyLarge" parent="TextAppearance.App.BodyLarge">
+        <item name="android:textSize">29sp</item>
+        <item name="lineHeight">43sp</item>
+        <item name="android:lineHeight">43sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.BodyMedium" parent="TextAppearance.App.BodyMedium">
+        <item name="android:textSize">25sp</item>
+        <item name="lineHeight">38sp</item>
+        <item name="android:lineHeight">38sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.BodySmall" parent="TextAppearance.App.BodySmall">
+        <item name="android:textSize">22sp</item>
+        <item name="lineHeight">33sp</item>
+        <item name="android:lineHeight">33sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.LabelLarge" parent="TextAppearance.App.LabelLarge">
+        <item name="android:textSize">25sp</item>
+        <item name="lineHeight">38sp</item>
+        <item name="android:lineHeight">38sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.LabelMedium" parent="TextAppearance.App.LabelMedium">
+        <item name="android:textSize">22sp</item>
+        <item name="lineHeight">33sp</item>
+        <item name="android:lineHeight">33sp</item>
+    </style>
+    <style name="TextAppearance.App.Xxxl.LabelSmall" parent="TextAppearance.App.LabelSmall">
+        <item name="android:textSize">20sp</item>
+        <item name="lineHeight">30sp</item>
+        <item name="android:lineHeight">30sp</item>
+    </style>
 </resources>

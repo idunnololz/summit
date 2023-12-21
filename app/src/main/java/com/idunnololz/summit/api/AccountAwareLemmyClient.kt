@@ -44,7 +44,6 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -967,7 +966,7 @@ class AccountAwareLemmyClient @Inject constructor(
                         Toast.makeText(
                             context,
                             context.getString(R.string.account_token_expired_format, account.name),
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_LONG,
                         ).show()
                     }
                 }

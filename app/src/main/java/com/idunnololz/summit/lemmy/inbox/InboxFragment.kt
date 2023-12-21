@@ -93,6 +93,12 @@ class InboxFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (savedInstanceState == null) {
+            requireMainActivity().apply {
+                setupForFragment<InboxTabbedFragment>()
+            }
+        }
+
         setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, _ ->
 //            val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
 //
@@ -121,8 +127,6 @@ class InboxFragment :
         val parentFragment = parentFragment as InboxTabbedFragment
 
         requireMainActivity().apply {
-            setupForFragment<InboxTabbedFragment>()
-
             setSupportActionBar(binding.toolbar)
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -165,7 +169,9 @@ class InboxFragment :
             }
 
             binding.recyclerView.postDelayed({
-                binding.recyclerView.scrollToPosition(0)
+                if (isBindingAvailable()) {
+                    binding.recyclerView.scrollToPosition(0)
+                }
             }, 100,)
         }
 

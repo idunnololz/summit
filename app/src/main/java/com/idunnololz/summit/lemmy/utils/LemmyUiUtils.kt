@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
+import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.community.usesDividers
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
@@ -18,9 +19,13 @@ import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 
 fun RecyclerView.setupDecoratorsForPostList(preferences: Preferences) {
+    setupDecoratorsForPostList(preferences.getPostsLayout())
+}
+
+fun RecyclerView.setupDecoratorsForPostList(communityLayout: CommunityLayout) {
     clearItemDecorations()
 
-    if (preferences.getPostsLayout().usesDividers()) {
+    if (communityLayout.usesDividers()) {
         this.addItemDecoration(
             CustomDividerItemDecoration(
                 this.context,

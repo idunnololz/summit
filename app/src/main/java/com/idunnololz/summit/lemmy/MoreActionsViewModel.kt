@@ -37,6 +37,7 @@ class MoreActionsViewModel @Inject constructor(
     private val hiddenPostsManager: HiddenPostsManager,
     private val savedManager: SavedManager,
     private val videoDownloadManager: VideoDownloadManager,
+    private val fileDownloadHelper: FileDownloadHelper,
 ) : ViewModel() {
 
     enum class PostActionType {
@@ -473,7 +474,7 @@ class MoreActionsViewModel @Inject constructor(
         viewModelScope.launch {
             videoDownloadManager.downloadVideo(url)
                 .onSuccess { file ->
-                    FileDownloadHelper
+                    fileDownloadHelper
                         .downloadFile(
                             c = context,
                             destFileName = file.name,

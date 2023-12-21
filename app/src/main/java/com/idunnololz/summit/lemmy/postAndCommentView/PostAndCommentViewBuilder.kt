@@ -760,7 +760,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             val iconImageView = headerView.getIconImageView()
 
             if (commentView.creator.avatar != null) {
-                iconImageView.load(commentView.creator.avatar)
+                iconImageView.load(commentView.creator.avatar) {
+                    allowHardware(false)
+                }
             } else {
                 val job = coroutineScope.launch {
                     val d = accountImageGenerator.generateDrawableForPerson(commentView.creator)
@@ -1831,9 +1833,9 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {
-        headerView.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
+        headerView.textSize = commentUiConfig.headerTextSizeSp.toCommentTextSize()
         text.textSize = commentUiConfig.contentTextSizeSp.toCommentTextSize()
-        scoreCount?.textSize = postUiConfig.footerTextSizeSp.toCommentTextSize()
+        scoreCount?.textSize = commentUiConfig.footerTextSizeSp.toCommentTextSize()
     }
 
     private fun PostCommentCollapsedItemBinding.scaleTextSizes() {

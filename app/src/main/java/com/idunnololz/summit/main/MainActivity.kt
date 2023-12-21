@@ -25,9 +25,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -66,7 +68,9 @@ import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity
+import com.idunnololz.summit.preview.ImageViewerActivity.Companion.ErrorCustomDownloadLocation
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
+import com.idunnololz.summit.preview.ImageViewerContract
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedTabbedFragment
@@ -140,6 +144,20 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var accountManager: AccountManager
+
+    private val imageViewerLauncher = registerForActivityResult(
+        ImageViewerContract(),
+    ) { resultCode ->
+        // Handle the returned Uri
+
+        if (resultCode == ErrorCustomDownloadLocation) {
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                    showDownloadsSettings()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -476,6 +494,10 @@ class MainActivity : BaseActivity() {
 
             currentBottomMenu?.setInsets(lastInsets.topInset, lastInsets.bottomInset)
 
+            binding.bottomSheetContainer.updateLayoutParams<MarginLayoutParams> {
+                topMargin = topInset
+            }
+
             WindowInsetsCompat.CONSUMED
         }
     }
@@ -526,7 +548,8 @@ class MainActivity : BaseActivity() {
 
     fun setNavUiOpenness(progress: Float) {
         if (lockUiOpenness) return
-        navBarController.bottomNavViewAnimationOffset.value = navBarController.navBar.height * progress
+        navBarController.bottomNavViewAnimationOffset.value =
+            navBarController.navBar.height * progress
     }
 
     private fun handleIntent(intent: Intent?) {
@@ -730,7 +753,6 @@ class MainActivity : BaseActivity() {
                 viewLifecycleOwner = this,
             ).also {
                 it.inflate(binding.bottomSheetContainer)
-                it.setCommunities(viewModel.communities.value)
 
                 communitySelectorController = it
             }
@@ -1081,9 +1103,7 @@ class MainActivity : BaseActivity() {
     ) {
         val transitionName = sharedElement?.transitionName
 
-        val intent = Intent(this, ImageViewerActivity::class.java).apply {
-            putExtras(ImageViewerActivityArgs(title, url, mimeType, transitionName).toBundle())
-        }
+        val args = ImageViewerActivityArgs(title, url, mimeType, transitionName)
 
         if (transitionName != null) {
             val sharedElements = mutableListOf<Pair<View, String>>()
@@ -1103,9 +1123,9 @@ class MainActivity : BaseActivity() {
                 this,
                 *sharedElements.toTypedArray(),
             )
-            startActivity(intent, options.toBundle())
+            imageViewerLauncher.launch(args, options)
         } else {
-            startActivity(intent)
+            imageViewerLauncher.launch(args)
         }
     }
 
@@ -1163,5 +1183,10 @@ class MainActivity : BaseActivity() {
 
     fun downloadAndShareImage(url: String) {
         viewModel.downloadAndShareImage(url)
+    }
+
+    fun showDownloadsSettings() {
+        val direction = MainDirections.actionGlobalSettingsFragment("downloads")
+        currentNavController?.navigateSafe(direction)
     }
 }

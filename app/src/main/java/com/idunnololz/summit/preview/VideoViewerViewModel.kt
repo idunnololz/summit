@@ -13,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VideoViewerViewModel @Inject constructor(
     private val videoDownloadManager: VideoDownloadManager,
+    private val fileDownloadHelper: FileDownloadHelper,
 ) : ViewModel() {
 
     var initialPositionHandled: Boolean = false
@@ -28,7 +29,7 @@ class VideoViewerViewModel @Inject constructor(
         viewModelScope.launch {
             videoDownloadManager.downloadVideo(url)
                 .onSuccess { file ->
-                    FileDownloadHelper
+                    fileDownloadHelper
                         .downloadFile(
                             c = context,
                             destFileName = file.name,

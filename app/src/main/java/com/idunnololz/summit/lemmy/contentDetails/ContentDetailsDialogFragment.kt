@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionManager
 import coil.load
+import com.google.gson.Gson
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentAggregates
@@ -27,6 +28,7 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.dateStringToFullDateTime
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import dagger.hilt.android.AndroidEntryPoint
+import org.json.JSONObject
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -132,6 +134,10 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
 
                     appendLine("Raw content")
                     appendLine(commentView.comment.content)
+
+                    appendLine()
+                    appendLine()
+                    appendLine(JSONObject(Gson().toJson(commentView)).toString(2))
                 },
             )
 

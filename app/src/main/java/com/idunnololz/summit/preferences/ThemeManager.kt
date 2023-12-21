@@ -13,6 +13,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.color.ColorManager
 import com.idunnololz.summit.util.isLightTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.inflationx.calligraphy3.CalligraphyConfig
@@ -33,6 +34,7 @@ class ThemeManager @Inject constructor(
     private val accountManager: AccountManager,
     private var preferences: Preferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val colorManager: ColorManager,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -162,6 +164,10 @@ class ThemeManager @Inject constructor(
                 activity.theme.applyStyle(R.style.TextStyle_Large, true)
             GlobalFontSizeId.ExtraLarge ->
                 activity.theme.applyStyle(R.style.TextStyle_ExtraLarge, true)
+            GlobalFontSizeId.Xxl ->
+                activity.theme.applyStyle(R.style.TextStyle_Xxl, true)
+            GlobalFontSizeId.Xxxl ->
+                activity.theme.applyStyle(R.style.TextStyle_Xxxl, true)
         }
 
         activity.isMaterialYou = useMaterialYou.value
@@ -205,6 +211,8 @@ class ThemeManager @Inject constructor(
             GlobalFontColorId.HighContrast ->
                 activity.theme.applyStyle(R.style.TextColor_HighContrast, true)
         }
+
+        colorManager.updateColors(activity)
 
         activity.lifecycleScope.launch(Dispatchers.Default) {
             useMaterialYou.collect {

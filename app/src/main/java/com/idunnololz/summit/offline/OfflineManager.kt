@@ -72,7 +72,7 @@ class OfflineManager @Inject constructor(
         private val errorListener: TaskFailedListener?,
     ) {
         fun cancel(offlineManager: OfflineManager) {
-            offlineManager.cancelFetch(key, listener)
+            offlineManager.cancelFetch(key, listener, errorListener)
         }
     }
 

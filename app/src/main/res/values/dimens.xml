@@ -2,6 +2,7 @@
 <resources>
     <dimen name="action_button_margin">16dp</dimen>
 
+    <dimen name="padding_three">48dp</dimen>
     <dimen name="padding_two">32dp</dimen>
     <dimen name="padding_one_half">24dp</dimen>
     <dimen name="padding">16dp</dimen>

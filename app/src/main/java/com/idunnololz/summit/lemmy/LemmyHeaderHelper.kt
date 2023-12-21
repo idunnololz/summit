@@ -14,11 +14,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
@@ -103,7 +100,7 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
         }
 
-        if (postView.post.removed) {
+        if (postView.post.removed || postView.post.deleted) {
             val d = Utils.tint(context, R.drawable.baseline_delete_24, R.color.style_red)
             val size: Int = Utils.convertDpToPixel(16f).toInt()
             d.setBounds(0, 0, size, size)
@@ -367,7 +364,6 @@ class LemmyHeaderHelper(
         )
         val e = sb.length
 
-
         if (commentView.creator_is_admin == true) {
             sb.setSpan(
                 ForegroundColorSpan(adminColor),
@@ -519,126 +515,6 @@ class LemmyHeaderHelper(
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
         )
-    }
-
-    fun populateHeaderSpan(
-        headerContainer: LemmyHeaderView,
-        item: PrivateMessageView,
-    ) {
-        var sb = SpannableStringBuilder()
-
-        if (item.creator.admin) {
-            run {
-                val s = sb.length
-                sb.append(item.creator.name)
-                val e = sb.length
-                sb.setSpan(
-                    ForegroundColorSpan(adminColor),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-                sb.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
-        } else {
-            sb.append(item.creator.name)
-        }
-
-        sb.appendSeparator()
-        sb.append(
-            dateStringToPretty(context, item.private_message.updated ?: item.private_message.published),
-        )
-        headerContainer.getFlairView().visibility = View.GONE
-
-        headerContainer.setTextFirstPart(sb)
-        sb = SpannableStringBuilder()
-
-        headerContainer.setTextSecondPart(sb)
-    }
-
-    fun populateHeaderSpan(
-        headerContainer: LemmyHeaderView,
-        item: PersonMentionView,
-    ) {
-        var sb = SpannableStringBuilder()
-
-        if (item.creator.admin) {
-            run {
-                val s = sb.length
-                sb.append(item.creator.name)
-                val e = sb.length
-                sb.setSpan(
-                    ForegroundColorSpan(adminColor),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-                sb.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
-        } else {
-            sb.append(item.creator.name)
-        }
-
-        sb.appendSeparator()
-        sb.append(
-            dateStringToPretty(context, item.comment.updated ?: item.comment.published),
-        )
-        headerContainer.getFlairView().visibility = View.GONE
-
-        headerContainer.setTextFirstPart(sb)
-        sb = SpannableStringBuilder()
-
-        headerContainer.setTextSecondPart(sb)
-    }
-
-    fun populateHeaderSpan(
-        headerContainer: LemmyHeaderView,
-        item: CommentReplyView,
-    ) {
-        var sb = SpannableStringBuilder()
-
-        if (item.creator.admin) {
-            run {
-                val s = sb.length
-                sb.append(item.creator.name)
-                val e = sb.length
-                sb.setSpan(
-                    ForegroundColorSpan(adminColor),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-                sb.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
-        } else {
-            sb.append(item.creator.name)
-        }
-
-        sb.appendSeparator()
-        sb.append(
-            dateStringToPretty(context, item.comment.updated ?: item.comment.published),
-        )
-        headerContainer.getFlairView().visibility = View.GONE
-
-        headerContainer.setTextFirstPart(sb)
-        sb = SpannableStringBuilder()
-
-        headerContainer.setTextSecondPart(sb)
     }
 
     private fun makeMovementMethod(

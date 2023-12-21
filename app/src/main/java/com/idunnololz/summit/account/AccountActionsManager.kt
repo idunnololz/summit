@@ -19,7 +19,6 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.GetCommentsResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.GetPersonMentionsResponse
 import com.idunnololz.summit.api.dto.GetPostResponse
 import com.idunnololz.summit.api.dto.GetPostsResponse
 import com.idunnololz.summit.api.dto.PostId
@@ -37,8 +36,7 @@ import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
-import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.color.ColorManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -55,6 +53,7 @@ class AccountActionsManager @Inject constructor(
     private val postReadManager: PostReadManager,
     private val preferenceManager: PreferenceManager,
     private val apiListenerManager: ApiListenerManager,
+    private val colorManager: ColorManager,
 ) {
 
     companion object {
@@ -202,18 +201,11 @@ class AccountActionsManager @Inject constructor(
         override val downvoteColor: Int
             get() = preferences.downvoteColor
 
-        private var neutralColor: Int? = null
-        private var controlColor: Int? = null
-
         override fun neutralColor(context: Context): Int =
-            neutralColor ?: context.getColorCompat(R.color.colorText).also {
-                neutralColor = it
-            }
+            colorManager.textColor
 
         override fun controlColor(context: Context): Int =
-            controlColor ?: context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal).also {
-                controlColor = it
-            }
+            colorManager.controlColor
     }
 
     private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {
@@ -510,7 +502,7 @@ class AccountActionsManager @Inject constructor(
 
     private fun handleApiResponse(response: Response<*>) {
         if (!response.isSuccessful) return
-        if (response.raw().networkResponse == null)  return
+        if (response.raw().networkResponse == null) return
 
         fun updateScore(item: Any?) {
             when (item) {
@@ -581,7 +573,7 @@ class AccountActionsManager @Inject constructor(
             }
             else -> {
 //                Log.d("ASDF", "${result?.javaClass?.simpleName}")
-            // do nothing
+                // do nothing
             }
         }
     }
