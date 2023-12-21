@@ -205,6 +205,8 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                     GlobalFontSizeId.Normal to getString(R.string.normal),
                     GlobalFontSizeId.Large to getString(R.string.large),
                     GlobalFontSizeId.ExtraLarge to getString(R.string.extra_large),
+                    GlobalFontSizeId.Xxl to getString(R.string.xxl),
+                    GlobalFontSizeId.Xxxl to getString(R.string.xxxl),
                 ),
                 getCurrentChoice = {
                     preferences.globalFontSize

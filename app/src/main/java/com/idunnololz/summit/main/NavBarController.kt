@@ -77,8 +77,10 @@ class NavBarController(
     val bottomNavViewOffset = MutableLiveData<Int>(0)
     val bottomNavViewAnimationOffset = MutableLiveData<Float>(0f)
     val bottomNavOpenness: Float
-        get() = (bottomNavViewOffset.value!!.toFloat() +
-            bottomNavViewAnimationOffset.value!!.toFloat()) / navBar.height
+        get() = (
+            bottomNavViewOffset.value!!.toFloat() +
+                bottomNavViewAnimationOffset.value!!.toFloat()
+            ) / navBar.height
 
     private var enableBottomNavViewScrolling = false
 
@@ -140,9 +142,11 @@ class NavBarController(
 
         navBar = if (useNavigationRail) {
             val v = NavigationRailView(activity).apply {
-                setBackgroundColor(activity.getColorFromAttribute(
-                    com.google.android.material.R.attr.backgroundColor
-                ))
+                setBackgroundColor(
+                    activity.getColorFromAttribute(
+                        com.google.android.material.R.attr.backgroundColor,
+                    ),
+                )
                 inflateMenu(R.menu.bottom_navigation_menu)
                 labelVisibilityMode = LABEL_VISIBILITY_LABELED
             }
@@ -158,8 +162,11 @@ class NavBarController(
             v
         } else {
             val v = BottomNavigationView(activity).apply {
-                setBackgroundColor(activity.getColorFromAttribute(
-                    com.google.android.material.R.attr.colorSurface))
+                setBackgroundColor(
+                    activity.getColorFromAttribute(
+                        com.google.android.material.R.attr.colorSurface,
+                    ),
+                )
                 inflateMenu(R.menu.bottom_navigation_menu)
                 labelVisibilityMode = LABEL_VISIBILITY_LABELED
             }
@@ -182,7 +189,6 @@ class NavBarController(
         rightInset: Int,
         bottomInset: Int,
     ) {
-
         val isRtl = navBar.layoutDirection == FrameLayout.LAYOUT_DIRECTION_RTL
 
         if (useNavigationRail) {

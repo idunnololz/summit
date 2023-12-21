@@ -169,24 +169,6 @@
         <item name="android:windowElevation">@dimen/abc_floating_window_z</item>
     </style>
 
-    <style name="TextStyleLarge">
-        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Material3.DisplayLarge</item>
-        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Material3.DisplayMedium</item>
-        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Material3.DisplaySmall</item>
-        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Material3.HeadlineLarge</item>
-        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Material3.HeadlineMedium</item>
-        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Material3.HeadlineSmall</item>
-        <item name="textAppearanceTitleLarge">@style/TextAppearance.Material3.TitleLarge</item>
-        <item name="textAppearanceTitleMedium">@style/TextAppearance.Material3.TitleMedium</item>
-        <item name="textAppearanceTitleSmall">@style/TextAppearance.Material3.TitleSmall</item>
-        <item name="textAppearanceBodyLarge">@style/TextAppearance.Material3.BodyLarge</item>
-        <item name="textAppearanceBodyMedium">@style/TextAppearance.Material3.BodyMedium</item>
-        <item name="textAppearanceBodySmall">@style/TextAppearance.Material3.BodySmall</item>
-        <item name="textAppearanceLabelLarge">@style/TextAppearance.Material3.LabelLarge</item>
-        <item name="textAppearanceLabelMedium">@style/TextAppearance.Material3.LabelMedium</item>
-        <item name="textAppearanceLabelSmall">@style/TextAppearance.Material3.LabelSmall</item>
-    </style>
-
     <style name="DialogAnimationStyle">
         <item name="android:windowEnterAnimation">@anim/slide_in</item>
         <item name="android:windowExitAnimation">@anim/slide_out</item>
@@ -262,6 +244,42 @@
         <item name="textAppearanceLabelLarge">@style/TextAppearance.App.ExtraLarge.LabelLarge</item>
         <item name="textAppearanceLabelMedium">@style/TextAppearance.App.ExtraLarge.LabelMedium</item>
         <item name="textAppearanceLabelSmall">@style/TextAppearance.App.ExtraLarge.LabelSmall</item>
+    </style>
+
+    <style name="TextStyle.Xxl">
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.App.Xxl.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.App.Xxl.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.App.Xxl.DisplaySmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.App.Xxl.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.App.Xxl.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.App.Xxl.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.App.Xxl.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.App.Xxl.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.App.Xxl.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.Xxl.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.Xxl.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.Xxl.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.App.Xxl.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.App.Xxl.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.App.Xxl.LabelSmall</item>
+    </style>
+
+    <style name="TextStyle.Xxxl">
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.App.Xxxl.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.App.Xxxl.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.App.Xxxl.DisplaySmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.App.Xxxl.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.App.Xxxl.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.App.Xxxl.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.App.Xxxl.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.App.Xxxl.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.App.Xxxl.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.Xxxl.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.Xxxl.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.Xxxl.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.App.Xxxl.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.App.Xxxl.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.App.Xxxl.LabelSmall</item>
     </style>
 
     <style name="TextColor">

@@ -5,14 +5,12 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -160,11 +158,6 @@ class BottomMenu(private val context: Context) {
 
         bottomInset.observeForever {
             recyclerView.updatePadding(bottom = it)
-        }
-        topInset.observeForever {
-            bottomSheet.updateLayoutParams<MarginLayoutParams> {
-                topMargin = it
-            }
         }
 
         rootView.postDelayed(
@@ -389,7 +382,7 @@ class BottomMenu(private val context: Context) {
             val icon: MenuIcon? = null,
             @DrawableRes val checkIcon: Int = 0,
         ) : MenuItem
-        object DividerItem : MenuItem
+        data object DividerItem : MenuItem
     }
 
     sealed interface MenuIcon {

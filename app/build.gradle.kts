@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 34
-        versionCode = 119
-        versionName = "1.20.0"
+        versionCode = 121
+        versionName = "1.21.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -92,6 +92,7 @@ dependencies {
 
     implementation(libs.coil)
     implementation(libs.coil.gif)
+    implementation(libs.coil.svg)
     implementation(libs.coil.video)
 
     implementation(libs.kotlinx.coroutine.android)

@@ -3,6 +3,7 @@ package com.idunnololz.summit.main
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
+import coil.dispose
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
@@ -35,6 +37,7 @@ import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorViewBinding
 import com.idunnololz.summit.databinding.DummyTopItemBinding
+import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
@@ -50,9 +53,13 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 typealias CommunitySelectedListener =
     ((controller: CommunitySelectorController, communityRef: CommunityRef) -> Unit)
@@ -88,7 +95,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
     private var coroutineScope = createCoroutineScope()
 
-    private val adapter = SubredditsAdapter()
+    private val adapter = CommunitiesAdapter()
 
     private var currentCommunity: CommunityRef? = null
 
@@ -123,7 +130,6 @@ class CommunitySelectorController @AssistedInject constructor(
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
 
         BottomSheetBehavior.from(binding.root).apply {
             peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
@@ -175,13 +181,16 @@ class CommunitySelectorController @AssistedInject constructor(
         adapter.setQueryServerResultsInProgress()
 
         coroutineScope.launch {
-            lemmyApiClient.search(
-                sortType = SortType.TopMonth,
-                listingType = ListingType.All,
-                searchType = SearchType.Communities,
-                query = query.toString(),
-                limit = 20,
-            ).onSuccess {
+            val result = withContext(Dispatchers.IO) {
+                lemmyApiClient.search(
+                    sortType = SortType.TopMonth,
+                    listingType = ListingType.All,
+                    searchType = SearchType.Communities,
+                    query = query.toString(),
+                    limit = 20,
+                )
+            }
+            result.onSuccess {
                 adapter.setQueryServerResults(it.communities)
             }
         }
@@ -199,7 +208,6 @@ class CommunitySelectorController @AssistedInject constructor(
         rootView?.visibility = View.VISIBLE
 
         activity.insetViewExceptTopAutomaticallyByMargins(lifecycleOwner, recyclerView)
-        activity.insetViewExceptBottomAutomaticallyByPadding(lifecycleOwner, binding.coordinatorLayout)
 
         activity.onBackPressedDispatcher.addCallback(lifecycleOwner, onBackPressedHandler)
 
@@ -207,9 +215,12 @@ class CommunitySelectorController @AssistedInject constructor(
             object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet1: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        adapter.stopLoading()
                         rootView?.visibility = View.GONE
                         container.removeView(rootView)
                         onBackPressedHandler.remove()
+                    } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        adapter.startLoading()
                     }
                 }
 
@@ -219,7 +230,9 @@ class CommunitySelectorController @AssistedInject constructor(
         )
 
         rootView?.runAfterLayout {
-            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+            rootView?.postDelayed({
+                bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+            }, 100,)
         }
     }
 
@@ -238,13 +251,14 @@ class CommunitySelectorController @AssistedInject constructor(
         binding.recyclerView.adapter = null
     }
 
-    fun setCommunities(it: StatefulData<List<CommunityView>>) {
-        when (it) {
+    fun setCommunities(communities: StatefulData<List<CommunityView>>) {
+        when (communities) {
             is StatefulData.Error -> {}
             is StatefulData.Loading -> {}
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {
-                adapter.setData(it.data)
+                Log.d("ASDF", "setCommunities: ${communities.data.size}")
+                adapter.setData(communities.data)
             }
         }
     }
@@ -264,7 +278,9 @@ class CommunitySelectorController @AssistedInject constructor(
     private sealed class Item(
         val id: String,
     ) {
-        object TopItem : Item("#always_the_top")
+        data object TopItem : Item("#always_the_top")
+
+        data object LoadingItem : Item("#loading")
 
         data class CurrentCommunity(
             val communityRef: CommunityRef,
@@ -301,7 +317,7 @@ class CommunitySelectorController @AssistedInject constructor(
         ) : Item("r:${communityRef.getKey()}")
     }
 
-    private inner class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private inner class CommunitiesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private var rawData: List<CommunityView> = listOf()
         private var serverResultsInProgress = false
@@ -310,6 +326,11 @@ class CommunitySelectorController @AssistedInject constructor(
         private var query: String? = null
         private var currentCommunityRef: CommunityRef? = null
         private var currentCommunityData: StatefulData<Either<GetSiteResponse, CommunityView>>? = null
+
+        private var refreshRequestFlow = MutableSharedFlow<Unit>(
+            replay = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
 
         private val adapterHelper = AdapterHelper<Item> (
             areItemsTheSame = { old, new ->
@@ -324,10 +345,17 @@ class CommunitySelectorController @AssistedInject constructor(
                     is Item.CommunityChildItem -> true
                     is Item.StaticChildItem -> true
                     is Item.RecentChildItem -> true
+                    is Item.LoadingItem -> true
                     is Item.CurrentCommunity -> old == new
                 }
             },
         ).apply {
+            addItemType(
+                clazz = Item.LoadingItem::class,
+                inflateFn = LoadingViewItemBinding::inflate,
+            ) { _, b, _ ->
+                b.loadingView.showProgressBar()
+            }
             addItemType(
                 clazz = Item.TopItem::class,
                 inflateFn = DummyTopItemBinding::inflate,
@@ -451,9 +479,20 @@ class CommunitySelectorController @AssistedInject constructor(
             ) { item, b, h ->
                 val community = item.community
 
-                b.icon.load(R.drawable.ic_subreddit_default)
-                offlineManager.fetchImage(h.itemView, community.community.icon) {
-                    b.icon.load(it)
+                if (community.community.icon == null) {
+                    b.icon.load(R.drawable.ic_subreddit_default)
+                } else {
+                    b.icon.dispose()
+                    offlineManager.fetchImageWithError(
+                        rootView = h.itemView,
+                        url = community.community.icon,
+                        listener = {
+                            b.icon.load(it)
+                        },
+                        errorListener = {
+                            b.icon.load(R.drawable.ic_subreddit_default)
+                        },
+                    )
                 }
 
                 b.title.text = item.text
@@ -507,44 +546,31 @@ class CommunitySelectorController @AssistedInject constructor(
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        private var loadingJob: Job? = null
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
+        private suspend fun refreshItemsImmediate() = withContext(Dispatchers.Default) {
+            Log.d("ASDF", "refreshItems()!")
+            val newItems = mutableListOf<Item>()
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            adapterHelper.onBindViewHolder(holder, position)
-        }
-
-        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-            super.onViewRecycled(holder)
-            offlineManager.cancelFetch(holder.itemView)
-        }
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        private fun refreshItems(cb: () -> Unit) {
-            fun makeRecentItems(query: String?): List<Item> =
+            fun addRecentItems(query: String?) {
                 if (!query.isNullOrBlank()) {
-                    listOf()
-                } else {
-                    arrayListOf<Item>().apply {
-                        val recents = recentCommunityManager.getRecentCommunities()
-                        if (recents.isNotEmpty()) {
-                            add(Item.GroupHeaderItem(context.getString(R.string.recents)))
-                            recents.forEach {
-                                add(Item.RecentChildItem(it.key, it.communityRef))
-                            }
+                    return
+                }
+
+                newItems.apply {
+                    val recents = recentCommunityManager.getRecentCommunities()
+                    if (recents.isNotEmpty()) {
+                        add(Item.GroupHeaderItem(context.getString(R.string.recents)))
+                        recents.forEach {
+                            add(Item.RecentChildItem(it.key, it.communityRef))
                         }
                     }
                 }
+            }
 
             val communityRefs = hashSetOf<CommunityRef>()
             val query = query
             val isQueryActive = !query.isNullOrBlank()
-
-            val newItems = mutableListOf<Item>()
 
             newItems += Item.TopItem
 
@@ -685,7 +711,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     )
                 }
 
-                newItems.addAll(makeRecentItems(query))
+                addRecentItems(query)
                 newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))
 
                 val filteredPopularCommunities = rawData.filter {
@@ -751,8 +777,36 @@ class CommunitySelectorController @AssistedInject constructor(
                     }
                 }
             }
+            withContext(Dispatchers.Main) {
+                adapterHelper.setItems(newItems, this@CommunitiesAdapter, {})
+            }
+        }
 
-            adapterHelper.setItems(newItems, this, cb)
+        init {
+            adapterHelper.setItems(listOf(Item.LoadingItem), this)
+        }
+
+        override fun getItemViewType(position: Int): Int =
+            adapterHelper.getItemViewType(position)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+            adapterHelper.onCreateViewHolder(parent, viewType)
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            adapterHelper.onBindViewHolder(holder, position)
+        }
+
+        override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+            super.onViewRecycled(holder)
+            offlineManager.cancelFetch(holder.itemView)
+        }
+
+        override fun getItemCount(): Int = adapterHelper.itemCount
+
+        private fun refreshItems(cb: () -> Unit) {
+            coroutineScope.launch {
+                refreshRequestFlow.emit(Unit)
+            }
         }
 
         fun setQuery(query: String?, cb: () -> Unit) {
@@ -790,6 +844,22 @@ class CommunitySelectorController @AssistedInject constructor(
             this.currentCommunityData = data
 
             refreshItems(cb)
+        }
+
+        fun startLoading() {
+            loadingJob?.cancel()
+            loadingJob =
+                coroutineScope.launch {
+                    refreshRequestFlow
+                        .collect {
+                            refreshItemsImmediate()
+                        }
+                }
+        }
+
+        fun stopLoading() {
+            loadingJob?.cancel()
+            adapterHelper.setItems(listOf(Item.LoadingItem), this@CommunitiesAdapter, {})
         }
     }
 }

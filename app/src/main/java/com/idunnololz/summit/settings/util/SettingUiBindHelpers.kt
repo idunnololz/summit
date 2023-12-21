@@ -18,6 +18,7 @@ import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
+import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.util.BottomMenu
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -281,3 +282,25 @@ var SettingTextValueBinding.isEnabled: Boolean
         this.title.isEnabled = value
         this.value.isEnabled = value
     }
+
+fun TextValueSettingItem.bindTo(
+    b: SettingTextValueBinding,
+    getCurrentValue: () -> String,
+    onSettingClick: (setting: TextValueSettingItem, currentValue: String) -> Unit,
+) {
+    b.title.text = this.title
+
+    if (this.description == null) {
+        b.desc.visibility = View.GONE
+    } else {
+        b.desc.text = this.description
+        b.desc.visibility = View.VISIBLE
+    }
+
+    b.value.text = getCurrentValue()
+
+    b.root.tag = this
+    b.root.setOnClickListener {
+        onSettingClick(this, getCurrentValue())
+    }
+}

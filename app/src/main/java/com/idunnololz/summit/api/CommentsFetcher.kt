@@ -6,7 +6,6 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.lemmy.utils.toVotableRef
 
 class CommentsFetcher(
     private val apiClient: AccountAwareLemmyClient,

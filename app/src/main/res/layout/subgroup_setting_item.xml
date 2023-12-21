@@ -9,5 +9,5 @@
     android:ellipsize="end"
     android:paddingHorizontal="@dimen/padding"
     android:paddingBottom="@dimen/padding_half"
-    android:paddingTop="@dimen/padding_two"
+    android:paddingTop="@dimen/padding_three"
     style="@style/SettingHeaderStyle"/>

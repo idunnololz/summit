@@ -1,6 +1,5 @@
 package com.idunnololz.summit.api
 
-import android.util.Log
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -8,9 +7,7 @@ import javax.inject.Singleton
 typealias ApiListener = (Response<*>) -> Unit
 
 @Singleton
-class ApiListenerManager @Inject constructor(
-
-) {
+class ApiListenerManager @Inject constructor() {
     private var listeners = listOf<ApiListener>()
 
     fun onRequestComplete(response: Response<*>) {

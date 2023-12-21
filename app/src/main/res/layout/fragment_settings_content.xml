@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
-                    android:paddingTop="@dimen/padding_two"
+                    android:paddingTop="@dimen/padding_three"
                     style="@style/SettingHeaderStyle"/>
 
                 <include
@@ -134,7 +134,7 @@
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-s
+
                 <include
                     android:id="@+id/show_video_posts"
                     layout="@layout/on_off_setting_item"
@@ -160,7 +160,7 @@ s
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
-                    android:paddingTop="@dimen/padding_two"
+                    android:paddingTop="@dimen/padding_three"
                     style="@style/SettingHeaderStyle"/>
 
                 <include
@@ -182,7 +182,7 @@ s
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
-                    android:paddingTop="@dimen/padding_two"
+                    android:paddingTop="@dimen/padding_three"
                     style="@style/SettingHeaderStyle"/>
 
                 <include

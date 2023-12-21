@@ -41,6 +41,7 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.BaseActivity
+import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.SharedElementTransition
@@ -65,6 +66,8 @@ class ImageViewerActivity : BaseActivity() {
         private val TAG = ImageViewerActivity::class.java.canonicalName
 
         private const val EXIT_OFFSET_DP = 60f
+
+        const val ErrorCustomDownloadLocation = 1234
     }
 
     private val args: ImageViewerActivityArgs by navArgs()
@@ -302,9 +305,28 @@ class ImageViewerActivity : BaseActivity() {
                             }
                         }
                         .onFailure {
-                            FirebaseCrashlytics.getInstance().recordException(it)
-                            Snackbar.make(getSnackbarContainer(), R.string.error_downloading_image, Snackbar.LENGTH_LONG)
-                                .show()
+                            if (it is FileDownloadHelper.CustomDownloadLocationException) {
+                                Snackbar
+                                    .make(
+                                        getSnackbarContainer(),
+                                        R.string.error_downloading_image,
+                                        Snackbar.LENGTH_LONG,
+                                    )
+                                    .setAction(R.string.downloads_settings) {
+                                        setResult(ErrorCustomDownloadLocation)
+                                        finish()
+                                    }
+                                    .show()
+                            } else {
+                                FirebaseCrashlytics.getInstance().recordException(it)
+                                Snackbar
+                                    .make(
+                                        getSnackbarContainer(),
+                                        R.string.error_downloading_image,
+                                        Snackbar.LENGTH_LONG,
+                                    )
+                                    .show()
+                            }
                         }
                 }
             }
@@ -525,10 +547,10 @@ class ImageViewerActivity : BaseActivity() {
     private fun downloadImage() {
         offlineManager.fetchImageWithError(binding.root, url, {
             viewModel.downloadFile(
-                this,
-                fileName,
-                url,
-                it,
+                context = this,
+                destFileName = fileName,
+                url = url,
+                cacheFile = it,
                 mimeType = mimeType,
             )
         }, {

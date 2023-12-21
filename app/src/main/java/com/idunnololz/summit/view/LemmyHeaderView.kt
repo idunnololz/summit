@@ -2,8 +2,8 @@ package com.idunnololz.summit.view
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -15,6 +15,7 @@ import com.google.android.material.R
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.RelativeCornerSize
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.convertSpToPixel
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import kotlin.math.max
@@ -79,6 +80,13 @@ class LemmyHeaderView : FrameLayout {
             textView1.textSize = value
             textView2.textSize = value
             textView3.textSize = value
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val lineHeight = (convertSpToPixel(value) * 1.33f).toInt()
+                textView1.lineHeight = lineHeight
+                textView2.lineHeight = lineHeight
+                textView3.lineHeight = lineHeight
+            }
         }
 
     fun getFlairView(): FlairView = flairView
@@ -98,6 +106,8 @@ class LemmyHeaderView : FrameLayout {
                 context.getColorFromAttribute(R.attr.colorControlNormal),
             ),
         )
+
+//        typeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
 
         return this
     }
@@ -129,6 +139,41 @@ class LemmyHeaderView : FrameLayout {
             marginEnd = Utils.convertDpToPixel(8f).toInt()
         }
         this.iconImageView = iconImageView
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
+        if (multiline) {
+            val iconImageView = iconImageView
+            var totalTextHeight = 0
+
+            fun getViewHeight(view: View): Int {
+                val layoutParams = view.layoutParams as LayoutParams
+                return view.measuredHeight + layoutParams.topMargin + layoutParams.bottomMargin
+            }
+
+            if (textView1.visibility != View.GONE) {
+                totalTextHeight += getViewHeight(textView1)
+            }
+            if (textView2.visibility != View.GONE) {
+                totalTextHeight += getViewHeight(textView2)
+            }
+            if (textView3.visibility != View.GONE) {
+                totalTextHeight += getViewHeight(textView3)
+            }
+
+            var viewHeight = totalTextHeight
+            if (iconImageView != null) {
+                val iconImageViewHeight = getViewHeight(iconImageView)
+                viewHeight = max(viewHeight, iconImageViewHeight)
+            }
+
+            setMeasuredDimension(
+                measuredWidth,
+                viewHeight + paddingTop + paddingBottom,
+            )
+        }
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

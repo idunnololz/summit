@@ -99,8 +99,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         val context = requireContext()
 
         requireMainActivity().apply {
-            setupForFragment<InboxTabbedFragment>()
-
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.appBar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomAppBar)
@@ -350,6 +348,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
     override fun onResume() {
         super.onResume()
+
+        requireMainActivity().apply {
+            if (!navBarController.useNavigationRail) {
+                navBarController.hideNavBar(animate = true)
+            }
+        }
 
         if (preferences.leftHandMode) {
             binding.bottomAppBar.layoutDirection = View.LAYOUT_DIRECTION_RTL

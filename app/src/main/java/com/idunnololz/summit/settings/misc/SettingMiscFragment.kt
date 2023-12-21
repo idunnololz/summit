@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -18,6 +19,7 @@ import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import dagger.hilt.android.AndroidEntryPoint
@@ -191,6 +193,13 @@ class SettingMiscFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        settings.perCommunitySettings.bindTo(
+            binding.perCommunitySettings,
+        ) {
+            val direction = SettingMiscFragmentDirections
+                .actionSettingMiscFragmentToSettingPerCommunityFragment()
+            findNavController().navigateSafe(direction)
+        }
     }
 
     private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {

@@ -58,6 +58,7 @@ import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
@@ -103,6 +104,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var accountInfoManager: AccountInfoManager
+
+    @Inject
+    lateinit var perCommunityPreferences: PerCommunityPreferences
 
     lateinit var preferences: Preferences
 
@@ -176,35 +180,9 @@ class CommunityFragment :
     }
 
     private val _layoutSelectorMenu: BottomMenu by lazy {
-        BottomMenu(requireContext()).apply {
-            addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_view_list_24)
-            addItemWithIcon(R.id.layout_large_list, R.string.large_list, R.drawable.baseline_view_list_24)
-            addItemWithIcon(R.id.layout_compact, R.string.compact, R.drawable.baseline_list_24)
-            addItemWithIcon(R.id.layout_card, R.string.card, R.drawable.baseline_article_24)
-            addItemWithIcon(R.id.layout_card2, R.string.card2, R.drawable.baseline_article_24)
-            addItemWithIcon(R.id.layout_card3, R.string.card3, R.drawable.baseline_article_24)
-            addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
-            setTitle(R.string.layout)
-
-            setOnMenuItemClickListener { menuItem ->
-                when (menuItem.id) {
-                    R.id.layout_compact ->
-                        preferences.setPostsLayout(CommunityLayout.Compact)
-                    R.id.layout_list ->
-                        preferences.setPostsLayout(CommunityLayout.List)
-                    R.id.layout_large_list ->
-                        preferences.setPostsLayout(CommunityLayout.LargeList)
-                    R.id.layout_card ->
-                        preferences.setPostsLayout(CommunityLayout.Card)
-                    R.id.layout_card2 ->
-                        preferences.setPostsLayout(CommunityLayout.Card2)
-                    R.id.layout_card3 ->
-                        preferences.setPostsLayout(CommunityLayout.Card3)
-                    R.id.layout_full ->
-                        preferences.setPostsLayout(CommunityLayout.Full)
-                }
-                onSelectedLayoutChanged()
-            }
+        makeLayoutSelectorMenu {
+            preferences.setPostsLayout(it)
+            onSelectedLayoutChanged()
         }
     }
 
@@ -659,7 +637,9 @@ class CommunityFragment :
                     }
                 }
                 is StatefulData.Loading -> {
-                    binding.loadingView.showProgressBar()
+                    if (!binding.swipeRefreshLayout.isRefreshing) {
+                        binding.loadingView.showProgressBar()
+                    }
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
@@ -854,6 +834,9 @@ class CommunityFragment :
                 if (tab != null) {
                     viewModel.updateTab(tab, it)
                 }
+
+                // Apply per-community settings
+                onSelectedLayoutChanged()
             }
 
             customAppBarController.setIsInfinity(viewModel.infinity)
@@ -984,6 +967,7 @@ class CommunityFragment :
 
         return _sortByTopMenu
     }
+
     private fun getLayoutMenu(): BottomMenu {
         when (preferences.getPostsLayout()) {
             CommunityLayout.Compact ->
@@ -1092,6 +1076,16 @@ class CommunityFragment :
                     icon = R.drawable.baseline_arrow_upward_24,
                 )
             }
+
+            addDivider()
+            addItemWithIcon(
+                id = R.id.per_community_settings,
+                title = getString(
+                    R.string.per_community_settings_format,
+                    currentCommunityRef.getName(context),
+                ),
+                icon = R.drawable.ic_community_24,
+            )
 
             if (getMainActivity()?.useBottomNavBar == false) {
                 addDivider()
@@ -1259,6 +1253,52 @@ class CommunityFragment :
                     R.id.back_to_the_beginning -> {
                         mainFragment?.backToBeginning()
                     }
+                    R.id.per_community_settings -> {
+                        showPerCommunitySettings(currentCommunityRef)
+                    }
+                }
+            }
+        }
+
+        getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
+    }
+
+    private fun showPerCommunitySettings(currentCommunityRef: CommunityRef) {
+        val context = context ?: return
+
+        val bottomMenu = BottomMenu(context).apply {
+            setTitle(
+                getString(
+                    R.string.per_community_settings_format,
+                    currentCommunityRef.getName(context),
+                ),
+            )
+            addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
+            addItemWithIcon(R.id.reset_settings, R.string.reset_settings, R.drawable.baseline_reset_wrench_24)
+
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.id) {
+                    R.id.layout -> {
+                        val layoutMenu = makeLayoutSelectorMenu {
+                            val communityConfig = perCommunityPreferences.getCommunityConfig(
+                                currentCommunityRef,
+                            ) ?: PerCommunityPreferences.CommunityConfig(currentCommunityRef)
+                            val updatedConfig = communityConfig.copy(layout = it)
+
+                            perCommunityPreferences.setCommunityConfig(
+                                currentCommunityRef,
+                                updatedConfig,
+                            )
+                            viewModel.basePreferences.usePerCommunitySettings = true
+                            onSelectedLayoutChanged()
+                        }
+
+                        getMainActivity()?.showBottomMenu(layoutMenu, expandFully = false)
+                    }
+                    R.id.reset_settings -> {
+                        perCommunityPreferences.setCommunityConfig(currentCommunityRef, null)
+                        onSelectedLayoutChanged()
+                    }
                 }
             }
         }
@@ -1284,9 +1324,10 @@ class CommunityFragment :
     }
 
     private fun onSelectedLayoutChanged() {
-        val newPostUiConfig = preferences.getPostInListUiConfig()
+        val currentLayout = currentLayout
+        val newPostUiConfig = preferences.getPostInListUiConfig(currentLayout)
         val didUiConfigChange = postListViewBuilder.postUiConfig != newPostUiConfig
-        val didLayoutChange = adapter?.layout != preferences.getPostsLayout()
+        val didLayoutChange = adapter?.layout != currentLayout
 
         if (didLayoutChange) {
             if (isBindingAvailable()) {
@@ -1299,7 +1340,10 @@ class CommunityFragment :
         }
 
         if (didLayoutChange || didUiConfigChange) {
-            adapter?.layout = preferences.getPostsLayout()
+            adapter?.layout = currentLayout
+
+            // Need to manually call this in case the layout didn't change
+            adapter?.notifyDataSetChanged()
         }
 
         postListViewBuilder.onPostUiConfigUpdated()
@@ -1310,10 +1354,55 @@ class CommunityFragment :
         // Setting the decorator removes the gesture item decorator
         // So we need to add it back right after
 
-        recyclerView.setupDecoratorsForPostList(preferences)
+        recyclerView.setupDecoratorsForPostList(currentLayout)
 
         // Detach before attaching or else attach will no-op
         itemTouchHelper?.attachToRecyclerView(null)
         attachGestureHandlerToRecyclerViewIfNeeded()
     }
+
+    private fun makeLayoutSelectorMenu(
+        onLayoutSelected: (CommunityLayout) -> Unit,
+    ): BottomMenu =
+        BottomMenu(requireContext()).apply {
+            addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_view_list_24)
+            addItemWithIcon(R.id.layout_large_list, R.string.large_list, R.drawable.baseline_view_list_24)
+            addItemWithIcon(R.id.layout_compact, R.string.compact, R.drawable.baseline_list_24)
+            addItemWithIcon(R.id.layout_card, R.string.card, R.drawable.baseline_article_24)
+            addItemWithIcon(R.id.layout_card2, R.string.card2, R.drawable.baseline_article_24)
+            addItemWithIcon(R.id.layout_card3, R.string.card3, R.drawable.baseline_article_24)
+            addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
+            setTitle(R.string.layout)
+
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.id) {
+                    R.id.layout_compact ->
+                        onLayoutSelected(CommunityLayout.Compact)
+                    R.id.layout_list ->
+                        onLayoutSelected(CommunityLayout.List)
+                    R.id.layout_large_list ->
+                        onLayoutSelected(CommunityLayout.LargeList)
+                    R.id.layout_card ->
+                        onLayoutSelected(CommunityLayout.Card)
+                    R.id.layout_card2 ->
+                        onLayoutSelected(CommunityLayout.Card2)
+                    R.id.layout_card3 ->
+                        onLayoutSelected(CommunityLayout.Card3)
+                    R.id.layout_full ->
+                        onLayoutSelected(CommunityLayout.Full)
+                }
+            }
+        }
+
+    private val currentLayout: CommunityLayout
+        get() {
+            if (!preferences.usePerCommunitySettings) {
+                return preferences.getPostsLayout()
+            }
+
+            val currentCommunityRef = viewModel.currentCommunityRef.value ?: args.communityRef
+            return currentCommunityRef?.let {
+                perCommunityPreferences.getCommunityConfig(it)
+            }?.layout ?: preferences.getPostsLayout()
+        }
 }

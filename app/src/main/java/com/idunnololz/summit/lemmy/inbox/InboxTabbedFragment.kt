@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.inbox
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -68,6 +69,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         }
 
         fun onPageChanged() {
+            Log.d("ASDF", "page change: ${binding.viewPager.currentItem}")
             if (binding.viewPager.currentItem == 0) {
                 viewModel.removeAllButFirst()
 

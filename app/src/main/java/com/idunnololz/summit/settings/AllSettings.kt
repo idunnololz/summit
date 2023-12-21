@@ -32,6 +32,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
@@ -80,6 +81,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MATERIAL_YOU
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MULTILINE_POST_HEADERS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PER_COMMUNITY_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -130,6 +132,9 @@ object SettingPath {
                 context.getString(R.string.navigation)
             ImportAndExportSettings::class ->
                 context.getString(R.string.backup_and_restore_settings)
+
+            DownloadSettings::class ->
+                context.getString(R.string.downloads)
 
             else -> error("No name for $this")
         }
@@ -242,6 +247,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.backup_and_restore_settings),
         context.getString(R.string.backup_and_restore_settings_desc),
     )
+    val downloadSettings = BasicSettingItem(
+        R.drawable.baseline_download_24,
+        context.getString(R.string.downloads),
+        context.getString(R.string.downloads_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -272,6 +282,7 @@ class MainSettings @Inject constructor(
                 historySettings,
                 navigationSettings,
                 userActionsSettings,
+                downloadSettings,
                 backupAndRestoreSettings,
                 settingAbout,
                 settingSummitCommunity,
@@ -1551,6 +1562,12 @@ class MiscSettings @Inject constructor(
         ),
     )
 
+    val perCommunitySettings = BasicSettingItem(
+        null,
+        context.getString(R.string.per_community_settings),
+        context.getString(R.string.per_community_settings_desc),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
@@ -1562,6 +1579,7 @@ class MiscSettings @Inject constructor(
         usePredictiveBack,
         shareImagesDirectly,
         navigationRailMode,
+        perCommunitySettings,
     )
 }
 
@@ -1882,6 +1900,62 @@ class PerAccountSettings @Inject constructor(
     )
 }
 
+@Singleton
+class DownloadSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val downloadDirectory = TextValueSettingItem(
+        title = context.getString(R.string.download_location),
+        supportsRichText = false,
+        relatedKeys = listOf(KEY_DOWNLOAD_DIRECTORY),
+    )
+
+    val resetDownloadDirectory = BasicSettingItem(
+        icon = null,
+        title = context.getString(R.string.reset_download_location),
+        description = null,
+        relatedKeys = listOf(KEY_DOWNLOAD_DIRECTORY),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        downloadDirectory,
+    )
+}
+
+@Singleton
+class PerCommunitySettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val usePerCommunitySettings = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_per_community_settings),
+        null,
+        relatedKeys = listOf(KEY_USE_PER_COMMUNITY_SETTINGS),
+    )
+
+    val clearPerCommunitySettings = BasicSettingItem(
+        icon = null,
+        title = context.getString(R.string.clear_per_community_settings),
+        description = null,
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+        MiscSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        usePerCommunitySettings,
+        clearPerCommunitySettings,
+    )
+}
+
 class AllSettings @Inject constructor(
     mainSettings: MainSettings,
     lemmyWebSettings: LemmyWebSettings,
@@ -1901,6 +1975,8 @@ class AllSettings @Inject constructor(
     actionsSettings: ActionsSettings,
     importAndExportSettings: ImportAndExportSettings,
     perAccountSettings: PerAccountSettings,
+    downloadSettings: DownloadSettings,
+    perCommunitySettings: PerCommunitySettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -1921,6 +1997,8 @@ class AllSettings @Inject constructor(
         actionsSettings,
         importAndExportSettings,
         perAccountSettings,
+        downloadSettings,
+        perCommunitySettings,
     )
 
     init {

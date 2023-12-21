@@ -101,7 +101,6 @@ class SettingViewTypeFragment :
     private fun setup() {
         if (!isBindingAvailable()) return
 
-        val context = requireContext()
         val parentActivity = requireMainActivity()
 
         updateRendering()

@@ -817,6 +817,21 @@
     <string name="auto">Auto</string>
     <string name="on">On</string>
     <string name="off">Off</string>
+    <string name="download_location">Download location</string>
+    <string name="downloads">Downloads</string>
+    <string name="downloads_settings">Downloads settings</string>
+    <string name="downloads_desc">Change settings related to downloading files</string>
+    <string name="reset_download_location">Reset download location</string>
+    <string name="per_community_settings_format">Change settings for this community (%1$s)</string>
+    <string name="xxl">XXL</string>
+    <string name="xxxl">XXXL</string>
+    <string name="reset_settings">Reset settings</string>
+    <string name="per_community_settings">Per-community settings</string>
+    <string name="per_community_settings_desc">Change settings that are applied to specific communities.</string>
+    <string name="use_per_community_settings">Per community settings</string>
+    <string name="clear_per_community_settings">Clear per community settings</string>
+    <string name="view_type_format">View type: %1$s</string>
+    <string name="per_community_overrides">Per community overrides</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

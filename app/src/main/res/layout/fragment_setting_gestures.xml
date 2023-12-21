@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
-                    android:paddingTop="@dimen/padding_two"
+                    android:paddingTop="@dimen/padding_three"
                     style="@style/SettingHeaderStyle"/>
 
                 <include
@@ -95,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/padding"
                     android:paddingBottom="@dimen/padding"
-                    android:paddingTop="@dimen/padding_two"
+                    android:paddingTop="@dimen/padding_three"
                     style="@style/SettingHeaderStyle"/>
 
                 <include

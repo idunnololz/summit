@@ -23,6 +23,7 @@ import javax.inject.Inject
 class ImageViewerViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val offlineManager: OfflineManager,
+    private val fileDownloadHelper: FileDownloadHelper,
 ) : ViewModel() {
 
     val downloadResult = StatefulLiveData<Result<FileDownloadHelper.DownloadResult>>()
@@ -37,12 +38,12 @@ class ImageViewerViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
-                FileDownloadHelper
+                fileDownloadHelper
                     .downloadFile(
-                        context,
-                        destFileName,
-                        url,
-                        cacheFile,
+                        c = context,
+                        destFileName = destFileName,
+                        url = url,
+                        cacheFile = cacheFile,
                         mimeType = mimeType,
                     )
             }

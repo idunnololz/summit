@@ -188,6 +188,12 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingDownloadsFragment"
+            app:destination="@id/settingDownloadsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingPerCommunityFragment"
+            app:destination="@id/settingPerCommunityFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -273,7 +279,11 @@
     <fragment
         android:id="@+id/settingMiscFragment"
         android:name="com.idunnololz.summit.settings.misc.SettingMiscFragment"
-        android:label="SettingMiscFragment" />
+        android:label="SettingMiscFragment" >
+        <action
+            android:id="@+id/action_settingMiscFragment_to_settingPerCommunityFragment"
+            app:destination="@id/settingPerCommunityFragment" />
+    </fragment>
     <fragment
         android:id="@+id/settingLoggingFragment"
         android:name="com.idunnololz.summit.settings.logging.SettingLoggingFragment"
@@ -358,4 +368,12 @@
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
+    <fragment
+        android:id="@+id/settingDownloadsFragment"
+        android:name="com.idunnololz.summit.settings.downloads.SettingDownloadsFragment"
+        android:label="SettingDownloadsFragment" />
+    <fragment
+        android:id="@+id/settingPerCommunityFragment"
+        android:name="com.idunnololz.summit.settings.perCommunity.SettingPerCommunityFragment"
+        android:label="SettingPerCommunityFragment" />
 </navigation>
