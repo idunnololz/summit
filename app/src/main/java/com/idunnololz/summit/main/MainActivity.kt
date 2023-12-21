@@ -256,9 +256,9 @@ class MainActivity : BaseActivity() {
             },
         )
 
-        onPreferencesChanged()
-
         navBarController.setup()
+
+        onPreferencesChanged()
 
         val newInstall = preferences.appVersionLastLaunch == 0
         val isVersionUpdate = isVersionUpdate()
