@@ -7,6 +7,7 @@ import android.os.Parcelable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -167,8 +168,6 @@ class AddOrEditCommentFragment :
 
         viewModel.currentAccount.observe(viewLifecycleOwner) {
             if (it != null) {
-                setup(it, savedInstanceState)
-
                 requireActivity().invalidateOptionsMenu()
             }
         }
@@ -296,6 +295,7 @@ class AddOrEditCommentFragment :
                 viewModel.addMessage(AddOrEditCommentViewModel.Message.ReplyTargetTooOld(replyTargetTs))
             }
         }
+        setup(savedInstanceState)
     }
 
     private fun refreshMessage() {
@@ -331,7 +331,7 @@ class AddOrEditCommentFragment :
         }
     }
 
-    private fun setup(currentAccount: Account, savedInstanceState: Bundle?) {
+    private fun setup(savedInstanceState: Bundle?) {
         if (!isBindingAvailable()) {
             return
         }

@@ -321,27 +321,27 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private fun GetSiteResponse.toPageData(): PageData {
         val siteView = this.site_view
         return PageData(
-            Either.Right(siteView),
-            siteView.site.name,
-            "!${siteView.site.instance}",
-            siteView.site.icon,
-            siteView.site.banner,
-            siteView.site.instance,
-            dateStringToTs(siteView.site.published).toInt(),
-            false,
-            false,
-            siteView.site.description,
+            backingObject = Either.Right(siteView),
+            name = siteView.site.name,
+            fullName = "!${siteView.site.instance}",
+            iconUrl = siteView.site.icon,
+            bannerUrl = siteView.site.banner,
+            instance = siteView.site.instance,
+            publishTs = dateStringToTs(siteView.site.published).toInt(),
+            isSubscribed = false,
+            canSubscribe = false,
+            content = siteView.site.sidebar,
 
-            siteView.counts.posts,
-            siteView.counts.comments,
-            siteView.counts.users,
-            siteView.counts.users_active_day,
-            siteView.counts.users_active_week,
-            siteView.counts.users_active_month,
-            siteView.counts.users_active_half_year,
+            postCount = siteView.counts.posts,
+            commentCount = siteView.counts.comments,
+            userCount = siteView.counts.users,
+            usersPerDay = siteView.counts.users_active_day,
+            usersPerWeek = siteView.counts.users_active_week,
+            usersPerMonth = siteView.counts.users_active_month,
+            usersPerSixMonth = siteView.counts.users_active_half_year,
 
-            listOf(),
-            this.admins,
+            mods = listOf(),
+            admins = this.admins,
 
         )
     }

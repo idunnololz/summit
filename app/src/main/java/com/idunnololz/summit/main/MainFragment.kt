@@ -71,10 +71,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         private const val SIS_FRAGMENT_TAGS = "SIS_FRAGMENT_TAGS"
         private const val SIS_CURRENT_TAB = "SIS_CURRENT_TAB"
 
-        fun getTagForTab(tabId: Long): String = "innerFragment:$tabId"
-        fun getTagForTab(communityRef: CommunityRef): String = "innerFragment:$communityRef"
+        private fun getTagForTab(tabId: Long): String = "innerFragment:$tabId"
+        private fun getTagForTab(communityRef: CommunityRef): String = "innerFragment:$communityRef"
 
-        fun getTagForTab(tab: TabsManager.Tab): String =
+        private fun getTagForTab(tab: TabsManager.Tab): String =
             when (tab) {
                 is TabsManager.Tab.SubscribedCommunityTab ->
                     getTagForTab(tab.communityRef)
@@ -82,7 +82,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     getTagForTab(tab.userCommunityItem.id)
             }
 
-        fun getIdFromTag(tag: String): Long? =
+        private fun getIdFromTag(tag: String): Long? =
             try {
                 tag.split(":")[1].toLong()
             } catch (e: Exception) { null }
@@ -93,7 +93,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private val viewModel: MainFragmentViewModel by viewModels()
     private val communitiesPaneViewModel: CommunitiesPaneViewModel by viewModels()
-    private val communityInfoViewModel: CommunityInfoViewModel by viewModels()
 
     private lateinit var firstFragmentTag: String
 
@@ -412,8 +411,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         requireMainActivity().apply {
             this.insetViewAutomaticallyByPadding(this, binding.startPanel.root)
-//            this.insetViewExceptBottomAutomaticallyByMargins(this, binding.startPanel.title)
-//            this.insetViewExceptTopAutomaticallyByMargins(this, binding.startPanel.swipeRefreshLayout)
         }
 
         lifecycleScope.launch {
@@ -670,54 +667,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             containerId,
             startDestinationArgs,
         )
-    }
-
-    fun restoreTabState(state: TabCommunityState) {
-//        // we need to check if tab is still open since user could have closed it
-//        if (userCommunitiesManager.getTab(state.tabId) == null) {
-//            // tab was closed... restore it
-//            sharedViewModel.addTab(
-//                UserCommunityItem(
-//                    id = state.tabId,
-//                    communityRef = state.viewState.communityState.communityRef,
-//
-//                    )
-//            )
-//        }
-//
-//        if (userCommunitiesManager.currentTabId.value != state.tabId) {
-//            userCommunitiesManager.currentTabId.value = state.tabId
-//        }
-//
-//        val runnable = object : Runnable {
-//            override fun run() {
-//                val fragmentTag = getTagForTab(state.tabId)
-//                val fragment = childFragmentManager.findFragmentByTag(fragmentTag)
-//
-//                if (fragment?.isAdded != true) {
-//                    binding.rootView.post(this)
-//                } else {
-//                    val curFrag = childFragmentManager.getCurrentNavigationFragment()
-//                    if (curFrag is CommunityFragment) {
-//                        curFrag.restoreState(state.viewState, reload = true)
-//                    } else {
-//                        // Pop the back stack to the start destination of the current navController graph
-//                        fragment.findNavController().let {
-//                            it.popBackStack(
-//                                it.graph.startDestinationId, false
-//                            )
-//                        }
-//                        binding.rootView.post(this)
-//                    }
-//                }
-//            }
-//        }
-//
-//        runnable.run()
-    }
-
-    fun updateCommunityInfoPane(communityRef: CommunityRef) {
-        communityInfoViewModel.onCommunityChanged(communityRef)
     }
 
     fun setStartPanelLockState(lockState: OverlappingPanelsLayout.LockState) {

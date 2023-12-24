@@ -28,7 +28,7 @@ class ExoPlayerManager(
 
     companion object {
 
-        private val TAG = "ExoPlayerManager"
+        private const val TAG = "ExoPlayerManager"
 
         private val managersMap = HashMap<LifecycleOwner, ExoPlayerManager>()
 
@@ -76,7 +76,7 @@ class ExoPlayerManager(
 
         fun destroyAll() {
             Log.d(TAG, "destroyAll()")
-            managersMap.forEach { (owner, manager) ->
+            managersMap.forEach { (_, manager) ->
                 manager.destroy()
             }
             managersMap.clear()
@@ -221,6 +221,7 @@ class ExoPlayerManager(
         // Prepare the player with the media source.
         player.setMediaSource(mediaSource)
         player.prepare()
+
         player.playWhenReady = true
 
         val videoState = config.videoState

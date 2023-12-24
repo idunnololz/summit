@@ -60,6 +60,7 @@ import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
+import com.idunnololz.summit.util.ext.getSize
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -1247,12 +1248,12 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     listener { _, result ->
-                        val d = result.drawable
-                        if (d is BitmapDrawable) {
+                        result.drawable.getSize(tempSize)
+                        if (tempSize.width > 0 && tempSize.height > 0) {
                             offlineManager.setImageSizeHint(
                                 imageUrl,
-                                d.bitmap.width,
-                                d.bitmap.height,
+                                tempSize.width,
+                                tempSize.height,
                             )
                         }
                     }
