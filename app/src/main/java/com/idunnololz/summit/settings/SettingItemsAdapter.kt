@@ -209,11 +209,18 @@ class SettingItemsAdapter(
             b.root.tag = settingItem
             b.root.setOnClickListener(onSettingClickListener)
         }
-        addItemType(Item.RadioGroupItem::class, SettingTextValueBinding::inflate) { item, b, h ->
+        addItemType(Item.RadioGroupItem::class, SettingTextValueBinding::inflate) { item, b, _ ->
             val settingItem = item.settingItem
 
             b.title.text = settingItem.title
             b.value.text = settingItem.options.firstOrNull { it.id == item.value }?.title
+
+            if (settingItem.description != null) {
+                b.desc.visibility = View.VISIBLE
+                b.desc.text = settingItem.description
+            } else {
+                b.desc.visibility = View.GONE
+            }
 
             b.root.tag = settingItem
             b.root.setOnClickListener(onSettingClickListener)

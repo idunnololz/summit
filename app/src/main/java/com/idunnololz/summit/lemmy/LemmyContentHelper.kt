@@ -1,7 +1,9 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
+import android.graphics.Point
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ScaleDrawable
 import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
@@ -44,6 +46,7 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
+import com.idunnololz.summit.util.ext.getSize
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
@@ -473,17 +476,18 @@ class LemmyContentHelper(
                             }
 
                             listener { _, result ->
-                                val d = result.drawable
-                                if (d is BitmapDrawable) {
+                                result.drawable.getSize(tempSize)
+                                Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
+
+                                if (tempSize.width > 0 && tempSize.height > 0) {
                                     offlineManager.setImageSizeHint(
                                         imageUrl,
-                                        d.bitmap.width,
-                                        d.bitmap.height,
+                                        tempSize.width,
+                                        tempSize.height,
                                     )
-                                    Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
-
-                                    updateLayoutParams()
                                 }
+
+                                updateLayoutParams()
                             }
                         }
                     },

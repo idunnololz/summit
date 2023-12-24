@@ -497,7 +497,7 @@ class CommunityFragment :
         val view = binding.root
         val context = requireContext()
 
-        checkNotNull(view.findNavController())
+        checkNotNull(view.findNavController()) { "NavController was null!" }
 
         requireMainActivity().apply {
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
@@ -513,10 +513,6 @@ class CommunityFragment :
                 binding.fastScroller,
             )
         }
-
-        (parentFragment?.parentFragment as? MainFragment)?.updateCommunityInfoPane(
-            requireNotNull(viewModel.currentCommunityRef.value),
-        )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.fetchCurrentPage(
@@ -804,7 +800,11 @@ class CommunityFragment :
                 },
                 preferences.postGestureSize,
             )
-            itemTouchHelper = ItemTouchHelper(requireNotNull(swipeActionCallback))
+            itemTouchHelper = ItemTouchHelper(
+                requireNotNull(swipeActionCallback) {
+                    "swipeActionCallback is null!"
+                }
+            )
         }
 
         swipeActionCallback?.updatePostSwipeActions()
@@ -992,7 +992,9 @@ class CommunityFragment :
     private fun showOverflowMenu() {
         val context = context ?: return
 
-        val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value)
+        val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value) {
+            "currentCommunityRef is null!"
+        }
         val currentDefaultPage = preferences.getDefaultPage()
         val isBookmarked = userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage

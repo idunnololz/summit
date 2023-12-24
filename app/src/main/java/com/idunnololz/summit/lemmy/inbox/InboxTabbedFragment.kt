@@ -69,7 +69,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         }
 
         fun onPageChanged() {
-            Log.d("ASDF", "page change: ${binding.viewPager.currentItem}")
             if (binding.viewPager.currentItem == 0) {
                 viewModel.removeAllButFirst()
 
