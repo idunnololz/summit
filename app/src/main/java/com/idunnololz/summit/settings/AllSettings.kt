@@ -136,6 +136,9 @@ object SettingPath {
             DownloadSettings::class ->
                 context.getString(R.string.downloads)
 
+            PerCommunitySettings::class ->
+                context.getString(R.string.per_community_settings)
+
             else -> error("No name for $this")
         }
     }

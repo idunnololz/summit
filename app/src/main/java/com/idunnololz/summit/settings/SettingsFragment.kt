@@ -70,12 +70,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         requireMainActivity().apply {
             setupForFragment<SettingsFragment>()
 
-//            setSupportActionBar(binding.searchBar)
-
-//            supportActionBar?.setDisplayShowHomeEnabled(true)
-//            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//            supportActionBar?.title = context.getString(R.string.settings)
-
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
@@ -84,13 +78,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 viewModel.showSearch.value = true
             }
         }
-
-//        binding.searchBar.runAfterLayout {
-//            binding.searchBar.updateLayoutParams<MarginLayoutParams> {
-//                topMargin = binding.collapsingToolbarContent.height +
-//                    context.getDimenFromAttribute(io.noties.markwon.R.attr.actionBarSize).toInt()
-//            }
-//        }
 
         with(binding) {
             recyclerView.layoutManager = LinearLayoutManager(context)
@@ -160,10 +147,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 true
                             }
                             mainSettings.settingSummitCommunity.id -> {
-                                val fm = parentFragmentManager
-                                for (i in 0 until fm.backStackEntryCount) {
-                                    fm.popBackStack()
-                                }
                                 getMainActivity()?.launchPage(summitCommunityPage)
                                 true
                             }

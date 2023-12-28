@@ -207,6 +207,7 @@ class CreateOrEditPostFragment :
 
         val postEditor = binding.postEditor
         textFormatterHelper.setupTextFormatterToolbar(
+            getMainActivity(),
             binding.textFormatToolbar,
             requireNotNull(postEditor.editText),
             onChooseImageClick = {

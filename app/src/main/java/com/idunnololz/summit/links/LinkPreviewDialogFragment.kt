@@ -10,12 +10,14 @@ import androidx.navigation.fragment.navArgs
 import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentLinkPreviewBinding
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBinding>() {
@@ -33,6 +35,9 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
     private val args by navArgs<LinkPreviewDialogFragmentArgs>()
 
     private val viewModel: LinkPreviewViewModel by viewModels()
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onStart() {
         super.onStart()
@@ -90,6 +95,16 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
                     }
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (preferences.leftHandMode) {
+            binding.buttonBar?.layoutDirection = View.LAYOUT_DIRECTION_RTL
+        } else {
+            binding.buttonBar?.layoutDirection = View.LAYOUT_DIRECTION_INHERIT
         }
     }
 

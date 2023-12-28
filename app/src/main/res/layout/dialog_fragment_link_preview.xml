@@ -30,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintBottom_toTopOf="@+id/launch_url">
+        app:layout_constraintBottom_toTopOf="@+id/button_bar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -133,26 +133,32 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <Button
-        style="?attr/materialButtonOutlinedStyle"
-        android:id="@+id/copy_link"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/button_bar"
+        android:orientation="horizontal"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/copy_link"
-        android:layout_marginEnd="@dimen/padding"
-        app:layout_constraintTop_toTopOf="@+id/launch_url"
-        app:layout_constraintBottom_toBottomOf="@+id/launch_url"
-        app:layout_constraintEnd_toStartOf="@+id/launch_url"/>
-
-    <Button
-        android:id="@+id/launch_url"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/open_link"
-        android:layout_marginEnd="@dimen/padding"
+        android:gravity="end"
         android:layout_marginBottom="@dimen/padding"
-        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/copy_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/copy_link"
+            android:layout_marginEnd="@dimen/padding"/>
+
+        <Button
+            android:id="@+id/launch_url"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_link"
+            android:layout_marginEnd="@dimen/padding"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
