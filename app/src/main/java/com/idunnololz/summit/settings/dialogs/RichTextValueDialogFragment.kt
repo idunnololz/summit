@@ -92,6 +92,7 @@ class RichTextValueDialogFragment :
             textEditor.setText(requireArguments().getString(ARG_CURRENT_VALUE))
 
             textFormatterHelper.setupTextFormatterToolbar(
+                getMainActivity(),
                 textFormatToolbar,
                 textEditor,
                 onChooseImageClick = {

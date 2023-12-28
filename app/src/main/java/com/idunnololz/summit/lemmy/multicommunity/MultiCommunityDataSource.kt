@@ -164,11 +164,11 @@ class MultiCommunityDataSource(
             }
             sourceToResult = sourceToResult.filter { it.second.isSuccess }
 
-            val nextSourceAndResult = sourceToResult.maxBy { (_, result) ->
-                val postView = result.getOrThrow() ?: return@maxBy -1.0
+            val nextSourceAndResult = sourceToResult.maxByOrNull { (_, result) ->
+                val postView = result.getOrThrow() ?: return@maxByOrNull -1.0
 
                 if (postView.post.featured_local || postView.post.featured_community) {
-                    return@maxBy Double.MAX_VALUE
+                    return@maxByOrNull Double.MAX_VALUE
                 }
 
                 when (sortType) {
@@ -202,7 +202,7 @@ class MultiCommunityDataSource(
                         postView.counts.score.toDouble() ?: 0.0
                 }
             }
-            val nextItem = nextSourceAndResult.second.getOrNull()
+            val nextItem = nextSourceAndResult?.second?.getOrNull()
 
             if (nextItem == null) {
                 // no more items!

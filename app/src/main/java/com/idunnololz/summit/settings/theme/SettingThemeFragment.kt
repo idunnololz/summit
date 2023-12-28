@@ -18,6 +18,7 @@ import com.idunnololz.summit.preferences.GlobalFontColorId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
+import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
@@ -179,24 +180,6 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
             )
 
-//            settings.font.bindTo(
-//                activity = parentActivity,
-//                b = binding.fontSize,
-//                choices = mapOf(
-//                    com.idunnololz.summit.preferences.GlobalFontSizeId.Small to getString(com.idunnololz.summit.R.string.small),
-//                    com.idunnololz.summit.preferences.GlobalFontSizeId.Normal to getString(com.idunnololz.summit.R.string.normal),
-//                    com.idunnololz.summit.preferences.GlobalFontSizeId.Large to getString(com.idunnololz.summit.R.string.large),
-//                    com.idunnololz.summit.preferences.GlobalFontSizeId.ExtraLarge to getString(com.idunnololz.summit.R.string.extra_large),
-//                ),
-//                getCurrentChoice = {
-//                    preferences.globalFontSize
-//                },
-//                onChoiceSelected = {
-//                    preferences.globalFontSize = it
-//                    themeManager.onThemeOverlayChanged()
-//                },
-//            )
-
             settings.fontSize.bindTo(
                 activity = parentActivity,
                 b = binding.fontSize,
@@ -254,6 +237,22 @@ class SettingThemeFragment : BaseFragment<FragmentSettingThemeBinding>() {
                 },
                 { context.getColorCompat(R.color.downvoteColor) },
             )
+            BasicSettingItem(
+                null,
+                context.getString(R.string.swap_colors),
+                null,
+            ).bindTo(
+                binding.swapColors,
+            ) {
+                val upvoteColor = preferences.downvoteColor
+                val downvoteColor = preferences.upvoteColor
+
+                preferences.upvoteColor = upvoteColor
+                preferences.downvoteColor = downvoteColor
+
+                postAndCommentViewBuilder.onPreferencesChanged()
+                setup()
+            }
         }
     }
 }

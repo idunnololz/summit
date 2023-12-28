@@ -220,8 +220,6 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        handleIntent(intent)
-
         runOnReady(this) {
             viewModel.loadCommunities()
 
@@ -258,7 +256,9 @@ class MainActivity : BaseActivity() {
 
         navBarController.setup()
 
-        onPreferencesChanged()
+        onPreferencesChanged() // must be called after navBarController.setup()
+
+        handleIntent(intent) // must be called after navBarController.setup()
 
         val newInstall = preferences.appVersionLastLaunch == 0
         val isVersionUpdate = isVersionUpdate()

@@ -1,9 +1,16 @@
 package com.idunnololz.summit.lemmy.utils
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.core.view.children
+import androidx.core.view.isVisible
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
+import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 
 class TextFormatterHelper {
 
@@ -23,6 +30,7 @@ class TextFormatterHelper {
     private var editText: EditText? = null
 
     fun setupTextFormatterToolbar(
+        mainActivity: MainActivity?,
         textFormatToolbarBinding: TextFormatToolbarBinding,
         editText: EditText,
         onChooseImageClick: (() -> Unit)? = null,
@@ -190,6 +198,27 @@ class TextFormatterHelper {
         }
 
         editText.setSelection(finalCursorPos)
+    }
+
+    private fun generateBottomSheetFromBar(viewGroup: ViewGroup): BottomMenu {
+        val bottomMenu = BottomMenu(viewGroup.context)
+
+        for (view in viewGroup.children) {
+            if (view !is ImageView) {
+                continue
+            }
+            if (!view.isVisible) {
+                continue
+            }
+
+            bottomMenu.addItemWithIcon(
+                view.id,
+                view.contentDescription.toString(),
+                view.drawable,
+            )
+        }
+
+        return bottomMenu
     }
 
     fun onImageUploaded(url: String) {

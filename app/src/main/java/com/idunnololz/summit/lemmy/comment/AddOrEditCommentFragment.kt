@@ -374,6 +374,7 @@ class AddOrEditCommentFragment :
         }
 
         textFormatterHelper.setupTextFormatterToolbar(
+            getMainActivity(),
             binding.textFormatToolbar,
             requireNotNull(commentEditor.editText),
             onChooseImageClick = {

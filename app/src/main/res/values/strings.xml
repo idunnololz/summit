@@ -828,10 +828,11 @@
     <string name="reset_settings">Reset settings</string>
     <string name="per_community_settings">Per-community settings</string>
     <string name="per_community_settings_desc">Change settings that are applied to specific communities.</string>
-    <string name="use_per_community_settings">Per community settings</string>
-    <string name="clear_per_community_settings">Clear per community settings</string>
+    <string name="use_per_community_settings">Per-community settings</string>
+    <string name="clear_per_community_settings">Clear per-community settings</string>
     <string name="view_type_format">View type: %1$s</string>
-    <string name="per_community_overrides">Per community overrides</string>
+    <string name="per_community_overrides">Per-community overrides</string>
+    <string name="swap_colors">Swap colors</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

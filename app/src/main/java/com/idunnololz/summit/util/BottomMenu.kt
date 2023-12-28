@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -85,6 +86,10 @@ class BottomMenu(private val context: Context) {
 
     fun addItemWithIcon(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
         adapter.menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
+    }
+
+    fun addItemWithIcon(@IdRes id: Int, title: String, drawable: Drawable) {
+        adapter.menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.DrawableIcon(drawable)))
     }
 
     fun addDivider() {
@@ -300,6 +305,8 @@ class BottomMenu(private val context: Context) {
                     when (icon) {
                         is MenuIcon.ResourceIcon ->
                             b.icon.setImageResource(icon.customIcon)
+                        is MenuIcon.DrawableIcon ->
+                            b.icon.setImageDrawable(icon.customIcon)
                     }
                 } else {
                     b.icon.visibility = View.GONE
@@ -388,6 +395,9 @@ class BottomMenu(private val context: Context) {
     sealed interface MenuIcon {
         data class ResourceIcon(
             @DrawableRes val customIcon: Int = 0,
+        ) : MenuIcon
+        data class DrawableIcon(
+            val customIcon: Drawable,
         ) : MenuIcon
     }
 }
