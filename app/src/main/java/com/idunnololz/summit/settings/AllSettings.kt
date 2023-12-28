@@ -10,6 +10,7 @@ import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.PostGestureAction
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PreferenceUtil
@@ -135,9 +136,12 @@ object SettingPath {
 
             DownloadSettings::class ->
                 context.getString(R.string.downloads)
-
             PerCommunitySettings::class ->
                 context.getString(R.string.per_community_settings)
+            PerAccountSettings::class ->
+                context.getString(R.string.per_account_settings)
+            ActionsSettings::class ->
+                context.getString(R.string.user_actions)
 
             else -> error("No name for $this")
         }
@@ -1016,9 +1020,6 @@ class PostAndCommentsSettings @Inject constructor(
 class ThemeSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
-    override val parents: List<KClass<out SearchableSettings>> = listOf(
-        MainSettings::class,
-    )
 
     val baseTheme = RadioGroupSettingItem(
         0,
@@ -1193,6 +1194,10 @@ class ThemeSettings @Inject constructor(
         context.getString(R.string.downvote_color),
         context.getString(R.string.downdoot_color),
         relatedKeys = listOf(KEY_DOWNVOTE_COLOR),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1586,6 +1591,9 @@ class MiscSettings @Inject constructor(
     )
 }
 
+/**
+ * User actions.
+ */
 @Singleton
 class ActionsSettings @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -1960,6 +1968,7 @@ class PerCommunitySettings @Inject constructor(
 }
 
 class AllSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
     mainSettings: MainSettings,
     lemmyWebSettings: LemmyWebSettings,
     gestureSettings: GestureSettings,
@@ -2014,6 +2023,10 @@ class AllSettings @Inject constructor(
 
             assert(classes.isEmpty()) {
                 "Some setting pages not added: $classes"
+            }
+
+            for (c in SearchableSettings::class.sealedSubclasses) {
+                c.getPageName(context)
             }
         }
     }

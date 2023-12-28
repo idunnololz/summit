@@ -833,6 +833,7 @@
     <string name="view_type_format">View type: %1$s</string>
     <string name="per_community_overrides">Per-community overrides</string>
     <string name="swap_colors">Swap colors</string>
+    <string name="per_account_settings">Per-account settings</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
