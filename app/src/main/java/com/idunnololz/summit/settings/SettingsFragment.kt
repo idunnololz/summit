@@ -443,19 +443,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         var data: List<SettingsViewModel.SettingSearchResultItem> = listOf()
             private set
 
-        var defaultSettingValues: Map<Int, Any?> = mapOf()
-            set(value) {
-                field = value
-
-                refreshItems()
-            }
-
-        var firstTitleHasTopMargin: Boolean = true
-
-        private val _updatedSettingValues = mutableMapOf<Int, Any?>()
-
-        var settingsChanged: (() -> Unit)? = null
-
         private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
@@ -516,16 +503,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             adapterHelper.setItems(newItems, this, onItemsUpdated)
         }
 
-        private fun getCurrentValue(key: Int): Any? =
-            if (_updatedSettingValues.contains(key)) {
-                _updatedSettingValues[key]
-            } else if (defaultSettingValues.contains(key)) {
-                defaultSettingValues[key]
-            } else {
-                null
-            }
+        fun setData(
+            data: List<SettingsViewModel.SettingSearchResultItem>,
+            onItemsUpdated: () -> Unit = {}
+        ) {
 
-        fun setData(data: List<SettingsViewModel.SettingSearchResultItem>, onItemsUpdated: () -> Unit = {}) {
             this.data = data
 
             refreshItems {

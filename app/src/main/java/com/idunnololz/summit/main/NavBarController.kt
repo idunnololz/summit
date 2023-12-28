@@ -98,10 +98,6 @@ class NavBarController(
     }
 
     private fun onWindowSizeChanged() {
-        if (!useBottomNavBar) {
-            return
-        }
-
         val metrics = WindowMetricsCalculator.getOrCreate()
             .computeCurrentWindowMetrics(activity)
 
@@ -180,6 +176,10 @@ class NavBarController(
             }
 
             v
+        }
+
+        if (!useBottomNavBar) {
+            navBar.visibility = View.GONE
         }
     }
 
