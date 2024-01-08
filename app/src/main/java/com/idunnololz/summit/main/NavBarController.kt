@@ -3,10 +3,13 @@ package com.idunnololz.summit.main
 import android.app.Activity
 import android.util.Log
 import android.view.Gravity
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
@@ -14,12 +17,16 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.window.layout.WindowMetricsCalculator
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
 import com.google.android.material.navigationrail.NavigationRailView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.navigation.NavBarConfig
+import com.idunnololz.summit.settings.navigation.NavBarDestinations
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 
@@ -27,11 +34,14 @@ class NavBarController(
     val activity: Activity,
     val contentView: CoordinatorLayout,
     val lifecycleOwner: LifecycleOwner,
+    val onNavBarChanged: () -> Unit,
 ) {
 
     companion object {
         private const val TAG = "BottomNavController"
     }
+
+    private val context = activity
 
     private var _useNavigationRail: Boolean? = null
 
@@ -81,8 +91,10 @@ class NavBarController(
             bottomNavViewOffset.value!!.toFloat() +
                 bottomNavViewAnimationOffset.value!!.toFloat()
             ) / navBar.height
+    var useCustomNavBar: Boolean = false
 
     private var enableBottomNavViewScrolling = false
+    private var navBarConfig: NavBarConfig = NavBarConfig()
 
     init {
         bottomNavViewOffset.observe(lifecycleOwner) {
@@ -132,7 +144,8 @@ class NavBarController(
         }
         _useNavigationRail = useNavigationRail
 
-        if (::navBar.isInitialized) {
+        val navBarChanged = ::navBar.isInitialized
+        if (navBarChanged) {
             contentView.removeView(navBar)
         }
 
@@ -148,6 +161,18 @@ class NavBarController(
             }
 
             contentView.addView(v)
+//            val divider = MaterialDivider(context)
+//            v.addView(divider)
+//            divider.apply {
+//                updateLayoutParams<FrameLayout.LayoutParams> {
+//                    width = Utils.convertDpToPixel(1f).toInt()
+//                    height = MarginLayoutParams.MATCH_PARENT
+//                    gravity = Gravity.END
+//                }
+//            }
+//            contentView.doOnPreDraw {
+//                divider.translationX = navBar.width.toFloat()
+//            }
 
             v.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                 width = CoordinatorLayout.LayoutParams.WRAP_CONTENT
@@ -178,8 +203,8 @@ class NavBarController(
             v
         }
 
-        if (!useBottomNavBar) {
-            navBar.visibility = View.GONE
+        if (navBarChanged) {
+            onNavBarChanged()
         }
     }
 
@@ -320,8 +345,86 @@ class NavBarController(
     fun onPreferencesChanged(preferences: Preferences) {
         useBottomNavBar = preferences.useBottomNavBar
         navRailMode = preferences.navigationRailMode
+        useCustomNavBar = preferences.useCustomNavBar
+        navBarConfig = preferences.navBarConfig
 
         onWindowSizeChanged()
+
+        if (!useBottomNavBar) {
+            navBar.visibility = View.GONE
+        } else if (useCustomNavBar) {
+            navBar.setTag(R.id.custom_nav_bar, true)
+            navBar.menu.apply {
+                clear()
+                val navBarDestinations = navBarConfig.navBarDestinations
+                for (dest in navBarDestinations) {
+                    when (dest) {
+                        NavBarDestinations.Home -> {
+                            add(
+                                Menu.NONE,
+                                R.id.mainFragment,
+                                Menu.NONE,
+                                context.getString(R.string.home),
+                            ).apply {
+                                setIcon(R.drawable.baseline_home_24)
+                            }
+                        }
+                        NavBarDestinations.Saved -> {
+                            add(
+                                Menu.NONE,
+                                R.id.savedFragment,
+                                Menu.NONE,
+                                context.getString(R.string.saved),
+                            ).apply {
+                                setIcon(R.drawable.baseline_bookmark_24)
+                            }
+                        }
+                        NavBarDestinations.Search -> {
+                            add(
+                                Menu.NONE,
+                                R.id.searchFragment,
+                                Menu.NONE,
+                                context.getString(R.string.search),
+                            ).apply {
+                                setIcon(R.drawable.baseline_search_24)
+                            }
+                        }
+                        NavBarDestinations.History -> {
+                            add(
+                                Menu.NONE,
+                                R.id.historyFragment,
+                                Menu.NONE,
+                                context.getString(R.string.history),
+                            ).apply {
+                                setIcon(R.drawable.baseline_history_24)
+                            }
+                        }
+                        NavBarDestinations.Inbox -> {
+                            add(
+                                Menu.NONE,
+                                R.id.inboxTabbedFragment,
+                                Menu.NONE,
+                                context.getString(R.string.inbox),
+                            ).apply {
+                                setIcon(R.drawable.baseline_inbox_24)
+                            }
+                        }
+                        NavBarDestinations.None -> {
+                        }
+                    }
+                }
+            }
+        } else {
+            if (navBar.getTag(R.id.custom_nav_bar) == true) {
+                navBar.menu.clear()
+                navBar.inflateMenu(R.menu.bottom_navigation_menu)
+                navBar.setTag(R.id.custom_nav_bar, false)
+            }
+        }
+
+        if (!useBottomNavBar) {
+            navBar.visibility = View.GONE
+        }
     }
 
     enum class WindowSizeClass { COMPACT, MEDIUM, EXPANDED }

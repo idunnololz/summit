@@ -1,57 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/coordinator_layout"
+    android:id="@+id/bottom_sheet_container_outer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="com.idunnololz.summit.util.FixedBottomSheetBehavior"
-    android:backgroundTint="?colorSurfaceContainerLow"
-    style="@style/Widget.Material3.BottomSheet.Modal">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/search_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/subreddit_filter_bg"
-        android:layout_marginHorizontal="@dimen/padding"
-        android:layout_marginTop="@dimen/padding"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:boxStrokeWidth="0dp"
-        app:boxStrokeWidthFocused="0dp"
-        app:hintEnabled="false"
-        app:endIconMinSize="44dp"
-        app:endIconMode="clear_text">
-
-        <com.idunnololz.summit.view.PrefixedEditText
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:inputType="text"
-            android:textAppearance="?textAppearanceBodyMedium"
-            android:background="@null"
-            android:gravity="center_vertical"
-            android:hint="@string/community_hint"
-            android:paddingVertical="12dp"
-            android:paddingHorizontal="@dimen/padding"
-            app:prefix="c/"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <View
+        android:id="@+id/overlay"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/footer_spacer_height"
-        android:scrollbars="vertical"
-        android:scrollbarStyle="outsideOverlay"
-        app:layout_constraintTop_toBottomOf="@+id/search_bar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="match_parent"
+        android:background="@color/black50"
+        android:alpha="0"/>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/bottom_sheet_container_inner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="17dp"
+        android:fitsSystemWindows="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/coordinator_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="com.idunnololz.summit.util.FixedBottomSheetBehavior"
+            android:backgroundTint="?colorSurfaceContainerLow"
+            style="@style/Widget.Material3.BottomSheet.Modal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/search_bar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/subreddit_filter_bg"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp"
+                app:hintEnabled="false"
+                app:endIconMinSize="44dp"
+                app:endIconMode="clear_text">
+
+                <com.idunnololz.summit.view.PrefixedEditText
+                    android:id="@+id/search_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:textAppearance="?textAppearanceBodyMedium"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="@string/community_hint"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="@dimen/padding"
+                    app:prefix="c/"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/footer_spacer_height"
+                android:scrollbars="vertical"
+                android:scrollbarStyle="outsideOverlay"
+                app:layout_constraintTop_toBottomOf="@+id/search_bar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

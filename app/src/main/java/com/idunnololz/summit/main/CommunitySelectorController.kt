@@ -8,9 +8,15 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,6 +51,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.toErrorMessage
@@ -122,7 +129,10 @@ class CommunitySelectorController @AssistedInject constructor(
         val binding = CommunitySelectorViewBinding.inflate(inflater, container, false)
         this.binding = binding
         this.rootView = binding.root
+
         val rootView = binding.root
+        val bottomSheet = binding.coordinatorLayout
+
         rootView.visibility = View.GONE
 
         recyclerView = binding.recyclerView
@@ -131,7 +141,7 @@ class CommunitySelectorController @AssistedInject constructor(
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        BottomSheetBehavior.from(binding.root).apply {
+        BottomSheetBehavior.from(bottomSheet).apply {
             peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
             isHideable = true
             state = BottomSheetBehavior.STATE_HIDDEN
@@ -196,28 +206,52 @@ class CommunitySelectorController @AssistedInject constructor(
         }
     }
 
-    fun show(container: ViewGroup, activity: MainActivity, lifecycleOwner: LifecycleOwner) {
-        if (rootView?.parent != null) {
+    fun show(
+        bottomSheetContainer: ViewGroup,
+        activity: MainActivity,
+        lifecycleOwner: LifecycleOwner,
+    ) {
+        val rootView = rootView ?: return
+
+        if (rootView.parent != null) {
             return
         }
 
-        container.addView(rootView)
+        val overlay = binding.overlay
+        overlay.setOnClickListener {
+            bottomSheetBehavior?.setState(
+                BottomSheetBehavior.STATE_HIDDEN,
+            )
+        }
+
         binding.recyclerView.adapter = adapter
         binding.recyclerView.scrollToPosition(0)
 
-        rootView?.visibility = View.VISIBLE
+        rootView.visibility = View.VISIBLE
+
+        activity.insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = checkNotNull(activity.windowInsets.value)
+            recyclerView.updatePadding(bottom = insets.bottom)
+            binding.bottomSheetContainerInner.updateLayoutParams<MarginLayoutParams> {
+                topMargin = insets.top
+                leftMargin = insets.left
+                rightMargin = insets.right
+            }
+        }
 
         activity.insetViewExceptTopAutomaticallyByMargins(lifecycleOwner, recyclerView)
 
         activity.onBackPressedDispatcher.addCallback(lifecycleOwner, onBackPressedHandler)
+
+        bottomSheetContainer.addView(rootView)
 
         bottomSheetBehavior?.addBottomSheetCallback(
             object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet1: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                         adapter.stopLoading()
-                        rootView?.visibility = View.GONE
-                        container.removeView(rootView)
+                        rootView.visibility = View.GONE
+                        bottomSheetContainer.removeView(rootView)
                         onBackPressedHandler.remove()
                     } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                         adapter.startLoading()
@@ -225,12 +259,17 @@ class CommunitySelectorController @AssistedInject constructor(
                 }
 
                 override fun onSlide(bottomSheet1: View, slideOffset: Float) {
+                    if (java.lang.Float.isNaN(slideOffset)) {
+                        overlay.alpha = 1f
+                    } else {
+                        overlay.alpha = 1 + slideOffset
+                    }
                 }
             },
         )
 
-        rootView?.runAfterLayout {
-            rootView?.postDelayed({
+        rootView.runAfterLayout {
+            rootView.postDelayed({
                 bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
             }, 100,)
         }

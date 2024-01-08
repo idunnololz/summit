@@ -10,6 +10,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -185,14 +186,6 @@ class SettingMiscFragment :
                 preferences.saveDraftsAutomatically = it
             },
         )
-        settings.navigationRailMode.bindTo(
-            binding.navigationRailMode,
-            { preferences.navigationRailMode },
-            { setting, currentValue ->
-                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            },
-        )
         settings.perCommunitySettings.bindTo(
             binding.perCommunitySettings,
         ) {
@@ -248,10 +241,7 @@ class SettingMiscFragment :
                     preferences.warnReplyToOldContent = threshold != 0L
                     preferences.warnReplyToOldContentThresholdMs = threshold
                 }
-            }
-            settings.navigationRailMode.id -> {
-                preferences.navigationRailMode = value as Int
-                getMainActivity()?.onPreferencesChanged()
+                GlobalSettings.refresh(preferences)
             }
         }
 

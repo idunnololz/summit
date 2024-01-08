@@ -40,13 +40,6 @@
             android:layout_marginBottom="@dimen/design_bottom_navigation_height" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/bottom_sheet_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="false">
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
     <FrameLayout
         android:id="@+id/notification_bar_bg_container"
         android:layout_width="match_parent"

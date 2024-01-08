@@ -116,7 +116,12 @@ class MultipleChoiceDialogFragment :
             .also {
                 bottomMenu = it
             }
-            .show(requireMainActivity(), binding.root, handleBackPress = false, expandFully = true)
+            .show(
+                mainActivity = requireMainActivity(),
+                bottomSheetContainer = binding.root,
+                handleBackPress = false,
+                expandFully = true,
+            )
     }
 
     override fun dismiss() {

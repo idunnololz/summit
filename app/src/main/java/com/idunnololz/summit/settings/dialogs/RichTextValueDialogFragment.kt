@@ -58,6 +58,8 @@ class RichTextValueDialogFragment :
             }
         }
 
+    private var currentBottomMenu: BottomMenu? = null
+
     override fun onStart() {
         super.onStart()
         val dialog = dialog
@@ -139,10 +141,11 @@ class RichTextValueDialogFragment :
 
                     bottomMenu.show(
                         mainActivity = requireMainActivity(),
-                        viewGroup = binding.coordinatorLayout,
+                        bottomSheetContainer = binding.root,
                         expandFully = true,
                         handleBackPress = false,
                     )
+                    currentBottomMenu = bottomMenu
                 },
                 onPreviewClick = {
                     PreviewCommentDialogFragment()
@@ -204,8 +207,8 @@ class RichTextValueDialogFragment :
 
     override fun onBackPressed(): Boolean {
         if (isBindingAvailable()) {
-            if (binding.coordinatorLayout.childCount > 0) {
-                binding.coordinatorLayout.removeAllViews()
+            if (currentBottomMenu?.close() == true) {
+                currentBottomMenu = null
                 return true
             }
         }

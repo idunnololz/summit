@@ -36,8 +36,10 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLO
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_HEADER_LAYOUT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
+import com.idunnololz.summit.util.PreferenceUtil.KEY_DATE_SCREENSHOTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
@@ -72,6 +74,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WATERMARK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
@@ -634,6 +637,22 @@ class Preferences(
                 .apply()
         }
 
+    var dateScreenshots: Boolean
+        get() = prefs.getBoolean(KEY_DATE_SCREENSHOTS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_DATE_SCREENSHOTS, value)
+                .apply()
+        }
+
+    var screenshotWatermark: Int
+        get() = prefs.getInt(KEY_SCREENSHOT_WATERMARK, ScreenshotWatermarkId.Lemmy)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_SCREENSHOT_WATERMARK, value)
+                .apply()
+        }
+
     var useFirebase: Boolean
         get() = prefs.getBoolean(KEY_USE_FIREBASE, true)
         set(value) {
@@ -781,6 +800,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_PROFILE_ICONS, value)
+                .apply()
+        }
+
+    var commentHeaderLayout: Int
+        get() = prefs.getInt(KEY_COMMENT_HEADER_LAYOUT, CommentHeaderLayoutId.SingleLine)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_COMMENT_HEADER_LAYOUT, value)
                 .apply()
         }
 

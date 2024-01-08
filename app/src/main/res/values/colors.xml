@@ -7,7 +7,7 @@
     <color name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</color>
     <color name="colorPrimaryDark">@color/orangeDarkTheme</color>
     <color name="colorSecondary">@color/orangeThemeSecondary</color>
-    <color name="colorOnSecondaryContainer">@color/white</color>
+    <color name="colorOnSecondaryContainer">@color/black</color>
     <color name="colorTertiary">@color/orangeThemeTertiary</color>
     <color name="colorAccent">@color/orangeTheme</color>
     <color name="colorOnPrimary">@color/black97</color>
@@ -18,7 +18,7 @@
     <color name="colorTextTitle">@color/black97</color>
     <color name="colorTextInverted">@color/white</color>
     <color name="colorTextFaint">@color/black50</color>
-    <color name="colorSecondaryContainer">@color/white</color>
+    <color name="colorSecondaryContainer">@color/orangeThemeSecondary</color>
     <color name="colorSelected">@color/black10</color>
     <color name="colorHighlight">@color/black10</color>
 
@@ -51,7 +51,7 @@
     <color name="transparent">#00000000</color>
 
     <color name="orangeTheme">#f0802b</color>
-    <color name="orangeThemeSecondary">#f5a67c</color>
+    <color name="orangeThemeSecondary">#fbdbca</color>
     <color name="orangeThemeTertiary">#949361</color>
     <color name="orangeDarkTheme">#ac4304</color>
 

@@ -61,7 +61,6 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
     ) : AsyncDrawableLoader() {
         private val cache: MutableMap<AsyncDrawable, Disposable?> = HashMap(2)
         override fun load(drawable: AsyncDrawable) {
-            Log.d("HAHA2", "Loading image ${drawable.destination}")
             val loaded = AtomicBoolean(false)
             val target: Target = AsyncDrawableTarget(drawable, loaded, drawable.destination)
             val request = coilStore.load(drawable).newBuilder()
@@ -80,7 +79,6 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
         }
 
         override fun cancel(drawable: AsyncDrawable) {
-            Log.d("HAHA2", "canceled ${drawable.destination}")
             val disposable = cache.remove(drawable)
             if (disposable != null) {
                 coilStore.cancel(disposable)
@@ -97,7 +95,6 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             private val source: String,
         ) : Target {
             override fun onSuccess(loadedDrawable: Drawable) {
-                Log.d("HAHA2", "onSuccess() image $source. hasknown: ${drawable.hasKnownDimensions()}")
                 // @since 4.5.1 check finished flag (result can be delivered _before_ disposable is created)
                 if (cache.remove(drawable) != null ||
                     !loaded.get()
@@ -116,7 +113,6 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             }
 
             override fun onStart(placeholder: Drawable?) {
-                Log.d("HAHA2", "onStart() image $source")
                 if (placeholder != null && drawable.isAttached) {
                     DrawableUtils.applyIntrinsicBoundsIfEmpty(placeholder)
                     drawable.result = placeholder
@@ -124,7 +120,6 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             }
 
             override fun onError(errorDrawable: Drawable?) {
-                Log.d("HAHA2", "onError() image $source")
                 if (cache.remove(drawable) != null) {
                     if (errorDrawable != null && drawable.isAttached) {
                         DrawableUtils.applyIntrinsicBoundsIfEmpty(errorDrawable)

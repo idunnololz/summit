@@ -3,6 +3,7 @@ package com.idunnololz.summit.util
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +11,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +30,9 @@ import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
-class BottomMenu(private val context: Context) {
+class BottomMenu(
+    private val context: Context
+) {
 
     companion object {
 
@@ -108,11 +113,11 @@ class BottomMenu(private val context: Context) {
 
     fun show(
         mainActivity: MainActivity,
-        viewGroup: ViewGroup,
+        bottomSheetContainer: ViewGroup,
         expandFully: Boolean,
         handleBackPress: Boolean = true,
     ) {
-        parent = viewGroup
+        parent = bottomSheetContainer
 
         adapter.title = title
         adapter.checked = checked
@@ -120,7 +125,7 @@ class BottomMenu(private val context: Context) {
 
         adapter.refreshItems()
 
-        val binding = BottomMenuBinding.inflate(inflater, viewGroup, false)
+        val binding = BottomMenuBinding.inflate(inflater, bottomSheetContainer, false)
 
         val rootView = binding.root
         val bottomSheet = binding.bottomSheet
@@ -129,29 +134,17 @@ class BottomMenu(private val context: Context) {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val overlay = View(context)
-        viewGroup.addView(overlay)
-        val layoutParams = overlay.layoutParams
-        layoutParams.height = RecyclerView.LayoutParams.MATCH_PARENT
-        layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
-        ViewCompat.setElevation(overlay, Utils.convertDpToPixel(16f))
-        overlay.layoutParams = layoutParams
-        overlay.setBackgroundColor(ContextCompat.getColor(context, R.color.black50))
-        overlay.setBackgroundColor(ContextCompat.getColor(context, R.color.black50))
-        overlay.alpha = 0f
+        val overlay = binding.overlay
         overlay.setOnClickListener {
             bottomSheetBehavior?.setState(
                 BottomSheetBehavior.STATE_HIDDEN,
             )
         }
 
-        ViewCompat.setElevation(rootView, Utils.convertDpToPixel(17f))
-        viewGroup.addView(rootView)
-
         val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
-            peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
             isHideable = true
             state = BottomSheetBehavior.STATE_HIDDEN
+            peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
 
             if (expandFully) {
                 skipCollapsed = true
@@ -164,13 +157,23 @@ class BottomMenu(private val context: Context) {
         bottomInset.observeForever {
             recyclerView.updatePadding(bottom = it)
         }
+        topInset.observeForever { topInset ->
+            binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = topInset
+            }
+        }
+
+        bottomSheetContainer.addView(rootView)
 
         rootView.postDelayed(
             {
-                if (expandFully) {
+                if (bottomSheetContainer.width > bottomSheetBehavior.maxWidth) {
+                    bottomSheetBehavior.skipCollapsed = true
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                } else if (expandFully) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 } else {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
                 bottomSheetBehavior.addBottomSheetCallback(
@@ -179,11 +182,12 @@ class BottomMenu(private val context: Context) {
                             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                                 parent = null
                                 onBackPressedCallback.remove()
-                                viewGroup.removeView(rootView)
-                                viewGroup.removeView(overlay)
+                                bottomSheetContainer.removeView(rootView)
 
                                 onClose?.invoke()
                             }
+
+                            Log.d(TAG, "bottom sheet state: $newState")
                         }
 
                         override fun onSlide(bottomSheet1: View, slideOffset: Float) {
@@ -226,9 +230,9 @@ class BottomMenu(private val context: Context) {
             val menuItem: MenuItem.ActionItem,
         ) : Item
 
-        object DividerItem : Item
+        data object DividerItem : Item
 
-        object FooterItem : Item
+        data object FooterItem : Item
     }
 
     class BottomMenuAdapter(

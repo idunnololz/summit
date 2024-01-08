@@ -77,9 +77,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+
+                <include
+                    android:id="@+id/comment_header"
+                    layout="@layout/subgroup_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/show_profile_icons"
                     layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/comment_header_layout"
+                    layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

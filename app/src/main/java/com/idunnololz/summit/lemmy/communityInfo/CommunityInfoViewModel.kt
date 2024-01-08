@@ -12,12 +12,15 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.Event
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -43,8 +46,22 @@ class CommunityInfoViewModel @Inject constructor(
     val multiCommunity = StatefulLiveData<List<GetCommunityResponse>>()
     private val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
 
+    private var pollCommunityInfoJob: Job? = null
+
     val instance
         get() = apiClient.instance
+
+    init {
+        siteOrCommunity.observeForever a@{
+            if (it !is StatefulData.Success) {
+                return@a
+            }
+            val result = it.data.getOrNull() ?: return@a
+            if (result.community_view.subscribed == SubscribedType.Pending) {
+                pollCommunityInfoForSubscribedStatus(result.community_view.community.toCommunityRef())
+            }
+        }
+    }
 
     private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
         siteOrCommunity.setIsLoading()
@@ -104,6 +121,31 @@ class CommunityInfoViewModel @Inject constructor(
                             siteOrCommunity.postError(it)
                         }
                 }
+        }
+    }
+
+    private fun pollCommunityInfoForSubscribedStatus(communityRef: CommunityRef.CommunityRefByName) {
+        Log.d(TAG, "polling community info")
+
+        pollCommunityInfoJob?.cancel()
+
+        pollCommunityInfoJob = viewModelScope.launch {
+            while (communityRef == this@CommunityInfoViewModel.communityRef) {
+                delay(5_000)
+
+                val result = apiClient.fetchCommunityWithRetry(
+                    Either.Right(communityRef.getServerId(instance)),
+                    force = true,
+                ).getOrNull() ?: continue
+
+                // We ignore failures here...
+                if (result.community_view.subscribed != SubscribedType.Pending) {
+                    Log.d(TAG, "Community subscribed status updated!")
+
+                    refetchCommunityOrSite(force = false)
+                    break
+                }
+            }
         }
     }
 

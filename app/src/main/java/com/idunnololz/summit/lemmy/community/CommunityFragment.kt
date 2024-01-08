@@ -1253,7 +1253,7 @@ class CommunityFragment :
                         getMainActivity()?.navigateTopLevel(menuItem.id)
                     }
                     R.id.back_to_the_beginning -> {
-                        mainFragment?.backToBeginning()
+                        binding.recyclerView.scrollToPosition(0)
                     }
                     R.id.per_community_settings -> {
                         showPerCommunitySettings(currentCommunityRef)

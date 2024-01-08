@@ -17,6 +17,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.CenteredImageSpan
@@ -51,9 +52,8 @@ class LemmyHeaderHelper(
     private val criticalWarningColor: Int = ContextCompat.getColor(context, R.color.style_red)
     private val modColor: Int = context.getColorCompat(R.color.style_green)
     private val adminColor: Int = context.getColorCompat(R.color.style_red)
+    private val savedColor: Int = context.getColorCompat(R.color.style_blue)
     private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
-
-    private val rewardViewRecycler = ViewRecycler<RewardView>()
 
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,
@@ -100,6 +100,22 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
         }
 
+        if (postView.saved) {
+            val d = Utils.tint(context, R.drawable.baseline_bookmark_24, R.color.style_blue)
+            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            d.setBounds(0, 0, size, size)
+            val s = sb.length
+            sb.append("  ")
+            val e = sb.length
+            sb.setSpan(
+                CenteredImageSpan(d),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.appendSeparator()
+        }
+
         if (postView.post.removed || postView.post.deleted) {
             val d = Utils.tint(context, R.drawable.baseline_delete_24, R.color.style_red)
             val size: Int = Utils.convertDpToPixel(16f).toInt()
@@ -115,19 +131,6 @@ class LemmyHeaderHelper(
             )
             sb.appendSeparator()
         }
-
-//        if (postView.post.spoiler) {
-//            val s = sb.length
-//            sb.append(context.getString(R.string.spoiler).toUpperCase(Locale.US))
-//            val e = sb.length
-//            sb.setSpan(
-//                RoundedBackgroundSpan(infoColor, regularColor),
-//                s,
-//                e,
-//                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//            )
-//            appendSeparator(sb)
-//        }
 
         if (postView.post.featured_local || postView.post.featured_community) {
             val d = Utils.tint(context, R.drawable.baseline_push_pin_24, R.color.style_green)
@@ -176,7 +179,7 @@ class LemmyHeaderHelper(
 
         if (displayFullName) {
             sb.appendLink(
-                "${postView.community.name}",
+                postView.community.name,
                 LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
             )
             val start = sb.length
@@ -287,30 +290,10 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
             sb.append(
                 PrettyPrintUtils.defaultShortPercentFormat.format(
-                    postView.counts.upvotes / (postView.counts.upvotes + postView.counts.downvotes).toFloat(),
+                    postView.upvotePercentage
                 ),
             )
         }
-//        if (listingItem.linkFlairText != null) {
-//            appendSeparator(sb)
-//            run {
-//                val s = sb.length
-//                sb.append(listingItem.linkFlairText ?: "")
-//                val e = sb.length
-//                Log.d(
-//                    TAG,
-//                    "color: ${listingItem.linkFlairTextColor} c: ${listingItem.linkFlairCssClass}"
-//                )
-//                sb.setSpan(
-//                    ForegroundColorSpan(accentColor),
-//                    s,
-//                    e,
-//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//                )
-//            }
-//        }
-//
-//        appendAwards(headerContainer, listingItem.allAwardings, sb)
 
         currentTextView.text = sb
         currentTextView.movementMethod = makeMovementMethod(
@@ -330,11 +313,12 @@ class LemmyHeaderHelper(
         onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
-        detailed: Boolean = false,
-        childrenCount: Int? = null,
         showUpvotePercentage: Boolean,
         useMultilineHeader: Boolean,
         isCurrentUser: Boolean,
+        detailed: Boolean = false,
+        childrenCount: Int? = null,
+        wrapHeader: Boolean = false,
     ) {
         val creatorInstance = commentView.creator.instance
         val currentTextView = headerContainer.textView1
@@ -352,6 +336,21 @@ class LemmyHeaderHelper(
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
             sb.append(" ")
+        }
+
+        if (commentView.saved) {
+            val d = Utils.tint(context, R.drawable.baseline_bookmark_24, R.color.style_blue)
+            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            d.setBounds(0, 0, size, size)
+            val s = sb.length
+            sb.append("  ")
+            val e = sb.length
+            sb.setSpan(
+                CenteredImageSpan(d),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
         }
 
         val creatorName = commentView.creator.name.trim()
@@ -494,19 +493,26 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
             sb.append(
                 PrettyPrintUtils.defaultShortPercentFormat.format(
-                    commentView.counts.upvotes / (commentView.counts.upvotes + commentView.counts.downvotes).toFloat(),
+                    commentView.upvotePercentage
                 ),
             )
         }
 
-        if (useMultilineHeader) {
+        if (wrapHeader) {
+            currentTextView.isSingleLine = false
+            currentTextView.maxLines = 2
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
+            }
+            headerContainer.multiline = false
+        } else if (useMultilineHeader) {
             currentTextView.isSingleLine = true
             headerContainer.multiline = true
         } else {
+            currentTextView.isSingleLine = true
             headerContainer.multiline = false
         }
 
-//        headerContainer.setTextFirstPart(sb)
         currentTextView.text = sb
 
         currentTextView.movementMethod = makeMovementMethod(

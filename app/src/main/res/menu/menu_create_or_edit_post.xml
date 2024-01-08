@@ -27,4 +27,11 @@
         android:icon="@drawable/baseline_save_24"
         app:showAsAction="never"
         app:iconTint="?attr/colorControlNormal"/>
+
+    <item
+        android:id="@+id/drafts"
+        android:title="@string/drafts"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        app:iconTint="?attr/colorControlNormal"/>
 </menu>

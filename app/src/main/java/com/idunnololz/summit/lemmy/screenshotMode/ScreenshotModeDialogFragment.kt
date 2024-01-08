@@ -4,36 +4,42 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentScreenshotModeBinding
-import com.idunnololz.summit.databinding.ScreenshotSizeConfigBinding
+import com.idunnololz.summit.databinding.ScreenshotBottomBarBinding
 import com.idunnololz.summit.databinding.ScreenshotStageBinding
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preferences.ScreenshotWatermarkId
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.MimeTypes
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.shareUri
@@ -41,6 +47,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -220,23 +230,9 @@ class ScreenshotModeDialogFragment :
                 R.id.cancel -> {
                     dismiss()
                 }
-                R.id.screenshot_size -> {
-                    val binding = ScreenshotSizeConfigBinding.inflate(LayoutInflater.from(context))
-                    binding.screenshotWidth.setText(preferences.screenshotWidthDp.toString())
-
-                    MaterialAlertDialogBuilder(context)
-                        .setView(binding.root)
-                        .setTitle(R.string.screenshot_size_settings)
-                        .setPositiveButton(androidx.navigation.dynamicfeatures.fragment.R.string.ok) { _, _ ->
-                            var width = binding.screenshotWidth.text?.toString()?.toIntOrNull() ?: 0
-                            width = width.coerceIn(100, 1000)
-
-                            preferences.screenshotWidthDp = width
-                            generateScreenshot(adapter)
-                        }
-                        .setNegativeButton(R.string.cancel) { _, _ ->
-                        }
-                        .show()
+                R.id.screenshot_settings -> {
+                    ScreenshotSettingsDialogFragment()
+                        .showAllowingStateLoss(childFragmentManager, "ScreenshotSettingsDialogFragment")
                 }
             }
 
@@ -272,6 +268,24 @@ class ScreenshotModeDialogFragment :
                 }
             }
         }
+    }
+
+    fun generateScreenshot() {
+        val parent = (parentFragment as? PostFragment)
+
+        if (parent == null) {
+            dismiss()
+            return
+        }
+
+        val adapter = parent.getAdapter()
+
+        if (adapter == null) {
+            dismiss()
+            return
+        }
+
+        generateScreenshot(adapter)
     }
 
     private fun generateScreenshot(adapter: PostAdapter) {
@@ -353,6 +367,40 @@ class ScreenshotModeDialogFragment :
         adapter.isScreenshoting = false
 
         screenshotStage.contentContainer.decorator = threadLinesDecoration
+
+        val dateScreenshots = preferences.dateScreenshots
+        val screenshotWatermark = preferences.screenshotWatermark
+        if (dateScreenshots || screenshotWatermark != ScreenshotWatermarkId.Off) {
+            screenshotStage.contentContainer.addView(
+                MaterialDivider(context)
+            )
+            ScreenshotBottomBarBinding.inflate(
+                LayoutInflater.from(context),
+                screenshotStage.contentContainer,
+                true,
+            ).apply {
+                if (dateScreenshots) {
+                    val dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+                    text.text = dateFormat.format(
+                        Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()
+                    )
+                } else {
+                    text.visibility = View.GONE
+                }
+
+                when (screenshotWatermark) {
+                    ScreenshotWatermarkId.Lemmy -> {
+                        watermark.setImageResource(R.drawable.ic_lemmy_24)
+                    }
+                    ScreenshotWatermarkId.Summit -> {
+                        watermark.setImageResource(R.drawable.ic_logo_mono_24)
+                    }
+                    else -> {
+                        watermark.visibility = View.GONE
+                    }
+                }
+            }
+        }
 
         binding.zoomLayout.removeAllViews()
         binding.zoomLayout.addView(screenshotStage.root)

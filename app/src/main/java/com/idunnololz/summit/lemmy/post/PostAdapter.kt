@@ -76,8 +76,8 @@ class PostAdapter(
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onVideoLongClickListener: (url: String) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
-    private val onPostMoreClick: (PostView) -> Unit,
-    private val onCommentMoreClick: (CommentView) -> Unit,
+    private val onPostMoreClick: (PostView, String) -> Unit,
+    private val onCommentMoreClick: (CommentView, String) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
     private val onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
@@ -401,7 +401,9 @@ class PostAdapter(
                         onVideoLongClickListener = onVideoLongClickListener,
                         onPageClick = onPageClick,
                         onAddCommentClick = onAddCommentClick,
-                        onPostMoreClick = onPostMoreClick,
+                        onPostMoreClick = {
+                            onPostMoreClick(it, item.id)
+                        },
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch = onInstanceMismatch,
                         onLinkClick = onLinkClick,
@@ -479,7 +481,9 @@ class PostAdapter(
                     onVideoLongClickListener = onVideoLongClickListener,
                     onPageClick = onPageClick,
                     onAddCommentClick = onAddCommentClick,
-                    onPostMoreClick = onPostMoreClick,
+                    onPostMoreClick = {
+                        onPostMoreClick(it, item.id)
+                    },
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
                     onLinkClick = onLinkClick,
@@ -541,7 +545,9 @@ class PostAdapter(
                             toggleActions(item.comment.comment.id)
                         },
                         onAddCommentClick = onAddCommentClick,
-                        onCommentMoreClick = onCommentMoreClick,
+                        onCommentMoreClick = {
+                            onCommentMoreClick(it, item.id)
+                        },
                         onLinkLongClick = onLinkLongClick,
                         onSignInRequired = onSignInRequired,
                         onLinkClick = onLinkClick,
@@ -737,11 +743,7 @@ class PostAdapter(
             binding.screenshotCb.isChecked = includedInScreenshot.contains(item.id)
             binding.screenshotCb.setOnCheckedChangeListener a@{ compoundButton, b ->
                 val item = items.getOrNull(viewHolder.absoluteAdapterPosition) ?: return@a
-                if (includedInScreenshot.contains(item.id)) {
-                    includedInScreenshot.remove(item.id)
-                } else {
-                    includedInScreenshot.add(item.id)
-                }
+                selectItemForScreenshot(item.id)
             }
 
             if (previousBinding == null) {
@@ -764,6 +766,18 @@ class PostAdapter(
             root.setTag(R.id.screenshot_mode, false)
             root.setTag(R.id.screenshot_options_view, null)
         }
+    }
+
+    private fun toggleItemForScreenshot(id: String) {
+        if (includedInScreenshot.contains(id)) {
+            includedInScreenshot.remove(id)
+        } else {
+            selectItemForScreenshot(id)
+        }
+    }
+
+    fun selectItemForScreenshot(id: String) {
+        includedInScreenshot.add(id)
     }
 
     /**

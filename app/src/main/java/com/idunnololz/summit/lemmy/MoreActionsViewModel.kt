@@ -202,7 +202,7 @@ class MoreActionsViewModel @Inject constructor(
         accountActionsManager.vote(apiClient.instance, ref, finalDir)
     }
 
-    fun vote(commentView: CommentView, dir: Int, toggle: Boolean = false) {
+    fun vote(commentView: CommentView, dir: Int, toggle: Boolean = false): Result<Unit> {
         val ref = VotableRef.CommentRef(commentView.comment.id)
         val finalDir = if (toggle) {
             val curScore = accountActionsManager.getVote(ref)
@@ -215,7 +215,7 @@ class MoreActionsViewModel @Inject constructor(
         } else {
             dir
         }
-        accountActionsManager.vote(apiClient.instance, ref, finalDir)
+        return accountActionsManager.vote(apiClient.instance, ref, finalDir)
     }
 
     fun savePost(id: PostId, save: Boolean) {
