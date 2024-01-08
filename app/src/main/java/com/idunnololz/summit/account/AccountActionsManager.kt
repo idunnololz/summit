@@ -437,9 +437,10 @@ class AccountActionsManager @Inject constructor(
         instance: String,
         ref: VotableRef,
         dir: Int,
-    ) {
-        val account = accountManager.currentAccount.value ?: return
-        voteOn(instance, ref, dir, account)
+    ): Result<Unit> {
+        val account = accountManager.currentAccount.value
+            ?: return Result.failure(NotAuthenticatedException())
+        return voteOn(instance, ref, dir, account)
     }
 
     suspend fun markPostAsRead(instance: String, id: PostId, read: Boolean) {

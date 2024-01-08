@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingNavigationBinding
@@ -99,6 +100,14 @@ class SettingNavigationFragment :
                 updateRendering()
             },
         )
+        settings.navigationRailMode.bindTo(
+            binding.navigationRailMode,
+            { preferences.navigationRailMode },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            },
+        )
 
         binding.navBarOptions.title.setText(R.string.navigation_options)
 
@@ -151,6 +160,14 @@ class SettingNavigationFragment :
             }
             settings.navBarDest5.id -> {
                 viewModel.updateDestination(4, value as NavBarDestId)
+            }
+            settings.navigationRailMode.id -> {
+                preferences.navigationRailMode = value as Int
+                getMainActivity()?.onPreferencesChanged()
+
+                binding.root.doOnPreDraw {
+                    getMainActivity()?.navBarController?.hideNavBar(animate = false)
+                }
             }
         }
 

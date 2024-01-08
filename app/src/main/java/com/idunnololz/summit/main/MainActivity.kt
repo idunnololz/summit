@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -76,7 +75,6 @@ import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
-import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
@@ -105,8 +103,6 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
 
     val windowInsets = MutableLiveData<Rect>(Rect())
-
-    private var enableBottomNavViewScrolling = false
 
     private val viewModel: MainActivityViewModel by viewModels()
 
@@ -194,9 +190,12 @@ class MainActivity : BaseActivity() {
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
 
         navBarController = NavBarController(
-            this,
-            binding.contentView,
-            this,
+            activity = this,
+            contentView = binding.contentView,
+            lifecycleOwner = this,
+            onNavBarChanged = {
+                setupNavigationBar()
+            }
         )
 
         setContentView(binding.root)
@@ -224,7 +223,7 @@ class MainActivity : BaseActivity() {
             viewModel.loadCommunities()
 
             if (savedInstanceState == null) {
-                setupBottomNavigationBar()
+                setupNavigationBar()
             } // Else, need to wait for onRestoreInstanceState
 
             lifecycleScope.launch(Dispatchers.Default) {
@@ -280,78 +279,6 @@ class MainActivity : BaseActivity() {
         }
 
         navBarController.onPreferencesChanged(preferences)
-
-        if (!navBarController.useBottomNavBar) {
-            navBarController.navBar.visibility = View.GONE
-        } else if (preferences.useCustomNavBar) {
-            navBarController.navBar.setTag(R.id.custom_nav_bar, true)
-            navBarController.navBar.menu.apply {
-                clear()
-                val navBarDestinations = preferences.navBarConfig.navBarDestinations
-                for (dest in navBarDestinations) {
-                    when (dest) {
-                        NavBarDestinations.Home -> {
-                            add(
-                                Menu.NONE,
-                                R.id.mainFragment,
-                                Menu.NONE,
-                                getString(R.string.home),
-                            ).apply {
-                                setIcon(R.drawable.baseline_home_24)
-                            }
-                        }
-                        NavBarDestinations.Saved -> {
-                            add(
-                                Menu.NONE,
-                                R.id.savedFragment,
-                                Menu.NONE,
-                                getString(R.string.saved),
-                            ).apply {
-                                setIcon(R.drawable.baseline_bookmark_24)
-                            }
-                        }
-                        NavBarDestinations.Search -> {
-                            add(
-                                Menu.NONE,
-                                R.id.searchFragment,
-                                Menu.NONE,
-                                getString(R.string.search),
-                            ).apply {
-                                setIcon(R.drawable.baseline_search_24)
-                            }
-                        }
-                        NavBarDestinations.History -> {
-                            add(
-                                Menu.NONE,
-                                R.id.historyFragment,
-                                Menu.NONE,
-                                getString(R.string.history),
-                            ).apply {
-                                setIcon(R.drawable.baseline_history_24)
-                            }
-                        }
-                        NavBarDestinations.Inbox -> {
-                            add(
-                                Menu.NONE,
-                                R.id.inboxTabbedFragment,
-                                Menu.NONE,
-                                getString(R.string.inbox),
-                            ).apply {
-                                setIcon(R.drawable.baseline_inbox_24)
-                            }
-                        }
-                        NavBarDestinations.None -> {
-                        }
-                    }
-                }
-            }
-        } else {
-            if (navBarController.navBar.getTag(R.id.custom_nav_bar) == true) {
-                navBarController.navBar.menu.clear()
-                navBarController.navBar.inflateMenu(R.menu.bottom_navigation_menu)
-                navBarController.navBar.setTag(R.id.custom_nav_bar, false)
-            }
-        }
     }
 
     private fun isVersionUpdate(): Boolean {
@@ -398,7 +325,7 @@ class MainActivity : BaseActivity() {
             // Now that BottomNavigationBar has restored its instance state
             // and its selectedItemId, we can proceed with setting up the
             // BottomNavigationBar with Navigation
-            setupBottomNavigationBar()
+            setupNavigationBar()
         }
     }
 
@@ -413,7 +340,7 @@ class MainActivity : BaseActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    private fun setupBottomNavigationBar() {
+    private fun setupNavigationBar() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
@@ -494,10 +421,6 @@ class MainActivity : BaseActivity() {
 
             currentBottomMenu?.setInsets(lastInsets.topInset, lastInsets.bottomInset)
 
-            binding.bottomSheetContainer.updateLayoutParams<MarginLayoutParams> {
-                topMargin = topInset
-            }
-
             WindowInsetsCompat.CONSUMED
         }
     }
@@ -521,12 +444,16 @@ class MainActivity : BaseActivity() {
 
     private fun hideNotificationBarBgIfNeeded() {
         if (showNotificationBarBg) return
-        binding.notificationBarBg.animate()
-            .setDuration(250)
-            .translationY((-binding.notificationBarBg.height).toFloat())
-        binding.navBarBg.animate()
-            .setDuration(250)
-            .translationY((binding.navBarBg.height).toFloat())
+        if (binding.notificationBarBg.translationY.toInt() != -binding.notificationBarBg.height) {
+            binding.notificationBarBg.animate()
+                .setDuration(250)
+                .translationY((-binding.notificationBarBg.height).toFloat())
+        }
+        if (binding.navBarBg.translationY.toInt() != binding.navBarBg.height) {
+            binding.navBarBg.animate()
+                .setDuration(250)
+                .translationY((binding.navBarBg.height).toFloat())
+        }
     }
 
     private fun showNotificationBarBgIfNeeded() {
@@ -752,7 +679,7 @@ class MainActivity : BaseActivity() {
                 viewModel = viewModel,
                 viewLifecycleOwner = this,
             ).also {
-                it.inflate(binding.bottomSheetContainer)
+                it.inflate(binding.root)
 
                 communitySelectorController = it
             }
@@ -768,7 +695,11 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        communitySelectorController.show(binding.bottomSheetContainer, this, this)
+        communitySelectorController.show(
+            bottomSheetContainer = binding.root,
+            activity = this,
+            lifecycleOwner = this
+        )
 
         return communitySelectorController
     }
@@ -1090,7 +1021,11 @@ class MainActivity : BaseActivity() {
     fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean = true) {
         currentBottomMenu?.close()
         bottomMenu.setInsets(lastInsets.topInset, lastInsets.bottomInset)
-        bottomMenu.show(this, binding.bottomSheetContainer, expandFully)
+        bottomMenu.show(
+            mainActivity = this,
+            bottomSheetContainer = binding.root,
+            expandFully = expandFully
+        )
         currentBottomMenu = bottomMenu
     }
 

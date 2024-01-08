@@ -27,6 +27,8 @@ import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -61,6 +63,8 @@ class AddOrEditCommentViewModel @Inject constructor(
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
     val messages = MutableLiveData<List<Message>>(listOf())
+
+    private var uploadJob: Job? = null
 
     fun editComment() {
         accountActionsManager
@@ -168,7 +172,7 @@ class AddOrEditCommentViewModel @Inject constructor(
     fun uploadImage(instance: String, uri: Uri) {
         uploadImageEvent.setIsLoading()
 
-        viewModelScope.launch {
+        uploadJob = viewModelScope.launch {
             var result = uri.path
             val cut: Int? = result?.lastIndexOf('/')
             if (cut != null && cut != -1) {
@@ -186,8 +190,10 @@ class AddOrEditCommentViewModel @Inject constructor(
             Log.d(TAG, "Uploading onto instance $uploadInstance")
             uploaderApiClient.changeInstance(uploadInstance)
 
-            context.contentResolver
-                .openInputStream(uri)
+            val inputStream = context.contentResolver.openInputStream(uri)
+
+            delay(10_000)
+            inputStream
                 .use {
                     if (it == null) {
                         return@use Result.failure(RuntimeException("file_not_found"))
@@ -227,4 +233,11 @@ class AddOrEditCommentViewModel @Inject constructor(
     fun dismissMessage(message: Message) {
         messages.value = (messages.value ?: listOf()).filter { it != message }
     }
+
+    val isUploading: Boolean
+        get() {
+            val uploadJob = uploadJob
+
+            return uploadJob != null && uploadJob.isActive
+        }
 }

@@ -23,10 +23,6 @@ import com.idunnololz.summit.R as R2
 
 class LemmyHeaderView : FrameLayout {
 
-    companion object {
-        const val STATIC_VIEW_COUNT = 3
-    }
-
     private var iconImageView: ImageView? = null
     val textView1: TextView
     val textView2: TextView
@@ -35,6 +31,10 @@ class LemmyHeaderView : FrameLayout {
 
     var multiline: Boolean = false
         set(value) {
+            if (field == value) {
+                return
+            }
+
             field = value
 
             requestLayout()
@@ -156,12 +156,19 @@ class LemmyHeaderView : FrameLayout {
             if (textView1.visibility != View.GONE) {
                 totalTextHeight += getViewHeight(textView1)
             }
-            if (textView2.visibility != View.GONE) {
-                totalTextHeight += getViewHeight(textView2)
-            }
-            if (textView3.visibility != View.GONE) {
-                totalTextHeight += getViewHeight(textView3)
-            }
+            val textView2Height =
+                if (textView2.visibility != View.GONE) {
+                    getViewHeight(textView2)
+                } else {
+                    0
+                }
+            val textView3Height =
+                if (textView3.visibility != View.GONE) {
+                    getViewHeight(textView3)
+                } else {
+                    0
+                }
+            totalTextHeight += max(textView2Height, textView3Height)
 
             var viewHeight = totalTextHeight
             if (iconImageView != null) {
@@ -177,7 +184,7 @@ class LemmyHeaderView : FrameLayout {
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-//        super.onLayout(changed, left, top, right, bottom)
+        super.onLayout(changed, left, top, right, bottom)
 
         val children = children
         val isRtl = layoutDirection == LAYOUT_DIRECTION_RTL

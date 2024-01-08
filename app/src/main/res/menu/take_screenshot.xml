@@ -19,10 +19,10 @@
         app:iconTint="?attr/colorControlNormal"/>
 
     <item
-        android:id="@+id/screenshot_size"
-        android:title="@string/screenshot_size_settings"
+        android:id="@+id/screenshot_settings"
+        android:title="@string/screenshot_settings"
         android:orderInCategory="300"
-        android:icon="@drawable/baseline_photo_size_select_large_24"
+        android:icon="@drawable/baseline_settings_24"
         app:showAsAction="ifRoom"
         app:iconTint="?attr/colorControlNormal" />
 

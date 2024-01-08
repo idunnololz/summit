@@ -6,6 +6,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.links.PreviewLinkOptions
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
+import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
@@ -896,12 +897,39 @@ class CommentListSettings @Inject constructor(
         context.getString(R.string.show_profile_icons_desc),
         relatedKeys = listOf(KEY_SHOW_PROFILE_ICONS),
     )
+    val commentHeaderLayout = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.comment_header_layout),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentHeaderLayoutId.SingleLine,
+                context.getString(R.string.single_line),
+                null,
+                null,
+            ),
+//            RadioGroupSettingItem.RadioGroupOption(
+//                CommentHeaderLayoutId.Wrap,
+//                context.getString(R.string.wrap),
+//                null,
+//                null,
+//            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CommentHeaderLayoutId.Multiline,
+                context.getString(R.string.multiline),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,
         relayStyleNavigation,
         hideCommentScores,
         useVolumeButtonNavigation,
+        commentHeaderLayout,
     )
 }
 
@@ -1541,35 +1569,6 @@ class MiscSettings @Inject constructor(
         relatedKeys = listOf(KEY_SAVE_DRAFTS_AUTOMATICALLY),
     )
 
-    val navigationRailMode = RadioGroupSettingItem(
-        null,
-        context.getString(R.string.navigation_rail_mode),
-        context.getString(R.string.navigation_rail_mode_desc),
-        listOf(
-            RadioGroupSettingItem.RadioGroupOption(
-                NavigationRailModeId.Auto,
-                context.getString(R.string.auto),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                NavigationRailModeId.ManualOn,
-                context.getString(R.string.on),
-                null,
-                null,
-            ),
-            RadioGroupSettingItem.RadioGroupOption(
-                NavigationRailModeId.ManualOff,
-                context.getString(R.string.off),
-                null,
-                null,
-            ),
-        ),
-        relatedKeys = listOf(
-            PreferenceUtil.KEY_NAVIGATION_RAIL_MODE,
-        ),
-    )
-
     val perCommunitySettings = BasicSettingItem(
         null,
         context.getString(R.string.per_community_settings),
@@ -1586,7 +1585,6 @@ class MiscSettings @Inject constructor(
         previewLinks,
         usePredictiveBack,
         shareImagesDirectly,
-        navigationRailMode,
         perCommunitySettings,
     )
 }
@@ -1745,6 +1743,35 @@ class NavigationSettings @Inject constructor(
         relatedKeys = listOf(KEY_USE_BOTTOM_NAV_BAR),
     )
 
+    val navigationRailMode = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.navigation_rail_mode),
+        context.getString(R.string.navigation_rail_mode_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                NavigationRailModeId.Auto,
+                context.getString(R.string.auto),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavigationRailModeId.ManualOn,
+                context.getString(R.string.on),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                NavigationRailModeId.ManualOff,
+                context.getString(R.string.off),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(
+            PreferenceUtil.KEY_NAVIGATION_RAIL_MODE,
+        ),
+    )
+
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
     )
@@ -1755,6 +1782,7 @@ class NavigationSettings @Inject constructor(
         navBarDest3,
         navBarDest4,
         navBarDest5,
+        navigationRailMode,
     )
 }
 

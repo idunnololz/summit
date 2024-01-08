@@ -52,7 +52,8 @@ import javax.inject.Inject
 class CreateOrEditPostFragment :
     BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
     FullscreenDialogFragment,
-    BackPressHandler {
+    BackPressHandler,
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "CreateOrEditPostFragment_req_key"
@@ -66,6 +67,8 @@ class CreateOrEditPostFragment :
     private val textFormatterHelper = TextFormatterHelper()
 
     private var adapter: CommunitySearchResultsAdapter? = null
+
+    private var currentBottomMenu: BottomMenu? = null
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -170,31 +173,40 @@ class CreateOrEditPostFragment :
         binding.toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
-        binding.toolbar.setOnMenuItemClickListener {
+        binding.toolbar.setOnMenuItemClickListener a@{
             when (it.itemId) {
                 R.id.create_post -> {
-                    viewModel.createPost(
-                        communityFullName = binding.communityEditText.text.toString(),
-                        name = binding.title.editText?.text.toString(),
-                        body = binding.postEditor.editText?.text.toString(),
-                        url = binding.url.editText?.text.toString(),
-                        isNsfw = binding.nsfwSwitch.isChecked,
-                    )
+                    if (viewModel.isUploading) {
+                        AlertDialogFragment.Builder()
+                            .setMessage(R.string.warn_upload_in_progress)
+                            .setPositiveButton(R.string.proceed_anyways)
+                            .setNegativeButton(R.string.cancel)
+                            .createAndShow(this@CreateOrEditPostFragment, "create_post")
+                        return@a true
+                    }
+
+                    createPost()
                     true
                 }
                 R.id.update_post -> {
-                    viewModel.updatePost(
-                        instance = args.instance,
-                        name = binding.title.editText?.text.toString(),
-                        body = binding.postEditor.editText?.text.toString(),
-                        url = binding.url.editText?.text.toString(),
-                        isNsfw = binding.nsfwSwitch.isChecked,
-                        postId = requireNotNull(args.post?.id) { "POST ID WAS NULL!" },
-                    )
+                    if (viewModel.isUploading) {
+                        AlertDialogFragment.Builder()
+                            .setMessage(R.string.warn_upload_in_progress)
+                            .setPositiveButton(R.string.proceed_anyways)
+                            .setNegativeButton(R.string.cancel)
+                            .createAndShow(this@CreateOrEditPostFragment, "update_post")
+                        return@a true
+                    }
+
+                    updatePost()
                     true
                 }
                 R.id.save_draft -> {
                     saveDraft(overwriteExistingDraft = false)
+                    true
+                }
+                R.id.drafts -> {
+                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
                     true
                 }
                 else -> false
@@ -254,7 +266,7 @@ class CreateOrEditPostFragment :
 
                 bottomMenu.show(
                     mainActivity = requireMainActivity(),
-                    viewGroup = binding.coordinatorLayout,
+                    bottomSheetContainer = binding.root,
                     expandFully = true,
                     handleBackPress = false,
                 )
@@ -333,10 +345,12 @@ class CreateOrEditPostFragment :
 
             bottomMenu.show(
                 mainActivity = requireMainActivity(),
-                viewGroup = binding.coordinatorLayout,
+                bottomSheetContainer = binding.root,
                 expandFully = true,
                 handleBackPress = false,
             )
+
+            currentBottomMenu = bottomMenu
         }
         viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
             updateEnableState()
@@ -544,6 +558,27 @@ class CreateOrEditPostFragment :
         updateEnableState()
     }
 
+    private fun createPost() {
+        viewModel.createPost(
+            communityFullName = binding.communityEditText.text.toString(),
+            name = binding.title.editText?.text.toString(),
+            body = binding.postEditor.editText?.text.toString(),
+            url = binding.url.editText?.text.toString(),
+            isNsfw = binding.nsfwSwitch.isChecked,
+        )
+    }
+
+    private fun updatePost() {
+        viewModel.updatePost(
+            instance = args.instance,
+            name = binding.title.editText?.text.toString(),
+            body = binding.postEditor.editText?.text.toString(),
+            url = binding.url.editText?.text.toString(),
+            isNsfw = binding.nsfwSwitch.isChecked,
+            postId = requireNotNull(args.post?.id) { "POST ID WAS NULL!" },
+        )
+    }
+
     private fun onLinkMetadataChanged() {
         val linkMetadata = viewModel.linkMetadata.value
 
@@ -641,8 +676,8 @@ class CreateOrEditPostFragment :
 
     override fun onBackPressed(): Boolean {
         if (isBindingAvailable()) {
-            if (binding.coordinatorLayout.childCount > 0) {
-                binding.coordinatorLayout.removeAllViews()
+            if (currentBottomMenu?.close() == true) {
+                currentBottomMenu = null
                 return true
             }
         }
@@ -711,4 +746,18 @@ class CreateOrEditPostFragment :
             this.url,
             this.nsfw,
         )
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        when (tag) {
+            "create_post" -> {
+                createPost()
+            }
+            "update_post" -> {
+                updatePost()
+            }
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    }
 }

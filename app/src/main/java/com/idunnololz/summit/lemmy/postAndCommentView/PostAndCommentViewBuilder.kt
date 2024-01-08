@@ -67,6 +67,7 @@ import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preview.VideoType
@@ -155,6 +156,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var useMultilinePostHeaders: Boolean = preferences.useMultilinePostHeaders
     private var indicateCurrentUser: Boolean = preferences.indicatePostsAndCommentsCreatedByCurrentUser
     private var showProfileIcons: Boolean = preferences.showProfileIcons
+    private var commentHeaderLayout: Int = preferences.commentHeaderLayout
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -202,6 +204,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         downvoteColor = preferences.downvoteColor
         showUpAndDownVotes = preferences.showUpAndDownVotes
         leftHandMode = preferences.leftHandMode
+        commentHeaderLayout = preferences.commentHeaderLayout
     }
 
     class CustomViewHolder(
@@ -215,6 +218,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         var addCommentButton: View? = null,
         val controlsDivider2: View? = null,
         val moreButton: View? = null,
+        val startGuideline: View? = null,
     )
 
     fun bindPostView(
@@ -251,6 +255,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                         addCommentButton = addCommentButton,
                         controlsDivider2 = controlsDivider2,
                         moreButton = moreButton,
+                        startGuideline = startGuideline,
                     )
                     this.root.setTag(R.id.view_holder, vh)
                     vh
@@ -388,7 +393,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 controlsDivider.visibility = View.GONE
 
                 title.visibility = View.VISIBLE
-                headerView.visibility = View.VISIBLE
+                headerContainer.visibility = View.VISIBLE
                 fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.ImageOnly -> {
@@ -398,7 +403,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 controlsDivider.visibility = View.GONE
 
                 title.visibility = View.GONE
-                headerView.visibility = View.GONE
+                headerContainer.visibility = View.GONE
                 fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.TextOnly -> {
@@ -408,7 +413,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 controlsDivider.visibility = View.GONE
 
                 title.visibility = View.VISIBLE
-                headerView.visibility = View.VISIBLE
+                headerContainer.visibility = View.VISIBLE
                 fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.TitleOnly -> {
@@ -419,7 +424,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 fullContent.visibility = View.GONE
 
                 title.visibility = View.VISIBLE
-                headerView.visibility = View.VISIBLE
+                headerContainer.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.Compact -> {
                 moreButton.visibility = View.GONE
@@ -428,7 +433,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 controlsDivider.visibility = View.GONE
 
                 title.visibility = View.VISIBLE
-                headerView.visibility = View.VISIBLE
+                headerContainer.visibility = View.VISIBLE
                 fullContent.visibility = View.VISIBLE
             }
             null -> {
@@ -463,7 +468,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     topToTop = existingActionButton.id
                     bottomToBottom = existingActionButton.id
 
-                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    startToStart = startGuideline?.id ?: ConstraintLayout.LayoutParams.PARENT_ID
                     marginStart = paddingFull
                 }
                 buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
@@ -605,7 +610,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
                 startToStart = ConstraintLayout.LayoutParams.UNSET
             } else {
-                startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                startToStart = startGuideline?.id ?: ConstraintLayout.LayoutParams.PARENT_ID
                 endToEnd = ConstraintLayout.LayoutParams.UNSET
             }
         }
@@ -681,6 +686,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(holder) {
         val isCompactView = this.rawBinding is PostCommentExpandedCompactItemBinding
+        val useMultilineHeader =
+            showProfileIcons || commentHeaderLayout == CommentHeaderLayoutId.Multiline
 
         with(holder) {
             if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {
@@ -701,7 +708,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                             holder.downvoteCount = null
                         }
 
-                        if (showProfileIcons) {
+                        if (useMultilineHeader) {
                             // We are displaying the score on it's own line so no padding needed.
                             headerView.textView2.updatePaddingRelative(
                                 start = 0,
@@ -746,7 +753,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
             displayInstanceStyle = displayInstanceStyle,
             showUpvotePercentage = showCommentUpvotePercentage,
-            useMultilineHeader = showProfileIcons,
+            useMultilineHeader = useMultilineHeader,
+            wrapHeader = commentHeaderLayout == CommentHeaderLayoutId.Wrap,
             isCurrentUser = if (indicateCurrentUser) {
                 currentUser?.id == commentView.creator.id &&
                     currentUser?.instance == commentView.creator.instance

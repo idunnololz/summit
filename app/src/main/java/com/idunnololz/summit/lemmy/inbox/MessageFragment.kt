@@ -468,11 +468,21 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
-                onPostMoreClick = {
-                    showMorePostOptions(viewModel.apiInstance, it, actionsViewModel, childFragmentManager)
+                onPostMoreClick = { postView, _ ->
+                    showMorePostOptions(
+                        instance = viewModel.apiInstance,
+                        postView = postView,
+                        actionsViewModel = actionsViewModel,
+                        fragmentManager = childFragmentManager
+                    )
                 },
-                onCommentMoreClick = {
-                    showMoreCommentOptions(viewModel.apiInstance, it, actionsViewModel, childFragmentManager)
+                onCommentMoreClick = { commentView, _ ->
+                    showMoreCommentOptions(
+                        instance = viewModel.apiInstance,
+                        commentView = commentView,
+                        actionsViewModel = actionsViewModel,
+                        fragmentManager = childFragmentManager
+                    )
                 },
                 onFetchComments = {
                     val postId = when (val inboxItem = args.inboxItem) {

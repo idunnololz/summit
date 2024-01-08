@@ -29,6 +29,7 @@ import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -73,6 +74,8 @@ class CreateOrEditPostViewModel @Inject constructor(
     private var searchJob: Job? = null
 
     private var urlFlow = MutableSharedFlow<String>()
+
+    private var uploadJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -211,6 +214,13 @@ class CreateOrEditPostViewModel @Inject constructor(
         }
     }
 
+    val isUploading: Boolean
+        get() {
+            val uploadJob = uploadJob
+
+            return uploadJob != null && uploadJob.isActive
+        }
+
     private fun doQuery(query: String) {
         searchResults.setIsLoading()
 
@@ -245,7 +255,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     ) {
         imageLiveData.setIsLoading()
 
-        viewModelScope.launch {
+        uploadJob = viewModelScope.launch {
             var result = uri.path
             val cut: Int? = result?.lastIndexOf('/')
             if (cut != null && cut != -1) {
@@ -263,8 +273,9 @@ class CreateOrEditPostViewModel @Inject constructor(
             Log.d(TAG, "Uploading onto instance $uploadInstance")
             uploaderApiClient.changeInstance(uploadInstance)
 
-            context.contentResolver
-                .openInputStream(uri)
+            val inputStream = context.contentResolver.openInputStream(uri)
+
+            inputStream
                 .use {
                     if (it == null) {
                         return@use Result.failure(RuntimeException("file_not_found"))

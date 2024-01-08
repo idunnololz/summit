@@ -80,6 +80,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
                     .show()
 
                 onSavePostChanged?.invoke(it.data)
+                onPostUpdated?.invoke(it.data.post.id)
             }
         }
     }
@@ -110,6 +111,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
                     .show()
 
                 onSaveCommentChanged?.invoke(it.data)
+                onCommentUpdated?.invoke(it.data.comment.id)
             }
         }
     }

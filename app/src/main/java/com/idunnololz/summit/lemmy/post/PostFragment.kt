@@ -33,6 +33,7 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
@@ -298,7 +299,10 @@ class PostFragment :
         super.onViewCreated(view, savedInstanceState)
 
         requireMainActivity().apply {
-            insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.findInPageToolbar)
+            insetViewExceptBottomAutomaticallyByPadding(
+                viewLifecycleOwner,
+                binding.findInPageToolbar
+            )
         }
 
         val context = requireContext()
@@ -322,16 +326,7 @@ class PostFragment :
                         .show(childFragmentManager, "asdf")
                 },
                 onInstanceMismatch = { accountInstance, apiInstance ->
-                    AlertDialogFragment.Builder()
-                        .setTitle(R.string.error_account_instance_mismatch_title)
-                        .setMessage(
-                            getString(
-                                R.string.error_account_instance_mismatch,
-                                accountInstance,
-                                apiInstance,
-                            ),
-                        )
-                        .createAndShow(childFragmentManager, "aa")
+                    onInstanceMismatch(accountInstance, apiInstance)
                 },
                 onAddCommentClick = { postOrComment ->
                     if (accountManager.currentAccount.value == null) {
@@ -371,15 +366,19 @@ class PostFragment :
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
-                onPostMoreClick = { postView ->
+                onPostMoreClick = { postView, itemId ->
                     showMorePostOptions(
                         instance = viewModel.apiInstance,
                         postView = postView,
                         actionsViewModel = actionsViewModel,
                         fragmentManager = childFragmentManager,
+                        onScreenshotClick = {
+                            getAdapter()?.selectItemForScreenshot(itemId)
+                            viewModel.screenshotMode.value = true
+                        }
                     )
                 },
-                onCommentMoreClick = { commentView ->
+                onCommentMoreClick = { commentView, itemId ->
                     showMoreCommentOptions(
                         instance = viewModel.apiInstance,
                         commentView = commentView,
@@ -389,6 +388,10 @@ class PostFragment :
                             viewModel.updatePostOrCommentRef(Either.Right(CommentRef(getInstance(), it)))
                             viewModel.fetchPostData()
                         },
+                        onScreenshotClick = {
+                            getAdapter()?.selectItemForScreenshot(itemId)
+                            viewModel.screenshotMode.value = true
+                        }
                     )
                 },
                 onFetchComments = {
@@ -624,6 +627,21 @@ class PostFragment :
         binding.clear.setOnClickListener {
             viewModel.findInPageVisible.value = false
         }
+    }
+
+    private fun onInstanceMismatch(accountInstance: String, apiInstance: String) {
+        AlertDialogFragment.Builder()
+            .setTitle(R.string.error_account_instance_mismatch_title)
+            .setMessage(
+                getString(
+                    R.string.error_account_instance_mismatch,
+                    accountInstance,
+                    apiInstance,
+                ),
+            )
+            .setPositiveButton(R.string.change_instance)
+            .setNegativeButton(R.string.cancel)
+            .createAndShow(childFragmentManager, "instance_mismatch")
     }
 
     private fun updateScreenshotMode(screenshotMode: Boolean?) {
@@ -896,13 +914,15 @@ class PostFragment :
                     val commentView = vh.itemView.getTag(R.id.comment_view) as? CommentView
                         ?: return@LemmySwipeActionCallback
 
+                    var result: Result<Unit>? = null
+
                     when (action.id) {
                         CommentGestureAction.Upvote -> {
-                            actionsViewModel.vote(commentView, dir = 1, toggle = true)
+                            result = actionsViewModel.vote(commentView, dir = 1, toggle = true)
                         }
 
                         CommentGestureAction.Downvote -> {
-                            actionsViewModel.vote(commentView, dir = -1, toggle = true)
+                            result = actionsViewModel.vote(commentView, dir = -1, toggle = true)
                         }
 
                         CommentGestureAction.Bookmark -> {
@@ -920,6 +940,11 @@ class PostFragment :
                         CommentGestureAction.CollapseOrExpand -> {
                             adapter?.toggleSection(vh.bindingAdapterPosition)
                         }
+                    }
+
+                    val error = result?.exceptionOrNull()
+                    if (error is AccountInstanceMismatchException) {
+                        onInstanceMismatch(error.accountInstance, error.apiInstance)
                     }
                 },
                 preferences.commentGestureSize,
@@ -1081,6 +1106,9 @@ class PostFragment :
                 if (commentId != null) {
                     viewModel.deleteComment(PostRef(getInstance(), args.id), commentId.toInt())
                 }
+            }
+            "instance_mismatch" -> {
+                viewModel.switchToNativeInstance()
             }
         }
     }

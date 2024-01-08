@@ -137,7 +137,7 @@
     <string name="error_downloading_image_permission_denied">Unable to download image. Storage permission denied.</string>
     <string name="help">Help</string>
     <string name="error_account_instance_mismatch_title">Incompatible account instance</string>
-    <string name="error_account_instance_mismatch">There is a mismatch between the instance the account was created on (%1$s) and the instance the action is taken on (%2$s).\nYou can fix this by either signing in to an account on the instance %2$s or by loading this page from the %2$s instance.</string>
+    <string name="error_account_instance_mismatch">There is a mismatch between the instance the account was created on (%1$s) and the instance the action is taken on (%2$s).\nYou can fix this by either signing in to an account on the instance %2$s or by loading this page from the %1$s instance.</string>
     <string name="go_to_account_instance">Go to account instance</string>
     <string name="error_server_timeout">Timeout waiting for server. The server is likely overloaded.</string>
     <string name="add_account">Add account</string>
@@ -769,7 +769,7 @@
     <string name="you">You</string>
     <string name="instance_info">Instance info</string>
     <string name="subscribers_format">%1$s Subs</string>
-    <string name="save_draft">Safe draft</string>
+    <string name="save_draft">Save draft</string>
     <string name="save_drafts_automatically">Save drafts automatically</string>
     <string name="save_drafts_automatically_desc">When enabled, drafts of posts/comments are saved automatically if you navigate away from the create/edit post/comment screen without pressing send.</string>
     <string name="community_actions">Community actions</string>
@@ -834,6 +834,17 @@
     <string name="per_community_overrides">Per-community overrides</string>
     <string name="swap_colors">Swap colors</string>
     <string name="per_account_settings">Per-account settings</string>
+    <string name="subscription_pending">Subscription pending...</string>
+    <string name="warn_upload_in_progress">There is an upload in progress. Do you want to proceed anyways?</string>
+    <string name="screenshot_settings">Screenshot settings</string>
+    <string name="date">Date</string>
+    <string name="watermark">Watermark</string>
+    <string name="comment_header_layout">Comment header layout</string>
+    <string name="single_line">Single line</string>
+    <string name="wrap">Wrap if necessary</string>
+    <string name="multiline">Multiline</string>
+    <string name="comment_header">Comment header</string>
+    <string name="change_instance">Change instance</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

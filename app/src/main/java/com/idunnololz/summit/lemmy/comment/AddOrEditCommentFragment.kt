@@ -7,7 +7,6 @@ import android.os.Parcelable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,9 +20,9 @@ import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
@@ -58,7 +57,8 @@ class AddOrEditCommentFragment :
     BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
     FullscreenDialogFragment,
     SignInNavigator,
-    BackPressHandler {
+    BackPressHandler,
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
@@ -85,6 +85,8 @@ class AddOrEditCommentFragment :
     private val viewModel: AddOrEditCommentViewModel by viewModels()
 
     private val textFormatterHelper = TextFormatterHelper()
+
+    private var currentBottomMenu: BottomMenu? = null
 
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -212,68 +214,38 @@ class AddOrEditCommentFragment :
         binding.toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
-        binding.toolbar.setOnMenuItemClickListener {
+        binding.toolbar.setOnMenuItemClickListener a@{
             when (it.itemId) {
                 R.id.send_comment -> {
-                    val account = viewModel.currentAccount.value
-                    if (account == null) {
-                        PreAuthDialogFragment()
-                            .showAllowingStateLoss(childFragmentManager, "AS")
-                        return@setOnMenuItemClickListener true
+                    if (viewModel.isUploading) {
+                        AlertDialogFragment.Builder()
+                            .setMessage(R.string.warn_upload_in_progress)
+                            .setPositiveButton(R.string.proceed_anyways)
+                            .setNegativeButton(R.string.cancel)
+                            .createAndShow(this, "send_comment")
+                        return@a true
                     }
-
-                    val inboxItem = args.inboxItem
-                    val personId = args.personId
-                    if (personId != 0L) {
-                        viewModel.sendComment(
-                            personId,
-                            binding.commentEditor.editText?.text.toString(),
-                        )
-                    } else if (inboxItem != null) {
-                        viewModel.sendComment(
-                            account,
-                            args.instance,
-                            inboxItem,
-                            binding.commentEditor.editText?.text.toString(),
-                        )
-                    } else {
-                        viewModel.sendComment(
-                            account,
-                            PostRef(
-                                args.instance,
-                                requireNotNull(
-                                    args.postView?.post?.id ?: args.commentView?.post?.id,
-                                ) {
-                                    "Both postView and commentView were null!"
-                                },
-                            ),
-                            args.commentView?.comment?.id,
-                            binding.commentEditor.editText?.text.toString(),
-                        )
-                    }
+                    sendComment()
                     true
                 }
                 R.id.update_comment -> {
-                    if (viewModel.currentAccount.value == null) {
-                        PreAuthDialogFragment()
-                            .showAllowingStateLoss(childFragmentManager, "DF")
-                        return@setOnMenuItemClickListener true
+                    if (viewModel.isUploading) {
+                        AlertDialogFragment.Builder()
+                            .setMessage(R.string.warn_upload_in_progress)
+                            .setPositiveButton(R.string.proceed_anyways)
+                            .setNegativeButton(R.string.cancel)
+                            .createAndShow(this, "update_comment")
+                        return@a true
                     }
-
-                    viewModel.updateComment(
-                        PostRef(
-                            args.instance,
-                            requireNotNull(args.editCommentView?.post?.id) {
-                                "editCommentView were null!"
-                            },
-                        ),
-                        requireNotNull(args.editCommentView?.comment?.id),
-                        binding.commentEditor.editText?.text.toString(),
-                    )
+                    updateComment()
                     true
                 }
                 R.id.save_draft -> {
                     saveDraft(overwriteExistingDraft = false)
+                    true
+                }
+                R.id.drafts -> {
+                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
                     true
                 }
                 else -> false
@@ -296,6 +268,64 @@ class AddOrEditCommentFragment :
             }
         }
         setup(savedInstanceState)
+    }
+
+    private fun updateComment() {
+        if (viewModel.currentAccount.value == null) {
+            PreAuthDialogFragment()
+                .showAllowingStateLoss(childFragmentManager, "DF")
+            return
+        }
+
+        viewModel.updateComment(
+            PostRef(
+                args.instance,
+                requireNotNull(args.editCommentView?.post?.id) {
+                    "editCommentView were null!"
+                },
+            ),
+            requireNotNull(args.editCommentView?.comment?.id),
+            binding.commentEditor.editText?.text.toString(),
+        )
+    }
+
+    private fun sendComment() {
+        val account = viewModel.currentAccount.value
+        if (account == null) {
+            PreAuthDialogFragment()
+                .showAllowingStateLoss(childFragmentManager, "AS")
+            return
+        }
+
+        val inboxItem = args.inboxItem
+        val personId = args.personId
+        if (personId != 0L) {
+            viewModel.sendComment(
+                personId,
+                binding.commentEditor.editText?.text.toString(),
+            )
+        } else if (inboxItem != null) {
+            viewModel.sendComment(
+                account,
+                args.instance,
+                inboxItem,
+                binding.commentEditor.editText?.text.toString(),
+            )
+        } else {
+            viewModel.sendComment(
+                account,
+                PostRef(
+                    args.instance,
+                    requireNotNull(
+                        args.postView?.post?.id ?: args.commentView?.post?.id,
+                    ) {
+                        "Both postView and commentView were null!"
+                    },
+                ),
+                args.commentView?.comment?.id,
+                binding.commentEditor.editText?.text.toString(),
+            )
+        }
     }
 
     private fun refreshMessage() {
@@ -421,10 +451,12 @@ class AddOrEditCommentFragment :
 
                 bottomMenu.show(
                     mainActivity = requireMainActivity(),
-                    viewGroup = binding.coordinatorLayout,
+                    bottomSheetContainer = binding.root,
                     expandFully = true,
                     handleBackPress = false,
                 )
+
+                currentBottomMenu = bottomMenu
             },
             onAddLinkClick = {
                 AddLinkDialogFragment.show(
@@ -495,8 +527,8 @@ class AddOrEditCommentFragment :
 
     override fun onBackPressed(): Boolean {
         if (isBindingAvailable()) {
-            if (binding.coordinatorLayout.childCount > 0) {
-                binding.coordinatorLayout.removeAllViews()
+            if (currentBottomMenu?.close() == true) {
+                currentBottomMenu = null
                 return true
             }
         }
@@ -557,4 +589,18 @@ class AddOrEditCommentFragment :
             content = this.comment.content,
             parentCommentId = args.commentView?.comment?.id,
         )
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        when (tag) {
+            "send_comment" -> {
+                sendComment()
+            }
+            "update_comment" -> {
+                updateComment()
+            }
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    }
 }

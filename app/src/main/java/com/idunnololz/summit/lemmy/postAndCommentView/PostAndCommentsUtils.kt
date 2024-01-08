@@ -55,6 +55,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
     actionsViewModel: MoreActionsViewModel,
     fragmentManager: FragmentManager,
     onLoadComment: ((CommentId) -> Unit)? = null,
+    onScreenshotClick: (() -> Unit)? = null,
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
 
@@ -146,6 +147,14 @@ fun BaseFragment<*>.showMoreCommentOptions(
         }
 
         addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
+
+        if (onScreenshotClick != null) {
+            addItemWithIcon(
+                R.id.screenshot,
+                getString(R.string.take_screenshot),
+                R.drawable.baseline_screenshot_24,
+            )
+        }
         addItemWithIcon(
             R.id.share_fediverse_link,
             getString(R.string.share_source_link),
@@ -243,6 +252,9 @@ fun BaseFragment<*>.showMoreCommentOptions(
                 }
                 R.id.open_comment_in_new_screen -> {
                     onLoadComment?.invoke(commentView.comment.id)
+                }
+                R.id.screenshot -> {
+                    onScreenshotClick?.invoke()
                 }
             }
         }

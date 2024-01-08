@@ -272,7 +272,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val bannerUrl: String?,
         val instance: String,
         val publishTs: Int,
-        val isSubscribed: Boolean,
+        val subscribedStatus: SubscribedType,
         val canSubscribe: Boolean,
         val content: String?,
 
@@ -301,7 +301,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             communityView.community.banner,
             communityView.community.instance,
             dateStringToTs(communityView.community.published).toInt(),
-            !(communityView.subscribed != SubscribedType.Subscribed),
+            communityView.subscribed,
             true,
             communityView.community.description,
 
@@ -328,7 +328,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             bannerUrl = siteView.site.banner,
             instance = siteView.site.instance,
             publishTs = dateStringToTs(siteView.site.published).toInt(),
-            isSubscribed = false,
+            subscribedStatus = SubscribedType.NotSubscribed,
             canSubscribe = false,
             content = siteView.site.sidebar,
 
@@ -342,7 +342,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
             mods = listOf(),
             admins = this.admins,
-
         )
     }
 
@@ -393,14 +392,26 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             if (communityView != null) {
                 subscribe.visibility = View.VISIBLE
 
-                if (data.isSubscribed) {
-                    subscribe.text = getString(R.string.unsubscribe)
-                } else {
-                    subscribe.text = getString(R.string.subscribe)
+                when (data.subscribedStatus) {
+                    SubscribedType.Subscribed -> {
+                        subscribe.text = getString(R.string.unsubscribe)
+                        subscribe.isEnabled = true
+                    }
+                    SubscribedType.NotSubscribed -> {
+                        subscribe.text = getString(R.string.subscribe)
+                        subscribe.isEnabled = true
+                    }
+                    SubscribedType.Pending -> {
+                        subscribe.text = getString(R.string.subscription_pending)
+                        subscribe.isEnabled = false
+                    }
                 }
 
                 subscribe.setOnClickListener {
-                    viewModel.updateSubscriptionStatus(communityView.community.id, !data.isSubscribed)
+                    viewModel.updateSubscriptionStatus(
+                        communityId = communityView.community.id,
+                        subscribe = data.subscribedStatus != SubscribedType.Subscribed
+                    )
                 }
 
                 binding.fab.visibility = View.VISIBLE

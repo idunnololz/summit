@@ -17,6 +17,7 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
+import com.idunnololz.summit.settings.util.isEnabled
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
@@ -115,13 +116,27 @@ class SettingCommentListFragment :
                 preferences.showCommentUpvotePercentage = it
             },
         )
+
+        binding.commentHeader.title.text = getString(R.string.comment_header)
         settings.showProfileIcons.bindTo(
             binding.showProfileIcons,
             { preferences.showProfileIcons },
             {
                 preferences.showProfileIcons = it
+                updateRendering()
             },
         )
+        settings.commentHeaderLayout.bindTo(
+            binding.commentHeaderLayout,
+            { preferences.commentHeaderLayout },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "commentHeaderLayout")
+            }
+        )
+
+        // Comment header layout only takes effect is not showing profile icons.
+        binding.commentHeaderLayout.isEnabled = !preferences.showProfileIcons
     }
 
     private fun convertAutoCollapseCommentToOptionId(value: Float) =
@@ -168,6 +183,9 @@ class SettingCommentListFragment :
                 if (threshold != null) {
                     preferences.autoCollapseCommentThreshold = threshold
                 }
+            }
+            settings.commentHeaderLayout.id -> {
+                preferences.commentHeaderLayout = value as Int
             }
         }
 

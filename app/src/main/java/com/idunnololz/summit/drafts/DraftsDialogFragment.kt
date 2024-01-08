@@ -160,7 +160,7 @@ class DraftsDialogFragment :
                 CustomDividerItemDecoration(
                     context,
                     DividerItemDecoration.VERTICAL,
-                    dividerAfterLastItem = true,
+                    dividerAfterLastItem = false,
                 ).apply {
                     setDrawable(
                         checkNotNull(

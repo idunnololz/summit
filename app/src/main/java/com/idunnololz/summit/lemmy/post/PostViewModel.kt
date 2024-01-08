@@ -180,6 +180,14 @@ class PostViewModel @Inject constructor(
         onPostOrCommentRefChange.postValue(postOrCommentRef)
     }
 
+    fun switchToNativeInstance() {
+        val nativeInstance = currentAccountView.value?.account?.instance
+            ?: return
+
+        lemmyApiClient.changeInstance(nativeInstance)
+        fetchPostData(force = true, switchToNativeInstance = true)
+    }
+
     fun fetchPostData(
         fetchPostData: Boolean = true,
         fetchCommentData: Boolean = true,

@@ -235,12 +235,4 @@
                 android:layout_gravity="center"/>
         </FrameLayout>
     </LinearLayout>
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinator_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="false">
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </FrameLayout>

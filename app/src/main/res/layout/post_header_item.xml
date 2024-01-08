@@ -13,8 +13,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <HorizontalScrollView
-        android:id="@+id/header_view"
+    <com.idunnololz.summit.view.LemmyHeaderView
+        android:id="@+id/header_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_half"
@@ -25,13 +25,7 @@
         android:scrollbars="none"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.idunnololz.summit.view.LemmyHeaderView
-            android:id="@+id/header_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </HorizontalScrollView>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/title"
@@ -42,7 +36,7 @@
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
         android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
         android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@+id/header_view"
+        app:layout_constraintTop_toBottomOf="@+id/header_container"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintEnd_toEndOf="parent" />
 
