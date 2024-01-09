@@ -176,7 +176,7 @@ class PostFragment :
 
             if (result != null) {
                 viewModel.fetchPostData(force = true)
-                (parentFragment as? CommunityFragment)?.onPostUpdated()
+                (parentFragment as? CommunityFragment)?.updatePost(result.post.id)
             }
         }
 
@@ -418,7 +418,7 @@ class PostFragment :
             snackbarContainer = binding.coordinatorLayout,
             onPostUpdated = {
                 viewModel.fetchPostData(force = true)
-                (parentFragment as? CommunityFragment)?.onPostUpdated()
+                (parentFragment as? CommunityFragment)?.updatePost(it)
             },
             onCommentUpdated = {
                 viewModel.fetchMoreComments(it, 1, true)
