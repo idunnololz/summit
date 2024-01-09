@@ -24,6 +24,7 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
@@ -379,7 +380,7 @@ class CommunityFragment :
             actionsViewModel = actionsViewModel,
             snackbarContainer = binding.fabSnackbarCoordinatorLayout,
             onPostUpdated = {
-                viewModel.updatePost(it)
+                updatePost(it)
             },
         )
 
@@ -487,8 +488,8 @@ class CommunityFragment :
         return position == 0 && viewModel.currentPageIndex.value == 0
     }
 
-    fun onPostUpdated() {
-        viewModel.fetchCurrentPage(force = true)
+    fun updatePost(postId: PostId) {
+        viewModel.updatePost(postId)
     }
 
     private fun onReady() {
