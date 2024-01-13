@@ -24,6 +24,7 @@ import com.idunnololz.summit.api.dto.CommentResponse
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.CommunityResponse
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.CreateComment
 import com.idunnololz.summit.api.dto.CreateCommentLike
@@ -58,6 +59,7 @@ import com.idunnololz.summit.api.dto.GetSite
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCount
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.HideCommunity
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.ListCommentReports
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
@@ -91,6 +93,7 @@ import com.idunnololz.summit.api.dto.PurgeCommunity
 import com.idunnololz.summit.api.dto.PurgePerson
 import com.idunnololz.summit.api.dto.PurgePost
 import com.idunnololz.summit.api.dto.RemoveComment
+import com.idunnololz.summit.api.dto.RemoveCommunity
 import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.ResolveCommentReport
 import com.idunnololz.summit.api.dto.ResolveObject
@@ -1598,6 +1601,48 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             api.banUserFromSite(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun removeCommunity(
+        communityId: CommunityId,
+        remove: Boolean,
+        reason: String?,
+        account: Account,
+    ): Result<CommunityResponse> {
+        val form = RemoveCommunity(
+            community_id = communityId,
+            removed = remove,
+            reason = reason,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.removeCommunity(authorization = account.bearer, form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun hideCommunity(
+        communityId: CommunityId,
+        hide: Boolean,
+        reason: String?,
+        account: Account,
+    ): Result<SuccessResponse> {
+        val form = HideCommunity(
+            community_id = communityId,
+            hidden = hide,
+            reason = reason,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.hideCommunity(authorization = account.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },

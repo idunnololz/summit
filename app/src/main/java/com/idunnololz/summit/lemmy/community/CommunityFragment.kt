@@ -804,7 +804,7 @@ class CommunityFragment :
             itemTouchHelper = ItemTouchHelper(
                 requireNotNull(swipeActionCallback) {
                     "swipeActionCallback is null!"
-                }
+                },
             )
         }
 

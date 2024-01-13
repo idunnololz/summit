@@ -15,7 +15,6 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PostFeatureType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -40,19 +39,6 @@ class MoreActionsViewModel @Inject constructor(
     private val fileDownloadHelper: FileDownloadHelper,
 ) : ViewModel() {
 
-    enum class PostActionType {
-        DeletePost,
-        SavePost,
-        FeaturePost,
-        LockPost,
-        RemovePost,
-    }
-
-    data class PostAction(
-        val actionType: PostActionType,
-        val state: StatefulLiveData<PostView> = StatefulLiveData(),
-    )
-
     val currentAccount: Account?
         get() = apiClient.accountForInstance()
     val apiInstance: String
@@ -62,22 +48,8 @@ class MoreActionsViewModel @Inject constructor(
     val blockPersonResult = StatefulLiveData<BlockPersonResult>()
     val blockInstanceResult = StatefulLiveData<BlockInstanceResult>()
     val saveCommentResult = StatefulLiveData<CommentView>()
-    val banUserResult = StatefulLiveData<Unit>()
-    val modUserResult = StatefulLiveData<Unit>()
-    val distinguishCommentResult = StatefulLiveData<Unit>()
-    val removeCommentResult = StatefulLiveData<Unit>()
-    val purgeCommunityResult = StatefulLiveData<Unit>()
-    val purgePostResult = StatefulLiveData<Unit>()
-    val purgeUserResult = StatefulLiveData<Unit>()
-    val purgeCommentResult = StatefulLiveData<Unit>()
-
-    val deletePostAction = PostAction(actionType = PostActionType.DeletePost)
-    val savePostAction = PostAction(actionType = PostActionType.SavePost)
-    val featurePostAction = PostAction(actionType = PostActionType.FeaturePost)
-    val lockPostAction = PostAction(actionType = PostActionType.LockPost)
-    val removePostAction = PostAction(actionType = PostActionType.RemovePost)
-
-    val banUserFromSiteResult = StatefulLiveData<Unit>()
+    val savePostResult = StatefulLiveData<PostView>()
+    val deletePostResult = StatefulLiveData<PostView>()
 
     val downloadVideoResult = StatefulLiveData<FileDownloadHelper.DownloadResult>()
 
@@ -123,60 +95,15 @@ class MoreActionsViewModel @Inject constructor(
     }
 
     fun deletePost(postId: PostId) {
-        deletePostAction.state.setIsLoading()
+        deletePostResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance { apiClient.deletePost(postId) }
                 .onSuccess {
-                    deletePostAction.state.postValue(it)
+                    deletePostResult.postValue(it)
                 }
                 .onFailure {
-                    deletePostAction.state.postError(it)
+                    deletePostResult.postError(it)
                 }
-        }
-    }
-
-    fun featurePost(postId: PostId, feature: Boolean) {
-        featurePostAction.state.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.featurePost(postId, feature, PostFeatureType.Community)
-                    .onSuccess {
-                        featurePostAction.state.postValue(it)
-                    }
-                    .onFailure {
-                        featurePostAction.state.postError(it)
-                    }
-            }
-        }
-    }
-
-    fun removePost(postId: PostId, remove: Boolean) {
-        removePostAction.state.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.removePost(postId, remove, null)
-                    .onSuccess {
-                        removePostAction.state.postValue(it)
-                    }
-                    .onFailure {
-                        removePostAction.state.postError(it)
-                    }
-            }
-        }
-    }
-
-    fun lockPost(postId: PostId, lock: Boolean) {
-        lockPostAction.state.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.lockPost(postId, lock)
-                    .onSuccess {
-                        lockPostAction.state.postValue(it)
-                    }
-                    .onFailure {
-                        lockPostAction.state.postError(it)
-                    }
-            }
         }
     }
 
@@ -219,15 +146,15 @@ class MoreActionsViewModel @Inject constructor(
     }
 
     fun savePost(id: PostId, save: Boolean) {
-        savePostAction.state.setIsLoading()
+        savePostResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance { apiClient.savePost(id, save) }
                 .onSuccess {
-                    savePostAction.state.postValue(it)
+                    savePostResult.postValue(it)
                     savedManager.onPostSaveChanged()
                 }
                 .onFailure {
-                    savePostAction.state.postError(it)
+                    savePostResult.postError(it)
                 }
         }
     }
@@ -262,207 +189,8 @@ class MoreActionsViewModel @Inject constructor(
         }
     }
 
-    fun banUser(
-        communityId: CommunityId,
-        personId: PersonId,
-        ban: Boolean,
-        removeData: Boolean,
-        reason: String?,
-        expiresDays: Int?,
-    ) {
-        banUserResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.banUserFromCommunity(
-                    communityId,
-                    personId,
-                    ban,
-                    removeData,
-                    reason,
-                    expiresDays,
-                )
-            }
-                .onSuccess {
-                    banUserResult.postValue(Unit)
-                }
-                .onFailure {
-                    banUserResult.postError(it)
-                }
-        }
-    }
-
-    fun mod(communityId: Int, personId: PersonId, mod: Boolean) {
-        modUserResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.modUser(
-                    communityId,
-                    personId,
-                    mod,
-                )
-            }
-                .onSuccess {
-                    modUserResult.postValue(Unit)
-                }
-                .onFailure {
-                    modUserResult.postError(it)
-                }
-        }
-    }
-
-    fun distinguishComment(
-        commentId: CommentId,
-        distinguish: Boolean,
-    ) {
-        distinguishCommentResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.distinguishComment(
-                    commentId,
-                    distinguish,
-                )
-            }
-                .onSuccess {
-                    distinguishCommentResult.postValue(Unit)
-                }
-                .onFailure {
-                    distinguishCommentResult.postError(it)
-                }
-        }
-    }
-
-    fun removeComment(commentId: Int, remove: Boolean) {
-        removeCommentResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.removeComment(
-                    commentId,
-                    remove,
-                    null,
-                )
-            }
-                .onSuccess {
-                    removeCommentResult.postValue(Unit)
-                }
-                .onFailure {
-                    removeCommentResult.postError(it)
-                }
-        }
-    }
-
     fun setPageInstance(instance: String) {
         currentPageInstance = instance
-    }
-
-    fun banUserFromSite(
-        personId: PersonId,
-        ban: Boolean,
-        removeData: Boolean,
-        reason: String?,
-        expiresDays: Int?,
-    ) {
-        banUserFromSiteResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.banUserFromSite(
-                    personId,
-                    ban,
-                    removeData,
-                    reason,
-                    expiresDays,
-                )
-            }
-                .onSuccess {
-                    banUserFromSiteResult.postValue(Unit)
-                }
-                .onFailure {
-                    banUserFromSiteResult.postError(it)
-                }
-        }
-    }
-
-    fun purgeCommunity(
-        communityId: CommunityId,
-        reason: String?,
-    ) {
-        purgeCommunityResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.purgeCommunity(
-                    communityId = communityId,
-                    reason = reason,
-                )
-            }
-                .onSuccess {
-                    purgeCommunityResult.postValue(Unit)
-                }
-                .onFailure {
-                    purgeCommunityResult.postError(it)
-                }
-        }
-    }
-
-    fun purgePost(
-        postId: PostId,
-        reason: String?,
-    ) {
-        purgeCommunityResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.purgePost(
-                    postId = postId,
-                    reason = reason,
-                )
-            }
-                .onSuccess {
-                    purgeCommunityResult.postValue(Unit)
-                }
-                .onFailure {
-                    purgeCommunityResult.postError(it)
-                }
-        }
-    }
-
-    fun purgePerson(
-        personId: PersonId,
-        reason: String?,
-    ) {
-        purgeCommunityResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.purgePerson(
-                    personId = personId,
-                    reason = reason,
-                )
-            }
-                .onSuccess {
-                    purgeCommunityResult.postValue(Unit)
-                }
-                .onFailure {
-                    purgeCommunityResult.postError(it)
-                }
-        }
-    }
-
-    fun purgeComment(
-        commentId: CommentId,
-        reason: String?,
-    ) {
-        purgeCommunityResult.setIsLoading()
-        viewModelScope.launch {
-            ensureRightInstance {
-                apiClient.purgeComment(
-                    commentId = commentId,
-                    reason = reason,
-                )
-            }
-                .onSuccess {
-                    purgeCommunityResult.postValue(Unit)
-                }
-                .onFailure {
-                    purgeCommunityResult.postError(it)
-                }
-        }
     }
 
     fun downloadVideo(

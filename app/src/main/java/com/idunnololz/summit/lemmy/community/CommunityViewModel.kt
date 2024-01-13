@@ -199,6 +199,11 @@ class CommunityViewModel @Inject constructor(
 
                     loadedPostsData.setValue(PostUpdateInfo())
                 }
+                // We need to "reset" the community because it can change how we fetch the community
+                // Eg.
+                // user idunnololz@lemmy.world accessing c/summit@lemmy.world = https://lemmy.world/c/summit
+                // user idunnololz@lemmy.ca accessing c/summit@lemmy.world = https://lemmy.ca/c/summit@lemmy.world
+                postsRepository.setCommunity(currentCommunityRef.value)
                 fetchInitialPage(force = true, clearPagesOnSuccess = true, scrollToTop = true)
             }
         }

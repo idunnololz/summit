@@ -41,21 +41,25 @@ class ModLogsViewModel @Inject constructor(
 
     private var modSource: MultiModEventDataSource? = null
 
+    var resetScrollPosition: Boolean = false
+
     init {
         viewModelScope.launch {
             modLogEngine.items.collect {
-                modLogData.postValue(ModLogData(it))
+                modLogData.postValue(ModLogData(it, resetScrollPosition = resetScrollPosition))
             }
         }
     }
 
-    fun fetchModLogs(pageIndex: Int, force: Boolean = false) {
+    fun fetchModLogs(pageIndex: Int, force: Boolean = false, resetScrollPosition: Boolean = false) {
         Log.d(TAG, "fetchModLogs(): $pageIndex, $force")
         modLogData.setIsLoading()
 
         val communityRef = communityRef
         val communityView = communityView
         val account = accountManager.currentAccount.value
+
+        this.resetScrollPosition = resetScrollPosition
 
         viewModelScope.launch {
             val communityIdOrNull: Result<CommunityId?> =
@@ -141,11 +145,12 @@ class ModLogsViewModel @Inject constructor(
     fun reset() {
         viewModelScope.launch {
             modLogData.clear()
-            fetchModLogs(0, force = true)
+            fetchModLogs(0, force = true, resetScrollPosition = true)
         }
     }
 
     data class ModLogData(
         val data: List<ListEngine.Item<ModEvent>>,
+        val resetScrollPosition: Boolean,
     )
 }

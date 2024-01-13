@@ -17,6 +17,7 @@ import com.idunnololz.summit.api.dto.CommentResponse
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.CommunityResponse
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetModlogResponse
@@ -771,6 +772,44 @@ class AccountAwareLemmyClient @Inject constructor(
                     removeData = removeData,
                     reason = reason,
                     expiresDays = expiresDays,
+                    account = account,
+                )
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+
+    suspend fun removeCommunity(
+        communityId: CommunityId,
+        remove: Boolean,
+        reason: String?,
+        account: Account? = accountForInstance(),
+    ): Result<CommunityResponse> =
+        if (account != null) {
+            apiClient
+                .removeCommunity(
+                    communityId = communityId,
+                    remove = remove,
+                    reason = reason,
+                    account = account,
+                )
+                .autoSignOut(account)
+        } else {
+            createAccountErrorResult()
+        }
+
+    suspend fun hideCommunity(
+        communityId: CommunityId,
+        hide: Boolean,
+        reason: String?,
+        account: Account? = accountForInstance(),
+    ): Result<SuccessResponse> =
+        if (account != null) {
+            apiClient
+                .hideCommunity(
+                    communityId = communityId,
+                    hide = hide,
+                    reason = reason,
                     account = account,
                 )
                 .autoSignOut(account)

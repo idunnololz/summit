@@ -1,9 +1,7 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
-import android.graphics.Point
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ScaleDrawable
 import android.net.Uri
 import android.text.TextUtils
 import android.util.Log

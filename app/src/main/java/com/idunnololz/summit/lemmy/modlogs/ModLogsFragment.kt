@@ -177,7 +177,11 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                         swipeRefreshLayout.isRefreshing = false
                         loadingView.hideAll()
 
-                        adapter.items = it.data.data
+                        adapter.setItems(it.data.data) {
+                            if (it.data.resetScrollPosition) {
+                                layoutManager.scrollToPosition(0)
+                            }
+                        }
                     }
                 }
             }
@@ -198,11 +202,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var items: List<ListEngine.Item<ModEvent>> = listOf()
-            set(value) {
-                field = value
-
-                updateItems()
-            }
+            private set
 
         private val summaryCharLength: Int
 
@@ -249,6 +249,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 val modEvent = item.data
 
                 var description: String = modEvent::class.simpleName ?: ""
+                var reason: String? = null
 
                 when (modEvent) {
                     is ModEvent.AdminPurgeCommentViewEvent -> {
@@ -258,6 +259,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             R.string.purged_comment_format,
                             "[${modEvent.event.post.name.summarize()}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
                         )
+                        reason = modEvent.event.admin_purge_comment.reason
                     }
                     is ModEvent.AdminPurgeCommunityViewEvent -> {
                         b.icon.setImageResource(R.drawable.baseline_delete_24)
@@ -265,6 +267,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                         description = context.getString(
                             R.string.purged_community,
                         )
+                        reason = modEvent.event.admin_purge_community.reason
                     }
                     is ModEvent.AdminPurgePersonViewEvent -> {
                         b.icon.setImageResource(R.drawable.baseline_delete_24)
@@ -272,6 +275,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                         description = context.getString(
                             R.string.purged_person,
                         )
+                        reason = modEvent.event.admin_purge_person.reason
                     }
                     is ModEvent.AdminPurgePostViewEvent -> {
                         b.icon.setImageResource(R.drawable.baseline_delete_24)
@@ -284,6 +288,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 modEvent.event.community.name,
                             )})",
                         )
+                        reason = modEvent.event.admin_purge_post.reason
                     }
                     is ModEvent.ModAddCommunityViewEvent -> {
                         if (modEvent.event.mod_add_community.removed) {
@@ -379,6 +384,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 })",
                             )
                         }
+                        reason = modEvent.event.mod_ban_from_community.reason
                     }
                     is ModEvent.ModBanViewEvent -> {
                         if (modEvent.event.mod_ban.banned) {
@@ -408,6 +414,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
                         }
+                        reason = modEvent.event.mod_ban.reason
                     }
                     is ModEvent.ModFeaturePostViewEvent -> {
                         if (modEvent.event.mod_feature_post.featured) {
@@ -474,6 +481,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 })",
                             )
                         }
+                        reason = modEvent.event.mod_hide_community.reason
                     }
                     is ModEvent.ModLockPostViewEvent -> {
                         if (modEvent.event.mod_lock_post.locked) {
@@ -552,6 +560,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 })",
                             )
                         }
+                        reason = modEvent.event.mod_remove_comment.reason
                     }
                     is ModEvent.ModRemoveCommunityViewEvent -> {
                         if (modEvent.event.mod_remove_community.removed) {
@@ -581,6 +590,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
                         }
+                        reason = modEvent.event.mod_remove_community.reason
                     }
                     is ModEvent.ModRemovePostViewEvent -> {
                         if (modEvent.event.mod_remove_post.removed) {
@@ -620,6 +630,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 })",
                             )
                         }
+                        reason = modEvent.event.mod_remove_post.reason
                     }
                     is ModEvent.ModTransferCommunityViewEvent -> {
                         b.icon.setImageResource(R.drawable.baseline_swap_horiz_24)
@@ -699,6 +710,12 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                         onLinkLongClick(url, text)
                     },
                 )
+                if (reason == null) {
+                    b.body.visibility = View.GONE
+                } else {
+                    b.body.visibility = View.VISIBLE
+                    b.body.text = context.getString(R.string.reason_format, reason)
+                }
             }
             addItemType(
                 clazz = ListEngine.Item.LoadItem<ModEvent>()::class,
@@ -728,8 +745,14 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
 
-        fun updateItems() {
-            adapterHelper.setItems(items, this)
+        fun updateItems(cb: () -> Unit) {
+            adapterHelper.setItems(items, this, cb)
+        }
+
+        fun setItems(newItems: List<ListEngine.Item<ModEvent>>, cb: () -> Unit) {
+            items = newItems
+
+            updateItems(cb)
         }
 
         private fun String.summarize() =

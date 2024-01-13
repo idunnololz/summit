@@ -37,6 +37,8 @@ class ModActionsViewModel @Inject constructor(
         ) : ModState
         data class CommunityModState(
             val isMod: Boolean,
+            val isRemoved: Boolean,
+            val isHidden: Boolean,
         ) : ModState
     }
 
@@ -149,7 +151,9 @@ class ModActionsViewModel @Inject constructor(
             if (communityResult != null) {
                 allModState +=
                     ModState.CommunityModState(
-                        communityResult.moderators.any { it.moderator.id == personId },
+                        isMod = communityResult.moderators.any { it.moderator.id == personId },
+                        isRemoved = communityResult.community_view.community.removed,
+                        isHidden = communityResult.community_view.community.hidden,
                     )
             }
 

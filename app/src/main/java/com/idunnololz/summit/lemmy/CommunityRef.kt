@@ -77,7 +77,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
                 return name
             }
             if (instance == null) {
-                return "$name@"
+                return name
             }
             return "$name@$instance"
         }

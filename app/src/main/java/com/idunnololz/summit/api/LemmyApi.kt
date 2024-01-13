@@ -47,6 +47,7 @@ import com.idunnololz.summit.api.dto.GetReportCountResponse
 import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.HideCommunity
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
@@ -70,6 +71,7 @@ import com.idunnololz.summit.api.dto.PurgeCommunity
 import com.idunnololz.summit.api.dto.PurgePerson
 import com.idunnololz.summit.api.dto.PurgePost
 import com.idunnololz.summit.api.dto.RemoveComment
+import com.idunnololz.summit.api.dto.RemoveCommunity
 import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.ResolveCommentReport
 import com.idunnololz.summit.api.dto.ResolveObjectResponse
@@ -644,6 +646,18 @@ interface LemmyApi {
         @Header("Authorization") authorization: String?,
         @Body form: BanPerson,
     ): Call<BanPersonResponse>
+
+    @POST("community/remove")
+    fun removeCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body form: RemoveCommunity,
+    ): Call<CommunityResponse>
+
+    @PUT("community/hide")
+    fun hideCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body form: HideCommunity,
+    ): Call<SuccessResponse>
 
     @POST("admin/purge/person")
     fun purgePerson(

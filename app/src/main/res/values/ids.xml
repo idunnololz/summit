@@ -165,4 +165,9 @@
     <item name="off" type="id" />
     <item name="per_community_settings" type="id" />
     <item name="reset_settings" type="id" />
+    <item name="icon_tint" type="id" />
+    <item name="undo_remove_community" type="id"/>
+    <item name="remove_community" type="id" />
+    <item name="undo_hide_community" type="id" />
+    <item name="hide_community" type="id" />
 </resources>

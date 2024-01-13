@@ -1,18 +1,14 @@
 package com.idunnololz.summit.lemmy.mod
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
@@ -20,7 +16,22 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.DialogFragmentModActionsBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.AdminOrModActionsViewModel
+import com.idunnololz.summit.lemmy.mod.ModActionResult.UpdatedObject
+import com.idunnololz.summit.lemmy.mod.ModActionResult.setModActionResult
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.PurgeComment
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.PurgeCommunity
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.PurgePerson
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.PurgePost
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.RemoveComment
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.RemoveCommunity
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.RemovePost
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.UndoBanUserFromCommunity
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.UndoBanUserFromSite
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.UndoRemoveComment
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.UndoRemoveCommunity
+import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason.UndoRemovePost
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommentModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommunityModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.PostModState
@@ -32,18 +43,13 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class ModActionsDialogFragment :
     BaseBottomSheetDialogFragment<DialogFragmentModActionsBinding>(),
-    FullscreenDialogFragment,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    FullscreenDialogFragment {
 
     companion object {
-
-        const val REQUEST_KEY = "ModActionsDialogFragment_req"
-        const val RESULT_UPDATED_OBJ = "RESULT_UPDATED_OBJ"
 
         fun show(
             postView: PostView,
@@ -95,22 +101,10 @@ class ModActionsDialogFragment :
         }
     }
 
-    sealed interface UpdatedObject : Parcelable {
-        @Parcelize
-        data class PostObject(
-            val postId: Int,
-        ) : UpdatedObject
-
-        @Parcelize
-        data class CommentObject(
-            val commentId: Int,
-        ) : UpdatedObject
-    }
-
     private val args by navArgs<ModActionsDialogFragmentArgs>()
 
     private val viewModel: ModActionsViewModel by viewModels()
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
+    private val actionsViewModel: AdminOrModActionsViewModel by viewModels()
 
     private var adapter: BottomMenu.BottomMenuAdapter? = null
 
@@ -131,6 +125,20 @@ class ModActionsDialogFragment :
 
         val context = requireContext()
         with(binding) {
+            fun launchModActionWithReason(modAction: ModActionWithReason) {
+                ModActionWithReasonDialogFragment()
+                    .apply {
+                        arguments = ModActionWithReasonDialogFragmentArgs(
+                            modAction = modAction,
+                        ).toBundle()
+                    }
+                    .showAllowingStateLoss(
+                        parentFragmentManager,
+                        "ModActionWithReasonDialogFragment",
+                    )
+                dismiss()
+            }
+
             adapter = BottomMenu.BottomMenuAdapter(context).apply {
                 title =
                     if (viewModel.isAdmin(args.communityInstance)) {
@@ -153,10 +161,18 @@ class ModActionsDialogFragment :
                             actionsViewModel.lockPost(args.postId, false)
                         }
                         R.id.remove_post -> {
-                            actionsViewModel.removePost(args.postId, true)
+                            launchModActionWithReason(
+                                RemovePost(
+                                    args.postId,
+                                ),
+                            )
                         }
                         R.id.undo_remove_post -> {
-                            actionsViewModel.removePost(args.postId, false)
+                            launchModActionWithReason(
+                                UndoRemovePost(
+                                    args.postId,
+                                ),
+                            )
                         }
                         R.id.mod -> {
                             actionsViewModel.mod(args.communityId, args.personId, true)
@@ -184,13 +200,11 @@ class ModActionsDialogFragment :
                             dismiss()
                         }
                         R.id.undo_ban -> {
-                            actionsViewModel.banUser(
-                                communityId = args.communityId,
-                                personId = args.personId,
-                                ban = false,
-                                removeData = false,
-                                reason = null,
-                                expiresDays = null,
+                            launchModActionWithReason(
+                                UndoBanUserFromCommunity(
+                                    args.communityId,
+                                    args.personId,
+                                ),
                             )
                         }
                         R.id.remove_feature_comment -> {
@@ -206,15 +220,17 @@ class ModActionsDialogFragment :
                             )
                         }
                         R.id.remove_comment -> {
-                            actionsViewModel.removeComment(
-                                commentId = args.commentId,
-                                remove = true,
+                            launchModActionWithReason(
+                                RemoveComment(
+                                    args.commentId,
+                                ),
                             )
                         }
                         R.id.undo_remove_comment -> {
-                            actionsViewModel.removeComment(
-                                commentId = args.commentId,
-                                remove = false,
+                            launchModActionWithReason(
+                                UndoRemoveComment(
+                                    args.commentId,
+                                ),
                             )
                         }
                         R.id.ban_from_site -> {
@@ -237,45 +253,67 @@ class ModActionsDialogFragment :
                             dismiss()
                         }
                         R.id.undo_ban_from_site -> {
-                            actionsViewModel.banUserFromSite(
-                                personId = args.personId,
-                                ban = false,
-                                removeData = false,
-                                reason = null,
-                                expiresDays = null,
+                            launchModActionWithReason(
+                                UndoBanUserFromSite(
+                                    args.personId,
+                                ),
                             )
                         }
                         R.id.purge_community -> {
-                            AlertDialogFragment.Builder()
-                                .setTitle(R.string.purge_community_title)
-                                .setMessage(R.string.purge_community_body)
-                                .setPositiveButton(R.string.purge_community)
-                                .setNegativeButton(android.R.string.cancel)
-                                .createAndShow(childFragmentManager, "purge_community")
+                            launchModActionWithReason(
+                                PurgeCommunity(
+                                    args.communityId,
+                                ),
+                            )
                         }
                         R.id.purge_post -> {
-                            AlertDialogFragment.Builder()
-                                .setTitle(R.string.purge_post_title)
-                                .setMessage(R.string.purge_community_body)
-                                .setPositiveButton(R.string.purge_post)
-                                .setNegativeButton(android.R.string.cancel)
-                                .createAndShow(childFragmentManager, "purge_post")
+                            launchModActionWithReason(
+                                PurgePost(
+                                    args.postId,
+                                ),
+                            )
                         }
                         R.id.purge_user -> {
-                            AlertDialogFragment.Builder()
-                                .setTitle(R.string.purge_user_title)
-                                .setMessage(R.string.purge_community_body)
-                                .setPositiveButton(R.string.purge_user)
-                                .setNegativeButton(android.R.string.cancel)
-                                .createAndShow(childFragmentManager, "purge_user")
+                            launchModActionWithReason(
+                                PurgePerson(
+                                    args.personId,
+                                ),
+                            )
                         }
                         R.id.purge_comment -> {
-                            AlertDialogFragment.Builder()
-                                .setTitle(R.string.purge_comment_title)
-                                .setMessage(R.string.purge_community_body)
-                                .setPositiveButton(R.string.purge_comment)
-                                .setNegativeButton(android.R.string.cancel)
-                                .createAndShow(childFragmentManager, "purge_comment")
+                            launchModActionWithReason(
+                                PurgeComment(
+                                    args.commentId,
+                                ),
+                            )
+                        }
+                        R.id.remove_community -> {
+                            launchModActionWithReason(
+                                RemoveCommunity(
+                                    args.communityId,
+                                ),
+                            )
+                        }
+                        R.id.undo_remove_community -> {
+                            launchModActionWithReason(
+                                UndoRemoveCommunity(
+                                    args.communityId,
+                                ),
+                            )
+                        }
+                        R.id.hide_community -> {
+                            launchModActionWithReason(
+                                ModActionWithReason.HideCommunity(
+                                    args.communityId,
+                                ),
+                            )
+                        }
+                        R.id.undo_hide_community -> {
+                            launchModActionWithReason(
+                                ModActionWithReason.UndoHideCommunity(
+                                    args.communityId,
+                                ),
+                            )
                         }
                     }
                 }
@@ -310,10 +348,36 @@ class ModActionsDialogFragment :
                 }
             }
 
-            actionsViewModel.deletePostAction.handleStateChange()
-            actionsViewModel.featurePostAction.handleStateChange()
-            actionsViewModel.lockPostAction.handleStateChange()
-            actionsViewModel.removePostAction.handleStateChange()
+            actionsViewModel.featurePostResult.handleStateChange(
+                errorMessage = {
+                    getString(R.string.error_unable_to_feature_post)
+                },
+                updatedObject = {
+                    UpdatedObject.PostObject(
+                        args.postId,
+                    )
+                },
+            )
+            actionsViewModel.lockPostResult.handleStateChange(
+                errorMessage = {
+                    getString(R.string.error_unable_to_lock_post)
+                },
+                updatedObject = {
+                    UpdatedObject.PostObject(
+                        args.postId,
+                    )
+                },
+            )
+            actionsViewModel.removePostResult.handleStateChange(
+                errorMessage = {
+                    getString(R.string.error_unable_to_remove_post)
+                },
+                updatedObject = {
+                    UpdatedObject.PostObject(
+                        args.postId,
+                    )
+                },
+            )
 
             actionsViewModel.banUserResult.handleStateChange(
                 { getString(R.string.error_unable_to_ban_user) },
@@ -387,12 +451,7 @@ class ModActionsDialogFragment :
             when (it) {
                 is StatefulData.Error -> {
                     if (it.error is ClientApiException && it.error.errorCode == 404) {
-                        setFragmentResult(
-                            REQUEST_KEY,
-                            bundleOf(
-                                RESULT_UPDATED_OBJ to updatedObject(),
-                            ),
-                        )
+                        setModActionResult(updatedObject())
                         dismiss()
                     } else {
                         ErrorDialogFragment.show(
@@ -406,45 +465,11 @@ class ModActionsDialogFragment :
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        bundleOf(
-                            RESULT_UPDATED_OBJ to updatedObject(),
-                        ),
-                    )
+                    setModActionResult(updatedObject())
                     dismiss()
                 }
             }
         }
-    }
-
-    private fun MoreActionsViewModel.PostAction.handleStateChange() {
-        this.state.handleStateChange(
-            errorMessage = {
-                when (actionType) {
-                    MoreActionsViewModel.PostActionType.DeletePost -> {
-                        getString(R.string.error_unable_to_delete_post)
-                    }
-                    MoreActionsViewModel.PostActionType.SavePost -> {
-                        getString(R.string.error_unable_to_save_post)
-                    }
-                    MoreActionsViewModel.PostActionType.FeaturePost -> {
-                        getString(R.string.error_unable_to_feature_post)
-                    }
-                    MoreActionsViewModel.PostActionType.LockPost -> {
-                        getString(R.string.error_unable_to_lock_post)
-                    }
-                    MoreActionsViewModel.PostActionType.RemovePost -> {
-                        getString(R.string.error_unable_to_remove_post)
-                    }
-                }
-            },
-            updatedObject = {
-                UpdatedObject.PostObject(
-                    args.postId,
-                )
-            },
-        )
     }
 
     private fun setupUi(data: ModActionsViewModel.FullModState) {
@@ -580,17 +605,52 @@ class ModActionsDialogFragment :
                 }
             }
 
+            val communityModState = data.modStates.filterIsInstance<CommunityModState>()
+                .firstOrNull()
+            if (communityModState != null) {
+                if (communityModState.isRemoved) {
+                    adapter?.addItemWithIcon(
+                        id = R.id.undo_remove_community,
+                        title = R.string.undo_remove_community,
+                        icon = R.drawable.baseline_add_24,
+                    )
+                } else {
+                    adapter?.addItemWithIcon(
+                        id = R.id.remove_community,
+                        title = R.string.remove_community,
+                        icon = R.drawable.baseline_remove_24,
+                    )
+                }
+                if (communityModState.isHidden) {
+                    adapter?.addItemWithIcon(
+                        id = R.id.undo_hide_community,
+                        title = R.string.undo_hide_community,
+                        icon = R.drawable.baseline_visibility_24,
+                    )
+                } else {
+                    adapter?.addItemWithIcon(
+                        id = R.id.hide_community,
+                        title = R.string.hide_community,
+                        icon = R.drawable.baseline_visibility_off_24,
+                    )
+                }
+            }
+
+            adapter?.addDividerIfNeeded()
+
             adapter?.addItemWithIcon(
                 id = R.id.purge_user,
                 title = R.string.purge_user,
                 icon = R.drawable.outline_person_remove_24,
+                modifier = BottomMenu.ModifierIds.Danger,
             )
 
             if (data.modStates.any { it is PostModState }) {
                 adapter?.addItemWithIcon(
                     id = R.id.purge_post,
                     title = R.string.purge_post,
-                    icon = R.drawable.baseline_remove_24,
+                    icon = R.drawable.baseline_delete_24,
+                    modifier = BottomMenu.ModifierIds.Danger,
                 )
             }
 
@@ -598,15 +658,17 @@ class ModActionsDialogFragment :
                 adapter?.addItemWithIcon(
                     id = R.id.purge_comment,
                     title = R.string.purge_comment,
-                    icon = R.drawable.baseline_remove_24,
+                    icon = R.drawable.baseline_delete_24,
+                    modifier = BottomMenu.ModifierIds.Danger,
                 )
             }
 
-            if (data.modStates.any { it is CommunityModState }) {
+            if (communityModState != null) {
                 adapter?.addItemWithIcon(
                     id = R.id.purge_community,
                     title = R.string.purge_community,
-                    icon = R.drawable.baseline_remove_24,
+                    icon = R.drawable.baseline_delete_24,
+                    modifier = BottomMenu.ModifierIds.Danger,
                 )
             }
 
@@ -616,37 +678,5 @@ class ModActionsDialogFragment :
         adapter?.refreshItems {
             binding.recyclerView.requestLayout()
         }
-    }
-
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
-        when (tag) {
-            "purge_community" -> {
-                actionsViewModel.purgeCommunity(
-                    communityId = args.communityId,
-                    reason = null,
-                )
-            }
-            "purge_post" -> {
-                actionsViewModel.purgePost(
-                    postId = args.postId,
-                    reason = null,
-                )
-            }
-            "purge_user" -> {
-                actionsViewModel.purgePerson(
-                    personId = args.personId,
-                    reason = null,
-                )
-            }
-            "purge_comment" -> {
-                actionsViewModel.purgeComment(
-                    commentId = args.commentId,
-                    reason = null,
-                )
-            }
-        }
-    }
-
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 }

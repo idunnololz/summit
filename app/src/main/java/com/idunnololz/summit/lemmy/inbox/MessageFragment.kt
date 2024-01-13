@@ -473,7 +473,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         instance = viewModel.apiInstance,
                         postView = postView,
                         actionsViewModel = actionsViewModel,
-                        fragmentManager = childFragmentManager
+                        fragmentManager = childFragmentManager,
                     )
                 },
                 onCommentMoreClick = { commentView, _ ->
@@ -481,7 +481,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         instance = viewModel.apiInstance,
                         commentView = commentView,
                         actionsViewModel = actionsViewModel,
-                        fragmentManager = childFragmentManager
+                        fragmentManager = childFragmentManager,
                     )
                 },
                 onFetchComments = {

@@ -33,7 +33,6 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
-import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
@@ -45,7 +44,6 @@ import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.communityRef
 import com.idunnololz.summit.tabs.isHomeTab
 import com.idunnololz.summit.tabs.toTab
-import com.idunnololz.summit.user.TabCommunityState
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu

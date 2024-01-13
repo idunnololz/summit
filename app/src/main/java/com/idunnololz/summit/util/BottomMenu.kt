@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.util.Log
@@ -11,11 +12,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.core.widget.ImageViewCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +31,7 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
 class BottomMenu(
-    private val context: Context
+    private val context: Context,
 ) {
 
     companion object {
@@ -247,6 +247,9 @@ class BottomMenu(
         private val checkedTextColor = context.getColorFromAttribute(
             com.google.android.material.R.attr.colorPrimary,
         )
+        private val dangerTextColor = context.getColorFromAttribute(
+            com.google.android.material.R.attr.colorError,
+        )
         private val defaultTextColor = ContextCompat.getColor(context, R.color.colorTextTitle)
 
         private val adapterHelper = AdapterHelper<Item> (
@@ -268,7 +271,13 @@ class BottomMenu(
             }
             addItemType(Item.DividerItem::class, MenuItemDividerBinding::inflate) { item, b, _ ->
             }
-            addItemType(Item.MenuItemItem::class, MenuItemBinding::inflate) { item, b, _ ->
+            addItemType(
+                clazz = Item.MenuItemItem::class,
+                inflateFn = MenuItemBinding::inflate,
+                onViewCreated = {
+                    it.icon.setTag(R.id.icon_tint, ImageViewCompat.getImageTintList(it.icon))
+                },
+            ) { item, b, _ ->
                 val menuItem = item.menuItem
                 b.title.text = menuItem.title
 
@@ -297,9 +306,18 @@ class BottomMenu(
                 if (menuItem.id == checked) {
                     b.title.setTextColor(checkedTextColor)
                     b.title.setTypeface(b.title.typeface, Typeface.BOLD)
+                } else if (menuItem.modifier == ModifierIds.Danger) {
+                    b.title.setTextColor(dangerTextColor)
+                    b.title.setTypeface(b.title.typeface, Typeface.NORMAL)
                 } else {
                     b.title.setTextColor(defaultTextColor)
                     b.title.setTypeface(b.title.typeface, Typeface.NORMAL)
+                }
+
+                if (menuItem.modifier == ModifierIds.Danger) {
+                    ImageViewCompat.setImageTintList(b.icon, ColorStateList.valueOf(dangerTextColor))
+                } else {
+                    ImageViewCompat.setImageTintList(b.icon, b.icon.getTag(R.id.icon_tint) as? ColorStateList)
                 }
 
                 val icon = menuItem.icon
@@ -342,12 +360,29 @@ class BottomMenu(
             menuItems.add(MenuItem.ActionItem(id, title, checkIcon = icon))
         }
 
-        fun addItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
-            addItemWithIcon(id, context.getString(title), icon)
+        fun addItemWithIcon(
+            @IdRes id: Int,
+            @StringRes title: Int,
+            @DrawableRes icon: Int,
+            modifier: Int = ModifierIds.None,
+        ) {
+            addItemWithIcon(id, context.getString(title), icon, modifier)
         }
 
-        fun addItemWithIcon(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
-            menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
+        fun addItemWithIcon(
+            @IdRes id: Int,
+            title: String,
+            @DrawableRes icon: Int,
+            modifier: Int = ModifierIds.None,
+        ) {
+            menuItems.add(
+                MenuItem.ActionItem(
+                    id = id,
+                    title = title,
+                    icon = MenuIcon.ResourceIcon(icon),
+                    modifier = modifier,
+                ),
+            )
         }
 
         fun addDividerIfNeeded() {
@@ -386,12 +421,18 @@ class BottomMenu(
         override fun getItemCount(): Int = adapterHelper.itemCount
     }
 
+    object ModifierIds {
+        const val None = 0
+        const val Danger = 1
+    }
+
     sealed interface MenuItem {
         class ActionItem(
             @IdRes val id: Int,
             val title: String,
             val icon: MenuIcon? = null,
             @DrawableRes val checkIcon: Int = 0,
+            val modifier: Int = ModifierIds.None,
         ) : MenuItem
         data object DividerItem : MenuItem
     }

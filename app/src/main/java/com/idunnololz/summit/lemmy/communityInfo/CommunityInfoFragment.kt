@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.SiteView
 import com.idunnololz.summit.api.dto.SubscribedType
+import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunityInfoCommunityItemBinding
 import com.idunnololz.summit.databinding.FragmentCommunityInfoBinding
@@ -33,13 +34,14 @@ import com.idunnololz.summit.databinding.PageDataDescriptionItemBinding
 import com.idunnololz.summit.databinding.PageDataModItemBinding
 import com.idunnololz.summit.databinding.PageDataStatsItemBinding
 import com.idunnololz.summit.databinding.PageDataTitleItemBinding
+import com.idunnololz.summit.databinding.WarningItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
@@ -275,6 +277,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val subscribedStatus: SubscribedType,
         val canSubscribe: Boolean,
         val content: String?,
+        val isHidden: Boolean,
+        val isRemoved: Boolean,
 
         val postCount: Int,
         val commentCount: Int,
@@ -294,27 +298,29 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val instance = communityView.community.instance
 
         return PageData(
-            Either.Left(communityView),
-            name,
-            "!$name@$instance",
-            communityView.community.icon,
-            communityView.community.banner,
-            communityView.community.instance,
-            dateStringToTs(communityView.community.published).toInt(),
-            communityView.subscribed,
-            true,
-            communityView.community.description,
+            backingObject = Either.Left(communityView),
+            name = name,
+            fullName = "!$name@$instance",
+            iconUrl = communityView.community.icon,
+            bannerUrl = communityView.community.banner,
+            instance = communityView.community.instance,
+            publishTs = dateStringToTs(communityView.community.published).toInt(),
+            subscribedStatus = communityView.subscribed,
+            canSubscribe = true,
+            content = communityView.community.description,
+            isHidden = communityView.community.hidden,
+            isRemoved = communityView.community.removed,
 
-            communityView.counts.posts,
-            communityView.counts.comments,
-            communityView.counts.subscribers,
-            communityView.counts.users_active_day,
-            communityView.counts.users_active_week,
-            communityView.counts.users_active_month,
-            communityView.counts.users_active_half_year,
+            postCount = communityView.counts.posts,
+            commentCount = communityView.counts.comments,
+            userCount = communityView.counts.subscribers,
+            usersPerDay = communityView.counts.users_active_day,
+            usersPerWeek = communityView.counts.users_active_week,
+            usersPerMonth = communityView.counts.users_active_month,
+            usersPerSixMonth = communityView.counts.users_active_half_year,
 
-            this.moderators.map { it.moderator },
-            listOf(),
+            mods = this.moderators.map { it.moderator },
+            admins = listOf(),
         )
     }
 
@@ -331,6 +337,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             subscribedStatus = SubscribedType.NotSubscribed,
             canSubscribe = false,
             content = siteView.site.sidebar,
+            isHidden = false,
+            isRemoved = false,
 
             postCount = siteView.counts.posts,
             commentCount = siteView.counts.comments,
@@ -410,7 +418,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 subscribe.setOnClickListener {
                     viewModel.updateSubscriptionStatus(
                         communityId = communityView.community.id,
-                        subscribe = data.subscribedStatus != SubscribedType.Subscribed
+                        subscribe = data.subscribedStatus != SubscribedType.Subscribed,
                     )
                 }
 
@@ -570,6 +578,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private sealed interface Item {
+            data class WarningItem(
+                val message: String,
+            ) : Item
             data class StatsItem(
                 val postCount: Int,
                 val commentCount: Int,
@@ -615,6 +626,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
+                    is Item.WarningItem -> true
                     is Item.DescriptionItem ->
                         true
                     is Item.AdminItem ->
@@ -632,6 +644,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 }
             },
         ).apply {
+            addItemType(
+                clazz = Item.WarningItem::class,
+                inflateFn = WarningItemBinding::inflate,
+            ) { item, b, _ ->
+                b.text.text = item.message
+            }
             addItemType(
                 clazz = Item.DescriptionItem::class,
                 inflateFn = PageDataDescriptionItemBinding::inflate,
@@ -668,10 +686,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 PageDataAdminItemBinding::inflate,
             ) { item, b, _ ->
                 b.icon.load(item.admin.person.avatar)
-                b.name.text = item.admin.person.name
+                b.name.text = item.admin.person.fullName
 
                 b.root.setOnClickListener {
-                    onPageClick(PersonRef.PersonRefByName(item.admin.person.name, instance))
+                    onPageClick(item.admin.person.toPersonRef())
                 }
             }
             addItemType(
@@ -679,10 +697,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 PageDataModItemBinding::inflate,
             ) { item, b, _ ->
                 b.icon.load(item.mod.avatar)
-                b.name.text = item.mod.name
+                b.name.text = item.mod.fullName
 
                 b.root.setOnClickListener {
-                    onPageClick(PersonRef.PersonRefByName(item.mod.name, instance))
+                    onPageClick(item.mod.toPersonRef())
                 }
             }
             addItemType(
@@ -730,6 +748,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             val newItems = mutableListOf<Item>()
 
             if (data != null) {
+                if (data.isRemoved) {
+                    newItems.add(Item.WarningItem(context.getString(R.string.warn_community_removed)))
+                } else if (data.isHidden) {
+                    newItems.add(Item.WarningItem(context.getString(R.string.warn_community_hidden)))
+                }
+
                 newItems.add(
                     Item.StatsItem(
                         data.postCount,
