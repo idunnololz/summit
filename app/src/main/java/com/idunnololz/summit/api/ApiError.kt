@@ -41,4 +41,4 @@ class NoInternetException() : NetworkException("No internet")
 
 sealed class NetworkException(msg: String) : RuntimeException(msg)
 
-class NotAModOrAdmin() : ClientApiException("Rate limit timed out.", 400)
+class NotAModOrAdmin() : ClientApiException("Not a mod or admin", 400)

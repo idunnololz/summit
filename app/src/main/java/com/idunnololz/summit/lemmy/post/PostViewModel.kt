@@ -16,6 +16,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommentId
@@ -676,35 +677,42 @@ class PostViewModel @Inject constructor(
 
         additionalLoadedCommentIds.add(parentId)
 
-        result.onSuccess { comments ->
-            // A comment is likely removed if we are loading a specific comment and it's direct
-            // descendant is missing
+        result
+            .onSuccess { comments ->
+                // A comment is likely removed if we are loading a specific comment and it's direct
+                // descendant is missing
 
-            val thisComment = comments.find { it.comment.id == parentId }
+                val thisComment = comments.find { it.comment.id == parentId }
 
-            if (comments.isEmpty() || thisComment == null) {
-                removedCommentIds.add(parentId)
-            } else {
-                removedCommentIds.remove(parentId)
+                if (comments.isEmpty() || thisComment == null) {
+                    removedCommentIds.add(parentId)
+                } else {
+                    removedCommentIds.remove(parentId)
+                }
+
+                val depthIsMoreThanOne = depth == null || depth > 1
+                if (thisComment != null && depthIsMoreThanOne) {
+                    fullyLoadedCommentIds.add(thisComment.comment.id)
+                }
+
+                //            val commentChildCount = thisComment?.counts?.child_count ?: 0
+                //            if (thisComment != null && commentChildCount > 0 && comments.size == 1 && depthIsMoreThanOne) {
+                //                // This comment's child was deleted...
+                //                val fakeComment = createFakeDeletedComment(thisComment.comment.path)
+                //                removedCommentIds.add(fakeComment.comment.id)
+                //                supplementaryComments[fakeComment.comment.id] = fakeComment
+                //            }
+
+                comments.forEach {
+                    supplementaryComments[it.comment.id] = it
+                }
             }
-
-            val depthIsMoreThanOne = depth == null || depth > 1
-            if (thisComment != null && depthIsMoreThanOne) {
-                fullyLoadedCommentIds.add(thisComment.comment.id)
+            .onFailure {
+                if (it is ClientApiException && it.errorCode == 404) {
+                    // comment has been removed...
+                    removedCommentIds.add(parentId)
+                }
             }
-
-//            val commentChildCount = thisComment?.counts?.child_count ?: 0
-//            if (thisComment != null && commentChildCount > 0 && comments.size == 1 && depthIsMoreThanOne) {
-//                // This comment's child was deleted...
-//                val fakeComment = createFakeDeletedComment(thisComment.comment.path)
-//                removedCommentIds.add(fakeComment.comment.id)
-//                supplementaryComments[fakeComment.comment.id] = fakeComment
-//            }
-
-            comments.forEach {
-                supplementaryComments[it.comment.id] = it
-            }
-        }
 
         return result
     }

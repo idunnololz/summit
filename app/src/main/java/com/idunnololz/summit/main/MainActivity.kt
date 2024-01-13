@@ -195,7 +195,7 @@ class MainActivity : BaseActivity() {
             lifecycleOwner = this,
             onNavBarChanged = {
                 setupNavigationBar()
-            }
+            },
         )
 
         setContentView(binding.root)
@@ -698,7 +698,7 @@ class MainActivity : BaseActivity() {
         communitySelectorController.show(
             bottomSheetContainer = binding.root,
             activity = this,
-            lifecycleOwner = this
+            lifecycleOwner = this,
         )
 
         return communitySelectorController
@@ -1024,7 +1024,7 @@ class MainActivity : BaseActivity() {
         bottomMenu.show(
             mainActivity = this,
             bottomSheetContainer = binding.root,
-            expandFully = expandFully
+            expandFully = expandFully,
         )
         currentBottomMenu = bottomMenu
     }

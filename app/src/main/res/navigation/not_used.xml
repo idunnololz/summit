@@ -221,4 +221,12 @@ safeargs.
             app:nullable="true"
             android:defaultValue="@null" />
     </dialog>
+    <dialog
+        android:id="@+id/removeCommentDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment"
+        android:label="RemoveCommentDialogFragment">
+        <argument
+            android:name="modAction"
+            app:argType="com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment$ModActionWithReason" />
+    </dialog>
 </navigation>

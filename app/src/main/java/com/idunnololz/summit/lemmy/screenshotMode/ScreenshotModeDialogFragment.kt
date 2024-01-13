@@ -4,20 +4,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -39,7 +35,6 @@ import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.MimeTypes
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.shareUri
@@ -372,7 +367,7 @@ class ScreenshotModeDialogFragment :
         val screenshotWatermark = preferences.screenshotWatermark
         if (dateScreenshots || screenshotWatermark != ScreenshotWatermarkId.Off) {
             screenshotStage.contentContainer.addView(
-                MaterialDivider(context)
+                MaterialDivider(context),
             )
             ScreenshotBottomBarBinding.inflate(
                 LayoutInflater.from(context),
@@ -382,7 +377,7 @@ class ScreenshotModeDialogFragment :
                 if (dateScreenshots) {
                     val dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
                     text.text = dateFormat.format(
-                        Instant.now().atZone(ZoneId.systemDefault()).toLocalDate()
+                        Instant.now().atZone(ZoneId.systemDefault()).toLocalDate(),
                     )
                 } else {
                     text.visibility = View.GONE

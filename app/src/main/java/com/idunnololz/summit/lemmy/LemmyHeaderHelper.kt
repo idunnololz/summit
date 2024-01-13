@@ -28,12 +28,10 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.view.LemmyHeaderView
-import com.idunnololz.summit.view.RewardView
 
 class LemmyHeaderHelper(
     private val context: Context,
@@ -290,7 +288,7 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
             sb.append(
                 PrettyPrintUtils.defaultShortPercentFormat.format(
-                    postView.upvotePercentage
+                    postView.upvotePercentage,
                 ),
             )
         }
@@ -493,7 +491,7 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
             sb.append(
                 PrettyPrintUtils.defaultShortPercentFormat.format(
-                    commentView.upvotePercentage
+                    commentView.upvotePercentage,
                 ),
             )
         }

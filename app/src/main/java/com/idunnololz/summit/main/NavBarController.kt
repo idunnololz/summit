@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
@@ -17,7 +16,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.window.layout.WindowMetricsCalculator
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
 import com.google.android.material.navigationrail.NavigationRailView
@@ -26,7 +24,6 @@ import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.navigation.NavBarConfig
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 

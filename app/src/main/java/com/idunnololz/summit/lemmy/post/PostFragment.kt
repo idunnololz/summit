@@ -301,7 +301,7 @@ class PostFragment :
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByPadding(
                 viewLifecycleOwner,
-                binding.findInPageToolbar
+                binding.findInPageToolbar,
             )
         }
 
@@ -375,7 +375,7 @@ class PostFragment :
                         onScreenshotClick = {
                             getAdapter()?.selectItemForScreenshot(itemId)
                             viewModel.screenshotMode.value = true
-                        }
+                        },
                     )
                 },
                 onCommentMoreClick = { commentView, itemId ->
@@ -391,7 +391,7 @@ class PostFragment :
                         onScreenshotClick = {
                             getAdapter()?.selectItemForScreenshot(itemId)
                             viewModel.screenshotMode.value = true
-                        }
+                        },
                     )
                 },
                 onFetchComments = {

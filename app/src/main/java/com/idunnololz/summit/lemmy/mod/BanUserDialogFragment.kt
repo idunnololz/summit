@@ -9,7 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentBanUserBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.AdminOrModActionsViewModel
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,7 +19,7 @@ class BanUserDialogFragment : BaseDialogFragment<DialogFragmentBanUserBinding>()
 
     private val args by navArgs<BanUserDialogFragmentArgs>()
 
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
+    private val actionsViewModel: AdminOrModActionsViewModel by viewModels()
 
     override fun onStart() {
         super.onStart()

@@ -515,6 +515,8 @@
     <string name="mod_tools">Mod tools</string>
     <string name="mod_actions">Mod actions</string>
     <string name="error_unable_to_ban_user">Unable to ban/unban user.</string>
+    <string name="error_unable_to_remove_community">Unable to remove/unremove community.</string>
+    <string name="error_unable_to_hide_community">Unable to hide/unhide community.</string>
     <string name="unmod_user">Unmod user</string>
     <string name="mod_user">Mod user</string>
     <string name="error_unable_to_add_user_as_moderator">Unable to add/remove user as moderator.</string>
@@ -845,6 +847,16 @@
     <string name="multiline">Multiline</string>
     <string name="comment_header">Comment header</string>
     <string name="change_instance">Change instance</string>
+    <string name="reason_format">Reason: %1$s</string>
+    <string name="purge_person">Purge person</string>
+    <string name="undo_user_ban">Undo user ban</string>
+    <string name="undo_user_ban_from_instance">Undo user ban from instance</string>
+    <string name="remove_community">Remove community</string>
+    <string name="undo_remove_community">Undo remove community</string>
+    <string name="undo_hide_community">Undo hide community</string>
+    <string name="hide_community">Hide community</string>
+    <string name="warn_community_removed">This community has been removed by an admin. It will not be visible to regular users.</string>
+    <string name="warn_community_hidden">This community has been hidden by an admin. It will not be visible to regular users.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

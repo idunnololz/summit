@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Log
 import android.view.Gravity

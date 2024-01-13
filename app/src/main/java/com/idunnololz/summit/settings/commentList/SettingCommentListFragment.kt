@@ -132,7 +132,7 @@ class SettingCommentListFragment :
             { setting, currentValue ->
                 MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "commentHeaderLayout")
-            }
+            },
         )
 
         // Comment header layout only takes effect is not showing profile icons.

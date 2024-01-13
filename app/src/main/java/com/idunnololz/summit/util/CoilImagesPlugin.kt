@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.text.Spanned
-import android.util.Log
 import android.widget.TextView
 import coil.Coil.imageLoader
 import coil.ImageLoader

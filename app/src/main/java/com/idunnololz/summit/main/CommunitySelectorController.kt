@@ -12,9 +12,6 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
@@ -51,7 +48,6 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.toErrorMessage

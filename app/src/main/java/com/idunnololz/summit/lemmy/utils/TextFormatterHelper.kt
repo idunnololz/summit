@@ -9,7 +9,6 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 
 class TextFormatterHelper {

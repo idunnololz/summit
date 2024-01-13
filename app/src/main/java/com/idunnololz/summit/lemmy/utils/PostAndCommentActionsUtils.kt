@@ -11,7 +11,7 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
+import com.idunnololz.summit.lemmy.mod.ModActionResult
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.getParcelableCompat
@@ -35,28 +35,28 @@ fun BaseFragment<*>.installOnActionResultHandler(
         }
 
     childFragmentManager.setFragmentResultListener(
-        ModActionsDialogFragment.REQUEST_KEY,
+        ModActionResult.REQUEST_KEY,
         viewLifecycleOwner,
     ) { requestKey, result ->
-        val updatedObject = result.getParcelableCompat<ModActionsDialogFragment.UpdatedObject>(
-            ModActionsDialogFragment.RESULT_UPDATED_OBJ,
+        val updatedObject = result.getParcelableCompat<ModActionResult.UpdatedObject>(
+            ModActionResult.RESULT_UPDATED_OBJ,
         )
 
         when (updatedObject) {
-            is ModActionsDialogFragment.UpdatedObject.CommentObject -> {
+            is ModActionResult.UpdatedObject.CommentObject -> {
                 onCommentUpdated?.invoke(updatedObject.commentId)
             }
-            is ModActionsDialogFragment.UpdatedObject.PostObject -> {
+            is ModActionResult.UpdatedObject.PostObject -> {
                 onPostUpdated?.invoke(updatedObject.postId)
             }
             null -> { /* do nothing */ }
         }
     }
 
-    actionsViewModel.savePostAction.state.observe(viewLifecycleOwner) {
+    actionsViewModel.savePostResult.observe(viewLifecycleOwner) {
         when (it) {
             is StatefulData.Error -> {
-                actionsViewModel.savePostAction.state.setIdle()
+                actionsViewModel.savePostResult.setIdle()
                 ErrorDialogFragment.show(
                     getString(R.string.unable_to_save_post),
                     it.error,
@@ -66,7 +66,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
             is StatefulData.Loading -> {}
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {
-                actionsViewModel.savePostAction.state.setIdle()
+                actionsViewModel.savePostResult.setIdle()
                 Snackbar.make(
                     snackbarContainer,
                     if (it.data.saved) {
@@ -112,70 +112,6 @@ fun BaseFragment<*>.installOnActionResultHandler(
 
                 onSaveCommentChanged?.invoke(it.data)
                 onCommentUpdated?.invoke(it.data.comment.id)
-            }
-        }
-    }
-
-    fun MoreActionsViewModel.PostAction.handleStateChange() {
-        this.state.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-//                    if (it.error is ClientApiException && it.error.errorCode == 404) {
-//                        onPostUpdated(actionType)
-//                        (parentFragment as? CommunityFragment)?.onPostUpdated()
-//                    } else {
-                    ErrorDialogFragment.show(
-                        when (actionType) {
-                            MoreActionsViewModel.PostActionType.DeletePost -> {
-                                getString(R.string.error_unable_to_delete_post)
-                            }
-                            MoreActionsViewModel.PostActionType.SavePost -> {
-                                getString(R.string.error_unable_to_save_post)
-                            }
-                            MoreActionsViewModel.PostActionType.FeaturePost -> {
-                                getString(R.string.error_unable_to_feature_post)
-                            }
-                            MoreActionsViewModel.PostActionType.LockPost -> {
-                                getString(R.string.error_unable_to_lock_post)
-                            }
-                            MoreActionsViewModel.PostActionType.RemovePost -> {
-                                getString(R.string.error_unable_to_remove_post)
-                            }
-                        },
-                        it.error,
-                        childFragmentManager,
-                    )
-//                    }
-                }
-
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    onPostUpdated?.invoke(it.data.post.id)
-                }
-            }
-        }
-    }
-
-    actionsViewModel.deletePostAction.handleStateChange()
-    actionsViewModel.featurePostAction.handleStateChange()
-    actionsViewModel.lockPostAction.handleStateChange()
-    actionsViewModel.removePostAction.handleStateChange()
-
-    actionsViewModel.banUserResult.observe(viewLifecycleOwner) {
-        when (it) {
-            is StatefulData.Error -> {
-                actionsViewModel.banUserResult.setIdle()
-                ErrorDialogFragment.show(
-                    getString(R.string.unable_to_ban_user),
-                    it.error,
-                    childFragmentManager,
-                )
-            }
-            is StatefulData.Loading -> {}
-            is StatefulData.NotStarted -> {}
-            is StatefulData.Success -> {
-                actionsViewModel.banUserResult.setIdle()
             }
         }
     }

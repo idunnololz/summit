@@ -505,9 +505,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
         fun setData(
             data: List<SettingsViewModel.SettingSearchResultItem>,
-            onItemsUpdated: () -> Unit = {}
+            onItemsUpdated: () -> Unit = {},
         ) {
-
             this.data = data
 
             refreshItems {
