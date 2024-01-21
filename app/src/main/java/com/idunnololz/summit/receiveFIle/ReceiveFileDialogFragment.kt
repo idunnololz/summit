@@ -1,19 +1,14 @@
 package com.idunnololz.summit.receiveFIle
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.IntentCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.navigation.fragment.navArgs
 import coil.load
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -22,9 +17,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.saveForLater.SaveForLaterDialogFragment
 import com.idunnololz.summit.saveForLater.SaveForLaterDialogFragmentArgs
-import com.idunnololz.summit.saveForLater.SaveForLaterManager
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.setupBottomSheetAndShow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -76,7 +69,7 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
             overlay = binding.overlay,
             onClose = {
                 dismiss()
-            }
+            },
         )
 
         requireMainActivity().apply {
@@ -118,7 +111,7 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
                 SaveForLaterDialogFragment()
                     .apply {
                         arguments = SaveForLaterDialogFragmentArgs(
-                            args.fileUri
+                            args.fileUri,
                         ).toBundle()
                     }
                     .show(parentFragmentManager, "SaveForLaterDialogFragment")

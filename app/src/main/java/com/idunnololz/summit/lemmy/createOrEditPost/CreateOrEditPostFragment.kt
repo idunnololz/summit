@@ -376,7 +376,7 @@ class CreateOrEditPostFragment :
                             ChooseSavedImageDialogFragment()
                                 .apply {
                                     arguments = ChooseSavedImageDialogFragmentArgs(
-                                        "for_link"
+                                        "for_link",
                                     ).toBundle()
                                 }
                                 .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")

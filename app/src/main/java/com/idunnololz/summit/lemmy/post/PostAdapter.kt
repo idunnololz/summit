@@ -584,7 +584,7 @@ class PostAdapter(
                         screenshotMode = item.screenshotMode,
                         startGuideline = b.startGuideline,
                         root = b.root,
-                        item = item
+                        item = item,
                     )
                 }
 

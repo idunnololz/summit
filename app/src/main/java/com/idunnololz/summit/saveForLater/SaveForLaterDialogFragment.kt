@@ -4,27 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toFile
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.navigation.fragment.navArgs
-import coil.clear
 import coil.dispose
 import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.databinding.DialogFragmentReceiveFileBinding
 import com.idunnololz.summit.databinding.DialogFragmentSaveForLaterBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragmentArgs
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.humanReadableByteCountSi
 import com.idunnololz.summit.util.setupBottomSheetAndShow
-import com.idunnololz.summit.util.tsToFullDateTime
 import com.idunnololz.summit.util.tsToShortDate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -76,7 +67,7 @@ class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLater
             overlay = binding.overlay,
             onClose = {
                 dismiss()
-            }
+            },
         )
 
         requireMainActivity().apply {
