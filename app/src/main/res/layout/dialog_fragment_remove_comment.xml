@@ -58,7 +58,7 @@
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintTop_toBottomOf="@+id/reason"
-        app:layout_constraintEnd_toStartOf="@+id/remove_comment"
+        app:layout_constraintEnd_toStartOf="@+id/positive_button"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator

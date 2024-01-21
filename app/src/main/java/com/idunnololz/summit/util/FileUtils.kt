@@ -3,7 +3,6 @@ package com.idunnololz.summit.util
 import java.text.CharacterIterator
 import java.text.StringCharacterIterator
 
-
 fun humanReadableByteCountSi(bytes: Long): String? {
     var bytes = bytes
     if (-1000 < bytes && bytes < 1000) {

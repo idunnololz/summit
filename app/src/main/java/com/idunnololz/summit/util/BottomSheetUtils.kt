@@ -1,9 +1,6 @@
 package com.idunnololz.summit.util
 
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import androidx.core.view.updateLayoutParams
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 fun setupBottomSheetAndShow(

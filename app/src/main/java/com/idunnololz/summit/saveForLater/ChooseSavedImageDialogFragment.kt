@@ -16,12 +16,10 @@ import coil.dispose
 import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentChooseSavedImageBinding
-import com.idunnololz.summit.databinding.DialogFragmentSaveForLaterBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.humanReadableByteCountSi
 import com.idunnololz.summit.util.setupBottomSheetAndShow
-import com.idunnololz.summit.util.tsToFullDateTime
 import com.idunnololz.summit.util.tsToShortDate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
@@ -37,9 +35,9 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
     }
 
     @Parcelize
-    data class Result (
-        val fileUri: Uri
-    ): Parcelable
+    data class Result(
+        val fileUri: Uri,
+    ) : Parcelable
 
     private val args by navArgs<ChooseSavedImageDialogFragmentArgs>()
 
@@ -85,7 +83,7 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
             overlay = binding.overlay,
             onClose = {
                 dismiss()
-            }
+            },
         )
 
         requireMainActivity().apply {
@@ -133,7 +131,7 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
                             args.requestKey ?: REQUEST_KEY,
                             Bundle().apply {
                                 putParcelable(REQUEST_RESULT, Result(file.toUri()))
-                            }
+                            },
                         )
                         dismiss()
                     }
