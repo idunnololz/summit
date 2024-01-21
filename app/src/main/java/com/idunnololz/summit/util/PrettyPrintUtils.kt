@@ -73,10 +73,21 @@ fun dateStringToPretty(context: Context, ts: Long): String {
 }
 
 fun dateStringToFullDateTime(dateStr: String): String {
-    val epochSecond = dateStringToTs(dateStr) / 1000
+    return tsToFullDateTime(dateStringToTs(dateStr))
+}
+
+fun tsToFullDateTime(ts: Long): String {
+    val epochSecond = ts / 1000
     val localDateTime = LocalDateTime.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
 
     return localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+}
+
+fun tsToShortDate(ts: Long): String {
+    val epochSecond = ts / 1000
+    val localDateTime = LocalDateTime.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
+
+    return localDateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
 }
 
 fun dateStringToTs(dateString: String): Long =

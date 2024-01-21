@@ -28,6 +28,7 @@ class DirectoryHelper @Inject constructor(
     val tabsDir = File(context.cacheDir, "tabs")
     val miscDir = File(context.cacheDir, "misc")
     val settingBackupsDir = File(context.filesDir, "sb")
+    val saveForLaterDir = File(context.filesDir, "sfl")
 
     val tabsDiskCache = MoshiDiskCache
         .create(moshi, tabsDir, 1, 10L * 1024L * 1024L /* 10MB */)

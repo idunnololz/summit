@@ -72,6 +72,8 @@ import com.idunnololz.summit.preview.ImageViewerActivityArgs
 import com.idunnololz.summit.preview.ImageViewerContract
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.preview.VideoViewerFragment
+import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragment
+import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragmentArgs
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingCacheFragment
@@ -500,27 +502,23 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleSendImage(intent: Intent) {
-        val account = accountManager.currentAccount.value
+        val fileUri = IntentCompat.getParcelableExtra(
+            intent,
+            Intent.EXTRA_STREAM,
+            Uri::class.java,
+        )
 
-        if (account == null) {
+        if (fileUri == null) {
             AlertDialogFragment.Builder()
-                .setMessage(R.string.you_must_sign_in_to_create_a_post)
+                .setMessage(R.string.error_unable_to_read_file)
                 .createAndShow(supportFragmentManager, "asdf")
             return
         }
 
-        CreateOrEditPostFragment()
+        ReceiveFileDialogFragment()
             .apply {
-                arguments = CreateOrEditPostFragmentArgs(
-                    instance = account.instance,
-                    communityName = null,
-                    post = null,
-                    crosspost = null,
-                    extraStream = IntentCompat.getParcelableExtra(
-                        intent,
-                        Intent.EXTRA_STREAM,
-                        Uri::class.java,
-                    ),
+                arguments = ReceiveFileDialogFragmentArgs(
+                    fileUri = fileUri,
                 ).toBundle()
             }
             .show(supportFragmentManager, "CreateOrEditPostFragment")
@@ -734,6 +732,13 @@ class MainActivity : BaseActivity() {
                     0
                 }
             )
+    }
+
+    fun doOnInsetChanged(lifecycleOwner: LifecycleOwner, onInsetChanged: (Rect) -> Unit) {
+        insetsChangedLiveData.observe(lifecycleOwner) {
+            val insets = checkNotNull(windowInsets.value)
+            onInsetChanged(insets)
+        }
     }
 
     fun insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
