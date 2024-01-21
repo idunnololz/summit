@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet_container_outer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black50"
+        android:alpha="0"/>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/bottom_sheet_container_inner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="17dp"
+        android:fitsSystemWindows="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_behavior="com.idunnololz.summit.util.FixedBottomSheetBehavior"
+            style="@style/Widget.Material3.BottomSheet.Modal">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/file_received"
+                android:textAppearance="?textAppearanceTitleLarge"
+                android:layout_marginTop="@dimen/dialog_padding"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/preview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                style="@style/RoundImageView"/>
+
+            <TextView
+                android:id="@+id/create_post"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/create_post"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:drawablePadding="8dp"
+                android:paddingHorizontal="@dimen/dialog_padding"
+                android:paddingVertical="@dimen/padding"
+                android:layout_marginTop="@dimen/padding"
+                android:gravity="center_vertical"
+                android:background="?selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/preview"
+                app:drawableStartCompat="@drawable/baseline_add_24"
+                app:drawableTint="?colorControlNormal" />
+
+            <TextView
+                android:id="@+id/save_for_later"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/save_for_later"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:drawablePadding="8dp"
+                android:paddingHorizontal="@dimen/dialog_padding"
+                android:paddingVertical="@dimen/padding"
+                android:gravity="center_vertical"
+                android:background="?selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/create_post"
+                app:drawableStartCompat="@drawable/baseline_save_24"
+                app:drawableTint="?colorControlNormal" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_quarter"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/save_for_later"/>
+
+            <TextView
+                android:id="@+id/cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:drawablePadding="8dp"
+                android:paddingHorizontal="@dimen/dialog_padding"
+                android:paddingVertical="@dimen/padding"
+                android:layout_marginTop="@dimen/padding_quarter"
+                android:gravity="center_vertical"
+                android:background="?selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider"
+                app:drawableStartCompat="@drawable/baseline_close_24"
+                app:drawableTint="?colorControlNormal" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

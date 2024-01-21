@@ -579,7 +579,13 @@ class PostAdapter(
                         onLinkLongClick = onLinkLongClick,
                     )
 
-                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
+                    updateScreenshotMode(
+                        viewHolder = holder,
+                        screenshotMode = item.screenshotMode,
+                        startGuideline = b.startGuideline,
+                        root = b.root,
+                        item = item
+                    )
                 }
 
                 holder.itemView.setTag(R.id.swipeable, true)
@@ -741,9 +747,14 @@ class PostAdapter(
             }
             binding.screenshotCb.setOnCheckedChangeListener(null)
             binding.screenshotCb.isChecked = includedInScreenshot.contains(item.id)
-            binding.screenshotCb.setOnCheckedChangeListener a@{ compoundButton, b ->
-                val item = items.getOrNull(viewHolder.absoluteAdapterPosition) ?: return@a
-                selectItemForScreenshot(item.id)
+            binding.screenshotCb.setOnCheckedChangeListener a@{ _, isChecked ->
+                val itemClicked = items.getOrNull(viewHolder.absoluteAdapterPosition) ?: return@a
+
+                if (isChecked) {
+                    selectItemForScreenshot(itemClicked.id)
+                } else {
+                    deselectItemForScreenshot(itemClicked.id)
+                }
             }
 
             if (previousBinding == null) {
@@ -770,7 +781,7 @@ class PostAdapter(
 
     private fun toggleItemForScreenshot(id: String) {
         if (includedInScreenshot.contains(id)) {
-            includedInScreenshot.remove(id)
+            deselectItemForScreenshot(id)
         } else {
             selectItemForScreenshot(id)
         }
@@ -778,6 +789,10 @@ class PostAdapter(
 
     fun selectItemForScreenshot(id: String) {
         includedInScreenshot.add(id)
+    }
+
+    fun deselectItemForScreenshot(id: String) {
+        includedInScreenshot.remove(id)
     }
 
     /**

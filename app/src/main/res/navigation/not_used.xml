@@ -229,4 +229,30 @@ safeargs.
             android:name="modAction"
             app:argType="com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment$ModActionWithReason" />
     </dialog>
+    <dialog
+        android:id="@+id/receiveFileDialogFragment"
+        android:name="com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragment"
+        android:label="ReceiveFileDialogFragment" >
+        <argument
+            android:name="fileUri"
+            app:argType="android.net.Uri" />
+    </dialog>
+    <dialog
+        android:id="@+id/saveForLaterDialogFragment"
+        android:name="com.idunnololz.summit.saveForLater.SaveForLaterDialogFragment"
+        android:label="SaveForLaterDialogFragment">
+        <argument
+            android:name="fileUri"
+            app:argType="android.net.Uri" />
+    </dialog>
+    <dialog
+        android:id="@+id/chooseSavedImageDialogFragment"
+        android:name="com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment"
+        android:label="ChooseSavedImageDialogFragment">
+        <argument
+            android:name="requestKey"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true"/>
+    </dialog>
 </navigation>

@@ -305,6 +305,33 @@ class PostFragment :
             )
         }
 
+        fun onMoreClick() {
+            val data = viewModel.postData.valueOrNull
+            val postView = data?.postView?.post ?: args.post
+
+            if (postView != null) {
+                showMorePostOptions(
+                    instance = viewModel.apiInstance,
+                    postView = postView,
+                    actionsViewModel = actionsViewModel,
+                    fragmentManager = childFragmentManager,
+                    isPostMenu = true,
+                    onSortOrderClick = {
+                        getMainActivity()?.showBottomMenu(getSortByMenu())
+                    },
+                    onRefreshClick = {
+                        viewModel.fetchPostData(force = true)
+                    },
+                    onFindInPageClick = {
+                        viewModel.findInPageVisible.value = true
+                    },
+                    onScreenshotClick = {
+                        viewModel.screenshotMode.value = true
+                    },
+                )
+            }
+        }
+
         val context = requireContext()
         if (adapter == null) {
             adapter = PostAdapter(
@@ -444,30 +471,7 @@ class PostFragment :
             binding.fab.setImageResource(R.drawable.baseline_more_horiz_24)
             binding.fab.show()
             binding.fab.setOnClickListener {
-                val data = viewModel.postData.valueOrNull
-                val postView = data?.postView?.post ?: args.post
-
-                if (postView != null) {
-                    showMorePostOptions(
-                        instance = viewModel.apiInstance,
-                        postView = postView,
-                        actionsViewModel = actionsViewModel,
-                        fragmentManager = childFragmentManager,
-                        isPostMenu = true,
-                        onSortOrderClick = {
-                            getMainActivity()?.showBottomMenu(getSortByMenu())
-                        },
-                        onRefreshClick = {
-                            viewModel.fetchPostData(force = true)
-                        },
-                        onFindInPageClick = {
-                            viewModel.findInPageVisible.value = true
-                        },
-                        onScreenshotClick = {
-                            viewModel.screenshotMode.value = true
-                        },
-                    )
-                }
+                onMoreClick()
             }
         }
 
@@ -510,7 +514,7 @@ class PostFragment :
                         val postView = data?.postView?.post ?: args.post
 
                         if (postView != null) {
-                            showMorePostOptions(viewModel.apiInstance, postView, actionsViewModel, childFragmentManager)
+                            onMoreClick()
                         }
                     },
                 )

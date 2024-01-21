@@ -170,4 +170,5 @@
     <item name="remove_community" type="id" />
     <item name="undo_hide_community" type="id" />
     <item name="hide_community" type="id" />
+    <item name="use_a_saved_image" type="id" />
 </resources>

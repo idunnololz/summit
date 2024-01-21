@@ -37,6 +37,8 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
+import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -132,6 +134,17 @@ class AddOrEditCommentFragment :
             )
             if (result != null) {
                 viewModel.currentDraftEntry.value = result
+            }
+        }
+        childFragmentManager.setFragmentResultListener(
+            ChooseSavedImageDialogFragment.REQUEST_KEY,
+            this,
+        ) { key, bundle ->
+            val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
+                ChooseSavedImageDialogFragment.REQUEST_RESULT,
+            )
+            if (result != null) {
+                viewModel.uploadImage(args.instance, result.fileUri)
             }
         }
     }
@@ -414,6 +427,7 @@ class AddOrEditCommentFragment :
                     addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
                     addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
                     addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
+                    addItemWithIcon(R.id.use_a_saved_image, R.string.use_a_saved_image, R.drawable.baseline_save_24)
 
                     setOnMenuItemClickListener {
                         when (it.id) {
@@ -444,6 +458,13 @@ class AddOrEditCommentFragment :
                                     .cropFreeStyle()
                                     .createIntent()
                                 launcher.launch(intent)
+                            }
+                            R.id.use_a_saved_image -> {
+                                ChooseSavedImageDialogFragment()
+                                    .apply {
+                                        arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
+                                    }
+                                    .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")
                             }
                         }
                     }

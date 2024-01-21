@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:paddingHorizontal="@dimen/dialog_padding"
+    android:paddingVertical="@dimen/padding_half"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/preview"
+        android:layout_width="156dp"
+        android:layout_height="0dp"
+        android:padding="1dp"
+        app:layout_constraintDimensionRatio="H,16:9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:strokeColor="?colorOnSurface"
+        app:strokeWidth="1dp"/>
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceTitleMedium"
+        android:layout_marginStart="@dimen/padding"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/preview"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/subtitle"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:layout_marginStart="@dimen/padding"
+        app:layout_constraintStart_toEndOf="@+id/preview"
+        app:layout_constraintTop_toBottomOf="@+id/text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
