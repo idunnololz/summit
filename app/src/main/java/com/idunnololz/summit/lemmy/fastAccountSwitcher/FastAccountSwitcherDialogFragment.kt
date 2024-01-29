@@ -58,9 +58,10 @@ class FastAccountSwitcherDialogFragment :
             adapter = AccountAdapter(
                 context,
                 isSimple = true,
+                showGuestAccount = false,
                 signOut = {},
                 onAccountClick = {
-                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACCOUNT to it.account))
+                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACCOUNT to it?.account))
                     dismiss()
                 },
                 onAddAccountClick = {},

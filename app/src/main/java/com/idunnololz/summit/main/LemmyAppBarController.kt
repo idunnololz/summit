@@ -40,7 +40,14 @@ class LemmyAppBarController(
         communitySelectedListener: CommunitySelectedListener,
         onAccountClick: (currentAccount: Account?) -> Unit,
         onSortOrderClick: () -> Unit,
+        onChangeInstanceClick: () -> Unit,
     ) {
+        fun showCommunitySelectorInternal() {
+            val controller = mainActivity.showCommunitySelector(currentCommunity)
+            controller.onCommunitySelectedListener = communitySelectedListener
+            controller.onChangeInstanceClick = onChangeInstanceClick
+        }
+
         accountChip.setOnClickListener {
             onAccountClick(null)
         }
@@ -49,12 +56,10 @@ class LemmyAppBarController(
             onAccountClick(account)
         }
         communityTextView.setOnClickListener {
-            val controller = mainActivity.showCommunitySelector(currentCommunity)
-            controller.onCommunitySelectedListener = communitySelectedListener
+            showCommunitySelectorInternal()
         }
         customActionBar.setOnClickListener {
-            val controller = mainActivity.showCommunitySelector(currentCommunity)
-            controller.onCommunitySelectedListener = communitySelectedListener
+            showCommunitySelectorInternal()
         }
         binding.communitySortOrder.setOnClickListener {
             onSortOrderClick()

@@ -49,6 +49,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GUEST_ACCOUNT_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
@@ -833,6 +834,12 @@ class Preferences(
             prefs.edit()
                 .putBoolean(KEY_USE_PER_COMMUNITY_SETTINGS, value)
                 .apply()
+        }
+
+    var guestAccountSettings: GuestAccountSettings?
+        get() = prefs.getMoshiValue(KEY_GUEST_ACCOUNT_SETTINGS)
+        set(value) {
+            prefs.putMoshiValue(KEY_GUEST_ACCOUNT_SETTINGS, value)
         }
 
     fun reset(key: String) {

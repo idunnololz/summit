@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
@@ -84,6 +85,7 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -200,9 +202,14 @@ class PostFragment :
             val result = bundle.getParcelableCompat<Account>(
                 AccountsAndSettingsDialogFragment.REQUEST_RESULT,
             )
+            val hasResult = bundle.containsKey(AccountsAndSettingsDialogFragment.REQUEST_RESULT)
 
-            if (result != null) {
-                viewModel.switchAccount(result)
+            if (hasResult) {
+                if (result != null) {
+                    viewModel.switchAccount(result)
+                } else {
+                    viewModel.switchAccount(result)
+                }
             }
         }
 
@@ -546,9 +553,7 @@ class PostFragment :
         }
 
         viewModel.currentAccountView.observe(viewLifecycleOwner) {
-            binding.accountImageView.load(it?.profileImage) {
-                allowHardware(false)
-            }
+            it.loadProfileImageOrDefault(binding.accountImageView)
         }
         binding.accountImageView.setOnClickListener {
             AccountsAndSettingsDialogFragment.newInstance(dontSwitchAccount = true)
@@ -557,8 +562,19 @@ class PostFragment :
         viewModel.switchAccountState.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
-                    binding.loadingViewFullscreen.visibility = View.VISIBLE
-                    binding.loadingView2.showDefaultErrorMessageFor(it.error)
+                    binding.loadingViewFullscreen.visibility = View.GONE
+                    binding.loadingView2.hideAll()
+
+                    Snackbar
+                        .make(
+                            binding.coordinatorLayout,
+                            getString(
+                                R.string.error_switch_instance_failed_format,
+                                it.error.toErrorMessage(context)
+                            ),
+                            Snackbar.LENGTH_LONG,
+                        )
+                        .show()
                 }
                 is StatefulData.Loading -> {
                     binding.loadingViewFullscreen.visibility = View.VISIBLE
@@ -786,6 +802,9 @@ class PostFragment :
             forceRefresh()
         }
         binding.loadingView.setOnRefreshClickListener {
+            forceRefresh()
+        }
+        binding.loadingView2.setOnRefreshClickListener {
             forceRefresh()
         }
 

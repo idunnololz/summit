@@ -24,6 +24,7 @@ import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +41,7 @@ class AddOrEditCommentViewModel @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val state: SavedStateHandle,
     private val apiListenerManager: ApiListenerManager,
+    private val preferences: Preferences,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
@@ -47,7 +49,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         private const val TAG = "AddOrEditCommentViewModel"
     }
 
-    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager)
+    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager, preferences)
 
     sealed interface Message {
         data class ReplyTargetTooOld(

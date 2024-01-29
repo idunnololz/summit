@@ -53,9 +53,12 @@ class SettingAccountsFragment : BaseFragment<FragmentSettingAccountsBinding>() {
         val adapter = AccountAdapter(
             context = context,
             isSimple = true,
+            showGuestAccount = false,
             signOut = {},
             onAccountClick = {
-                onAccountClick(it.account.id)
+                if (it != null) {
+                    onAccountClick(it.account.id)
+                }
             },
             onAddAccountClick = {},
             onSettingClick = {},

@@ -87,9 +87,9 @@ class AccountManager @Inject constructor(
         deferred.await()
     }
 
-    suspend fun setCurrentAccount(account: Account) = withContext(Dispatchers.IO) {
+    suspend fun setCurrentAccount(account: Account?) = withContext(Dispatchers.IO) {
         val deferred = coroutineScope.async {
-            accountDao.clearAndSetCurrent(account.id)
+            accountDao.clearAndSetCurrent(account?.id)
 
             doSwitchAccountWork(account)
 

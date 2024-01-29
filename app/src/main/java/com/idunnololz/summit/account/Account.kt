@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.idunnololz.summit.lemmy.PersonRef
 import kotlinx.parcelize.Parcelize
 
 @Entity
@@ -30,3 +31,6 @@ data class Account(
 
 val Account.fullName
     get() = "${this.name}@${this.instance}"
+
+fun Account.toPersonRef() =
+    PersonRef.PersonRefByName(name = name, instance = instance)

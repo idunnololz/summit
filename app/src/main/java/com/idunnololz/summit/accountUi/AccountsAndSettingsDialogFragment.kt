@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.CommunityDirections
+import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.databinding.DialogFragmentAccountsBinding
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -70,6 +71,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
             val adapter = AccountAdapter(
                 context,
                 isSimple = false,
+                showGuestAccount = true,
                 signOut = {
                     viewModel.signOut(it.account)
                 },
@@ -78,12 +80,12 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                         setFragmentResult(
                             REQUEST_KEY,
                             bundleOf(
-                                REQUEST_RESULT to it.account,
+                                REQUEST_RESULT to it?.account,
                             ),
                         )
                         dismiss()
                     } else {
-                        viewModel.switchAccount(it.account)
+                        viewModel.switchAccount(it?.account)
                     }
                 },
                 onAddAccountClick = {
@@ -95,7 +97,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                 },
                 onPersonClick = {
                     requireMainActivity().launchPage(
-                        PersonRef.PersonRefByName(it.account.name, it.account.instance),
+                        it.account.toPersonRef(),
                     )
                 },
             )

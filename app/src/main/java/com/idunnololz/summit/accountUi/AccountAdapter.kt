@@ -10,13 +10,15 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.databinding.AccountItemBinding
 import com.idunnololz.summit.databinding.AddAccountItemBinding
 import com.idunnololz.summit.databinding.CurrentAccountItemBinding
+import com.idunnololz.summit.databinding.GuestAccountItemBinding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
 class AccountAdapter(
     private val context: Context,
     private val isSimple: Boolean,
+    private val showGuestAccount: Boolean,
     private val signOut: (AccountView) -> Unit,
-    private val onAccountClick: (AccountView) -> Unit,
+    private val onAccountClick: (AccountView?) -> Unit,
     private val onAddAccountClick: () -> Unit,
     private val onSettingClick: () -> Unit,
     private val onPersonClick: (AccountView) -> Unit,
@@ -28,6 +30,9 @@ class AccountAdapter(
         ) : Item
         data class AccountItem(
             val accountView: AccountView,
+        ) : Item
+        data class GuestAccountItem(
+            val isSelected: Boolean,
         ) : Item
         data class AddAccountItem(
             val hasAccounts: Boolean,
@@ -41,6 +46,7 @@ class AccountAdapter(
             is Item.AccountItem ->
                 old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
             is Item.AddAccountItem -> true
+            is Item.GuestAccountItem -> true
         }
     },).apply {
         addItemType(
@@ -96,6 +102,17 @@ class AccountAdapter(
                 onAddAccountClick()
             }
         }
+        addItemType(Item.GuestAccountItem::class, GuestAccountItemBinding::inflate) { item, b, h ->
+            if (item.isSelected) {
+                b.selected.visibility = View.VISIBLE
+            } else {
+                b.selected.visibility = View.GONE
+            }
+
+            b.root.setOnClickListener {
+                onAccountClick(null)
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -112,9 +129,14 @@ class AccountAdapter(
     fun setAccounts(accounts: List<AccountView>, cb: () -> Unit = {}) {
         val currentAccount = accounts.firstOrNull { it.account.current }
         val newItems = mutableListOf<Item>()
+        val showGuestAccount = accounts.isNotEmpty() && showGuestAccount
 
         if (currentAccount != null) {
             newItems.add(Item.CurrentAccountItem(currentAccount))
+        }
+
+        if (currentAccount == null && showGuestAccount) {
+            newItems.add(Item.GuestAccountItem(isSelected = true))
         }
 
         accounts.mapNotNullTo(newItems) {
@@ -123,6 +145,10 @@ class AccountAdapter(
             } else {
                 null
             }
+        }
+
+        if (currentAccount != null && showGuestAccount) {
+            newItems.add(Item.GuestAccountItem(isSelected = false))
         }
 
         if (!isSimple) {

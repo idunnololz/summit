@@ -204,6 +204,10 @@ class ScreenshotModeDialogFragment :
                         setIcon(R.drawable.baseline_title_24)
                         setTitle(R.string.post_title_only)
                     }
+                    ScreenshotModeViewModel.PostViewType.TitleAndImageOnly -> {
+                        setIcon(R.drawable.baseline_art_track_24)
+                        setTitle(R.string.post_title_and_image_only)
+                    }
                     ScreenshotModeViewModel.PostViewType.Compact -> {
                         setIcon(R.drawable.baseline_list_24)
                         setTitle(R.string.compact_post)
@@ -333,6 +337,9 @@ class ScreenshotModeDialogFragment :
                 screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
             }
             ScreenshotModeViewModel.PostViewType.TitleOnly -> {
+                screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
+            }
+            ScreenshotModeViewModel.PostViewType.TitleAndImageOnly -> {
                 screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
             }
             ScreenshotModeViewModel.PostViewType.Compact -> {

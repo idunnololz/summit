@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -314,16 +315,17 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun switchAccount(account: Account) {
+    fun switchAccount(account: Account?) {
         val postOrCommentRef = postOrCommentRef ?: return
 
         val instance = postOrCommentRef.fold(
             { it.instance },
             { it.instance },
         )
-        val didInstanceChange = instance != account.instance
+        val newInstance = account?.instance ?: DEFAULT_INSTANCE
+        val didInstanceChange = instance != newInstance
 
-        if (account.id == currentAccountView.value?.account?.id) {
+        if (account?.id == currentAccountView.value?.account?.id) {
             return
         }
 
@@ -391,9 +393,9 @@ class PostViewModel @Inject constructor(
                 .fold(
                     onSuccess = {
                         val newPostOrCommentRef = if (it.post != null) {
-                            Either.Left(PostRef(account.instance, it.post.post.id))
+                            Either.Left(PostRef(newInstance, it.post.post.id))
                         } else if (it.comment != null) {
-                            Either.Right(CommentRef(account.instance, it.comment.comment.id))
+                            Either.Right(CommentRef(newInstance, it.comment.comment.id))
                         } else {
                             null
                         }
