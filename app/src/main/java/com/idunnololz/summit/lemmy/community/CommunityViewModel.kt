@@ -29,7 +29,9 @@ import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.preferences.GuestAccountSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
@@ -102,6 +104,8 @@ class CommunityViewModel @Inject constructor(
         get() = postsRepository.communityInstance
     val apiInstance: String
         get() = postsRepository.apiInstance
+
+    private var initialPageFetched = state.getLiveData<Boolean>("_initialPageFetched")
 
     override var lastSelectedPost: PostRef? = null
 
@@ -181,12 +185,31 @@ class CommunityViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            accountInfoManager.currentFullAccount.collect {
-                if (it != null) {
-                    val accountView = accountInfoManager.getAccountViewForAccount(it.account)
+            accountInfoManager.currentFullAccount.collect { fullAccount ->
+                if (fullAccount != null) {
+                    val accountView = accountInfoManager.getAccountViewForAccount(fullAccount.account)
 
                     currentAccount.postValue(accountView)
                 }
+
+                val preferences = preferenceManager.getComposedPreferencesForAccount(
+                    fullAccount?.account,
+                )
+
+                val sortOrder = if (fullAccount != null) {
+                    preferences.defaultCommunitySortOrder
+                        ?: fullAccount
+                            .accountInfo
+                            .miscAccountInfo
+                            ?.defaultCommunitySortType
+                            ?.toSortOrder()
+                        ?: return@collect
+                } else {
+                    preferences.defaultCommunitySortOrder
+                        ?: return@collect
+                }
+
+                setSortOrder(sortOrder)
             }
         }
 
@@ -204,6 +227,7 @@ class CommunityViewModel @Inject constructor(
                 // user idunnololz@lemmy.world accessing c/summit@lemmy.world = https://lemmy.world/c/summit
                 // user idunnololz@lemmy.ca accessing c/summit@lemmy.world = https://lemmy.ca/c/summit@lemmy.world
                 postsRepository.setCommunity(currentCommunityRef.value)
+
                 fetchInitialPage(force = true, clearPagesOnSuccess = true, scrollToTop = true)
             }
         }
@@ -293,10 +317,27 @@ class CommunityViewModel @Inject constructor(
         clearPagesOnSuccess: Boolean = false,
         scrollToTop: Boolean = false,
     ) {
-        if (postListEngine.infinity) {
-            fetchPage(0, force, clearPagesOnSuccess, scrollToTop)
-        } else {
-            fetchCurrentPage(force, clearPagesOnSuccess)
+        viewModelScope.launch {
+            // Allow some time for settings to settle or else we will end up loading multiple times
+            delay(100)
+
+            withContext(Dispatchers.Main) {
+                initialPageFetched.value = true
+
+                if (postListEngine.infinity) {
+                    fetchPage(
+                        pageIndex = 0,
+                        force = force,
+                        clearPagesOnSuccess = clearPagesOnSuccess,
+                        scrollToTop = scrollToTop
+                    )
+                } else {
+                    fetchCurrentPage(
+                        force = force,
+                        resetHideRead = clearPagesOnSuccess
+                    )
+                }
+            }
         }
     }
 
@@ -352,6 +393,8 @@ class CommunityViewModel @Inject constructor(
         if (fetchingPages.contains(pageToFetch)) {
             return
         }
+
+        Log.d(TAG, "fetching page $pageToFetch")
 
         fetchingPages.add(pageToFetch)
 
@@ -436,6 +479,8 @@ class CommunityViewModel @Inject constructor(
             return
         }
 
+        initialPageFetched.value = false
+
         FirebaseCrashlytics.getInstance().apply {
             setCustomKey("community", communityRef.toString())
             setCustomKey("view_type", preferences.getPostsLayout().name)
@@ -447,6 +492,12 @@ class CommunityViewModel @Inject constructor(
         postListEngine.setSecondaryKey(communityRef.getKey())
 
         postListEngine.tryRestore()
+
+        onCommunityOrInstanceChange()
+    }
+
+    fun changeInstance(instance: String) {
+        apiClient.changeInstance(instance)
 
         onCommunityOrInstanceChange()
     }
@@ -543,12 +594,14 @@ class CommunityViewModel @Inject constructor(
     fun setSortOrder(newSortOrder: CommunitySortOrder) {
         postsRepository.sortOrder = newSortOrder
 
-        fetchCurrentPage(
-            force = true,
-            resetHideRead = true,
-            clearPages = true,
-            scrollToTop = true,
-        )
+        if (initialPageFetched.value == true) {
+            fetchCurrentPage(
+                force = true,
+                resetHideRead = true,
+                clearPages = true,
+                scrollToTop = true,
+            )
+        }
     }
 
     fun getCurrentSortOrder(): CommunitySortOrder = postsRepository.sortOrder
@@ -728,5 +781,13 @@ class CommunityViewModel @Inject constructor(
         communityRef ?: return
 
         tabsManager.updateTabState(tab, communityRef)
+    }
+
+    fun changeGuestAccountInstance(instance: String) {
+        val currentGuestAccount = preferences.guestAccountSettings ?: GuestAccountSettings()
+        preferences.guestAccountSettings =
+            currentGuestAccount.copy(instance = instance)
+
+        changeInstance(instance)
     }
 }

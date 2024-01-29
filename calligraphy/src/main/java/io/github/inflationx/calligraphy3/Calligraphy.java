@@ -1,20 +1,18 @@
 package io.github.inflationx.calligraphy3;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.Toolbar;
+
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-
-import androidx.appcompat.widget.Toolbar;
 
 class Calligraphy {
 
@@ -231,7 +229,6 @@ class Calligraphy {
             toolbar.setSubtitle(BLANK);
         }
 
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         @Override public void onGlobalLayout() {
             final Toolbar toolbar = mToolbarReference.get();
             final Context context = mContextRef.get();
@@ -259,12 +256,7 @@ class Calligraphy {
         }
 
         private void removeSelf(final Toolbar toolbar) {// Our dark deed is done
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                //noinspection deprecation
-                toolbar.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-            } else {
-                toolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
+            toolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
         }
 
     }

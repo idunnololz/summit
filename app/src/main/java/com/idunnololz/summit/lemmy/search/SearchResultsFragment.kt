@@ -57,6 +57,7 @@ import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.LinkType
@@ -623,7 +624,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 b.instance.text = person.instance
 
                 b.root.setOnClickListener {
-                    onPageClick(PersonRef.PersonRefByName(person.name, person.instance))
+                    onPageClick(person.toPersonRef())
                 }
             }
             addItemType(Item.ErrorItem::class, LoadingViewItemBinding::inflate) { item, b, _ ->

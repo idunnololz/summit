@@ -116,11 +116,14 @@ class LemmyContentHelper(
         // Handles crossposts
         val targetPostView = postView
 
-        val showText = screenshotConfig?.postViewType != PostViewType.ImageOnly
-        val showImage = screenshotConfig?.postViewType != PostViewType.TextOnly
-        val showLink = screenshotConfig?.postViewType == null ||
+        val postViewType = screenshotConfig?.postViewType
+        val showText = postViewType != PostViewType.ImageOnly &&
+            postViewType != PostViewType.TitleAndImageOnly
+        val showImage = postViewType != PostViewType.TextOnly
+        val showLink = postViewType == null ||
             screenshotConfig.postViewType == PostViewType.Full
-        val onlyImage = screenshotConfig?.postViewType == PostViewType.ImageOnly
+        val onlyImage = postViewType == PostViewType.ImageOnly ||
+            postViewType == PostViewType.TitleAndImageOnly
 
         @Suppress("UNCHECKED_CAST")
         fun <T : View> getView(@LayoutRes resId: Int): T =

@@ -1682,6 +1682,12 @@ class NavigationSettings @Inject constructor(
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.Profile,
+                context.getString(R.string.user_profile),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
                 NavBarDestinations.None,
                 context.getString(R.string.none),
                 null,

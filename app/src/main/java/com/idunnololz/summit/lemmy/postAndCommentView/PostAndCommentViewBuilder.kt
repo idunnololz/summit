@@ -426,6 +426,16 @@ class PostAndCommentViewBuilder @Inject constructor(
                 title.visibility = View.VISIBLE
                 headerContainer.visibility = View.VISIBLE
             }
+            ScreenshotModeViewModel.PostViewType.TitleAndImageOnly -> {
+                moreButton.visibility = View.GONE
+                controlsDivider2.visibility = View.GONE
+                addCommentButton.visibility = View.GONE
+                controlsDivider.visibility = View.GONE
+
+                title.visibility = View.VISIBLE
+                fullContent.visibility = View.VISIBLE
+                headerContainer.visibility = View.VISIBLE
+            }
             ScreenshotModeViewModel.PostViewType.Compact -> {
                 moreButton.visibility = View.GONE
                 controlsDivider2.visibility = View.GONE

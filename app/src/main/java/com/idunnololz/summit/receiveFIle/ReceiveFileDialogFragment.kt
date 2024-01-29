@@ -70,6 +70,7 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
             onClose = {
                 dismiss()
             },
+            expandFully = true,
         )
 
         requireMainActivity().apply {

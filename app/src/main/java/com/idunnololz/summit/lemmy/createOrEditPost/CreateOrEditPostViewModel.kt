@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.links.LinkMetadataHelper
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -44,6 +45,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val state: SavedStateHandle,
     private val apiListenerManager: ApiListenerManager,
+    private val preferences: Preferences,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
@@ -51,7 +53,7 @@ class CreateOrEditPostViewModel @Inject constructor(
         private const val TAG = "CreateOrEditPostViewModel"
     }
 
-    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager)
+    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager, preferences)
 
     private val linkMetadataHelper = LinkMetadataHelper()
 

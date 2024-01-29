@@ -16,10 +16,15 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
+import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.loadProfileImageOrDefault
+import com.idunnololz.summit.account.toPersonRef
+import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
@@ -64,12 +69,19 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     @Inject
     lateinit var accountImageGenerator: AccountImageGenerator
 
+    @Inject
+    lateinit var accountManager: AccountManager
+
     val viewModel: PersonTabbedViewModel by viewModels()
     var viewPagerController: ViewPagerController? = null
     val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
+
+    private val personRef
+        get() = args.personRef
+            ?: accountManager.currentAccount.value?.toPersonRef()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,10 +111,23 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
         }
 
-        viewModel.fetchPersonIfNotDone(args.personRef)
+        onPersonChanged()
 
         binding.fab.hide()
         with(binding) {
+            if (args.personRef == null) {
+                viewModel.currentAccountView.observe(viewLifecycleOwner) {
+                    it.loadProfileImageOrDefault(binding.accountImageView)
+
+                    onPersonChanged()
+                }
+                accountImageView.setOnClickListener {
+                    AccountsAndSettingsDialogFragment.newInstance()
+                        .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+                }
+            } else {
+                binding.accountImageView.visibility = View.GONE
+            }
             viewModel.personData.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {
@@ -118,7 +143,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         binding.fab.show()
                         loadingView.hideAll()
 
-                        setup()
+                        setup(personRef)
                     }
                 }
             }
@@ -217,6 +242,34 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         }
     }
 
+    private fun onPersonChanged() {
+        val personRef = personRef
+        if (personRef == null) {
+            // this can happen if the user tapped on the profile page and is not signed in.
+            binding.loadingView.showErrorText(
+                getString(R.string.error_not_signed_in)
+            )
+            binding.profileIcon.visibility = View.GONE
+            binding.collapsingToolbarContent.visibility = View.GONE
+            binding.viewPager.visibility = View.GONE
+            binding.tabLayout.visibility = View.GONE
+            binding.fab.hide()
+
+            viewModel.clearPersonData()
+        } else {
+            binding.loadingView.hideAll()
+            binding.profileIcon.visibility = View.VISIBLE
+            binding.collapsingToolbarContent.visibility = View.VISIBLE
+            binding.viewPager.visibility = View.VISIBLE
+            binding.tabLayout.visibility = View.VISIBLE
+            binding.fab.show()
+
+            viewModel.fetchPersonIfNotDone(personRef)
+        }
+
+        setup(personRef)
+    }
+
     private fun showOverflowMenu() {
         if (!isBindingAvailable()) return
 
@@ -291,7 +344,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         }
     }
 
-    private fun setup() {
+    private fun setup(personRef: PersonRef?) {
         if (!isBindingAvailable()) return
 
         val data = viewModel.personData.valueOrNull ?: return
@@ -317,7 +370,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     getMainActivity()?.openImage(
                         banner,
                         null,
-                        args.personRef.fullName,
+                        personRef?.fullName,
                         bannerUrl,
                         null,
                     )

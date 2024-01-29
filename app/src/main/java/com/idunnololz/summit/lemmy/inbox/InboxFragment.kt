@@ -25,6 +25,7 @@ import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -351,7 +352,7 @@ class InboxFragment :
         }
 
         viewModel.currentAccountView.observe(viewLifecycleOwner) {
-            binding.accountImageView.load(it?.profileImage)
+            it.loadProfileImageOrDefault(binding.accountImageView)
         }
         viewModel.currentAccount.observe(viewLifecycleOwner) {
             adapter.accountId = it?.id

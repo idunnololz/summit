@@ -406,6 +406,16 @@ class NavBarController(
                                 setIcon(R.drawable.baseline_inbox_24)
                             }
                         }
+                        NavBarDestinations.Profile -> {
+                            add(
+                                Menu.NONE,
+                                R.id.personTabbedFragment2,
+                                Menu.NONE,
+                                context.getString(R.string.user_profile),
+                            ).apply {
+                                setIcon(R.drawable.outline_account_circle_24)
+                            }
+                        }
                         NavBarDestinations.None -> {
                         }
                     }

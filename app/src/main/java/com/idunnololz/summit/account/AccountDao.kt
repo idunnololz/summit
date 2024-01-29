@@ -44,8 +44,10 @@ abstract class AccountDao {
     abstract suspend fun count(): Int
 
     @Transaction
-    open suspend fun clearAndSetCurrent(accountId: Long) {
+    open suspend fun clearAndSetCurrent(accountId: Long?) {
         removeCurrent()
-        setCurrent(accountId)
+        if (accountId != null) {
+            setCurrent(accountId)
+        }
     }
 }

@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.databinding.TabbedFragmentSavedBinding
@@ -72,9 +73,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
             binding.fab.setup(preferences)
 
             viewModel.currentAccountView.observe(viewLifecycleOwner) {
-                accountImageView.load(it?.profileImage) {
-                    allowHardware(false)
-                }
+                it.loadProfileImageOrDefault(binding.accountImageView)
             }
             accountImageView.setOnClickListener {
                 AccountsAndSettingsDialogFragment.newInstance()

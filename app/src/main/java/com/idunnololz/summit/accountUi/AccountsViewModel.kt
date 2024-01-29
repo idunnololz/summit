@@ -39,7 +39,7 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    fun switchAccount(account: Account) {
+    fun switchAccount(account: Account?) {
         viewModelScope.launch {
             accountManager.setCurrentAccount(account)
 

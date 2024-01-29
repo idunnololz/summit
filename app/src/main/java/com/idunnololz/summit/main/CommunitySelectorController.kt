@@ -14,6 +14,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,11 +40,14 @@ import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorViewBinding
+import com.idunnololz.summit.databinding.CurrentInstanceItemBinding
 import com.idunnololz.summit.databinding.DummyTopItemBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
+import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulData
@@ -61,6 +65,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -98,12 +103,17 @@ class CommunitySelectorController @AssistedInject constructor(
 
     private var coroutineScope = createCoroutineScope()
 
-    private val adapter = CommunitiesAdapter()
+    private val adapter = CommunitiesAdapter(
+        onCurrentInstanceClick = {
+            onChangeInstanceClick?.invoke()
+        }
+    )
 
     private var currentCommunity: CommunityRef? = null
 
     var onCommunitySelectedListener: CommunitySelectedListener? = null
     var onCommunityInfoClick: ((CommunityRef) -> Unit)? = null
+    var onChangeInstanceClick: (() -> Unit)? = null
 
     private val onBackPressedHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -114,6 +124,12 @@ class CommunitySelectorController @AssistedInject constructor(
     init {
         viewModel.siteOrCommunity.observe(viewLifecycleOwner) {
             adapter.setCurrentCommunity(currentCommunity, it, {})
+        }
+
+        coroutineScope.launch {
+            lemmyApiClient.instanceFlow.collect {
+                adapter.refreshItems {  }
+            }
         }
     }
 
@@ -292,7 +308,6 @@ class CommunitySelectorController @AssistedInject constructor(
             is StatefulData.Loading -> {}
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {
-                Log.d("ASDF", "setCommunities: ${communities.data.size}")
                 adapter.setData(communities.data)
             }
         }
@@ -325,6 +340,13 @@ class CommunitySelectorController @AssistedInject constructor(
             val error: Throwable?,
         ) : Item("#current_community")
 
+        data class CurrentInstance(
+            val instance: String,
+            val siteResponse: GetSiteResponse?,
+            val isLoading: Boolean,
+            val error: Throwable?,
+        ) : Item("#current_instance")
+
         class GroupHeaderItem(
             val text: String,
             val stillLoading: Boolean = false,
@@ -352,7 +374,9 @@ class CommunitySelectorController @AssistedInject constructor(
         ) : Item("r:${communityRef.getKey()}")
     }
 
-    private inner class CommunitiesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private inner class CommunitiesAdapter(
+        private val onCurrentInstanceClick: () -> Unit,
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private var rawData: List<CommunityView> = listOf()
         private var serverResultsInProgress = false
@@ -382,6 +406,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     is Item.RecentChildItem -> true
                     is Item.LoadingItem -> true
                     is Item.CurrentCommunity -> old == new
+                    is Item.CurrentInstance -> old == new
                 }
             },
         ).apply {
@@ -496,6 +521,16 @@ class CommunitySelectorController @AssistedInject constructor(
             }
 
             addItemType(
+                clazz = Item.CurrentInstance::class,
+                inflateFn = CurrentInstanceItemBinding::inflate,
+            ) { item, b, _ ->
+                b.instanceName.text = item.instance
+                b.cardView.setOnClickListener {
+                    onCurrentInstanceClick()
+                }
+            }
+
+            addItemType(
                 clazz = Item.GroupHeaderItem::class,
                 inflateFn = CommunitySelectorGroupItemBinding::inflate,
             ) { item, b, _ ->
@@ -584,7 +619,6 @@ class CommunitySelectorController @AssistedInject constructor(
         private var loadingJob: Job? = null
 
         private suspend fun refreshItemsImmediate() = withContext(Dispatchers.Default) {
-            Log.d("ASDF", "refreshItems()!")
             val newItems = mutableListOf<Item>()
 
             fun addRecentItems(query: String?) {
@@ -608,6 +642,8 @@ class CommunitySelectorController @AssistedInject constructor(
             val isQueryActive = !query.isNullOrBlank()
 
             newItems += Item.TopItem
+
+            val account = accountManager.currentAccount.value
 
             if (!isQueryActive) {
                 val currentCommunityData = currentCommunityData
@@ -683,6 +719,17 @@ class CommunitySelectorController @AssistedInject constructor(
                                 )
                         }
                     }
+
+                    if (account == null) {
+                        newItems.add(
+                            Item.CurrentInstance(
+                                instance = lemmyApiClient.instance,
+                                siteResponse = null,
+                                isLoading = false,
+                                error = null,
+                            )
+                        )
+                    }
                 }
 
                 newItems.add(Item.GroupHeaderItem(context.getString(R.string.feeds)))
@@ -694,7 +741,6 @@ class CommunitySelectorController @AssistedInject constructor(
                     ),
                 )
 
-                val account = accountManager.currentAccount.value
                 if (account != null) {
                     newItems.add(
                         Item.StaticChildItem(
@@ -838,7 +884,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
         override fun getItemCount(): Int = adapterHelper.itemCount
 
-        private fun refreshItems(cb: () -> Unit) {
+        fun refreshItems(cb: () -> Unit) {
             coroutineScope.launch {
                 refreshRequestFlow.emit(Unit)
             }

@@ -2,9 +2,12 @@ package com.idunnololz.summit.lemmy.person
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityModeratorView
@@ -24,7 +27,9 @@ import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,6 +39,7 @@ class PersonTabbedViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
+    private val accountInfoManager: AccountInfoManager,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
     companion object {
@@ -65,14 +71,30 @@ class PersonTabbedViewModel @Inject constructor(
     val instance: String
         get() = apiClient.instance
 
+    val currentAccountView = MutableLiveData<AccountView?>()
+
     override var lastSelectedPost: PostRef? = null
     override val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
 
     private var personRef: PersonRef? = null
     private var fetchingPages = mutableSetOf<Int>()
 
+    init {
+        viewModelScope.launch {
+            accountInfoManager.currentFullAccount.collect {
+                withContext(Dispatchers.Main) {
+                    if (it != null) {
+                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(it.account)
+                    } else {
+                        currentAccountView.value = null
+                    }
+                }
+            }
+        }
+    }
+
     fun fetchPersonIfNotDone(personRef: PersonRef) {
-        if (personData.valueOrNull != null) return
+        if (personData.valueOrNull != null && this.personRef == personRef) return
 
         this.personRef = personRef
         fetchPage(0, isPeronInfoFetch = true)
@@ -205,6 +227,10 @@ class PersonTabbedViewModel @Inject constructor(
 
     fun fetchNextCommentPage() {
         fetchPage(commentListEngine.nextPage, false)
+    }
+
+    fun clearPersonData() {
+        personData.setIdle()
     }
 
     private fun reset() {

@@ -44,6 +44,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
+import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
@@ -327,6 +328,19 @@ class CommunityFragment :
                 }
             }
 
+            setFragmentResultListener(
+                InstancePickerDialogFragment.REQUEST_KEY,
+                this@CommunityFragment
+            ) { _, bundle ->
+                val result = bundle.getParcelableCompat<InstancePickerDialogFragment.Result>(
+                    InstancePickerDialogFragment.REQUEST_KEY_RESULT
+                )
+
+                if (result != null) {
+                    viewModel.changeGuestAccountInstance(result.instance)
+                }
+            }
+
 //            setFragmentResultListener(
 //                MultiCommunityEditorDialogFragment.REQUEST_KEY,
 //                this@CommunityFragment,
@@ -423,6 +437,9 @@ class CommunityFragment :
                 },
                 onSortOrderClick = {
                     getMainActivity()?.showBottomMenu(getSortByMenu())
+                },
+                onChangeInstanceClick = {
+                    InstancePickerDialogFragment.show(childFragmentManager)
                 },
             )
         }
@@ -1128,6 +1145,13 @@ class CommunityFragment :
                                 R.id.inboxTabbedFragment,
                                 getString(R.string.inbox),
                                 R.drawable.baseline_inbox_24,
+                            )
+                        }
+                        NavBarDestinations.Profile -> {
+                            addItemWithIcon(
+                                R.id.personTabbedFragment2,
+                                getString(R.string.user_profile),
+                                R.drawable.outline_account_circle_24,
                             )
                         }
                         NavBarDestinations.None -> {

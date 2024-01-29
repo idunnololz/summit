@@ -22,6 +22,7 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -93,28 +94,7 @@ class PostsRepository @Inject constructor(
 
             reset()
         }
-    val sortOrderFlow = MutableStateFlow<CommunitySortOrder>(sortOrder)
-
-    init {
-        coroutineScope.launch {
-            accountInfoManager.currentFullAccount.collect { fullAccount ->
-                val preferences = preferenceManager.getComposedPreferencesForAccount(
-                    fullAccount?.account,
-                )
-
-                if (fullAccount != null) {
-                    sortOrder =
-                        preferences.defaultCommunitySortOrder
-                            ?: fullAccount
-                                .accountInfo
-                                .miscAccountInfo
-                                ?.defaultCommunitySortType
-                                ?.toSortOrder()
-                            ?: return@collect
-                }
-            }
-        }
-    }
+    val sortOrderFlow = MutableStateFlow(sortOrder)
 
     suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> =
         updateStateMaintainingPosition({

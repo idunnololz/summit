@@ -107,12 +107,14 @@ import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runInterruptible
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -130,6 +132,7 @@ class LemmyApiClient(
     @ApplicationContext private val context: Context,
     private val apiListenerManager: ApiListenerManager,
     private val userAgent: String,
+    private val preferences: Preferences,
 ) {
 
     companion object {
@@ -161,20 +164,33 @@ class LemmyApiClient(
         )
     }
 
-    private var api = LemmyApi.getInstance(context)
+    private var api = LemmyApi.getInstance(
+        context,
+        preferences.guestAccountSettings?.instance
+            ?: DEFAULT_INSTANCE
+    )
     val okHttpClient = LemmyApi.okHttpClient(context, userAgent)
 
     @Inject constructor(
         @ApplicationContext context: Context,
         apiListenerManager: ApiListenerManager,
-    ) : this(context, apiListenerManager, LinkUtils.USER_AGENT)
+        preferences: Preferences,
+    ) : this(context, apiListenerManager, LinkUtils.USER_AGENT, preferences)
 
     fun changeInstance(newInstance: String) {
         api = LemmyApi.getInstance(context, newInstance)
+
+        instanceFlow.value = api.instance
     }
 
     fun defaultInstance() {
-        api = LemmyApi.getInstance(context)
+        api = LemmyApi.getInstance(
+            context,
+            preferences.guestAccountSettings?.instance
+                ?: DEFAULT_INSTANCE
+        )
+
+        instanceFlow.value = api.instance
     }
 
     fun clearCache() {
@@ -1762,7 +1778,9 @@ class LemmyApiClient(
     }
 
     val instance: String
-        get() = api.instance
+        get() = instanceFlow.value
+
+    val instanceFlow = MutableStateFlow<String>(api.instance)
 
     private suspend fun <T> retrofitErrorHandler(
         call: () -> Call<T>,

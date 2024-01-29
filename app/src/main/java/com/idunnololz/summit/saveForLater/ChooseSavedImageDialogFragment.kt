@@ -84,6 +84,7 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
             onClose = {
                 dismiss()
             },
+            expandFully = true,
         )
 
         requireMainActivity().apply {
