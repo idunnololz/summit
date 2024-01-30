@@ -12,6 +12,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PostReadManager
@@ -144,11 +145,13 @@ class PostViewModel @Inject constructor(
         }
         viewModelScope.launch {
             accountManager.currentAccount.collect {
+                val account = it as? Account
+
                 withContext(Dispatchers.Main) {
                     preferences = preferenceManager.currentPreferences
 
-                    if (it != null) {
-                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(it)
+                    if (account != null) {
+                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(account)
                     } else {
                         currentAccountView.value = null
                     }
@@ -593,7 +596,7 @@ class PostViewModel @Inject constructor(
                                     }
                                 }
                                 .firstOrNull {
-                                    it.comment.creator_id == accountManager.currentAccount.value?.id
+                                    it.comment.creator_id == accountManager.currentAccount.asAccount?.id
                                 }
                                 ?.comment?.id
                         }

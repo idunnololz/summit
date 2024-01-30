@@ -175,4 +175,16 @@
         android:layout_gravity="center_vertical"
         app:tint="?colorControlNormal"/>
 
+    <ImageView
+        android:id="@+id/settings"
+        android:src="@drawable/baseline_settings_24"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:contentDescription="@string/settings"
+        android:tooltipText="@string/settings"
+        android:background="?selectableItemBackgroundBorderless"
+        android:layout_gravity="center_vertical"
+        app:tint="?colorControlNormal"/>
+
 </LinearLayout>

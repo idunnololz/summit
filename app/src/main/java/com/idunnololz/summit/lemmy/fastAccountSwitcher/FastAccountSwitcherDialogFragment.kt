@@ -9,7 +9,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.accountUi.AccountAdapter
 import com.idunnololz.summit.databinding.DialogFragmentFastAccountSwitchBinding
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
@@ -17,6 +19,7 @@ import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FastAccountSwitcherDialogFragment :
@@ -36,6 +39,9 @@ class FastAccountSwitcherDialogFragment :
     private val viewModel: FastAccountSwitcherViewModel by viewModels()
 
     private var adapter: AccountAdapter? = null
+
+    @Inject
+    lateinit var guestAccountManager: GuestAccountManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,9 +65,10 @@ class FastAccountSwitcherDialogFragment :
                 context,
                 isSimple = true,
                 showGuestAccount = false,
+                guestAccountManager = guestAccountManager,
                 signOut = {},
                 onAccountClick = {
-                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACCOUNT to it?.account))
+                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACCOUNT to it as? Account))
                     dismiss()
                 },
                 onAddAccountClick = {},

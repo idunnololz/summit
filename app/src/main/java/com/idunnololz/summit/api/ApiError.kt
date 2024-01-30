@@ -9,6 +9,8 @@ open class ClientApiException(val errorMessage: String?, val errorCode: Int) : A
     "Client error. Code: $errorCode. Message: $errorMessage.",
 )
 
+class IncorrectLoginException() : ClientApiException("Incorrect username or password.", 401)
+
 class NotAuthenticatedException() : ClientApiException("Not signed in", 401)
 class AccountInstanceMismatchException(
     val accountInstance: String,

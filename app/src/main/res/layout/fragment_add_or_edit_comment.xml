@@ -109,10 +109,6 @@
             android:layout_height="wrap_content"
             android:background="@color/colorSurface"
             android:layout_gravity="bottom">
-
-            <include
-                android:id="@+id/text_format_toolbar"
-                layout="@layout/text_format_toolbar"/>
         </HorizontalScrollView>
     </LinearLayout>
 </FrameLayout>

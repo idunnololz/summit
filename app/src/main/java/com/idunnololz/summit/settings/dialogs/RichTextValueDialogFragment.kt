@@ -11,10 +11,11 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentRichTextValueBinding
+import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
-import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -22,6 +23,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RichTextValueDialogFragment :
@@ -45,7 +47,8 @@ class RichTextValueDialogFragment :
 
     private val viewModel: RichTextValueViewModel by viewModels()
 
-    private val textFormatterHelper = TextFormatterHelper()
+    @Inject
+    lateinit var textFieldToolbarManager: TextFieldToolbarManager
 
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -59,6 +62,9 @@ class RichTextValueDialogFragment :
         }
 
     private var currentBottomMenu: BottomMenu? = null
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onStart() {
         super.onStart()
@@ -93,9 +99,12 @@ class RichTextValueDialogFragment :
             textEditor.hint = requireArguments().getString(ARG_TITLE)
             textEditor.setText(requireArguments().getString(ARG_CURRENT_VALUE))
 
-            textFormatterHelper.setupTextFormatterToolbar(
-                getMainActivity(),
-                textFormatToolbar,
+            val textFormatToolbar = textFieldToolbarManager.createTextFormatterToolbar(
+                context,
+                postBodyToolbar,
+            )
+
+            textFormatToolbar.setupTextFormatterToolbar(
                 textEditor,
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
@@ -187,7 +196,7 @@ class RichTextValueDialogFragment :
                         loadingView.hideAll()
                         viewModel.uploadImageEvent.clear()
 
-                        textFormatterHelper.onImageUploaded(it.data.url)
+                        textFormatToolbar.onImageUploaded(it.data.url)
                     }
                 }
             }

@@ -26,6 +26,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
@@ -86,7 +87,7 @@ class PostListViewBuilder @Inject constructor(
     }
 
     private var preferences = preferenceManager.getComposedPreferencesForAccount(
-        accountManager.currentAccount.value,
+        accountManager.currentAccount.asAccount,
     )
 
     var postUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
@@ -138,9 +139,10 @@ class PostListViewBuilder @Inject constructor(
 
         coroutineScope.launch {
             accountManager.currentAccount.collect {
-                currentUser = it
+                val account = it as? Account
+                currentUser = account
 
-                preferences = preferenceManager.getComposedPreferencesForAccount(it)
+                preferences = preferenceManager.getComposedPreferencesForAccount(account)
 
                 onPostUiConfigUpdated()
             }

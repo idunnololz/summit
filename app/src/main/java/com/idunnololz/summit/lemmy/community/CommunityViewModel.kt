@@ -15,7 +15,11 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.GuestAccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.FullAccount
+import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
@@ -26,12 +30,12 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
 import com.idunnololz.summit.lemmy.CommunityViewState
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.toUrl
-import com.idunnololz.summit.preferences.GuestAccountSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.TabsManager
@@ -68,6 +72,7 @@ class CommunityViewModel @Inject constructor(
     private val hiddenPostsManager: HiddenPostsManager,
     private val tabsManager: TabsManager,
     private val apiClient: AccountAwareLemmyClient,
+    private val guestAccountManager: GuestAccountManager,
     val basePreferences: Preferences,
 ) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
 
@@ -91,7 +96,7 @@ class CommunityViewModel @Inject constructor(
 
     private var pagePositions = arrayListOf<PageScrollState>()
 
-    val currentCommunityRef = MutableLiveData<CommunityRef?>(null)
+    val currentCommunityRef = state.getLiveData<CommunityRef?>("currentCommunityRef")
     val currentPageIndex = MutableLiveData(0)
     private val communityRefChangeObserver = Observer<CommunityRef?> {
         it ?: return@Observer
@@ -99,6 +104,9 @@ class CommunityViewModel @Inject constructor(
         recentCommunityManager.addRecentCommunity(it)
     }
     val loadedPostsData = StatefulLiveData<PostUpdateInfo>()
+    private val personRefOfLastAccountPreferencesLoaded = state.getLiveData<PersonRef?>(
+        "accountIdOfLastAccountPreferencesLoaded",
+    )
 
     val communityInstance: String
         get() = postsRepository.communityInstance
@@ -130,7 +138,7 @@ class CommunityViewModel @Inject constructor(
     val infinity: Boolean
         get() = postListEngine.infinity
 
-    val sortOrder = postsRepository.sortOrderFlow.asLiveData()
+    val sortOrder = postsRepository.sortOrder.asLiveData()
 
     var lockBottomBar: Boolean = false
 
@@ -143,6 +151,10 @@ class CommunityViewModel @Inject constructor(
             postsRepository.hideRead = it
         }
         postsRepository.showNsfwPosts = preferences.showNsfwPosts
+
+        currentCommunityRef.value?.let {
+            postsRepository.setCommunity(it)
+        }
 
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
@@ -174,7 +186,7 @@ class CommunityViewModel @Inject constructor(
 
         viewModelScope.launch {
             accountManager.currentAccount.collect {
-                val accountView = if (it != null) {
+                val accountView = if (it != null && it is Account) {
                     accountInfoManager.getAccountViewForAccount(it)
                 } else {
                     null
@@ -192,24 +204,7 @@ class CommunityViewModel @Inject constructor(
                     currentAccount.postValue(accountView)
                 }
 
-                val preferences = preferenceManager.getComposedPreferencesForAccount(
-                    fullAccount?.account,
-                )
-
-                val sortOrder = if (fullAccount != null) {
-                    preferences.defaultCommunitySortOrder
-                        ?: fullAccount
-                            .accountInfo
-                            .miscAccountInfo
-                            ?.defaultCommunitySortType
-                            ?.toSortOrder()
-                        ?: return@collect
-                } else {
-                    preferences.defaultCommunitySortOrder
-                        ?: return@collect
-                }
-
-                setSortOrder(sortOrder)
+                loadAccountPreferences(fullAccount)
             }
         }
 
@@ -258,6 +253,36 @@ class CommunityViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun loadAccountPreferences(fullAccount: FullAccount?) {
+        if (
+            fullAccount != null &&
+            personRefOfLastAccountPreferencesLoaded.value == fullAccount.account.toPersonRef()
+        ) {
+            return
+        }
+
+        val preferences = preferenceManager.getComposedPreferencesForAccount(
+            fullAccount?.account,
+        )
+
+        val sortOrder = if (fullAccount != null) {
+            preferences.defaultCommunitySortOrder
+                ?: fullAccount
+                    .accountInfo
+                    .miscAccountInfo
+                    ?.defaultCommunitySortType
+                    ?.toSortOrder()
+                ?: return
+        } else {
+            preferences.defaultCommunitySortOrder
+                ?: return
+        }
+
+        setSortOrder(sortOrder)
+
+        personRefOfLastAccountPreferencesLoaded.value = fullAccount?.account?.toPersonRef()
     }
 
     fun updatePreferences() {
@@ -329,12 +354,12 @@ class CommunityViewModel @Inject constructor(
                         pageIndex = 0,
                         force = force,
                         clearPagesOnSuccess = clearPagesOnSuccess,
-                        scrollToTop = scrollToTop
+                        scrollToTop = scrollToTop,
                     )
                 } else {
                     fetchCurrentPage(
                         force = force,
-                        resetHideRead = clearPagesOnSuccess
+                        resetHideRead = clearPagesOnSuccess,
                     )
                 }
             }
@@ -459,7 +484,7 @@ class CommunityViewModel @Inject constructor(
             return
         }
 
-        val currentAccount = accountManager.currentAccount.value
+        val currentAccount = accountManager.currentAccount.asAccount
         if (communityRef is CommunityRef.Subscribed && currentAccount == null) {
             return
         }
@@ -592,7 +617,11 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun setSortOrder(newSortOrder: CommunitySortOrder) {
-        postsRepository.sortOrder = newSortOrder
+        if (postsRepository.sortOrder.value == newSortOrder) {
+            return
+        }
+
+        postsRepository.setSortOrder(newSortOrder)
 
         if (initialPageFetched.value == true) {
             fetchCurrentPage(
@@ -604,7 +633,7 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun getCurrentSortOrder(): CommunitySortOrder = postsRepository.sortOrder
+    fun getCurrentSortOrder(): CommunitySortOrder = postsRepository.sortOrder.value
 
     fun setDefaultPage(currentCommunityRef: CommunityRef) {
         viewModelScope.launch {
@@ -613,7 +642,7 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun resetToAccountInstance() {
-        val account = accountManager.currentAccount.value ?: return
+        val account = accountManager.currentAccount.value as Account? ?: return
         changeCommunity(CommunityRef.All(account.instance))
 
         reset(resetScrollPosition = true)
@@ -784,10 +813,6 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun changeGuestAccountInstance(instance: String) {
-        val currentGuestAccount = preferences.guestAccountSettings ?: GuestAccountSettings()
-        preferences.guestAccountSettings =
-            currentGuestAccount.copy(instance = instance)
-
-        changeInstance(instance)
+        guestAccountManager.changeGuestAccountInstance(instance)
     }
 }

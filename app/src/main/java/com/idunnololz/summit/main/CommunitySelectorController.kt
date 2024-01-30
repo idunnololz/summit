@@ -3,7 +3,6 @@ package com.idunnololz.summit.main
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,9 +22,9 @@ import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.CommonLemmyInstance
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListingType
@@ -46,8 +44,6 @@ import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
-import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
-import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulData
@@ -65,7 +61,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -106,7 +101,7 @@ class CommunitySelectorController @AssistedInject constructor(
     private val adapter = CommunitiesAdapter(
         onCurrentInstanceClick = {
             onChangeInstanceClick?.invoke()
-        }
+        },
     )
 
     private var currentCommunity: CommunityRef? = null
@@ -128,7 +123,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
         coroutineScope.launch {
             lemmyApiClient.instanceFlow.collect {
-                adapter.refreshItems {  }
+                adapter.refreshItems { }
             }
         }
     }
@@ -643,7 +638,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
             newItems += Item.TopItem
 
-            val account = accountManager.currentAccount.value
+            val account = accountManager.currentAccount.asAccount
 
             if (!isQueryActive) {
                 val currentCommunityData = currentCommunityData
@@ -727,7 +722,7 @@ class CommunitySelectorController @AssistedInject constructor(
                                 siteResponse = null,
                                 isLoading = false,
                                 error = null,
-                            )
+                            ),
                         )
                     }
                 }
@@ -771,23 +766,11 @@ class CommunitySelectorController @AssistedInject constructor(
                         )
                     }
                 } else {
-                    newItems.addAll(
-                        listOf(
-                            Item.StaticChildItem(
-                                CommonLemmyInstance.LemmyMl.instance,
-                                R.drawable.ic_subreddit_home,
-                                CommunityRef.Local(CommonLemmyInstance.LemmyMl.instance),
-                            ),
-                            Item.StaticChildItem(
-                                CommonLemmyInstance.LemmyWorld.instance,
-                                R.drawable.ic_subreddit_home,
-                                CommunityRef.Local(CommonLemmyInstance.LemmyWorld.instance),
-                            ),
-                            Item.StaticChildItem(
-                                CommonLemmyInstance.Beehaw.instance,
-                                R.drawable.ic_subreddit_home,
-                                CommunityRef.Local(CommonLemmyInstance.Beehaw.instance),
-                            ),
+                    newItems.add(
+                        Item.StaticChildItem(
+                            context.getString(R.string.local),
+                            R.drawable.ic_subreddit_home,
+                            CommunityRef.Local(null),
                         ),
                     )
                 }

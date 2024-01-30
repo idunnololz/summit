@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
@@ -24,7 +25,7 @@ class SettingPerAccountViewModel @Inject constructor(
 
         viewModelScope.launch {
             val account = if (accountId == 0L) {
-                accountManager.currentAccount.value
+                accountManager.currentAccount.asAccount
             } else {
                 accountManager.getAccountById(accountId)
             }

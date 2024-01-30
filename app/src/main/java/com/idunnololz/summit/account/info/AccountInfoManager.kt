@@ -6,6 +6,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.Community
@@ -76,9 +77,9 @@ class AccountInfoManager @Inject constructor(
             accountManager.currentAccount.collect {
                 accountInfoUpdateState.emit(StatefulData.NotStarted())
 
-                loadAccountInfo(it)
+                loadAccountInfo(it as? Account)
 
-                refreshAccountInfo(it)
+                refreshAccountInfo(it as? Account)
                 updateUnreadCount()
             }
         }
@@ -86,7 +87,7 @@ class AccountInfoManager @Inject constructor(
         coroutineScope.launch {
             unreadCountInvalidates.debounce(1000)
                 .collect {
-                    val account = accountManager.currentAccount.value ?: return@collect
+                    val account = accountManager.currentAccount.asAccount ?: return@collect
                     updateUnreadCount(account)
                 }
         }
@@ -94,12 +95,12 @@ class AccountInfoManager @Inject constructor(
 
     fun refreshAccountInfo() {
         coroutineScope.launch {
-            refreshAccountInfo(accountManager.currentAccount.value)
+            refreshAccountInfo(accountManager.currentAccount.asAccount)
         }
     }
 
     suspend fun fetchAccountInfo(): Result<GetSiteResponse> =
-        refreshAccountInfo(accountManager.currentAccount.value)
+        refreshAccountInfo(accountManager.currentAccount.asAccount)
 
     fun updateUnreadCount() {
         coroutineScope.launch {

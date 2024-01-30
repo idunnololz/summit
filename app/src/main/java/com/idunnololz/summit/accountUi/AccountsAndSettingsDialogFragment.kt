@@ -11,13 +11,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.CommunityDirections
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.databinding.DialogFragmentAccountsBinding
-import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccountsBinding>() {
@@ -37,6 +39,9 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
     private val args by navArgs<AccountsAndSettingsDialogFragmentArgs>()
 
     private val viewModel: AccountsViewModel by viewModels()
+
+    @Inject
+    lateinit var guestAccountManager: GuestAccountManager
 
     override fun onStart() {
         super.onStart()
@@ -72,6 +77,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                 context,
                 isSimple = false,
                 showGuestAccount = true,
+                guestAccountManager = guestAccountManager,
                 signOut = {
                     viewModel.signOut(it.account)
                 },
@@ -80,12 +86,12 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                         setFragmentResult(
                             REQUEST_KEY,
                             bundleOf(
-                                REQUEST_RESULT to it?.account,
+                                REQUEST_RESULT to it as? Account,
                             ),
                         )
                         dismiss()
                     } else {
-                        viewModel.switchAccount(it?.account)
+                        viewModel.switchAccount(it)
                     }
                 },
                 onAddAccountClick = {

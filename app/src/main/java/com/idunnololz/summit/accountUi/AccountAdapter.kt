@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.GuestAccountManager
+import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.databinding.AccountItemBinding
 import com.idunnololz.summit.databinding.AddAccountItemBinding
 import com.idunnololz.summit.databinding.CurrentAccountItemBinding
@@ -17,8 +19,9 @@ class AccountAdapter(
     private val context: Context,
     private val isSimple: Boolean,
     private val showGuestAccount: Boolean,
+    private val guestAccountManager: GuestAccountManager,
     private val signOut: (AccountView) -> Unit,
-    private val onAccountClick: (AccountView?) -> Unit,
+    private val onAccountClick: (GuestOrUserAccount) -> Unit,
     private val onAddAccountClick: () -> Unit,
     private val onSettingClick: () -> Unit,
     private val onPersonClick: (AccountView) -> Unit,
@@ -62,11 +65,11 @@ class AccountAdapter(
                 b.settings.setImageResource(R.drawable.baseline_check_24)
 
                 b.settings.setOnClickListener {
-                    onAccountClick(item.accountView)
+                    onAccountClick(item.accountView.account)
                 }
                 b.signOut.setOnClickListener {}
                 b.root.setOnClickListener {
-                    onAccountClick(item.accountView)
+                    onAccountClick(item.accountView.account)
                 }
             } else {
                 b.signOut.visibility = View.VISIBLE
@@ -89,7 +92,7 @@ class AccountAdapter(
             b.instance.text = item.accountView.account.instance
 
             b.root.setOnClickListener {
-                onAccountClick(item.accountView)
+                onAccountClick(item.accountView.account)
             }
         }
         addItemType(Item.AddAccountItem::class, AddAccountItemBinding::inflate) { item, b, _ ->
@@ -110,7 +113,7 @@ class AccountAdapter(
             }
 
             b.root.setOnClickListener {
-                onAccountClick(null)
+                onAccountClick(guestAccountManager.getGuestAccount())
             }
         }
     }

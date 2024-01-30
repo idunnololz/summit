@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.postListView
 import androidx.fragment.app.FragmentManager
 import arrow.core.Either
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
@@ -69,7 +70,7 @@ fun BaseFragment<*>.showMorePostOptions(
             addDivider()
         }
 
-        if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.value?.id) {
+        if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.asAccount?.id) {
             addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
             addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
         }

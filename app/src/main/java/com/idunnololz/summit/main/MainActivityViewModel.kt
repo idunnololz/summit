@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -83,8 +84,9 @@ class MainActivityViewModel @Inject constructor(
 
             launch {
                 accountManager.currentAccount.collect {
-                    val accountView = if (it != null) {
-                        accountInfoManager.getAccountViewForAccount(it)
+                    val account = it as? Account
+                    val accountView = if (account != null) {
+                        accountInfoManager.getAccountViewForAccount(account)
                     } else {
                         null
                     }

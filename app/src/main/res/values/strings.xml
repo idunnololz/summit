@@ -171,7 +171,7 @@
     <string name="strikethrough">Strikethrough</string>
     <string name="superscript">Superscript</string>
     <string name="quote">Quote</string>
-    <string name="bulleted_list">Bulleted lsit</string>
+    <string name="bulleted_list">Bulleted list</string>
     <string name="numbered_list">Numbered list</string>
     <string name="add_link_to_app">Add link to app</string>
     <string name="press_back_again_to_exit">Press BACK again to exit.</string>
@@ -865,13 +865,14 @@
     <string name="save_for_later_desc">You can use saved images when creating a comment or post.</string>
     <string name="use_a_saved_image">Use a saved image</string>
     <string name="choose_a_saved_image">Choose a saved image</string>
-    <string name="guest_or_signed_out">Guest/Signed out</string>
+    <string name="guest_or_signed_out">Guest (Signed out)</string>
     <string name="post_title_and_image_only">Post title and image only</string>
     <string name="error_switch_instance_failed_format">Switching instance failed. Cause by: %1$s.</string>
     <string name="current_instance">Current instance</string>
     <string name="suggestions">Suggestions</string>
     <string name="user_profile">User profile</string>
     <string name="guest_or_signed_out_desc">Browse different instances without an account.</string>
+    <string name="text_field_toolbar_settings">Text field toolbar settings</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

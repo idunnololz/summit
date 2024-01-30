@@ -8,6 +8,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.accountUi.AccountAdapter
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.databinding.FragmentSettingAccountsBinding
@@ -16,11 +18,15 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingAccountsFragment : BaseFragment<FragmentSettingAccountsBinding>() {
 
     private val viewModel: SettingAccountsViewModel by viewModels()
+
+    @Inject
+    lateinit var guestAccountManager: GuestAccountManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,10 +60,11 @@ class SettingAccountsFragment : BaseFragment<FragmentSettingAccountsBinding>() {
             context = context,
             isSimple = true,
             showGuestAccount = false,
+            guestAccountManager = guestAccountManager,
             signOut = {},
             onAccountClick = {
-                if (it != null) {
-                    onAccountClick(it.account.id)
+                if (it is Account) {
+                    onAccountClick(it.id)
                 }
             },
             onAddAccountClick = {},

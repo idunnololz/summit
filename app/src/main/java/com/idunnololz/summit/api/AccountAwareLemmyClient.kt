@@ -42,12 +42,9 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -89,7 +86,7 @@ class AccountAwareLemmyClient @Inject constructor(
         )
         coroutineScope.launch {
             accountManager.currentAccount.collect {
-                setAccount(it, accountChanged = false)
+                setAccount(it as? Account, accountChanged = false)
             }
         }
     }

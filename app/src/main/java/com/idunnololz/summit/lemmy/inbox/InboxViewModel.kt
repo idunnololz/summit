@@ -8,8 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.asAccountLiveData
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
@@ -43,7 +45,7 @@ class InboxViewModel @Inject constructor(
     var inboxRepository = inboxRepositoryFactory.create()
 
     val currentAccount
-        get() = accountManager.currentAccount.asLiveData()
+        get() = accountManager.currentAccount.asAccountLiveData()
     val currentAccountView = MutableLiveData<AccountView?>()
     val currentFullAccount = MutableLiveData<FullAccount?>()
     val markAsReadResult = StatefulLiveData<Unit>()
@@ -67,8 +69,9 @@ class InboxViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             accountManager.currentAccountOnChange.collect {
-                if (it != null) {
-                    instance = it.instance
+                val account = it as? Account
+                if (account != null) {
+                    instance = account.instance
                 }
 
                 inboxRepository = inboxRepositoryFactory.create()
@@ -87,8 +90,9 @@ class InboxViewModel @Inject constructor(
         viewModelScope.launch {
             accountManager.currentAccount.collect {
                 withContext(Dispatchers.Main) {
-                    if (it != null) {
-                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(it)
+                    val account = it as? Account
+                    if (account != null) {
+                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(account)
                     } else {
                         currentAccountView.value = null
                     }

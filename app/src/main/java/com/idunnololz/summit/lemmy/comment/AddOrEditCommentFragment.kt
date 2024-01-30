@@ -32,9 +32,11 @@ import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.OriginalCommentData
+import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
+import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
+import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -86,8 +88,6 @@ class AddOrEditCommentFragment :
 
     private val viewModel: AddOrEditCommentViewModel by viewModels()
 
-    private val textFormatterHelper = TextFormatterHelper()
-
     private var currentBottomMenu: BottomMenu? = null
 
     private val launcher =
@@ -104,6 +104,11 @@ class AddOrEditCommentFragment :
     @Inject
     lateinit var preferences: Preferences
 
+    @Inject
+    lateinit var textFieldToolbarManager: TextFieldToolbarManager
+
+    private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
+
     @Parcelize
     enum class Result : Parcelable {
         CommentSent,
@@ -117,18 +122,18 @@ class AddOrEditCommentFragment :
         childFragmentManager.setFragmentResultListener(
             AddLinkDialogFragment.REQUEST_KEY,
             this,
-        ) { key, bundle ->
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
                 AddLinkDialogFragment.REQUEST_KEY_RESULT,
             )
             if (result != null) {
-                textFormatterHelper.onLinkAdded(result.text, result.url)
+                textFormatterToolbar?.onLinkAdded(result.text, result.url)
             }
         }
         childFragmentManager.setFragmentResultListener(
             DraftsDialogFragment.REQUEST_KEY,
             this,
-        ) { key, bundle ->
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<DraftEntry>(
                 DraftsDialogFragment.REQUEST_KEY_RESULT,
             )
@@ -179,6 +184,130 @@ class AddOrEditCommentFragment :
         requireMainActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomBar)
+        }
+
+        textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
+            binding.bottomBar.removeAllViews()
+
+            val commentEditText = binding.commentEditText
+
+            textFormatterToolbar = textFieldToolbarManager.createTextFormatterToolbar(
+                context,
+                binding.bottomBar,
+            )
+
+            textFormatterToolbar?.setupTextFormatterToolbar(
+                commentEditText,
+                onChooseImageClick = {
+                    val bottomMenu = BottomMenu(context).apply {
+                        setTitle(R.string.insert_image)
+                        addItemWithIcon(
+                            R.id.from_camera,
+                            R.string.take_a_photo,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery,
+                            R.string.choose_from_gallery,
+                            R.drawable.baseline_image_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_camera_with_editor,
+                            R.string.take_a_photo_with_editor,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery_with_editor,
+                            R.string.choose_from_gallery_with_editor,
+                            R.drawable.baseline_image_24,
+                        )
+                        addItemWithIcon(
+                            R.id.use_a_saved_image,
+                            R.string.use_a_saved_image,
+                            R.drawable.baseline_save_24,
+                        )
+
+                        setOnMenuItemClickListener {
+                            when (it.id) {
+                                R.id.from_camera -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .cameraOnly()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+
+                                R.id.from_gallery -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .galleryOnly()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+
+                                R.id.from_camera_with_editor -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .cameraOnly()
+                                        .crop()
+                                        .cropFreeStyle()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+
+                                R.id.from_gallery_with_editor -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .galleryOnly()
+                                        .crop()
+                                        .cropFreeStyle()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+
+                                R.id.use_a_saved_image -> {
+                                    ChooseSavedImageDialogFragment()
+                                        .apply {
+                                            arguments =
+                                                ChooseSavedImageDialogFragmentArgs().toBundle()
+                                        }
+                                        .showAllowingStateLoss(
+                                            childFragmentManager,
+                                            "ChooseSavedImageDialogFragment",
+                                        )
+                                }
+                            }
+                        }
+                    }
+
+                    bottomMenu.show(
+                        mainActivity = requireMainActivity(),
+                        bottomSheetContainer = binding.root,
+                        expandFully = true,
+                        handleBackPress = false,
+                    )
+
+                    currentBottomMenu = bottomMenu
+                },
+                onAddLinkClick = {
+                    AddLinkDialogFragment.show(
+                        binding.commentEditText.getSelectedText(),
+                        childFragmentManager,
+                    )
+                },
+                onPreviewClick = {
+                    PreviewCommentDialogFragment()
+                        .apply {
+                            arguments = PreviewCommentDialogFragmentArgs(
+                                args.instance,
+                                commentEditText.text.toString(),
+                            ).toBundle()
+                        }
+                        .showAllowingStateLoss(childFragmentManager, "AA")
+                },
+                onDraftsClick = {
+                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
+                },
+                onSettingsClick = {
+                    EditTextToolbarSettingsDialogFragment.show(childFragmentManager)
+                },
+            )
         }
 
         viewModel.currentAccount.observe(viewLifecycleOwner) {
@@ -415,90 +544,6 @@ class AddOrEditCommentFragment :
             dismiss()
             return
         }
-
-        textFormatterHelper.setupTextFormatterToolbar(
-            getMainActivity(),
-            binding.textFormatToolbar,
-            requireNotNull(commentEditor.editText),
-            onChooseImageClick = {
-                val bottomMenu = BottomMenu(context).apply {
-                    setTitle(R.string.insert_image)
-                    addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
-                    addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
-                    addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
-                    addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
-                    addItemWithIcon(R.id.use_a_saved_image, R.string.use_a_saved_image, R.drawable.baseline_save_24)
-
-                    setOnMenuItemClickListener {
-                        when (it.id) {
-                            R.id.from_camera -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .cameraOnly()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.from_gallery -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .galleryOnly()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.from_camera_with_editor -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .cameraOnly()
-                                    .crop()
-                                    .cropFreeStyle()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.from_gallery_with_editor -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .galleryOnly()
-                                    .crop()
-                                    .cropFreeStyle()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.use_a_saved_image -> {
-                                ChooseSavedImageDialogFragment()
-                                    .apply {
-                                        arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
-                                    }
-                                    .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")
-                            }
-                        }
-                    }
-                }
-
-                bottomMenu.show(
-                    mainActivity = requireMainActivity(),
-                    bottomSheetContainer = binding.root,
-                    expandFully = true,
-                    handleBackPress = false,
-                )
-
-                currentBottomMenu = bottomMenu
-            },
-            onAddLinkClick = {
-                AddLinkDialogFragment.show(
-                    binding.commentEditText.getSelectedText(),
-                    childFragmentManager,
-                )
-            },
-            onPreviewClick = {
-                PreviewCommentDialogFragment()
-                    .apply {
-                        arguments = PreviewCommentDialogFragmentArgs(
-                            args.instance,
-                            commentEditor.editText?.text.toString(),
-                        ).toBundle()
-                    }
-                    .showAllowingStateLoss(childFragmentManager, "AA")
-            },
-            onDraftsClick = {
-                DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
-            },
-        )
         viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
@@ -518,7 +563,7 @@ class AddOrEditCommentFragment :
                     binding.loadingView.hideAll()
                     viewModel.uploadImageEvent.clear()
 
-                    textFormatterHelper.onImageUploaded(it.data.url)
+                    textFormatterToolbar?.onImageUploaded(it.data.url)
                 }
             }
         }
@@ -583,19 +628,20 @@ class AddOrEditCommentFragment :
                     showToast = true,
                 )
             } else {
+                val account = viewModel.currentAccount.value
                 viewModel.draftsManager.saveDraftAsync(
                     DraftData.CommentDraftData(
-                        args.editCommentView?.toOriginalCommentData(),
-                        PostRef(
+                        originalComment = args.editCommentView?.toOriginalCommentData(),
+                        postRef = PostRef(
                             args.instance,
                             args.postView?.post?.id
                                 ?: args.commentView?.post?.id
                                 ?: args.editCommentView?.post?.id ?: 0,
                         ),
-                        args.commentView?.comment?.id,
-                        content,
-                        viewModel.currentAccount.value?.id ?: 0L,
-                        viewModel.currentAccount.value?.instance ?: "",
+                        parentCommentId = args.commentView?.comment?.id,
+                        content = content,
+                        accountId = account?.id ?: 0L,
+                        accountInstance = account?.instance ?: "",
                     ),
                     showToast = true,
                 )

@@ -33,10 +33,6 @@
             android:layout_gravity="bottom"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/positive_button">
-
-            <include
-                android:id="@+id/text_format_toolbar"
-                layout="@layout/text_format_toolbar"/>
         </HorizontalScrollView>
 
         <Button

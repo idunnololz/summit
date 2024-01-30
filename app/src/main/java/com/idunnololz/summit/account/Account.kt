@@ -27,7 +27,7 @@ data class Account(
         defaultValue = "0",
     )
     val defaultSortType: Int,
-) : Parcelable
+) : Parcelable, GuestOrUserAccount
 
 val Account.fullName
     get() = "${this.name}@${this.instance}"

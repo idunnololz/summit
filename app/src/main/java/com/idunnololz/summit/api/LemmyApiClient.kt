@@ -139,19 +139,23 @@ class LemmyApiClient(
         private const val TAG = "LemmyApiClient"
 
         const val API_VERSION = "v3"
-        val DEFAULT_INSTANCE = CommonLemmyInstance.LemmyMl.instance
+        const val DEFAULT_INSTANCE = "lemmy.ml"
 
         val DEFAULT_LEMMY_INSTANCES = listOf(
-            CommonLemmyInstance.Beehaw.instance,
+            "beehaw.org",
+            "discuss.tchncs.de",
             "feddit.de",
             "feddit.it",
+            "hexbear.net",
             "lemm.ee",
             "lemmy.blahaj.zone",
             "lemmy.ca",
             "lemmy.dbzer0.com",
-            CommonLemmyInstance.LemmyMl.instance,
+            "lemmy.ml",
             "lemmy.one",
-            CommonLemmyInstance.LemmyWorld.instance,
+            "lemmy.sdf.org",
+            "lemmy.world",
+            "lemmy.zip",
             "lemmygrad.ml",
             "lemmynsfw.com",
             "midwest.social",
@@ -167,7 +171,7 @@ class LemmyApiClient(
     private var api = LemmyApi.getInstance(
         context,
         preferences.guestAccountSettings?.instance
-            ?: DEFAULT_INSTANCE
+            ?: DEFAULT_INSTANCE,
     )
     val okHttpClient = LemmyApi.okHttpClient(context, userAgent)
 
@@ -187,7 +191,7 @@ class LemmyApiClient(
         api = LemmyApi.getInstance(
             context,
             preferences.guestAccountSettings?.instance
-                ?: DEFAULT_INSTANCE
+                ?: DEFAULT_INSTANCE,
         )
 
         instanceFlow.value = api.instance

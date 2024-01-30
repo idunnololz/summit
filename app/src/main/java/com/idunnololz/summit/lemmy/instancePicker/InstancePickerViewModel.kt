@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InstancePickerViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient
+    private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
     private val trigram = NGram(3)
 
@@ -24,7 +24,6 @@ class InstancePickerViewModel @Inject constructor(
     init {
         doQuery("")
     }
-
 
     fun doQuery(query: String) {
         searchResults.setIsLoading()
@@ -43,6 +42,6 @@ class InstancePickerViewModel @Inject constructor(
     }
 
     data class SearchResults(
-        val results: List<String> = listOf()
+        val results: List<String> = listOf(),
     )
 }

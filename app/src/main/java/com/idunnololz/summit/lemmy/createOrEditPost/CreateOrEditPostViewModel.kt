@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ApiListenerManager
 import com.idunnololz.summit.api.LemmyApiClient
@@ -70,7 +71,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
     val currentAccount: Account?
-        get() = accountManager.currentAccount.value
+        get() = accountManager.currentAccount.asAccount
 
     private var searchJob: Job? = null
 
@@ -158,7 +159,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     ) {
         createOrEditPostResult.setIsLoading()
         viewModelScope.launch {
-            val account = accountManager.currentAccount.value
+            val account = accountManager.currentAccount.asAccount
 
             if (account == null) {
                 createOrEditPostResult.postError(NotAuthenticatedException())
@@ -263,7 +264,7 @@ class CreateOrEditPostViewModel @Inject constructor(
                 result = result?.substring(cut + 1)
             }
 
-            val account = accountManager.currentAccount.value
+            val account = accountManager.currentAccount.asAccount
 
             if (account == null) {
                 imageLiveData.postError(NotAuthenticatedException())
