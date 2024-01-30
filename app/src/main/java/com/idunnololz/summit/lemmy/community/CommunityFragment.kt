@@ -330,10 +330,10 @@ class CommunityFragment :
 
             setFragmentResultListener(
                 InstancePickerDialogFragment.REQUEST_KEY,
-                this@CommunityFragment
+                this@CommunityFragment,
             ) { _, bundle ->
                 val result = bundle.getParcelableCompat<InstancePickerDialogFragment.Result>(
-                    InstancePickerDialogFragment.REQUEST_KEY_RESULT
+                    InstancePickerDialogFragment.REQUEST_KEY_RESULT,
                 )
 
                 if (result != null) {

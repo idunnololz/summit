@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
@@ -81,7 +82,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
     private val personRef
         get() = args.personRef
-            ?: accountManager.currentAccount.value?.toPersonRef()
+            ?: accountManager.currentAccount.asAccount?.toPersonRef()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -247,7 +248,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         if (personRef == null) {
             // this can happen if the user tapped on the profile page and is not signed in.
             binding.loadingView.showErrorText(
-                getString(R.string.error_not_signed_in)
+                getString(R.string.error_not_signed_in),
             )
             binding.profileIcon.visibility = View.GONE
             binding.collapsingToolbarContent.visibility = View.GONE

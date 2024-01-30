@@ -109,7 +109,7 @@ class AccountActionsManager @Inject constructor(
                 unregisterVoteHandler(existingRegId as Long)
             }
 
-            val account = accountManager.currentAccount.value
+            val account = accountManager.currentAccount.value as? Account
 
             upVoteView?.setOnClickListener {
                 val curVote = votesManager.getVote(ref) ?: 0
@@ -398,7 +398,7 @@ class AccountActionsManager @Inject constructor(
         parentId: CommentId?,
         content: String,
     ) {
-        val account = accountManager.currentAccount.value ?: return
+        val account = accountManager.currentAccount.asAccount ?: return
         pendingActionsManager.comment(
             postRef,
             parentId,
@@ -412,7 +412,7 @@ class AccountActionsManager @Inject constructor(
         commentId: CommentId,
         content: String,
     ) {
-        val account = accountManager.currentAccount.value ?: return
+        val account = accountManager.currentAccount.asAccount ?: return
         pendingActionsManager.editComment(
             postRef,
             commentId,
@@ -425,7 +425,7 @@ class AccountActionsManager @Inject constructor(
         postRef: PostRef,
         commentId: CommentId,
     ) {
-        val account = accountManager.currentAccount.value ?: return
+        val account = accountManager.currentAccount.asAccount ?: return
         pendingActionsManager.deleteComment(
             postRef,
             commentId,
@@ -438,13 +438,13 @@ class AccountActionsManager @Inject constructor(
         ref: VotableRef,
         dir: Int,
     ): Result<Unit> {
-        val account = accountManager.currentAccount.value
+        val account = accountManager.currentAccount.asAccount
             ?: return Result.failure(NotAuthenticatedException())
         return voteOn(instance, ref, dir, account)
     }
 
     suspend fun markPostAsRead(instance: String, id: PostId, read: Boolean) {
-        val account = accountManager.currentAccount.value ?: return
+        val account = accountManager.currentAccount.asAccount ?: return
         pendingActionsManager.markPostAsRead(
             PostRef(instance, id),
             read,

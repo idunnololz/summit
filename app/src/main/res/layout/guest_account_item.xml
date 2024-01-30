@@ -6,22 +6,32 @@
     android:background="?selectableItemBackground"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/outline_account_circle_24"
+        android:layout_marginEnd="@dimen/dialog_padding"
+        android:layout_marginStart="@dimen/dialog_padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="?colorControlNormal"
+        app:drawableTint="?colorControlNormal" />
+
     <TextView
         android:id="@+id/title"
         android:text="@string/guest_or_signed_out"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:drawablePadding="@dimen/dialog_padding"
-        android:paddingHorizontal="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/dialog_padding"
+        android:layout_marginStart="@dimen/dialog_padding"
         android:gravity="center_vertical"
         android:textAppearance="?textAppearanceTitleSmall"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/desc"
-        app:layout_constraintEnd_toStartOf="@+id/selected"
-        app:drawableTint="?colorControlNormal"
-        app:drawableStartCompat="@drawable/outline_account_circle_24" />
+        app:layout_constraintEnd_toStartOf="@+id/selected" />
 
     <TextView
         android:id="@+id/desc"
@@ -30,11 +40,10 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:textAppearance="?textAppearanceBodySmall"
-        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginTop="@dimen/padding_quarter"
         android:layout_marginBottom="@dimen/dialog_padding"
-        android:layout_marginStart="72dp"
         android:layout_marginEnd="@dimen/dialog_padding"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/title"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/selected" />

@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.instancePicker
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +15,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentInstancePickerBinding
-import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BackPressHandler
@@ -105,6 +104,26 @@ class InstancePickerDialogFragment :
             }
             searchBar.hint = viewModel.instance
             searchEditText.hint = viewModel.instance
+
+            searchEditText.setOnKeyListener(
+                object : View.OnKeyListener {
+                    override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+                        if (event?.action == KeyEvent.ACTION_DOWN &&
+                            keyCode == KeyEvent.KEYCODE_ENTER
+                        ) {
+                            setFragmentResult(
+                                REQUEST_KEY,
+                                bundleOf(
+                                    REQUEST_KEY_RESULT to Result(searchEditText.text.toString()),
+                                ),
+                            )
+                            dismiss()
+                            return true
+                        }
+                        return false
+                    }
+                },
+            )
 
             adapter = InstanceAdapter(
                 context = context,

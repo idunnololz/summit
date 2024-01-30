@@ -1,15 +1,23 @@
 package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Activity
+import android.graphics.Point
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnPreDrawListener
 import android.webkit.URLUtil
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
-import androidx.core.view.children
+import androidx.core.view.updateLayoutParams
+import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.setFragmentResult
@@ -26,13 +34,15 @@ import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.OriginalPostData
+import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
+import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
+import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.lemmy.utils.TextFormatterHelper
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -66,17 +76,23 @@ class CreateOrEditPostFragment :
 
     private val viewModel: CreateOrEditPostViewModel by viewModels()
 
-    private val textFormatterHelper = TextFormatterHelper()
-
     private var adapter: CommunitySearchResultsAdapter? = null
 
     private var currentBottomMenu: BottomMenu? = null
+
+    @Inject
+    lateinit var textFieldToolbarManager: TextFieldToolbarManager
 
     @Inject
     lateinit var offlineManager: OfflineManager
 
     @Inject
     lateinit var preferences: Preferences
+
+    private var textFormatToolbar: TextFormatToolbarViewHolder? = null
+
+    private val dockedLocation = Point()
+    private val floatingLocation = Point()
 
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -113,7 +129,7 @@ class CreateOrEditPostFragment :
                 AddLinkDialogFragment.REQUEST_KEY_RESULT,
             )
             if (result != null) {
-                textFormatterHelper.onLinkAdded(result.text, result.url)
+                textFormatToolbar?.onLinkAdded(result.text, result.url)
             }
         }
         childFragmentManager.setFragmentResultListener(
@@ -179,8 +195,7 @@ class CreateOrEditPostFragment :
         val context = requireContext()
 
         requireMainActivity().apply {
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.content)
+            insetViewAutomaticallyByMargins(viewLifecycleOwner, binding.contentOuter)
         }
 
         binding.toolbar.inflateMenu(R.menu.menu_create_or_edit_post)
@@ -241,95 +256,105 @@ class CreateOrEditPostFragment :
             viewModel.setUrl(text.toString())
         }
 
-        val postEditor = binding.postEditor
-        textFormatterHelper.setupTextFormatterToolbar(
-            getMainActivity(),
-            binding.textFormatToolbar,
-            requireNotNull(postEditor.editText),
-            onChooseImageClick = {
-                val bottomMenu = BottomMenu(context).apply {
-                    setTitle(R.string.insert_image)
-                    addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
-                    addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
-                    addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
-                    addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
-                    addItemWithIcon(R.id.use_a_saved_image, R.string.use_a_saved_image, R.drawable.baseline_save_24)
+        textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
+            binding.postBodyToolbar.removeAllViews()
 
-                    setOnMenuItemClickListener {
-                        when (it.id) {
-                            R.id.from_camera -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .cameraOnly()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.from_gallery -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .galleryOnly()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.from_camera_with_editor -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .cameraOnly()
-                                    .crop()
-                                    .cropFreeStyle()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.from_gallery_with_editor -> {
-                                val intent = ImagePicker.with(requireActivity())
-                                    .galleryOnly()
-                                    .crop()
-                                    .cropFreeStyle()
-                                    .createIntent()
-                                launcher.launch(intent)
-                            }
-                            R.id.use_a_saved_image -> {
-                                ChooseSavedImageDialogFragment()
-                                    .apply {
-                                        arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
-                                    }
-                                    .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")
+            textFormatToolbar = textFieldToolbarManager.createTextFormatterToolbar(
+                context,
+                binding.postBodyToolbar,
+            )
+
+            val postEditor = binding.postEditor
+            textFormatToolbar?.setupTextFormatterToolbar(
+                requireNotNull(postEditor.editText),
+                onChooseImageClick = {
+                    val bottomMenu = BottomMenu(context).apply {
+                        setTitle(R.string.insert_image)
+                        addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
+                        addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
+                        addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
+                        addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
+                        addItemWithIcon(R.id.use_a_saved_image, R.string.use_a_saved_image, R.drawable.baseline_save_24)
+
+                        setOnMenuItemClickListener {
+                            when (it.id) {
+                                R.id.from_camera -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .cameraOnly()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                                R.id.from_gallery -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .galleryOnly()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                                R.id.from_camera_with_editor -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .cameraOnly()
+                                        .crop()
+                                        .cropFreeStyle()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                                R.id.from_gallery_with_editor -> {
+                                    val intent = ImagePicker.with(requireActivity())
+                                        .galleryOnly()
+                                        .crop()
+                                        .cropFreeStyle()
+                                        .createIntent()
+                                    launcher.launch(intent)
+                                }
+                                R.id.use_a_saved_image -> {
+                                    ChooseSavedImageDialogFragment()
+                                        .apply {
+                                            arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
+                                        }
+                                        .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")
+                                }
                             }
                         }
                     }
-                }
 
-                bottomMenu.show(
-                    mainActivity = requireMainActivity(),
-                    bottomSheetContainer = binding.root,
-                    expandFully = true,
-                    handleBackPress = false,
-                )
-            },
-            onAddLinkClick = {
-                AddLinkDialogFragment.show(
-                    binding.postEditText.getSelectedText(),
-                    childFragmentManager,
-                )
-            },
-            onPreviewClick = {
-                val postStr = buildString {
-                    appendLine("## ${binding.titleEditText.text}")
-                    appendLine()
-                    appendLine("![](${binding.urlEditText.text})")
-                    appendLine()
-                    appendLine(postEditor.editText?.text.toString())
-                }
-                PreviewCommentDialogFragment()
-                    .apply {
-                        arguments = PreviewCommentDialogFragmentArgs(
-                            args.instance,
-                            postStr,
-                        ).toBundle()
+                    bottomMenu.show(
+                        mainActivity = requireMainActivity(),
+                        bottomSheetContainer = binding.root,
+                        expandFully = true,
+                        handleBackPress = false,
+                    )
+                },
+                onAddLinkClick = {
+                    AddLinkDialogFragment.show(
+                        binding.postEditText.getSelectedText(),
+                        childFragmentManager,
+                    )
+                },
+                onPreviewClick = {
+                    val postStr = buildString {
+                        appendLine("## ${binding.titleEditText.text}")
+                        appendLine()
+                        appendLine("![](${binding.urlEditText.text})")
+                        appendLine()
+                        appendLine(postEditor.editText?.text.toString())
                     }
-                    .showAllowingStateLoss(childFragmentManager, "AA")
-            },
-            onDraftsClick = {
-                DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
-            },
-        )
+                    PreviewCommentDialogFragment()
+                        .apply {
+                            arguments = PreviewCommentDialogFragmentArgs(
+                                args.instance,
+                                postStr,
+                            ).toBundle()
+                        }
+                        .showAllowingStateLoss(childFragmentManager, "AA")
+                },
+                onDraftsClick = {
+                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
+                },
+                onSettingsClick = {
+                    EditTextToolbarSettingsDialogFragment.show(childFragmentManager)
+                },
+            )
+        }
 
         binding.loadingView.hideAll()
 
@@ -449,7 +474,7 @@ class CreateOrEditPostFragment :
                     binding.loadingView.hideAll()
                     viewModel.uploadImageResult.clear()
 
-                    textFormatterHelper.onImageUploaded(it.data.url)
+                    textFormatToolbar?.onImageUploaded(it.data.url)
                 }
             }
         }
@@ -479,6 +504,39 @@ class CreateOrEditPostFragment :
         viewModel.linkMetadata.observe(viewLifecycleOwner) { linkMetadata ->
             onLinkMetadataChanged()
         }
+
+        binding.scrollView.setOnScrollChangeListener(
+            NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                onScrollUpdated()
+            },
+        )
+
+        getMainActivity()?.insetsChangedLiveData?.observe(viewLifecycleOwner) {
+            val insets = getMainActivity()?.lastInsets
+            val isImeOpen = (insets?.imeHeight ?: 0) > 0
+
+            onImeChange(isImeOpen)
+        }
+        binding.root.viewTreeObserver.addOnPreDrawListener(
+            object : OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    binding.root.viewTreeObserver.removeOnPreDrawListener(this)
+
+                    binding.postBodyToolbarPlaceholder.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        height = binding.postBodyToolbar.height
+                    }
+                    binding.postBodyToolbarPlaceholder2.updateLayoutParams<LinearLayout.LayoutParams> {
+                        height = binding.postBodyToolbar.height
+                    }
+
+                    binding.root.post {
+                        onScrollUpdated()
+                    }
+
+                    return false // discard frame
+                }
+            },
+        )
 
         binding.communityEditText.setOnClickListener {
             viewModel.showSearch.value = true
@@ -600,6 +658,88 @@ class CreateOrEditPostFragment :
         updateEnableState()
     }
 
+    private var isImeOpen: Boolean = false
+    private val outLocation = IntArray(2)
+
+    private fun onImeChange(isImeOpen: Boolean) {
+        this.isImeOpen = isImeOpen
+        if (isImeOpen) {
+            binding.postBodyToolbarPlaceholder.visibility = View.GONE
+            binding.postBodyToolbarPlaceholder2.visibility = View.VISIBLE
+            binding.postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
+                gravity = Gravity.BOTTOM
+            }
+            binding.postBodyToolbar.translationY = 0f
+
+            showPostToolbar()
+        } else {
+            binding.postBodyToolbarPlaceholder.visibility = View.VISIBLE
+            binding.postBodyToolbarPlaceholder2.visibility = View.GONE
+            binding.postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
+                gravity = Gravity.TOP or Gravity.LEFT
+            }
+
+            onPositionChanged()
+        }
+    }
+
+    private fun onPositionChanged() {
+        if (isImeOpen || !isBindingAvailable()) {
+            return
+        }
+
+        val scrollBounds = Rect()
+        binding.scrollView.getHitRect(scrollBounds)
+        val anyPartVisible = binding.postBodyToolbarPlaceholder.getLocalVisibleRect(scrollBounds)
+        val visiblePercent = scrollBounds.height().toFloat() / binding.postBodyToolbarPlaceholder.height
+
+        if (anyPartVisible && visiblePercent > 0.9f) {
+            showPostToolbar()
+        } else {
+            hidePostToolbar()
+        }
+
+        binding.postBodyToolbar.translationY = floatingLocation.y.toFloat() -
+            (getMainActivity()?.lastInsets?.topInset ?: 0)
+    }
+
+    var hiding = false
+    var showing = true
+    private fun hidePostToolbar() {
+        if (hiding) {
+            return
+        }
+
+        hiding = true
+        showing = false
+
+        binding.postBodyToolbar.clearAnimation()
+        binding.postBodyToolbar.animate()
+            .alpha(0f)
+    }
+
+    private fun showPostToolbar() {
+        if (showing) {
+            return
+        }
+
+        hiding = false
+        showing = true
+
+        binding.postBodyToolbar.clearAnimation()
+        binding.postBodyToolbar.animate()
+            .alpha(1f)
+    }
+
+    private fun onScrollUpdated() {
+        binding.postEditText.getLocationOnScreen(outLocation)
+
+        floatingLocation.y = outLocation[1] +
+            binding.postEditText.height
+
+        onPositionChanged()
+    }
+
     private fun createPost() {
         viewModel.createPost(
             communityFullName = binding.communityEditText.text.toString(),
@@ -666,9 +806,7 @@ class CreateOrEditPostFragment :
         binding.postEditor.isEnabled = !isLoading
         binding.postBodyToolbar.isEnabled = !isLoading
         binding.nsfwSwitch.isEnabled = !isLoading
-        binding.textFormatToolbar.root.children.forEach {
-            it.isEnabled = !isLoading
-        }
+        textFormatToolbar?.isEnabled = !isLoading
     }
 
     private fun Post.getCrossPostContent(): String =

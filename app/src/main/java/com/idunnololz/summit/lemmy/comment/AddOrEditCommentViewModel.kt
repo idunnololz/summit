@@ -6,11 +6,11 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccountLiveData
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.ApiListenerManager
@@ -57,7 +57,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         ) : Message
     }
 
-    val currentAccount = accountManager.currentAccount.asLiveData()
+    val currentAccount = accountManager.currentAccount.asAccountLiveData()
 
     val commentSentEvent = MutableLiveData<Event<Result<Unit>>>()
     val uploadImageEvent = StatefulLiveData<UploadImageResult>()
@@ -181,7 +181,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                 result = result?.substring(cut + 1)
             }
 
-            val account = accountManager.currentAccount.value
+            val account = accountManager.currentAccount.value as? Account
 
             if (account == null) {
                 uploadImageEvent.postError(NotAuthenticatedException())

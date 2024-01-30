@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommunityId
@@ -57,7 +58,7 @@ class ModLogsViewModel @Inject constructor(
 
         val communityRef = communityRef
         val communityView = communityView
-        val account = accountManager.currentAccount.value
+        val account = accountManager.currentAccount.asAccount
 
         this.resetScrollPosition = resetScrollPosition
 

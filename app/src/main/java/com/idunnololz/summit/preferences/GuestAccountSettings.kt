@@ -5,5 +5,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class GuestAccountSettings(
-    val instance: String = DEFAULT_INSTANCE
+    val instance: String = DEFAULT_INSTANCE,
 )

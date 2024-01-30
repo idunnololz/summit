@@ -11,6 +11,7 @@ import androidx.navigation.fragment.navArgs
 import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentReceiveFileBinding
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
@@ -86,7 +87,7 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
             preview.load(args.fileUri)
 
             createPost.setOnClickListener {
-                val account = accountManager.currentAccount.value
+                val account = accountManager.currentAccount.asAccount
 
                 if (account == null) {
                     AlertDialogFragment.Builder()

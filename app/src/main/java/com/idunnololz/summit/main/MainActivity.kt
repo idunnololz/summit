@@ -39,6 +39,7 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
@@ -525,7 +526,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleSendText(intent: Intent) {
-        val account = accountManager.currentAccount.value
+        val account = accountManager.currentAccount.asAccount
 
         if (account == null) {
             AlertDialogFragment.Builder()

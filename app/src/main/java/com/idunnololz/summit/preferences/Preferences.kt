@@ -88,6 +88,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_TEXT_FIELD_TOOLBAR_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
@@ -840,6 +841,12 @@ class Preferences(
         get() = prefs.getMoshiValue(KEY_GUEST_ACCOUNT_SETTINGS)
         set(value) {
             prefs.putMoshiValue(KEY_GUEST_ACCOUNT_SETTINGS, value)
+        }
+
+    var textFieldToolbarSettings: TextFieldToolbarSettings?
+        get() = prefs.getMoshiValue(KEY_TEXT_FIELD_TOOLBAR_SETTINGS)
+        set(value) {
+            prefs.putMoshiValue(KEY_TEXT_FIELD_TOOLBAR_SETTINGS, value)
         }
 
     fun reset(key: String) {

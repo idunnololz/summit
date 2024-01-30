@@ -2,237 +2,248 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?backgroundColor">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
+        android:id="@+id/content_outer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?backgroundColor">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent">
+            android:layout_height="match_parent">
 
-        </com.google.android.material.appbar.MaterialToolbar>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/scroll_view"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/content"
+            </com.google.android.material.appbar.MaterialToolbar>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/scroll_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?backgroundColor">
+                    android:layout_height="match_parent">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/community"
-                        android:layout_width="0dp"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp"
-                        app:hintEnabled="false">
+                        android:background="?backgroundColor">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/community_edit_text"
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/community"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:autofillHints="no"
-                            android:background="@null"
-                            android:padding="@dimen/padding"
-                            android:textIsSelectable="true"
-                            android:scrollbars="vertical"
-                            android:textAppearance="?textAppearanceBodyMedium"
-                            android:inputType="textMultiLine"
-                            android:hint="@string/community"/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="0dp"
+                            app:hintEnabled="false">
 
-                    <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/divider0"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/community"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/url"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/community"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp"
-                        app:hintEnabled="false"
-                        app:endIconDrawable="@drawable/baseline_image_24"
-                        app:endIconTint="?colorControlNormal"
-                        app:endIconMode="custom">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/url_edit_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:autofillHints="no"
-                            android:background="@null"
-                            android:padding="@dimen/padding"
-                            android:textIsSelectable="true"
-                            android:scrollbars="vertical"
-                            android:textAppearance="?textAppearanceBodyMedium"
-                            android:inputType="textMultiLine|textUri"
-                            android:hint="@string/url_optional"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/divider1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/url"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/title"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/divider1"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp"
-                        app:hintEnabled="false">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/title_edit_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:autofillHints="no"
-                            android:background="@null"
-                            android:padding="@dimen/padding"
-                            android:textIsSelectable="true"
-                            android:scrollbars="vertical"
-                            android:textAppearance="?textAppearanceBodyMedium"
-                            android:inputType="textMultiLine|textCapSentences"
-                            android:hint="@string/title"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <FrameLayout
-                        android:id="@+id/title_suggestion_container"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:paddingHorizontal="@dimen/padding"
-                        android:paddingBottom="@dimen/padding_half"
-                        app:layout_constraintTop_toBottomOf="@+id/title"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:id="@+id/title_suggestion"
-                                android:layout_width="wrap_content"
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/community_edit_text"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:padding="@dimen/padding"/>
-                        </com.google.android.material.card.MaterialCardView>
-                    </FrameLayout>
+                                android:autofillHints="no"
+                                android:background="@null"
+                                android:padding="@dimen/padding"
+                                android:textIsSelectable="true"
+                                android:scrollbars="vertical"
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                android:inputType="textMultiLine"
+                                android:hint="@string/community"/>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/divider2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/title_suggestion_container"/>
+                        <com.google.android.material.divider.MaterialDivider
+                            android:id="@+id/divider0"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/community"/>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/post_editor"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/divider2"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="0dp"
-                        app:hintEnabled="false">
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/url"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/community"
+                            app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="0dp"
+                            app:hintEnabled="false"
+                            app:endIconDrawable="@drawable/baseline_image_24"
+                            app:endIconTint="?colorControlNormal"
+                            app:endIconMode="custom">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/post_edit_text"
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/url_edit_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autofillHints="no"
+                                android:background="@null"
+                                android:padding="@dimen/padding"
+                                android:textIsSelectable="true"
+                                android:scrollbars="vertical"
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                android:inputType="textMultiLine|textUri"
+                                android:hint="@string/url_optional"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:id="@+id/divider1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/url"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/title"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/divider1"
+                            app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="0dp"
+                            app:hintEnabled="false">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/title_edit_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autofillHints="no"
+                                android:background="@null"
+                                android:padding="@dimen/padding"
+                                android:textIsSelectable="true"
+                                android:scrollbars="vertical"
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                android:inputType="textMultiLine|textCapSentences"
+                                android:hint="@string/title"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <FrameLayout
+                            android:id="@+id/title_suggestion_container"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="@dimen/padding"
+                            android:paddingBottom="@dimen/padding_half"
+                            app:layout_constraintTop_toBottomOf="@+id/title"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/title_suggestion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:padding="@dimen/padding"/>
+                            </com.google.android.material.card.MaterialCardView>
+                        </FrameLayout>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:id="@+id/divider2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/title_suggestion_container"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/post_editor"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/divider2"
+                            app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="0dp"
+                            app:hintEnabled="false">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/post_edit_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autofillHints="no"
+                                android:background="@null"
+                                android:hint="@string/compose_post"
+                                android:padding="@dimen/padding"
+                                android:gravity="start|top"
+                                android:inputType="textMultiLine|textCapSentences"
+                                android:textAppearance="?textAppearanceBodyMedium"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <Space
+                            android:id="@+id/post_body_toolbar_placeholder"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autofillHints="no"
-                            android:background="@null"
-                            android:hint="@string/compose_post"
-                            android:padding="@dimen/padding"
-                            android:gravity="start|top"
-                            android:inputType="textMultiLine|textCapSentences"
-                            android:textAppearance="?textAppearanceBodyMedium"/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/post_editor"/>
 
-                    <HorizontalScrollView
-                        android:id="@+id/post_body_toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/colorSurface"
-                        android:layout_gravity="bottom"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/post_editor">
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/nsfw_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/padding"
+                            android:layout_marginEnd="@dimen/padding"
+                            app:layout_constraintTop_toBottomOf="@+id/post_body_toolbar_placeholder"
+                            app:layout_constraintEnd_toEndOf="parent"/>
 
-                        <include
-                            android:id="@+id/text_format_toolbar"
-                            layout="@layout/text_format_toolbar"/>
-                    </HorizontalScrollView>
+                        <TextView
+                            android:text="@string/nsfw"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/padding"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintTop_toTopOf="@+id/nsfw_switch"
+                            app:layout_constraintBottom_toBottomOf="@+id/nsfw_switch"
+                            app:layout_constraintStart_toStartOf="parent"/>
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/nsfw_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/padding"
-                        android:layout_marginEnd="@dimen/padding"
-                        app:layout_constraintTop_toBottomOf="@+id/post_body_toolbar"
-                        app:layout_constraintEnd_toEndOf="parent"/>
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/community_suggestions_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:background="?backgroundColor"
+                            app:layout_constraintTop_toBottomOf="@+id/community"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"/>
 
-                    <TextView
-                        android:text="@string/nsfw"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/padding"
-                        app:layout_constrainedWidth="true"
-                        app:layout_constraintTop_toTopOf="@+id/nsfw_switch"
-                        app:layout_constraintBottom_toBottomOf="@+id/nsfw_switch"
-                        app:layout_constraintStart_toStartOf="parent"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/community_suggestions_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:background="?backgroundColor"
-                        app:layout_constraintTop_toBottomOf="@+id/community"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"/>
+                </androidx.core.widget.NestedScrollView>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <com.idunnololz.summit.view.LoadingView
+                    android:id="@+id/loading_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
 
-            </androidx.core.widget.NestedScrollView>
-
-            <com.idunnololz.summit.view.LoadingView
-                android:id="@+id/loading_view"
+            <Space
+                android:id="@+id/post_body_toolbar_placeholder2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
-        </FrameLayout>
-    </LinearLayout>
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/post_body_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorSurface"
+            android:layout_gravity="top|left">
+        </HorizontalScrollView>
+    </FrameLayout>
 </FrameLayout>

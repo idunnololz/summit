@@ -177,9 +177,10 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         coroutineScope.launch {
             accountManager.currentAccount.collect {
-                currentUser = it
+                val account = it as? Account
+                currentUser = account
 
-                preferences = preferenceManager.getComposedPreferencesForAccount(it)
+                preferences = preferenceManager.getComposedPreferencesForAccount(account)
 
                 onPreferencesChanged()
             }

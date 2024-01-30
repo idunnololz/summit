@@ -3,6 +3,7 @@ package com.idunnololz.summit.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.GuestOrUserAccount
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -11,7 +12,7 @@ import javax.inject.Singleton
 class PreferenceManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val baseSharedPreferences: SharedPreferences,
-    private val basePreferences: Preferences,
+    val basePreferences: Preferences,
 ) {
 
     private var currentAccount: Account? = null
@@ -20,7 +21,9 @@ class PreferenceManager @Inject constructor(
     val currentPreferences: Preferences
         get() = _currentPreferences ?: basePreferences
 
-    fun getComposedPreferencesForAccount(account: Account?): Preferences {
+    fun getComposedPreferencesForAccount(guestOrUserAccount: GuestOrUserAccount?): Preferences {
+        val account = guestOrUserAccount as? Account
+
         if (currentAccount == account) {
             return _currentPreferences!!
         }

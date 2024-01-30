@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentId
@@ -60,7 +61,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
     if (!isBindingAvailable()) return null
 
     val context = requireContext()
-    val currentAccount = actionsViewModel.accountManager.currentAccount.value
+    val currentAccount = actionsViewModel.accountManager.currentAccount.asAccount
 
     val onEditCommentClick: (CommentView) -> Unit = a@{
         if (currentAccount == null) {

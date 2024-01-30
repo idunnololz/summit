@@ -1,14 +1,17 @@
 package com.idunnololz.summit.account
 
 import android.util.Log
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.PreferenceManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -32,17 +35,18 @@ class AccountManager @Inject constructor(
 
     private val onAccountChangeListeners = mutableListOf<OnAccountChangedListener>()
 
-    val currentAccount = MutableStateFlow<Account?>(null)
-    val currentAccountOnChange = currentAccount.asSharedFlow().drop(1)
+    private val _currentAccount = MutableStateFlow<GuestOrUserAccount?>(null)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentAccount: StateFlow<GuestOrUserAccount?> = _currentAccount
+    val currentAccountOnChange = _currentAccount.asSharedFlow().drop(1)
+
     val mutex = Mutex()
 
     init {
         runBlocking {
             val curAccount = accountDao.getCurrentAccount()?.fix()
             preferenceManager.getComposedPreferencesForAccount(curAccount)
-            currentAccount.emit(curAccount)
+            _currentAccount.emit(curAccount)
         }
         coroutineScope.launch {
             Log.d("dbdb", "accountDao: ${accountDao.count()}")
@@ -55,7 +59,7 @@ class AccountManager @Inject constructor(
             accountDao.clearAndSetCurrent(account.id)
             doSwitchAccountWork(account)
 
-            currentAccount.emit(account)
+            _currentAccount.emit(account)
         }
     }
 
@@ -87,13 +91,14 @@ class AccountManager @Inject constructor(
         deferred.await()
     }
 
-    suspend fun setCurrentAccount(account: Account?) = withContext(Dispatchers.IO) {
+    suspend fun setCurrentAccount(guestOrUserAccount: GuestOrUserAccount?) = withContext(Dispatchers.IO) {
         val deferred = coroutineScope.async {
+            val account = guestOrUserAccount as? Account
             accountDao.clearAndSetCurrent(account?.id)
 
             doSwitchAccountWork(account)
 
-            currentAccount.emit(account)
+            _currentAccount.emit(guestOrUserAccount)
         }
 
         deferred.await()
@@ -101,10 +106,10 @@ class AccountManager @Inject constructor(
 
     private suspend fun updateCurrentAccount() {
         val currentAccount = accountDao.getCurrentAccount()
-        if (this.currentAccount.value != currentAccount) {
+        if (this._currentAccount.value != currentAccount) {
             doSwitchAccountWork(currentAccount)
         }
-        this.currentAccount.emit(currentAccount)
+        this._currentAccount.emit(currentAccount)
     }
 
     suspend fun getAccountById(id: Long): Account? {
@@ -137,6 +142,12 @@ class AccountManager @Inject constructor(
         }
     }
 }
+
+val StateFlow<GuestOrUserAccount?>.asAccount
+    get() = value as? Account
+
+fun StateFlow<GuestOrUserAccount?>.asAccountLiveData() =
+    this.asLiveData().map { it as? Account }
 
 private fun Account.fix() =
     copy(instance = instance.trim())

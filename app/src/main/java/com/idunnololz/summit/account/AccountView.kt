@@ -19,7 +19,8 @@ fun AccountView?.loadProfileImageOrDefault(imageView: ImageView) {
         imageView.dispose()
         imageView.setImageResource(R.drawable.baseline_account_circle_24)
         val color = imageView.context.getColorFromAttribute(
-            androidx.appcompat.R.attr.colorControlNormal)
+            androidx.appcompat.R.attr.colorControlNormal,
+        )
         ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(color))
     } else {
         ImageViewCompat.setImageTintList(imageView, null)

@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import arrow.core.Either
-import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -570,7 +569,7 @@ class PostFragment :
                             binding.coordinatorLayout,
                             getString(
                                 R.string.error_switch_instance_failed_format,
-                                it.error.toErrorMessage(context)
+                                it.error.toErrorMessage(context),
                             ),
                             Snackbar.LENGTH_LONG,
                         )

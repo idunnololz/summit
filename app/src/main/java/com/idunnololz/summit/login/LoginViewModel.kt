@@ -8,6 +8,8 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.IncorrectLoginException
+import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.util.StatefulLiveData
@@ -17,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
+    private val apiClientFactory: AccountAwareLemmyClient.Factory,
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
@@ -25,6 +27,8 @@ class LoginViewModel @Inject constructor(
     companion object {
         private const val TAG = "LoginViewModel"
     }
+
+    private val apiClient = apiClientFactory.create()
 
     val accountLiveData = StatefulLiveData<Account>()
     val state = MutableLiveData<State>(State.Login)
@@ -52,7 +56,14 @@ class LoginViewModel @Inject constructor(
 
             if (result.isFailure) {
                 Log.e(TAG, "", result.exceptionOrNull())
-                accountLiveData.postError(requireNotNull(result.exceptionOrNull()))
+
+                var error = requireNotNull(result.exceptionOrNull())
+
+                if (error is NotAuthenticatedException) {
+                    error = IncorrectLoginException()
+                }
+
+                accountLiveData.postError(error)
                 return@launch
             }
 

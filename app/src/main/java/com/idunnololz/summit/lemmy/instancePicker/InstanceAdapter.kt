@@ -4,16 +4,11 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorSelectedCommunityItemBinding
 import com.idunnololz.summit.databinding.InstanceSelectorSearchResultInstanceItemBinding
-import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.instancePicker.InstancePickerViewModel
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
@@ -23,7 +18,7 @@ class InstanceAdapter(
     private val canSelectMultipleCommunities: Boolean,
     private val onTooManyInstances: (Int) -> Unit = {},
     private val onSingleInstanceSelected: (
-        instance: String
+        instance: String,
     ) -> Unit = { },
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -107,7 +102,6 @@ class InstanceAdapter(
         ) { item, b, h ->
 
             b.title.text = item.text
-
 
             if (canSelectMultipleCommunities) {
                 b.checkbox.visibility = View.VISIBLE

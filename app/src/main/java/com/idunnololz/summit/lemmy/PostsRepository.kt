@@ -1,9 +1,7 @@
 package com.idunnololz.summit.lemmy
 
 import android.util.Log
-import com.idunnololz.summit.account.AccountActionsManager
-import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account.info.AccountInfoManager
+import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
@@ -16,33 +14,24 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
-import com.idunnololz.summit.lemmy.multicommunity.ModeratedCommunitiesDataSource
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
-import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.min
 
 @ViewModelScoped
 class PostsRepository @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val apiClient: AccountAwareLemmyClient,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val postReadManager: PostReadManager,
-    private val accountManager: AccountManager,
-    private val accountInfoManager: AccountInfoManager,
-    private val accountActionsManager: AccountActionsManager,
     private val hiddenPostsManager: HiddenPostsManager,
     private val contentFiltersManager: ContentFiltersManager,
-    private val preferenceManager: PreferenceManager,
     private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
     private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
-    private val moderatedCommunitiesDataSourceFactory: ModeratedCommunitiesDataSource.Factory,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -54,8 +43,6 @@ class PostsRepository @Inject constructor(
         val post: PostView,
         val postPageIndexInternal: Int,
     )
-
-    private val coroutineScope = coroutineScopeFactory.create()
 
     private var currentDataSource: PostsDataSource = singlePostsDataSourceFactory.create(
         communityName = null,
@@ -84,17 +71,14 @@ class PostsRepository @Inject constructor(
     private var consecutiveFilteredPostsByFilter = 0
     private var consecutiveFilteredPostsByType = 0
 
-    var sortOrder: CommunitySortOrder = CommunitySortOrder.Active
-        set(value) {
-            field = value
+    var sortOrder = savedStateHandle.getStateFlow<CommunitySortOrder>(
+        "PostsRepository.sortOrder",
+        CommunitySortOrder.Active,
+    )
 
-            coroutineScope.launch {
-                sortOrderFlow.value = value
-            }
-
-            reset()
-        }
-    val sortOrderFlow = MutableStateFlow(sortOrder)
+    fun setSortOrder(sortOrder: CommunitySortOrder) {
+        savedStateHandle["PostsRepository.sortOrder"] = sortOrder
+    }
 
     suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> =
         updateStateMaintainingPosition({
@@ -176,7 +160,7 @@ class PostsRepository @Inject constructor(
             val hasMoreResult = retry {
                 fetchPage(
                     pageIndex = currentPageInternal,
-                    sortType = sortOrder.toApiSortOrder(),
+                    sortType = sortOrder.value.toApiSortOrder(),
                     force = force,
                 )
             }
