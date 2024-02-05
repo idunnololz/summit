@@ -331,14 +331,24 @@
         <item name="android:textColor">@color/colorTextTitle</item>
     </style>
 
+    <style name="RectangleImageView">
+        <item name="shapeAppearance">@style/RectangleImageViewAppearanceOverlay</item>
+    </style>
+
+    <style name="RectangleImageViewAppearanceOverlay">
+        <item name="cornerSize">0dp</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
 
     <style name="CircleImageView">
-        <item name="shapeAppearanceOverlay">@style/CircleImageViewAppearanceOverlay</item>
+<!--        <item name="shapeAppearanceOverlay">@style/CircleImageViewAppearanceOverlay</item>-->
         <item name="android:foreground">@drawable/circle_ripple</item>
+        <item name="shapeAppearance">@style/CircleImageViewAppearanceOverlay</item>
     </style>
 
     <style name="CircleImageViewAppearanceOverlay">
         <item name="cornerSize">50%</item>
+        <item name="cornerFamily">rounded</item>
     </style>
 
     <style name="MyApp.Widget.Material3.CardView" parent="Widget.Material3.CardView.Elevated">
@@ -360,6 +370,7 @@
     </style>
 
     <style name="RoundImageViewAppearanceOverlay">
+        <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/padding_half</item>
     </style>
     <style name="CardImageViewAppearanceOverlay">

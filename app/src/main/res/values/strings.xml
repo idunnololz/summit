@@ -873,6 +873,7 @@
     <string name="user_profile">User profile</string>
     <string name="guest_or_signed_out_desc">Browse different instances without an account.</string>
     <string name="text_field_toolbar_settings">Text field toolbar settings</string>
+    <string name="error_user_has_no_profile_image">User has no profile image set. The profile image you see is a placeholder inserted by Summit.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

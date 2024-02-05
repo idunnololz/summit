@@ -14,6 +14,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.transition.CrossfadeTransition
+import coil.util.DebugLogger
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -24,7 +25,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
 import com.idunnololz.summit.util.Client
-import com.idunnololz.summit.util.CustomVideoFrameDecoder
+import com.idunnololz.summit.util.coil.CustomVideoFrameDecoder
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.DataFiles
 import com.idunnololz.summit.util.LocaleHelper
@@ -199,6 +200,11 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                     }
                     add(CustomVideoFrameDecoder.Factory())
                     add(SvgDecoder.Factory())
+                }
+                .apply {
+                    if (BuildConfig.DEBUG) {
+                        logger(DebugLogger())
+                    }
                 }
                 .build(),
         )

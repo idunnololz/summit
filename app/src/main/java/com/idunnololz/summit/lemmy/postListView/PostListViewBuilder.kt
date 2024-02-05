@@ -20,6 +20,8 @@ import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import coil.load
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
@@ -58,6 +60,7 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
+import com.idunnololz.summit.util.coil.VideoWatermarkTransformation
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.ext.getSize
@@ -207,8 +210,6 @@ class PostListViewBuilder @Inject constructor(
         onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
-        var start = System.nanoTime()
-
         val url = postView.post.url
         val thumbnailUrl = postView.post.thumbnail_url
         with(holder) {
@@ -346,9 +347,6 @@ class PostListViewBuilder @Inject constructor(
                 holder.state.preferTitleText = postUiConfig.preferTitleText
             }
 
-            Log.d("HAHA", "s1: ${System.nanoTime() - start}")
-            start = System.nanoTime()
-
             scaleTextSizes()
 
             if (holder.state.preferImagesAtEnd != postUiConfig.preferImagesAtEnd) {
@@ -428,9 +426,6 @@ class PostListViewBuilder @Inject constructor(
 
                 holder.state.preferImagesAtEnd = postUiConfig.preferImagesAtEnd
             }
-
-            Log.d("HAHA", "s2: ${System.nanoTime() - start}")
-            start = System.nanoTime()
 
             val preferFullSizeImages = postUiConfig.preferFullSizeImages &&
                 (rawBinding is ListingItemCardBinding) ||
@@ -531,9 +526,6 @@ class PostListViewBuilder @Inject constructor(
                 )
             }
 
-            Log.d("HAHA", "s3: ${System.nanoTime() - start}")
-            start = System.nanoTime()
-
             val postType = postView.getType()
             if (updateContent) {
                 lemmyHeaderHelper.populateHeaderSpan(
@@ -577,6 +569,7 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     val imageUrl = thumbnailImageUrl ?: url
+
                     val backupImageUrl = if (imageUrl != url &&
                         url != null &&
                         ContentUtils.isUrlImage(url)
@@ -596,13 +589,17 @@ class PostListViewBuilder @Inject constructor(
                         return
                     }
 
-                    if (!ContentUtils.isUrlImage(imageUrl)) {
+                    val isUrlMp4 = ContentUtils.isUrlMp4(imageUrl)
+
+                    if (!ContentUtils.isUrlImage(imageUrl) && !isUrlMp4) {
                         image.visibility = View.GONE
                         return
                     }
 
                     image.visibility = View.VISIBLE
                     iconImage?.visibility = View.GONE
+
+//                    image.load("https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cat_August_2010-4.jpg/181px-Cat_August_2010-4.jpg")
 
                     image.load(R.drawable.thumbnail_placeholder_16_9) {
                         if (image is ShapeableImageView) {
@@ -635,11 +632,19 @@ class PostListViewBuilder @Inject constructor(
 
                     loadImage()
 
+                    fun showImageOrVideo() {
+                        if (isUrlMp4) {
+                            onVideoClick(imageUrl, VideoType.Mp4, null)
+                        } else {
+                            onImageClick(postView, image, imageUrl)
+                        }
+                    }
+
                     image.transitionName = "image_$absoluteAdapterPosition"
                     image.setOnClickListener {
                         if (fullContentContainerView != null) {
                             if (singleTapToViewImage) {
-                                onImageClick(postView, image, imageUrl)
+                                showImageOrVideo()
                             } else {
                                 toggleItem(postView)
                             }
@@ -647,7 +652,7 @@ class PostListViewBuilder @Inject constructor(
                             if (url != null && (postType == PostType.Text || postType == PostType.Link)) {
                                 onLinkClick(url, null, LinkType.Rich)
                             } else {
-                                onImageClick(postView, image, imageUrl)
+                                showImageOrVideo()
                             }
                         }
                     }
@@ -657,20 +662,17 @@ class PostListViewBuilder @Inject constructor(
                             if (singleTapToViewImage) {
                                 toggleItem(postView)
                             } else {
-                                onImageClick(postView, image, imageUrl)
+                                showImageOrVideo()
                             }
                             true
                         }
                     } else {
                         image.setOnLongClickListener {
-                            onImageClick(postView, image, imageUrl)
+                            showImageOrVideo()
                             true
                         }
                     }
                 }
-
-                Log.d("HAHA", "s4: ${System.nanoTime() - start}")
-                start = System.nanoTime()
 
                 iconImage?.visibility = View.GONE
                 iconImage?.setOnClickListener(null)
@@ -711,6 +713,8 @@ class PostListViewBuilder @Inject constructor(
                         onLinkLongClick = onLinkLongClick,
                     )
                 }
+
+                Log.d(TAG, "postType: ${postType}")
 
                 when (postType) {
                     PostType.Image -> {
@@ -786,9 +790,6 @@ class PostListViewBuilder @Inject constructor(
                 }
             }
 
-            Log.d("HAHA", "s5: ${System.nanoTime() - start}")
-            start = System.nanoTime()
-
             LemmyTextHelper.bindText(
                 title,
                 postView.post.name,
@@ -803,9 +804,6 @@ class PostListViewBuilder @Inject constructor(
                 onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
-
-            Log.d("HAHA", "s6: ${System.nanoTime() - start}")
-            start = System.nanoTime()
 
             if (postView.read && !alwaysRenderAsUnread) {
                 if (themeManager.isLightTheme) {
@@ -834,10 +832,9 @@ class PostListViewBuilder @Inject constructor(
                     null,
                 )
             }
+
             commentButton?.isEnabled = !postView.post.locked
 
-            Log.d("HAHA", "s7: ${System.nanoTime() - start}")
-            start = System.nanoTime()
             val scoreCount: TextView? = upvoteCount
             if (scoreCount != null) {
                 val upvoteCount: TextView?
@@ -865,9 +862,6 @@ class PostListViewBuilder @Inject constructor(
                     onInstanceMismatch,
                 )
             }
-
-            Log.d("HAHA", "s8: ${System.nanoTime() - start}")
-            start = System.nanoTime()
 
             if (highlightForever) {
                 highlightBg.visibility = View.VISIBLE
@@ -957,9 +951,6 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
             }
-
-            Log.d("HAHA", "s9: ${System.nanoTime() - start}")
-            start = System.nanoTime()
         }
     }
 
@@ -1195,6 +1186,8 @@ class PostListViewBuilder @Inject constructor(
     ) {
         val urlToLoad = imageUrl
 
+        val isUrlMp4 = ContentUtils.isUrlMp4(imageUrl)
+
         offlineManager.getImageSizeHint(imageUrl, tempSize)
 
         if (preferFullSizeImage) {
@@ -1213,54 +1206,75 @@ class PostListViewBuilder @Inject constructor(
             }
         }
 
-        offlineManager.fetchImageWithError(
-            rootView = rootView,
-            url = urlToLoad,
-            listener = {
-                offlineManager.getMaxImageSizeHint(it, tempSize)
+        fun loadImage(urlOrFile: Any, size: Size, showPlaceholder: Boolean) {
+            var w: Int? = null
+            var h: Int? = null
 
-                var w: Int? = null
-                var h: Int? = null
-                if (tempSize.height > 0 && tempSize.width > 0) {
-                    val heightToWidthRatio = tempSize.height / tempSize.width
+            if (size.height > 0 && size.width > 0) {
+                val heightToWidthRatio = size.height / size.width
 
-                    if (heightToWidthRatio > 10) {
-                        // shrink the image if needed
-                        w = tempSize.width
-                        h = tempSize.height
-                    }
+                if (heightToWidthRatio > 10) {
+                    // shrink the image if needed
+                    w = size.width
+                    h = size.height
+                }
+            }
+
+            imageView.load(urlOrFile) {
+                if (showPlaceholder) {
+                    placeholder(R.drawable.thumbnail_placeholder_16_9)
                 }
 
-                imageView.load(it) {
-                    if (imageView is ShapeableImageView) {
-                        allowHardware(false)
-                    }
+                if (imageView is ShapeableImageView) {
+                    allowHardware(false)
+                }
 
-                    if (w != null && h != null) {
-                        this.size(w, h)
-                    }
-                    //                                fallback(R.drawable.thumbnail_placeholder_16_9)
-                    //                                placeholder(R.drawable.thumbnail_placeholder_16_9)
+                if (w != null && h != null) {
+                    this.size(w, h)
+                }
+                // fallback(R.drawable.thumbnail_placeholder_16_9)
 
-                    if (shouldBlur) {
-                        val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+                if (shouldBlur) {
+                    val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
 
+                    if (isUrlMp4) {
+                        transformations(
+                            BlurTransformation(context, sampling = sampling),
+                            VideoWatermarkTransformation(context, sampling = 1f / sampling),
+                        )
+                    } else {
                         transformations(BlurTransformation(context, sampling = sampling))
                     }
+                }
 
-                    listener { _, result ->
-                        result.drawable.getSize(tempSize)
-                        if (tempSize.width > 0 && tempSize.height > 0) {
-                            offlineManager.setImageSizeHint(
-                                imageUrl,
-                                tempSize.width,
-                                tempSize.height,
-                            )
-                        }
+                listener { _, result ->
+                    result.drawable.getSize(size)
+                    if (size.width > 0 && size.height > 0) {
+                        offlineManager.setImageSizeHint(
+                            imageUrl,
+                            size.width,
+                            size.height,
+                        )
                     }
                 }
-            },
-            errorListener = errorListener,
-        )
+            }
+        }
+
+        if (isUrlMp4) {
+            offlineManager.getMaxImageSizeHint(imageUrl, tempSize)
+
+            loadImage(imageUrl, tempSize, showPlaceholder = true)
+        } else {
+            offlineManager.fetchImageWithError(
+                rootView = rootView,
+                url = urlToLoad,
+                listener = {
+                    offlineManager.getMaxImageSizeHint(it, tempSize)
+
+                    loadImage(it, tempSize, showPlaceholder = false)
+                },
+                errorListener = errorListener,
+            )
+        }
     }
 }

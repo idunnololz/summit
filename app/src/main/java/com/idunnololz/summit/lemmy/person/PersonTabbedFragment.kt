@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
+import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -22,6 +23,7 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
@@ -386,10 +388,27 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 profileIcon.setImageDrawable(
                     accountImageGenerator.generateDrawableForPerson(data.personView.person),
                 )
+
+                profileIcon.setOnClickListener {
+                    AlertDialogFragment.Builder()
+                        .setMessage(R.string.error_user_has_no_profile_image)
+                        .createAndShow(childFragmentManager, "error_user_has_no_profile_image")
+                }
             } else {
                 profileIcon.load(data.personView.person.avatar) {
                     fallback(R.drawable.thumbnail_placeholder_square)
                     allowHardware(false)
+                }
+                ViewCompat.setTransitionName(profileIcon, "profileIcon")
+
+                profileIcon.setOnClickListener {
+                    getMainActivity()?.openImage(
+                        profileIcon,
+                        toolbar,
+                        data.personView.person.fullName,
+                        data.personView.person.avatar,
+                        null,
+                    )
                 }
             }
             name.text = displayName

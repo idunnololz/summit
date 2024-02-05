@@ -33,6 +33,7 @@ class CommentExpandedViewHolder(
     var downvoteButton: View?,
     var commentButton: View?,
     var moreButton: View?,
+    var quickActionsBar: View?,
     val actionsContainer: ViewGroup?,
 
     var actionsDivider1: View? = null,
@@ -71,6 +72,7 @@ class CommentExpandedViewHolder(
                 downvoteButton = null,
                 commentButton = null,
                 moreButton = null,
+                quickActionsBar = null,
                 actionsContainer = null,
             )
         fun fromBinding(binding: PostCommentExpandedCompactItemBinding) =
@@ -95,6 +97,7 @@ class CommentExpandedViewHolder(
                 downvoteButton = null,
                 commentButton = null,
                 moreButton = null,
+                quickActionsBar = null,
                 actionsContainer = binding.actionsContainer,
             )
     }

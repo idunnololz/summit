@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.View
+import androidx.core.net.toUri
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.ServerApiException
@@ -51,7 +52,7 @@ class OfflineManager @Inject constructor(
     private val jobMap = HashMap<String, MutableList<Job>>()
 
     private val imageSizeHints = HashMap<String, Size>()
-    private val maxImageSizeHint = HashMap<File, Size>()
+    private val maxImageSizeHint = HashMap<String, Size>()
 
     private var offlineDownloadProgressListeners = ArrayList<OfflineDownloadProgressListener>()
 
@@ -145,16 +146,19 @@ class OfflineManager @Inject constructor(
     }
 
     fun setMaxImageSizeHint(file: File, w: Int, h: Int) {
-        maxImageSizeHint.getOrPut(file) { Size() }.apply {
+        maxImageSizeHint.getOrPut(file.toUri().toString()) { Size() }.apply {
             width = w
             height = h
         }
     }
 
-    fun hasMaxImageSizeHint(file: File): Boolean = maxImageSizeHint.containsKey(file)
+    fun hasMaxImageSizeHint(file: File): Boolean = maxImageSizeHint.containsKey(file.toUri().toString())
 
-    fun getMaxImageSizeHint(file: File, size: Size): Size = size.apply {
-        val size = maxImageSizeHint[file]
+    fun getMaxImageSizeHint(file: File, size: Size): Size =
+        getMaxImageSizeHint(file.toUri().toString(), size)
+
+    fun getMaxImageSizeHint(url: String, size: Size): Size = size.apply {
+        val size = maxImageSizeHint[url]
         if (size != null) {
             width = size.width
             height = size.height

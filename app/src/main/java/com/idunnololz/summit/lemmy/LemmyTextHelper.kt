@@ -91,6 +91,7 @@ object LemmyTextHelper {
             }
         }
     }
+
     fun getSpannable(context: Context, text: String): Spanned {
         val markwon = getMarkwon(context)
 
