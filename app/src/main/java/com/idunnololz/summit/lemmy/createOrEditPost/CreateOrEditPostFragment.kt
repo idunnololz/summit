@@ -135,7 +135,7 @@ class CreateOrEditPostFragment :
         childFragmentManager.setFragmentResultListener(
             DraftsDialogFragment.REQUEST_KEY,
             this,
-        ) { key, bundle ->
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<DraftEntry>(
                 DraftsDialogFragment.REQUEST_KEY_RESULT,
             )
@@ -146,7 +146,7 @@ class CreateOrEditPostFragment :
         childFragmentManager.setFragmentResultListener(
             ChooseSavedImageDialogFragment.REQUEST_KEY,
             this,
-        ) { key, bundle ->
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
                 ChooseSavedImageDialogFragment.REQUEST_RESULT,
             )
@@ -157,7 +157,7 @@ class CreateOrEditPostFragment :
         childFragmentManager.setFragmentResultListener(
             "for_link",
             this,
-        ) { key, bundle ->
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
                 ChooseSavedImageDialogFragment.REQUEST_RESULT,
             )
@@ -252,8 +252,14 @@ class CreateOrEditPostFragment :
             }
         }
 
-        binding.url.editText?.doOnTextChanged { text, start, before, count ->
+        binding.url.editText?.doOnTextChanged { text, _, _, _ ->
             viewModel.setUrl(text.toString())
+        }
+
+        binding.postEditText.addTextChangedListener {
+            binding.root.postDelayed({
+                onScrollUpdated()
+            }, 10)
         }
 
         textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
@@ -501,12 +507,12 @@ class CreateOrEditPostFragment :
                 }
             }
         }
-        viewModel.linkMetadata.observe(viewLifecycleOwner) { linkMetadata ->
+        viewModel.linkMetadata.observe(viewLifecycleOwner) {
             onLinkMetadataChanged()
         }
 
         binding.scrollView.setOnScrollChangeListener(
-            NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            NestedScrollView.OnScrollChangeListener { _, _, _, _, _ ->
                 onScrollUpdated()
             },
         )
@@ -515,7 +521,9 @@ class CreateOrEditPostFragment :
             val insets = getMainActivity()?.lastInsets
             val isImeOpen = (insets?.imeHeight ?: 0) > 0
 
-            onImeChange(isImeOpen)
+            binding.root.post {
+                onImeChange(isImeOpen)
+            }
         }
         binding.root.viewTreeObserver.addOnPreDrawListener(
             object : OnPreDrawListener {
@@ -542,7 +550,7 @@ class CreateOrEditPostFragment :
             viewModel.showSearch.value = true
         }
 
-        binding.communityEditText.onFocusChangeListener = View.OnFocusChangeListener { editTextView, hasFocus ->
+        binding.communityEditText.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
             viewModel.showSearch.value =
                 binding.communityEditText.hasFocus() &&
                 !binding.communityEditText.text.isNullOrBlank()
@@ -666,6 +674,7 @@ class CreateOrEditPostFragment :
         if (isImeOpen) {
             binding.postBodyToolbarPlaceholder.visibility = View.GONE
             binding.postBodyToolbarPlaceholder2.visibility = View.VISIBLE
+            binding.postTextDivider.visibility = View.VISIBLE
             binding.postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
                 gravity = Gravity.BOTTOM
             }
@@ -675,6 +684,7 @@ class CreateOrEditPostFragment :
         } else {
             binding.postBodyToolbarPlaceholder.visibility = View.VISIBLE
             binding.postBodyToolbarPlaceholder2.visibility = View.GONE
+            binding.postTextDivider.visibility = View.GONE
             binding.postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
                 gravity = Gravity.TOP or Gravity.LEFT
             }
@@ -762,9 +772,7 @@ class CreateOrEditPostFragment :
     }
 
     private fun onLinkMetadataChanged() {
-        val linkMetadata = viewModel.linkMetadata.value
-
-        when (linkMetadata) {
+        when (val linkMetadata = viewModel.linkMetadata.value) {
             is StatefulData.Error -> {
                 binding.titleSuggestionContainer.visibility = View.GONE
             }

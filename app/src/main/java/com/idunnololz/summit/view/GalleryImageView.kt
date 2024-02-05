@@ -15,12 +15,13 @@ import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ScaleGestureDetectorCompat
+import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.util.Utils
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class GalleryImageView : AppCompatImageView {
+class GalleryImageView : ShapeableImageView {
 
     companion object {
 

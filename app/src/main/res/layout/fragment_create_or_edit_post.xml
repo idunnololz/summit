@@ -185,6 +185,13 @@
                                 android:textAppearance="?textAppearanceBodyMedium"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
+                        <com.google.android.material.divider.MaterialDivider
+                            android:id="@+id/post_text_divider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/post_editor"/>
+
                         <Space
                             android:id="@+id/post_body_toolbar_placeholder"
                             android:layout_width="match_parent"
@@ -196,7 +203,7 @@
                             android:id="@+id/nsfw_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/padding"
+                            android:layout_marginTop="@dimen/padding_half"
                             android:layout_marginEnd="@dimen/padding"
                             app:layout_constraintTop_toBottomOf="@+id/post_body_toolbar_placeholder"
                             app:layout_constraintEnd_toEndOf="parent"/>
@@ -210,6 +217,13 @@
                             app:layout_constrainedWidth="true"
                             app:layout_constraintTop_toTopOf="@+id/nsfw_switch"
                             app:layout_constraintBottom_toBottomOf="@+id/nsfw_switch"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+                        <Space
+                            android:id="@+id/bottom_spacer"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/footer_spacer_height"
+                            app:layout_constraintTop_toBottomOf="@+id/nsfw_switch"
                             app:layout_constraintStart_toStartOf="parent"/>
 
                         <androidx.recyclerview.widget.RecyclerView

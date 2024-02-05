@@ -80,7 +80,7 @@
                         android:layout_height="64dp"
                         android:layout_marginHorizontal="@dimen/padding"
                         android:layout_marginTop="?attr/actionBarSize"
-                        android:foreground="@drawable/account_ripple"
+                        android:foreground="@drawable/account_ripple_2"
                         android:scaleType="centerCrop"
                         android:padding="2dp"
                         style="@style/CircleImageView"

@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.transition.ChangeClipBounds
 import android.transition.Fade
 import android.transition.Transition
 import android.util.Log
@@ -31,6 +32,7 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
@@ -169,6 +171,7 @@ class ImageViewerActivity : BaseActivity() {
             excludeTarget(R.id.dummy_image_view, true)
             excludeTarget(R.id.imageView, true)
         }
+
         window.sharedElementEnterTransition = SharedElementTransition()
         window.sharedElementReturnTransition = SharedElementTransition()
 //        window.sharedElementsUseOverlay = false
