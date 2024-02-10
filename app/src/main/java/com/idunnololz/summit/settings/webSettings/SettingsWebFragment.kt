@@ -154,7 +154,7 @@ class SettingsWebFragment :
 
         viewModel.fetchAccountInfo()
 
-        addMenuProvider(
+        addMenuProvider2(
             object : MenuProvider {
                 override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                     menuInflater.inflate(R.menu.menu_setting_web, menu)
@@ -162,7 +162,7 @@ class SettingsWebFragment :
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     return when (menuItem.itemId) {
-                        R.id.save -> {
+                        R.id.ca_save -> {
                             save()
                             true
                         }

@@ -29,6 +29,7 @@ import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
@@ -476,13 +477,13 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         fragmentManager = childFragmentManager,
                     )
                 },
-                onCommentMoreClick = { commentView, _ ->
-                    showMoreCommentOptions(
+                onCommentActionClick = { commentView, _, actionId ->
+                    createCommentActionHandler(
                         instance = viewModel.apiInstance,
                         commentView = commentView,
                         actionsViewModel = actionsViewModel,
                         fragmentManager = childFragmentManager,
-                    )
+                    )(actionId)
                 },
                 onFetchComments = {
                     val postId = when (val inboxItem = args.inboxItem) {

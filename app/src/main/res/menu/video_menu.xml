@@ -4,7 +4,7 @@
     tools:context=".activity.MainActivity">
 
     <item
-        android:id="@+id/save"
+        android:id="@+id/ca_save"
         android:title="@string/save"
         android:icon="@drawable/baseline_save_24"
         android:orderInCategory="100"

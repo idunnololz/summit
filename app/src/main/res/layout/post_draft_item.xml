@@ -7,18 +7,36 @@
     android:background="?selectableItemBackground">
 
     <TextView
+        android:id="@+id/type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:text="@string/post_draft"
+        android:drawablePadding="@dimen/padding_half"
+        android:textColor="@color/colorTextFaint"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:textAppearance="?textAppearanceLabelMedium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:drawableStartCompat="@drawable/outline_article_14"
+        app:drawableTint="@color/style_red" />
+
+    <TextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceTitleMedium"
         android:maxLines="1"
         android:ellipsize="end"
-        android:layout_marginTop="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/delete"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/type"/>
 
     <TextView
         android:id="@+id/text"

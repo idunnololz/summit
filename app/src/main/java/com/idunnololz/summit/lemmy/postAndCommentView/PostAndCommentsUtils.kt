@@ -9,7 +9,6 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -60,6 +59,120 @@ fun BaseFragment<*>.showMoreCommentOptions(
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
 
+    val currentAccount = actionsViewModel.accountManager.currentAccount.asAccount
+
+    val bottomMenu = BottomMenu(requireContext()).apply {
+        setTitle(R.string.more_actions)
+
+        addItemWithIcon(R.id.ca_reply, R.string.reply, R.drawable.baseline_reply_24)
+
+        if (commentView.creator.id == currentAccount?.id) {
+            addItemWithIcon(R.id.ca_edit_comment, R.string.edit_comment, R.drawable.baseline_edit_24)
+            addItemWithIcon(R.id.ca_delete_comment, R.string.delete_comment, R.drawable.baseline_delete_24)
+        }
+        if (commentView.saved) {
+            addItemWithIcon(R.id.ca_remove_from_saved, R.string.remove_from_saved, R.drawable.baseline_bookmark_remove_24)
+        } else {
+            addItemWithIcon(R.id.ca_save, R.string.save, R.drawable.baseline_bookmark_add_24)
+        }
+
+        val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
+        val miscAccountInfo = fullAccount
+            ?.accountInfo
+            ?.miscAccountInfo
+
+        if (instance == fullAccount?.account?.instance &&
+            miscAccountInfo?.isAdmin == true
+        ) {
+            // Apparently if the user is an admin, they can ignore mod rules and perform any actions
+            // they wish on their instance.
+            addDivider()
+
+            addItemWithIcon(
+                id = R.id.ca_admin_tools,
+                title = R.string.admin_tools,
+                icon = R.drawable.outline_shield_24,
+            )
+
+            addDivider()
+        } else if (miscAccountInfo
+            ?.modCommunityIds
+            ?.contains(commentView.community.id) == true
+        ) {
+            addDivider()
+
+            addItemWithIcon(
+                id = R.id.ca_mod_tools,
+                title = R.string.mod_tools,
+                icon = R.drawable.outline_shield_24,
+            )
+
+            addDivider()
+        }
+
+        addItemWithIcon(R.id.ca_share, R.string.share, R.drawable.baseline_share_24)
+
+        if (onScreenshotClick != null) {
+            addItemWithIcon(
+                R.id.ca_screenshot,
+                getString(R.string.take_screenshot),
+                R.drawable.baseline_screenshot_24,
+            )
+        }
+        addItemWithIcon(
+            R.id.ca_share_fediverse_link,
+            getString(R.string.share_source_link),
+            R.drawable.ic_fediverse_24,
+        )
+        if (onLoadComment != null) {
+            addItemWithIcon(
+                R.id.ca_open_comment_in_new_screen,
+                R.string.open_comment,
+                R.drawable.baseline_open_in_new_24,
+            )
+        }
+
+        addDivider()
+        addItemWithIcon(
+            R.id.ca_block_user,
+            getString(R.string.block_this_user_format, commentView.creator.name),
+            R.drawable.baseline_person_off_24,
+        )
+        addItemWithIcon(
+            R.id.ca_report_comment,
+            getString(R.string.report_comment),
+            R.drawable.baseline_outlined_flag_24,
+        )
+        addDivider()
+
+        addItemWithIcon(R.id.ca_view_source, R.string.view_source, R.drawable.baseline_code_24)
+        addItemWithIcon(R.id.ca_detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
+
+        setOnMenuItemClickListener {
+            createCommentActionHandler(
+                instance = instance,
+                commentView = commentView,
+                actionsViewModel = actionsViewModel,
+                fragmentManager = fragmentManager,
+                onLoadComment = onLoadComment,
+                onScreenshotClick = onScreenshotClick
+            )(it.id)
+        }
+    }
+    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
+
+    return bottomMenu
+}
+
+fun BaseFragment<*>.createCommentActionHandler(
+    instance: String,
+    commentView: CommentView,
+    actionsViewModel: MoreActionsViewModel,
+    fragmentManager: FragmentManager,
+    onLoadComment: ((CommentId) -> Unit)? = null,
+    onScreenshotClick: (() -> Unit)? = null,
+): (Int) -> Unit = test@{ id: Int ->
+
     val context = requireContext()
     val currentAccount = actionsViewModel.accountManager.currentAccount.asAccount
 
@@ -98,169 +211,93 @@ fun BaseFragment<*>.showMoreCommentOptions(
             )
     }
 
-    val bottomMenu = BottomMenu(requireContext()).apply {
-        setTitle(R.string.more_actions)
-
-        addItemWithIcon(R.id.reply, R.string.reply, R.drawable.baseline_reply_24)
-
-        if (commentView.creator.id == currentAccount?.id) {
-            addItemWithIcon(R.id.edit_comment, R.string.edit_comment, R.drawable.baseline_edit_24)
-            addItemWithIcon(R.id.delete_comment, R.string.delete_comment, R.drawable.baseline_delete_24)
+    when (id) {
+        R.id.ca_edit_comment -> {
+            onEditCommentClick(commentView)
         }
-        if (commentView.saved) {
-            addItemWithIcon(R.id.remove_from_saved, R.string.remove_from_saved, R.drawable.baseline_bookmark_remove_24)
-        } else {
-            addItemWithIcon(R.id.save, R.string.save, R.drawable.baseline_bookmark_add_24)
+        R.id.ca_delete_comment -> {
+            onDeleteCommentClick(commentView)
         }
-
-        val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
-        val miscAccountInfo = fullAccount
-            ?.accountInfo
-            ?.miscAccountInfo
-
-        if (instance == fullAccount?.account?.instance &&
-            miscAccountInfo?.isAdmin == true
-        ) {
-            // Apparently if the user is an admin, they can ignore mod rules and perform any actions
-            // they wish on their instance.
-            addDivider()
-
-            addItemWithIcon(
-                id = R.id.admin_tools,
-                title = R.string.admin_tools,
-                icon = R.drawable.outline_shield_24,
-            )
-
-            addDivider()
-        } else if (miscAccountInfo
-            ?.modCommunityIds
-            ?.contains(commentView.community.id) == true
-        ) {
-            addDivider()
-
-            addItemWithIcon(
-                id = R.id.mod_tools,
-                title = R.string.mod_tools,
-                icon = R.drawable.outline_shield_24,
-            )
-
-            addDivider()
-        }
-
-        addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
-
-        if (onScreenshotClick != null) {
-            addItemWithIcon(
-                R.id.screenshot,
-                getString(R.string.take_screenshot),
-                R.drawable.baseline_screenshot_24,
-            )
-        }
-        addItemWithIcon(
-            R.id.share_fediverse_link,
-            getString(R.string.share_source_link),
-            R.drawable.ic_fediverse_24,
-        )
-        if (onLoadComment != null) {
-            addItemWithIcon(
-                R.id.open_comment_in_new_screen,
-                R.string.open_comment,
-                R.drawable.baseline_open_in_new_24,
-            )
-        }
-
-        addDivider()
-        addItemWithIcon(
-            R.id.block_user,
-            getString(R.string.block_this_user_format, commentView.creator.name),
-            R.drawable.baseline_person_off_24,
-        )
-        addItemWithIcon(
-            R.id.report_comment,
-            getString(R.string.report_comment),
-            R.drawable.baseline_outlined_flag_24,
-        )
-        addDivider()
-
-        addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
-        addItemWithIcon(R.id.detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
-
-        setOnMenuItemClickListener {
-            when (it.id) {
-                R.id.edit_comment -> {
-                    onEditCommentClick(commentView)
-                }
-                R.id.delete_comment -> {
-                    onDeleteCommentClick(commentView)
-                }
-                R.id.save -> {
-                    actionsViewModel.saveComment(commentView.comment.id, true)
-                }
-                R.id.remove_from_saved -> {
-                    actionsViewModel.saveComment(commentView.comment.id, false)
-                }
-                R.id.share -> {
-                    Utils.shareLink(
-                        context,
-                        LinkUtils.getLinkForComment(instance, commentView.comment.id),
-                    )
-                }
-                R.id.share_fediverse_link -> {
-                    Utils.shareLink(
-                        context,
-                        commentView.comment.ap_id,
-                    )
-                }
-                R.id.view_source -> {
-                    PreviewCommentDialogFragment()
-                        .apply {
-                            arguments = PreviewCommentDialogFragmentArgs(
-                                "",
-                                commentView.comment.content,
-                                true,
-                            ).toBundle()
-                        }
-                        .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
-                }
-                R.id.detailed_view -> {
-                    ContentDetailsDialogFragment
-                        .show(childFragmentManager, instance, commentView)
-                }
-                R.id.admin_tools,
-                R.id.mod_tools,
-                -> {
-                    ModActionsDialogFragment.show(commentView, childFragmentManager)
-                }
-                R.id.reply -> {
-                    AddOrEditCommentFragment.showReplyDialog(
-                        instance = instance,
-                        postOrCommentView = Either.Right(commentView),
-                        fragmentManager = childFragmentManager,
-                    )
-                }
-                R.id.block_user -> {
-                    actionsViewModel.blockPerson(commentView.creator.id)
-                }
-                R.id.report_comment -> {
-                    ReportContentDialogFragment.show(
-                        childFragmentManager,
-                        null,
-                        CommentRef(
-                            instance,
-                            commentView.comment.id,
-                        ),
-                    )
-                }
-                R.id.open_comment_in_new_screen -> {
-                    onLoadComment?.invoke(commentView.comment.id)
-                }
-                R.id.screenshot -> {
-                    onScreenshotClick?.invoke()
-                }
+        R.id.ca_save_toggle -> {
+            if (commentView.saved) {
+                actionsViewModel.saveComment(commentView.comment.id, false)
+            } else {
+                actionsViewModel.saveComment(commentView.comment.id, true)
             }
         }
+        R.id.ca_save -> {
+            actionsViewModel.saveComment(commentView.comment.id, true)
+        }
+        R.id.ca_remove_from_saved -> {
+            actionsViewModel.saveComment(commentView.comment.id, false)
+        }
+        R.id.ca_share -> {
+            Utils.shareLink(
+                context,
+                LinkUtils.getLinkForComment(instance, commentView.comment.id),
+            )
+        }
+        R.id.ca_share_fediverse_link -> {
+            Utils.shareLink(
+                context,
+                commentView.comment.ap_id,
+            )
+        }
+        R.id.ca_view_source -> {
+            PreviewCommentDialogFragment()
+                .apply {
+                    arguments = PreviewCommentDialogFragmentArgs(
+                        "",
+                        commentView.comment.content,
+                        true,
+                    ).toBundle()
+                }
+                .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
+        }
+        R.id.ca_detailed_view -> {
+            ContentDetailsDialogFragment
+                .show(childFragmentManager, instance, commentView)
+        }
+        R.id.ca_admin_tools,
+        R.id.ca_mod_tools,
+        -> {
+            ModActionsDialogFragment.show(commentView, childFragmentManager)
+        }
+        R.id.ca_reply -> {
+            AddOrEditCommentFragment.showReplyDialog(
+                instance = instance,
+                postOrCommentView = Either.Right(commentView),
+                fragmentManager = childFragmentManager,
+            )
+        }
+        R.id.ca_block_user -> {
+            actionsViewModel.blockPerson(commentView.creator.id)
+        }
+        R.id.ca_report_comment -> {
+            ReportContentDialogFragment.show(
+                childFragmentManager,
+                null,
+                CommentRef(
+                    instance,
+                    commentView.comment.id,
+                ),
+            )
+        }
+        R.id.ca_open_comment_in_new_screen -> {
+            onLoadComment?.invoke(commentView.comment.id)
+        }
+        R.id.ca_screenshot -> {
+            onScreenshotClick?.invoke()
+        }
+        R.id.ca_more -> {
+            showMoreCommentOptions(
+                instance = instance,
+                commentView = commentView,
+                actionsViewModel = actionsViewModel,
+                fragmentManager = fragmentManager,
+                onLoadComment = onLoadComment,
+                onScreenshotClick = onScreenshotClick
+            )
+        }
     }
-    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
-
-    return bottomMenu
 }

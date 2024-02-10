@@ -77,7 +77,7 @@ class PostAdapter(
     private val onVideoLongClickListener: (url: String) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onPostMoreClick: (PostView, String) -> Unit,
-    private val onCommentMoreClick: (CommentView, String) -> Unit,
+    private val onCommentActionClick: (CommentView, String, actionId: Int) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
     private val onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
@@ -544,9 +544,8 @@ class PostAdapter(
                         toggleActionsExpanded = {
                             toggleActions(item.comment.comment.id)
                         },
-                        onAddCommentClick = onAddCommentClick,
-                        onCommentMoreClick = {
-                            onCommentMoreClick(it, item.id)
+                        onCommentActionClick = { commentView, actionId ->
+                            onCommentActionClick(commentView, item.id, actionId)
                         },
                         onLinkLongClick = onLinkLongClick,
                         onSignInRequired = onSignInRequired,
@@ -1084,10 +1083,10 @@ class PostAdapter(
             }
 
         val curP = topLevelCommentIndices.getOrNull(topLevelPosition)
-        if (position == curP) {
-            return topLevelCommentIndices.getOrNull(topLevelPosition - 1) ?: 0
+        return if (position == curP) {
+            topLevelCommentIndices.getOrNull(topLevelPosition - 1) ?: 0
         } else {
-            return curP
+            curP
         }
     }
 

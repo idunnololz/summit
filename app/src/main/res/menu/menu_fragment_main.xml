@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/share"
+        android:id="@+id/ca_share"
         android:title="@string/share"
         android:orderInCategory="100" />
     <item

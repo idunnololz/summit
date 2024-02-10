@@ -148,7 +148,7 @@ class HistoryFragment :
             viewModel.loadHistory(force = true)
         }
 
-        addMenuProvider(
+        addMenuProvider2(
             object : MenuProvider {
                 override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                     menuInflater.inflate(R.menu.menu_fragment_history, menu)

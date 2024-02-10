@@ -281,10 +281,17 @@ class TextFormatToolbarViewHolder(
             )
         }
         quote?.setOnClickListener {
-            editText.wrapTextAtCursor(
-                startText = "> ",
-                endText = "",
-            )
+            val start = editText.selectionStart.coerceAtLeast(0)
+            val end = editText.selectionEnd.coerceAtLeast(0)
+
+            val text = editText.text.toString().substring(start, end)
+            val newText = ">" + text.split("\n").joinToString(separator = "\n>")
+
+            editText.text.replace(start, end, newText)
+
+            val finalCursorPos = Integer.min(start, end) + newText.length
+
+            editText.setSelection(finalCursorPos)
         }
         link?.setOnClickListener {
             onAddLinkClick?.invoke()

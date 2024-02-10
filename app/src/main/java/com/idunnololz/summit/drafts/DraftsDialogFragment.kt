@@ -1,11 +1,14 @@
 package com.idunnololz.summit.drafts
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.text.buildSpannedString
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
@@ -108,6 +111,15 @@ class DraftsDialogFragment :
                         .createAndShow(childFragmentManager, "delete_all")
                     true
                 }
+                R.id.show_all_drafts -> {
+                    if (viewModel.draftType == null) {
+                        viewModel.draftType = args.draftType
+                    } else {
+                        viewModel.draftType = null
+                    }
+                    viewModel.loadMoreDrafts(force = true)
+                    true
+                }
                 else -> false
             }
         }
@@ -115,7 +127,54 @@ class DraftsDialogFragment :
         with(binding) {
             val adapter = DraftsAdapter(
                 onDraftClick = {
-                    setFragmentResult(REQUEST_KEY, bundleOf(REQUEST_KEY_RESULT to it))
+                    // Convert the draft data to the correct type (eg. if comment draft was requested
+                    // but the draft selected was a post then convert the post to a comment)
+                    val draft = when (args.draftType) {
+                        DraftTypes.Post -> {
+                            when (it.data) {
+                                is DraftData.CommentDraftData ->
+                                    it.copy(
+                                        id = 0L, // prevent overwriting the original
+                                        data = DraftData.PostDraftData(
+                                            originalPost = null,
+                                            name = null,
+                                            body = it.data.content,
+                                            url = null,
+                                            isNsfw = false,
+                                            accountId = it.data.accountId,
+                                            accountInstance = it.data.accountInstance,
+                                            targetCommunityFullName = "",
+                                        )
+                                    )
+                                is DraftData.PostDraftData -> it
+                                null -> null
+                            }
+                        }
+                        DraftTypes.Comment -> {
+                            when (it.data) {
+                                is DraftData.CommentDraftData -> it
+                                is DraftData.PostDraftData ->
+                                    it.copy(
+                                        id = 0L, // prevent overwriting the original
+                                        data = DraftData.CommentDraftData(
+                                            originalComment = null,
+                                            postRef = null,
+                                            parentCommentId = null,
+                                            content = it.data.body ?: "",
+                                            accountId = it.data.accountId,
+                                            accountInstance = it.data.accountInstance,
+                                        )
+                                    )
+                                null -> null
+                            }
+                        }
+                        else -> null
+                    }
+
+                    setFragmentResult(
+                        REQUEST_KEY,
+                        bundleOf(REQUEST_KEY_RESULT to draft)
+                    )
                     dismiss()
                 },
                 onDeleteClick = {
@@ -218,8 +277,22 @@ class DraftsDialogFragment :
                 clazz = DraftsViewModel.ViewModelItem.PostDraftItem::class,
                 inflateFn = PostDraftItemBinding::inflate,
             ) { item, b, h ->
-                b.title.text = item.postData.name
-                b.text.text = item.postData.body
+                b.title.text = if (item.postData.name.isNullOrBlank()) {
+                    buildSpannedString {
+                        append(b.title.context.getString(R.string.empty))
+                        setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
+                    }
+                } else {
+                    item.postData.name
+                }
+                b.text.text = if (item.postData.body.isNullOrBlank()) {
+                    buildSpannedString {
+                        append(b.title.context.getString(R.string.empty))
+                        setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
+                    }
+                } else {
+                    item.postData.body
+                }
 
                 b.delete.setOnClickListener {
                     onDeleteClick(item.draftEntry)

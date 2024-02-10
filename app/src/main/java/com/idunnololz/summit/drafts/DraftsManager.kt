@@ -76,6 +76,11 @@ class DraftsManager @Inject constructor(
         draftData: DraftData,
         showToast: Boolean,
     ) {
+        if (entryId == 0L) {
+            saveDraftAsync(draftData, showToast)
+            return
+        }
+
         coroutineScope.launch {
             draftsDao.update(
                 entryId,
@@ -92,8 +97,11 @@ class DraftsManager @Inject constructor(
         }
     }
 
-    suspend fun getDrafts(draftType: Int, limit: Int, updateTs: Long) =
+    suspend fun getDraftsByType(draftType: Int, limit: Int, updateTs: Long) =
         draftsDao.getDraftsByType(draftType, limit, updateTs)
+
+    suspend fun getAllDrafts(limit: Int, updateTs: Long) =
+        draftsDao.getAllDrafts(limit, updateTs)
 
     suspend fun deleteAll(draftType: Int) =
         draftsDao.deleteAll(draftType)

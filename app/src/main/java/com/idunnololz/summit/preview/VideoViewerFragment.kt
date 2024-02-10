@@ -319,7 +319,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
                 setOnMenuItemClickListener {
                     when (it.itemId) {
-                        R.id.save -> {
+                        R.id.ca_save -> {
                             viewModel.downloadVideo(requireContext(), url)
                             true
                         }

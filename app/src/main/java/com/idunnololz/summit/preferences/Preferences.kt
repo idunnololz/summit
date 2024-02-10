@@ -37,6 +37,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLO
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_HEADER_LAYOUT
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DATE_SCREENSHOTS
@@ -847,6 +848,13 @@ class Preferences(
         get() = prefs.getMoshiValue(KEY_TEXT_FIELD_TOOLBAR_SETTINGS)
         set(value) {
             prefs.putMoshiValue(KEY_TEXT_FIELD_TOOLBAR_SETTINGS, value)
+        }
+
+    var commentQuickActions: CommentQuickActionsSettings?
+        get() =
+            prefs.getMoshiValue(KEY_COMMENT_QUICK_ACTIONS)
+        set(value) {
+            prefs.putMoshiValue(KEY_COMMENT_QUICK_ACTIONS, value)
         }
 
     fun reset(key: String) {

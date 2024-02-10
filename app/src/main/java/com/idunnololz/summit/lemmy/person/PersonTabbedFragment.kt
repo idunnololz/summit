@@ -287,7 +287,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             )
             addDivider()
             addItemWithIcon(
-                id = R.id.block_user,
+                id = R.id.ca_block_user,
                 title = getString(R.string.block_this_user_format, person.name),
                 icon = R.drawable.baseline_person_off_24,
             )
@@ -312,7 +312,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                             { viewModel.sortType = it },
                         ).show()
                     }
-                    R.id.block_user -> {
+                    R.id.ca_block_user -> {
                         actionsViewModel.blockPerson(person.id)
                     }
                     R.id.unblock_user -> {
