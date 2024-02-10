@@ -4,25 +4,34 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.LayoutDirection
+import android.view.Gravity
 import android.view.View
+import android.view.View.LAYOUT_DIRECTION_LTR
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
+import androidx.core.view.children
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import coil.load
@@ -62,12 +71,14 @@ import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.preferences.CommentQuickActionIds
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId
+import com.idunnololz.summit.preferences.CommentQuickActionsSettings
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preview.VideoType
@@ -157,6 +168,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var indicateCurrentUser: Boolean = preferences.indicatePostsAndCommentsCreatedByCurrentUser
     private var showProfileIcons: Boolean = preferences.showProfileIcons
     private var commentHeaderLayout: Int = preferences.commentHeaderLayout
+    private var commentQuickActions: CommentQuickActionsSettings = preferences.commentQuickActions
+        ?: CommentQuickActionsSettings()
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -166,9 +179,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackground)
     private val selectableItemBackgroundBorderless =
         context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackgroundBorderless)
+    private val backgroundColor =
+        context.getColorFromAttribute(android.R.attr.colorBackground)
 
     private val paddingHalf = context.getDimen(R.dimen.padding_half)
     private val paddingFull = context.getDimen(R.dimen.padding)
+
+    private val paddingIcon = Utils.convertDpToPixel(12f).toInt()
 
     private var currentUser: Account? = null
 
@@ -206,6 +223,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         showUpAndDownVotes = preferences.showUpAndDownVotes
         leftHandMode = preferences.leftHandMode
         commentHeaderLayout = preferences.commentHeaderLayout
+        commentQuickActions = preferences.commentQuickActions
+            ?: CommentQuickActionsSettings()
     }
 
     class CustomViewHolder(
@@ -689,8 +708,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onPageClick: (PageRef) -> Unit,
         collapseSection: (position: Int) -> Unit,
         toggleActionsExpanded: () -> Unit,
-        onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-        onCommentMoreClick: (CommentView) -> Unit,
+        onCommentActionClick: (CommentView, actionId: Int) -> Unit,
         onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
@@ -704,7 +722,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {
                 when (val rb = rawBinding) {
                     is PostCommentExpandedItemBinding -> {
-                        ensureActionButtons(rb.root, isCompactView, leftHandMode)
+                        ensureActionButtons(
+                            root = rb.root,
+                            isCompact = isCompactView,
+                            leftHandMode = leftHandMode,
+                            showUpAndDownVotes = showUpAndDownVotes
+                        )
                     }
                     is PostCommentExpandedCompactItemBinding -> {
                         if (showUpAndDownVotes) {
@@ -737,9 +760,20 @@ class PostAndCommentViewBuilder @Inject constructor(
                         }
 
                         if (isActionsExpanded) {
-                            ensureActionButtons(root, isCompactView, leftHandMode)
+                            ensureActionButtons(
+                                root = root,
+                                isCompact = isCompactView,
+                                leftHandMode = leftHandMode,
+                                showUpAndDownVotes = showUpAndDownVotes
+                            )
                         } else {
-                            ensureActionButtons(root, isCompactView, leftHandMode, removeOnly = true)
+                            ensureActionButtons(
+                                root = root,
+                                isCompact = isCompactView,
+                                leftHandMode = leftHandMode,
+                                showUpAndDownVotes = showUpAndDownVotes,
+                                removeOnly = true
+                            )
                         }
                     }
                 }
@@ -750,8 +784,6 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         val upvoteButton = upvoteButton
         val downvoteButton = downvoteButton
-        val commentButton = commentButton
-        val moreButton = moreButton
 
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
         lemmyHeaderHelper.populateHeaderSpan(
@@ -864,13 +896,15 @@ class PostAndCommentViewBuilder @Inject constructor(
             collapseSection(h.absoluteAdapterPosition)
         }
 
-        commentButton?.isEnabled = !isPostLocked
-        commentButton?.setOnClickListener {
-            onAddCommentClick(Either.Right(commentView))
+        actionButtons.forEach {
+            it.setOnClickListener {
+                onCommentActionClick(commentView, it.id)
+            }
+            if (it.id == R.id.ca_reply) {
+                it.isEnabled = !isPostLocked
+            }
         }
-        moreButton?.setOnClickListener {
-            onCommentMoreClick(commentView)
-        }
+
         if (commentView.comment.distinguished) {
             overlay.visibility = View.VISIBLE
             overlay.setBackgroundResource(R.drawable.locked_overlay)
@@ -1413,310 +1447,297 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
     }
 
+    private fun makeCommentActionButton(
+        @IdRes idRes: Int
+    ) =
+        ImageView(
+            context,
+        ).apply {
+            id = idRes
+            layoutParams = LinearLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            )
+            setPadding(
+                paddingIcon,
+                paddingHalf,
+                paddingIcon,
+                paddingHalf,
+            )
+            setBackgroundResource(selectableItemBackgroundBorderless)
+            imageTintList = ColorStateList.valueOf(normalTextColor)
+        }
+
     private fun CommentExpandedViewHolder.ensureActionButtons(
         root: ViewGroup,
         isCompact: Boolean,
         leftHandMode: Boolean,
+        showUpAndDownVotes: Boolean,
         removeOnly: Boolean = false,
     ) {
-        root.removeView(commentButton)
-        root.removeView(upvoteButton)
-        root.removeView(downvoteButton)
-        root.removeView(scoreCount)
-        root.removeView(moreButton)
-        root.removeView(actionsDivider1)
-        root.removeView(actionsDivider2)
-        root.removeView(scoreCount2)
-        root.removeView(upvoteCount2)
-        root.removeView(downvoteCount2)
+        root.removeView(quickActionsBar)
 
         if (removeOnly) return
 
-        val paddingIcon = Utils.convertDpToPixel(12f).toInt()
+        val actions = commentQuickActions.actions + CommentQuickActionIds.More
 
-        var lastView: View
-
-        if (showUpAndDownVotes) {
-            val buttons = makeUpAndDownVoteButtons(context)
-
-            if (leftHandMode) {
-                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToBottom = R.id.bottom_barrier
-                    startToStart = R.id.start_barrier
-                    marginStart = paddingFull
-                }
-                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = buttons.upvoteButton.id
-                    bottomToBottom = buttons.upvoteButton.id
-
-                    startToEnd = buttons.upvoteButton.id
-                }
-
-                lastView = buttons.downvoteButton
-            } else {
-                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToBottom = R.id.bottom_barrier
-                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                    marginEnd = paddingFull
-                }
-                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = buttons.downvoteButton.id
-                    bottomToBottom = buttons.downvoteButton.id
-
-                    endToStart = buttons.downvoteButton.id
-                }
-
-                lastView = buttons.upvoteButton
+        val quickActionsBarContainer = HorizontalScrollView(context)
+            .apply {
+                background = ColorDrawable(backgroundColor)
             }
-            root.addView(buttons.upvoteButton)
-            root.addView(buttons.downvoteButton)
-
-            if (isCompact) {
-                upvoteButton = buttons.upvoteButton
-                downvoteButton = buttons.downvoteButton
-                upvoteCount2 = buttons.upvoteButton
-                downvoteCount2 = buttons.downvoteButton
-            } else {
-                scoreCount = buttons.upvoteButton
-                upvoteButton = buttons.upvoteButton
-                upvoteCount = buttons.upvoteButton
-                downvoteButton = buttons.downvoteButton
-                downvoteCount = buttons.downvoteButton
+            .also {
+                quickActionsBar = it
             }
+        val quickActionsBar = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        if (!leftHandMode) {
+            quickActionsBarContainer.layoutDirection = LAYOUT_DIRECTION_RTL
+            quickActionsBar.layoutDirection = LAYOUT_DIRECTION_LTR
+        }
+
+        val indices: IntProgression
+        if (leftHandMode) {
+            quickActionsBar.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+            indices = actions.indices
         } else {
-            val button1 = ImageView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToBottom = R.id.bottom_barrier
-                    if (leftHandMode) {
-                        startToStart = R.id.start_barrier
-                        marginStart = context.getDimen(R.dimen.padding_quarter)
+            quickActionsBar.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+            indices = actions.indices.reversed()
+        }
+
+        val actionButtons = mutableListOf<ImageView>()
+
+        for (actionIndex in indices) {
+            when (val action = actions[actionIndex]) {
+                CommentQuickActionIds.Voting -> {
+                    if (showUpAndDownVotes) {
+                        val buttons = makeUpAndDownVoteButtons(context) {
+                            LinearLayout.LayoutParams(
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                Utils.convertDpToPixel(48f).toInt(),
+                            )
+                        }
+
+                        if (leftHandMode) {
+                            buttons.upvoteButton.updateLayoutParams<LinearLayout.LayoutParams> {
+                                marginStart = paddingFull
+                            }
+                            buttons.downvoteButton.updateLayoutParams<LinearLayout.LayoutParams> {
+                                marginEnd = paddingHalf
+                            }
+                        } else {
+                            buttons.downvoteButton.updateLayoutParams<LinearLayout.LayoutParams> {
+                                marginEnd = paddingFull
+                            }
+                            buttons.upvoteButton.updateLayoutParams<LinearLayout.LayoutParams> {
+                                marginStart = paddingHalf
+                            }
+                        }
+                        quickActionsBar.addView(buttons.upvoteButton)
+                        quickActionsBar.addView(buttons.downvoteButton)
+
+                        if (isCompact) {
+                            upvoteButton = buttons.upvoteButton
+                            downvoteButton = buttons.downvoteButton
+                            upvoteCount2 = buttons.upvoteButton
+                            downvoteCount2 = buttons.downvoteButton
+                        } else {
+                            scoreCount = buttons.upvoteButton
+                            upvoteButton = buttons.upvoteButton
+                            upvoteCount = buttons.upvoteButton
+                            downvoteButton = buttons.downvoteButton
+                            downvoteCount = buttons.downvoteButton
+                        }
                     } else {
-                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                        marginEnd = context.getDimen(R.dimen.padding_quarter)
+                        val button1 = ImageView(
+                            context,
+                        ).apply {
+                            id = View.generateViewId()
+                            layoutParams = LinearLayout.LayoutParams(
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                            ).apply {
+                                if (leftHandMode) {
+                                    marginStart = context.getDimen(R.dimen.padding_quarter)
+                                } else {
+                                    marginEnd = context.getDimen(R.dimen.padding_quarter)
+                                }
+                            }
+                            setPaddingRelative(
+                                paddingHalf,
+                                paddingHalf,
+                                paddingHalf,
+                                paddingHalf,
+                            )
+                            setBackgroundResource(selectableItemBackgroundBorderless)
+                            imageTintList = ColorStateList.valueOf(normalTextColor)
+                        }
+
+                        val scoreCount = TextView(
+                            context,
+                        ).apply {
+                            id = View.generateViewId()
+                            layoutParams = LinearLayout.LayoutParams(
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                            ).apply {
+                                gravity = Gravity.CENTER_VERTICAL
+                            }
+                        }.also {
+                            if (isCompact) {
+                                scoreCount2 = it
+                            } else {
+                                scoreCount = it
+                            }
+                        }
+
+                        val button2 = ImageView(
+                            context,
+                        ).apply {
+                            id = View.generateViewId()
+                            layoutParams = LinearLayout.LayoutParams(
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                            )
+                            setPaddingRelative(
+                                paddingIcon,
+                                paddingHalf,
+                                paddingHalf,
+                                paddingHalf,
+                            )
+                            setBackgroundResource(selectableItemBackgroundBorderless)
+                            imageTintList = ColorStateList.valueOf(normalTextColor)
+                        }
+
+                        val finalUpvoteButton: ImageView
+                        val finalDownvoteButton: ImageView
+
+                        if (leftHandMode) {
+                            finalUpvoteButton = button1
+                            finalDownvoteButton = button2
+                        } else {
+                            finalUpvoteButton = button2
+                            finalDownvoteButton = button1
+                        }
+
+                        finalUpvoteButton.apply {
+                            setImageResource(R.drawable.baseline_arrow_upward_24)
+                        }
+                        finalDownvoteButton.apply {
+                            setImageResource(R.drawable.baseline_arrow_downward_24)
+                        }
+
+                        upvoteButton = finalUpvoteButton
+                        downvoteButton = finalDownvoteButton
+
+                        quickActionsBar.addView(button2)
+                        quickActionsBar.addView(scoreCount)
+                        quickActionsBar.addView(button1)
                     }
-                    topMargin = context.getDimen(R.dimen.padding_half)
                 }
-                setPaddingRelative(
-                    paddingHalf,
-                    paddingHalf,
-                    paddingHalf,
-                    paddingHalf,
-                )
-                setBackgroundResource(selectableItemBackgroundBorderless)
-                imageTintList = ColorStateList.valueOf(normalTextColor)
+                CommentQuickActionIds.Reply -> {
+                    makeCommentActionButton(R.id.ca_reply).apply {
+                        setImageResource(R.drawable.baseline_add_comment_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.Save -> {
+                    makeCommentActionButton(R.id.ca_save).apply {
+                        setImageResource(R.drawable.baseline_bookmark_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.Share -> {
+                    makeCommentActionButton(R.id.ca_share).apply {
+                        setImageResource(R.drawable.baseline_share_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.TakeScreenshot -> {
+                    makeCommentActionButton(R.id.ca_screenshot).apply {
+                        setImageResource(R.drawable.baseline_screenshot_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.ShareSource -> {
+                    makeCommentActionButton(R.id.ca_share_fediverse_link).apply {
+                        setImageResource(R.drawable.ic_fediverse_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.OpenComment -> {
+                    makeCommentActionButton(R.id.ca_open_comment_in_new_screen).apply {
+                        setImageResource(R.drawable.baseline_open_in_new_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.ViewSource -> {
+                    makeCommentActionButton(R.id.ca_view_source).apply {
+                        setImageResource(R.drawable.baseline_code_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.DetailedView -> {
+                    makeCommentActionButton(R.id.ca_detailed_view).apply {
+                        setImageResource(R.drawable.baseline_open_in_full_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                CommentQuickActionIds.More -> {
+                    makeCommentActionButton(R.id.ca_more).apply {
+                        setImageResource(R.drawable.baseline_more_horiz_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
             }
 
-            val scoreCount = TextView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            this.actionButtons = actionButtons
+
+            if (actionIndex != indices.last) {
+                val actionsDivider1 = MaterialDivider(
+                    context,
                 ).apply {
-                    topToTop = button1.id
-                    bottomToBottom = button1.id
-
-                    if (leftHandMode) {
-                        startToEnd = button1.id
-                    } else {
-                        endToStart = button1.id
+                    id = View.generateViewId()
+                    layoutParams = LinearLayout.LayoutParams(
+                        Utils.convertDpToPixel(1f).toInt(),
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                    ).apply {
+                        topMargin = paddingHalf
+                        bottomMargin = paddingHalf
                     }
+                }.also {
+                    actionsDivider1 = it
                 }
-            }.also {
-                if (isCompact) {
-                    scoreCount2 = it
-                } else {
-                    scoreCount = it
-                }
+                quickActionsBar.addView(actionsDivider1)
             }
-            root.addView(scoreCount)
+        }
 
-            val button2 = ImageView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToTop = button1.id
-                    bottomToBottom = button1.id
-
-                    val anchorId = scoreCount.id
-
-                    if (leftHandMode) {
-                        startToEnd = anchorId
-                    } else {
-                        endToStart = anchorId
-                    }
-                }
-                setPaddingRelative(
-                    paddingIcon,
-                    paddingHalf,
-                    paddingHalf,
-                    paddingHalf,
-                )
-                setBackgroundResource(selectableItemBackgroundBorderless)
-                imageTintList = ColorStateList.valueOf(normalTextColor)
-            }
-
-            val finalUpvoteButton: ImageView
-            val finalDownvoteButton: ImageView
+        quickActionsBarContainer.addView(quickActionsBar)
+        quickActionsBarContainer.isHorizontalScrollBarEnabled = false
+        quickActionsBarContainer.layoutParams = ConstraintLayout.LayoutParams(
+            0,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+        ).apply {
+            topToBottom = R.id.bottom_barrier
 
             if (leftHandMode) {
-                finalUpvoteButton = button1
-                finalDownvoteButton = button2
+                startToStart = R.id.start_barrier
+                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             } else {
-                finalUpvoteButton = button2
-                finalDownvoteButton = button1
+                startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             }
-
-            finalUpvoteButton.apply {
-                setImageResource(R.drawable.baseline_arrow_upward_24)
-            }
-            finalDownvoteButton.apply {
-                setImageResource(R.drawable.baseline_arrow_downward_24)
-            }
-
-            upvoteButton = finalUpvoteButton
-            downvoteButton = finalDownvoteButton
-
-            root.addView(button1)
-            root.addView(button2)
-
-            lastView = button2
         }
-
-        val downvoteButton = requireNotNull(downvoteButton)
-
-        val actionsDivider1 = MaterialDivider(
-            context,
-        ).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                Utils.convertDpToPixel(1f).toInt(),
-                0,
-            ).apply {
-                topToTop = downvoteButton.id
-                bottomToBottom = downvoteButton.id
-
-                topMargin = paddingHalf
-                bottomMargin = paddingHalf
-
-                if (leftHandMode) {
-                    startToEnd = lastView.id
-                } else {
-                    endToStart = lastView.id
-                }
-
-                if (showUpAndDownVotes) {
-                    if (leftHandMode) {
-                        marginStart = paddingHalf
-                    } else {
-                        marginEnd = paddingHalf
-                    }
-                }
-            }
-        }.also {
-            actionsDivider1 = it
-        }
-        root.addView(actionsDivider1)
-
-        val commentButton = ImageView(
-            context,
-        ).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-            ).apply {
-                topToTop = downvoteButton.id
-                bottomToBottom = downvoteButton.id
-                if (leftHandMode) {
-                    startToEnd = actionsDivider1.id
-                    marginEnd = Utils.convertDpToPixel(2f).toInt()
-                } else {
-                    endToStart = actionsDivider1.id
-                    marginStart = Utils.convertDpToPixel(2f).toInt()
-                }
-            }
-            setPadding(
-                paddingIcon,
-                paddingHalf,
-                paddingIcon,
-                paddingHalf,
-            )
-            setImageResource(R.drawable.baseline_add_comment_24)
-            setBackgroundResource(selectableItemBackgroundBorderless)
-            imageTintList = ColorStateList.valueOf(normalTextColor)
-        }.also {
-            commentButton = it
-        }
-        root.addView(commentButton)
-
-        val actionsDivider2 = MaterialDivider(
-            context,
-        ).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                Utils.convertDpToPixel(1f).toInt(),
-                0,
-            ).apply {
-                topToTop = downvoteButton.id
-                bottomToBottom = downvoteButton.id
-
-                topMargin = paddingHalf
-                bottomMargin = paddingHalf
-
-                if (leftHandMode) {
-                    startToEnd = commentButton.id
-                } else {
-                    endToStart = commentButton.id
-                }
-            }
-        }.also {
-            actionsDivider2 = it
-        }
-        root.addView(actionsDivider2)
-
-        val moreButton = ImageView(
-            context,
-        ).apply {
-            id = View.generateViewId()
-            layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-            ).apply {
-                topToTop = downvoteButton.id
-                bottomToBottom = downvoteButton.id
-                if (leftHandMode) {
-                    startToEnd = commentButton.id
-                    marginEnd = Utils.convertDpToPixel(2f).toInt()
-                } else {
-                    endToStart = commentButton.id
-                    marginStart = Utils.convertDpToPixel(2f).toInt()
-                }
-            }
-            setPadding(
-                paddingIcon,
-                paddingHalf,
-                paddingIcon,
-                paddingHalf,
-            )
-            setImageResource(R.drawable.baseline_more_horiz_24)
-            setBackgroundResource(selectableItemBackgroundBorderless)
-            imageTintList = ColorStateList.valueOf(normalTextColor)
-        }.also {
-            moreButton = it
-        }
-        root.addView(moreButton)
+        root.addView(quickActionsBarContainer)
     }
 
     fun bindMoreCommentsItem(

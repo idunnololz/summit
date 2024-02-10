@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -22,7 +23,7 @@ class DraftsViewModel @Inject constructor(
         private const val LIMIT = 500
     }
 
-    var draftType: Int = DraftTypes.Post
+    var draftType: Int? = DraftTypes.Post
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val draftEntriesContext = Dispatchers.IO.limitedParallelism(1)
@@ -31,27 +32,41 @@ class DraftsViewModel @Inject constructor(
     private val seenDrafts = mutableSetOf<Long>()
     private var isLoading = false
     private var hasMore = true
+    private var loadingJob: Job? = null
 
     val viewModelItems = MutableLiveData<List<ViewModelItem>>(listOf(ViewModelItem.LoadingItem))
 
-    fun loadMoreDrafts() {
+    fun loadMoreDrafts(force: Boolean = false) {
+        if (force) {
+            reset()
+        }
+
         if (isLoading) {
             return
         }
 
         isLoading = true
 
-        viewModelScope.launch {
+        loadingJob?.cancel()
+        loadingJob = viewModelScope.launch {
             val lastDraftEntry = draftEntries.lastOrNull()
             val ts = lastDraftEntry?.updatedTs ?: Long.MAX_VALUE
 
             Log.d(TAG, "Loading drafts type = $draftType from $ts")
 
-            val drafts = draftsManager.getDrafts(
-                draftType = draftType,
-                limit = LIMIT,
-                updateTs = ts,
-            )
+            val draftType = draftType
+            val drafts = if (draftType == null) {
+                draftsManager.getAllDrafts(
+                    limit = LIMIT,
+                    updateTs = ts,
+                )
+            } else {
+                draftsManager.getDraftsByType(
+                    draftType = draftType,
+                    limit = LIMIT,
+                    updateTs = ts,
+                )
+            }
             withContext(draftEntriesContext) {
                 for (draft in drafts) {
                     if (seenDrafts.add(draft.id)) {
@@ -60,6 +75,9 @@ class DraftsViewModel @Inject constructor(
                 }
             }
             hasMore = drafts.size == LIMIT
+
+
+            Log.d(TAG, "Loaded ${drafts.size} drafts")
 
             generateItems()
 

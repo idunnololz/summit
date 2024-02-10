@@ -1018,22 +1018,9 @@ class CommunityFragment :
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
 
         val bottomMenu = BottomMenu(context).apply {
-            val currentCommunity = viewModel.currentCommunityRef.value
-            var communityName: String? = null
-            when (currentCommunity) {
-                is CommunityRef.All -> {}
-                is CommunityRef.CommunityRefByName -> {
-                    communityName = currentCommunity.name
-                    addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
-                }
-                is CommunityRef.Local -> {}
-                is CommunityRef.Subscribed -> {}
-                is CommunityRef.MultiCommunity -> {}
-                is CommunityRef.ModeratedCommunities -> {}
-                null -> {}
-            }
+            addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
 
-            addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
+            addItemWithIcon(R.id.ca_share, R.string.share, R.drawable.baseline_share_24)
             addItemWithIcon(R.id.hide_read, R.string.hide_read, R.drawable.baseline_clear_all_24)
 
             addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
@@ -1163,6 +1150,20 @@ class CommunityFragment :
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.id) {
                     R.id.create_post -> {
+                        val currentCommunity = viewModel.currentCommunityRef.value
+                        var communityName: String? = null
+                        when (currentCommunity) {
+                            is CommunityRef.All -> {}
+                            is CommunityRef.CommunityRefByName -> {
+                                communityName = currentCommunity.name
+                            }
+                            is CommunityRef.Local -> {}
+                            is CommunityRef.Subscribed -> {}
+                            is CommunityRef.MultiCommunity -> {}
+                            is CommunityRef.ModeratedCommunities -> {}
+                            null -> {}
+                        }
+
                         CreateOrEditPostFragment()
                             .apply {
                                 arguments = CreateOrEditPostFragmentArgs(
@@ -1172,7 +1173,7 @@ class CommunityFragment :
                             }
                             .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
                     }
-                    R.id.share -> {
+                    R.id.ca_share -> {
                         try {
                             val sendIntent: Intent = Intent().apply {
                                 action = Intent.ACTION_SEND

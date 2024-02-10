@@ -55,6 +55,7 @@ import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -411,8 +412,8 @@ class PostFragment :
                         },
                     )
                 },
-                onCommentMoreClick = { commentView, itemId ->
-                    showMoreCommentOptions(
+                onCommentActionClick = { commentView, itemId, actionId ->
+                    createCommentActionHandler(
                         instance = viewModel.apiInstance,
                         commentView = commentView,
                         actionsViewModel = actionsViewModel,
@@ -425,7 +426,21 @@ class PostFragment :
                             getAdapter()?.selectItemForScreenshot(itemId)
                             viewModel.screenshotMode.value = true
                         },
-                    )
+                    )(actionId)
+//                    showMoreCommentOptions(
+//                        instance = viewModel.apiInstance,
+//                        commentView = commentView,
+//                        actionsViewModel = actionsViewModel,
+//                        fragmentManager = childFragmentManager,
+//                        onLoadComment = {
+//                            viewModel.updatePostOrCommentRef(Either.Right(CommentRef(getInstance(), it)))
+//                            viewModel.fetchPostData()
+//                        },
+//                        onScreenshotClick = {
+//                            getAdapter()?.selectItemForScreenshot(itemId)
+//                            viewModel.screenshotMode.value = true
+//                        },
+//                    )
                 },
                 onFetchComments = {
                     viewModel.fetchMoreComments(it)

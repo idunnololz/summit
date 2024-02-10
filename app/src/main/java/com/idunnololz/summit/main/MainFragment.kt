@@ -393,7 +393,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             )
         binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
 
-        addMenuProvider(
+        addMenuProvider2(
             object : MenuProvider {
                 override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {}
 

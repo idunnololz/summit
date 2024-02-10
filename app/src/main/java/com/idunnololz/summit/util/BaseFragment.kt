@@ -65,7 +65,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         binding.root.runAfterLayout(callback)
     }
 
-    fun addMenuProvider(menuProvider: MenuProvider) {
+    fun addMenuProvider2(menuProvider: MenuProvider) {
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 

@@ -166,7 +166,7 @@ class CommunityViewModel @Inject constructor(
 
                     postsRepository.onAccountChanged()
 
-                    onCommunityOrInstanceChange()
+                    registerHiddenPostObserver()
 
                     preferences = preferenceManager.getComposedPreferencesForAccount(newAccount)
 
@@ -252,6 +252,10 @@ class CommunityViewModel @Inject constructor(
                     loadedPostsData.setValue(PostUpdateInfo(isReadPostUpdate = true))
                 }
             }
+        }
+
+        if (currentCommunityRef.isInitialized) {
+            registerHiddenPostObserver()
         }
     }
 
@@ -518,20 +522,22 @@ class CommunityViewModel @Inject constructor(
 
         postListEngine.tryRestore()
 
-        onCommunityOrInstanceChange()
+        registerHiddenPostObserver()
     }
 
     fun changeInstance(instance: String) {
         apiClient.changeInstance(instance)
 
-        onCommunityOrInstanceChange()
+        registerHiddenPostObserver()
     }
 
-    private fun onCommunityOrInstanceChange() {
+    private fun registerHiddenPostObserver() {
+        Log.d(TAG, "Registering hidden post observer!")
         hiddenPostObserverJob?.cancel()
         hiddenPostObserverJob = viewModelScope.launch {
-            Log.d(TAG, "Hidden posts changed. Refreshing!")
             hiddenPostsManager.getOnHiddenPostsChangeFlow(apiInstance).collect {
+                Log.d(TAG, "Hidden posts changed. Refreshing!")
+
                 val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
                 postsRepository.onHiddenPostsChange()
 

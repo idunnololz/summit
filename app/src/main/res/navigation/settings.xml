@@ -271,7 +271,15 @@
     <fragment
         android:id="@+id/settingCommentListFragment"
         android:name="com.idunnololz.summit.settings.commentList.SettingCommentListFragment"
-        android:label="SettingCommentListFragment" />
+        android:label="SettingCommentListFragment" >
+        <action
+            android:id="@+id/action_settingCommentListFragment_to_customQuickActionsFragment"
+            app:destination="@id/customQuickActionsFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
+    </fragment>
     <fragment
         android:id="@+id/patreonFragment"
         android:name="com.idunnololz.summit.settings.patreon.PatreonFragment"
@@ -282,7 +290,11 @@
         android:label="SettingMiscFragment" >
         <action
             android:id="@+id/action_settingMiscFragment_to_settingPerCommunityFragment"
-            app:destination="@id/settingPerCommunityFragment" />
+            app:destination="@id/settingPerCommunityFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"  />
     </fragment>
     <fragment
         android:id="@+id/settingLoggingFragment"
@@ -376,4 +388,8 @@
         android:id="@+id/settingPerCommunityFragment"
         android:name="com.idunnololz.summit.settings.perCommunity.SettingPerCommunityFragment"
         android:label="SettingPerCommunityFragment" />
+    <fragment
+        android:id="@+id/customQuickActionsFragment"
+        android:name="com.idunnololz.summit.settings.commentQuickActions.CustomQuickActionsFragment"
+        android:label="CustomQuickActionsFragment" />
 </navigation>

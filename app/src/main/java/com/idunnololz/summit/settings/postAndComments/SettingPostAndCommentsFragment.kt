@@ -370,10 +370,9 @@ class SettingPostAndCommentsFragment :
                         onPageClick = {},
                         collapseSection = {},
                         toggleActionsExpanded = {},
-                        onAddCommentClick = {},
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
-                        onCommentMoreClick = {},
+                        onCommentActionClick = { _, _ -> },
                         onLinkClick = { _, _, _ -> },
                         onLinkLongClick = { _, _ -> },
                     )
@@ -417,10 +416,9 @@ class SettingPostAndCommentsFragment :
                         onPageClick = {},
                         collapseSection = {},
                         toggleActionsExpanded = {},
-                        onAddCommentClick = {},
                         onSignInRequired = {},
                         onInstanceMismatch = { _, _ -> },
-                        onCommentMoreClick = {},
+                        onCommentActionClick = { _, _ -> },
                         onLinkClick = { _, _, _ -> },
                         onLinkLongClick = { _, _ -> },
                     )

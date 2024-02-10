@@ -86,7 +86,7 @@ fun BaseFragment<*>.showMorePostOptions(
             addDivider()
 
             addItemWithIcon(
-                id = R.id.admin_tools,
+                id = R.id.ca_admin_tools,
                 title = R.string.admin_tools,
                 icon = R.drawable.outline_shield_24,
             )
@@ -99,7 +99,7 @@ fun BaseFragment<*>.showMorePostOptions(
             addDivider()
 
             addItemWithIcon(
-                id = R.id.mod_tools,
+                id = R.id.ca_mod_tools,
                 title = R.string.mod_tools,
                 icon = R.drawable.outline_shield_24,
             )
@@ -115,27 +115,27 @@ fun BaseFragment<*>.showMorePostOptions(
 
         if (postView.saved) {
             addItemWithIcon(
-                R.id.remove_from_saved,
+                R.id.ca_remove_from_saved,
                 getString(R.string.remove_from_saved),
                 R.drawable.baseline_bookmark_remove_24,
             )
         } else {
             addItemWithIcon(
-                R.id.save,
+                R.id.ca_save,
                 getString(R.string.save),
                 R.drawable.baseline_bookmark_add_24,
             )
         }
 
         addItemWithIcon(
-            R.id.share,
+            R.id.ca_share,
             getString(R.string.share),
             R.drawable.baseline_share_24,
         )
 
         if (onScreenshotClick != null) {
             addItemWithIcon(
-                R.id.screenshot,
+                R.id.ca_screenshot,
                 getString(R.string.take_screenshot),
                 R.drawable.baseline_screenshot_24,
             )
@@ -148,7 +148,7 @@ fun BaseFragment<*>.showMorePostOptions(
         )
 
         addItemWithIcon(
-            R.id.share_fediverse_link,
+            R.id.ca_share_fediverse_link,
             getString(R.string.share_source_link),
             R.drawable.ic_fediverse_24,
         )
@@ -166,7 +166,7 @@ fun BaseFragment<*>.showMorePostOptions(
             R.drawable.baseline_outlined_flag_24,
         )
         addItemWithIcon(
-            R.id.block_user,
+            R.id.ca_block_user,
             getString(R.string.block_this_user_format, postView.creator.name),
             R.drawable.baseline_person_off_24,
         )
@@ -185,8 +185,8 @@ fun BaseFragment<*>.showMorePostOptions(
 //            R.id.switch_account_temp,
 //            R.string.switch_account_for_post,
 //            R.drawable.baseline_account_circle_24)
-        addItemWithIcon(R.id.view_source, R.string.view_source, R.drawable.baseline_code_24)
-        addItemWithIcon(R.id.detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
+        addItemWithIcon(R.id.ca_view_source, R.string.view_source, R.drawable.baseline_code_24)
+        addItemWithIcon(R.id.ca_detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
 
         setOnMenuItemClickListener {
             when (it.id) {
@@ -214,10 +214,10 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.id.hide_post -> {
                     actionsViewModel.hidePost(postView.post.id)
                 }
-                R.id.save -> {
+                R.id.ca_save -> {
                     actionsViewModel.savePost(postView.post.id, save = true)
                 }
-                R.id.remove_from_saved -> {
+                R.id.ca_remove_from_saved -> {
                     actionsViewModel.savePost(postView.post.id, save = false)
                 }
                 R.id.community_info -> {
@@ -226,13 +226,13 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.id.block_community -> {
                     actionsViewModel.blockCommunity(postView.community.id)
                 }
-                R.id.block_user -> {
+                R.id.ca_block_user -> {
                     actionsViewModel.blockPerson(postView.creator.id)
                 }
                 R.id.block_instance -> {
                     actionsViewModel.blockInstance(postView.community.instance_id)
                 }
-                R.id.share -> {
+                R.id.ca_share -> {
                     Utils.shareLink(
                         context = context,
                         link = LinkUtils.getLinkForPost(instance, postView.post.id),
@@ -250,13 +250,13 @@ fun BaseFragment<*>.showMorePostOptions(
                         }
                         .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
                 }
-                R.id.share_fediverse_link -> {
+                R.id.ca_share_fediverse_link -> {
                     Utils.shareLink(
                         context = context,
                         link = postView.post.ap_id,
                     )
                 }
-                R.id.view_source -> {
+                R.id.ca_view_source -> {
                     PreviewCommentDialogFragment()
                         .apply {
                             arguments = PreviewCommentDialogFragmentArgs(
@@ -276,14 +276,14 @@ fun BaseFragment<*>.showMorePostOptions(
                         }
                         .showAllowingStateLoss(fragmentManager, "PreviewCommentDialogFragment")
                 }
-                R.id.detailed_view -> {
+                R.id.ca_detailed_view -> {
                     ContentDetailsDialogFragment
                         .show(childFragmentManager, instance, postView)
                 }
-                R.id.admin_tools -> {
+                R.id.ca_admin_tools -> {
                     ModActionsDialogFragment.show(postView, childFragmentManager)
                 }
-                R.id.mod_tools -> {
+                R.id.ca_mod_tools -> {
                     ModActionsDialogFragment.show(postView, childFragmentManager)
                 }
                 R.id.report_post -> {
@@ -308,7 +308,7 @@ fun BaseFragment<*>.showMorePostOptions(
                 R.id.find_in_page -> {
                     onFindInPageClick()
                 }
-                R.id.screenshot -> {
+                R.id.ca_screenshot -> {
                     onScreenshotClick?.invoke()
                 }
             }

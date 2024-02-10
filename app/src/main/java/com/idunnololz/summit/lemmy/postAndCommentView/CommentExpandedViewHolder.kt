@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Space
 import android.widget.TextView
@@ -31,9 +32,8 @@ class CommentExpandedViewHolder(
     var upvoteButton: View?,
     var downvoteCount: TextView?,
     var downvoteButton: View?,
-    var commentButton: View?,
-    var moreButton: View?,
-    var quickActionsBar: View?,
+    var quickActionsBar: ViewGroup?,
+    var actionButtons: List<ImageView>,
     val actionsContainer: ViewGroup?,
 
     var actionsDivider1: View? = null,
@@ -70,8 +70,7 @@ class CommentExpandedViewHolder(
                 upvoteButton = null,
                 downvoteCount = null,
                 downvoteButton = null,
-                commentButton = null,
-                moreButton = null,
+                actionButtons = listOf(),
                 quickActionsBar = null,
                 actionsContainer = null,
             )
@@ -95,8 +94,7 @@ class CommentExpandedViewHolder(
                 upvoteButton = null,
                 downvoteCount = null,
                 downvoteButton = null,
-                commentButton = null,
-                moreButton = null,
+                actionButtons = listOf(),
                 quickActionsBar = null,
                 actionsContainer = binding.actionsContainer,
             )

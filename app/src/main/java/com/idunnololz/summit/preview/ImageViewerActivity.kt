@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.transition.ChangeClipBounds
 import android.transition.Fade
 import android.transition.Transition
 import android.util.Log
@@ -32,7 +31,6 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
@@ -343,7 +341,7 @@ class ImageViewerActivity : BaseActivity() {
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                     when (menuItem.itemId) {
-                        R.id.save -> {
+                        R.id.ca_save -> {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
                                 ContextCompat.checkSelfPermission(
                                         context,
@@ -358,7 +356,7 @@ class ImageViewerActivity : BaseActivity() {
                             }
                             true
                         }
-                        R.id.share -> {
+                        R.id.ca_share -> {
                             if (GlobalSettings.shareImagesDirectly) {
                                 downloadAndShareImage(args.url)
                             } else {

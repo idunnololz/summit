@@ -10,4 +10,12 @@
         app:showAsAction="always"
         app:iconTint="?attr/colorControlNormal"/>
 
+    <item
+        android:id="@+id/show_all_drafts"
+        android:title="@string/show_all_drafts"
+        android:orderInCategory="200"
+        android:icon="@drawable/baseline_all_out_24"
+        app:showAsAction="ifRoom"
+        app:iconTint="?attr/colorControlNormal"/>
+
 </menu>

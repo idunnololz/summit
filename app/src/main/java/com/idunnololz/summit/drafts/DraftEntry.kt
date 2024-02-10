@@ -81,7 +81,7 @@ sealed interface DraftData : Parcelable {
     @JsonClass(generateAdapter = true)
     data class CommentDraftData(
         val originalComment: OriginalCommentData?,
-        val postRef: PostRef,
+        val postRef: PostRef?,
         val parentCommentId: Int?,
         val content: String,
         val accountId: Long,

@@ -923,6 +923,11 @@ class CommentListSettings @Inject constructor(
         ),
         relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
+    val customizeCommentQuickActions = BasicSettingItem(
+        null,
+        context.getString(R.string.customize_comment_quick_actions),
+        context.getString(R.string.customize_comment_quick_actions_desc),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,

@@ -47,10 +47,7 @@ fun makeUpAndDownVoteButtons(
         context.getResIdFromAttribute(R.attr.materialIconButtonStyle),
     ).apply {
         id = View.generateViewId()
-        layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.WRAP_CONTENT,
-            Utils.convertDpToPixel(48f).toInt(),
-        )
+        layoutParams = makeButtonLp()
         iconPadding = context.getDimen(com.idunnololz.summit.R.dimen.padding_half)
         setPadding(
             context.getDimen(com.idunnololz.summit.R.dimen.padding_half),
