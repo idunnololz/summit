@@ -76,7 +76,6 @@ class DraftsViewModel @Inject constructor(
             }
             hasMore = drafts.size == LIMIT
 
-
             Log.d(TAG, "Loaded ${drafts.size} drafts")
 
             generateItems()

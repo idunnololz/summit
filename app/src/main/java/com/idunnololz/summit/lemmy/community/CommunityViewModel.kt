@@ -74,7 +74,7 @@ class CommunityViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val guestAccountManager: GuestAccountManager,
     val basePreferences: Preferences,
-) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
+) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
         private val TAG = CommunityViewModel::class.java.canonicalName
@@ -116,8 +116,6 @@ class CommunityViewModel @Inject constructor(
     private var initialPageFetched = state.getLiveData<Boolean>("_initialPageFetched")
 
     override var lastSelectedPost: PostRef? = null
-
-    override val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
 
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
     val currentAccount = MutableLiveData<AccountView?>(null)
@@ -429,7 +427,7 @@ class CommunityViewModel @Inject constructor(
 
         loadedPostsData.setIsLoading()
 
-        fetchPageJob = viewModelScope.launch {
+        fetchPageJob = viewModelScope.launch(Dispatchers.Default) {
             val result = postsRepository.getPage(
                 pageToFetch,
                 force,
@@ -534,7 +532,7 @@ class CommunityViewModel @Inject constructor(
     private fun registerHiddenPostObserver() {
         Log.d(TAG, "Registering hidden post observer!")
         hiddenPostObserverJob?.cancel()
-        hiddenPostObserverJob = viewModelScope.launch {
+        hiddenPostObserverJob = viewModelScope.launch(Dispatchers.Default) {
             hiddenPostsManager.getOnHiddenPostsChangeFlow(apiInstance).collect {
                 Log.d(TAG, "Hidden posts changed. Refreshing!")
 
@@ -548,7 +546,7 @@ class CommunityViewModel @Inject constructor(
                 val updatedPages = withContext(Dispatchers.Default) {
                     pagesCopy.map {
                         it.copy(
-                            posts = it.posts.filter { !hiddenPosts.contains(it.post.id) },
+                            posts = it.posts.filter { !hiddenPosts.contains(it.postView.post.id) },
                             isReadPostUpdate = false,
                         )
                     }
@@ -655,14 +653,14 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun onBlockSettingsChanged() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             postsRepository.resetCacheForCommunity()
             fetchCurrentPage()
         }
     }
 
     fun updatePost(postId: PostId) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             apiClient.fetchPostWithRetry(Either.Left(postId), true)
                 .onSuccess {
                     postListEngine.updatePost(it)
@@ -749,7 +747,8 @@ class CommunityViewModel @Inject constructor(
             postsRepository.showImagePosts == preferences.showImagePosts &&
             postsRepository.showVideoPosts == preferences.showVideoPosts &&
             postsRepository.showTextPosts == preferences.showTextPosts &&
-            postsRepository.showNsfwPosts == preferences.showNsfwPosts
+            postsRepository.showNsfwPosts == preferences.showNsfwPosts &&
+            postsRepository.showFilteredPosts == preferences.showFilteredPosts
         ) {
             return
         }
@@ -761,6 +760,7 @@ class CommunityViewModel @Inject constructor(
                 this.showVideoPosts = preferences.showVideoPosts
                 this.showTextPosts = preferences.showTextPosts
                 this.showNsfwPosts = preferences.showNsfwPosts
+                this.showFilteredPosts = preferences.showFilteredPosts
             },
             null,
         )
@@ -787,7 +787,7 @@ class CommunityViewModel @Inject constructor(
                     postListEngine.biggestPageIndex ?: 0,
                 )
                 .onSuccess {
-                    val position = it.posts.indexOfFirst { anchorPosts.contains(it.post.id) }
+                    val position = it.posts.indexOfFirst { anchorPosts.contains(it.postView.post.id) }
                     var scrollToTop = false
 
                     if (position != -1) {

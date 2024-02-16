@@ -39,7 +39,6 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_HEADER_LAYOUT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
-import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DATE_SCREENSHOTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
@@ -50,6 +49,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_LAYOUT_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GUEST_ACCOUNT_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
@@ -75,11 +75,13 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SIN
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WATERMARK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
@@ -494,14 +496,6 @@ class Preferences(
                 .apply()
         }
 
-    var compatibilityMode: Boolean
-        get() = prefs.getBoolean(KEY_COMPATIBILITY_MODE2, false)
-        set(value) {
-            prefs.edit()
-                .putBoolean(KEY_COMPATIBILITY_MODE2, value)
-                .apply()
-        }
-
     var hidePostScores: Boolean
         get() = prefs.getBoolean(KEY_HIDE_POST_SCORES, false)
         set(value) {
@@ -855,6 +849,30 @@ class Preferences(
             prefs.getMoshiValue(KEY_COMMENT_QUICK_ACTIONS)
         set(value) {
             prefs.putMoshiValue(KEY_COMMENT_QUICK_ACTIONS, value)
+        }
+
+    var globalLayoutMode: GlobalLayoutMode
+        get() = prefs.getInt(KEY_GLOBAL_LAYOUT_MODE, GlobalLayoutModes.Auto)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_GLOBAL_LAYOUT_MODE, value)
+                .apply()
+        }
+
+    var rotateInstanceOnUploadFail: Boolean
+        get() = prefs.getBoolean(KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL, value)
+                .apply()
+        }
+
+    var showFilteredPosts: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_FILTERED_POSTS, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SHOW_FILTERED_POSTS, value)
+                .apply()
         }
 
     fun reset(key: String) {

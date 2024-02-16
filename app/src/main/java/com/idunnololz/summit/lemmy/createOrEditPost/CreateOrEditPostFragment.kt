@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
@@ -91,7 +92,6 @@ class CreateOrEditPostFragment :
 
     private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
-    private val dockedLocation = Point()
     private val floatingLocation = Point()
 
     private val launcher =
@@ -100,7 +100,7 @@ class CreateOrEditPostFragment :
                 val uri = it.data?.data
 
                 if (uri != null) {
-                    viewModel.uploadImage(args.instance, uri)
+                    viewModel.uploadImage(uri)
                 }
             }
         }
@@ -111,7 +111,7 @@ class CreateOrEditPostFragment :
                 val uri = it.data?.data
 
                 if (uri != null) {
-                    viewModel.uploadImageForUrl(args.instance, uri)
+                    viewModel.uploadImageForUrl(uri)
                 }
             }
         }
@@ -151,7 +151,7 @@ class CreateOrEditPostFragment :
                 ChooseSavedImageDialogFragment.REQUEST_RESULT,
             )
             if (result != null) {
-                viewModel.uploadImage(args.instance, result.fileUri)
+                viewModel.uploadImage(result.fileUri)
             }
         }
         childFragmentManager.setFragmentResultListener(
@@ -162,7 +162,7 @@ class CreateOrEditPostFragment :
                 ChooseSavedImageDialogFragment.REQUEST_RESULT,
             )
             if (result != null) {
-                viewModel.uploadImageForUrl(args.instance, result.fileUri)
+                viewModel.uploadImageForUrl(result.fileUri)
             }
         }
     }
@@ -259,7 +259,17 @@ class CreateOrEditPostFragment :
         binding.postEditText.addTextChangedListener {
             binding.root.postDelayed({
                 onScrollUpdated()
-            }, 10)
+            }, 10,)
+        }
+        binding.titleEditText.addTextChangedListener {
+            binding.root.postDelayed({
+                onScrollUpdated()
+            }, 10,)
+        }
+        binding.urlEditText.addTextChangedListener {
+            binding.root.postDelayed({
+                onScrollUpdated()
+            }, 10,)
         }
 
         textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
@@ -591,6 +601,7 @@ class CreateOrEditPostFragment :
             } else {
                 hideSearch()
             }
+            updateToolbar()
         }
 
         binding.communityEditText.addTextChangedListener {
@@ -658,7 +669,7 @@ class CreateOrEditPostFragment :
             }
 
             if (extraImage != null) {
-                viewModel.uploadImageForUrl(args.instance, extraImage)
+                viewModel.uploadImageForUrl(extraImage)
             }
         }
 
@@ -671,7 +682,14 @@ class CreateOrEditPostFragment :
 
     private fun onImeChange(isImeOpen: Boolean) {
         this.isImeOpen = isImeOpen
-        if (isImeOpen) {
+
+        updateToolbar()
+    }
+
+    private fun updateToolbar() {
+        if (viewModel.showSearch.value) {
+            hidePostToolbar()
+        } else if (isImeOpen) {
             binding.postBodyToolbarPlaceholder.visibility = View.GONE
             binding.postBodyToolbarPlaceholder2.visibility = View.VISIBLE
             binding.postTextDivider.visibility = View.VISIBLE
@@ -703,7 +721,7 @@ class CreateOrEditPostFragment :
         val anyPartVisible = binding.postBodyToolbarPlaceholder.getLocalVisibleRect(scrollBounds)
         val visiblePercent = scrollBounds.height().toFloat() / binding.postBodyToolbarPlaceholder.height
 
-        if (anyPartVisible && visiblePercent > 0.9f) {
+        if (anyPartVisible && visiblePercent > 0.9f && !viewModel.showSearch.value) {
             showPostToolbar()
         } else {
             hidePostToolbar()

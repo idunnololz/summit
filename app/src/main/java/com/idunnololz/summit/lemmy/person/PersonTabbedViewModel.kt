@@ -17,12 +17,13 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentPageResult
+import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
-import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
@@ -40,7 +41,7 @@ class PersonTabbedViewModel @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
-) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
+) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
         private const val PAGE_SIZE = 10
@@ -74,7 +75,6 @@ class PersonTabbedViewModel @Inject constructor(
     val currentAccountView = MutableLiveData<AccountView?>()
 
     override var lastSelectedPost: PostRef? = null
-    override val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
 
     private var personRef: PersonRef? = null
     private var fetchingPages = mutableSetOf<Int>()
@@ -135,14 +135,14 @@ class PersonTabbedViewModel @Inject constructor(
             }
 
             result
-                .onSuccess {
+                .onSuccess { result ->
                     if (isPeronInfoFetch) {
                         personData.postValue(
                             PersonDetailsData(
-                                it.person_view,
-                                it.comments,
-                                it.posts,
-                                it.moderates,
+                                result.person_view,
+                                result.comments,
+                                result.posts,
+                                result.moderates,
                             ),
                         )
                     }
@@ -150,10 +150,12 @@ class PersonTabbedViewModel @Inject constructor(
                     if (postListEngine.hasMore || force) {
                         postListEngine.addPage(
                             LoadedPostsData(
-                                it.posts,
+                                result.posts.map {
+                                    LocalPostView(postView = it, filterReason = null)
+                                },
                                 apiClient.instance,
                                 pageIndex,
-                                it.posts.size == PAGE_SIZE,
+                                result.posts.size == PAGE_SIZE,
                             ),
                         )
                         postListEngine.createItems()
@@ -161,10 +163,10 @@ class PersonTabbedViewModel @Inject constructor(
                     if (commentListEngine.hasMore || force) {
                         commentListEngine.addComments(
                             CommentPageResult(
-                                it.comments,
+                                result.comments,
                                 apiClient.instance,
                                 pageIndex,
-                                it.comments.size == PAGE_SIZE,
+                                result.comments.size == PAGE_SIZE,
                                 null,
                             ),
                         )

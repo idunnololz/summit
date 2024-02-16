@@ -19,9 +19,8 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
+import coil.dispose
 import coil.load
-import coil.request.ImageRequest
-import coil.request.SuccessResult
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
@@ -599,13 +598,8 @@ class PostListViewBuilder @Inject constructor(
                     image.visibility = View.VISIBLE
                     iconImage?.visibility = View.GONE
 
-//                    image.load("https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cat_August_2010-4.jpg/181px-Cat_August_2010-4.jpg")
-
-                    image.load(R.drawable.thumbnail_placeholder_16_9) {
-                        if (image is ShapeableImageView) {
-                            allowHardware(false)
-                        }
-                    }
+                    image.dispose()
+                    image.setImageResource(R.drawable.thumbnail_placeholder_16_9)
 
                     fun loadImage(useBackupUrl: Boolean = false) {
                         val urlToLoad = if (useBackupUrl) {
@@ -714,7 +708,7 @@ class PostListViewBuilder @Inject constructor(
                     )
                 }
 
-                Log.d(TAG, "postType: ${postType}")
+                Log.d(TAG, "postType: $postType")
 
                 when (postType) {
                     PostType.Image -> {
@@ -1184,8 +1178,6 @@ class PostListViewBuilder @Inject constructor(
         shouldBlur: Boolean,
         errorListener: TaskFailedListener?,
     ) {
-        val urlToLoad = imageUrl
-
         val isUrlMp4 = ContentUtils.isUrlMp4(imageUrl)
 
         offlineManager.getImageSizeHint(imageUrl, tempSize)
@@ -1206,7 +1198,8 @@ class PostListViewBuilder @Inject constructor(
             }
         }
 
-        fun loadImage(urlOrFile: Any, size: Size, showPlaceholder: Boolean) {
+        fun loadImage(urlOrFile: Any, size: Size) {
+            Log.d(TAG, "loadImage() size: $size")
             var w: Int? = null
             var h: Int? = null
 
@@ -1221,10 +1214,6 @@ class PostListViewBuilder @Inject constructor(
             }
 
             imageView.load(urlOrFile) {
-                if (showPlaceholder) {
-                    placeholder(R.drawable.thumbnail_placeholder_16_9)
-                }
-
                 if (imageView is ShapeableImageView) {
                     allowHardware(false)
                 }
@@ -1232,6 +1221,7 @@ class PostListViewBuilder @Inject constructor(
                 if (w != null && h != null) {
                     this.size(w, h)
                 }
+                placeholder(R.drawable.thumbnail_placeholder_16_9)
                 // fallback(R.drawable.thumbnail_placeholder_16_9)
 
                 if (shouldBlur) {
@@ -1249,6 +1239,7 @@ class PostListViewBuilder @Inject constructor(
 
                 listener { _, result ->
                     result.drawable.getSize(size)
+
                     if (size.width > 0 && size.height > 0) {
                         offlineManager.setImageSizeHint(
                             imageUrl,
@@ -1263,15 +1254,21 @@ class PostListViewBuilder @Inject constructor(
         if (isUrlMp4) {
             offlineManager.getMaxImageSizeHint(imageUrl, tempSize)
 
-            loadImage(imageUrl, tempSize, showPlaceholder = true)
+            loadImage(
+                urlOrFile = imageUrl,
+                size = tempSize,
+            )
         } else {
             offlineManager.fetchImageWithError(
                 rootView = rootView,
-                url = urlToLoad,
+                url = imageUrl,
                 listener = {
                     offlineManager.getMaxImageSizeHint(it, tempSize)
 
-                    loadImage(it, tempSize, showPlaceholder = false)
+                    loadImage(
+                        urlOrFile = it,
+                        size = tempSize,
+                    )
                 },
                 errorListener = errorListener,
             )

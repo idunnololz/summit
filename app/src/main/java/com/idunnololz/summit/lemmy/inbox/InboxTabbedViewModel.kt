@@ -7,6 +7,8 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.util.PageItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -15,11 +17,11 @@ import javax.inject.Inject
 class InboxTabbedViewModel @Inject constructor(
     private val context: Application,
     private val accountInfoManager: AccountInfoManager,
-) : ViewModel() {
+) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     var pageItems = MutableLiveData<List<PageItem>>()
 
-    var pagePosition: Int = 0
+    override var lastSelectedPost: PostRef? = null
 
     init {
         addFrag(

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import arrow.core.Either
+import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -112,7 +113,7 @@ class CommunityFragment :
 
     lateinit var preferences: Preferences
 
-    private var viewPagerController: ViewPagerController? = null
+    private var slidingPaneController: SlidingPaneController? = null
 
     private var isCustomAppBarExpandedPercent = 0f
 
@@ -258,7 +259,7 @@ class CommunityFragment :
                         reveal,
                         videoState, ->
 
-                    viewPagerController?.openPost(
+                    slidingPaneController?.openPost(
                         instance = instance,
                         id = id,
                         reveal = reveal,
@@ -316,7 +317,7 @@ class CommunityFragment :
 
                 if (result != null) {
                     viewModel.fetchCurrentPage(force = true)
-                    viewPagerController?.openPost(
+                    slidingPaneController?.openPost(
                         instance = result.instance,
                         id = result.post.id,
                         reveal = false,
@@ -340,19 +341,6 @@ class CommunityFragment :
                     viewModel.changeGuestAccountInstance(result.instance)
                 }
             }
-
-//            setFragmentResultListener(
-//                MultiCommunityEditorDialogFragment.REQUEST_KEY,
-//                this@CommunityFragment,
-//            ) { _, bundle ->
-//                val result = bundle.getParcelableCompat<CommunityRef.MultiCommunity>(
-//                    MultiCommunityEditorDialogFragment.REQUEST_KEY_RESULT,
-//                )
-//
-//                if (result != null) {
-//                    userCommunitiesManager.addUserCommunity(result, null)
-//                }
-//            }
         }
     }
 
@@ -414,8 +402,9 @@ class CommunityFragment :
 
                 val percentShown = -verticalOffset.toFloat() / binding.customAppBar.root.height
 
-                navBarController.bottomNavViewOffset.value =
-                    (percentShown * getBottomNavHeight()).toInt()
+                if (!navBarController.useNavigationRail) {
+                    navBarController.navBarOffsetPercent.value = percentShown
+                }
 
                 isCustomAppBarExpandedPercent = 1f - percentShown
 
@@ -463,35 +452,65 @@ class CommunityFragment :
         requireActivity().onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, onBackPressedHandler)
 
-        viewPagerController = ViewPagerController(
-            this,
-            binding.viewPager,
-            childFragmentManager,
-            viewModel,
-            compatibilityMode = preferences.compatibilityMode,
+        slidingPaneController = SlidingPaneController(
+            fragment = this,
+            slidingPaneLayout = binding.slidingPaneLayout,
+            childFragmentManager = childFragmentManager,
+            viewModel = viewModel,
+            globalLayoutMode = preferences.globalLayoutMode,
             retainClosedPosts = preferences.retainLastPost,
-        ) {
-            if (it == 0) {
-                val lastSelectedPost = viewModel.lastSelectedPost
-                if (lastSelectedPost != null) {
-                    // We came from a post...
-                    adapter?.highlightPost(lastSelectedPost)
-                    viewModel.lastSelectedPost = null
+        ).apply {
+            onPageSelectedListener = { isOpen ->
+                if (!isOpen) {
+                    val lastSelectedPost = viewModel.lastSelectedPost
+                    if (lastSelectedPost != null) {
+                        // We came from a post...
+                        adapter?.highlightPost(lastSelectedPost)
+                        viewModel.lastSelectedPost = null
+                    }
+                } else {
+                    val lastSelectedPost = viewModel.lastSelectedPost
+                    if (lastSelectedPost != null) {
+                        adapter?.highlightPostForever(lastSelectedPost)
+                    }
                 }
-            } else {
-                val lastSelectedPost = viewModel.lastSelectedPost
-                if (lastSelectedPost != null) {
-                    adapter?.highlightPostForever(lastSelectedPost)
+
+                if (isOpen) {
+                    requireMainActivity().apply {
+                        setupForFragment<PostFragment>()
+                        if (isSlideable) {
+                            navBarController.hideNavBar(true)
+                            setNavUiOpenPercent(1f)
+                            lockUiOpenness = true
+                        }
+                    }
+                    if (isSlideable) {
+                        val mainFragment = parentFragment?.parentFragment as? MainFragment
+                        mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
+                    }
+                } else {
+                    requireMainActivity().apply {
+                        setupForFragment<CommunityFragment>()
+                        lockUiOpenness = false
+                        if (isSlideable) {
+                            setNavUiOpenPercent(0f)
+                        }
+                    }
+                    if (isSlideable) {
+                        val mainFragment = parentFragment?.parentFragment as? MainFragment
+                        if (!lockPanes) {
+                            mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+                        }
+                    }
                 }
             }
-        }.apply {
+
             init()
         }
-        binding.viewPager.disableLeftSwipe = true
     }
 
     fun closePost(postFragment: PostFragment) {
-        viewPagerController?.closePost(postFragment)
+        slidingPaneController?.closePost(postFragment)
     }
 
     fun isPristineFirstPage(): Boolean {
@@ -599,7 +618,7 @@ class CommunityFragment :
                     val adapter = adapter ?: return
                     val firstPos = layoutManager.findFirstVisibleItemPosition()
                     val lastPos = layoutManager.findLastVisibleItemPosition()
-                    (adapter.items.getOrNull(firstPos) as? Item.PostItem)
+                    (adapter.items.getOrNull(firstPos) as? Item.VisiblePostItem)
                         ?.pageIndex
                         ?.let { pageIndex ->
                             if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
@@ -758,8 +777,12 @@ class CommunityFragment :
             viewModel.fetchInitialPage()
         }
 
-        // try to restore state...
-        viewPagerController?.onPageSelected()
+        runAfterLayout {
+            // try to restore state...
+            // SlidingPaneLayout needs 1 layout pass in order to be in the right state. Otherwise
+            // it will always think there is enough room even if there isn't.
+            slidingPaneController?.callPageSelected()
+        }
     }
 
     private fun attachGestureHandlerToRecyclerViewIfNeeded() {
@@ -790,7 +813,7 @@ class CommunityFragment :
                         }
 
                         PostGestureAction.Reply -> {
-                            viewPagerController?.openPost(
+                            slidingPaneController?.openPost(
                                 instance = viewModel.apiInstance,
                                 id = postView.post.id,
                                 reveal = false,
@@ -871,8 +894,8 @@ class CommunityFragment :
                 }
             }
 
-            if (binding.viewPager.currentItem == 0) {
-                getMainActivity()?.setNavUiOpenness(0f)
+            if (!binding.slidingPaneLayout.isOpaque) {
+                getMainActivity()?.setNavUiOpenPercent(0f)
             }
 
             adapter?.updateWithPreferences(preferences)
@@ -1198,7 +1221,7 @@ class CommunityFragment :
                             it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
                         }
                         range?.mapNotNullTo(anchors) {
-                            (adapter?.items?.getOrNull(it) as? Item.PostItem)?.postView?.post?.id
+                            (adapter?.items?.getOrNull(it) as? Item.VisiblePostItem)?.postView?.post?.id
                         }
                         viewModel.onHideRead(anchors)
                     }

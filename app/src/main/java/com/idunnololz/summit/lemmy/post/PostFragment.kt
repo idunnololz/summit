@@ -57,7 +57,6 @@ import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMEN
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
-import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
@@ -1052,6 +1051,7 @@ class PostFragment :
         if (args.isSinglePage) {
             requireMainActivity().apply {
                 setupForFragment<PostFragment>()
+                navBarController.hideNavBar(true)
                 if (!navBarController.useNavigationRail) {
                     navBarController.hideNavBar(animate = true)
                 }

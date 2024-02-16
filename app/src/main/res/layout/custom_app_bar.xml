@@ -83,49 +83,45 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="@+id/guideline" />
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/account_image_view"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:textAppearance="?textAppearanceTitleMedium"
+            <FrameLayout
+                android:id="@+id/account_hit_region"
+                android:layout_width="56dp"
+                android:layout_height="40dp"
                 android:gravity="start|center_vertical"
-                android:padding="8dp"
-                android:foreground="@drawable/account_ripple"
-                android:layout_marginStart="@dimen/padding_half"
-                android:layout_marginEnd="@dimen/padding_half"
-                android:visibility="invisible"
-                android:scaleType="centerCrop"
-                style="@style/CircleImageView"
-                app:layout_constraintDimensionRatio="W,1:1"
-                app:layout_constraintVertical_chainStyle="packed"
-                app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="@+id/guideline"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/account_chip"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:minWidth="0dp"
-                android:textAppearance="?textAppearanceTitleMedium"
-                android:textStyle="bold"
-                android:gravity="start|center_vertical"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:layout_marginStart="@dimen/padding_quarter"
-                android:visibility="invisible"
-                app:chipIcon="@drawable/baseline_add_24"
-                app:chipIconTint="?colorControlNormal"
-                app:textStartPadding="0dp"
-                app:textEndPadding="0dp"
-                app:chipStartPadding="4dp"
-                app:chipEndPadding="4dp"
-                app:layout_constraintVertical_chainStyle="packed"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="@+id/guideline"
-                app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/account_image_view"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:textAppearance="?textAppearanceTitleMedium"
+                    android:layout_gravity="center"
+                    android:padding="8dp"
+                    android:foreground="@drawable/account_ripple"
+                    android:visibility="invisible"
+                    android:scaleType="centerCrop"
+                    style="@style/CircleImageView"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/account_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:minWidth="0dp"
+                    android:textAppearance="?textAppearanceTitleMedium"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:visibility="invisible"
+                    app:chipIcon="@drawable/baseline_add_24"
+                    app:chipIconTint="?colorControlNormal"
+                    app:textStartPadding="0dp"
+                    app:textEndPadding="0dp"
+                    app:chipStartPadding="4dp"
+                    app:chipEndPadding="4dp" />
+            </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 </com.google.android.material.appbar.AppBarLayout>

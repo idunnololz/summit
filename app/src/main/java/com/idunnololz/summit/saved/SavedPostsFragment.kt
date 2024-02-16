@@ -103,7 +103,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                     reveal,
                     videoState, ->
 
-                parentFragment.viewPagerController?.openPost(
+                parentFragment.slidingPaneController?.openPost(
                     instance = instance,
                     id = id,
                     reveal = reveal,

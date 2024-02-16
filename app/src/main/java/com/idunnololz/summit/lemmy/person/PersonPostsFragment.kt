@@ -100,7 +100,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     reveal,
                     videoState, ->
 
-                parentFragment.viewPagerController?.openPost(
+                parentFragment.slidingPaneController?.openPost(
                     instance = instance,
                     id = id,
                     reveal = reveal,

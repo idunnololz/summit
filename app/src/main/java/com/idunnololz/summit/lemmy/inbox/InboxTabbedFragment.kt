@@ -6,30 +6,37 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentInboxBinding
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.DepthPageTransformer2
 import com.idunnololz.summit.util.PageItem
+import com.idunnololz.summit.util.TwoPaneOnBackPressedCallback
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
     private val viewModel: InboxTabbedViewModel by viewModels()
     private val inboxViewModel: InboxViewModel by activityViewModels()
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +55,11 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
         val context = requireContext()
 
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            TwoPaneOnBackPressedCallback(binding.slidingPaneLayout),
+        )
+
         val pagerAdapter = InboxPagerAdapter(
             context,
             this,
@@ -61,51 +73,72 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
             pagerAdapter.setPages(it)
 
-            binding.viewPager.isUserInputEnabled = it.size > 1
+//            binding.viewPager.isUserInputEnabled = it.size > 1
         }
         viewModel.pageItems.value?.let {
             pagerAdapter.setPages(it)
         }
 
         fun onPageChanged() {
-            if (binding.viewPager.currentItem == 0) {
-                viewModel.removeAllButFirst()
+        }
 
-                getMainActivity()?.setNavUiOpenness(0f)
-            } else {
-                getMainActivity()?.setNavUiOpenness(1f)
+        val slidingPaneController = SlidingPaneController(
+            fragment = this,
+            slidingPaneLayout = binding.slidingPaneLayout,
+            childFragmentManager = childFragmentManager,
+            viewModel = viewModel,
+            globalLayoutMode = preferences.globalLayoutMode,
+        ).apply {
+            onPageSelectedListener = { isOpen ->
+
+                if (!isOpen) {
+                    viewModel.removeAllButFirst()
+
+                    getMainActivity()?.setNavUiOpenPercent(0f)
+                } else {
+                    getMainActivity()?.setNavUiOpenPercent(1f)
+                }
+            }
+
+            init()
+        }
+
+        if (savedInstanceState == null) {
+            childFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.inbox_fragment_container, InboxFragment::class.java, InboxFragmentArgs(InboxViewModel.PageType.All).toBundle())
             }
         }
 
-        binding.viewPager.offscreenPageLimit = 99
-        binding.viewPager.adapter = pagerAdapter
-        binding.viewPager.setPageTransformer(DepthPageTransformer2())
-        binding.viewPager.setCurrentItem(viewModel.pagePosition, false)
-        binding.viewPager.registerOnPageChangeCallback(
-            object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageScrolled(
-                    position: Int,
-                    positionOffset: Float,
-                    positionOffsetPixels: Int,
-                ) {
-                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                    if (!binding.viewPager.isLaidOut) {
-                        return
-                    }
-                    if (position == 0) {
-                        getMainActivity()?.setNavUiOpenness(positionOffset)
-                    }
-                }
-
-                override fun onPageScrollStateChanged(state: Int) {
-                    super.onPageScrollStateChanged(state)
-
-                    if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                        onPageChanged()
-                    }
-                }
-            },
-        )
+//        binding.viewPager.offscreenPageLimit = 99
+//        binding.viewPager.adapter = pagerAdapter
+//        binding.viewPager.setPageTransformer(DepthPageTransformer2())
+//        binding.viewPager.setCurrentItem(viewModel.pagePosition, false)
+//        binding.viewPager.registerOnPageChangeCallback(
+//            object : ViewPager2.OnPageChangeCallback() {
+//                override fun onPageScrolled(
+//                    position: Int,
+//                    positionOffset: Float,
+//                    positionOffsetPixels: Int,
+//                ) {
+//                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+//                    if (!binding.viewPager.isLaidOut) {
+//                        return
+//                    }
+//                    if (position == 0) {
+//                        getMainActivity()?.setNavUiOpenPercent(positionOffset)
+//                    }
+//                }
+//
+//                override fun onPageScrollStateChanged(state: Int) {
+//                    super.onPageScrollStateChanged(state)
+//
+//                    if (state == ViewPager2.SCROLL_STATE_IDLE) {
+//                        onPageChanged()
+//                    }
+//                }
+//            },
+//        )
 
         onPageChanged()
         viewModel.updateUnreadCount()
@@ -121,23 +154,21 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         super.onPause()
     }
 
-    override fun onDestroyView() {
-        viewModel.pagePosition = binding.viewPager.currentItem
-        binding.viewPager.adapter = null
-
-        super.onDestroyView()
-    }
-
     fun openMessage(item: InboxItem, instance: String) {
-        viewModel.openMessage(item, instance)
-
-        binding.viewPager.post {
-            binding.viewPager.currentItem = 1
+        childFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(R.id.message_fragment_container, MessageFragment::class.java, MessageFragmentArgs(item, instance).toBundle())
+            // If it's already open and the detail pane is visible, crossfade
+            // between the fragments.
+            if (binding.slidingPaneLayout.isOpen) {
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            }
         }
+        binding.slidingPaneLayout.open()
     }
 
     fun closeMessage() {
-        binding.viewPager.currentItem = 0
+        binding.slidingPaneLayout.closePane()
     }
 
     fun showLogin() {

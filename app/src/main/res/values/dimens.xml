@@ -37,4 +37,8 @@
     <dimen name="max_image_height">1000dp</dimen>
     <dimen name="screenshot_options_size">64dp</dimen>
     <dimen name="label_text_size">11sp</dimen>
+    <dimen name="divider_size">1dp</dimen>
+
+    <dimen name="sliding_pane_first_child_width">420dp</dimen>
+    <dimen name="sliding_pane_second_child_width">300dp</dimen>
 </resources>

@@ -1,44 +1,60 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.FilterReason
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.DirectoryHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-sealed class Item {
-    data class PostItem(
-        val postView: PostView,
+sealed interface Item {
+
+    sealed interface PostItem : Item {
+        val postView: PostView
+    }
+
+    data class VisiblePostItem(
+        override val postView: PostView,
         val instance: String,
         val isExpanded: Boolean,
         val isActionExpanded: Boolean,
         val highlight: Boolean,
         val highlightForever: Boolean,
         val pageIndex: Int,
-    ) : Item()
+    ) : PostItem
+
+    data class FilteredPostItem(
+        override val postView: PostView,
+        val instance: String,
+        val isExpanded: Boolean,
+        val isActionExpanded: Boolean,
+        val highlight: Boolean,
+        val highlightForever: Boolean,
+        val pageIndex: Int,
+        val filterReason: FilterReason,
+    ) : PostItem
 
     data class FooterItem(
         val hasMore: Boolean,
         val hasLess: Boolean,
-    ) : Item()
+    ) : Item
 
-    data class AutoLoadItem(val pageToLoad: Int) : Item()
+    data class AutoLoadItem(val pageToLoad: Int) : Item
 
-    data class ManualLoadItem(val pageToLoad: Int) : Item()
+    data class ManualLoadItem(val pageToLoad: Int) : Item
 
-    data class ErrorItem(val message: String, val pageToLoad: Int, val isLoading: Boolean) : Item()
+    data class ErrorItem(val message: String, val pageToLoad: Int, val isLoading: Boolean) : Item
 
-    data class PersistentErrorItem(val exception: Exception) : Item()
+    data class PersistentErrorItem(val exception: Exception) : Item
 
-    data class PageTitle(val pageIndex: Int) : Item()
+    data class PageTitle(val pageIndex: Int) : Item
 
-    data object EndItem : Item()
-    data object FooterSpacerItem : Item()
+    data object EndItem : Item
+    data object FooterSpacerItem : Item
 }
 
 class PostListEngine(
@@ -63,7 +79,7 @@ class PostListEngine(
 
             if (!value && pages.isNotEmpty()) {
                 val firstPage = pages.first()
-                _pages.value = listOf(firstPage)
+                _pages = listOf(firstPage)
             }
             createItems()
         }
@@ -89,13 +105,15 @@ class PostListEngine(
     val hasMore: Boolean
         get() = pages.lastOrNull()?.hasMore != false
 
-    private val _pages = MutableLiveData<List<LoadedPostsData>>()
+    private var unfilteredItems = mutableSetOf<PostId>()
+
+    private var _pages = listOf<LoadedPostsData>()
 
     /**
      * Sorted pages in ascending order.
      */
     val pages: List<LoadedPostsData>
-        get() = _pages.value ?: listOf()
+        get() = _pages
 
     private var persistentErrors: List<Item> = listOf()
     private var expandedItems = mutableSetOf<String>()
@@ -121,7 +139,7 @@ class PostListEngine(
         cachedPages?.let {
             // We need to use let here because Google's lint rule doesn't support smart cast
             Log.d(TAG, "Restoration successful! Restored ${cachedPages.size} page(s) totalling ${it.sumOf { it.posts.size }} posts.")
-            _pages.value = it
+            _pages = it
         }
     }
 
@@ -142,9 +160,9 @@ class PostListEngine(
                 pages.add(data)
                 pages.sortBy { it.pageIndex }
             }
-            _pages.value = pages
+            _pages = pages
         } else {
-            _pages.value = listOf(data)
+            _pages = listOf(data)
         }
 
         coroutineScope.launch(Dispatchers.IO) {
@@ -153,6 +171,8 @@ class PostListEngine(
     }
 
     fun createItems() {
+        Log.d(TAG, "createItems()")
+
         if (pages.isEmpty()) {
             _items = listOf()
             return
@@ -184,19 +204,32 @@ class PostListEngine(
             } else {
                 page.posts
                     .mapTo(items) {
-                        val key = it.getUniqueKey()
+                        val key = it.postView.getUniqueKey()
                         val isActionsExpanded = actionsExpandedItems.contains(key)
                         val isExpanded = expandedItems.contains(key)
 
-                        Item.PostItem(
-                            postView = it,
-                            instance = page.instance,
-                            isExpanded = isExpanded,
-                            isActionExpanded = isActionsExpanded,
-                            highlight = postToHighlight?.id == it.post.id,
-                            highlightForever = postToHighlightForever?.id == it.post.id,
-                            pageIndex = page.pageIndex,
-                        )
+                        if (it.filterReason != null && !unfilteredItems.contains(it.postView.post.id)) {
+                            Item.FilteredPostItem(
+                                postView = it.postView,
+                                instance = page.instance,
+                                isExpanded = isExpanded,
+                                isActionExpanded = isActionsExpanded,
+                                highlight = postToHighlight?.id == it.postView.post.id,
+                                highlightForever = postToHighlightForever?.id == it.postView.post.id,
+                                pageIndex = page.pageIndex,
+                                filterReason = it.filterReason,
+                            )
+                        } else {
+                            Item.VisiblePostItem(
+                                postView = it.postView,
+                                instance = page.instance,
+                                isExpanded = isExpanded,
+                                isActionExpanded = isActionsExpanded,
+                                highlight = postToHighlight?.id == it.postView.post.id,
+                                highlightForever = postToHighlightForever?.id == it.postView.post.id,
+                                pageIndex = page.pageIndex,
+                            )
+                        }
                     }
             }
         }
@@ -259,6 +292,7 @@ class PostListEngine(
     fun highlight(postToHighlight: PostRef): Int {
         this.postToHighlight = postToHighlight
         this.postToHighlightForever = null
+
         return _items.indexOfFirst {
             when (it) {
                 is Item.FooterItem -> false
@@ -304,12 +338,12 @@ class PostListEngine(
             return listOf()
         }
 
-        var firstPost: Item.PostItem? = null
-        var lastPost: Item.PostItem? = null
+        var firstPost: Item.VisiblePostItem? = null
+        var lastPost: Item.VisiblePostItem? = null
         var i = displayFirstItemsIndex
         while (i < _items.size) {
             val item = _items.getOrNull(i)
-            if (item is Item.PostItem) {
+            if (item is Item.VisiblePostItem) {
                 firstPost = item
                 break
             }
@@ -319,7 +353,7 @@ class PostListEngine(
         i = displayLastItemsIndex
         while (i > displayFirstItemsIndex) {
             val item = _items.getOrNull(i)
-            if (item is Item.PostItem) {
+            if (item is Item.VisiblePostItem) {
                 lastPost = item
                 break
             }
@@ -334,7 +368,7 @@ class PostListEngine(
     }
 
     fun clearPages() {
-        _pages.value = listOf()
+        _pages = listOf()
         coroutineScope.launch(Dispatchers.IO) {
             directoryHelper.clearPages(key, secondaryKey)
         }
@@ -349,7 +383,7 @@ class PostListEngine(
         for (i in start until end) {
             val item = _items[i]
 
-            if (item is Item.PostItem) {
+            if (item is Item.VisiblePostItem) {
                 results.add(item.postView)
             }
         }
@@ -358,7 +392,7 @@ class PostListEngine(
     }
 
     fun getCommunityIcon(): String? =
-        pages.firstOrNull()?.posts?.firstOrNull()?.community?.icon
+        pages.firstOrNull()?.posts?.firstOrNull()?.postView?.community?.icon
 
     fun setKey(tag: String?) {
         key = tag
@@ -370,13 +404,15 @@ class PostListEngine(
 
     fun updatePost(newPost: PostView) {
         val postId = newPost.post.id
-        val pages = _pages.value?.toMutableList() ?: return
+        val pages = _pages.toMutableList()
         for ((index, page) in pages.withIndex()) {
-            if (page.posts.any { it.post.id == postId }) {
+            if (page.posts.any { it.postView.post.id == postId }) {
                 pages[index] = page.copy(
                     posts = page.posts.map {
-                        if (it.post.id == postId) {
-                            newPost
+                        if (it.postView.post.id == postId) {
+                            it.copy(
+                                postView = newPost,
+                            )
                         } else {
                             it
                         }
@@ -384,26 +420,30 @@ class PostListEngine(
                 )
             }
         }
-        _pages.value = pages
+        _pages = pages
     }
 
     fun removePost(id: PostId) {
-        val pages = _pages.value?.toMutableList() ?: return
+        val pages = _pages.toMutableList()
         for ((index, page) in pages.withIndex()) {
-            if (page.posts.any { it.post.id == id }) {
-                pages[index] = page.copy(posts = page.posts.filter { it.post.id != id })
+            if (page.posts.any { it.postView.post.id == id }) {
+                pages[index] = page.copy(posts = page.posts.filter { it.postView.post.id != id })
             }
         }
-        _pages.value = pages
+        _pages = pages
     }
 
     fun setPageItemLoading(pageToLoad: Int) {
-        _pages.value?.find { it.pageIndex == pageToLoad }?.let {
+        _pages.find { it.pageIndex == pageToLoad }?.let {
             if (it.error != null && !it.error.isLoading) {
                 it.error.isLoading = true
 
                 createItems()
             }
         }
+    }
+
+    fun unfilter(postId: PostId) {
+        unfilteredItems.add(postId)
     }
 }

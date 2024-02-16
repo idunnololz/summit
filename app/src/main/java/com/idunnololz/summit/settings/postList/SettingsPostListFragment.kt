@@ -219,13 +219,6 @@ class SettingsPostListFragment :
             },
         )
 
-        settings.compatibilityMode.bindTo(
-            binding.compatibilityMode,
-            { preferences.compatibilityMode },
-            {
-                preferences.compatibilityMode = it
-            },
-        )
         settings.lockBottomBar.bindTo(
             binding.lockBottomBar,
             { preferences.lockBottomBar },
@@ -259,6 +252,13 @@ class SettingsPostListFragment :
             { preferences.useMultilinePostHeaders },
             {
                 preferences.useMultilinePostHeaders = it
+            },
+        )
+        settings.showFilteredPosts.bindTo(
+            binding.showFilteredPosts,
+            { preferences.showFilteredPosts },
+            {
+                preferences.showFilteredPosts = it
             },
         )
     }

@@ -12,7 +12,6 @@ interface DraftsDao {
     @Query("SELECT * FROM drafts")
     suspend fun getAllDrafts(): List<DraftEntry>
 
-
     @Query("SELECT * FROM drafts WHERE uts <= :updateTs ORDER BY uts DESC LIMIT :limit")
     suspend fun getAllDrafts(limit: Int, updateTs: Long): List<DraftEntry>
 

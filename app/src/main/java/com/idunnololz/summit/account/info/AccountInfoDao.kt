@@ -1,5 +1,6 @@
 package com.idunnololz.summit.account.info
 
+import android.net.Uri
 import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Dao
@@ -61,6 +62,9 @@ data class AccountSubscription(
     val posting_restricted_to_mods: Boolean,
     val instanceId: InstanceId,
 )
+
+val AccountSubscription.instance: String?
+    get() = Uri.parse(this.actorId).host
 
 @Dao
 abstract class AccountInfoDao {

@@ -13,7 +13,7 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.databinding.TabbedFragmentSavedBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
@@ -32,7 +32,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
 
     val viewModel: SavedViewModel by viewModels()
     val actionsViewModel: MoreActionsViewModel by viewModels()
-    var viewPagerController: ViewPagerController? = null
+    var slidingPaneController: SlidingPaneController? = null
 
     @Inject
     lateinit var preferences: Preferences
@@ -94,32 +94,32 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
                 binding.viewPager.adapter as ViewPagerAdapter,
             ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
 
-            viewPagerController = ViewPagerController(
-                this@SavedTabbedFragment,
-                topViewPager,
-                childFragmentManager,
-                viewModel,
-                true,
-                compatibilityMode = preferences.compatibilityMode,
+            slidingPaneController = SlidingPaneController(
+                fragment = this@SavedTabbedFragment,
+                slidingPaneLayout = slidingPaneLayout,
+                childFragmentManager = childFragmentManager,
+                viewModel = viewModel,
+                globalLayoutMode = preferences.globalLayoutMode,
+                lockPanes = true,
                 retainClosedPosts = preferences.retainLastPost,
-            ) {
-                if (it == 0) {
-                    val lastSelectedPost = viewModel.lastSelectedPost
-                    if (lastSelectedPost != null) {
-                        // We came from a post...
+            ).apply {
+                onPageSelectedListener = { isOpen ->
+                    if (!isOpen) {
+                        val lastSelectedPost = viewModel.lastSelectedPost
+                        if (lastSelectedPost != null) {
+                            // We came from a post...
 //                        adapter?.highlightPost(lastSelectedPost)
-                        viewModel.lastSelectedPost = null
-                    }
-                } else {
-                    val lastSelectedPost = viewModel.lastSelectedPost
-                    if (lastSelectedPost != null) {
+                            viewModel.lastSelectedPost = null
+                        }
+                    } else {
+                        val lastSelectedPost = viewModel.lastSelectedPost
+                        if (lastSelectedPost != null) {
 //                        adapter?.highlightPostForever(lastSelectedPost)
+                        }
                     }
                 }
-            }.apply {
                 init()
             }
-            topViewPager.disableLeftSwipe = true
 
             installOnActionResultHandler(
                 actionsViewModel = actionsViewModel,
@@ -143,6 +143,6 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
     }
 
     fun closePost(postFragment: PostFragment) {
-        viewPagerController?.closePost(postFragment)
+        slidingPaneController?.closePost(postFragment)
     }
 }

@@ -157,7 +157,8 @@ class MultiCommunityEditorDialogFragment :
                 when (it.itemId) {
                     R.id.ok -> {
                         val adapter = adapter
-                        val selectedCommunities = adapter?.selectedCommunities?.toList() ?: listOf()
+                        val selectedCommunities = adapter?.selectedCommunities?.keys?.toList()
+                            ?: listOf()
 
                         if (selectedCommunities.isEmpty()) {
                             AlertDialogFragment.Builder()
@@ -208,8 +209,8 @@ class MultiCommunityEditorDialogFragment :
             }
 
             adapter = CommunityAdapter(
-                context,
-                offlineManager,
+                context = context,
+                offlineManager = offlineManager,
                 canSelectMultipleCommunities = true,
                 onTooManyCommunities = {
                     showTooManyCommunitiesMessage()
@@ -252,6 +253,10 @@ class MultiCommunityEditorDialogFragment :
                     adapter?.setQueryServerResults(it.data)
                 }
             }
+        }
+
+        viewModel.subscribedCommunities.observe(viewLifecycleOwner) {
+            adapter?.subscribedCommunities = it
         }
 
         fun updateAdapter() {
@@ -360,7 +365,7 @@ class MultiCommunityEditorDialogFragment :
             binding.communitySelectorContainer.alpha = 1f
         }
         adapter?.selectedCommunities?.let {
-            viewModel.setSelectedCommunities(it.toList())
+            viewModel.setSelectedCommunities(it.keys.toList())
         }
     }
 
@@ -384,7 +389,7 @@ class MultiCommunityEditorDialogFragment :
                 val stillLoading: Boolean = false,
             ) : Item
 
-            object SelectedCommunitiesHeader : Item
+            data object SelectedCommunitiesHeader : Item
 
             data class NoResultsItem(
                 val text: String,
@@ -394,7 +399,7 @@ class MultiCommunityEditorDialogFragment :
                 val communityRef: CommunityRef.CommunityRefByName,
             ) : Item
 
-            object IconsItem : Item
+            data object IconsItem : Item
         }
 
         data class Data(
@@ -423,7 +428,7 @@ class MultiCommunityEditorDialogFragment :
                     is Item.SelectedCommunitiesHeader -> true
                 }
             },
-            getChangePayload = { old, new ->
+            getChangePayload = { _, new ->
                 when (new) {
                     is Item.HeaderItem -> new.communityName
                     else -> null
@@ -453,13 +458,13 @@ class MultiCommunityEditorDialogFragment :
                         },
                     )
                 },
-            ) { item, b, h ->
+            ) { item, b, _ ->
                 b.nameEditText.setText(item.communityName)
             }
             addItemType(
                 clazz = Item.SelectedCommunitiesHeader::class,
                 inflateFn = MultiCommunitySelectedCommunitiesItemBinding::inflate,
-            ) { item, b, _ ->
+            ) { _, b, _ ->
                 b.edit.setOnClickListener {
                     onChooseCommunitiesClick()
                 }

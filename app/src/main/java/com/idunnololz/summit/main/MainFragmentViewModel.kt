@@ -7,6 +7,7 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,12 +21,12 @@ class MainFragmentViewModel @Inject constructor(
     val userCommunitiesUpdated = MutableLiveData<Event<UserCommunityItem>>()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             userCommunitiesManager.userCommunitiesChangedFlow.collect {
                 userCommunitiesChangedEvents.postValue(Event(Unit))
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             userCommunitiesManager.userCommunitiesUpdatedFlow.collect {
                 userCommunitiesUpdated.postValue(Event(it))
             }

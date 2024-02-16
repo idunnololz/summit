@@ -4,8 +4,11 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.dispose
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.info.AccountSubscription
+import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
@@ -43,6 +46,7 @@ class CommunityAdapter(
         ) : Item
 
         data class SelectedCommunityItem(
+            val icon: String?,
             val communityRef: CommunityRef.CommunityRefByName,
         ) : Item
 
@@ -52,9 +56,27 @@ class CommunityAdapter(
             val monthlyActiveUsers: Int,
             val isChecked: Boolean,
         ) : Item
+
+        data class SubscribedCommunityItem(
+            val text: String,
+            val subscribedCommunity: AccountSubscription,
+            val isChecked: Boolean,
+        ) : Item
     }
 
-    var selectedCommunities = LinkedHashSet<CommunityRef.CommunityRefByName>()
+    data class SelectedCommunity(
+        val icon: String,
+        val communityRef: CommunityRef.CommunityRefByName,
+    )
+
+    var subscribedCommunities: List<AccountSubscription>? = null
+        set(value) {
+            field = value
+
+            refreshItems { }
+        }
+    var selectedCommunities = LinkedHashMap<CommunityRef.CommunityRefByName, String?>()
+
     private var serverResultsInProgress = false
     private var serverQueryResults: List<CommunityView> = listOf()
 
@@ -69,10 +91,15 @@ class CommunityAdapter(
                 is Item.GroupHeaderItem -> {
                     old.text == (new as Item.GroupHeaderItem).text
                 }
-                is Item.NoResultsItem -> true
+                is Item.NoResultsItem ->
+                    old.text == (new as Item.NoResultsItem).text
                 is Item.SearchResultCommunityItem -> {
                     old.communityView.community.id ==
                         (new as Item.SearchResultCommunityItem).communityView.community.id
+                }
+                is Item.SubscribedCommunityItem -> {
+                    old.subscribedCommunity.id ==
+                        (new as Item.SubscribedCommunityItem).subscribedCommunity.id
                 }
             }
         },
@@ -94,7 +121,15 @@ class CommunityAdapter(
             clazz = Item.SelectedCommunityItem::class,
             inflateFn = CommunitySelectorSelectedCommunityItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_subreddit_default)
+            if (item.icon != null) {
+                b.icon.load(item.icon) {
+                    placeholder(R.drawable.ic_subreddit_default)
+                    fallback(R.drawable.ic_subreddit_default)
+                }
+            } else {
+                b.icon.dispose()
+                b.icon.setImageResource(R.drawable.ic_subreddit_default)
+            }
 
             b.title.text = item.communityRef.name
 
@@ -103,10 +138,10 @@ class CommunityAdapter(
 
             b.checkbox.isChecked = true
             b.checkbox.setOnClickListener {
-                toggleCommunity(item.communityRef)
+                toggleCommunity(item.communityRef, item.icon)
             }
             h.itemView.setOnClickListener {
-                toggleCommunity(item.communityRef)
+                toggleCommunity(item.communityRef, item.icon)
             }
         }
         addItemType(
@@ -132,16 +167,50 @@ class CommunityAdapter(
             }
             b.checkbox.isChecked = item.isChecked
             b.checkbox.setOnClickListener {
-                toggleCommunity(item.communityView.community.toCommunityRef())
+                toggleCommunity(item.communityView.community.toCommunityRef(), item.communityView.community.icon)
             }
             h.itemView.setOnClickListener {
                 if (canSelectMultipleCommunities) {
-                    toggleCommunity(item.communityView.community.toCommunityRef())
+                    toggleCommunity(item.communityView.community.toCommunityRef(), item.communityView.community.icon)
                 } else {
                     onSingleCommunitySelected(
                         item.communityView.community.toCommunityRef(),
                         item.communityView.community.icon,
                         item.communityView.community.id,
+                    )
+                }
+            }
+        }
+        addItemType(
+            clazz = Item.SubscribedCommunityItem::class,
+            inflateFn = CommunitySelectorSearchResultCommunityItemBinding::inflate,
+        ) { item, b, h ->
+            b.icon.load(R.drawable.ic_subreddit_default)
+            offlineManager.fetchImage(h.itemView, item.subscribedCommunity.icon) {
+                b.icon.load(it)
+            }
+
+            b.title.text = item.text
+
+            b.monthlyActives.text = item.subscribedCommunity.instance
+
+            if (canSelectMultipleCommunities) {
+                b.checkbox.visibility = View.VISIBLE
+            } else {
+                b.checkbox.visibility = View.GONE
+            }
+            b.checkbox.isChecked = item.isChecked
+            b.checkbox.setOnClickListener {
+                toggleCommunity(item.subscribedCommunity.toCommunityRef(), item.subscribedCommunity.icon)
+            }
+            h.itemView.setOnClickListener {
+                if (canSelectMultipleCommunities) {
+                    toggleCommunity(item.subscribedCommunity.toCommunityRef(), item.subscribedCommunity.icon)
+                } else {
+                    onSingleCommunitySelected(
+                        item.subscribedCommunity.toCommunityRef(),
+                        item.subscribedCommunity.icon,
+                        item.subscribedCommunity.id,
                     )
                 }
             }
@@ -154,14 +223,14 @@ class CommunityAdapter(
         }
     }
 
-    private fun toggleCommunity(ref: CommunityRef.CommunityRefByName) {
+    private fun toggleCommunity(ref: CommunityRef.CommunityRefByName, icon: String?) {
         if (selectedCommunities.contains(ref)) {
             selectedCommunities.remove(ref)
         } else {
             if (selectedCommunities.size == MULTI_COMMUNITY_DATA_SOURCE_LIMIT) {
                 onTooManyCommunities(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
             } else {
-                selectedCommunities.add(ref)
+                selectedCommunities[ref] = icon
             }
         }
 
@@ -187,7 +256,9 @@ class CommunityAdapter(
 
     fun setSelectedCommunities(selectedCommunities: List<CommunityRef.CommunityRefByName>) {
         this.selectedCommunities.clear()
-        this.selectedCommunities.addAll(selectedCommunities)
+        selectedCommunities.forEach {
+            this.selectedCommunities[it] = null
+        }
 
         refreshItems { }
     }
@@ -203,9 +274,10 @@ class CommunityAdapter(
             if (selectedCommunities.isEmpty()) {
                 newItems += Item.NoResultsItem(context.getString(R.string.no_communities_selected))
             } else {
-                selectedCommunities.forEach {
+                selectedCommunities.forEach { (communityRef, icon) ->
                     newItems += Item.SelectedCommunityItem(
-                        it,
+                        icon,
+                        communityRef,
                     )
                 }
             }
@@ -230,6 +302,23 @@ class CommunityAdapter(
                     )
                 }
             }
+        } else {
+            val subscribedCommunities = subscribedCommunities
+            if (!subscribedCommunities.isNullOrEmpty()) {
+                newItems.add(
+                    Item.GroupHeaderItem(
+                        context.getString(R.string.subscribed_communities),
+                        false,
+                    ),
+                )
+                subscribedCommunities.forEach {
+                    newItems += Item.SubscribedCommunityItem(
+                        it.name,
+                        it,
+                        selectedCommunities.contains(it.toCommunityRef()),
+                    )
+                }
+            }
         }
 
         adapterHelper.setItems(newItems, this, cb)
@@ -245,13 +334,13 @@ class CommunityAdapter(
         this.serverQueryResults = serverQueryResults
         serverResultsInProgress = false
 
-        refreshItems({})
+        refreshItems {}
     }
 
     fun setQueryServerResultsInProgress() {
         serverQueryResults = listOf()
         serverResultsInProgress = true
 
-        refreshItems({})
+        refreshItems {}
     }
 }

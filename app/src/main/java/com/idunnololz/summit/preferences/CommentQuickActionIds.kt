@@ -13,7 +13,6 @@ object CommentQuickActionIds {
     const val ViewSource: CommentQuickActionId = 8
     const val DetailedView: CommentQuickActionId = 9
 
-
     const val More: CommentQuickActionId = 999
 
     val AllActions = listOf(

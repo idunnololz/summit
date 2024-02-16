@@ -15,6 +15,7 @@ import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ class CommunitiesPaneViewModel @Inject constructor(
     val communities = MutableLiveData<CommunityData?>(null)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             accountInfoManager.subscribedCommunities.collect {
                 subscriptionCommunities = it
 
@@ -43,7 +44,7 @@ class CommunitiesPaneViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             userCommunitiesManager.userCommunitiesChangedFlow.collect {
                 userCommunities = userCommunitiesManager.getAllUserCommunities()
 
@@ -51,7 +52,7 @@ class CommunitiesPaneViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             accountInfoManager.accountInfoUpdateState.collect {
                 accountInfoUpdateState = it
 
@@ -59,7 +60,7 @@ class CommunitiesPaneViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             tabsManager.tabStateChangedFlow.collect {
                 updateTabsState()
             }

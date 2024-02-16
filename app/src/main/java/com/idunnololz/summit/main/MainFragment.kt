@@ -365,27 +365,26 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             .registerStartPanelStateListeners(
                 object : OverlappingPanelsLayout.PanelStateListener {
                     override fun onPanelStateChange(panelState: PanelState) {
-                        Log.d(TAG, "panelState: $panelState")
                         when (panelState) {
                             PanelState.Closed -> {
                                 getMainActivity()?.let {
-                                    it.setNavUiOpenness(0f)
+                                    it.setNavUiOpenPercent(0f)
                                     Utils.hideKeyboard(it)
                                 }
 
                                 updatePaneBackPressHandler()
                             }
                             is PanelState.Closing -> {
-                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
                             }
                             PanelState.Opened -> {
-                                getMainActivity()?.setNavUiOpenness(100f)
+                                getMainActivity()?.setNavUiOpenPercent(100f)
                                 communitiesPaneController.onShown()
 
                                 updatePaneBackPressHandler()
                             }
                             is PanelState.Opening -> {
-                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
                             }
                         }
                     }
@@ -672,6 +671,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             return
         }
 
+        Log.d(TAG, "setStartPanelLockState(): $lockState")
         binding.rootView.setStartPanelLockState(lockState)
     }
 

@@ -13,7 +13,7 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val coroutineScopeFactory: CoroutineScopeFactory,
-) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
+) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
         private const val MAX_QUERY_PAGE_LIMIT = 20
@@ -34,7 +34,6 @@ class SearchViewModel @Inject constructor(
     val instance: String
         get() = apiClient.instance
     override var lastSelectedPost: PostRef? = null
-    override val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
 
     val queryEnginesByType = mutableMapOf<SearchType, QueryEngine>()
 

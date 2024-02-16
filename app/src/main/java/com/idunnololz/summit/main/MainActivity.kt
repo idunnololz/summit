@@ -256,9 +256,9 @@ class MainActivity : BaseActivity() {
             },
         )
 
-        navBarController.setup()
-
         onPreferencesChanged() // must be called after navBarController.setup()
+
+        navBarController.setup()
 
         handleIntent(intent) // must be called after navBarController.setup()
 
@@ -411,7 +411,7 @@ class MainActivity : BaseActivity() {
                 bottom = bottomInset
             }
             binding.snackbarContainer.updateLayoutParams<MarginLayoutParams> {
-                bottomMargin = navBarController.navBar.height
+                bottomMargin = navBarController.bottomNavHeight
             }
 
             onStatusBarHeightChanged(topInset)
@@ -476,10 +476,9 @@ class MainActivity : BaseActivity() {
             .translationY(0f)
     }
 
-    fun setNavUiOpenness(progress: Float) {
+    fun setNavUiOpenPercent(progress: Float) {
         if (lockUiOpenness) return
-        navBarController.bottomNavViewAnimationOffset.value =
-            navBarController.navBar.height * progress
+        navBarController.bottomNavViewAnimationOffsetPercent.value = progress
     }
 
     private fun handleIntent(intent: Intent?) {
@@ -939,7 +938,6 @@ class MainActivity : BaseActivity() {
             }
             PostFragment::class -> {
                 navBarController.disableBottomNavViewScrolling()
-                navBarController.hideNavBar(animate)
                 showNotificationBarBg()
             }
             VideoViewerFragment::class -> {
@@ -1026,7 +1024,6 @@ class MainActivity : BaseActivity() {
 
     fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean = true) {
         currentBottomMenu?.close()
-        bottomMenu.setInsets(lastInsets.topInset, lastInsets.bottomInset)
         bottomMenu.show(
             mainActivity = this,
             bottomSheetContainer = binding.root,
@@ -1053,7 +1050,7 @@ class MainActivity : BaseActivity() {
                 sharedElements += Pair.create(appBar, SharedElementNames.AppBar)
             }
 
-            if (navBarController.useBottomNavBar) {
+            if (navBarController.useBottomNavBar && !navBarController.useNavigationRail) {
                 sharedElements += Pair.create(
                     navBarController.navBar,
                     SharedElementNames.NavBar,

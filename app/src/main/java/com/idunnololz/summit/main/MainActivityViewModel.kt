@@ -72,7 +72,7 @@ class MainActivityViewModel @Inject constructor(
         get() = apiClient.instance
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             launch {
                 readyCount
                     .completeWhenDone()
@@ -120,7 +120,9 @@ class MainActivityViewModel @Inject constructor(
 
             launch {
                 accountManager.currentAccount.collect {
-                    loadCommunities()
+                    withContext(Dispatchers.Main) {
+                        loadCommunities()
+                    }
                 }
             }
 
@@ -134,7 +136,7 @@ class MainActivityViewModel @Inject constructor(
 
     fun loadCommunities() {
         communities.setIsLoading()
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             apiClient.fetchCommunitiesWithRetry(
                 sortType = SortType.TopAll,
                 listingType = ListingType.All,

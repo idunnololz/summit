@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import okhttp3.internal.toImmutableList
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
@@ -31,7 +33,7 @@ class HistoryViewModel @Inject constructor(
         get() = apiClient.instance
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             query.debounce(500)
                 .collect {
                     queryInternal(it)
@@ -40,7 +42,7 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun loadHistory(force: Boolean = false) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             try {
                 if (force) {
                     entries.clear()
@@ -53,7 +55,7 @@ class HistoryViewModel @Inject constructor(
 
                 historyData.postValue(
                     HistoryEntryData(
-                        entries,
+                        entries.toImmutableList(),
                         hasMore,
                     ),
                 )
@@ -64,13 +66,13 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun query(query: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             this@HistoryViewModel.query.emit(query)
         }
     }
 
     private fun queryInternal(query: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             try {
                 val searchEntries = historyManager.query(query)
 
@@ -110,7 +112,7 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun clearHistory() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             historyManager.clearHistory()
         }
     }

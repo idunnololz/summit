@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.idunnololz.summit.util.CustomScrollViewPager
+<androidx.slidingpanelayout.widget.SlidingPaneLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/top_view_pager"
+    android:id="@+id/sliding_pane_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -100,13 +100,19 @@
                     </HorizontalScrollView>
                 </LinearLayout>
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tab_layout"
-                    android:layout_width="wrap_content"
+                <FrameLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?backgroundColor"
-                    android:layout_gravity="center_horizontal"
-                    app:tabMode="scrollable"/>
+                    android:background="@drawable/tabs_background">
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tab_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@null"
+                        app:tabMode="scrollable"/>
+                </FrameLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
             <FrameLayout
@@ -213,4 +219,4 @@
         android:layout_height="match_parent"
         android:background="?backgroundColor">
     </androidx.fragment.app.FragmentContainerView>
-</com.idunnololz.summit.util.CustomScrollViewPager>
+</androidx.slidingpanelayout.widget.SlidingPaneLayout>

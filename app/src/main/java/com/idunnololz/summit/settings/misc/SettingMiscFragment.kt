@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.navigation.fragment.findNavController
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingMiscBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.MiscSettings
@@ -186,6 +188,29 @@ class SettingMiscFragment :
                 preferences.saveDraftsAutomatically = it
             },
         )
+        settings.largeScreenSupport.bindTo(
+            binding.largeScreenSupport,
+            { preferences.globalLayoutMode == GlobalLayoutModes.Auto },
+            {
+                if (it) {
+                    preferences.globalLayoutMode = GlobalLayoutModes.Auto
+                } else {
+                    preferences.globalLayoutMode = GlobalLayoutModes.SmallScreen
+                }
+                getMainActivity()?.onPreferencesChanged()
+            },
+        )
+        if (BuildConfig.DEBUG) {
+            settings.rotateInstanceOnUploadFail.bindTo(
+                binding.rotateInstanceOnUploadFail,
+                { preferences.rotateInstanceOnUploadFail },
+                {
+                    preferences.rotateInstanceOnUploadFail = it
+                },
+            )
+        } else {
+            binding.rotateInstanceOnUploadFail.root.visibility = View.GONE
+        }
         settings.perCommunitySettings.bindTo(
             binding.perCommunitySettings,
         ) {

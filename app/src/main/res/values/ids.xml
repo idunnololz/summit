@@ -174,4 +174,5 @@
     <item name="ca_more" type="id" />
     <item name="ca_reply" type="id" />
     <item name="ca_save_toggle" type="id" />
+    <item name="is_single_line" type="id" />
 </resources>

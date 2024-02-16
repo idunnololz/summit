@@ -33,8 +33,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.Collections
 
 @AndroidEntryPoint
-class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener{
+class CustomQuickActionsFragment :
+    BaseFragment<FragmentCustomQuickActionsBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: CustomQuickActionsViewModel by viewModels()
 
@@ -85,7 +86,6 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
 
                             else -> false
                         }
-
                 },
             )
         }
@@ -98,8 +98,10 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
                 },
             ).apply {
                 setItems(
-                    (viewModel.preferences.commentQuickActions
-                        ?: CommentQuickActionsSettings())
+                    (
+                        viewModel.preferences.commentQuickActions
+                            ?: CommentQuickActionsSettings()
+                        )
                         .actions,
                 )
             }
@@ -111,8 +113,10 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
 
             viewModel.settingsChangedLiveData.observe(viewLifecycleOwner) {
                 adapter.setItems(
-                    (viewModel.preferences.commentQuickActions
-                        ?: CommentQuickActionsSettings())
+                    (
+                        viewModel.preferences.commentQuickActions
+                            ?: CommentQuickActionsSettings()
+                        )
                         .actions,
                 )
             }
@@ -126,12 +130,12 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
 
         private sealed class Item {
             data object QuickActionsTitle : Item()
-            data object InactiveActionsTitle: Item()
+            data object InactiveActionsTitle : Item()
             data class QuickAction(
                 val actionId: Int,
                 @DrawableRes val icon: Int,
                 val name: String,
-            ): Item()
+            ) : Item()
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -148,13 +152,11 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
                 clazz = Item.QuickActionsTitle::class,
                 inflateFn = QuickActionsTitleBinding::inflate,
             ) { item, b, h ->
-
             }
             addItemType(
                 clazz = Item.InactiveActionsTitle::class,
                 inflateFn = InactiveActionsTitleBinding::inflate,
             ) { item, b, h ->
-
             }
         }
         private val ith: ItemTouchHelper
@@ -273,7 +275,6 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
         }
 
         fun refreshItems() {
-
             fun toQuickAction(actionId: Int): Item.QuickAction? {
                 val icon: Int
                 val name: String
@@ -365,7 +366,6 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
             quickActions = newQuickActions
             onQuickActionsChanged(newQuickActions)
         }
-
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

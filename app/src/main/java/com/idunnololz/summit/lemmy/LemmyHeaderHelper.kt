@@ -205,21 +205,23 @@ class LemmyHeaderHelper(
         }
 
         if (wrapHeader) {
-            currentTextView.isSingleLine = false
-            currentTextView.maxLines = 2
+            currentTextView.setSingleLineAvoidingRelayout(false)
+            if (currentTextView.maxLines != 2) {
+                currentTextView.maxLines = 2
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
             }
             headerContainer.multiline = false
         } else if (useMultilineHeader) {
-            currentTextView.text = sb
             currentTextView.movementMethod = makeMovementMethod(
                 instance = instance,
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
-            currentTextView.isSingleLine = true
+            currentTextView.text = sb
+            currentTextView.setSingleLineAvoidingRelayout(true)
             headerContainer.multiline = true
 
             currentTextView = headerContainer.textView2
@@ -560,4 +562,12 @@ inline fun SpannableStringBuilder.appendSeparator() {
         e - 1,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
+}
+
+fun TextView.setSingleLineAvoidingRelayout(isSingleLine: Boolean) {
+    if (this.getTag(R.id.is_single_line) as? Boolean == isSingleLine) {
+        return
+    }
+    this.isSingleLine = false
+    this.setTag(R.id.is_single_line, isSingleLine)
 }

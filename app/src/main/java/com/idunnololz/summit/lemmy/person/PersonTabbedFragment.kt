@@ -31,7 +31,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.SortTypeMenuHelper
@@ -76,7 +76,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     lateinit var accountManager: AccountManager
 
     val viewModel: PersonTabbedViewModel by viewModels()
-    var viewPagerController: ViewPagerController? = null
+    var slidingPaneController: SlidingPaneController? = null
     val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var isAnimatingTitleIn: Boolean = false
@@ -116,8 +116,10 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
         onPersonChanged()
 
-        binding.fab.hide()
         with(binding) {
+            binding.fab.hide()
+            binding.tabLayoutContainer.visibility = View.GONE
+
             if (args.personRef == null) {
                 viewModel.currentAccountView.observe(viewLifecycleOwner) {
                     it.loadProfileImageOrDefault(binding.accountImageView)
@@ -177,32 +179,19 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 }
             }
 
-            viewPagerController = ViewPagerController(
-                this@PersonTabbedFragment,
-                topViewPager,
-                childFragmentManager,
-                viewModel,
-                true,
-                compatibilityMode = preferences.compatibilityMode,
+            slidingPaneController = SlidingPaneController(
+                fragment = this@PersonTabbedFragment,
+                slidingPaneLayout = binding.slidingPaneLayout,
+                childFragmentManager = childFragmentManager,
+                viewModel = viewModel,
+                globalLayoutMode = preferences.globalLayoutMode,
+                lockPanes = true,
                 retainClosedPosts = preferences.retainLastPost,
-            ) {
-                if (it == 0) {
-                    val lastSelectedPost = viewModel.lastSelectedPost
-                    if (lastSelectedPost != null) {
-                        // We came from a post...
-//                        adapter?.highlightPost(lastSelectedPost)
-                        viewModel.lastSelectedPost = null
-                    }
-                } else {
-                    val lastSelectedPost = viewModel.lastSelectedPost
-                    if (lastSelectedPost != null) {
-//                        adapter?.highlightPostForever(lastSelectedPost)
-                    }
+            ).apply {
+                onPageSelectedListener = { isOpen ->
                 }
-            }.apply {
                 init()
             }
-            topViewPager.disableLeftSwipe = true
 
             binding.title.alpha = 0f
             isAnimatingTitleIn = false
@@ -255,7 +244,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             binding.profileIcon.visibility = View.GONE
             binding.collapsingToolbarContent.visibility = View.GONE
             binding.viewPager.visibility = View.GONE
-            binding.tabLayout.visibility = View.GONE
+            binding.tabLayoutContainer.visibility = View.GONE
             binding.fab.hide()
 
             viewModel.clearPersonData()
@@ -264,7 +253,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             binding.profileIcon.visibility = View.VISIBLE
             binding.collapsingToolbarContent.visibility = View.VISIBLE
             binding.viewPager.visibility = View.VISIBLE
-            binding.tabLayout.visibility = View.VISIBLE
+            binding.tabLayoutContainer.visibility = View.VISIBLE
             binding.fab.show()
 
             viewModel.fetchPersonIfNotDone(personRef)
@@ -343,7 +332,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         super.onResume()
 
         if (binding.viewPager.currentItem == 0) {
-            getMainActivity()?.setNavUiOpenness(0f)
+            getMainActivity()?.setNavUiOpenPercent(0f)
         }
     }
 
@@ -452,6 +441,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 viewPager.adapter = adapter
             }
 
+            tabLayoutContainer.visibility = View.VISIBLE
             TabLayoutMediator(
                 tabLayout,
                 binding.viewPager,
@@ -461,7 +451,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     }
 
     fun closePost(postFragment: PostFragment) {
-        viewPagerController?.closePost(postFragment)
+        slidingPaneController?.closePost(postFragment)
     }
 
     override fun navigateToSignInScreen() {
