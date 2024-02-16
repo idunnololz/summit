@@ -30,6 +30,7 @@ class LemmyAppBarController(
     private val customActionBar: ViewGroup = binding.customActionBar
     private val accountChip: Chip = binding.accountChip
     private val accountImageView: ShapeableImageView = binding.accountImageView
+    private val accountHitRegion: View = binding.accountHitRegion
     private val communityTextView: Chip = binding.communityTextView
     private val pageTextView: TextView = binding.pageTextView
 
@@ -48,10 +49,7 @@ class LemmyAppBarController(
             controller.onChangeInstanceClick = onChangeInstanceClick
         }
 
-        accountChip.setOnClickListener {
-            onAccountClick(null)
-        }
-        accountImageView.setOnClickListener {
+        accountHitRegion.setOnClickListener {
             val account = it.tag as? Account
             onAccountClick(account)
         }
@@ -185,6 +183,8 @@ class LemmyAppBarController(
     }
 
     fun onAccountChanged(it: AccountView?) {
+        accountHitRegion.tag = it?.account
+
         if (it == null) {
             accountChip.visibility = View.VISIBLE
             accountImageView.visibility = View.INVISIBLE
@@ -197,7 +197,6 @@ class LemmyAppBarController(
             accountChip.visibility = View.INVISIBLE
             accountImageView.visibility = View.VISIBLE
 
-            accountImageView.tag = it.account
             accountImageView.load(it.profileImage) {
                 allowHardware(false)
                 placeholder(R.drawable.baseline_person_24)

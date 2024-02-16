@@ -280,22 +280,21 @@ class InboxFragment :
             .registerStartPanelStateListeners(
                 object : OverlappingPanelsLayout.PanelStateListener {
                     override fun onPanelStateChange(panelState: PanelState) {
-                        Log.d(TAG, "panelState: $panelState")
                         when (panelState) {
                             PanelState.Closed -> {
-                                getMainActivity()?.setNavUiOpenness(0f)
+                                getMainActivity()?.setNavUiOpenPercent(0f)
 
                                 updatePaneBackPressHandler()
                             }
                             is PanelState.Closing -> {
-                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
                             }
                             PanelState.Opened -> {
-                                getMainActivity()?.setNavUiOpenness(100f)
+                                getMainActivity()?.setNavUiOpenPercent(100f)
                                 updatePaneBackPressHandler()
                             }
                             is PanelState.Opening -> {
-                                getMainActivity()?.setNavUiOpenness(panelState.progress)
+                                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
                             }
                         }
                     }

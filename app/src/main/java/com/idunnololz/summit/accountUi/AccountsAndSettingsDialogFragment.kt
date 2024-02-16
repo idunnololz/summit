@@ -125,6 +125,8 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                     is StatefulData.NotStarted -> {}
                     is StatefulData.Success -> {
                         loadingView.hideAll()
+
+                        binding.recyclerView.scrollToPosition(0)
                         adapter.setAccounts(it.data)
                     }
                 }

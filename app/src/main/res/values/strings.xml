@@ -883,6 +883,12 @@
     <string name="inactive_actions_desc">Unused actions (drop below to hide action)</string>
     <string name="vote_actions">Vote actions</string>
     <string name="warn_reset_settings">Reset settings to defaults values?</string>
+    <string name="large_screen_support">Large screen support</string>
+    <string name="large_screen_support_desc">When enabled, certain screens will utilize different layouts to try to use as much of the screen as possible.</string>
+    <string name="show_filtered_posts">Show filtered posts</string>
+    <string name="show_filtered_posts_desc">When enabled, posts filtered by the filtering rules will appear as a collapsed item.</string>
+    <string name="subscribed_communities">Subscribed communities</string>
+    <string name="post_filtered_format">This post has been filtered. Filter reason: %1$s.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

@@ -28,7 +28,7 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
-import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
@@ -67,7 +67,7 @@ class SearchTabbedFragment :
 
     val viewModel: SearchViewModel by viewModels()
     val actionsViewModel: MoreActionsViewModel by viewModels()
-    var viewPagerController: ViewPagerController? = null
+    var slidingPaneController: SlidingPaneController? = null
 
     private var searchSuggestionsAdapter: CustomSearchSuggestionsAdapter? = null
 
@@ -238,32 +238,32 @@ class SearchTabbedFragment :
                 },
             )
 
-            viewPagerController = ViewPagerController(
-                this@SearchTabbedFragment,
-                topViewPager,
-                childFragmentManager,
-                viewModel,
-                true,
-                compatibilityMode = preferences.compatibilityMode,
+            slidingPaneController = SlidingPaneController(
+                fragment = this@SearchTabbedFragment,
+                slidingPaneLayout = binding.slidingPaneLayout,
+                childFragmentManager = childFragmentManager,
+                viewModel = viewModel,
+                globalLayoutMode = preferences.globalLayoutMode,
+                lockPanes = true,
                 retainClosedPosts = preferences.retainLastPost,
-            ) {
-                if (it == 0) {
-                    val lastSelectedPost = viewModel.lastSelectedPost
-                    if (lastSelectedPost != null) {
-                        // We came from a post...
+            ).apply {
+                onPageSelectedListener = { isOpen ->
+                    if (!isOpen) {
+                        val lastSelectedPost = viewModel.lastSelectedPost
+                        if (lastSelectedPost != null) {
+                            // We came from a post...
 //                        adapter?.highlightPost(lastSelectedPost)
-                        viewModel.lastSelectedPost = null
-                    }
-                } else {
-                    val lastSelectedPost = viewModel.lastSelectedPost
-                    if (lastSelectedPost != null) {
+                            viewModel.lastSelectedPost = null
+                        }
+                    } else {
+                        val lastSelectedPost = viewModel.lastSelectedPost
+                        if (lastSelectedPost != null) {
 //                        adapter?.highlightPostForever(lastSelectedPost)
+                        }
                     }
                 }
-            }.apply {
                 init()
             }
-            topViewPager.disableLeftSwipe = true
 
             installOnActionResultHandler(
                 actionsViewModel = actionsViewModel,
@@ -551,7 +551,7 @@ class SearchTabbedFragment :
     }
 
     fun closePost(postFragment: PostFragment) {
-        viewPagerController?.closePost(postFragment)
+        slidingPaneController?.closePost(postFragment)
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

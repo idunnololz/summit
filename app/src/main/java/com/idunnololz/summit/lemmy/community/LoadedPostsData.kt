@@ -1,14 +1,14 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.os.Parcelable
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.lemmy.LocalPostView
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class LoadedPostsData(
-    val posts: List<PostView>,
+    val posts: List<LocalPostView>,
     val instance: String,
     val pageIndex: Int,
     val hasMore: Boolean,

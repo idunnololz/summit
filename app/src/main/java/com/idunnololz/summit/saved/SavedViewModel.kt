@@ -16,11 +16,12 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentPageResult
+import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
-import com.idunnololz.summit.lemmy.community.ViewPagerController
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
@@ -41,7 +42,7 @@ class SavedViewModel @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
     private val savedManager: SavedManager,
-) : ViewModel(), ViewPagerController.PostViewPagerViewModel {
+) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
         private const val TAG = "SavedViewModel"
@@ -69,7 +70,6 @@ class SavedViewModel @Inject constructor(
     private var fetchingCommentPages = mutableSetOf<Int>()
 
     override var lastSelectedPost: PostRef? = null
-    override val viewPagerAdapter = ViewPagerController.ViewPagerAdapter()
 
     init {
         fetchPostPage(0, false)
@@ -150,7 +150,9 @@ class SavedViewModel @Inject constructor(
                     if (postListEngine.hasMore || force) {
                         postListEngine.addPage(
                             LoadedPostsData(
-                                it,
+                                it.map {
+                                    LocalPostView(it, null)
+                                },
                                 apiClient.instance,
                                 pageIndex,
                                 it.size == PAGE_SIZE,

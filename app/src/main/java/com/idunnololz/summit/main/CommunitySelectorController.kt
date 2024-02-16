@@ -32,6 +32,7 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.CommunitySelectorCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorCurrentCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
@@ -54,10 +55,8 @@ import com.idunnololz.summit.util.toErrorMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -76,6 +75,7 @@ class CommunitySelectorController @AssistedInject constructor(
     private val accountInfoManager: AccountInfoManager,
     private val lemmyApiClient: AccountAwareLemmyClient,
     private val recentCommunityManager: RecentCommunityManager,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
     @AssistedFactory
     interface Factory {
@@ -96,7 +96,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
-    private var coroutineScope = createCoroutineScope()
+    private var coroutineScope = coroutineScopeFactory.create()
 
     private val adapter = CommunitiesAdapter(
         onCurrentInstanceClick = {
@@ -293,7 +293,7 @@ class CommunitySelectorController @AssistedInject constructor(
     fun hide() {
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
         coroutineScope.cancel()
-        coroutineScope = createCoroutineScope()
+        coroutineScope = coroutineScopeFactory.create()
         binding.recyclerView.adapter = null
     }
 
@@ -307,9 +307,6 @@ class CommunitySelectorController @AssistedInject constructor(
             }
         }
     }
-
-    private fun createCoroutineScope() =
-        CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     fun setCurrentCommunity(communityRef: CommunityRef?) {
         currentCommunity = communityRef

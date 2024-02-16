@@ -101,7 +101,7 @@ class SavedCommentsFragment :
                 getMainActivity()?.launchPage(it)
             },
             onCommentClick = {
-                parentFragment.viewPagerController?.openComment(
+                parentFragment.slidingPaneController?.openComment(
                     it.instance,
                     it.id,
                 )

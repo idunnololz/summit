@@ -20,7 +20,7 @@ class CustomQuickActionsViewModel @Inject constructor(
     fun updateCommentQuickActions(quickActions: List<CommentQuickActionId>) {
         viewModelScope.launch {
             preferences.commentQuickActions = CommentQuickActionsSettings(
-                quickActions
+                quickActions,
             )
         }
     }
@@ -32,5 +32,4 @@ class CustomQuickActionsViewModel @Inject constructor(
             settingsChangedLiveData.postValue(Unit)
         }
     }
-
 }

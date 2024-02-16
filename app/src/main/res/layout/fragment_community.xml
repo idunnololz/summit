@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.idunnololz.summit.util.CustomScrollViewPager
+<androidx.slidingpanelayout.widget.SlidingPaneLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/view_pager"
+    android:id="@+id/sliding_pane_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/sliding_pane_first_child_width"
         android:layout_height="match_parent">
 
         <include
             android:id="@+id/custom_app_bar"
             layout="@layout/custom_app_bar"/>
-
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -79,13 +78,21 @@
                 android:layout_margin="@dimen/padding"
                 app:srcCompat="@drawable/baseline_more_horiz_24"/>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/pane_divider"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:visibility="gone"
+            android:translationZ="20dp"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/post_fragment_container"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/sliding_pane_second_child_width"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:background="?backgroundColor">
     </androidx.fragment.app.FragmentContainerView>
-
-</com.idunnololz.summit.util.CustomScrollViewPager>
+</androidx.slidingpanelayout.widget.SlidingPaneLayout>

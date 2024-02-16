@@ -30,7 +30,7 @@ class AccountsViewModel @Inject constructor(
     fun signOut(account: Account) {
         signOut.setIsLoading()
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             accountManager.signOut(account)
             signOut.postValue(Unit)
 
@@ -41,17 +41,19 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun switchAccount(account: GuestOrUserAccount) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             accountManager.setCurrentAccount(account)
 
-            refreshAccounts()
+            withContext(Dispatchers.Main) {
+                refreshAccounts()
+            }
         }
     }
 
     fun refreshAccounts() {
         accounts.setIsLoading()
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val accountViews = accountManager.getAccounts().map {
                 accountInfoManager.getAccountViewForAccount(it)
             }

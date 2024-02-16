@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.util.LayoutDirection
 import android.view.Gravity
 import android.view.View
 import android.view.View.LAYOUT_DIRECTION_LTR
@@ -24,7 +23,6 @@ import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
-import androidx.core.view.children
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
@@ -34,6 +32,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
+import coil.dispose
 import coil.load
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
@@ -71,13 +70,13 @@ import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.lemmy.toPersonRef
-import com.idunnololz.summit.preferences.CommentQuickActionIds
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId
+import com.idunnololz.summit.preferences.CommentQuickActionIds
 import com.idunnololz.summit.preferences.CommentQuickActionsSettings
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PreferenceManager
@@ -726,7 +725,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                             root = rb.root,
                             isCompact = isCompactView,
                             leftHandMode = leftHandMode,
-                            showUpAndDownVotes = showUpAndDownVotes
+                            showUpAndDownVotes = showUpAndDownVotes,
                         )
                     }
                     is PostCommentExpandedCompactItemBinding -> {
@@ -764,7 +763,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                                 root = root,
                                 isCompact = isCompactView,
                                 leftHandMode = leftHandMode,
-                                showUpAndDownVotes = showUpAndDownVotes
+                                showUpAndDownVotes = showUpAndDownVotes,
                             )
                         } else {
                             ensureActionButtons(
@@ -772,7 +771,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                                 isCompact = isCompactView,
                                 leftHandMode = leftHandMode,
                                 showUpAndDownVotes = showUpAndDownVotes,
-                                removeOnly = true
+                                removeOnly = true,
                             )
                         }
                     }
@@ -812,6 +811,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
             if (commentView.creator.avatar != null) {
                 iconImageView.load(commentView.creator.avatar) {
+                    placeholder(R.drawable.thumbnail_placeholder_square)
                     allowHardware(false)
                 }
             } else {
@@ -819,7 +819,8 @@ class PostAndCommentViewBuilder @Inject constructor(
                     val d = accountImageGenerator.generateDrawableForPerson(commentView.creator)
 
                     withContext(Dispatchers.Main) {
-                        iconImageView.load(d)
+                        iconImageView.dispose()
+                        iconImageView.setImageDrawable(d)
                     }
                 }
                 headerView.setTag(R.id.generate_profile_icon_job, job)
@@ -880,7 +881,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             )
         }
 
-        mediaContainer.removeAllViews()
+        if (mediaContainer.childCount > 0) {
+            mediaContainer.removeAllViews()
+        }
         mediaContainer.visibility = View.GONE
 
         collapseSectionButton.setOnClickListener {
@@ -1448,7 +1451,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     private fun makeCommentActionButton(
-        @IdRes idRes: Int
+        @IdRes idRes: Int,
     ) =
         ImageView(
             context,
@@ -1490,6 +1493,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
         val quickActionsBar = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
+            setPadding(
+                0,
+                Utils.convertDpToPixel(8f).toInt(),
+                0,
+                Utils.convertDpToPixel(8f).toInt(),
+            )
         }
         if (!leftHandMode) {
             quickActionsBarContainer.layoutDirection = LAYOUT_DIRECTION_RTL
@@ -1643,7 +1652,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     }
                 }
                 CommentQuickActionIds.Save -> {
-                    makeCommentActionButton(R.id.ca_save).apply {
+                    makeCommentActionButton(R.id.ca_save_toggle).apply {
                         setImageResource(R.drawable.baseline_bookmark_24)
                         quickActionsBar.addView(this)
                         actionButtons.add(this)

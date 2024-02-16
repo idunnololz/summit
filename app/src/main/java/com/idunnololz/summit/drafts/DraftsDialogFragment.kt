@@ -144,7 +144,7 @@ class DraftsDialogFragment :
                                             accountId = it.data.accountId,
                                             accountInstance = it.data.accountInstance,
                                             targetCommunityFullName = "",
-                                        )
+                                        ),
                                     )
                                 is DraftData.PostDraftData -> it
                                 null -> null
@@ -163,7 +163,7 @@ class DraftsDialogFragment :
                                             content = it.data.body ?: "",
                                             accountId = it.data.accountId,
                                             accountInstance = it.data.accountInstance,
-                                        )
+                                        ),
                                     )
                                 null -> null
                             }
@@ -173,7 +173,7 @@ class DraftsDialogFragment :
 
                     setFragmentResult(
                         REQUEST_KEY,
-                        bundleOf(REQUEST_KEY_RESULT to draft)
+                        bundleOf(REQUEST_KEY_RESULT to draft),
                     )
                     dismiss()
                 },

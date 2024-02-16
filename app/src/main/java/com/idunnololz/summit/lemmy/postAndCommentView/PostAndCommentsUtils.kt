@@ -155,7 +155,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
                 actionsViewModel = actionsViewModel,
                 fragmentManager = fragmentManager,
                 onLoadComment = onLoadComment,
-                onScreenshotClick = onScreenshotClick
+                onScreenshotClick = onScreenshotClick,
             )(it.id)
         }
     }
@@ -296,7 +296,7 @@ fun BaseFragment<*>.createCommentActionHandler(
                 actionsViewModel = actionsViewModel,
                 fragmentManager = fragmentManager,
                 onLoadComment = onLoadComment,
-                onScreenshotClick = onScreenshotClick
+                onScreenshotClick = onScreenshotClick,
             )
         }
     }

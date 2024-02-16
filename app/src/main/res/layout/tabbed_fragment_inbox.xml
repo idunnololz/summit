@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.viewpager2.widget.ViewPager2
+<androidx.slidingpanelayout.widget.SlidingPaneLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/view_pager"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sliding_pane_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="@dimen/sliding_pane_first_child_width"
+        android:layout_height="match_parent"
+        android:background="?backgroundColor">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/inbox_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/pane_divider"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:visibility="gone"
+            android:translationZ="20dp"/>
+
+    </FrameLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/message_fragment_container"
+        android:layout_width="@dimen/sliding_pane_second_child_width"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?backgroundColor"/>
+</androidx.slidingpanelayout.widget.SlidingPaneLayout>

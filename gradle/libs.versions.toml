@@ -8,20 +8,20 @@ javaStringSimilarity = "2.0.0"
 imagepicker = "2.3.22"
 kotlin = "1.9.10"
 ksp = "1.9.10-1.0.13"
-kotlinx = "1.7.1"
+kotlinx = "1.7.3"
 moshiSealedCodegen = "0.22.1"
 moshiSealedRuntime = "0.22.1"
-navigation = "2.7.6"
+navigation = "2.7.7"
 markwon = "4.6.2"
 room = "2.6.1"
-lifecycle = "2.6.2"
+lifecycle = "2.7.0"
 moshi = "1.15.0"
-media3 = "1.2.0"
+media3 = "1.2.1"
 fresco = "2.6.0"
 transformations = "2.0.2"
 viewpump = "2.0.3"
 work = "2.9.0"
-coil = "2.4.0"
+coil = "2.5.0"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
@@ -63,7 +63,7 @@ media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3"}
 media3-transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
 
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.7.0" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.7.2" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 
@@ -104,7 +104,7 @@ mp-android-chart = { module = "com.github.PhilJay:MPAndroidChart", version = "v3
 disklrucache = { module = "com.jakewharton:disklrucache", version = "2.0.2" }
 billing-ktx = { module = "com.android.billingclient:billing-ktx", version = "6.1.0" }
 asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflater", version = "1.0.0" }
-okio = { module = "com.squareup.okio:okio", version = "3.3.0" }
+okio = { module = "com.squareup.okio:okio", version = "3.6.0" }
 zoom-layout = { module = "com.otaliastudios:zoomlayout", version = "1.9.0" }
 gson = {module = "com.google.code.gson:gson", version = "2.10.1"}
 process-phoenix = {module = "com.jakewharton:process-phoenix", version = "2.1.2"}

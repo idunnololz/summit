@@ -176,7 +176,7 @@ object LemmyTextHelper {
          * 3) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
          * 4) Matches against full community names (!a@b.com)
          */
-        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n)*?)(:::\s*\n?|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]+)""")
+        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n)*?)(:::\s*\n?|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""")
 
         private fun processAll(s: String): String {
             val matcher = largeRegex.matcher(s)

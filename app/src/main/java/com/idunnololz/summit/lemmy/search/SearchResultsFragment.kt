@@ -201,7 +201,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     getMainActivity()?.showBottomMenuForLink(url, text)
                 },
                 onCommentClick = {
-                    parentFragment.viewPagerController?.openComment(
+                    parentFragment.slidingPaneController?.openComment(
                         it.instance,
                         it.id,
                     )
@@ -215,7 +215,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         reveal,
                         videoState, ->
 
-                    parentFragment.viewPagerController?.openPost(
+                    parentFragment.slidingPaneController?.openPost(
                         instance = instance,
                         id = id,
                         reveal = reveal,

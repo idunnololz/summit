@@ -8,5 +8,6 @@ class CommentQuickActionsSettings(
         listOf(
             CommentQuickActionIds.Voting,
             CommentQuickActionIds.Reply,
-        )
+            CommentQuickActionIds.Save,
+        ),
 )

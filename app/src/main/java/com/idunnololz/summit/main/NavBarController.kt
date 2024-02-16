@@ -6,7 +6,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
@@ -16,10 +15,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.window.layout.WindowMetricsCalculator
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
 import com.google.android.material.navigationrail.NavigationRailView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.preferences.GlobalLayoutMode
+import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.navigation.NavBarConfig
@@ -35,7 +37,7 @@ class NavBarController(
 ) {
 
     companion object {
-        private const val TAG = "BottomNavController"
+        private const val TAG = "NavBarController"
     }
 
     private val context = activity
@@ -47,8 +49,10 @@ class NavBarController(
 
     var useBottomNavBar = true
     var navRailMode = NavigationRailModeId.Auto
+    var globalLayoutMode: GlobalLayoutMode = GlobalLayoutModes.Auto
 
     lateinit var navBar: NavigationBarView
+    lateinit var navBarContainer: View
 
     var newLeftInset: Int = 0
     var newRightInset: Int = 0
@@ -59,7 +63,7 @@ class NavBarController(
                 if (useNavigationRail) {
                     0
                 } else {
-                    navBar.height
+                    navBarContainer.height
                 }
             } else {
                 0
@@ -69,10 +73,10 @@ class NavBarController(
         get() =
             if (useBottomNavBar) {
                 if (useNavigationRail) {
-                    if (navBar.width == 0) {
+                    if (navBarContainer.width == 0) {
                         activity.getDimen(com.google.android.material.R.dimen.m3_navigation_rail_default_width)
                     } else {
-                        navBar.width
+                        navBarContainer.width
                     }
                 } else {
                     0
@@ -81,24 +85,22 @@ class NavBarController(
                 0
             }
 
-    val bottomNavViewOffset = MutableLiveData<Int>(0)
-    val bottomNavViewAnimationOffset = MutableLiveData<Float>(0f)
-    val bottomNavOpenness: Float
-        get() = (
-            bottomNavViewOffset.value!!.toFloat() +
-                bottomNavViewAnimationOffset.value!!.toFloat()
-            ) / navBar.height
+    val navBarOffsetPercent = MutableLiveData<Float>(0f)
+    val bottomNavViewAnimationOffsetPercent = MutableLiveData<Float>(0f)
+    val bottomNavOpenPercent: Float
+        get() = navBarOffsetPercent.value!! +
+            bottomNavViewAnimationOffsetPercent.value!!
     var useCustomNavBar: Boolean = false
 
     private var enableBottomNavViewScrolling = false
     private var navBarConfig: NavBarConfig = NavBarConfig()
 
     init {
-        bottomNavViewOffset.observe(lifecycleOwner) {
-            updateOpenness(bottomNavOpenness)
+        navBarOffsetPercent.observe(lifecycleOwner) {
+            updateOpenness(bottomNavOpenPercent)
         }
-        bottomNavViewAnimationOffset.observe(lifecycleOwner) {
-            updateOpenness(bottomNavOpenness)
+        bottomNavViewAnimationOffsetPercent.observe(lifecycleOwner) {
+            updateOpenness(bottomNavOpenPercent)
         }
     }
 
@@ -143,11 +145,11 @@ class NavBarController(
 
         val navBarChanged = ::navBar.isInitialized
         if (navBarChanged) {
-            contentView.removeView(navBar)
+            contentView.removeView(navBarContainer)
         }
 
         navBar = if (useNavigationRail) {
-            val v = NavigationRailView(activity).apply {
+            NavigationRailView(activity).apply {
                 setBackgroundColor(
                     activity.getColorFromAttribute(
                         com.google.android.material.R.attr.backgroundColor,
@@ -156,30 +158,8 @@ class NavBarController(
                 inflateMenu(R.menu.bottom_navigation_menu)
                 labelVisibilityMode = LABEL_VISIBILITY_LABELED
             }
-
-            contentView.addView(v)
-//            val divider = MaterialDivider(context)
-//            v.addView(divider)
-//            divider.apply {
-//                updateLayoutParams<FrameLayout.LayoutParams> {
-//                    width = Utils.convertDpToPixel(1f).toInt()
-//                    height = MarginLayoutParams.MATCH_PARENT
-//                    gravity = Gravity.END
-//                }
-//            }
-//            contentView.doOnPreDraw {
-//                divider.translationX = navBar.width.toFloat()
-//            }
-
-            v.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                width = CoordinatorLayout.LayoutParams.WRAP_CONTENT
-                height = CoordinatorLayout.LayoutParams.MATCH_PARENT
-                gravity = Gravity.START
-            }
-
-            v
         } else {
-            val v = BottomNavigationView(activity).apply {
+            BottomNavigationView(activity).apply {
                 setBackgroundColor(
                     activity.getColorFromAttribute(
                         com.google.android.material.R.attr.colorSurface,
@@ -188,16 +168,44 @@ class NavBarController(
                 inflateMenu(R.menu.bottom_navigation_menu)
                 labelVisibilityMode = LABEL_VISIBILITY_LABELED
             }
+        }
 
-            contentView.addView(v)
+        navBarContainer = if (useNavigationRail) {
+            FrameLayout(context).apply {
+                val materialDivider = MaterialDivider(context)
 
-            v.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                addView(navBar)
+                addView(materialDivider)
+
+                navBar.updateLayoutParams<FrameLayout.LayoutParams> {
+                    width = CoordinatorLayout.LayoutParams.WRAP_CONTENT
+                    height = CoordinatorLayout.LayoutParams.MATCH_PARENT
+                    gravity = Gravity.START
+                }
+                materialDivider.updateLayoutParams<FrameLayout.LayoutParams> {
+                    width = context.resources.getDimensionPixelSize(R.dimen.divider_size)
+                    height = FrameLayout.LayoutParams.MATCH_PARENT
+                    gravity = Gravity.END
+                }
+            }
+        } else {
+            navBar
+        }
+
+        contentView.addView(navBarContainer)
+
+        if (useNavigationRail) {
+            navBarContainer.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                width = CoordinatorLayout.LayoutParams.WRAP_CONTENT
+                height = CoordinatorLayout.LayoutParams.MATCH_PARENT
+                gravity = Gravity.START
+            }
+        } else {
+            navBarContainer.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                 width = CoordinatorLayout.LayoutParams.MATCH_PARENT
                 height = CoordinatorLayout.LayoutParams.WRAP_CONTENT
                 gravity = Gravity.BOTTOM
             }
-
-            v
         }
 
         if (navBarChanged) {
@@ -240,10 +248,12 @@ class NavBarController(
     fun updateOpenness(navOpenness: Float) {
         if (!useBottomNavBar) return
 
+        Log.d(TAG, "updateOpenness(): $navOpenness")
+
         if (useNavigationRail) {
-            navBar.translationX = -navOpenness * navBar.width
+            navBarContainer.translationX = -navOpenness * navBarContainer.width
         } else {
-            navBar.translationY = navOpenness * navBar.height
+            navBarContainer.translationY = navOpenness * navBarContainer.height
         }
     }
 
@@ -265,72 +275,93 @@ class NavBarController(
             return
         }
 
-        val finalY =
+        Log.d(TAG, "showBottomNav() bottomNavigationView.height: ${navBarContainer.height} bottomNavOpenness: $bottomNavOpenPercent")
+
+        val navigationBarOffset =
             if (supportOpenness) {
-                bottomNavOpenness
+                bottomNavOpenPercent
             } else {
                 0f
-            }
+            } *
+                if (useNavigationRail) {
+                    navBarContainer.width.toFloat()
+                } else {
+                    navBarContainer.height.toFloat()
+                }
 
-        bottomNavViewOffset.value = 0
-        if (navBar.visibility != View.VISIBLE) {
-            navBar.visibility = View.VISIBLE
-            navBar.translationY =
-                navBar.height.toFloat()
-            Log.d(TAG, "bottomNavigationView.height: ${navBar.height}")
+        navBarOffsetPercent.value = 0f
 
-            navBar.post {
-                navBar.animate()
-                    .translationY(finalY).duration = 250
+        if (useNavigationRail) {
+            if (navBarContainer.visibility != View.VISIBLE) {
+                navBarContainer.visibility = View.VISIBLE
+                navBarContainer.translationX =
+                    -navBar.width.toFloat()
+
+                navBarContainer.post {
+                    navBarContainer.animate()
+                        .translationX(navigationBarOffset).duration = 250
+                }
+            } else {
+                if (navBarContainer.translationX == 0f) return
+
+                navBarContainer.animate()
+                    .translationX(navigationBarOffset).duration = 250
             }
         } else {
-            if (navBar.translationY == 0f) return
+            if (navBarContainer.visibility != View.VISIBLE) {
+                navBarContainer.visibility = View.VISIBLE
+                navBarContainer.translationY =
+                    navBarContainer.height.toFloat()
 
-            navBar.animate()
-                .translationY(finalY).duration = 250
+                navBarContainer.post {
+                    navBarContainer.animate()
+                        .translationY(navigationBarOffset).duration = 250
+                }
+            } else {
+                if (navBarContainer.translationY == 0f) return
+
+                navBarContainer.animate()
+                    .translationY(navigationBarOffset).duration = 250
+            }
         }
     }
 
     fun hideNavBar(animate: Boolean) {
         if (!useBottomNavBar) return
 
-        Log.d(TAG, "bottomNavigationView.height: ${navBar.height}")
-
         if (useNavigationRail) {
             if (animate) {
-                if (navBar.translationX > -navBar.width.toFloat()) {
-                    navBar.animate()
-                        .translationX(-navBar.height.toFloat())
+                if (navBarContainer.translationX > -navBarContainer.width.toFloat()) {
+                    navBarContainer.animate()
+                        .translationX(-navBarContainer.width.toFloat())
                         .apply {
                             duration = 250
                         }
                 }
             } else {
-                navBar.translationX =
-                    -navBar.width.toFloat()
+                navBarContainer.translationX = -navBarContainer.width.toFloat()
             }
         } else {
             if (animate) {
-                if (navBar.translationY < navBar.height.toFloat()) {
-                    navBar.animate()
-                        .translationY(navBar.height.toFloat())
+                if (navBarContainer.translationY < navBarContainer.height.toFloat()) {
+                    navBarContainer.animate()
+                        .translationY(navBarContainer.height.toFloat())
                         .apply {
                             duration = 250
                         }
                 }
             } else {
-                navBar.translationY =
-                    navBar.height.toFloat()
+                navBarContainer.translationY = navBarContainer.height.toFloat()
             }
         }
     }
 
     fun updatePaddingForNavBar(contentContainer: View) {
         if (useNavigationRail) {
-            val width = if (navBar.width == 0) {
+            val width = if (navBarContainer.width == 0) {
                 activity.getDimen(com.google.android.material.R.dimen.m3_navigation_rail_default_width)
             } else {
-                navBar.width
+                navBarContainer.width
             }
 
             contentContainer.updatePaddingRelative(start = width)
@@ -344,6 +375,14 @@ class NavBarController(
         navRailMode = preferences.navigationRailMode
         useCustomNavBar = preferences.useCustomNavBar
         navBarConfig = preferences.navBarConfig
+        globalLayoutMode = preferences.globalLayoutMode
+
+        navRailMode =
+            if (globalLayoutMode == GlobalLayoutModes.SmallScreen) {
+                navRailMode
+            } else {
+                NavigationRailModeId.Auto
+            }
 
         onWindowSizeChanged()
 
@@ -430,7 +469,7 @@ class NavBarController(
         }
 
         if (!useBottomNavBar) {
-            navBar.visibility = View.GONE
+            navBarContainer.visibility = View.GONE
         }
     }
 

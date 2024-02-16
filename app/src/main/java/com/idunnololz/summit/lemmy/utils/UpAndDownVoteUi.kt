@@ -18,7 +18,7 @@ fun makeUpAndDownVoteButtons(
             ConstraintLayout.LayoutParams.WRAP_CONTENT,
             Utils.convertDpToPixel(48f).toInt(),
         )
-    }
+    },
 ): UpAndDownVoteUi {
     val downvoteButton = MaterialButton(
         context,

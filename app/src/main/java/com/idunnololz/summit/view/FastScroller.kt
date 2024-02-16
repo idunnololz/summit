@@ -71,6 +71,7 @@ class FastScroller : LinearLayout {
     private var scrollerOrientation: Int = 0
 
     private var isTouchingHandle = false
+    private var isHandleInitialized = false
 
     // TODO the name should be fixed, also check if there is a better way of handling the visibility, because this is somewhat convoluted
     private var maxVisibility: Int = 0
@@ -253,7 +254,10 @@ class FastScroller : LinearLayout {
         Log.d(TAG, "onLayout")
         super.onLayout(changed, l, t, r, b)
 
-        initHandleMovement()
+        if (!isHandleInitialized) {
+            isHandleInitialized = true
+            initHandleMovement()
+        }
 
         if (!isInEditMode) {
             // sometimes recycler starts with a defined scroll (e.g. when coming from saved state)

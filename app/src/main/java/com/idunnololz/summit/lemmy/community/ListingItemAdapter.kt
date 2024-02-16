@@ -11,6 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
+import com.idunnololz.summit.databinding.FilteredPostItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
@@ -108,7 +109,7 @@ class ListingItemAdapter(
     var seenItemPositions = mutableSetOf<Int>()
 
     override fun getItemViewType(position: Int): Int = when (items[position]) {
-        is Item.PostItem -> when (layout) {
+        is Item.VisiblePostItem -> when (layout) {
             CommunityLayout.Compact -> R.layout.listing_item_compact
             CommunityLayout.List -> R.layout.listing_item_list
             CommunityLayout.LargeList -> R.layout.listing_item_large_list
@@ -117,6 +118,7 @@ class ListingItemAdapter(
             CommunityLayout.Card3 -> R.layout.listing_item_card3
             CommunityLayout.Full -> R.layout.listing_item_full
         }
+        is Item.FilteredPostItem -> R.layout.filtered_post_item
         is Item.FooterItem -> R.layout.main_footer_item
         is Item.AutoLoadItem -> R.layout.auto_load_item
         Item.EndItem -> R.layout.post_list_end_item
@@ -144,6 +146,7 @@ class ListingItemAdapter(
                 ListingItemViewHolder.fromBinding(ListingItemCard3Binding.bind(v))
             R.layout.listing_item_full ->
                 ListingItemViewHolder.fromBinding(ListingItemFullBinding.bind(v))
+            R.layout.filtered_post_item -> ViewBindingViewHolder(FilteredPostItemBinding.bind(v))
             R.layout.main_footer_item -> ViewBindingViewHolder(MainFooterItemBinding.bind(v))
             R.layout.auto_load_item ->
                 ViewBindingViewHolder(AutoLoadItemBinding.bind(v))
@@ -169,7 +172,7 @@ class ListingItemAdapter(
         payloads: MutableList<Any>,
     ) {
         when (val item = items[position]) {
-            is Item.PostItem -> {
+            is Item.VisiblePostItem -> {
                 if (payloads.isEmpty()) {
                     super.onBindViewHolder(holder, position, payloads)
                 } else {
@@ -233,7 +236,7 @@ class ListingItemAdapter(
                     b.nextButton.setOnClickListener {
                         if (markPostsAsReadOnScroll) {
                             seenItemPositions.forEach {
-                                (items.getOrNull(it) as? Item.PostItem)?.let {
+                                (items.getOrNull(it) as? Item.VisiblePostItem)?.let {
                                     onPostRead(it.postView)
                                 }
                             }
@@ -252,7 +255,7 @@ class ListingItemAdapter(
                     b.prevButton.visibility = View.INVISIBLE
                 }
             }
-            is Item.PostItem -> {
+            is Item.VisiblePostItem -> {
                 val h: ListingItemViewHolder = holder as ListingItemViewHolder
                 val isRevealed = revealedItems.contains(item.postView.getUniqueKey()) ||
                     !blurNsfwPosts
@@ -296,6 +299,16 @@ class ListingItemAdapter(
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
+            }
+
+            is Item.FilteredPostItem -> {
+                val b = holder.getBinding<FilteredPostItemBinding>()
+                b.text.text = context.getString(R.string.post_filtered_format, item.filterReason)
+                b.root.setOnClickListener {
+                    postListEngine.unfilter(item.postView.post.id)
+                    postListEngine.createItems()
+                    refreshItems(true)
+                }
             }
 
             is Item.AutoLoadItem -> {

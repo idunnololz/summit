@@ -132,7 +132,7 @@ class PostViewModel @Inject constructor(
         commentsSortOrderLiveData.observeForever {
             fetchPostData(fetchPostData = false)
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             accountActionsManager.onCommentActionChanged.collect {
                 val postOrCommentRef = postOrCommentRef
                 if (postOrCommentRef != null) {
@@ -143,7 +143,7 @@ class PostViewModel @Inject constructor(
                 }
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             accountManager.currentAccount.collect {
                 val account = it as? Account
 
@@ -158,7 +158,7 @@ class PostViewModel @Inject constructor(
                 }
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             findInPageQueryFlow
                 .debounce(300)
                 .collect {
@@ -211,7 +211,7 @@ class PostViewModel @Inject constructor(
 
         val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
-        return viewModelScope.launch {
+        return viewModelScope.launch(Dispatchers.Default) {
             if (switchToNativeInstance) {
                 translatePostToCurrentInstance()
             }
@@ -338,7 +338,7 @@ class PostViewModel @Inject constructor(
 
         unauthedApiClient.changeInstance(instance)
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val linkToResolve = postOrCommentRef
                 .fold(
                     {
@@ -415,8 +415,9 @@ class PostViewModel @Inject constructor(
                                 removedCommentIds.clear()
                             }
 
-                            fetchPostData(fetchPostData = true, force = true)
-                                ?.join()
+                            withContext(Dispatchers.Main) {
+                                fetchPostData(fetchPostData = true, force = true)
+                            }?.join()
                         }
 
                         switchAccountState.postValue(Unit)
@@ -619,28 +620,28 @@ class PostViewModel @Inject constructor(
         val supplementaryComments = supplementaryComments
         val postOrCommentRef = postOrCommentRef
 
-        postData.postValue(
-            PostData(
-                ListView.PostListView(post),
-                CommentTreeBuilder(accountManager).buildCommentsTreeListView(
-                    post = post,
-                    comments = comments,
-                    parentComment = true,
-                    pendingComments = pendingComments,
-                    supplementaryComments = supplementaryComments,
-                    removedCommentIds = removedCommentIds,
-                    fullyLoadedCommentIds = fullyLoadedCommentIds,
-                    targetCommentRef = postOrCommentRef
-                        ?.fold(
-                            { null },
-                            { it },
-                        ),
-                ),
-                newlyPostedCommentId = newlyPostedCommentId,
-                selectedCommentId = postOrCommentRef?.getOrNull()?.id,
-                isSingleComment = postOrCommentRef?.getOrNull() != null,
+        val postDataValue = PostData(
+            postView = ListView.PostListView(post),
+            commentTree = CommentTreeBuilder(accountManager).buildCommentsTreeListView(
+                post = post,
+                comments = comments,
+                parentComment = true,
+                pendingComments = pendingComments,
+                supplementaryComments = supplementaryComments,
+                removedCommentIds = removedCommentIds,
+                fullyLoadedCommentIds = fullyLoadedCommentIds,
+                targetCommentRef = postOrCommentRef
+                    ?.fold(
+                        { null },
+                        { it },
+                    ),
             ),
+            newlyPostedCommentId = newlyPostedCommentId,
+            selectedCommentId = postOrCommentRef?.getOrNull()?.id,
+            isSingleComment = postOrCommentRef?.getOrNull() != null,
         )
+
+        postData.postValue(postDataValue)
     }
 
     fun fetchMoreComments(parentId: CommentId?, depth: Int? = null, force: Boolean = false) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copied from @drawable/m3_tabs_background -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fills the entire area with the container's color first... -->
+    <item>
+        <shape
+            android:shape="rectangle">
+            <solid android:color="?backgroundColor"/>
+        </shape>
+    </item>
+    <!-- ..., then draws a rectangle for the divider at the bottom. -->
+    <item
+        android:gravity="bottom">
+        <shape>
+            <size android:height="1dp" />
+            <solid android:color="@macro/m3_comp_divider_color" />
+        </shape>
+    </item>
+</layer-list>

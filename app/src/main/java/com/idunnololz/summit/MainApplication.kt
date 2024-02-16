@@ -25,13 +25,13 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
 import com.idunnololz.summit.util.Client
-import com.idunnololz.summit.util.coil.CustomVideoFrameDecoder
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.DataFiles
 import com.idunnololz.summit.util.LocaleHelper
 import com.idunnololz.summit.util.NotificationHelper
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.coil.CustomVideoFrameDecoder
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp

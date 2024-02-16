@@ -1,10 +1,10 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
-import android.net.Uri
 import android.os.Parcelable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
+import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.utils.instance
 import com.squareup.moshi.Json
@@ -164,6 +164,5 @@ fun Community.toCommunityRef(): CommunityRef.CommunityRefByName {
 }
 
 fun AccountSubscription.toCommunityRef(): CommunityRef.CommunityRefByName {
-    val uri = Uri.parse(this.actorId)
-    return CommunityRef.CommunityRefByName(this.name, uri.host)
+    return CommunityRef.CommunityRefByName(this.name, this.instance)
 }

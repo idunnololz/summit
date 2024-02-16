@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import android.webkit.URLUtil
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,8 +12,6 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.ApiListenerManager
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.api.dto.CommunityView
@@ -25,6 +22,7 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
+import com.idunnololz.summit.lemmy.UploadHelper
 import com.idunnololz.summit.links.LinkMetadataHelper
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
@@ -33,7 +31,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,16 +42,14 @@ class CreateOrEditPostViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val state: SavedStateHandle,
-    private val apiListenerManager: ApiListenerManager,
     private val preferences: Preferences,
+    private val uploadHelper: UploadHelper,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "CreateOrEditPostViewModel"
     }
-
-    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager, preferences)
 
     private val linkMetadataHelper = LinkMetadataHelper()
 
@@ -76,8 +71,6 @@ class CreateOrEditPostViewModel @Inject constructor(
     private var searchJob: Job? = null
 
     private var urlFlow = MutableSharedFlow<String>()
-
-    private var uploadJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -190,12 +183,12 @@ class CreateOrEditPostViewModel @Inject constructor(
         }
     }
 
-    fun uploadImage(instance: String, uri: Uri) {
-        uploadImageInternal(instance, uri, uploadImageResult)
+    fun uploadImage(uri: Uri) {
+        uploadImageInternal(uri, uploadImageResult)
     }
 
-    fun uploadImageForUrl(instance: String, uri: Uri) {
-        uploadImageInternal(instance, uri, uploadImageForUrlResult)
+    fun uploadImageForUrl(uri: Uri) {
+        uploadImageInternal(uri, uploadImageForUrlResult)
     }
 
     fun loadLinkMetadata(url: String) {
@@ -217,11 +210,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     }
 
     val isUploading: Boolean
-        get() {
-            val uploadJob = uploadJob
-
-            return uploadJob != null && uploadJob.isActive
-        }
+        get() = uploadHelper.isUploading
 
     private fun doQuery(query: String) {
         searchResults.setIsLoading()
@@ -251,46 +240,22 @@ class CreateOrEditPostViewModel @Inject constructor(
     }
 
     private fun uploadImageInternal(
-        instance: String,
         uri: Uri,
         imageLiveData: StatefulLiveData<UploadImageResult>,
     ) {
         imageLiveData.setIsLoading()
 
-        uploadJob = viewModelScope.launch {
-            var result = uri.path
-            val cut: Int? = result?.lastIndexOf('/')
-            if (cut != null && cut != -1) {
-                result = result?.substring(cut + 1)
-            }
-
-            val account = accountManager.currentAccount.asAccount
-
-            if (account == null) {
-                imageLiveData.postError(NotAuthenticatedException())
-                return@launch
-            }
-
-            val uploadInstance = account.instance
-            Log.d(TAG, "Uploading onto instance $uploadInstance")
-            uploaderApiClient.changeInstance(uploadInstance)
-
-            val inputStream = context.contentResolver.openInputStream(uri)
-
-            inputStream
-                .use {
-                    if (it == null) {
-                        return@use Result.failure(RuntimeException("file_not_found"))
-                    }
-                    return@use uploaderApiClient.uploadImage(account, result ?: "image", it)
-                }
-                .onFailure {
-                    imageLiveData.postError(it)
-                }
-                .onSuccess {
-                    imageLiveData.postValue(it)
-                }
-        }
+        uploadHelper.upload(
+            coroutineScope = viewModelScope,
+            uri = uri,
+            rotateAccounts = preferences.rotateInstanceOnUploadFail,
+            onSuccess = {
+                imageLiveData.postValue(it)
+            },
+            onFailure = {
+                imageLiveData.postError(it)
+            },
+        )
     }
 
     class NoTitleError : RuntimeException()

@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
@@ -20,11 +22,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class MultiCommunityEditorViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
+    private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
     val showSearch = MutableLiveData<Boolean>()
@@ -35,13 +39,24 @@ class MultiCommunityEditorViewModel @Inject constructor(
     val selectedCommunitiesLiveData = selectedCommunitiesFlow.asLiveData()
     val communityName = MutableLiveData<String>()
     val selectedIcon = MutableLiveData<String?>()
+    val subscribedCommunities = MutableLiveData<List<AccountSubscription>>()
 
     private var searchJob: Job? = null
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             selectedCommunitiesFlow.collect {
-                fetchCommunityIcons(it)
+                withContext(Dispatchers.Main) {
+                    fetchCommunityIcons(it)
+                }
+            }
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            accountInfoManager.currentFullAccount.collect {
+                val subscriptions = it?.accountInfo?.subscriptions
+                    ?: listOf()
+
+                subscribedCommunities.postValue(subscriptions)
             }
         }
     }
@@ -61,7 +76,7 @@ class MultiCommunityEditorViewModel @Inject constructor(
                     sortType = SortType.TopMonth,
                     listingType = ListingType.All,
                     searchType = SearchType.Communities,
-                    query = query.toString(),
+                    query = query,
                     limit = 20,
                 )
                 .onSuccess {

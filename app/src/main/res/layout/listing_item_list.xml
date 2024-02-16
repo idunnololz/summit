@@ -20,7 +20,7 @@
         android:id="@+id/header_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginTop="12dp"
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding"
         android:fadingEdge="horizontal"
@@ -39,25 +39,25 @@
             app:layout_constraintEnd_toEndOf="parent"/>
     </FrameLayout>
 
-    <!-- Width set programatically -->
+    <!-- Width set programmatically -->
     <com.idunnololz.summit.view.ReactiveImageView
         android:id="@+id/image"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginTop="12dp"
         android:scaleType="centerCrop"
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header_view" />
 
-    <!-- Width set programatically -->
+    <!-- Width set programmatically -->
     <com.idunnololz.summit.view.ReactiveImageView
         android:id="@+id/icon_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginTop="12dp"
         android:background="@drawable/border1"
         android:padding="@dimen/padding_half"
         app:tint="?attr/colorControlNormal"
@@ -86,7 +86,7 @@
         android:textAppearance="?textAppearanceBodyMedium"
         android:layout_marginStart="@dimen/padding_half"
         android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginTop="@dimen/padding_quarter"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintTop_toBottomOf="@+id/header_view"
         app:layout_constraintStart_toEndOf="@+id/left_barrier"
         app:layout_constraintEnd_toEndOf="parent" />

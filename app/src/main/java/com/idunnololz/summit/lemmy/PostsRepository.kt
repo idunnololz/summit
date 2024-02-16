@@ -11,7 +11,6 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getDominantType
 import com.idunnololz.summit.api.utils.getUniqueKey
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
@@ -26,7 +25,6 @@ import kotlin.math.min
 class PostsRepository @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val apiClient: AccountAwareLemmyClient,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
     private val postReadManager: PostReadManager,
     private val hiddenPostsManager: HiddenPostsManager,
     private val contentFiltersManager: ContentFiltersManager,
@@ -42,7 +40,10 @@ class PostsRepository @Inject constructor(
     private data class PostData(
         val post: PostView,
         val postPageIndexInternal: Int,
-    )
+        val filterReason: FilterReason? = null,
+    ) {
+        val isFiltered = filterReason != null
+    }
 
     private var currentDataSource: PostsDataSource = singlePostsDataSourceFactory.create(
         communityName = null,
@@ -67,6 +68,8 @@ class PostsRepository @Inject constructor(
     var showVideoPosts = true
     var showTextPosts = true
     var showNsfwPosts = true
+
+    var showFilteredPosts = false
 
     private var consecutiveFilteredPostsByFilter = 0
     private var consecutiveFilteredPostsByType = 0
@@ -120,7 +123,7 @@ class PostsRepository @Inject constructor(
             }
 
             // try to find our anchors
-            val anchorsMatched = pageResult.posts.count { anchors.contains(it.post.id) }
+            val anchorsMatched = pageResult.posts.count { anchors.contains(it.postView.post.id) }
             if (anchorsMatched > 0) {
                 return result
             }
@@ -132,64 +135,69 @@ class PostsRepository @Inject constructor(
     }
 
     suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
-        val startIndex = pageIndex * postsPerPage
-        val endIndex = startIndex + postsPerPage
+        return withContext(Dispatchers.Default) {
+            val startIndex = pageIndex * postsPerPage
+            val endIndex = startIndex + postsPerPage
 
-        if (force) {
-            // delete all cached data for the given page
-            val minPageInternal = allPosts
-                .slice(startIndex until min(endIndex, allPosts.size))
-                .minOfOrNull { it.postPageIndexInternal } ?: 0
-
-            deleteFromPage(minPageInternal)
-            endReached = false
-        }
-
-        var hasMore = true
-
-        while (true) {
-            if (allPosts.size >= endIndex) {
-                break
-            }
-
-            if (endReached) {
-                hasMore = false
-                break
-            }
-
-            val hasMoreResult = retry {
-                fetchPage(
-                    pageIndex = currentPageInternal,
-                    sortType = sortOrder.value.toApiSortOrder(),
-                    force = force,
-                )
-            }
-
-            if (hasMoreResult.isFailure) {
-                return Result.failure(requireNotNull(hasMoreResult.exceptionOrNull()))
-            } else {
-                hasMore = hasMoreResult.getOrThrow()
-                currentPageInternal++
-            }
-
-            if (!hasMore) {
-                endReached = true
-                break
-            }
-        }
-
-        return Result.success(
-            PageResult(
-                posts = allPosts
+            if (force) {
+                // delete all cached data for the given page
+                val minPageInternal = allPosts
                     .slice(startIndex until min(endIndex, allPosts.size))
-                    .map {
-                        transformPostWithLocalData(it.post)
-                    },
-                pageIndex = pageIndex,
-                instance = apiClient.instance,
-                hasMore = hasMore,
-            ),
-        )
+                    .minOfOrNull { it.postPageIndexInternal } ?: 0
+
+                deleteFromPage(minPageInternal)
+                endReached = false
+            }
+
+            var hasMore = true
+
+            while (true) {
+                if (allPosts.size >= endIndex) {
+                    break
+                }
+
+                if (endReached) {
+                    hasMore = false
+                    break
+                }
+
+                val hasMoreResult = retry {
+                    fetchPage(
+                        pageIndex = currentPageInternal,
+                        sortType = sortOrder.value.toApiSortOrder(),
+                        force = force,
+                    )
+                }
+
+                if (hasMoreResult.isFailure) {
+                    return@withContext Result.failure(requireNotNull(hasMoreResult.exceptionOrNull()))
+                } else {
+                    hasMore = hasMoreResult.getOrThrow()
+                    currentPageInternal++
+                }
+
+                if (!hasMore) {
+                    endReached = true
+                    break
+                }
+            }
+
+            return@withContext Result.success(
+                PageResult(
+                    posts = allPosts
+                        .slice(startIndex until min(endIndex, allPosts.size))
+                        .map {
+                            LocalPostView(
+                                postView = transformPostWithLocalData(it.post),
+                                filterReason = it.filterReason,
+                            )
+                        },
+                    pageIndex = pageIndex,
+                    instance = apiClient.instance,
+                    hasMore = hasMore,
+                ),
+            )
+        }
     }
 
     val communityInstance: String
@@ -394,43 +402,74 @@ class PostsRepository @Inject constructor(
     ) {
         for (post in newPosts) {
             val uniquePostKey = post.getUniqueKey()
+            var filterReason: FilterReason? = null
 
             if (hideRead && (post.read || postReadManager.isPostRead(apiInstance, post.post.id))) {
                 continue
             }
             if (!showNsfwPosts && post.post.nsfw) {
-                continue
+                if (showFilteredPosts) {
+                    filterReason = FilterReason.Nsfw
+                } else {
+                    continue
+                }
             }
             val postType = post.getDominantType()
             if (!showLinkPosts && postType == PostType.Link) {
-                consecutiveFilteredPostsByType++
-                continue
+                if (showFilteredPosts) {
+                    filterReason = FilterReason.Link
+                } else {
+                    consecutiveFilteredPostsByType++
+                    continue
+                }
             }
             if (!showImagePosts && postType == PostType.Image) {
-                consecutiveFilteredPostsByType++
-                continue
+                if (showFilteredPosts) {
+                    filterReason = FilterReason.Image
+                } else {
+                    consecutiveFilteredPostsByType++
+                    continue
+                }
             }
             if (!showVideoPosts && postType == PostType.Video) {
-                consecutiveFilteredPostsByType++
-                continue
+                if (showFilteredPosts) {
+                    filterReason = FilterReason.Video
+                } else {
+                    consecutiveFilteredPostsByType++
+                    continue
+                }
             }
             if (!showTextPosts && postType == PostType.Text) {
-                consecutiveFilteredPostsByType++
-                continue
+                if (showFilteredPosts) {
+                    filterReason = FilterReason.Text
+                } else {
+                    consecutiveFilteredPostsByType++
+                    continue
+                }
             }
             if (hiddenPosts.contains(post.post.id)) {
                 continue
             }
             if (contentFiltersManager.testPostView(post)) {
-                consecutiveFilteredPostsByFilter++
-                continue
+                if (showFilteredPosts) {
+                    filterReason = FilterReason.Custom
+                } else {
+                    consecutiveFilteredPostsByFilter++
+                    continue
+                }
             }
 
             consecutiveFilteredPostsByFilter = 0
             consecutiveFilteredPostsByType = 0
 
             if (seenPosts.add(uniquePostKey)) {
-                allPosts.add(PostData(post, pageIndex))
+                allPosts.add(
+                    PostData(
+                        post = post,
+                        postPageIndexInternal = pageIndex,
+                        filterReason = filterReason,
+                    ),
+                )
             }
         }
     }
@@ -449,9 +488,11 @@ class PostsRepository @Inject constructor(
         Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allPosts.size}")
     }
 
-    fun update(posts: List<PostView>): List<PostView> {
+    fun update(posts: List<LocalPostView>): List<LocalPostView> {
         return posts.map {
-            transformPostWithLocalData(it)
+            it.copy(
+                postView = transformPostWithLocalData(it.postView),
+            )
         }
     }
 
@@ -464,7 +505,7 @@ class PostsRepository @Inject constructor(
     }
 
     class PageResult(
-        val posts: List<PostView>,
+        val posts: List<LocalPostView>,
         val pageIndex: Int,
         val instance: String,
         val hasMore: Boolean,

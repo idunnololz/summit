@@ -30,7 +30,6 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLO
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
-import com.idunnololz.summit.util.PreferenceUtil.KEY_COMPATIBILITY_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
@@ -40,6 +39,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_LAYOUT_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
@@ -61,9 +61,11 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
@@ -657,13 +659,6 @@ class PostListSettings @Inject constructor(
         relatedKeys = listOf(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP),
     )
 
-    val compatibilityMode = OnOffSettingItem(
-        null,
-        context.getString(R.string.compatibility_mode),
-        context.getString(R.string.compatibility_mode_desc),
-        relatedKeys = listOf(KEY_COMPATIBILITY_MODE),
-    )
-
     val hidePostScores = OnOffSettingItem(
         null,
         context.getString(R.string.hide_post_scores),
@@ -750,6 +745,12 @@ class PostListSettings @Inject constructor(
         null,
         relatedKeys = listOf(KEY_USE_MULTILINE_POST_HEADERS),
     )
+    val showFilteredPosts = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_filtered_posts),
+        context.getString(R.string.show_filtered_posts_desc),
+        relatedKeys = listOf(KEY_SHOW_FILTERED_POSTS),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -757,7 +758,6 @@ class PostListSettings @Inject constructor(
         blurNsfwPosts,
         defaultCommunitySortOrder,
         viewImageOnSingleTap,
-        compatibilityMode,
         hidePostScores,
         keywordFilters,
         instanceFilters,
@@ -769,6 +769,7 @@ class PostListSettings @Inject constructor(
         showTextPosts,
         showNsfwPosts,
         lockBottomBar,
+        showFilteredPosts,
     )
 }
 
@@ -1580,6 +1581,20 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.per_community_settings_desc),
     )
 
+    val largeScreenSupport = OnOffSettingItem(
+        null,
+        context.getString(R.string.large_screen_support),
+        context.getString(R.string.large_screen_support_desc),
+        relatedKeys = listOf(KEY_GLOBAL_LAYOUT_MODE),
+    )
+
+    val rotateInstanceOnUploadFail = OnOffSettingItem(
+        null,
+        "Beep boop",
+        "Beep",
+        relatedKeys = listOf(KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
@@ -1591,6 +1606,7 @@ class MiscSettings @Inject constructor(
         usePredictiveBack,
         shareImagesDirectly,
         perCommunitySettings,
+        largeScreenSupport,
     )
 }
 
