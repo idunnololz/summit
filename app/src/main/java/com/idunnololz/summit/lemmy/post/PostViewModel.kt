@@ -519,8 +519,9 @@ class PostViewModel @Inject constructor(
                             removedCommentIds.clear()
                         }
 
-                        fetchPostData(fetchPostData = true, force = true)
-                            ?.join()
+                        withContext(Dispatchers.Main) {
+                            fetchPostData(fetchPostData = true, force = true)
+                        }?.join()
                     }
                 },
                 onFailure = {
