@@ -305,7 +305,7 @@ class CustomQuickActionsFragment :
                     }
                     CommentQuickActionIds.OpenComment -> {
                         icon = R.drawable.baseline_open_in_new_24
-                        name = context.getString(R.string.share)
+                        name = context.getString(R.string.open_comment)
                     }
                     CommentQuickActionIds.ViewSource -> {
                         icon = R.drawable.baseline_code_24

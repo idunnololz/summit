@@ -655,7 +655,10 @@ class CommunityViewModel @Inject constructor(
     fun onBlockSettingsChanged() {
         viewModelScope.launch(Dispatchers.Default) {
             postsRepository.resetCacheForCommunity()
-            fetchCurrentPage()
+
+            withContext(Dispatchers.Main) {
+                fetchCurrentPage()
+            }
         }
     }
 
