@@ -22,6 +22,9 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"/>
+        <action
+            android:id="@+id/action_settingsAccountBlockListFragment_to_settingsInstanceBlockListFragment"
+            app:destination="@id/settingsInstanceBlockListFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsWebFragment"
@@ -392,4 +395,8 @@
         android:id="@+id/customQuickActionsFragment"
         android:name="com.idunnololz.summit.settings.commentQuickActions.CustomQuickActionsFragment"
         android:label="CustomQuickActionsFragment" />
+    <fragment
+        android:id="@+id/settingsInstanceBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.instance.SettingsInstanceBlockListFragment"
+        android:label="SettingsInstanceBlockListFragment" />
 </navigation>

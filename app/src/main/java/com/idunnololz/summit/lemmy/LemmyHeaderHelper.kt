@@ -205,7 +205,7 @@ class LemmyHeaderHelper(
         }
 
         if (wrapHeader) {
-            currentTextView.setSingleLineAvoidingRelayout(false)
+//            currentTextView.setSingleLineAvoidingRelayout(false)
             if (currentTextView.maxLines != 2) {
                 currentTextView.maxLines = 2
             }
@@ -221,7 +221,7 @@ class LemmyHeaderHelper(
                 onLinkLongClick = onLinkLongClick,
             )
             currentTextView.text = sb
-            currentTextView.setSingleLineAvoidingRelayout(true)
+//            currentTextView.setSingleLineAvoidingRelayout(true)
             headerContainer.multiline = true
 
             currentTextView = headerContainer.textView2

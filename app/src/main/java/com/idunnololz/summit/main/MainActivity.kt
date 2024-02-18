@@ -904,6 +904,8 @@ class MainActivity : BaseActivity() {
                 insets.rightInset,
                 insets.bottomInset + additionalPaddingBottom,
             )
+
+            Log.d("HAHA", "bottomInset: ${insets.bottomInset + additionalPaddingBottom}")
         }
     }
 

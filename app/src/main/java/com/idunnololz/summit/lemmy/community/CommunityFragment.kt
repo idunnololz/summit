@@ -459,17 +459,19 @@ class CommunityFragment :
             viewModel = viewModel,
             globalLayoutMode = preferences.globalLayoutMode,
             retainClosedPosts = preferences.retainLastPost,
+            emptyScreenText = getString(R.string.select_a_post),
+            fragmentContainerId = R.id.post_fragment_container,
         ).apply {
             onPageSelectedListener = { isOpen ->
                 if (!isOpen) {
-                    val lastSelectedPost = viewModel.lastSelectedPost
+                    val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
                     if (lastSelectedPost != null) {
                         // We came from a post...
                         adapter?.highlightPost(lastSelectedPost)
-                        viewModel.lastSelectedPost = null
+                        viewModel.lastSelectedItem = null
                     }
                 } else {
-                    val lastSelectedPost = viewModel.lastSelectedPost
+                    val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
                     if (lastSelectedPost != null) {
                         adapter?.highlightPostForever(lastSelectedPost)
                     }

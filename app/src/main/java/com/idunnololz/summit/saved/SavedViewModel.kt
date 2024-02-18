@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -16,6 +17,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentPageResult
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
@@ -69,7 +71,14 @@ class SavedViewModel @Inject constructor(
     private var fetchingPostPages = mutableSetOf<Int>()
     private var fetchingCommentPages = mutableSetOf<Int>()
 
-    override var lastSelectedPost: PostRef? = null
+    override var lastSelectedItem: Either<PostRef, CommentRef>? = null
+        set(value) {
+            field = value
+
+            lastSelectedItemLiveData.postValue(value)
+        }
+
+    val lastSelectedItemLiveData = MutableLiveData<Either<PostRef, CommentRef>?>()
 
     init {
         fetchPostPage(0, false)

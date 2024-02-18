@@ -102,17 +102,19 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
                 globalLayoutMode = preferences.globalLayoutMode,
                 lockPanes = true,
                 retainClosedPosts = preferences.retainLastPost,
+                emptyScreenText = getString(R.string.select_a_post_or_comment),
+                fragmentContainerId = R.id.post_fragment_container,
             ).apply {
                 onPageSelectedListener = { isOpen ->
                     if (!isOpen) {
-                        val lastSelectedPost = viewModel.lastSelectedPost
+                        val lastSelectedPost = viewModel.lastSelectedItem
                         if (lastSelectedPost != null) {
                             // We came from a post...
 //                        adapter?.highlightPost(lastSelectedPost)
-                            viewModel.lastSelectedPost = null
+                            viewModel.lastSelectedItem = null
                         }
                     } else {
-                        val lastSelectedPost = viewModel.lastSelectedPost
+                        val lastSelectedPost = viewModel.lastSelectedItem
                         if (lastSelectedPost != null) {
 //                        adapter?.highlightPostForever(lastSelectedPost)
                         }

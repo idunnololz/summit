@@ -44,6 +44,12 @@
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/blocked_instances"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

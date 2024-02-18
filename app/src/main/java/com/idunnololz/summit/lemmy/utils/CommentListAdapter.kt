@@ -29,7 +29,9 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.appendSeparator
+import com.idunnololz.summit.lemmy.community.Item
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preview.VideoType
@@ -61,13 +63,15 @@ class CommentListAdapter(
             val commentView: CommentView,
             val instance: String,
             val pageIndex: Int,
+            val highlight: Boolean,
+            val highlightForever: Boolean,
         ) : Item
 
         data class AutoLoadItem(val pageToLoad: Int) : Item
 
         data class ErrorItem(val error: Throwable, val pageToLoad: Int) : Item
 
-        object EndItem : Item
+        data object EndItem : Item
     }
 
     private val regularColor: Int = ContextCompat.getColor(context, R.color.colorText)
@@ -77,6 +81,9 @@ class CommentListAdapter(
         get() = adapterHelper.items
 
     private var commentPages: List<CommentPageResult> = listOf()
+
+    private var commentToHighlightForever: CommentRef? = null
+    private var commentToHighlight: CommentRef? = null
 
     private val adapterHelper = AdapterHelper<Item>(
         areItemsTheSame = { old, new ->
@@ -220,6 +227,26 @@ class CommentListAdapter(
             b.moreButton.setOnClickListener {
                 onCommentMoreClick(item.commentView)
             }
+
+            if (item.highlightForever) {
+                b.highlightBg.visibility = View.VISIBLE
+                b.highlightBg.alpha = 1f
+            } else if (item.highlight) {
+                b.highlightBg.visibility = View.VISIBLE
+                b.highlightBg.animate()
+                    .alpha(0f)
+                    .apply {
+                        duration = 350
+                    }
+                    .withEndAction {
+                        b.highlightBg.visibility = View.GONE
+
+                        onHighlightComplete()
+                    }
+            } else {
+                b.highlightBg.visibility = View.GONE
+            }
+
             b.root.setOnClickListener {
                 onCommentClick(CommentRef(item.instance, item.commentView.comment.id))
             }
@@ -265,9 +292,11 @@ class CommentListAdapter(
             for (comment in page.comments) {
                 newItems.add(
                     Item.CommentItem(
-                        comment,
-                        page.instance,
-                        page.pageIndex,
+                        commentView = comment,
+                        instance = page.instance,
+                        pageIndex = page.pageIndex,
+                        highlight = commentToHighlight?.id == comment.comment.id,
+                        highlightForever = commentToHighlightForever?.id == comment.comment.id,
                     ),
                 )
             }
@@ -283,5 +312,58 @@ class CommentListAdapter(
         }
 
         adapterHelper.setItems(newItems, this)
+    }
+
+    fun highlight(commentToHighlight: CommentRef) {
+        this.commentToHighlight = commentToHighlight
+        this.commentToHighlightForever = null
+
+        items.indexOfFirst {
+            when (it) {
+                is Item.AutoLoadItem -> false
+                is Item.CommentItem -> commentToHighlight.id == it.commentView.comment.id
+                Item.EndItem -> false
+                is Item.ErrorItem -> false
+            }
+        }
+
+        refreshItems()
+    }
+
+    fun highlightForever(commentToHighlight: CommentRef) {
+        this.commentToHighlight = null
+        this.commentToHighlightForever = commentToHighlight
+
+        items.indexOfFirst {
+            when (it) {
+                is Item.AutoLoadItem -> false
+                is Item.CommentItem -> commentToHighlight.id == it.commentView.comment.id
+                Item.EndItem -> false
+                is Item.ErrorItem -> false
+            }
+        }
+
+        refreshItems()
+    }
+
+    fun endHighlightForever() {
+        val commentToHighlight = commentToHighlightForever
+
+        if (commentToHighlight != null) {
+            highlight(commentToHighlight)
+        }
+
+        refreshItems()
+    }
+
+    fun onHighlightComplete() {
+        if (commentToHighlight == null && commentToHighlightForever == null) {
+            return
+        }
+
+        this.commentToHighlight = null
+        this.commentToHighlightForever = null
+
+        refreshItems()
     }
 }

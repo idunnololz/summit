@@ -57,9 +57,7 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
                     findNavController().navigateSafe(directions)
                 },
             )
-        }
 
-        with(binding) {
             BasicSettingItem(
                 R.drawable.ic_subreddit_default,
                 getString(R.string.blocked_communities),
@@ -69,6 +67,19 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
                 onValueChanged = {
                     val directions = SettingsAccountBlockListFragmentDirections
                         .actionSettingsAccountBlockListFragmentToSettingsCommunityBlockListFragment()
+                    findNavController().navigateSafe(directions)
+                },
+            )
+
+            BasicSettingItem(
+                R.drawable.ic_lemmy_24,
+                getString(R.string.blocked_instances),
+                null,
+            ).bindTo(
+                blockedInstances,
+                onValueChanged = {
+                    val directions = SettingsAccountBlockListFragmentDirections
+                        .actionSettingsAccountBlockListFragmentToSettingsInstanceBlockListFragment()
                     findNavController().navigateSafe(directions)
                 },
             )

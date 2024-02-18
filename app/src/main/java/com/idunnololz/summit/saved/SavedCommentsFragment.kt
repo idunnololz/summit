@@ -140,13 +140,15 @@ class SavedCommentsFragment :
 
         val parentFragment = parentFragment as SavedTabbedFragment
 
+        val viewModel = parentFragment.viewModel
+
         val layoutManager = LinearLayoutManager(context)
 
         fun fetchPageIfLoadItem(position: Int) {
             (adapter?.items?.getOrNull(position) as? CommentListAdapter.Item.AutoLoadItem)
                 ?.pageToLoad
                 ?.let {
-                    parentFragment.viewModel.fetchCommentPage(it)
+                    viewModel.fetchCommentPage(it)
                 }
         }
 
@@ -160,7 +162,7 @@ class SavedCommentsFragment :
             fetchPageIfLoadItem(lastPos + 1)
         }
 
-        parentFragment.viewModel.commentsState.observe(viewLifecycleOwner) {
+        viewModel.commentsState.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -177,7 +179,7 @@ class SavedCommentsFragment :
                     } else {
                         binding.loadingView.showDefaultErrorMessageFor(it.error)
                         binding.loadingView.setOnRefreshClickListener {
-                            parentFragment.viewModel.fetchCommentPage(0, true)
+                            viewModel.fetchCommentPage(0, true)
                         }
                     }
                 }
@@ -188,7 +190,7 @@ class SavedCommentsFragment :
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
 
-                    adapter?.setData(parentFragment.viewModel.commentListEngine.commentPages)
+                    adapter?.setData(viewModel.commentListEngine.commentPages)
 
                     binding.root.post {
                         checkIfFetchNeeded()
@@ -211,7 +213,22 @@ class SavedCommentsFragment :
             )
 
             swipeRefreshLayout.setOnRefreshListener {
-                parentFragment.viewModel.fetchCommentPage(0, true)
+                viewModel.fetchCommentPage(0, true)
+            }
+        }
+
+        viewModel.lastSelectedItemLiveData.observe(viewLifecycleOwner) { lastSelectedPost ->
+            if (lastSelectedPost != null) {
+                lastSelectedPost.fold(
+                    {
+                        adapter?.onHighlightComplete()
+                    },
+                    {
+                        adapter?.highlightForever(it)
+                    }
+                )
+            } else {
+                adapter?.endHighlightForever()
             }
         }
 

@@ -26,6 +26,7 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
@@ -115,7 +116,7 @@ class CommunityViewModel @Inject constructor(
 
     private var initialPageFetched = state.getLiveData<Boolean>("_initialPageFetched")
 
-    override var lastSelectedPost: PostRef? = null
+    override var lastSelectedItem: Either<PostRef, CommentRef>? = null
 
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
     val currentAccount = MutableLiveData<AccountView?>(null)
