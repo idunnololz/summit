@@ -328,6 +328,16 @@ class PostListEngine(
         }
     }
 
+    fun endendHighlightForever(): Int {
+        val postToHighlight = postToHighlightForever
+
+        return if (postToHighlight != null) {
+            highlight(postToHighlight)
+        } else {
+            -1
+        }
+    }
+
     fun updateViewingPosition(firstItemsIndex: Int, lastItemsIndex: Int) {
         displayFirstItemsIndex = firstItemsIndex
         displayLastItemsIndex = lastItemsIndex

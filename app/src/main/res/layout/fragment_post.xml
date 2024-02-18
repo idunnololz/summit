@@ -74,7 +74,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/fab_snackbar_coordinator_layout"
         android:layout_width="match_parent"

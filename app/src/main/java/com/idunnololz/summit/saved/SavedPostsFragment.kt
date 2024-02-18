@@ -158,11 +158,13 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
 
         val layoutManager = LinearLayoutManager(context)
 
+        val viewModel = parentFragment.viewModel
+
         fun fetchPageIfLoadItem(position: Int) {
             (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
                 ?.pageToLoad
                 ?.let {
-                    parentFragment.viewModel.fetchPostPage(it, false)
+                    viewModel.fetchPostPage(it, false)
                 }
         }
 
@@ -176,7 +178,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
             fetchPageIfLoadItem(lastPos + 1)
         }
 
-        parentFragment.viewModel.postsState.observe(viewLifecycleOwner) {
+        viewModel.postsState.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -193,7 +195,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                     } else {
                         binding.loadingView.showDefaultErrorMessageFor(it.error)
                         binding.loadingView.setOnRefreshClickListener {
-                            parentFragment.viewModel.fetchPostPage(0, true)
+                            viewModel.fetchPostPage(0, true)
                         }
                     }
                 }
@@ -226,7 +228,22 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
             )
 
             swipeRefreshLayout.setOnRefreshListener {
-                parentFragment.viewModel.fetchPostPage(0, true)
+                viewModel.fetchPostPage(0, true)
+            }
+        }
+
+        viewModel.lastSelectedItemLiveData.observe(viewLifecycleOwner) { lastSelectedPost ->
+            if (lastSelectedPost != null) {
+                lastSelectedPost.fold(
+                    {
+                        adapter?.highlightPostForever(it)
+                    },
+                    {
+                        adapter?.clearHighlight()
+                    }
+                )
+            } else {
+                adapter?.endHighlightForever()
             }
         }
 

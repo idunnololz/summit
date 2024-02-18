@@ -12,6 +12,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.databinding.CustomAppBarBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -28,9 +29,6 @@ class LemmyAppBarController(
     private val context = mainActivity
 
     private val customActionBar: ViewGroup = binding.customActionBar
-    private val accountChip: Chip = binding.accountChip
-    private val accountImageView: ShapeableImageView = binding.accountImageView
-    private val accountHitRegion: View = binding.accountHitRegion
     private val communityTextView: Chip = binding.communityTextView
     private val pageTextView: TextView = binding.pageTextView
 
@@ -49,7 +47,7 @@ class LemmyAppBarController(
             controller.onChangeInstanceClick = onChangeInstanceClick
         }
 
-        accountHitRegion.setOnClickListener {
+        binding.accountHitRegion.setOnClickListener {
             val account = it.tag as? Account
             onAccountClick(account)
         }
@@ -183,24 +181,8 @@ class LemmyAppBarController(
     }
 
     fun onAccountChanged(it: AccountView?) {
-        accountHitRegion.tag = it?.account
+        binding.accountHitRegion.tag = it?.account
 
-        if (it == null) {
-            accountChip.visibility = View.VISIBLE
-            accountImageView.visibility = View.INVISIBLE
-//            accountButton.setImageResource(R.drawable.baseline_add_24)
-//            val padding = Utils.convertDpToPixel(10f).toInt()
-//            accountButton.setPadding(padding, padding, padding, padding)
-//            accountButton.imageTintList = ColorStateList.valueOf(context.getColorFromAttribute(
-//                androidx.appcompat.R.attr.colorControlNormal))
-        } else {
-            accountChip.visibility = View.INVISIBLE
-            accountImageView.visibility = View.VISIBLE
-
-            accountImageView.load(it.profileImage) {
-                allowHardware(false)
-                placeholder(R.drawable.baseline_person_24)
-            }
-        }
+        it.loadProfileImageOrDefault(binding.accountImageView)
     }
 }

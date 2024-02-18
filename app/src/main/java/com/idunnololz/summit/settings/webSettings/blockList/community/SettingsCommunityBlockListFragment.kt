@@ -52,7 +52,7 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.blocked_users)
+            supportActionBar?.title = context.getString(R.string.blocked_communities)
         }
 
         with(binding) {

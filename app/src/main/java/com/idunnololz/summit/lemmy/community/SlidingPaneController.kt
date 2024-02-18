@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.community
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.annotation.IdRes
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -10,9 +11,12 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.slidingpanelayout.widget.SlidingPaneLayout.PanelSlideListener
+import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.empty_screen.EmptyScreenFragment
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.post.PostFragment
@@ -33,12 +37,17 @@ class SlidingPaneController(
     private val childFragmentManager: FragmentManager,
     private val viewModel: PostViewPagerViewModel,
     private val globalLayoutMode: GlobalLayoutMode,
+    /**
+     * Used for tablets. The message is shown on the side pane when nothing is selected.
+     */
+    private val emptyScreenText: String,
+    @IdRes private val fragmentContainerId: Int,
     val lockPanes: Boolean = false,
     private val retainClosedPosts: Boolean = false,
 ) {
 
     interface PostViewPagerViewModel {
-        var lastSelectedPost: PostRef?
+        var lastSelectedItem: Either<PostRef, CommentRef>?
     }
 
     companion object {
@@ -109,6 +118,17 @@ class SlidingPaneController(
             if (!slidingPaneLayout.isSlideable) {
                 val firstChild = slidingPaneLayout.getChildAt(0) ?: return@post
                 firstChild.findViewById<View>(R.id.pane_divider)?.visibility = View.VISIBLE
+
+                val currentFragment = childFragmentManager.findFragmentById(fragmentContainerId)
+                if (currentFragment == null) {
+                    childFragmentManager.commit(allowStateLoss = true) {
+                        setReorderingAllowed(true)
+                        replace(
+                            fragmentContainerId,
+                            EmptyScreenFragment.newInstance(emptyScreenText)
+                        )
+                    }
+                }
             }
         }
 
@@ -162,7 +182,7 @@ class SlidingPaneController(
                 currentCommunity = currentCommunity,
                 videoState = videoState,
             ).toBundle(),
-            PostRef(instance, id),
+            Either.Left(PostRef(instance, id)),
         )
     }
 
@@ -175,12 +195,13 @@ class SlidingPaneController(
                 currentCommunity = null,
                 isSinglePage = false,
             ).toBundle(),
+            Either.Right(CommentRef(instance, commentId)),
         )
     }
 
     private fun openPostInternal(
         args: Bundle,
-        postRef: PostRef? = null,
+        itemRef: Either<PostRef, CommentRef>? = null,
         postFragmentOverride: PostFragment? = null,
     ) {
         if (activeOpenPostJob != null) {
@@ -210,7 +231,7 @@ class SlidingPaneController(
                 }
             }
 
-            viewModel.lastSelectedPost = postRef
+            viewModel.lastSelectedItem = itemRef
 
             openPane()
 

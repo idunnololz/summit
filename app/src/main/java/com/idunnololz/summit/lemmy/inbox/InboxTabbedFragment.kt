@@ -88,6 +88,8 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             childFragmentManager = childFragmentManager,
             viewModel = viewModel,
             globalLayoutMode = preferences.globalLayoutMode,
+            emptyScreenText = getString(R.string.select_a_message),
+            fragmentContainerId = R.id.message_fragment_container,
         ).apply {
             onPageSelectedListener = { isOpen ->
 

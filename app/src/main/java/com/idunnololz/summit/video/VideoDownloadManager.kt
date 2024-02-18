@@ -42,6 +42,10 @@ class VideoDownloadManager @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
+    companion object {
+        private const val TAG = "VideoDownloadManager"
+    }
+
     private val databaseProvider = StandaloneDatabaseProvider(context)
 
     private val downloadCache = SimpleCache(directoryHelper.videosDir, NoOpCacheEvictor(), databaseProvider)
@@ -69,7 +73,7 @@ class VideoDownloadManager @Inject constructor(
                 ) {
                     super.onDownloadChanged(downloadManager, download, finalException)
 
-                    Log.d("HAHA", "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException")
+                    Log.d(TAG, "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException")
 
                     if (download.state == Download.STATE_COMPLETED) {
                         onDownloadComplete(download.request)
@@ -81,7 +85,6 @@ class VideoDownloadManager @Inject constructor(
                     waitingForRequirements: Boolean,
                 ) {
                     super.onWaitingForRequirementsChanged(downloadManager, waitingForRequirements)
-                    Log.d("HAHA", "onWaitingForRequirementsChanged()")
                 }
 
                 override fun onDownloadsPausedChanged(
@@ -89,17 +92,14 @@ class VideoDownloadManager @Inject constructor(
                     downloadsPaused: Boolean,
                 ) {
                     super.onDownloadsPausedChanged(downloadManager, downloadsPaused)
-                    Log.d("HAHA", "onDownloadsPausedChanged()")
                 }
 
                 override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
                     super.onDownloadRemoved(downloadManager, download)
-                    Log.d("HAHA", "onDownloadRemoved()")
                 }
 
                 override fun onIdle(downloadManager: DownloadManager) {
                     super.onIdle(downloadManager)
-                    Log.d("HAHA", "onIdle()")
                 }
 
                 override fun onRequirementsStateChanged(
@@ -108,7 +108,6 @@ class VideoDownloadManager @Inject constructor(
                     notMetRequirements: Int,
                 ) {
                     super.onRequirementsStateChanged(downloadManager, requirements, notMetRequirements)
-                    Log.d("HAHA", "onRequirementsStateChanged()")
                 }
             },
         )

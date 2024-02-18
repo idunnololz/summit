@@ -93,6 +93,5 @@
         android:layout_width="@dimen/sliding_pane_second_child_width"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="?backgroundColor">
-    </androidx.fragment.app.FragmentContainerView>
+        android:background="?backgroundColor"/>
 </androidx.slidingpanelayout.widget.SlidingPaneLayout>

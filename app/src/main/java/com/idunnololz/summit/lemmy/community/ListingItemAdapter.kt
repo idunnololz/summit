@@ -213,7 +213,7 @@ class ListingItemAdapter(
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch = onInstanceMismatch,
                         onHighlightComplete = {
-                            postListEngine.clearHighlight()
+                            clearHighlight()
                         },
                         onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
@@ -294,7 +294,7 @@ class ListingItemAdapter(
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
                     onHighlightComplete = {
-                        postListEngine.clearHighlight()
+                      clearHighlight()
                     },
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
@@ -434,6 +434,15 @@ class ListingItemAdapter(
         }
     }
 
+    fun endHighlightForever() {
+        val index = postListEngine.endendHighlightForever()
+
+        if (index >= 0) {
+            postListEngine.createItems()
+            refreshItems(animate = false)
+        }
+    }
+
     fun refreshItems(animate: Boolean) {
         val newItems = postListEngine.items
         val oldItems = items
@@ -502,5 +511,11 @@ class ListingItemAdapter(
     fun updateWithPreferences(preferences: Preferences) {
         markPostsAsReadOnScroll = preferences.markPostsAsReadOnScroll
         blurNsfwPosts = preferences.blurNsfwPosts
+    }
+
+    fun clearHighlight() {
+        postListEngine.clearHighlight()
+        postListEngine.createItems()
+        refreshItems(animate = false)
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
@@ -17,6 +18,7 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentPageResult
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -74,7 +76,7 @@ class PersonTabbedViewModel @Inject constructor(
 
     val currentAccountView = MutableLiveData<AccountView?>()
 
-    override var lastSelectedPost: PostRef? = null
+    override var lastSelectedItem: Either<PostRef, CommentRef>? = null
 
     private var personRef: PersonRef? = null
     private var fetchingPages = mutableSetOf<Int>()

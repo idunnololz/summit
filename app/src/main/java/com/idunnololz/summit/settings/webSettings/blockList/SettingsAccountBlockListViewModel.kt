@@ -7,6 +7,8 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityBlockView
 import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.InstanceBlockView
+import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.MyUserInfo
 import com.idunnololz.summit.api.dto.PersonBlockView
 import com.idunnololz.summit.api.dto.PersonId
@@ -25,9 +27,11 @@ class SettingsAccountBlockListViewModel @Inject constructor(
 
     val userBlockList = StatefulLiveData<List<BlockedPersonItem>>()
     val communityBlockList = StatefulLiveData<List<BlockedCommunityItem>>()
+    val instanceBlockList = StatefulLiveData<List<BlockedInstanceItem>>()
 
     val personChanges = mutableMapOf<PersonId, StatefulData<Unit>>()
     val communityChanges = mutableMapOf<CommunityId, StatefulData<Unit>>()
+    val instanceChanges = mutableMapOf<InstanceId, StatefulData<Unit>>()
 
     private var myUserInfo: MyUserInfo? = null
 
@@ -52,6 +56,7 @@ class SettingsAccountBlockListViewModel @Inject constructor(
                         ).let {
                             userBlockList.postError(it)
                             communityBlockList.postError(it)
+                            instanceBlockList.postError(it)
                         }
                     } else {
                         myUserInfo = data.my_user
@@ -61,6 +66,7 @@ class SettingsAccountBlockListViewModel @Inject constructor(
                 .onFailure {
                     userBlockList.postError(it)
                     communityBlockList.postError(it)
+                    instanceBlockList.postError(it)
                 }
         }
     }
@@ -99,6 +105,23 @@ class SettingsAccountBlockListViewModel @Inject constructor(
         }
     }
 
+    fun unblockInstance(instanceId: InstanceId) {
+        instanceChanges[instanceId] = StatefulData.Loading()
+        onDataChanged()
+
+        viewModelScope.launch {
+            apiClient.blockInstance(instanceId, false)
+                .onFailure {
+                    instanceChanges[instanceId] = StatefulData.Error(it)
+                    onDataChanged()
+                }
+                .onSuccess {
+                    instanceChanges[instanceId] = StatefulData.Success(Unit)
+                    onDataChanged()
+                }
+        }
+    }
+
     private fun onDataChanged() {
         val blockedPersonItems = myUserInfo?.person_blocks?.mapNotNull {
             when (personChanges[it.target.id]) {
@@ -118,9 +141,19 @@ class SettingsAccountBlockListViewModel @Inject constructor(
                 null -> BlockedCommunityItem(it, false)
             }
         }
+        val blockedInstanceItems = myUserInfo?.instance_blocks?.mapNotNull {
+            when (instanceChanges[it.instance.id]) {
+                is StatefulData.Error -> BlockedInstanceItem(it, false)
+                is StatefulData.Loading -> BlockedInstanceItem(it, true)
+                is StatefulData.NotStarted -> BlockedInstanceItem(it, false)
+                is StatefulData.Success -> null
+                null -> BlockedInstanceItem(it, false)
+            }
+        }
 
         userBlockList.postValue(blockedPersonItems ?: listOf())
         communityBlockList.postValue(blockedCommunityItems ?: listOf())
+        instanceBlockList.postValue(blockedInstanceItems ?: listOf())
     }
 
     data class BlockedPersonItem(
@@ -130,6 +163,11 @@ class SettingsAccountBlockListViewModel @Inject constructor(
 
     data class BlockedCommunityItem(
         val blockedCommunity: CommunityBlockView,
+        val isRemoving: Boolean,
+    )
+
+    data class BlockedInstanceItem(
+        val blockedInstance: InstanceBlockView,
         val isRemoving: Boolean,
     )
 }

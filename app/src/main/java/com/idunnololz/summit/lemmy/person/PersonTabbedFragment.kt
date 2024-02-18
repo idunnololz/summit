@@ -187,6 +187,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 globalLayoutMode = preferences.globalLayoutMode,
                 lockPanes = true,
                 retainClosedPosts = preferences.retainLastPost,
+                emptyScreenText = getString(R.string.select_a_post_or_comment),
+                fragmentContainerId = R.id.post_fragment_container,
             ).apply {
                 onPageSelectedListener = { isOpen ->
                 }

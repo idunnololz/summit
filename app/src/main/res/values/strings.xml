@@ -889,6 +889,10 @@
     <string name="show_filtered_posts_desc">When enabled, posts filtered by the filtering rules will appear as a collapsed item.</string>
     <string name="subscribed_communities">Subscribed communities</string>
     <string name="post_filtered_format">This post has been filtered. Filter reason: %1$s.</string>
+    <string name="select_a_post">Select a post</string>
+    <string name="select_a_message">Select a message</string>
+    <string name="select_a_post_or_comment">Select a post or comment</string>
+    <string name="blocked_instances">Blocked instances</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
