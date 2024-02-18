@@ -611,19 +611,22 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
             root.addView(button2)
 
-            if (leftHandMode) {
-                button1.setImageResource(R.drawable.baseline_arrow_upward_24)
-                button2.setImageResource(R.drawable.baseline_arrow_downward_24)
+            val upvoteButton: ImageView
+            val downvoteButton: ImageView
 
+            if (leftHandMode) {
                 upvoteButton = button1
                 downvoteButton = button2
             } else {
-                button2.setImageResource(R.drawable.baseline_arrow_upward_24)
-                button1.setImageResource(R.drawable.baseline_arrow_downward_24)
-
                 upvoteButton = button2
                 downvoteButton = button1
             }
+
+            upvoteButton.setImageResource(R.drawable.baseline_arrow_upward_24)
+            downvoteButton.setImageResource(R.drawable.baseline_arrow_downward_24)
+
+            this.upvoteButton = upvoteButton
+            this.downvoteButton = downvoteButton
 
             controlsDivider?.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 if (leftHandMode) {
@@ -1618,16 +1621,8 @@ class PostAndCommentViewBuilder @Inject constructor(
                             imageTintList = ColorStateList.valueOf(normalTextColor)
                         }
 
-                        val finalUpvoteButton: ImageView
-                        val finalDownvoteButton: ImageView
-
-                        if (leftHandMode) {
-                            finalUpvoteButton = button1
-                            finalDownvoteButton = button2
-                        } else {
-                            finalUpvoteButton = button2
-                            finalDownvoteButton = button1
-                        }
+                        val finalUpvoteButton: ImageView = button2
+                        val finalDownvoteButton: ImageView = button1
 
                         finalUpvoteButton.apply {
                             setImageResource(R.drawable.baseline_arrow_upward_24)
