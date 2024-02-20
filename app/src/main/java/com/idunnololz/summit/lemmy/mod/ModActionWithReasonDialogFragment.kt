@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.mod.ModActionResult.setModActionResult
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.ext.setSizeDynamically
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 
@@ -35,14 +36,7 @@ class ModActionWithReasonDialogFragment :
 
     override fun onStart() {
         super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.WRAP_CONTENT
-
-            val window = checkNotNull(dialog.window)
-            window.setLayout(width, height)
-        }
+        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     override fun onCreateView(

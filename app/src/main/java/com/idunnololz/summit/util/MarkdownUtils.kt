@@ -5,8 +5,6 @@ import android.util.Log
 fun String.escapeMarkdown(): String {
     val that = this
 
-    Log.d("HAHA", "input: $that")
-
     return buildString {
         for (c in that) {
             when (c) {

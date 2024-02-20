@@ -179,7 +179,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val selectableItemBackgroundBorderless =
         context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackgroundBorderless)
     private val backgroundColor =
-        context.getColorFromAttribute(android.R.attr.colorBackground)
+        context.getColorFromAttribute(com.google.android.material.R.attr.backgroundColor)
 
     private val paddingHalf = context.getDimen(R.dimen.padding_half)
     private val paddingFull = context.getDimen(R.dimen.padding)
@@ -722,56 +722,55 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         with(holder) {
             if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {
+                if (showUpAndDownVotes) {
+                    holder.headerView.textView3.visibility = View.VISIBLE
+
+                    holder.upvoteCount = holder.headerView.textView2
+                    holder.downvoteCount = holder.headerView.textView3
+                } else {
+                    holder.headerView.textView3.visibility = View.GONE
+
+                    holder.upvoteCount = null
+                    holder.downvoteCount = null
+                }
+
+                if (useMultilineHeader) {
+                    // We are displaying the score on it's own line so no padding needed.
+                    headerView.textView2.updatePaddingRelative(
+                        start = 0,
+                    )
+                    headerView.updatePaddingRelative(
+                        bottom = Utils.convertDpToPixel(8f).toInt(),
+                    )
+                    collapseSectionButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        bottomMargin = Utils.convertDpToPixel(8f).toInt()
+                    }
+                } else {
+                    headerView.textView2.updatePaddingRelative(
+                        start = Utils.convertDpToPixel(8f).toInt(),
+                    )
+                }
+
                 when (val rb = rawBinding) {
                     is PostCommentExpandedItemBinding -> {
                         ensureActionButtons(
                             root = rb.root,
-                            isCompact = isCompactView,
                             leftHandMode = leftHandMode,
                             showUpAndDownVotes = showUpAndDownVotes,
+                            fullWidth = false,
                         )
                     }
                     is PostCommentExpandedCompactItemBinding -> {
-                        if (showUpAndDownVotes) {
-                            holder.headerView.textView3.visibility = View.VISIBLE
-
-                            holder.upvoteCount = holder.headerView.textView2
-                            holder.downvoteCount = holder.headerView.textView3
-                        } else {
-                            holder.headerView.textView3.visibility = View.GONE
-
-                            holder.upvoteCount = null
-                            holder.downvoteCount = null
-                        }
-
-                        if (useMultilineHeader) {
-                            // We are displaying the score on it's own line so no padding needed.
-                            headerView.textView2.updatePaddingRelative(
-                                start = 0,
-                            )
-                            headerView.updatePaddingRelative(
-                                bottom = Utils.convertDpToPixel(8f).toInt(),
-                            )
-                            collapseSectionButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                                bottomMargin = Utils.convertDpToPixel(8f).toInt()
-                            }
-                        } else {
-                            headerView.textView2.updatePaddingRelative(
-                                start = Utils.convertDpToPixel(8f).toInt(),
-                            )
-                        }
-
                         if (isActionsExpanded) {
                             ensureActionButtons(
                                 root = root,
-                                isCompact = isCompactView,
                                 leftHandMode = leftHandMode,
                                 showUpAndDownVotes = showUpAndDownVotes,
+                                fullWidth = false,
                             )
                         } else {
                             ensureActionButtons(
                                 root = root,
-                                isCompact = isCompactView,
                                 leftHandMode = leftHandMode,
                                 showUpAndDownVotes = showUpAndDownVotes,
                                 removeOnly = true,
@@ -1476,10 +1475,10 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     private fun CommentExpandedViewHolder.ensureActionButtons(
         root: ViewGroup,
-        isCompact: Boolean,
         leftHandMode: Boolean,
         showUpAndDownVotes: Boolean,
         removeOnly: Boolean = false,
+        fullWidth: Boolean = true,
     ) {
         root.removeView(quickActionsBar)
 
@@ -1548,18 +1547,11 @@ class PostAndCommentViewBuilder @Inject constructor(
                         quickActionsBar.addView(buttons.upvoteButton)
                         quickActionsBar.addView(buttons.downvoteButton)
 
-                        if (isCompact) {
-                            upvoteButton = buttons.upvoteButton
-                            downvoteButton = buttons.downvoteButton
-                            upvoteCount2 = buttons.upvoteButton
-                            downvoteCount2 = buttons.downvoteButton
-                        } else {
-                            scoreCount = buttons.upvoteButton
-                            upvoteButton = buttons.upvoteButton
-                            upvoteCount = buttons.upvoteButton
-                            downvoteButton = buttons.downvoteButton
-                            downvoteCount = buttons.downvoteButton
-                        }
+                        scoreCount2 = buttons.upvoteButton
+                        upvoteButton = buttons.upvoteButton
+                        upvoteCount2 = buttons.upvoteButton
+                        downvoteButton = buttons.downvoteButton
+                        downvoteCount2 = buttons.downvoteButton
                     } else {
                         val button1 = ImageView(
                             context,
@@ -1596,11 +1588,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                                 gravity = Gravity.CENTER_VERTICAL
                             }
                         }.also {
-                            if (isCompact) {
-                                scoreCount2 = it
-                            } else {
-                                scoreCount = it
-                            }
+                            scoreCount2 = it
                         }
 
                         val button2 = ImageView(
@@ -1737,8 +1725,13 @@ class PostAndCommentViewBuilder @Inject constructor(
                 startToStart = R.id.start_barrier
                 endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             } else {
+                if (fullWidth) {
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                } else {
+                    endToEnd = R.id.start_barrier
+                    marginEnd = Utils.convertDpToPixel(16f).toInt()
+                }
                 startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             }
         }
         root.addView(quickActionsBarContainer)

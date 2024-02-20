@@ -11,6 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentAddFilterBinding
 import com.idunnololz.summit.filterLists.FilterEntry
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 
 class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilterBinding>() {
@@ -32,14 +33,8 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
 
     override fun onStart() {
         super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.WRAP_CONTENT
 
-            val window = checkNotNull(dialog.window)
-            window.setLayout(width, height)
-        }
+        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     override fun onCreateView(

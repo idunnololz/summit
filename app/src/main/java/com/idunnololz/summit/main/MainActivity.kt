@@ -120,6 +120,7 @@ class MainActivity : BaseActivity() {
     val keyPressRegistrationManager = KeyPressRegistrationManager()
 
     val insetsChangedLiveData = MutableLiveData<Int>()
+    val lastInsetLiveData = MutableLiveData<MainActivityInsets>()
 
     private val onNavigationItemReselectedListeners =
         mutableListOf<NavigationBarView.OnItemReselectedListener>()
@@ -421,6 +422,7 @@ class MainActivity : BaseActivity() {
             }
 
             insetsChangedLiveData.postValue(0)
+            lastInsetLiveData.value = lastInsets
 
             currentBottomMenu?.setInsets(lastInsets.topInset, lastInsets.bottomInset)
 
@@ -677,7 +679,7 @@ class MainActivity : BaseActivity() {
                 viewModel = viewModel,
                 viewLifecycleOwner = this,
             ).also {
-                it.inflate(binding.root)
+                it.setup(this, binding.root)
 
                 communitySelectorController = it
             }
@@ -695,8 +697,7 @@ class MainActivity : BaseActivity() {
 
         communitySelectorController.show(
             bottomSheetContainer = binding.root,
-            activity = this,
-            lifecycleOwner = this,
+            this,
         )
 
         return communitySelectorController

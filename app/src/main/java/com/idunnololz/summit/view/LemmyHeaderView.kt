@@ -269,7 +269,7 @@ class LemmyHeaderView : FrameLayout {
                 child.layout(
                     start + layoutParams.leftMargin,
                     top,
-                    start + child.measuredWidth + layoutParams.leftMargin,
+                    start + layoutParams.leftMargin + child.measuredWidth,
                     top + child.measuredHeight,
                 )
                 top += child.measuredHeight

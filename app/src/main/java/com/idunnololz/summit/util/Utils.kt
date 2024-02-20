@@ -470,7 +470,6 @@ object Utils {
 
     fun getScreenHeight(context: Context): Int {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        checkNotNull(windowManager) { "WindowManager was null" }
 
         val display = windowManager.defaultDisplay
         val size = Point()
