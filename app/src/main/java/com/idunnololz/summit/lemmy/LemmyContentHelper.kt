@@ -409,7 +409,7 @@ class LemmyContentHelper(
                 true
             }
         }
-        fun insertAndLoadFullImage(imageUrl: String, fallback: String? = null) {
+        fun insertAndLoadFullImage(originalImageUrl: String, fallback: String? = null) {
             if (!showImage) return
 
             val fullContentImageView = getView<View>(R.layout.full_content_image_view)
@@ -425,12 +425,12 @@ class LemmyContentHelper(
 
             fullImageView.load(null)
             fullImageView.setOnLongClickListener {
-                onLinkLongClick(imageUrl, null)
+                onLinkLongClick(originalImageUrl, null)
                 true
             }
 
             fun updateLayoutParams() {
-                offlineManager.getImageSizeHint(imageUrl, tempSize)
+                offlineManager.getImageSizeHint(originalImageUrl, tempSize)
                 if (tempSize.width > 0 && tempSize.height > 0) {
                     val thumbnailMaxHeight =
                         (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
@@ -482,7 +482,7 @@ class LemmyContentHelper(
 
                                 if (tempSize.width > 0 && tempSize.height > 0) {
                                     offlineManager.setImageSizeHint(
-                                        imageUrl,
+                                        originalImageUrl,
                                         tempSize.width,
                                         tempSize.height,
                                     )
@@ -503,15 +503,16 @@ class LemmyContentHelper(
             }
 
             updateLayoutParams()
+            offlineManager.getImageSizeHint(originalImageUrl, tempSize)
 
             loadingView?.setOnRefreshClickListener {
-                fetchFullImage(imageUrl)
+                fetchFullImage(originalImageUrl)
             }
-            fetchFullImage(imageUrl)
+            fetchFullImage(originalImageUrl)
 
             fullImageView.transitionName = fullImageViewTransitionName
             fullImageView.setOnClickListener {
-                onFullImageViewClickListener(it, imageUrl)
+                onFullImageViewClickListener(it, originalImageUrl)
             }
         }
 
@@ -520,8 +521,8 @@ class LemmyContentHelper(
             when (postType) {
                 PostType.Image -> {
                     insertAndLoadFullImage(
-                        requireNotNull(targetPostView.post.url),
-                        targetPostView.post.thumbnail_url,
+                        originalImageUrl = requireNotNull(targetPostView.post.url),
+                        fallback = targetPostView.post.thumbnail_url,
                     )
                 }
                 PostType.Video -> {

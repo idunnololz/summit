@@ -9,6 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.databinding.DialogFragmentPreviewCommentBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.ext.setSizeDynamically
 
 class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCommentBinding>() {
 
@@ -16,14 +17,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
 
     override fun onStart() {
         super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.WRAP_CONTENT
-
-            val window = checkNotNull(dialog.window)
-            window.setLayout(width, height)
-        }
+        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     override fun onCreateView(

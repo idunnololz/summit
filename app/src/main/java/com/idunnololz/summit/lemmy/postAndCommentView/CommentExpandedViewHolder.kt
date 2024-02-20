@@ -65,7 +65,7 @@ class CommentExpandedViewHolder(
                 overlay = binding.overlay,
                 text = binding.text,
                 startGuideline = binding.startGuideline,
-                scoreCount = null,
+                scoreCount = binding.headerView.textView2,
                 upvoteCount = null,
                 upvoteButton = null,
                 downvoteCount = null,

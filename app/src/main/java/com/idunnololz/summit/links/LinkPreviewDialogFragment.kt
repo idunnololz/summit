@@ -41,6 +41,9 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
 
     override fun onStart() {
         super.onStart()
+
+        // WARNING!!! This dialog has multiple layouts for different screen sizes!
+
         val dialog = dialog
         if (dialog != null) {
             val width = ViewGroup.LayoutParams.MATCH_PARENT

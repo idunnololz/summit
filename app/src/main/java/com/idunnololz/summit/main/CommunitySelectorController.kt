@@ -3,6 +3,7 @@ package com.idunnololz.summit.main
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +12,11 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
@@ -47,6 +50,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.FixedBottomSheetBehavior
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
 import com.idunnololz.summit.util.ext.runAfterLayout
@@ -91,7 +95,6 @@ class CommunitySelectorController @AssistedInject constructor(
     private var rootView: View? = null
 
     private lateinit var binding: CommunitySelectorViewBinding
-    private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: EditText
 
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
@@ -116,6 +119,16 @@ class CommunitySelectorController @AssistedInject constructor(
         }
     }
 
+    private val insetObserver: Observer<MainActivityInsets> = Observer { insets ->
+        binding.csBottomSheetContainerInner.updateLayoutParams<MarginLayoutParams> {
+            topMargin = insets.topInset
+            leftMargin = insets.leftInset
+            rightMargin = insets.rightInset
+        }
+    }
+
+    private var removeView: (() -> Unit)? = null
+
     init {
         viewModel.siteOrCommunity.observe(viewLifecycleOwner) {
             adapter.setCurrentCommunity(currentCommunity, it, {})
@@ -128,7 +141,7 @@ class CommunitySelectorController @AssistedInject constructor(
         }
     }
 
-    fun inflate(container: ViewGroup) {
+    fun setup(activity: MainActivity, container: ViewGroup) {
         rootView?.let {
             return
         }
@@ -137,25 +150,10 @@ class CommunitySelectorController @AssistedInject constructor(
         this.binding = binding
         this.rootView = binding.root
 
-        val rootView = binding.root
-        val bottomSheet = binding.coordinatorLayout
-
-        rootView.visibility = View.GONE
-
-        recyclerView = binding.recyclerView
         searchView = binding.searchView
 
-        recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-
-        BottomSheetBehavior.from(bottomSheet).apply {
-            peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
-            isHideable = true
-            state = BottomSheetBehavior.STATE_HIDDEN
-            skipCollapsed = true
-        }.also {
-            bottomSheetBehavior = it
-        }
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
         searchView.setOnKeyListener(
             View.OnKeyListener { _, keyCode, event ->
@@ -184,39 +182,20 @@ class CommunitySelectorController @AssistedInject constructor(
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     adapter.setQuery(s?.toString()) {
-                        recyclerView.scrollToPosition(0)
+                        binding.recyclerView.scrollToPosition(0)
                     }
                     doQueryAsync(s)
                 }
             },
         )
-    }
 
-    private fun doQueryAsync(query: CharSequence?) {
-        query ?: return
-
-        adapter.setQueryServerResultsInProgress()
-
-        coroutineScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                lemmyApiClient.search(
-                    sortType = SortType.TopMonth,
-                    listingType = ListingType.All,
-                    searchType = SearchType.Communities,
-                    query = query.toString(),
-                    limit = 20,
-                )
-            }
-            result.onSuccess {
-                adapter.setQueryServerResults(it.communities)
-            }
-        }
+        activity.lastInsetLiveData.observe(activity, insetObserver)
+        activity.insetViewExceptTopAutomaticallyByMargins(activity, binding.recyclerView)
     }
 
     fun show(
         bottomSheetContainer: ViewGroup,
         activity: MainActivity,
-        lifecycleOwner: LifecycleOwner,
     ) {
         val rootView = rootView ?: return
 
@@ -224,41 +203,38 @@ class CommunitySelectorController @AssistedInject constructor(
             return
         }
 
-        val overlay = binding.overlay
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.scrollToPosition(0)
+
+        removeView = { bottomSheetContainer.removeView(rootView) }
+        bottomSheetContainer.addView(rootView)
+
+        activity.onBackPressedDispatcher.addCallback(activity, onBackPressedHandler)
+
+        rootView.requestLayout()
+
+        BottomSheetBehavior.from(binding.csCoordinatorLayout).apply {
+            peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
+            isHideable = true
+            state = BottomSheetBehavior.STATE_HIDDEN
+            skipCollapsed = true
+        }.also {
+            bottomSheetBehavior = it
+        }
+        val overlay = binding.csOverlay
         overlay.setOnClickListener {
             bottomSheetBehavior?.setState(
                 BottomSheetBehavior.STATE_HIDDEN,
             )
         }
 
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.scrollToPosition(0)
-
-        rootView.visibility = View.VISIBLE
-
-        activity.insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = checkNotNull(activity.windowInsets.value)
-            recyclerView.updatePadding(bottom = insets.bottom)
-            binding.bottomSheetContainerInner.updateLayoutParams<MarginLayoutParams> {
-                topMargin = insets.top
-                leftMargin = insets.left
-                rightMargin = insets.right
-            }
-        }
-
-        activity.insetViewExceptTopAutomaticallyByMargins(lifecycleOwner, recyclerView)
-
-        activity.onBackPressedDispatcher.addCallback(lifecycleOwner, onBackPressedHandler)
-
-        bottomSheetContainer.addView(rootView)
-
         bottomSheetBehavior?.addBottomSheetCallback(
             object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet1: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                         adapter.stopLoading()
-                        rootView.visibility = View.GONE
-                        bottomSheetContainer.removeView(rootView)
+                        removeView?.invoke()
+                        removeView = null
                         onBackPressedHandler.remove()
                     } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                         adapter.startLoading()
@@ -274,6 +250,8 @@ class CommunitySelectorController @AssistedInject constructor(
                 }
             },
         )
+
+        binding.csCoordinatorLayout.translationY = 0f
 
         rootView.runAfterLayout {
             rootView.postDelayed({
@@ -314,6 +292,27 @@ class CommunitySelectorController @AssistedInject constructor(
 
         if (communityRef != null) {
             viewModel.onCommunityChanged(communityRef)
+        }
+    }
+
+    private fun doQueryAsync(query: CharSequence?) {
+        query ?: return
+
+        adapter.setQueryServerResultsInProgress()
+
+        coroutineScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                lemmyApiClient.search(
+                    sortType = SortType.TopMonth,
+                    listingType = ListingType.All,
+                    searchType = SearchType.Communities,
+                    query = query.toString(),
+                    limit = 20,
+                )
+            }
+            result.onSuccess {
+                adapter.setQueryServerResults(it.communities)
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.databinding.DialogFragmentAddLinkBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.getPlainTextFromClipboard
+import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import kotlinx.parcelize.Parcelize
 
@@ -41,14 +42,8 @@ class AddLinkDialogFragment : BaseDialogFragment<DialogFragmentAddLinkBinding>()
 
     override fun onStart() {
         super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.WRAP_CONTENT
 
-            val window = checkNotNull(dialog.window)
-            window.setLayout(width, height)
-        }
+        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     override fun onCreateView(

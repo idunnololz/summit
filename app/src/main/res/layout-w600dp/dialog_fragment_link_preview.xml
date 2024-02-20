@@ -30,8 +30,9 @@
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"
         android:maxWidth="300dp"
-        android:layout_marginHorizontal="@dimen/padding"
-        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginStart="@dimen/dialog_padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:layout_marginBottom="@dimen/dialog_padding"
         style="@style/CardImageView"
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintHeight_min="100dp"
@@ -67,7 +68,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/padding"
+            android:paddingBottom="@dimen/dialog_padding"
+            android:layout_marginEnd="@dimen/padding"
             android:clipToPadding="false">
 
             <com.idunnololz.summit.view.LinkifyTextView
@@ -155,8 +157,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/open_link"
-        android:layout_marginEnd="@dimen/padding"
-        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginEnd="@dimen/dialog_padding"
+        android:layout_marginBottom="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

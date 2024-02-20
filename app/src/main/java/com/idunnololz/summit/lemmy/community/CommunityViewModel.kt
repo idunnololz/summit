@@ -345,6 +345,7 @@ class CommunityViewModel @Inject constructor(
         clearPagesOnSuccess: Boolean = false,
         scrollToTop: Boolean = false,
     ) {
+        Log.d("HAHA", "fetchInitialPage()", RuntimeException())
         viewModelScope.launch {
             // Allow some time for settings to settle or else we will end up loading multiple times
             delay(100)
@@ -418,6 +419,7 @@ class CommunityViewModel @Inject constructor(
         clearPagesOnSuccess: Boolean = false,
         scrollToTop: Boolean = false,
     ) {
+        Log.d("HAHA", "aaaa", RuntimeException())
         if (fetchingPages.contains(pageToFetch)) {
             return
         }
@@ -493,15 +495,17 @@ class CommunityViewModel @Inject constructor(
         }
 
         val communityRefSafe: CommunityRef = communityRef
-        val instance = when (communityRefSafe) {
+        val newApiInstance = when (communityRefSafe) {
             is CommunityRef.All -> communityRefSafe.instance
-            is CommunityRef.CommunityRefByName -> communityRefSafe.instance
+            is CommunityRef.CommunityRefByName ->
+                // These references are universal. I.e. they can be opened on any instance.
+                null
             is CommunityRef.Local -> communityRefSafe.instance
             is CommunityRef.ModeratedCommunities -> communityRefSafe.instance
             is CommunityRef.MultiCommunity -> currentAccount?.instance
             is CommunityRef.Subscribed -> communityRefSafe.instance
         }
-        val instanceChange = instance != null && instance != apiInstance
+        val instanceChange = newApiInstance != null && newApiInstance != apiInstance
 
         if (currentCommunityRef.value == communityRefSafe && !instanceChange) {
             return

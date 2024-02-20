@@ -65,7 +65,7 @@
 
     <com.idunnololz.summit.view.LemmyHeaderView
         android:id="@+id/header_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fadingEdge="horizontal"
         android:requiresFadingEdge="horizontal"
