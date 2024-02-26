@@ -35,4 +35,5 @@ typealias ContentTypeId = Int
 
 object ContentTypes {
     const val PostListType = 1
+    const val CommentListType = 2
 }

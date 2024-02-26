@@ -149,7 +149,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
                 }
             },
         ).apply {
-            this.addItemType(Item.FilterItem::class, FilterItemBinding::inflate) { item, b, h ->
+            this.addItemType(Item.FilterItem::class, FilterItemBinding::inflate) { item, b, _ ->
                 b.icon.setImageResource(
                     if (item.filter.isRegex) {
                         R.drawable.ic_regex_24

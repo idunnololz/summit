@@ -7,6 +7,7 @@ import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getDepth
+import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import java.util.LinkedHashMap
 import java.util.LinkedList
@@ -14,13 +15,14 @@ import java.util.LinkedList
 private const val TAG = "CommentTreeBuilder"
 
 data class CommentNodeData(
-    var commentView: PostViewModel.ListView,
+    var listView: PostViewModel.ListView,
     var depth: Int,
     val children: MutableList<CommentNodeData> = mutableListOf(),
 )
 
 class CommentTreeBuilder(
     private val accountManager: AccountManager,
+    private val contentFiltersManager: ContentFiltersManager,
 ) {
 
     suspend fun buildCommentsTreeListView(
@@ -47,37 +49,43 @@ class CommentTreeBuilder(
                 "Depth: ${firstComment?.getDepth()} First comment: ${firstComment?.content}. ",
         )
 
-        val topNodes = mutableListOf<CommentNodeData>()
-        comments?.forEach { comment ->
+        fun addComment(comment: CommentView) {
             val depth = comment.comment.getDepth().minus(depthOffset)
-            val node = CommentNodeData(
-                commentView = PostViewModel.ListView.CommentListView(
+
+            val commentView = if (contentFiltersManager.testCommentView(comment)) {
+                PostViewModel.ListView.FilteredCommentItem(
                     comment,
                     pendingCommentView = idToPendingComments[comment.comment.id],
                     isRemoved = removedCommentIds.contains(comment.comment.id),
-                ),
-                depth = depth,
-            )
+                )
+            } else {
+                PostViewModel.ListView.VisibleCommentListView(
+                    comment,
+                    pendingCommentView = idToPendingComments[comment.comment.id],
+                    isRemoved = removedCommentIds.contains(comment.comment.id),
+                )
+            }
+            val node =
+                CommentNodeData(
+                    listView = commentView,
+                    depth = depth,
+                )
             map[comment.comment.id] = node
         }
+
+        val topNodes = mutableListOf<CommentNodeData>()
+        comments?.forEach { comment ->
+            addComment(comment)
+        }
         supplementaryComments.values.forEach { comment ->
-            val depth = comment.comment.getDepth().minus(depthOffset)
-            val node = CommentNodeData(
-                commentView = PostViewModel.ListView.CommentListView(
-                    comment,
-                    pendingCommentView = idToPendingComments[comment.comment.id],
-                    isRemoved = removedCommentIds.contains(comment.comment.id),
-                ),
-                depth = depth,
-            )
-            map[comment.comment.id] = node
+            addComment(comment)
         }
 
         val targetCommentId = targetCommentRef?.id
 
         // add missing comments first
         ArrayList(map.values).forEach { node ->
-            val commentView = node.commentView
+            val commentView = node.listView
             if (commentView !is PostViewModel.ListView.CommentListView) {
                 return@forEach
             }
@@ -109,7 +117,7 @@ class CommentTreeBuilder(
         }
 
         map.values.forEach { node ->
-            val commentView = node.commentView
+            val commentView = node.listView
             if (commentView !is PostViewModel.ListView.CommentListView &&
                 commentView !is PostViewModel.ListView.MissingCommentItem
             ) {
@@ -161,17 +169,24 @@ class CommentTreeBuilder(
                 // this is an updated comment
 
                 val originalComment = map[pendingComment.commentId]
-                val commentView = originalComment?.commentView
+                val commentView = originalComment?.listView
                 if (originalComment != null && commentView is PostViewModel.ListView.CommentListView) {
-                    originalComment.commentView = commentView.copy(
-                        pendingCommentView = pendingComment,
-                    )
+                    originalComment.listView = when (commentView) {
+                        is PostViewModel.ListView.FilteredCommentItem ->
+                            commentView.copy(
+                                pendingCommentView = pendingComment,
+                            )
+                        is PostViewModel.ListView.VisibleCommentListView ->
+                            commentView.copy(
+                                pendingCommentView = pendingComment,
+                            )
+                    }
                 }
             } else if (pendingComment.parentId == null) {
                 topNodes.add(
                     0,
                     CommentNodeData(
-                        commentView = PostViewModel.ListView.PendingCommentListView(
+                        listView = PostViewModel.ListView.PendingCommentListView(
                             pendingComment,
                             author = accountManager.getAccountById(pendingComment.accountId)?.name,
                         ),
@@ -186,7 +201,7 @@ class CommentTreeBuilder(
                     it.children.add(
                         0,
                         CommentNodeData(
-                            commentView = PostViewModel.ListView.PendingCommentListView(
+                            listView = PostViewModel.ListView.PendingCommentListView(
                                 pendingComment,
                                 author = accountManager.getAccountById(pendingComment.accountId)?.name,
                             ),
@@ -212,7 +227,7 @@ class CommentTreeBuilder(
         while (toVisit.isNotEmpty()) {
             val node = toVisit.pollFirst() ?: continue
 
-            val commentView = node.commentView
+            val commentView = node.listView
             if (commentView !is PostViewModel.ListView.CommentListView) {
                 continue
             }
@@ -221,7 +236,7 @@ class CommentTreeBuilder(
             val expectedCount = commentView.comment.counts.child_count
 
             node.children.forEach {
-                when (val commentView = it.commentView) {
+                when (val commentView = it.listView) {
                     is PostViewModel.ListView.CommentListView -> {
                         childrenCount += commentView.comment.counts.child_count + 1 // + 1 for this comment
                         toVisit.push(it)
@@ -278,7 +293,7 @@ class CommentTreeBuilder(
         val expectedCount = post.counts.comments
 
         topNodes.forEach {
-            when (val commentView = it.commentView) {
+            when (val commentView = it.listView) {
                 is PostViewModel.ListView.CommentListView -> {
                     childrenCount += commentView.comment.counts.child_count + 1 // + 1 for this comment
                 }
@@ -340,7 +355,7 @@ fun List<CommentNodeData>.flatten(
 
             result.add(currentNode)
 
-            when (val commentView = currentNode.commentView) {
+            when (val commentView = currentNode.listView) {
                 is PostViewModel.ListView.CommentListView -> {
                     if (collapsedItemIds.contains(commentView.id)) {
                         continue

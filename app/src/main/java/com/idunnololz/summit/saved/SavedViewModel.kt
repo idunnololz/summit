@@ -16,7 +16,6 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
-import com.idunnololz.summit.lemmy.CommentPageResult
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PostRef
@@ -44,6 +43,7 @@ class SavedViewModel @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
     private val savedManager: SavedManager,
+    private val commentListEngineFactory: CommentListEngine.Factory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
@@ -63,7 +63,7 @@ class SavedViewModel @Inject constructor(
         coroutineScopeFactory = coroutineScopeFactory,
         directoryHelper = directoryHelper,
     )
-    var commentListEngine = CommentListEngine()
+    var commentListEngine = commentListEngineFactory.create()
 
     val instance: String
         get() = apiClient.instance
@@ -214,13 +214,11 @@ class SavedViewModel @Inject constructor(
                 .onSuccess {
                     if (commentListEngine.hasMore || force) {
                         commentListEngine.addComments(
-                            CommentPageResult(
-                                it,
-                                apiClient.instance,
-                                pageIndex,
-                                it.size == PAGE_SIZE,
-                                null,
-                            ),
+                            comments = it,
+                            instance = apiClient.instance,
+                            pageIndex = pageIndex,
+                            hasMore = it.size == PAGE_SIZE,
+                            error = null,
                         )
                     }
 
@@ -231,13 +229,11 @@ class SavedViewModel @Inject constructor(
                 .onFailure {
                     if (commentListEngine.hasMore || force) {
                         commentListEngine.addComments(
-                            CommentPageResult(
-                                listOf(),
-                                apiClient.instance,
-                                pageIndex,
-                                false,
-                                it,
-                            ),
+                            comments = listOf(),
+                            instance = apiClient.instance,
+                            pageIndex = pageIndex,
+                            hasMore = false,
+                            error = it,
                         )
                     }
 

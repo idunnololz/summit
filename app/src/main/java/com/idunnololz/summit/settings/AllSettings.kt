@@ -929,6 +929,21 @@ class CommentListSettings @Inject constructor(
         context.getString(R.string.customize_comment_quick_actions),
         context.getString(R.string.customize_comment_quick_actions_desc),
     )
+    val keywordFilters = BasicSettingItem(
+        null,
+        context.getString(R.string.keyword_filters),
+        context.getString(R.string.comment_keyword_filters_desc),
+    )
+    val instanceFilters = BasicSettingItem(
+        null,
+        context.getString(R.string.instance_filters),
+        context.getString(R.string.comment_instance_filters_desc),
+    )
+    val userFilters = BasicSettingItem(
+        null,
+        context.getString(R.string.user_filters),
+        context.getString(R.string.comment_user_filters_desc),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,
@@ -2136,6 +2151,18 @@ fun makeCommunitySortOrderChoices(context: Context) =
         RadioGroupSettingItem.RadioGroupOption(
             R.id.sort_order_new_comments,
             context.getString(R.string.sort_order_new_comments),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_controversial,
+            context.getString(R.string.sort_order_controversial),
+            null,
+            null,
+        ),
+        RadioGroupSettingItem.RadioGroupOption(
+            R.id.sort_order_scaled,
+            context.getString(R.string.sort_order_scaled),
             null,
             null,
         ),

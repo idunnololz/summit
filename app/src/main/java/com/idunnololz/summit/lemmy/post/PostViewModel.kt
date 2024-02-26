@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentNavControlsState
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
@@ -58,6 +59,7 @@ class PostViewModel @Inject constructor(
     private val preferenceManager: PreferenceManager,
     private val state: SavedStateHandle,
     private val unauthedApiClient: LemmyApiClient,
+    private val contentFiltersManager: ContentFiltersManager,
     val queryMatchHelper: QueryMatchHelper,
 ) : ViewModel() {
 
@@ -269,7 +271,10 @@ class PostViewModel @Inject constructor(
             } else {
                 Result.success(this@PostViewModel.comments)
             }
-            this@PostViewModel.comments = commentsResult.getOrNull()
+            val newComments = commentsResult.getOrNull()
+            this@PostViewModel.comments = newComments
+
+            invalidateSupplementaryComments(newComments)
 
             if (force) {
                 additionalLoadedCommentIds.forEach {
@@ -558,21 +563,63 @@ class PostViewModel @Inject constructor(
 
         var modified = false
         if (resolveCompletedPendingComments) {
-            pendingComments?.forEach { pendingComment ->
-                if (pendingComment.complete) {
+            val completedPendingComments = pendingComments?.filter { it.complete } ?: listOf()
+            val anyPendingCommentComplete = completedPendingComments.isNotEmpty()
+
+            if (anyPendingCommentComplete) {
+                var result: Result<List<CommentView>>? = null
+
+                for (i in 0 until 10) {
                     // Looks like commits on the server is async. Refreshing a comment immediately
                     // after we post it may not get us the latest value.
-                    delay(1000)
 
-                    val result = commentsFetcher.fetchCommentsWithRetry(
-                        Either.Left(pendingComment.postRef.id),
+                    result = commentsFetcher.fetchCommentsWithRetry(
+                        Either.Left(postRef.id),
                         sortOrder,
                         maxDepth = null,
                         force = true,
                     )
 
-                    this@PostViewModel.comments = result.getOrNull()
+                    val oldComments = this@PostViewModel.comments
+                    val newComments = result.getOrNull()
 
+                    var allCommentsUpdates = true // tracks if all comments are updated on the server
+
+                    if (oldComments != null && newComments != null) {
+                        for (completedPendingComment in completedPendingComments) {
+                            val commentId = completedPendingComment.commentId
+                            if (commentId != null) {
+                                val oldComment = oldComments.firstOrNull { it.comment.id == commentId }
+                                    ?: continue
+                                val newComment = newComments.firstOrNull { it.comment.id == commentId }
+                                    ?: continue
+
+                                if (oldComment.comment.updated == newComment.comment.updated) {
+                                    Log.d(TAG, "1 completed pending comment was not updated on the server.")
+                                    allCommentsUpdates = false
+                                } else {
+                                    Log.d(TAG, "1 completed pending comment was updated on the server. New content: '${newComment.comment.content}'")
+                                }
+                            }
+                        }
+                    }
+
+                    // If a user sends a new comment, we update that comment as a supplementary
+                    // comment. If we then update that comment, our new comment data can be
+                    // overridden by supplementary comments. So invalidate those...
+                    invalidateSupplementaryComments(newComments)
+
+                    if (allCommentsUpdates) {
+                        delay(1000)
+                        break
+                    }
+                }
+
+                requireNotNull(result)
+
+                this@PostViewModel.comments = result.getOrNull()
+
+                completedPendingComments.forEach { pendingComment ->
                     val commentsResult = if (pendingComment.parentId == null) {
                         result
                     } else {
@@ -582,7 +629,7 @@ class PostViewModel @Inject constructor(
                     commentsResult.onSuccess {
                         modified = true
 
-                        // find the comment that was recently posts by guessing!
+                        // find the comment that was recently posted by guessing!
 
                         if (pendingComment.isActionDelete) {
                             newlyPostedCommentId = pendingComment.commentId
@@ -614,7 +661,17 @@ class PostViewModel @Inject constructor(
         }
     }
 
+    private fun invalidateSupplementaryComments(newComments: List<CommentView>?) {
+        newComments ?: return
+
+        for (comment in newComments) {
+            supplementaryComments.remove(comment.comment.id)
+        }
+    }
+
     private suspend fun updateData() {
+        Log.d(TAG, "updateData()")
+
         val post = postView ?: return
         val comments = comments
         val pendingComments = pendingComments
@@ -623,7 +680,7 @@ class PostViewModel @Inject constructor(
 
         val postDataValue = PostData(
             postView = ListView.PostListView(post),
-            commentTree = CommentTreeBuilder(accountManager).buildCommentsTreeListView(
+            commentTree = CommentTreeBuilder(accountManager, contentFiltersManager).buildCommentsTreeListView(
                 post = post,
                 comments = comments,
                 parentComment = true,
@@ -675,6 +732,7 @@ class PostViewModel @Inject constructor(
         depth: Int? = null,
         force: Boolean = false,
     ): Result<List<CommentView>> {
+        Log.d(TAG, "fetchMoreCommentsInternal(): parentId = ${parentId}")
         val result = commentsFetcher.fetchCommentsWithRetry(
             Either.Right(parentId),
             sortOrder,
@@ -747,12 +805,26 @@ class PostViewModel @Inject constructor(
             override val id: Long = post.post.id.toLong() or POST_FLAG,
         ) : ListView
 
-        data class CommentListView(
-            val comment: CommentView,
-            val pendingCommentView: PendingCommentView? = null,
-            var isRemoved: Boolean = false,
+        sealed interface CommentListView: ListView {
+            val comment: CommentView
+            val pendingCommentView: PendingCommentView?
+            var isRemoved: Boolean
+        }
+
+        data class VisibleCommentListView(
+            override val comment: CommentView,
+            override val pendingCommentView: PendingCommentView? = null,
+            override var isRemoved: Boolean = false,
             override val id: Long = comment.comment.id.toLong() or COMMENT_FLAG,
-        ) : ListView
+        ) : CommentListView
+
+        data class FilteredCommentItem(
+            override val comment: CommentView,
+            override val pendingCommentView: PendingCommentView? = null,
+            override var isRemoved: Boolean = false,
+            override val id: Long = comment.comment.id.toLong() or COMMENT_FLAG,
+            var show: Boolean = false,
+        ) : CommentListView
 
         data class PendingCommentListView(
             val pendingCommentView: PendingCommentView,

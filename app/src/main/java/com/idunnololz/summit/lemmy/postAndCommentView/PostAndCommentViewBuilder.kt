@@ -24,6 +24,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.setPadding
+import androidx.core.view.size
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
@@ -49,6 +50,7 @@ import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
+import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
@@ -102,8 +104,11 @@ import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -1487,9 +1492,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         val actions = commentQuickActions.actions + CommentQuickActionIds.More
 
         val quickActionsBarContainer = HorizontalScrollView(context)
-            .apply {
-                background = ColorDrawable(backgroundColor)
-            }
+//            .apply {
+//                background = ColorDrawable(backgroundColor)
+//            }
             .also {
                 quickActionsBar = it
             }
@@ -1734,7 +1739,28 @@ class PostAndCommentViewBuilder @Inject constructor(
                 startToStart = ConstraintLayout.LayoutParams.PARENT_ID
             }
         }
-        root.addView(quickActionsBarContainer)
+        root.addView(quickActionsBarContainer, root.childCount - 2)
+    }
+
+    fun bindCommentFilteredItem(
+        b: PostCommentFilteredItemBinding,
+        depth: Int,
+        baseDepth: Int,
+        maxDepth: Int,
+        onTap: () -> Unit,
+    ) = with(b) {
+        threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
+
+        b.root.setOnClickListener {
+            onTap()
+        }
+
+        root.tag = ThreadLinesData(
+            depth = depth,
+            baseDepth = baseDepth,
+            maxDepth = maxDepth,
+            indentationPerLevel = commentUiConfig.indentationPerLevelDp,
+        )
     }
 
     fun bindMoreCommentsItem(

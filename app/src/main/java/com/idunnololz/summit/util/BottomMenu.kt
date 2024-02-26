@@ -117,7 +117,7 @@ class BottomMenu(
         expandFully: Boolean,
         handleBackPress: Boolean = true,
     ) {
-        setInsets(mainActivity.lastInsets.topInset, mainActivity.lastInsets.bottomInset)
+//        setInsets(mainActivity.lastInsets.topInset, mainActivity.lastInsets.bottomInset)
 
         parent = bottomSheetContainer
 

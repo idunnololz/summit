@@ -408,6 +408,10 @@
     <string name="error_content_type_filter_too_aggressive">Your content type filters are too aggressive for this community/instance. Please relax your content type filters or choose a different community/instance.</string>
     <string name="card2">Card 2</string>
 
+    <string name="comment_instance_filters_desc">Filter comments based on the instance name</string>
+    <string name="comment_keyword_filters_desc">Filter comments based on title keywords</string>
+    <string name="comment_user_filters_desc">Filter comments based on OP\'s name</string>
+
     <string name="elapsed_time_just_now">now</string>
     <string name="elapsed_time_a_minute_ago">1m</string>
     <string name="elapsed_time_minutes_ago">%1$dm</string>
@@ -893,6 +897,8 @@
     <string name="select_a_message">Select a message</string>
     <string name="select_a_post_or_comment">Select a post or comment</string>
     <string name="blocked_instances">Blocked instances</string>
+    <string name="image_saved">Image saved.</string>
+    <string name="filtered_message_desc">Filtered message. Tap to show.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

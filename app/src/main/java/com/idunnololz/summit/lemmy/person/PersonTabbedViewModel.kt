@@ -17,7 +17,6 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
-import com.idunnololz.summit.lemmy.CommentPageResult
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PersonRef
@@ -43,6 +42,7 @@ class PersonTabbedViewModel @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
+    private val commentListEngineFactory: CommentListEngine.Factory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
@@ -61,7 +61,7 @@ class PersonTabbedViewModel @Inject constructor(
         coroutineScopeFactory = coroutineScopeFactory,
         directoryHelper = directoryHelper,
     )
-    var commentListEngine = CommentListEngine()
+    var commentListEngine = commentListEngineFactory.create()
 
     var sortType: SortType = SortType.New
         set(value) {
@@ -164,13 +164,11 @@ class PersonTabbedViewModel @Inject constructor(
                     }
                     if (commentListEngine.hasMore || force) {
                         commentListEngine.addComments(
-                            CommentPageResult(
-                                result.comments,
-                                apiClient.instance,
-                                pageIndex,
-                                result.comments.size == PAGE_SIZE,
-                                null,
-                            ),
+                            comments = result.comments,
+                            instance = apiClient.instance,
+                            pageIndex = pageIndex,
+                            hasMore = result.comments.size == PAGE_SIZE,
+                            error = null,
                         )
                     }
 
@@ -208,13 +206,11 @@ class PersonTabbedViewModel @Inject constructor(
                     }
                     if (commentListEngine.hasMore || force) {
                         commentListEngine.addComments(
-                            CommentPageResult(
-                                listOf(),
-                                apiClient.instance,
-                                pageIndex,
-                                false,
-                                it,
-                            ),
+                            comments = listOf(),
+                            instance = apiClient.instance,
+                            pageIndex = pageIndex,
+                            hasMore = false,
+                            error = it,
                         )
                     }
 

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
@@ -23,15 +24,18 @@ import com.idunnololz.summit.databinding.AutoLoadItemBinding
 import com.idunnololz.summit.databinding.CommentListCommentItemBinding
 import com.idunnololz.summit.databinding.CommentListEndItemBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
-import com.idunnololz.summit.lemmy.CommentPageResult
+import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
+import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
+import com.idunnololz.summit.lemmy.CommentItem
+import com.idunnololz.summit.lemmy.CommentPage
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.FilteredCommentItem
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.VisibleCommentItem
 import com.idunnololz.summit.lemmy.appendSeparator
-import com.idunnololz.summit.lemmy.community.Item
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preview.VideoType
@@ -59,7 +63,14 @@ class CommentListAdapter(
 ) : Adapter<ViewHolder>() {
 
     sealed interface Item {
-        data class CommentItem(
+        data class VisibleCommentItem(
+            val commentView: CommentView,
+            val instance: String,
+            val pageIndex: Int,
+            val highlight: Boolean,
+            val highlightForever: Boolean,
+        ) : Item
+        data class FilteredCommentItem(
             val commentView: CommentView,
             val instance: String,
             val pageIndex: Int,
@@ -80,7 +91,7 @@ class CommentListAdapter(
     val items: List<Item>
         get() = adapterHelper.items
 
-    private var commentPages: List<CommentPageResult> = listOf()
+    private var commentPages: List<CommentPage> = listOf()
 
     private var commentToHighlightForever: CommentRef? = null
     private var commentToHighlight: CommentRef? = null
@@ -90,8 +101,10 @@ class CommentListAdapter(
             old::class == new::class && when (old) {
                 is Item.AutoLoadItem ->
                     old.pageToLoad == (new as Item.AutoLoadItem).pageToLoad
-                is Item.CommentItem ->
-                    old.commentView.comment.id == (new as Item.CommentItem).commentView.comment.id
+                is Item.VisibleCommentItem ->
+                    old.commentView.comment.id == (new as Item.VisibleCommentItem).commentView.comment.id
+                is Item.FilteredCommentItem ->
+                    old.commentView.comment.id == (new as Item.FilteredCommentItem).commentView.comment.id
                 Item.EndItem -> true
                 is Item.ErrorItem ->
                     old.pageToLoad == (new as Item.ErrorItem).pageToLoad
@@ -101,7 +114,7 @@ class CommentListAdapter(
         addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { _, b, _ ->
             b.loadingView.showProgressBar()
         }
-        addItemType(Item.CommentItem::class, CommentListCommentItemBinding::inflate) { item, b, _ ->
+        addItemType(Item.VisibleCommentItem::class, CommentListCommentItemBinding::inflate) { item, b, _ ->
             val post = item.commentView.post
             val viewHolder = b.root.getTag(R.id.view_holder) as? PostAndCommentViewBuilder.CustomViewHolder
                 ?: run {
@@ -255,6 +268,11 @@ class CommentListAdapter(
                 true
             }
         }
+        addItemType(Item.FilteredCommentItem::class, PostCommentFilteredItemBinding::inflate) { item, b, _ ->
+            b.root.setOnClickListener {
+                showFilteredMessage(item.commentView.comment.id)
+            }
+        }
         addItemType(Item.EndItem::class, CommentListEndItemBinding::inflate) { _, _, _ -> }
         addItemType(Item.ErrorItem::class, LoadingViewItemBinding::inflate) { item, b, _ ->
             b.loadingView.showDefaultErrorMessageFor(item.error)
@@ -262,6 +280,27 @@ class CommentListAdapter(
                 onLoadPage(item.pageToLoad)
             }
         }
+    }
+
+    private fun showFilteredMessage(id: CommentId) {
+        var commentItem: FilteredCommentItem? = null
+
+        out@for (commentPage in commentPages) {
+            for (comment in commentPage.comments) {
+                if (comment is FilteredCommentItem && comment.commentView.comment.id == id) {
+                    commentItem = comment
+                    break@out
+                }
+            }
+        }
+
+        if (commentItem == null) {
+            return
+        }
+
+        commentItem.show = true
+
+        refreshItems()
     }
 
     override fun getItemViewType(position: Int): Int =
@@ -275,7 +314,7 @@ class CommentListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         adapterHelper.onBindViewHolder(holder, position)
 
-    fun setData(commentPages: List<CommentPageResult>) {
+    fun setData(commentPages: List<CommentPage>) {
         this.commentPages = commentPages
 
         refreshItems()
@@ -291,13 +330,24 @@ class CommentListAdapter(
         for (page in commentPages) {
             for (comment in page.comments) {
                 newItems.add(
-                    Item.CommentItem(
-                        commentView = comment,
-                        instance = page.instance,
-                        pageIndex = page.pageIndex,
-                        highlight = commentToHighlight?.id == comment.comment.id,
-                        highlightForever = commentToHighlightForever?.id == comment.comment.id,
-                    ),
+                    when (comment) {
+                        is FilteredCommentItem ->
+                            Item.FilteredCommentItem(
+                                commentView = comment.commentView,
+                                instance = page.instance,
+                                pageIndex = page.pageIndex,
+                                highlight = commentToHighlight?.id == comment.commentView.comment.id,
+                                highlightForever = commentToHighlightForever?.id == comment.commentView.comment.id,
+                            )
+                        is VisibleCommentItem ->
+                            Item.VisibleCommentItem(
+                                commentView = comment.commentView,
+                                instance = page.instance,
+                                pageIndex = page.pageIndex,
+                                highlight = commentToHighlight?.id == comment.commentView.comment.id,
+                                highlightForever = commentToHighlightForever?.id == comment.commentView.comment.id,
+                            )
+                    }
                 )
             }
         }
@@ -321,7 +371,8 @@ class CommentListAdapter(
         items.indexOfFirst {
             when (it) {
                 is Item.AutoLoadItem -> false
-                is Item.CommentItem -> commentToHighlight.id == it.commentView.comment.id
+                is Item.VisibleCommentItem -> commentToHighlight.id == it.commentView.comment.id
+                is Item.FilteredCommentItem -> commentToHighlight.id == it.commentView.comment.id
                 Item.EndItem -> false
                 is Item.ErrorItem -> false
             }
@@ -337,7 +388,8 @@ class CommentListAdapter(
         items.indexOfFirst {
             when (it) {
                 is Item.AutoLoadItem -> false
-                is Item.CommentItem -> commentToHighlight.id == it.commentView.comment.id
+                is Item.VisibleCommentItem -> commentToHighlight.id == it.commentView.comment.id
+                is Item.FilteredCommentItem -> commentToHighlight.id == it.commentView.comment.id
                 Item.EndItem -> false
                 is Item.ErrorItem -> false
             }

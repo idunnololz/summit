@@ -13,6 +13,8 @@
         android:layout_width="156dp"
         android:layout_height="0dp"
         android:padding="1dp"
+        android:scaleType="centerCrop"
+        style="@style/RoundImageView"
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

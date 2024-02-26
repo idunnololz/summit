@@ -282,6 +282,14 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"  />
+        <argument
+            android:name="account"
+            android:defaultValue="@null"
+            app:argType="com.idunnololz.summit.account.Account"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_settingCommentListFragment_to_settingsFilterListFragment"
+            app:destination="@id/settingsFilterListFragment" />
     </fragment>
     <fragment
         android:id="@+id/patreonFragment"

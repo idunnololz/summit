@@ -28,7 +28,7 @@
 
         <activity
             android:configChanges="layoutDirection|locale"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:name=".main.MainActivity"
             android:theme="@style/Theme.App.Splash"
             android:exported="true"

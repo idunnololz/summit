@@ -257,11 +257,13 @@ class MainActivity : BaseActivity() {
             },
         )
 
-        onPreferencesChanged() // must be called after navBarController.setup()
+        onPreferencesChanged()
 
         navBarController.setup()
 
-        handleIntent(intent) // must be called after navBarController.setup()
+        if (savedInstanceState == null) {
+            handleIntent(intent) // must be called after navBarController.setup()
+        }
 
         val newInstall = preferences.appVersionLastLaunch == 0
         val isVersionUpdate = isVersionUpdate()
@@ -384,8 +386,11 @@ class MainActivity : BaseActivity() {
             val imeHeight = imeInsets.bottom
             val topInset = systemBarsInsets.top
             val bottomInset = max(systemBarsInsets.bottom, imeHeight)
-            val leftInset = systemBarsInsets.left
-            val rightInset = systemBarsInsets.right
+            val leftInset = 0
+            val rightInset = 0
+
+            val mainLeftInset = systemBarsInsets.left
+            val mainRightInset = systemBarsInsets.right
 
             Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
 
@@ -419,6 +424,11 @@ class MainActivity : BaseActivity() {
 
             binding.navBarBg.updateLayoutParams<LayoutParams> {
                 height = bottomInset
+            }
+
+            binding.root.updateLayoutParams<MarginLayoutParams> {
+                leftMargin = mainLeftInset
+                rightMargin = mainRightInset
             }
 
             insetsChangedLiveData.postValue(0)
