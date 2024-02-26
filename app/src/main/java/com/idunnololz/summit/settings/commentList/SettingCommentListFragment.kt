@@ -6,8 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsCommentListBinding
+import com.idunnololz.summit.filterLists.ContentTypes
+import com.idunnololz.summit.filterLists.FilterTypes
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
@@ -17,6 +20,8 @@ import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
+import com.idunnololz.summit.settings.postList.SettingsPostListFragmentArgs
+import com.idunnololz.summit.settings.postList.SettingsPostListFragmentDirections
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.settings.util.isEnabled
 import com.idunnololz.summit.util.BaseFragment
@@ -29,6 +34,8 @@ import javax.inject.Inject
 class SettingCommentListFragment :
     BaseFragment<FragmentSettingsCommentListBinding>(),
     SettingValueUpdateCallback {
+
+    private val args: SettingCommentListFragmentArgs by navArgs()
 
     @Inject
     lateinit var preferences: Preferences
@@ -146,6 +153,44 @@ class SettingCommentListFragment :
 
         // Comment header layout only takes effect is not showing profile icons.
         binding.commentHeaderLayout.isEnabled = !preferences.showProfileIcons
+
+        if (args.account != null) {
+            binding.keywordFilters.root.visibility = View.GONE
+            binding.instanceFilters.root.visibility = View.GONE
+            binding.userFilters.root.visibility = View.GONE
+        } else {
+            binding.keywordFilters.root.visibility = View.VISIBLE
+            binding.instanceFilters.root.visibility = View.VISIBLE
+            binding.userFilters.root.visibility = View.VISIBLE
+        }
+
+        settings.keywordFilters.bindTo(binding.keywordFilters) {
+            val direction = SettingCommentListFragmentDirections
+                .actionSettingCommentListFragmentToSettingsFilterListFragment(
+                    ContentTypes.CommentListType,
+                    FilterTypes.KeywordFilter,
+                    getString(R.string.keyword_filters),
+                )
+            findNavController().navigateSafe(direction)
+        }
+        settings.instanceFilters.bindTo(binding.instanceFilters) {
+            val direction = SettingCommentListFragmentDirections
+                .actionSettingCommentListFragmentToSettingsFilterListFragment(
+                    ContentTypes.CommentListType,
+                    FilterTypes.InstanceFilter,
+                    getString(R.string.instance_filters),
+                )
+            findNavController().navigateSafe(direction)
+        }
+        settings.userFilters.bindTo(binding.userFilters) {
+            val direction = SettingCommentListFragmentDirections
+                .actionSettingCommentListFragmentToSettingsFilterListFragment(
+                    ContentTypes.CommentListType,
+                    FilterTypes.UserFilter,
+                    getString(R.string.user_filters),
+                )
+            findNavController().navigateSafe(direction)
+        }
     }
 
     private fun convertAutoCollapseCommentToOptionId(value: Float) =

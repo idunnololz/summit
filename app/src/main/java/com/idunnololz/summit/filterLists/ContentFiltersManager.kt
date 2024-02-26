@@ -2,6 +2,7 @@ package com.idunnololz.summit.filterLists
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -25,6 +26,7 @@ class ContentFiltersManager @Inject constructor(
     private val coroutineScope = coroutineScopeFactory.create()
 
     private var postListFilters: List<FilterEntry> = listOf()
+    private var commentListFilters: List<FilterEntry> = listOf()
 
     private var regexCache = mutableMapOf<Long, Pattern>()
 
@@ -42,7 +44,6 @@ class ContentFiltersManager @Inject constructor(
                     FirebaseCrashlytics.getInstance().recordException(e)
                 }
             }
-            Log.d("dbdb", "hiddenPostsDao: ${dao.count()}")
         }
     }
 
@@ -52,15 +53,20 @@ class ContentFiltersManager @Inject constructor(
         }
 
         val postListFilters = mutableListOf<FilterEntry>()
+        val commentListFilters = mutableListOf<FilterEntry>()
         for (filter in filters) {
             when (filter.contentType) {
                 ContentTypes.PostListType -> {
                     postListFilters.add(filter)
                 }
+                ContentTypes.CommentListType -> {
+                    commentListFilters.add(filter)
+                }
             }
         }
 
         this.postListFilters = postListFilters
+        this.commentListFilters = commentListFilters
     }
 
     /**
@@ -103,10 +109,46 @@ class ContentFiltersManager @Inject constructor(
         }
     }
 
+    /**
+     * Tests a [CommentView] to see if it matches any of the filters.
+     * @return true if the [CommentView] matches at least one filter.
+     */
+    fun testCommentView(commentView: CommentView): Boolean {
+        return commentListFilters.any { filter ->
+            when (filter.filterType) {
+                FilterTypes.KeywordFilter -> {
+                    if (filter.isRegex) {
+                        getPattern(filter).matcher(commentView.comment.content).find()
+                    } else {
+                        commentView.comment.content.contains(filter.filter, ignoreCase = true)
+                    }
+                }
+                FilterTypes.InstanceFilter -> {
+                    if (filter.isRegex) {
+                        getPattern(filter).matcher(commentView.creator.instance).find()
+                    } else {
+                        commentView.creator.instance.contains(filter.filter, ignoreCase = true)
+                    }
+                }
+                FilterTypes.UserFilter -> {
+                    if (filter.isRegex) {
+                        getPattern(filter).matcher(commentView.creator.name).find()
+                    } else {
+                        commentView.creator.name.contains(filter.filter, ignoreCase = true)
+                    }
+                }
+                else -> false
+            }
+        }
+    }
+
     fun getFilters(contentTypeId: ContentTypeId, filterTypeId: FilterTypeId): List<FilterEntry> {
         return when (contentTypeId) {
             ContentTypes.PostListType -> {
                 postListFilters.filter { it.filterType == filterTypeId }
+            }
+            ContentTypes.CommentListType -> {
+                commentListFilters.filter { it.filterType == filterTypeId }
             }
             else -> listOf()
         }

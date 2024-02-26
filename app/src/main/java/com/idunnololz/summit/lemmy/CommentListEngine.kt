@@ -1,9 +1,21 @@
 package com.idunnololz.summit.lemmy
 
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.filterLists.ContentFiltersManager
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class CommentListEngine {
-    var commentPages: List<CommentPageResult> = listOf()
+class CommentListEngine @AssistedInject constructor(
+    private val contentFiltersManager: ContentFiltersManager
+) {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(): CommentListEngine
+    }
+
+    var commentPages: List<CommentPage> = listOf()
 
     val nextPage: Int
         get() = (commentPages.lastOrNull()?.pageIndex ?: 0) + 1
@@ -11,13 +23,36 @@ class CommentListEngine {
     val hasMore: Boolean
         get() = commentPages.lastOrNull()?.hasMore != false
 
-    fun addComments(commentPageResult: CommentPageResult) {
+    fun addComments(
+        comments: List<CommentView>,
+        instance: String,
+        pageIndex: Int,
+        hasMore: Boolean,
+        error: Throwable?,
+    ) {
         val newPages = commentPages.toMutableList()
-        val existingPage = newPages.getOrNull(commentPageResult.pageIndex)
+        val existingPage = newPages.getOrNull(pageIndex)
+
+        val commentItems = comments.map {
+//            if (contentFiltersManager.testCommentView(it)) {
+//                FilteredCommentItem(it)
+//            } else {
+                VisibleCommentItem(it)
+//            }
+        }
+
+        val commentPage = CommentPage(
+            comments = commentItems,
+            instance = instance,
+            pageIndex = pageIndex,
+            hasMore = hasMore,
+            error = error,
+        )
+
         if (existingPage != null) {
-            newPages[commentPageResult.pageIndex] = commentPageResult
+            newPages[pageIndex] = commentPage
         } else {
-            newPages.add(commentPageResult)
+            newPages.add(commentPage)
         }
 
         commentPages = newPages
@@ -30,8 +65,8 @@ class CommentListEngine {
     fun removeComment(id: CommentId) {
         val pages = commentPages.toMutableList()
         for ((index, page) in pages.withIndex()) {
-            if (page.comments.any { it.comment.id == id }) {
-                pages[index] = page.copy(comments = page.comments.filter { it.comment.id != id })
+            if (page.comments.any { it.commentView.comment.id == id }) {
+                pages[index] = page.copy(comments = page.comments.filter { it.commentView.comment.id != id })
             }
         }
         commentPages = pages

@@ -9,6 +9,7 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.util.StatefulLiveData
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class MessageViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountActionsManager: AccountActionsManager,
+    private val contentFiltersManager: ContentFiltersManager,
     val accountManager: AccountManager,
 ) : ViewModel() {
 
@@ -80,7 +82,7 @@ class MessageViewModel @Inject constructor(
                 return@launch
             }
 
-            val tree = CommentTreeBuilder(accountManager).buildCommentsTreeListView(
+            val tree = CommentTreeBuilder(accountManager, contentFiltersManager).buildCommentsTreeListView(
                 post = null,
                 comments = commentResult?.getOrNull(),
                 parentComment = true,

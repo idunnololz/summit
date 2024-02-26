@@ -97,6 +97,15 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
                     viewModel.removeAllButFirst()
 
                     getMainActivity()?.setNavUiOpenPercent(0f)
+
+                    val fragment = childFragmentManager.findFragmentById(R.id.message_fragment_container)
+
+                    if (fragment != null) {
+                        childFragmentManager.commit {
+                            setReorderingAllowed(true)
+                            remove(fragment)
+                        }
+                    }
                 } else {
                     getMainActivity()?.setNavUiOpenPercent(1f)
                 }

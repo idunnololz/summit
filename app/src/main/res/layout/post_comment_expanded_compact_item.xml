@@ -5,16 +5,6 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <View
-        android:id="@+id/highlight_bg"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/colorHighlight"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
     <Space
         android:id="@+id/thread_lines_spacer"
         android:layout_width="wrap_content"
@@ -155,5 +145,15 @@
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="start_guideline"
         app:barrierDirection="end" />
+
+    <View
+        android:id="@+id/highlight_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorHighlight"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

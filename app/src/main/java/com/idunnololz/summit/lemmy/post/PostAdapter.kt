@@ -23,6 +23,7 @@ import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
+import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
@@ -33,7 +34,6 @@ import com.idunnololz.summit.databinding.ViewAllCommentsBinding
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.flatten
-import com.idunnololz.summit.lemmy.post.PostAdapter.Item.CommentItem
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.FooterItem
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.HeaderItem
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.MoreCommentsItem
@@ -99,13 +99,36 @@ class PostAdapter(
             val screenshotMode: Boolean,
         ) : Item(postView.getUniqueKey()), ScreenshotOptions
 
-        data class CommentItem(
+        data class VisibleCommentItem(
             val commentId: CommentId,
             val content: String,
             val comment: CommentView,
             val depth: Int,
             val baseDepth: Int,
             val isExpanded: Boolean,
+            val isPending: Boolean,
+            val view: PostViewModel.ListView.CommentListView,
+            val childrenCount: Int,
+            val isPostLocked: Boolean,
+            val isUpdating: Boolean,
+            val isDeleting: Boolean,
+            val isRemoved: Boolean,
+            val isActionsExpanded: Boolean,
+            val isHighlighted: Boolean,
+            val query: String?,
+            val currentMatch: QueryResult?,
+            val screenshotMode: Boolean,
+        ) : Item(
+            "comment_${comment.comment.id}",
+        ),
+            ScreenshotOptions
+
+        data class FilteredCommentItem(
+            val commentId: CommentId,
+            val content: String,
+            val comment: CommentView,
+            val depth: Int,
+            val baseDepth: Int,
             val isPending: Boolean,
             val view: PostViewModel.ListView.CommentListView,
             val childrenCount: Int,
@@ -262,7 +285,7 @@ class PostAdapter(
 
     override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
         is HeaderItem -> R.layout.post_header_item
-        is CommentItem ->
+        is Item.VisibleCommentItem ->
             if (item.isExpanded) {
                 if (postAndCommentViewBuilder.hideCommentActions) {
                     R.layout.post_comment_expanded_compact_item
@@ -272,6 +295,8 @@ class PostAdapter(
             } else {
                 R.layout.post_comment_collapsed_item
             }
+        is Item.FilteredCommentItem ->
+            R.layout.post_comment_filtered_item
         is PendingCommentItem ->
             if (item.isExpanded) {
                 R.layout.post_pending_comment_expanded_item
@@ -340,6 +365,8 @@ class PostAdapter(
                             start = Utils.convertDpToPixel(8f).toInt(),
                         )
                     }
+            R.layout.post_comment_filtered_item ->
+                ViewBindingViewHolder(PostCommentFilteredItemBinding.bind(v))
             R.layout.post_comment_collapsed_item ->
                 ViewBindingViewHolder(PostCommentCollapsedItemBinding.bind(v))
             R.layout.post_pending_comment_expanded_item ->
@@ -525,7 +552,7 @@ class PostAdapter(
 
                 updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
             }
-            is CommentItem -> {
+            is Item.VisibleCommentItem -> {
                 if (item.isExpanded) {
                     val b = holder as CommentExpandedViewHolder
                     val highlight = highlightedComment == item.commentId
@@ -612,6 +639,19 @@ class PostAdapter(
                 holder.itemView.setTag(R.id.swipeable, true)
                 holder.itemView.setTag(R.id.comment_view, item.comment)
                 holder.itemView.setTag(R.id.expanded, item.isExpanded)
+            }
+            is Item.FilteredCommentItem -> {
+                val b = holder.getBinding<PostCommentFilteredItemBinding>()
+
+                postAndCommentViewBuilder.bindCommentFilteredItem(
+                    b = b,
+                    baseDepth = item.baseDepth,
+                    depth = item.depth,
+                    maxDepth = maxDepth,
+                    onTap = {
+                        showFilteredComment(item)
+                    }
+                )
             }
             is PendingCommentItem -> {
                 if (item.isExpanded) {
@@ -868,46 +908,82 @@ class PostAdapter(
                 for (commentItem in commentItems) {
                     var depth = -1
 
-                    when (val commentView = commentItem.commentView) {
+                    when (val commentView = commentItem.listView) {
                         is PostViewModel.ListView.CommentListView -> {
                             val commentId = commentView.comment.comment.id
                             val isCurrentMatchThisComment = currentMatch?.targetId == commentId
                             val isDeleting =
                                 commentView.pendingCommentView?.isActionDelete == true
+                            val show = when (commentView) {
+                                is PostViewModel.ListView.FilteredCommentItem -> commentView.show
+                                is PostViewModel.ListView.VisibleCommentListView -> true
+                            }
+
                             depth = commentItem.depth
 
                             if (depth == 0) {
                                 lastTopLevelCommentPosition++
                             }
 
-                            finalItems += CommentItem(
-                                commentId = commentId,
-                                content =
-                                commentView.pendingCommentView?.content
-                                    ?: commentView.comment.comment.content,
-                                comment = commentView.comment,
-                                depth = commentItem.depth,
-                                baseDepth = 0,
-                                isExpanded = !collapsedItemIds.contains(commentView.id) || isCurrentMatchThisComment,
-                                isPending = false,
-                                view = commentView,
-                                childrenCount = commentItem.children.size,
-                                isPostLocked = commentView.comment.post.locked,
-                                isUpdating = commentView.pendingCommentView != null,
-                                isDeleting = isDeleting,
-                                isRemoved = commentView.isRemoved,
-                                isActionsExpanded = actionExpandedComments.contains(
-                                    commentId,
-                                ),
-                                isHighlighted = rawData.selectedCommentId == commentId,
-                                query = query,
-                                currentMatch = if (isCurrentMatchThisComment) {
-                                    currentMatch
+                            finalItems +=
+                                if (show) {
+                                    Item.VisibleCommentItem(
+                                        commentId = commentId,
+                                        content =
+                                        commentView.pendingCommentView?.content
+                                            ?: commentView.comment.comment.content,
+                                        comment = commentView.comment,
+                                        depth = commentItem.depth,
+                                        baseDepth = 0,
+                                        isExpanded = !collapsedItemIds.contains(commentView.id) || isCurrentMatchThisComment,
+                                        isPending = false,
+                                        view = commentView,
+                                        childrenCount = commentItem.children.size,
+                                        isPostLocked = commentView.comment.post.locked,
+                                        isUpdating = commentView.pendingCommentView != null,
+                                        isDeleting = isDeleting,
+                                        isRemoved = commentView.isRemoved,
+                                        isActionsExpanded = actionExpandedComments.contains(
+                                            commentId,
+                                        ),
+                                        isHighlighted = rawData.selectedCommentId == commentId,
+                                        query = query,
+                                        currentMatch = if (isCurrentMatchThisComment) {
+                                            currentMatch
+                                        } else {
+                                            null
+                                        },
+                                        screenshotMode,
+                                    )
                                 } else {
-                                    null
-                                },
-                                screenshotMode,
-                            )
+                                    Item.FilteredCommentItem(
+                                        commentId = commentId,
+                                        content =
+                                        commentView.pendingCommentView?.content
+                                            ?: commentView.comment.comment.content,
+                                        comment = commentView.comment,
+                                        depth = commentItem.depth,
+                                        baseDepth = 0,
+                                        isPending = false,
+                                        view = commentView,
+                                        childrenCount = commentItem.children.size,
+                                        isPostLocked = commentView.comment.post.locked,
+                                        isUpdating = commentView.pendingCommentView != null,
+                                        isDeleting = isDeleting,
+                                        isRemoved = commentView.isRemoved,
+                                        isActionsExpanded = actionExpandedComments.contains(
+                                            commentId,
+                                        ),
+                                        isHighlighted = rawData.selectedCommentId == commentId,
+                                        query = query,
+                                        currentMatch = if (isCurrentMatchThisComment) {
+                                            currentMatch
+                                        } else {
+                                            null
+                                        },
+                                        screenshotMode,
+                                    )
+                                }
                             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
                         }
                         is PostViewModel.ListView.PendingCommentListView -> {
@@ -1050,8 +1126,8 @@ class PostAdapter(
 
             toVisit.addAll(node.children)
 
-            when (val commentView = node.commentView) {
-                is PostViewModel.ListView.CommentListView -> {
+            when (val commentView = node.listView) {
+                is PostViewModel.ListView.VisibleCommentListView -> {
                     val commentId = commentView.comment.comment.id
                     if (seenCommentIds.add(commentId)) {
                         val upvotes = commentView.comment.counts.upvotes
@@ -1069,6 +1145,9 @@ class PostAdapter(
                         }
                     }
                 }
+                is PostViewModel.ListView.FilteredCommentItem -> {
+
+                }
                 is PostViewModel.ListView.MissingCommentItem -> {
                 }
                 is PostViewModel.ListView.MoreCommentsItem -> {
@@ -1085,7 +1164,8 @@ class PostAdapter(
     fun getPositionOfComment(commentId: CommentId): Int =
         items.indexOfFirst {
             when (it) {
-                is CommentItem -> it.commentId == commentId
+                is Item.VisibleCommentItem -> it.commentId == commentId
+                is Item.FilteredCommentItem -> it.commentId == commentId
                 is HeaderItem -> false
                 is MoreCommentsItem -> false
                 is PendingCommentItem -> it.commentId == commentId
@@ -1175,7 +1255,8 @@ class PostAdapter(
         if (position < 0) return
 
         when (val item = items[position]) {
-            is CommentItem -> collapsedItemIds.add(item.view.id)
+            is Item.VisibleCommentItem -> collapsedItemIds.add(item.view.id)
+            is Item.FilteredCommentItem -> collapsedItemIds.add(item.view.id)
             is PendingCommentItem -> collapsedItemIds.add(item.view.id)
             is Item.MissingCommentItem -> collapsedItemIds.add(item.view.id)
             FooterItem,
@@ -1193,7 +1274,8 @@ class PostAdapter(
         if (position < 0) return
 
         when (val item = items[position]) {
-            is CommentItem -> collapsedItemIds.remove(item.view.id)
+            is Item.VisibleCommentItem -> collapsedItemIds.remove(item.view.id)
+            is Item.FilteredCommentItem -> collapsedItemIds.remove(item.view.id)
             is PendingCommentItem -> collapsedItemIds.remove(item.view.id)
             is Item.MissingCommentItem -> collapsedItemIds.remove(item.view.id)
             FooterItem,
@@ -1207,9 +1289,18 @@ class PostAdapter(
         refreshItems(refreshHeader = false)
     }
 
+    private fun showFilteredComment(commentItem: Item.FilteredCommentItem) {
+        val filteredComment = commentItem.view as? PostViewModel.ListView.FilteredCommentItem
+            ?: return
+        filteredComment.show = true
+
+        refreshItems()
+    }
+
     fun toggleSection(position: Int) {
         val isCollapsed = when (val item = items[position]) {
-            is CommentItem -> collapsedItemIds.contains(item.view.id)
+            is Item.VisibleCommentItem -> collapsedItemIds.contains(item.view.id)
+            is Item.FilteredCommentItem -> collapsedItemIds.contains(item.view.id)
             is PendingCommentItem -> collapsedItemIds.contains(item.view.id)
             is Item.MissingCommentItem -> collapsedItemIds.contains(item.view.id)
             FooterItem,
@@ -1277,7 +1368,20 @@ class PostAdapter(
 
             items.withIndex().forEach { (index, item) ->
                 when (item) {
-                    is CommentItem -> {
+                    is Item.VisibleCommentItem -> {
+                        count(item.comment.comment.content, finalQuery) {
+                            occurrences.add(
+                                QueryResult(
+                                    targetId = item.commentId,
+                                    targetSubtype = 0,
+                                    relativeMatchIndex = it,
+                                    itemIndex = index,
+                                    matchIndex = occurrences.size,
+                                ),
+                            )
+                        }
+                    }
+                    is Item.FilteredCommentItem -> {
                         count(item.comment.comment.content, finalQuery) {
                             occurrences.add(
                                 QueryResult(

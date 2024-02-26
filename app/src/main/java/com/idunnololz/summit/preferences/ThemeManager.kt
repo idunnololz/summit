@@ -135,7 +135,7 @@ class ThemeManager @Inject constructor(
         }
     }
 
-    fun onThemeOverlayChanged(currentConfig: ThemeOverlayConfig) {
+    private fun onThemeOverlayChanged(currentConfig: ThemeOverlayConfig) {
         coroutineScope.launch {
             themeOverlayChanged.emit(Unit)
             updateTextConfig(currentConfig)
@@ -144,9 +144,7 @@ class ThemeManager @Inject constructor(
 
     fun applyThemeForActivity(activity: BaseActivity) {
         if (activity.isLightTheme()) {
-            if (preferences.isBlackTheme()) {
-                activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
-            }
+            // do nothing
         } else {
             if (preferences.useLessDarkBackgroundTheme) {
                 activity.theme.applyStyle(R.style.LessDarkBackground, true)
