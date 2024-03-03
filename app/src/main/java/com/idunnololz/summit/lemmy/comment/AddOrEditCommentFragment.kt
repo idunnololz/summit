@@ -508,8 +508,6 @@ class AddOrEditCommentFragment :
             return
         }
 
-        val context = requireContext()
-
         val postView = args.postView
         val commentView = args.commentView
         val inboxItem = args.inboxItem

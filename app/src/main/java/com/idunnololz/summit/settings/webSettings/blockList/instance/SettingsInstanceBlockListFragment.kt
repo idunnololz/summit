@@ -7,17 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.InstanceId
-import com.idunnololz.summit.api.utils.fullName
-import com.idunnololz.summit.databinding.BlockListCommunityItemBinding
 import com.idunnololz.summit.databinding.BlockListInstanceItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsCommunityBlockListBinding
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel
-import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel.BlockedCommunityItem
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel.BlockedInstanceItem
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData

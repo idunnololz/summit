@@ -240,7 +240,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                     },
                     {
                         adapter?.clearHighlight()
-                    }
+                    },
                 )
             } else {
                 adapter?.endHighlightForever()

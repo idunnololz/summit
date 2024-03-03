@@ -17,9 +17,8 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonCommentsBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
+import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
@@ -79,18 +78,13 @@ class PersonCommentsFragment :
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
-            onAddCommentClick = { postOrComment ->
-                if (accountManager.currentAccount.value == null) {
-                    PreAuthDialogFragment.newInstance(R.id.action_add_comment)
-                        .show(childFragmentManager, "asdf")
-                    return@CommentListAdapter
-                }
-
-                AddOrEditCommentFragment.showReplyDialog(
+            onCommentActionClick = { commentView, actionId ->
+                createCommentActionHandler(
                     instance = parentFragment.viewModel.instance,
-                    postOrCommentView = postOrComment,
+                    commentView = commentView,
+                    actionsViewModel = actionsViewModel,
                     fragmentManager = childFragmentManager,
-                )
+                )(actionId)
             },
             onImageClick = { view, url ->
                 getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
@@ -109,14 +103,6 @@ class PersonCommentsFragment :
             },
             onLoadPage = {
                 parentFragment.viewModel.fetchPage(it, false)
-            },
-            onCommentMoreClick = {
-                showMoreCommentOptions(
-                    instance = parentFragment.viewModel.instance,
-                    commentView = it,
-                    actionsViewModel = actionsViewModel,
-                    fragmentManager = childFragmentManager,
-                )
             },
             onLinkClick = { url, text, linkType ->
                 onLinkClick(url, text, linkType)

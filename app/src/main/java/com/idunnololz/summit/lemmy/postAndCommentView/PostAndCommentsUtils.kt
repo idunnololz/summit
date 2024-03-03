@@ -171,7 +171,7 @@ fun BaseFragment<*>.createCommentActionHandler(
     fragmentManager: FragmentManager,
     onLoadComment: ((CommentId) -> Unit)? = null,
     onScreenshotClick: (() -> Unit)? = null,
-): (Int) -> Unit = test@{ id: Int ->
+): (Int) -> Unit = outer@{ id: Int ->
 
     val context = requireContext()
     val currentAccount = actionsViewModel.accountManager.currentAccount.asAccount
@@ -264,6 +264,12 @@ fun BaseFragment<*>.createCommentActionHandler(
             ModActionsDialogFragment.show(commentView, childFragmentManager)
         }
         R.id.ca_reply -> {
+            if (actionsViewModel.accountManager.currentAccount.value == null) {
+                PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                    .show(childFragmentManager, "PreAuthDialogFragment")
+                return@outer
+            }
+
             AddOrEditCommentFragment.showReplyDialog(
                 instance = instance,
                 postOrCommentView = Either.Right(commentView),

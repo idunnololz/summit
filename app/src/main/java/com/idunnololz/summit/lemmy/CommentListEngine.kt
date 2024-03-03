@@ -7,7 +7,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
 class CommentListEngine @AssistedInject constructor(
-    private val contentFiltersManager: ContentFiltersManager
+    private val contentFiltersManager: ContentFiltersManager,
 ) {
 
     @AssistedFactory
@@ -37,7 +37,7 @@ class CommentListEngine @AssistedInject constructor(
 //            if (contentFiltersManager.testCommentView(it)) {
 //                FilteredCommentItem(it)
 //            } else {
-                VisibleCommentItem(it)
+            VisibleCommentItem(it)
 //            }
         }
 

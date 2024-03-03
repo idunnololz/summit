@@ -76,7 +76,7 @@ class PostAdapter(
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onVideoLongClickListener: (url: String) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
-    private val onPostMoreClick: (PostView, String) -> Unit,
+    private val onPostActionClick: (PostView, String, actionId: Int) -> Unit,
     private val onCommentActionClick: (CommentView, String, actionId: Int) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
@@ -450,8 +450,8 @@ class PostAdapter(
                         onVideoLongClickListener = onVideoLongClickListener,
                         onPageClick = onPageClick,
                         onAddCommentClick = onAddCommentClick,
-                        onPostMoreClick = {
-                            onPostMoreClick(it, item.id)
+                        onPostActionClick = { postView, actionId ->
+                            onPostActionClick(postView, item.id, actionId)
                         },
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch = onInstanceMismatch,
@@ -466,7 +466,13 @@ class PostAdapter(
                         b.bottomDivider.visibility = View.GONE
                     }
 
-                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
+                    updateScreenshotMode(
+                        viewHolder = holder,
+                        screenshotMode = item.screenshotMode,
+                        startGuideline = b.startGuideline,
+                        root = b.root,
+                        item = item,
+                    )
                 }
             }
             else -> super.onBindViewHolder(holder, position, payloads)
@@ -530,8 +536,8 @@ class PostAdapter(
                     onVideoLongClickListener = onVideoLongClickListener,
                     onPageClick = onPageClick,
                     onAddCommentClick = onAddCommentClick,
-                    onPostMoreClick = {
-                        onPostMoreClick(it, item.id)
+                    onPostActionClick = { postView, actionId ->
+                        onPostActionClick(postView, item.id, actionId)
                     },
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
@@ -550,7 +556,7 @@ class PostAdapter(
                     b.bottomDivider.visibility = View.GONE
                 }
 
-                updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
+                updateScreenshotMode(holder, item.screenshotMode, b.startBarrier, b.root, item)
             }
             is Item.VisibleCommentItem -> {
                 if (item.isExpanded) {
@@ -650,7 +656,7 @@ class PostAdapter(
                     maxDepth = maxDepth,
                     onTap = {
                         showFilteredComment(item)
-                    }
+                    },
                 )
             }
             is PendingCommentItem -> {
@@ -1146,7 +1152,6 @@ class PostAdapter(
                     }
                 }
                 is PostViewModel.ListView.FilteredCommentItem -> {
-
                 }
                 is PostViewModel.ListView.MissingCommentItem -> {
                 }

@@ -184,6 +184,15 @@ class LoadingView : ConstraintLayout {
         showErrorWithRetry(t.toErrorMessage(context))
     }
 
+    fun showDefaultErrorMessageFor(
+        t: Throwable,
+        @StringRes negativeButtonText: Int,
+        negativeButtonListener: (View) -> Unit,
+    ) {
+        showErrorWithRetry(t.toErrorMessage(context))
+        bindNegativeButton(context.getString(negativeButtonText), negativeButtonListener)
+    }
+
     fun hideAll(animate: Boolean = true, makeViewGone: Boolean = false) {
         rootViewAnimationController.hideVisibility = if (makeViewGone) View.GONE else View.INVISIBLE
         rootViewAnimationController.hide(animate)

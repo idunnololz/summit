@@ -2,6 +2,7 @@ package com.idunnololz.summit.preferences.perCommunity
 
 import android.content.Context
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.util.ext.getMoshiValue
 import com.idunnololz.summit.util.ext.putMoshiValue
@@ -41,5 +42,6 @@ class PerCommunityPreferences @Inject constructor(
     data class CommunityConfig(
         val communityRef: CommunityRef,
         val layout: CommunityLayout? = null,
+        val sortOrder: CommunitySortOrder? = null,
     )
 }

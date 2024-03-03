@@ -8,10 +8,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
@@ -60,6 +57,7 @@ import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMEN
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
+import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
@@ -402,8 +400,8 @@ class PostFragment :
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
-                onPostMoreClick = { postView, itemId ->
-                    showMorePostOptions(
+                onPostActionClick = { postView, itemId, actionId ->
+                    createPostActionHandler(
                         instance = viewModel.apiInstance,
                         postView = postView,
                         actionsViewModel = actionsViewModel,
@@ -412,7 +410,7 @@ class PostFragment :
                             getAdapter()?.selectItemForScreenshot(itemId)
                             viewModel.screenshotMode.value = true
                         },
-                    )
+                    )(actionId)
                 },
                 onCommentActionClick = { commentView, itemId, actionId ->
                     createCommentActionHandler(
@@ -429,20 +427,6 @@ class PostFragment :
                             viewModel.screenshotMode.value = true
                         },
                     )(actionId)
-//                    showMoreCommentOptions(
-//                        instance = viewModel.apiInstance,
-//                        commentView = commentView,
-//                        actionsViewModel = actionsViewModel,
-//                        fragmentManager = childFragmentManager,
-//                        onLoadComment = {
-//                            viewModel.updatePostOrCommentRef(Either.Right(CommentRef(getInstance(), it)))
-//                            viewModel.fetchPostData()
-//                        },
-//                        onScreenshotClick = {
-//                            getAdapter()?.selectItemForScreenshot(itemId)
-//                            viewModel.screenshotMode.value = true
-//                        },
-//                    )
                 },
                 onFetchComments = {
                     viewModel.fetchMoreComments(it)

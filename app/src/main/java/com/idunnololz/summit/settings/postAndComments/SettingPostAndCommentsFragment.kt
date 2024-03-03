@@ -314,7 +314,7 @@ class SettingPostAndCommentsFragment :
                     onInstanceMismatch = { _, _ -> },
                     videoState = null,
                     onAddCommentClick = {},
-                    onPostMoreClick = {},
+                    onPostActionClick = { _, _ -> },
                     onLinkClick = { _, _, _ -> },
                     onLinkLongClick = { _, _ -> },
                 )

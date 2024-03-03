@@ -216,8 +216,6 @@ class PostsRepository @Inject constructor(
         get() = apiClient.instance
 
     fun setCommunity(communityRef: CommunityRef?) {
-        Log.d("HAHA", "setCommunity: $communityRef", RuntimeException())
-
         this.communityRef = communityRef ?: CommunityRef.All()
 
         when (communityRef) {
@@ -500,6 +498,10 @@ class PostsRepository @Inject constructor(
 
     fun clearHideRead() {
         hideRead = false
+    }
+
+    fun addSeenPosts(posts: List<PostView>) {
+        seenPosts.addAll(posts.map { it.getUniqueKey() })
     }
 
     interface Factory {

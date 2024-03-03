@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.PostRef
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,11 +24,6 @@ class DraftsManager @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dbContext = Dispatchers.IO.limitedParallelism(1)
-
-    init {
-//        fixEntries()
-//        addTestEntries()
-    }
 
     init {
         coroutineScope.launch {
@@ -105,46 +99,6 @@ class DraftsManager @Inject constructor(
 
     suspend fun deleteAll(draftType: Int) =
         draftsDao.deleteAll(draftType)
-
-    private fun fixEntries() {
-        coroutineScope.launch {
-            draftsDao.getAllDrafts().forEach a@{
-                if (it.data == null) return@a
-
-                draftsDao.update(
-                    it.id,
-                    it.updatedTs,
-                    it.data.type,
-                    it.data,
-                )
-            }
-        }
-    }
-
-    private fun addTestEntries() {
-        coroutineScope.launch {
-            for (i in 0 until 1000) {
-                val draftData = DraftData.CommentDraftData(
-                    null,
-                    PostRef("asdf", 10),
-                    null,
-                    "test $i",
-                    100,
-                    "aaaa",
-                )
-
-                draftsDao.insert(
-                    DraftEntry(
-                        id = 0,
-                        creationTs = System.currentTimeMillis(),
-                        updatedTs = System.currentTimeMillis(),
-                        draftType = draftData.type,
-                        data = draftData,
-                    ),
-                )
-            }
-        }
-    }
 
     suspend fun deleteDraft(entry: DraftEntry) = withContext(dbContext) {
         draftsDao.delete(entry)

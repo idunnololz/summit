@@ -465,14 +465,15 @@ class LemmyHeaderHelper(
         if (detailed) {
             sb.appendSeparator()
 
-            val finalScore = score ?: commentView.counts.score
-            sb.append(
-                headerContainer.context.resources.getQuantityString(
-                    R.plurals.point_count_format,
-                    finalScore,
-                    LemmyUtils.abbrevNumber(finalScore.toLong()),
-                ),
-            )
+            if (score != null) {
+                sb.append(
+                    headerContainer.context.resources.getQuantityString(
+                        R.plurals.point_count_format,
+                        score,
+                        LemmyUtils.abbrevNumber(score.toLong()),
+                    ),
+                )
+            }
 
             if (childrenCount != null) {
                 sb.appendSeparator()

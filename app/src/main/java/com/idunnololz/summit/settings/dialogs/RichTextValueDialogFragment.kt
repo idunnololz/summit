@@ -153,6 +153,7 @@ class RichTextValueDialogFragment :
                         bottomSheetContainer = binding.root,
                         expandFully = true,
                         handleBackPress = false,
+                        handleInsets = false,
                     )
                     currentBottomMenu = bottomMenu
                 },

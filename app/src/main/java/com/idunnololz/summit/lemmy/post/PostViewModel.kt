@@ -732,7 +732,7 @@ class PostViewModel @Inject constructor(
         depth: Int? = null,
         force: Boolean = false,
     ): Result<List<CommentView>> {
-        Log.d(TAG, "fetchMoreCommentsInternal(): parentId = ${parentId}")
+        Log.d(TAG, "fetchMoreCommentsInternal(): parentId = $parentId")
         val result = commentsFetcher.fetchCommentsWithRetry(
             Either.Right(parentId),
             sortOrder,
@@ -805,7 +805,7 @@ class PostViewModel @Inject constructor(
             override val id: Long = post.post.id.toLong() or POST_FLAG,
         ) : ListView
 
-        sealed interface CommentListView: ListView {
+        sealed interface CommentListView : ListView {
             val comment: CommentView
             val pendingCommentView: PendingCommentView?
             var isRemoved: Boolean

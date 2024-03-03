@@ -1,7 +1,6 @@
 package com.idunnololz.summit.accountUi
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +17,6 @@ import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.databinding.DialogFragmentAccountsBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import dagger.hilt.android.AndroidEntryPoint

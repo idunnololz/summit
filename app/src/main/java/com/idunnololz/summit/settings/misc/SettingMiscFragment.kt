@@ -200,6 +200,14 @@ class SettingMiscFragment :
                 getMainActivity()?.onPreferencesChanged()
             },
         )
+        settings.customizePostQuickActions.bindTo(
+            binding.customizeCommentQuickActions,
+        ) {
+            val directions = SettingMiscFragmentDirections
+                .actionSettingMiscFragmentToPostQuickActionsFragment()
+            findNavController().navigateSafe(directions)
+        }
+
         if (BuildConfig.DEBUG) {
             settings.rotateInstanceOnUploadFail.bindTo(
                 binding.rotateInstanceOnUploadFail,

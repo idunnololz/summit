@@ -434,7 +434,7 @@ class MainActivity : BaseActivity() {
             insetsChangedLiveData.postValue(0)
             lastInsetLiveData.value = lastInsets
 
-            currentBottomMenu?.setInsets(lastInsets.topInset, lastInsets.bottomInset)
+//            currentBottomMenu?.setInsets(lastInsets.topInset, lastInsets.bottomInset)
 
             WindowInsetsCompat.CONSUMED
         }
