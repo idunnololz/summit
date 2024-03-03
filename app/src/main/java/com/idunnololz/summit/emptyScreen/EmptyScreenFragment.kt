@@ -1,10 +1,9 @@
-package com.idunnololz.summit.empty_screen
+package com.idunnololz.summit.emptyScreen
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentEmptyScreenBinding
 import com.idunnololz.summit.util.BaseFragment
 

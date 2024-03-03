@@ -828,7 +828,7 @@
     <string name="downloads_settings">Downloads settings</string>
     <string name="downloads_desc">Change settings related to downloading files</string>
     <string name="reset_download_location">Reset download location</string>
-    <string name="per_community_settings_format">Change settings for this community (%1$s)</string>
+    <string name="per_community_settings_format">Change settings for this community/feed (%1$s)</string>
     <string name="xxl">XXL</string>
     <string name="xxxl">XXXL</string>
     <string name="reset_settings">Reset settings</string>
@@ -883,6 +883,8 @@
     <string name="comment_draft">Comment draft</string>
     <string name="customize_comment_quick_actions">Customize comment quick actions</string>
     <string name="customize_comment_quick_actions_desc">Change which actions appear when a comment is expanded.</string>
+    <string name="customize_post_quick_actions">Customize post quick actions</string>
+    <string name="customize_post_quick_actions_desc">Change which actions appear under a post in the post screen.</string>
     <string name="comment_quick_actions_desc">Comment quick actions (drag items to reorder or remove)</string>
     <string name="inactive_actions_desc">Unused actions (drop below to hide action)</string>
     <string name="vote_actions">Vote actions</string>
@@ -899,6 +901,9 @@
     <string name="blocked_instances">Blocked instances</string>
     <string name="image_saved">Image saved.</string>
     <string name="filtered_message_desc">Filtered message. Tap to show.</string>
+    <string name="set_default_sort_order_for_this_feed">Set default sort order for this feed</string>
+    <string name="show_inline_media_as_links">Show inline media as links</string>
+    <string name="show_inline_media_as_links_desc">When enabled, images/gifs/videos within text will be shown as text links.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

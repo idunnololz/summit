@@ -20,8 +20,6 @@ import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.postList.SettingsPostListFragmentArgs
-import com.idunnololz.summit.settings.postList.SettingsPostListFragmentDirections
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.settings.util.isEnabled
 import com.idunnololz.summit.util.BaseFragment
@@ -123,6 +121,13 @@ class SettingCommentListFragment :
             { preferences.showCommentUpvotePercentage },
             {
                 preferences.showCommentUpvotePercentage = it
+            },
+        )
+        settings.showInlineMediaAsLinks.bindTo(
+            binding.showInlineMediaAsLinks,
+            { preferences.commentsShowInlineMediaAsLinks },
+            {
+                preferences.commentsShowInlineMediaAsLinks = it
             },
         )
 

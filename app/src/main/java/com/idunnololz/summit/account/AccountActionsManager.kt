@@ -154,9 +154,9 @@ class AccountActionsManager @Inject constructor(
 
             registration.voteCurrent(
                 score = votesManager.getVote(ref) ?: 0,
-                totalScore = votesManager.getScore(ref) ?: 0,
-                votesManager.getUpvotes(ref) ?: 0,
-                votesManager.getDownvotes(ref) ?: 0,
+                totalScore = votesManager.getScore(ref),
+                upvotes = votesManager.getUpvotes(ref),
+                downvotes = votesManager.getDownvotes(ref),
             )
 
             Log.d(TAG, "Binding vote handler - $ref")
@@ -216,9 +216,9 @@ class AccountActionsManager @Inject constructor(
                     voteRefToRegistrations[action.info.ref]?.forEach {
                         it.votePending(
                             pendingScore = action.info.dir,
-                            totalScore = votesManager.getScore(action.info.ref) ?: 0,
-                            upvotes = votesManager.getUpvotes(action.info.ref) ?: 0,
-                            downvotes = votesManager.getDownvotes(action.info.ref) ?: 0,
+                            totalScore = votesManager.getScore(action.info.ref),
+                            upvotes = votesManager.getUpvotes(action.info.ref),
+                            downvotes = votesManager.getDownvotes(action.info.ref),
                         )
                     }
                 }
@@ -308,9 +308,9 @@ class AccountActionsManager @Inject constructor(
             Log.d(TAG, "onActionComplete(): $action")
             when (action.info) {
                 is ActionInfo.VoteActionInfo -> {
-                    var score: Int = 0
-                    var upvotes: Int = 0
-                    var downvotes: Int = 0
+                    var score: Int? = 0
+                    var upvotes: Int? = 0
+                    var downvotes: Int? = 0
 
                     (result as LemmyActionResult.VoteLemmyActionResult).result
                         .fold(
@@ -322,9 +322,15 @@ class AccountActionsManager @Inject constructor(
                                 votesManager.setUpvotes(voteRef, it.counts.upvotes)
                                 votesManager.setDownvotes(voteRef, it.counts.downvotes)
 
-                                score = it.counts.score
-                                upvotes = it.counts.upvotes
-                                downvotes = it.counts.downvotes
+                                if (votesManager.shouldShowScore(voteRef)) {
+                                    score = it.counts.score
+                                    upvotes = it.counts.upvotes
+                                    downvotes = it.counts.downvotes
+                                } else {
+                                    score = null
+                                    upvotes = null
+                                    downvotes = null
+                                }
                             },
                             {
                                 val voteRef = VotableRef.CommentRef(it.comment.id)
@@ -333,9 +339,15 @@ class AccountActionsManager @Inject constructor(
                                 votesManager.setUpvotes(voteRef, it.counts.upvotes)
                                 votesManager.setDownvotes(voteRef, it.counts.downvotes)
 
-                                score = it.counts.score
-                                upvotes = it.counts.upvotes
-                                downvotes = it.counts.downvotes
+                                if (votesManager.shouldShowScore(voteRef)) {
+                                    score = it.counts.score
+                                    upvotes = it.counts.upvotes
+                                    downvotes = it.counts.downvotes
+                                } else {
+                                    score = null
+                                    upvotes = null
+                                    downvotes = null
+                                }
                             },
                         )
 

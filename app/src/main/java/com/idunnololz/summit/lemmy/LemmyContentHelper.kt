@@ -602,7 +602,7 @@ class LemmyContentHelper(
             if (!postView.post.body.isNullOrBlank() && showText) {
                 val fullTextView = getView<View>(R.layout.full_content_text_view)
                 val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
-                rootView.setTag(R.id.body, bodyTextView)
+                fullContentContainerView.setTag(R.id.body, bodyTextView)
 
                 bodyTextView.visibility = View.VISIBLE
                 bodyTextView.textSize = config.bodyTextSizeSp.toTextSize()
@@ -635,7 +635,7 @@ class LemmyContentHelper(
             }
         }
 
-        (rootView.getTag(R.id.body) as? TextView)?.let { textView ->
+        (fullContentContainerView.getTag(R.id.body) as? TextView)?.let { textView ->
             LemmyTextHelper.bindText(
                 textView = textView,
                 text = postView.post.body ?: "",
@@ -685,6 +685,10 @@ class LemmyContentHelper(
                 fullContentContainerView.removeViewAt(0)
                 viewRecycler.addRecycledView(c, viewId)
             }
+        }
+
+        if (recycle) {
+            fullContentContainerView.setTag(R.id.body, null)
         }
 
         return stateBuilder.build()

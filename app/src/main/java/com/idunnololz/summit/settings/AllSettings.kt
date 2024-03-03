@@ -944,6 +944,11 @@ class CommentListSettings @Inject constructor(
         context.getString(R.string.user_filters),
         context.getString(R.string.comment_user_filters_desc),
     )
+    val showInlineMediaAsLinks = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_inline_media_as_links),
+        context.getString(R.string.show_inline_media_as_links_desc),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,
@@ -1608,6 +1613,11 @@ class MiscSettings @Inject constructor(
         "Beep boop",
         "Beep",
         relatedKeys = listOf(KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL),
+    )
+    val customizePostQuickActions = BasicSettingItem(
+        null,
+        context.getString(R.string.customize_post_quick_actions),
+        context.getString(R.string.customize_post_quick_actions_desc),
     )
 
     override val allSettings: List<SettingItem> = listOf(

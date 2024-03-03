@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -50,6 +51,8 @@ import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFrag
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
@@ -134,22 +137,17 @@ class CommunityFragment :
     }
 
     private val _sortByMenu: BottomMenu by lazy {
-        BottomMenu(requireContext()).apply {
-            addItem(R.id.sort_order_active, R.string.sort_order_active)
-            addItem(R.id.sort_order_hot, R.string.sort_order_hot)
-            addItem(R.id.sort_order_top, R.string.sort_order_top, R.drawable.baseline_chevron_right_24)
-            addItem(R.id.sort_order_new, R.string.sort_order_new)
-            addItem(R.id.sort_order_old, R.string.sort_order_old)
-            addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
-            addItem(R.id.sort_order_new_comments, R.string.sort_order_new_comments)
-            addItem(R.id.sort_order_controversial, R.string.sort_order_controversial)
-            addItem(R.id.sort_order_scaled, R.string.sort_order_scaled)
-            setTitle(R.string.sort_by)
+        makeSortByMenu(requireContext()).apply {
+            addDivider()
+
+            addItem(R.id.set_default_sort_order, getString(R.string.set_default_sort_order_for_this_feed))
 
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.id) {
                     R.id.sort_order_top ->
                         getMainActivity()?.showBottomMenu(getSortByTopMenu())
+                    R.id.set_default_sort_order ->
+                        getMainActivity()?.showBottomMenu(getDefaultSortOrderSortByMenu())
                     else ->
                         idToSortOrder(menuItem.id)?.let {
                             viewModel.setSortOrder(it)
@@ -160,20 +158,7 @@ class CommunityFragment :
     }
 
     private val _sortByTopMenu: BottomMenu by lazy {
-        BottomMenu(requireContext()).apply {
-            addItem(R.id.sort_order_top_last_hour, R.string.time_frame_last_hour)
-            addItem(R.id.sort_order_top_last_six_hour, getString(R.string.time_frame_last_hours_format, "6"))
-            addItem(R.id.sort_order_top_last_twelve_hour, getString(R.string.time_frame_last_hours_format, "12"))
-            addItem(R.id.sort_order_top_day, R.string.time_frame_today)
-            addItem(R.id.sort_order_top_week, R.string.time_frame_this_week)
-            addItem(R.id.sort_order_top_month, R.string.time_frame_this_month)
-            addItem(R.id.sort_order_top_last_three_month, getString(R.string.time_frame_last_months_format, "3"))
-            addItem(R.id.sort_order_top_last_six_month, getString(R.string.time_frame_last_months_format, "6"))
-            addItem(R.id.sort_order_top_last_nine_month, getString(R.string.time_frame_last_months_format, "9"))
-            addItem(R.id.sort_order_top_year, R.string.time_frame_this_year)
-            addItem(R.id.sort_order_top_all_time, R.string.time_frame_all_time)
-            setTitle(R.string.sort_by_top)
-
+        makeSortByTopMenu(requireContext()).apply {
             setOnMenuItemClickListener { menuItem ->
                 idToSortOrder(menuItem.id)?.let {
                     viewModel.setSortOrder(it)
@@ -188,6 +173,80 @@ class CommunityFragment :
             onSelectedLayoutChanged()
         }
     }
+
+    private val _defaultSortOrderSortByMenu by lazy {
+        makeSortByMenu(requireContext()).apply {
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.id) {
+                    R.id.sort_order_top ->
+                        getMainActivity()?.showBottomMenu(getDefaultSortOrderSortByTopMenu())
+                    else ->
+                        idToSortOrder(menuItem.id)?.let {
+                            viewModel.setDefaultSortOrder(it)
+                        }
+                }
+            }
+        }
+    }
+
+    private val _defaultSortOrderSortByTopMenu by lazy {
+        makeSortByTopMenu(requireContext()).apply {
+            setOnMenuItemClickListener { menuItem ->
+                idToSortOrder(menuItem.id)?.let {
+                    viewModel.setDefaultSortOrder(it)
+                }
+            }
+        }
+    }
+
+    private fun makeSortByMenu(context: Context) =
+        BottomMenu(requireContext()).apply {
+            setTitle(R.string.sort_by)
+            addItem(R.id.sort_order_active, R.string.sort_order_active)
+            addItem(R.id.sort_order_hot, R.string.sort_order_hot)
+            addItem(
+                R.id.sort_order_top,
+                R.string.sort_order_top,
+                R.drawable.baseline_chevron_right_24,
+            )
+            addItem(R.id.sort_order_new, R.string.sort_order_new)
+            addItem(R.id.sort_order_old, R.string.sort_order_old)
+            addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
+            addItem(R.id.sort_order_new_comments, R.string.sort_order_new_comments)
+            addItem(R.id.sort_order_controversial, R.string.sort_order_controversial)
+            addItem(R.id.sort_order_scaled, R.string.sort_order_scaled)
+        }
+
+    private fun makeSortByTopMenu(context: Context) =
+        BottomMenu(requireContext()).apply {
+            setTitle(R.string.sort_by_top)
+            addItem(R.id.sort_order_top_last_hour, R.string.time_frame_last_hour)
+            addItem(
+                R.id.sort_order_top_last_six_hour,
+                getString(R.string.time_frame_last_hours_format, "6"),
+            )
+            addItem(
+                R.id.sort_order_top_last_twelve_hour,
+                getString(R.string.time_frame_last_hours_format, "12"),
+            )
+            addItem(R.id.sort_order_top_day, R.string.time_frame_today)
+            addItem(R.id.sort_order_top_week, R.string.time_frame_this_week)
+            addItem(R.id.sort_order_top_month, R.string.time_frame_this_month)
+            addItem(
+                R.id.sort_order_top_last_three_month,
+                getString(R.string.time_frame_last_months_format, "3"),
+            )
+            addItem(
+                R.id.sort_order_top_last_six_month,
+                getString(R.string.time_frame_last_months_format, "6"),
+            )
+            addItem(
+                R.id.sort_order_top_last_nine_month,
+                getString(R.string.time_frame_last_months_format, "9"),
+            )
+            addItem(R.id.sort_order_top_year, R.string.time_frame_this_year)
+            addItem(R.id.sort_order_top_all_time, R.string.time_frame_all_time)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -964,51 +1023,30 @@ class CommunityFragment :
 
     private fun getSortByMenu(): BottomMenu {
         when (viewModel.getCurrentSortOrder()) {
-            CommunitySortOrder.Active -> _sortByMenu.setChecked(R.id.sort_order_active)
-            CommunitySortOrder.Hot -> _sortByMenu.setChecked(R.id.sort_order_hot)
-            CommunitySortOrder.New -> _sortByMenu.setChecked(R.id.sort_order_new)
             is CommunitySortOrder.TopOrder -> _sortByMenu.setChecked(R.id.sort_order_top)
-            CommunitySortOrder.MostComments -> _sortByMenu.setChecked(R.id.sort_order_most_comments)
-            CommunitySortOrder.NewComments -> _sortByMenu.setChecked(R.id.sort_order_new_comments)
-            CommunitySortOrder.Old -> _sortByMenu.setChecked(R.id.sort_order_old)
-            CommunitySortOrder.Controversial -> _sortByMenu.setChecked(R.id.sort_order_controversial)
-            CommunitySortOrder.Scaled -> _sortByMenu.setChecked(R.id.sort_order_scaled)
+            else -> _sortByMenu.setChecked(viewModel.getCurrentSortOrder().toApiSortOrder().toId())
         }
 
         return _sortByMenu
     }
     private fun getSortByTopMenu(): BottomMenu {
-        when (val order = viewModel.getCurrentSortOrder()) {
-            is CommunitySortOrder.TopOrder -> {
-                when (order.timeFrame) {
-                    CommunitySortOrder.TimeFrame.Today ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_day)
-                    CommunitySortOrder.TimeFrame.ThisWeek ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_week)
-                    CommunitySortOrder.TimeFrame.ThisMonth ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_month)
-                    CommunitySortOrder.TimeFrame.ThisYear ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_year)
-                    CommunitySortOrder.TimeFrame.AllTime ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_all_time)
-                    CommunitySortOrder.TimeFrame.LastHour ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_hour)
-                    CommunitySortOrder.TimeFrame.LastSixHour ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_six_hour)
-                    CommunitySortOrder.TimeFrame.LastTwelveHour ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_twelve_hour)
-                    CommunitySortOrder.TimeFrame.LastThreeMonth ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_three_month)
-                    CommunitySortOrder.TimeFrame.LastSixMonth ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_six_month)
-                    CommunitySortOrder.TimeFrame.LastNineMonth ->
-                        _sortByTopMenu.setChecked(R.id.sort_order_top_last_nine_month)
-                }
-            }
-            else -> {}
-        }
+        _sortByTopMenu.setChecked(viewModel.getCurrentSortOrder().toApiSortOrder().toId())
 
         return _sortByTopMenu
+    }
+
+    private fun getDefaultSortOrderSortByMenu(): BottomMenu {
+        when (viewModel.getCurrentSortOrder()) {
+            is CommunitySortOrder.TopOrder -> _defaultSortOrderSortByMenu.setChecked(R.id.sort_order_top)
+            else -> _defaultSortOrderSortByMenu.setChecked(viewModel.getCurrentSortOrder().toApiSortOrder().toId())
+        }
+
+        return _defaultSortOrderSortByMenu
+    }
+    private fun getDefaultSortOrderSortByTopMenu(): BottomMenu {
+        _defaultSortOrderSortByTopMenu.setChecked(viewModel.getCurrentSortOrder().toApiSortOrder().toId())
+
+        return _defaultSortOrderSortByTopMenu
     }
 
     private fun getLayoutMenu(): BottomMenu {
@@ -1327,6 +1365,8 @@ class CommunityFragment :
                 ),
             )
             addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
+            addItemWithIcon(R.id.sort_order, getString(R.string.sort_order), R.drawable.baseline_sort_24)
+            addDivider()
             addItemWithIcon(R.id.reset_settings, R.string.reset_settings, R.drawable.baseline_reset_wrench_24)
 
             setOnMenuItemClickListener { menuItem ->
@@ -1347,6 +1387,9 @@ class CommunityFragment :
                         }
 
                         getMainActivity()?.showBottomMenu(layoutMenu, expandFully = false)
+                    }
+                    R.id.sort_order -> {
+                        getMainActivity()?.showBottomMenu(getDefaultSortOrderSortByMenu())
                     }
                     R.id.reset_settings -> {
                         perCommunityPreferences.setCommunityConfig(currentCommunityRef, null)

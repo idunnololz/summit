@@ -78,6 +78,12 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/show_inline_media_as_links"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/customize_comment_quick_actions"
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"

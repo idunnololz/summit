@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
@@ -20,11 +19,10 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
 import androidx.annotation.IdRes
+import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
-import androidx.core.view.setPadding
-import androidx.core.view.size
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
@@ -81,6 +79,8 @@ import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
 import com.idunnololz.summit.preferences.CommentQuickActionsSettings
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PostQuickActionIds
+import com.idunnololz.summit.preferences.PostQuickActionsSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.CustomLinkMovementMethod
@@ -104,11 +104,8 @@ import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -174,6 +171,9 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var commentHeaderLayout: Int = preferences.commentHeaderLayout
     private var commentQuickActions: CommentQuickActionsSettings = preferences.commentQuickActions
         ?: CommentQuickActionsSettings()
+    private var commentsShowInlineMediaAsLinks: Boolean = preferences.commentsShowInlineMediaAsLinks
+    private var postQuickActions: PostQuickActionsSettings = preferences.postQuickActions
+        ?: PostQuickActionsSettings()
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
 
@@ -229,21 +229,26 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentHeaderLayout = preferences.commentHeaderLayout
         commentQuickActions = preferences.commentQuickActions
             ?: CommentQuickActionsSettings()
+        commentsShowInlineMediaAsLinks = preferences.commentsShowInlineMediaAsLinks
+        postQuickActions = preferences.postQuickActions
+            ?: PostQuickActionsSettings()
     }
 
-    class CustomViewHolder(
+    class PostViewHolder(
         val root: ViewGroup,
-        val commentButton: View? = null,
-        val controlsDivider: View? = null,
-        var upvoteCount: TextView? = null,
-        var upvoteButton: View? = null,
-        var downvoteCount: TextView? = null,
-        var downvoteButton: View? = null,
-        var addCommentButton: View? = null,
-        val controlsDivider2: View? = null,
-        val moreButton: View? = null,
+        val commentButton: View,
         val startGuideline: View? = null,
-    )
+        override val quickActionsTopBarrier: View,
+        override val quickActionsStartBarrier: View? = null,
+        override val quickActionsEndBarrier: View? = null,
+        override var upvoteButton: View? = null,
+        override var downvoteButton: View? = null,
+        override var quickActionsBar: ViewGroup? = null,
+        override var scoreCount2: TextView? = null,
+        override var upvoteCount2: TextView? = null,
+        override var downvoteCount2: TextView? = null,
+        override var actionButtons: List<ImageView> = listOf(),
+    ) : QuickActionsViewHolder
 
     fun bindPostView(
         binding: PostHeaderItemBinding,
@@ -258,34 +263,40 @@ class PostAndCommentViewBuilder @Inject constructor(
         highlightTextData: HighlightTextData?,
         screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
         onRevealContentClickedFn: () -> Unit,
+        onPostActionClick: (PostView, actionId: Int) -> Unit,
         onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onVideoLongClickListener: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-        onPostMoreClick: (PostView) -> Unit,
         onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
         val viewHolder =
-            root.getTag(R.id.view_holder) as? CustomViewHolder
+            root.getTag(R.id.view_holder) as? PostViewHolder
                 ?: run {
-                    val vh = CustomViewHolder(
+                    val vh = PostViewHolder(
                         root = root,
                         commentButton = commentButton,
-                        controlsDivider = controlsDivider,
-                        addCommentButton = addCommentButton,
-                        controlsDivider2 = controlsDivider2,
-                        moreButton = moreButton,
                         startGuideline = startGuideline,
+                        quickActionsTopBarrier = bottomBarrier,
+                        quickActionsStartBarrier = startBarrier,
+                        quickActionsEndBarrier = endBarrier,
                     )
                     this.root.setTag(R.id.view_holder, vh)
                     vh
                 }
 
         ensureContent(viewHolder)
+        viewHolder.ensureActionButtons(
+            root = root,
+            leftHandMode = leftHandMode,
+            showUpAndDownVotes = showUpAndDownVotes,
+            actions = postQuickActions.actions + PostQuickActionIds.More,
+            fullWidth = false,
+        )
 
         scaleTextSizes()
         viewHolder.scaleTextSizes()
@@ -335,13 +346,14 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentButton.setOnClickListener {
             onAddCommentClick(Either.Left(postView))
         }
-        addCommentButton.isEnabled = !postView.post.locked
-        addCommentButton.setOnClickListener {
-            onAddCommentClick(Either.Left(postView))
-        }
 
-        moreButton.setOnClickListener {
-            onPostMoreClick(postView)
+        viewHolder.actionButtons.forEach {
+            it.setOnClickListener {
+                onPostActionClick(postView, it.id)
+            }
+            if (it.id == R.id.pa_reply) {
+                it.isEnabled = !postView.post.locked
+            }
         }
 
         lemmyContentHelper.setupFullContent(
@@ -381,91 +393,65 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
         )
 
-        val scoreCount: TextView = viewHolder.upvoteCount!!
-        val upvoteCount: TextView?
-        val downvoteCount: TextView?
+        val scoreCount: TextView? = viewHolder.scoreCount2
+            ?: viewHolder.upvoteCount2
+        if (scoreCount != null) {
+            val upvoteCount: TextView?
+            val downvoteCount: TextView?
 
-        if (viewHolder.downvoteCount != null) {
-            upvoteCount = viewHolder.upvoteCount
-            downvoteCount = viewHolder.downvoteCount
-        } else {
-            upvoteCount = null
-            downvoteCount = null
+            if (viewHolder.downvoteCount2 != null) {
+                upvoteCount = viewHolder.upvoteCount2
+                downvoteCount = viewHolder.downvoteCount2
+            } else {
+                upvoteCount = null
+                downvoteCount = null
+            }
+
+            voteUiHandler.bind(
+                lifecycleOwner = viewLifecycleOwner,
+                instance = instance,
+                postView = postView,
+                upVoteView = viewHolder.upvoteButton,
+                downVoteView = viewHolder.downvoteButton,
+                scoreView = scoreCount,
+                upvoteCount = upvoteCount,
+                downvoteCount = downvoteCount,
+                onUpdate = null,
+                onSignInRequired = onSignInRequired,
+                onInstanceMismatch = onInstanceMismatch,
+            )
         }
-
-        voteUiHandler.bind(
-            lifecycleOwner = viewLifecycleOwner,
-            instance = instance,
-            postView = postView,
-            upVoteView = viewHolder.upvoteButton,
-            downVoteView = viewHolder.downvoteButton,
-            scoreView = scoreCount,
-            upvoteCount = upvoteCount,
-            downvoteCount = downvoteCount,
-            onUpdate = null,
-            onSignInRequired = onSignInRequired,
-            onInstanceMismatch = onInstanceMismatch,
-        )
 
         root.tag = postView
 
         when (screenshotConfig?.postViewType) {
             ScreenshotModeViewModel.PostViewType.Full -> {
-                moreButton.visibility = View.GONE
-                controlsDivider2.visibility = View.GONE
-                addCommentButton.visibility = View.GONE
-                controlsDivider.visibility = View.GONE
-
                 title.visibility = View.VISIBLE
                 headerContainer.visibility = View.VISIBLE
                 fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.ImageOnly -> {
-                moreButton.visibility = View.GONE
-                controlsDivider2.visibility = View.GONE
-                addCommentButton.visibility = View.GONE
-                controlsDivider.visibility = View.GONE
-
                 title.visibility = View.GONE
                 headerContainer.visibility = View.GONE
                 fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.TextOnly -> {
-                moreButton.visibility = View.GONE
-                controlsDivider2.visibility = View.GONE
-                addCommentButton.visibility = View.GONE
-                controlsDivider.visibility = View.GONE
-
                 title.visibility = View.VISIBLE
                 headerContainer.visibility = View.VISIBLE
                 fullContent.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.TitleOnly -> {
-                moreButton.visibility = View.GONE
-                controlsDivider2.visibility = View.GONE
-                addCommentButton.visibility = View.GONE
-                controlsDivider.visibility = View.GONE
                 fullContent.visibility = View.GONE
 
                 title.visibility = View.VISIBLE
                 headerContainer.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.TitleAndImageOnly -> {
-                moreButton.visibility = View.GONE
-                controlsDivider2.visibility = View.GONE
-                addCommentButton.visibility = View.GONE
-                controlsDivider.visibility = View.GONE
-
                 title.visibility = View.VISIBLE
                 fullContent.visibility = View.VISIBLE
                 headerContainer.visibility = View.VISIBLE
             }
             ScreenshotModeViewModel.PostViewType.Compact -> {
-                moreButton.visibility = View.GONE
-                controlsDivider2.visibility = View.GONE
-                addCommentButton.visibility = View.GONE
-                controlsDivider.visibility = View.GONE
-
                 title.visibility = View.VISIBLE
                 headerContainer.visibility = View.VISIBLE
                 fullContent.visibility = View.VISIBLE
@@ -475,174 +461,16 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
     }
 
-    fun ensureContent(vh: CustomViewHolder) = with(vh) {
-        val currentState = root.getTag(R.id.show_up_and_down_votes) as? Boolean
+    private fun ensureContent(vh: PostViewHolder) = with(vh) {
         val currentLeftHandMode = root.getTag(R.id.left_hand_mode) as? Boolean
 
-        if (showUpAndDownVotes == currentState && leftHandMode == currentLeftHandMode) {
-            return
+        if (leftHandMode == currentLeftHandMode) {
+            return@with
         }
 
-        root.setTag(R.id.show_up_and_down_votes, showUpAndDownVotes)
         root.setTag(R.id.left_hand_mode, leftHandMode)
 
-        root.removeView(upvoteButton)
-        root.removeView(downvoteButton)
-        root.removeView(upvoteCount)
-
-        val existingActionButton = commentButton ?: addCommentButton ?: moreButton
-        requireNotNull(existingActionButton)
-
-        if (showUpAndDownVotes) {
-            val lastView: View
-            val buttons = makeUpAndDownVoteButtons(context)
-
-            if (leftHandMode) {
-                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = existingActionButton.id
-                    bottomToBottom = existingActionButton.id
-
-                    startToStart = startGuideline?.id ?: ConstraintLayout.LayoutParams.PARENT_ID
-                    marginStart = paddingFull
-                }
-                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = existingActionButton.id
-                    bottomToBottom = existingActionButton.id
-
-                    startToEnd = buttons.upvoteButton.id
-                }
-
-                lastView = buttons.downvoteButton
-            } else {
-                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = existingActionButton.id
-                    bottomToBottom = existingActionButton.id
-
-                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                    marginEnd = paddingFull
-                }
-                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = existingActionButton.id
-                    bottomToBottom = existingActionButton.id
-
-                    endToStart = buttons.downvoteButton.id
-                }
-
-                lastView = buttons.upvoteButton
-            }
-            root.addView(buttons.upvoteButton)
-            root.addView(buttons.downvoteButton)
-
-            upvoteButton = buttons.upvoteButton
-            upvoteCount = buttons.upvoteButton
-            downvoteButton = buttons.downvoteButton
-            downvoteCount = buttons.downvoteButton
-
-            controlsDivider?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                if (leftHandMode) {
-                    startToEnd = lastView.id
-                    marginStart = context.getDimen(R.dimen.padding_half)
-                } else {
-                    endToStart = lastView.id
-                    marginEnd = context.getDimen(R.dimen.padding_half)
-                }
-            }
-        } else {
-            val button1 = ImageView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToTop = existingActionButton.id
-                    bottomToBottom = existingActionButton.id
-
-                    if (leftHandMode) {
-                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                        marginStart = context.getDimen(R.dimen.padding_quarter)
-                    } else {
-                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                        marginEnd = context.getDimen(R.dimen.padding_quarter)
-                    }
-                }
-                setPadding(context.getDimen(R.dimen.padding_half))
-                setBackgroundResource(selectableItemBackgroundBorderless)
-            }
-            root.addView(button1)
-
-            val upvoteCount = TextView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToTop = existingActionButton.id
-                    bottomToBottom = existingActionButton.id
-
-                    if (leftHandMode) {
-                        startToEnd = button1.id
-                    } else {
-                        endToStart = button1.id
-                    }
-                }
-            }.also {
-                upvoteCount = it
-            }
-            root.addView(upvoteCount)
-
-            val button2 = ImageView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToTop = existingActionButton.id
-                    bottomToBottom = existingActionButton.id
-
-                    if (leftHandMode) {
-                        startToEnd = upvoteCount.id
-                    } else {
-                        endToStart = upvoteCount.id
-                    }
-                }
-                setPadding(context.getDimen(R.dimen.padding_half))
-                setBackgroundResource(selectableItemBackgroundBorderless)
-            }
-            root.addView(button2)
-
-            val upvoteButton: ImageView
-            val downvoteButton: ImageView
-
-            if (leftHandMode) {
-                upvoteButton = button1
-                downvoteButton = button2
-            } else {
-                upvoteButton = button2
-                downvoteButton = button1
-            }
-
-            upvoteButton.setImageResource(R.drawable.baseline_arrow_upward_24)
-            downvoteButton.setImageResource(R.drawable.baseline_arrow_downward_24)
-
-            this.upvoteButton = upvoteButton
-            this.downvoteButton = downvoteButton
-
-            controlsDivider?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                if (leftHandMode) {
-                    startToEnd = button2.id
-                } else {
-                    endToStart = button2.id
-                }
-            }
-        }
-
-        commentButton?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+        commentButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
             if (leftHandMode) {
                 endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
                 startToStart = ConstraintLayout.LayoutParams.UNSET
@@ -651,43 +479,18 @@ class PostAndCommentViewBuilder @Inject constructor(
                 endToEnd = ConstraintLayout.LayoutParams.UNSET
             }
         }
-
-        val controlsDivider = controlsDivider
-        if (controlsDivider != null) {
-            addCommentButton?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                if (leftHandMode) {
-                    startToEnd = controlsDivider.id
-                    endToStart = ConstraintLayout.LayoutParams.UNSET
-                } else {
-                    endToStart = controlsDivider.id
-                    startToEnd = ConstraintLayout.LayoutParams.UNSET
-                }
+        (quickActionsStartBarrier as? Barrier)?.apply {
+            referencedIds = if (leftHandMode) {
+                intArrayOf(ConstraintLayout.LayoutParams.PARENT_ID)
+            } else {
+                intArrayOf(commentButton.id)
             }
         }
-
-        val addCommentButton = addCommentButton
-        if (addCommentButton != null) {
-            controlsDivider2?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                if (leftHandMode) {
-                    startToEnd = addCommentButton.id
-                    endToStart = ConstraintLayout.LayoutParams.UNSET
-                } else {
-                    endToStart = addCommentButton.id
-                    startToEnd = ConstraintLayout.LayoutParams.UNSET
-                }
-            }
-        }
-
-        val controlsDivider2 = controlsDivider2
-        if (controlsDivider2 != null) {
-            moreButton?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                if (leftHandMode) {
-                    startToEnd = controlsDivider2.id
-                    endToStart = ConstraintLayout.LayoutParams.UNSET
-                } else {
-                    endToStart = controlsDivider2.id
-                    startToEnd = ConstraintLayout.LayoutParams.UNSET
-                }
+        (quickActionsEndBarrier as? Barrier)?.apply {
+            referencedIds = if (leftHandMode) {
+                intArrayOf(commentButton.id)
+            } else {
+                intArrayOf(ConstraintLayout.LayoutParams.PARENT_ID)
             }
         }
     }
@@ -758,26 +561,23 @@ class PostAndCommentViewBuilder @Inject constructor(
 
                 when (val rb = rawBinding) {
                     is PostCommentExpandedItemBinding -> {
-                        ensureActionButtons(
+                        ensureCommentsActionButtons(
+                            vh = this,
                             root = rb.root,
-                            leftHandMode = leftHandMode,
-                            showUpAndDownVotes = showUpAndDownVotes,
                             fullWidth = false,
                         )
                     }
                     is PostCommentExpandedCompactItemBinding -> {
                         if (isActionsExpanded) {
-                            ensureActionButtons(
+                            ensureCommentsActionButtons(
+                                vh = this,
                                 root = root,
-                                leftHandMode = leftHandMode,
-                                showUpAndDownVotes = showUpAndDownVotes,
                                 fullWidth = false,
                             )
                         } else {
-                            ensureActionButtons(
+                            ensureCommentsActionButtons(
+                                vh = this,
                                 root = root,
-                                leftHandMode = leftHandMode,
-                                showUpAndDownVotes = showUpAndDownVotes,
                                 removeOnly = true,
                             )
                         }
@@ -885,6 +685,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onPageClick = onPageClick,
                 onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
+                showMediaAsLinks = commentsShowInlineMediaAsLinks,
             )
         }
 
@@ -1478,10 +1279,27 @@ class PostAndCommentViewBuilder @Inject constructor(
             imageTintList = ColorStateList.valueOf(normalTextColor)
         }
 
-    private fun CommentExpandedViewHolder.ensureActionButtons(
+    fun ensureCommentsActionButtons(
+        vh: QuickActionsViewHolder,
+        root: ViewGroup,
+        removeOnly: Boolean = false,
+        fullWidth: Boolean = true,
+    ) {
+        vh.ensureActionButtons(
+            root = root,
+            leftHandMode = leftHandMode,
+            showUpAndDownVotes = showUpAndDownVotes,
+            actions = commentQuickActions.actions + CommentQuickActionIds.More,
+            removeOnly = removeOnly,
+            fullWidth = fullWidth,
+        )
+    }
+
+    private fun QuickActionsViewHolder.ensureActionButtons(
         root: ViewGroup,
         leftHandMode: Boolean,
         showUpAndDownVotes: Boolean,
+        actions: List<Int>,
         removeOnly: Boolean = false,
         fullWidth: Boolean = true,
     ) {
@@ -1489,12 +1307,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         if (removeOnly) return
 
-        val actions = commentQuickActions.actions + CommentQuickActionIds.More
-
         val quickActionsBarContainer = HorizontalScrollView(context)
-//            .apply {
-//                background = ColorDrawable(backgroundColor)
-//            }
             .also {
                 quickActionsBar = it
             }
@@ -1525,7 +1338,9 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         for (actionIndex in indices) {
             when (val action = actions[actionIndex]) {
-                CommentQuickActionIds.Voting -> {
+                PostQuickActionIds.Voting,
+                CommentQuickActionIds.Voting,
+                -> {
                     if (showUpAndDownVotes) {
                         val buttons = makeUpAndDownVoteButtons(context) {
                             LinearLayout.LayoutParams(
@@ -1632,9 +1447,23 @@ class PostAndCommentViewBuilder @Inject constructor(
                         quickActionsBar.addView(button1)
                     }
                 }
+                PostQuickActionIds.Reply -> {
+                    makeCommentActionButton(R.id.pa_reply).apply {
+                        setImageResource(R.drawable.baseline_add_comment_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
                 CommentQuickActionIds.Reply -> {
                     makeCommentActionButton(R.id.ca_reply).apply {
                         setImageResource(R.drawable.baseline_add_comment_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                PostQuickActionIds.Save -> {
+                    makeCommentActionButton(R.id.pa_save_toggle).apply {
+                        setImageResource(R.drawable.baseline_bookmark_24)
                         quickActionsBar.addView(this)
                         actionButtons.add(this)
                     }
@@ -1688,9 +1517,58 @@ class PostAndCommentViewBuilder @Inject constructor(
                         actionButtons.add(this)
                     }
                 }
+                PostQuickActionIds.More -> {
+                    makeCommentActionButton(R.id.pa_more).apply {
+                        setImageResource(R.drawable.baseline_more_horiz_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
                 CommentQuickActionIds.More -> {
                     makeCommentActionButton(R.id.ca_more).apply {
                         setImageResource(R.drawable.baseline_more_horiz_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                PostQuickActionIds.TakeScreenshot -> {
+                    makeCommentActionButton(R.id.pa_screenshot).apply {
+                        setImageResource(R.drawable.baseline_screenshot_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                PostQuickActionIds.CrossPost -> {
+                    makeCommentActionButton(R.id.pa_cross_post).apply {
+                        setImageResource(R.drawable.baseline_content_copy_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                PostQuickActionIds.ShareSourceLink -> {
+                    makeCommentActionButton(R.id.pa_share_fediverse_link).apply {
+                        setImageResource(R.drawable.ic_fediverse_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                PostQuickActionIds.CommunityInfo -> {
+                    makeCommentActionButton(R.id.pa_community_info).apply {
+                        setImageResource(R.drawable.ic_community_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                PostQuickActionIds.ViewSource -> {
+                    makeCommentActionButton(R.id.pa_view_source).apply {
+                        setImageResource(R.drawable.baseline_code_24)
+                        quickActionsBar.addView(this)
+                        actionButtons.add(this)
+                    }
+                }
+                PostQuickActionIds.DetailedView -> {
+                    makeCommentActionButton(R.id.pa_detailed_view).apply {
+                        setImageResource(R.drawable.baseline_open_in_full_24)
                         quickActionsBar.addView(this)
                         actionButtons.add(this)
                     }
@@ -1711,8 +1589,6 @@ class PostAndCommentViewBuilder @Inject constructor(
                         topMargin = paddingHalf
                         bottomMargin = paddingHalf
                     }
-                }.also {
-                    actionsDivider1 = it
                 }
                 quickActionsBar.addView(actionsDivider1)
             }
@@ -1724,19 +1600,41 @@ class PostAndCommentViewBuilder @Inject constructor(
             0,
             ConstraintLayout.LayoutParams.WRAP_CONTENT,
         ).apply {
-            topToBottom = R.id.bottom_barrier
+            val startBarrier = quickActionsStartBarrier
+            val endBarrier = quickActionsEndBarrier
+
+            topToBottom = quickActionsTopBarrier.id
 
             if (leftHandMode) {
-                startToStart = R.id.start_barrier
-                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                if (startBarrier != null) {
+                    startToEnd = startBarrier.id
+                } else {
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                }
+
+                if (endBarrier != null) {
+                    endToStart = endBarrier.id
+                } else {
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                }
             } else {
                 if (fullWidth) {
                     endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
                 } else {
-                    endToEnd = R.id.start_barrier
+                    if (startBarrier != null) {
+                        endToStart = startBarrier.id
+                    } else {
+                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+
                     marginEnd = Utils.convertDpToPixel(16f).toInt()
                 }
-                startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+
+                if (endBarrier != null) {
+                    startToEnd = endBarrier.id
+                } else {
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                }
             }
         }
         root.addView(quickActionsBarContainer, root.childCount - 2)
@@ -1817,7 +1715,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     fun recycle(b: PostHeaderItemBinding): RecycledState {
         val recycledState = lemmyContentHelper.recycleFullContent(b.fullContent)
         offlineManager.cancelFetch(b.root)
-        (b.root.getTag(R.id.view_holder) as? CustomViewHolder)?.upvoteCount?.let {
+        (b.root.getTag(R.id.view_holder) as? PostViewHolder)?.upvoteCount2?.let {
             voteUiHandler.unbindVoteUi(it)
         }
         return recycledState
@@ -1864,7 +1762,11 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
     }
 
-    private fun highlightComment(isCommentHighlighted: Boolean, highlightForever: Boolean, bg: View) {
+    private fun highlightComment(
+        isCommentHighlighted: Boolean,
+        highlightForever: Boolean,
+        bg: View,
+    ) {
         if (highlightForever) {
             bg.visibility = View.VISIBLE
             bg.clearAnimation()
@@ -1890,9 +1792,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentButton.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
 
-    private fun CustomViewHolder.scaleTextSizes() {
-        upvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
-        downvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+    private fun PostViewHolder.scaleTextSizes() {
+        upvoteCount2?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+        downvoteCount2?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+        scoreCount2?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {

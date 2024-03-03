@@ -39,6 +39,7 @@ import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.DirectoryHelper
@@ -74,6 +75,7 @@ class CommunityViewModel @Inject constructor(
     private val tabsManager: TabsManager,
     private val apiClient: AccountAwareLemmyClient,
     private val guestAccountManager: GuestAccountManager,
+    private val perCommunityPreferences: PerCommunityPreferences,
     val basePreferences: Preferences,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
@@ -103,6 +105,7 @@ class CommunityViewModel @Inject constructor(
         it ?: return@Observer
 
         recentCommunityManager.addRecentCommunity(it)
+        updateSortOrder()
     }
     val loadedPostsData = StatefulLiveData<PostUpdateInfo>()
     private val personRefOfLastAccountPreferencesLoaded = state.getLiveData<PersonRef?>(
@@ -266,24 +269,7 @@ class CommunityViewModel @Inject constructor(
             return
         }
 
-        val preferences = preferenceManager.getComposedPreferencesForAccount(
-            fullAccount?.account,
-        )
-
-        val sortOrder = if (fullAccount != null) {
-            preferences.defaultCommunitySortOrder
-                ?: fullAccount
-                    .accountInfo
-                    .miscAccountInfo
-                    ?.defaultCommunitySortType
-                    ?.toSortOrder()
-                ?: return
-        } else {
-            preferences.defaultCommunitySortOrder
-                ?: return
-        }
-
-        setSortOrder(sortOrder)
+        updateSortOrder()
 
         personRefOfLastAccountPreferencesLoaded.value = fullAccount?.account?.toPersonRef()
     }
@@ -345,7 +331,6 @@ class CommunityViewModel @Inject constructor(
         clearPagesOnSuccess: Boolean = false,
         scrollToTop: Boolean = false,
     ) {
-        Log.d("HAHA", "fetchInitialPage()", RuntimeException())
         viewModelScope.launch {
             // Allow some time for settings to settle or else we will end up loading multiple times
             delay(100)
@@ -419,7 +404,6 @@ class CommunityViewModel @Inject constructor(
         clearPagesOnSuccess: Boolean = false,
         scrollToTop: Boolean = false,
     ) {
-        Log.d("HAHA", "aaaa", RuntimeException())
         if (fetchingPages.contains(pageToFetch)) {
             return
         }
@@ -523,7 +507,23 @@ class CommunityViewModel @Inject constructor(
         postsRepository.setCommunity(communityRef)
         postListEngine.setSecondaryKey(communityRef.getKey())
 
-        postListEngine.tryRestore()
+        // The below has an issue...
+        // If there are posts cached, then loading it would result in possible duplicate posts
+        // Since the posts repository will not know about the cached posts
+        // However if we add the posts to the posts repository, then the posts repository
+        // will mark all those posts as read.
+        // For communities with only a few posts, the post repository will incorrectly think
+        // that there is no more posts since all posts have been "seen".
+
+//        postListEngine.tryRestore()
+//
+//        // After restoration, we need to sync seen posts
+//        val allPosts = postListEngine.pages.asSequence()
+//            .flatMap { it.posts }
+//            .map { it.postView }
+//            .toList()
+//
+//        postsRepository.addSeenPosts(allPosts)
 
         registerHiddenPostObserver()
     }
@@ -828,5 +828,57 @@ class CommunityViewModel @Inject constructor(
 
     fun changeGuestAccountInstance(instance: String) {
         guestAccountManager.changeGuestAccountInstance(instance)
+    }
+
+    fun setDefaultSortOrder(sortOrder: CommunitySortOrder) {
+        val currentCommunityRef = currentCommunityRef.value ?: return
+        val config = perCommunityPreferences.getCommunityConfig(currentCommunityRef)
+            ?: PerCommunityPreferences.CommunityConfig(currentCommunityRef)
+        perCommunityPreferences.setCommunityConfig(
+            communityRef = currentCommunityRef,
+            config = config.copy(sortOrder = sortOrder),
+        )
+
+        updateSortOrder()
+    }
+
+    private fun updateSortOrder() {
+        val fullAccount = accountInfoManager.currentFullAccount.value
+        val preferences = preferenceManager.getComposedPreferencesForAccount(
+            fullAccount?.account,
+        )
+
+        fun getSortOrder(): CommunitySortOrder? {
+            Log.d("HAHA", "currentCommunityRef: ${currentCommunityRef.value}")
+            val currentCommunityRef = currentCommunityRef.value
+            if (currentCommunityRef != null) {
+                val config = perCommunityPreferences.getCommunityConfig(currentCommunityRef)
+                val sortOrder = config?.sortOrder
+
+                if (sortOrder != null) {
+                    return sortOrder
+                }
+            }
+
+            if (preferences.defaultCommunitySortOrder != null) {
+                return preferences.defaultCommunitySortOrder
+            }
+
+            if (fullAccount != null) {
+                return fullAccount
+                    .accountInfo
+                    .miscAccountInfo
+                    ?.defaultCommunitySortType
+                    ?.toSortOrder()
+            }
+
+            return null
+        }
+
+        val sortOrder = getSortOrder()
+
+        if (sortOrder != null) {
+            setSortOrder(sortOrder)
+        }
     }
 }

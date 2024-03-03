@@ -17,6 +17,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -27,6 +28,7 @@ import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.main.MainActivityInsets
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
@@ -57,6 +59,10 @@ class BottomMenu(
         override fun handleOnBackPressed() {
             close()
         }
+    }
+
+    private val insetsObserver = Observer<MainActivityInsets> {
+        setInsets(it.topInset, it.bottomInset)
     }
 
     var onClose: (() -> Unit)? = null
@@ -116,8 +122,11 @@ class BottomMenu(
         bottomSheetContainer: ViewGroup,
         expandFully: Boolean,
         handleBackPress: Boolean = true,
+        handleInsets: Boolean = true,
     ) {
-//        setInsets(mainActivity.lastInsets.topInset, mainActivity.lastInsets.bottomInset)
+        if (handleInsets) {
+            mainActivity.lastInsetLiveData.observeForever(insetsObserver)
+        }
 
         parent = bottomSheetContainer
 
@@ -147,6 +156,7 @@ class BottomMenu(
             isHideable = true
             state = BottomSheetBehavior.STATE_HIDDEN
             peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
+            isGestureInsetBottomIgnored = true
 
             if (expandFully) {
                 skipCollapsed = true
@@ -185,6 +195,7 @@ class BottomMenu(
                                 parent = null
                                 onBackPressedCallback.remove()
                                 bottomSheetContainer.removeView(rootView)
+                                mainActivity.lastInsetLiveData.removeObserver(insetsObserver)
 
                                 onClose?.invoke()
                             }

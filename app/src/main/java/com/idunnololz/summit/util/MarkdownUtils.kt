@@ -1,7 +1,5 @@
 package com.idunnololz.summit.util
 
-import android.util.Log
-
 fun String.escapeMarkdown(): String {
     val that = this
 

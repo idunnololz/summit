@@ -306,6 +306,9 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"  />
+        <action
+            android:id="@+id/action_settingMiscFragment_to_postQuickActionsFragment"
+            app:destination="@id/postQuickActionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingLoggingFragment"
@@ -407,4 +410,8 @@
         android:id="@+id/settingsInstanceBlockListFragment"
         android:name="com.idunnololz.summit.settings.webSettings.blockList.instance.SettingsInstanceBlockListFragment"
         android:label="SettingsInstanceBlockListFragment" />
+    <fragment
+        android:id="@+id/postQuickActionsFragment"
+        android:name="com.idunnololz.summit.settings.postQuickActions.PostQuickActionsFragment"
+        android:label="PostQuickActionsFragment" />
 </navigation>

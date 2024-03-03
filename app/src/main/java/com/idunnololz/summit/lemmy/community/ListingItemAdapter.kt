@@ -294,7 +294,7 @@ class ListingItemAdapter(
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
                     onHighlightComplete = {
-                      clearHighlight()
+                        clearHighlight()
                     },
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,

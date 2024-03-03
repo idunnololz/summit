@@ -19,12 +19,19 @@
         android:layout_height="match_parent"
         android:elevation="17dp">
 
+        <!--
+        BottomSheetBehavior auto-handles system insets unless told otherwise. Since we do not
+        consume system insets within windows, this causes us to apply insets twice within dialogs.
+        To workaround this, disable bottom sheet auto-inset handling.
+        -->
         <FrameLayout
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            app:paddingBottomSystemWindowInsets="false"
+            app:paddingTopSystemWindowInsets="false"
             app:layout_behavior="com.idunnololz.summit.util.FixedBottomSheetBehavior"
             style="@style/Widget.Material3.BottomSheet.Modal">
 

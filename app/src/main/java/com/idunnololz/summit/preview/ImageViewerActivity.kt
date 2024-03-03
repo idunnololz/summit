@@ -604,7 +604,9 @@ class ImageViewerActivity : BaseActivity() {
                 .build()
             binding.imageView.context.imageLoader.enqueue(request)
         }, {
-            binding.loadingView.showDefaultErrorMessageFor(it)
+            binding.loadingView.showDefaultErrorMessageFor(
+                it,
+            )
         },)
     }
 

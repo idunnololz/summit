@@ -10,17 +10,15 @@ data class CommentPage(
     val error: Throwable?,
 )
 
-
 sealed interface CommentItem {
     val commentView: CommentView
 }
 
 data class VisibleCommentItem(
-    override val commentView: CommentView
-): CommentItem
-
+    override val commentView: CommentView,
+) : CommentItem
 
 data class FilteredCommentItem(
     override val commentView: CommentView,
     var show: Boolean = false,
-): CommentItem
+) : CommentItem

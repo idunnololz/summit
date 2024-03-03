@@ -50,11 +50,12 @@ import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.postAndCommentView.GeneralQuickActionsViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
+import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
-import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.bind
@@ -160,21 +161,21 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         fragmentManager = childFragmentManager,
                     )
                 },
-                onCommentMoreClick = {
-                    showMoreCommentOptions(
+                onPostActionClick = { postView, actionId ->
+                    createPostActionHandler(
                         instance = parentFragment.viewModel.instance,
-                        commentView = it,
+                        postView = postView,
                         actionsViewModel = actionsViewModel,
                         fragmentManager = childFragmentManager,
-                    )
+                    )(actionId)
                 },
-                onPostMoreClick = {
-                    showMorePostOptions(
+                onCommentActionClick = { commentView, actionId ->
+                    createCommentActionHandler(
                         instance = parentFragment.viewModel.instance,
-                        postView = it,
+                        commentView = commentView,
                         actionsViewModel = actionsViewModel,
                         fragmentManager = childFragmentManager,
-                    )
+                    )(actionId)
                 },
                 onSignInRequired = {
                     PreAuthDialogFragment.newInstance()
@@ -342,8 +343,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private val onVideoLongClickListener: (url: String) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-        private val onCommentMoreClick: (CommentView) -> Unit,
-        private val onPostMoreClick: (PostView) -> Unit,
+        private val onPostActionClick: (PostView, actionId: Int) -> Unit,
+        private val onCommentActionClick: (CommentView, actionId: Int) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
         private val onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
@@ -418,20 +419,21 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 inflateFn = CommentListCommentItemBinding::inflate,
             ) { item, b, _ ->
                 val post = item.commentView.post
-                val viewHolder = b.root.getTag(R.id.view_holder) as? PostAndCommentViewBuilder.CustomViewHolder
+                val viewHolder = b.root.getTag(R.id.view_holder) as? GeneralQuickActionsViewHolder
                     ?: run {
-                        val vh = PostAndCommentViewBuilder.CustomViewHolder(
+                        val vh = GeneralQuickActionsViewHolder(
                             root = b.root,
-                            controlsDivider = b.controlsDivider,
-                            addCommentButton = b.commentButton,
-                            controlsDivider2 = b.controlsDivider2,
-                            moreButton = b.moreButton,
+                            quickActionsTopBarrier = b.text,
                         )
                         b.root.setTag(R.id.view_holder, vh)
                         vh
                     }
 
-                postAndCommentViewBuilder.ensureContent(viewHolder)
+                b.highlightBg.visibility = View.GONE
+                postAndCommentViewBuilder.ensureCommentsActionButtons(
+                    vh = viewHolder,
+                    root = viewHolder.root,
+                )
 
                 b.postInfo.text = buildSpannedString {
                     appendLink(
@@ -508,43 +510,46 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkLongClick = onLinkLongClick,
                 )
 
-                val scoreCount: TextView = viewHolder.upvoteCount!!
+                val scoreCount: TextView? = viewHolder.scoreCount2
                 val upvoteCount: TextView?
                 val downvoteCount: TextView?
 
-                if (viewHolder.downvoteCount != null) {
-                    upvoteCount = viewHolder.upvoteCount
-                    downvoteCount = viewHolder.downvoteCount
-                } else {
-                    upvoteCount = null
-                    downvoteCount = null
+                if (scoreCount != null) {
+                    if (viewHolder.downvoteCount2 != null) {
+                        upvoteCount = viewHolder.upvoteCount2
+                        downvoteCount = viewHolder.downvoteCount2
+                    } else {
+                        upvoteCount = null
+                        downvoteCount = null
+                    }
+                    postAndCommentViewBuilder.voteUiHandler.bind(
+                        lifecycleOwner = viewLifecycleOwner,
+                        instance = item.instance,
+                        commentView = item.commentView,
+                        upVoteView = viewHolder.upvoteButton,
+                        downVoteView = viewHolder.downvoteButton,
+                        scoreView = scoreCount,
+                        upvoteCount = upvoteCount,
+                        downvoteCount = downvoteCount,
+                        onUpdate = null,
+                        onSignInRequired = onSignInRequired,
+                        onInstanceMismatch = onInstanceMismatch,
+                    )
                 }
-                postAndCommentViewBuilder.voteUiHandler.bind(
-                    lifecycleOwner = viewLifecycleOwner,
-                    instance = item.instance,
-                    commentView = item.commentView,
-                    upVoteView = viewHolder.upvoteButton,
-                    downVoteView = viewHolder.downvoteButton,
-                    scoreView = scoreCount,
-                    upvoteCount = upvoteCount,
-                    downvoteCount = downvoteCount,
-                    onUpdate = null,
-                    onSignInRequired = onSignInRequired,
-                    onInstanceMismatch = onInstanceMismatch,
-                )
 
-                b.commentButton.isEnabled = !post.locked
-                b.commentButton.setOnClickListener {
-                    onAddCommentClick(Either.Right(item.commentView))
-                }
-                b.moreButton.setOnClickListener {
-                    onCommentMoreClick(item.commentView)
+                viewHolder.actionButtons.forEach {
+                    it.setOnClickListener {
+                        onCommentActionClick(item.commentView, it.id)
+                    }
+                    if (it.id == R.id.ca_reply) {
+                        it.isEnabled = !item.commentView.post.locked
+                    }
                 }
                 b.root.setOnClickListener {
                     onCommentClick(CommentRef(item.instance, item.commentView.comment.id))
                 }
                 b.root.setOnLongClickListener {
-                    onCommentMoreClick(item.commentView)
+                    onCommentActionClick(item.commentView, R.id.ca_more)
                     true
                 }
             }
@@ -601,7 +606,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     },
                     onImageClick = onPostImageClick,
                     onShowMoreOptions = {
-                        onPostMoreClick(item.postView)
+                        onPostActionClick(it, R.id.pa_more)
                     },
                     onVideoClick = onVideoClick,
                     onVideoLongClickListener = onVideoLongClickListener,

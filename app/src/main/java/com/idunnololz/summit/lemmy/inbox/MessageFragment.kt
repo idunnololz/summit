@@ -458,7 +458,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
-                onPostMoreClick = { postView, _ ->
+                onPostActionClick = { postView, _, actionId ->
                     showMorePostOptions(
                         instance = viewModel.apiInstance,
                         postView = postView,

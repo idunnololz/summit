@@ -15,7 +15,7 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.empty_screen.EmptyScreenFragment
+import com.idunnololz.summit.emptyScreen.EmptyScreenFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -125,7 +125,7 @@ class SlidingPaneController(
                         setReorderingAllowed(true)
                         replace(
                             fragmentContainerId,
-                            EmptyScreenFragment.newInstance(emptyScreenText)
+                            EmptyScreenFragment.newInstance(emptyScreenText),
                         )
                     }
                 }

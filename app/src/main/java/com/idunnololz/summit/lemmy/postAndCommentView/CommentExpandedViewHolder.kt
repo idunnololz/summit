@@ -29,19 +29,20 @@ class CommentExpandedViewHolder(
     val startGuideline: View,
     var scoreCount: TextView?,
     var upvoteCount: TextView?,
-    var upvoteButton: View?,
+    override var upvoteButton: View?,
     var downvoteCount: TextView?,
-    var downvoteButton: View?,
-    var quickActionsBar: ViewGroup?,
-    var actionButtons: List<ImageView>,
+    override var downvoteButton: View?,
+    override var quickActionsBar: ViewGroup?,
+    override var actionButtons: List<ImageView>,
     val actionsContainer: ViewGroup?,
+    override val quickActionsStartBarrier: View,
+    override val quickActionsEndBarrier: View? = null,
+    override val quickActionsTopBarrier: View,
 
-    var actionsDivider1: View? = null,
-    var actionsDivider2: View? = null,
-    var scoreCount2: TextView? = null,
-    var upvoteCount2: TextView? = null,
-    var downvoteCount2: TextView? = null,
-) : RecyclerView.ViewHolder(root) {
+    override var scoreCount2: TextView? = null,
+    override var upvoteCount2: TextView? = null,
+    override var downvoteCount2: TextView? = null,
+) : RecyclerView.ViewHolder(root), QuickActionsViewHolder {
 
     data class State(
         var preferUpAndDownVotes: Boolean? = null,
@@ -73,6 +74,8 @@ class CommentExpandedViewHolder(
                 actionButtons = listOf(),
                 quickActionsBar = null,
                 actionsContainer = null,
+                quickActionsStartBarrier = binding.startBarrier,
+                quickActionsTopBarrier = binding.bottomBarrier,
             )
         fun fromBinding(binding: PostCommentExpandedCompactItemBinding) =
             CommentExpandedViewHolder(
@@ -97,6 +100,8 @@ class CommentExpandedViewHolder(
                 actionButtons = listOf(),
                 quickActionsBar = null,
                 actionsContainer = binding.actionsContainer,
+                quickActionsStartBarrier = binding.startBarrier,
+                quickActionsTopBarrier = binding.bottomBarrier,
             )
     }
 }

@@ -19,9 +19,8 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedCommentsBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.lemmy.postAndCommentView.showMoreCommentOptions
+import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.BaseFragment
@@ -78,19 +77,6 @@ class SavedCommentsFragment :
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
-            onAddCommentClick = { postOrComment ->
-                if (accountManager.currentAccount.value == null) {
-                    PreAuthDialogFragment.newInstance(R.id.action_add_comment)
-                        .show(childFragmentManager, "asdf")
-                    return@CommentListAdapter
-                }
-
-                AddOrEditCommentFragment.showReplyDialog(
-                    instance = parentFragment.viewModel.instance,
-                    postOrCommentView = postOrComment,
-                    fragmentManager = childFragmentManager,
-                )
-            },
             onImageClick = { view, url ->
                 getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
             },
@@ -109,8 +95,13 @@ class SavedCommentsFragment :
             onLoadPage = {
                 parentFragment.viewModel.fetchCommentPage(it, false)
             },
-            onCommentMoreClick = {
-                showMoreCommentOptions(parentFragment.viewModel.instance, it, actionsViewModel, childFragmentManager)
+            onCommentActionClick = { commentView, actionId ->
+                createCommentActionHandler(
+                    instance = parentFragment.viewModel.instance,
+                    commentView = commentView,
+                    actionsViewModel = actionsViewModel,
+                    fragmentManager = childFragmentManager,
+                )(actionId)
             },
             onLinkClick = { url, text, linkType ->
                 onLinkClick(url, text, linkType)
@@ -225,7 +216,7 @@ class SavedCommentsFragment :
                     },
                     {
                         adapter?.highlightForever(it)
-                    }
+                    },
                 )
             } else {
                 adapter?.endHighlightForever()

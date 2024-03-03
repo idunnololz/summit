@@ -124,7 +124,7 @@ class CommunitiesPaneController @AssistedInject constructor(
     ) : Adapter<ViewHolder>() {
 
         private sealed interface Item {
-            object BookmarkHeaderItem : Item
+            data object BookmarkHeaderItem : Item
             data class HomeCommunityItem(
                 val communityRef: CommunityRef,
                 val userCommunityItem: UserCommunityItem,
@@ -207,7 +207,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 clazz = Item.HomeCommunityItem::class,
                 inflateFn = HomeCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.textView.text = item.communityRef.getName(context)
+                b.textView.text = context.getString(R.string.home)
                 b.selectedIndicator.visibility = if (item.isSelected) {
                     View.VISIBLE
                 } else {

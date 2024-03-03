@@ -14,19 +14,15 @@ import androidx.core.text.buildSpannedString
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
 import com.idunnololz.summit.databinding.CommentListCommentItemBinding
 import com.idunnololz.summit.databinding.CommentListEndItemBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
-import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
-import com.idunnololz.summit.lemmy.CommentItem
 import com.idunnololz.summit.lemmy.CommentPage
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -36,6 +32,7 @@ import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.VisibleCommentItem
 import com.idunnololz.summit.lemmy.appendSeparator
+import com.idunnololz.summit.lemmy.postAndCommentView.GeneralQuickActionsViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.preview.VideoType
@@ -54,8 +51,7 @@ class CommentListAdapter(
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onCommentClick: (CommentRef) -> Unit,
-    private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-    private val onCommentMoreClick: (CommentView) -> Unit,
+    private val onCommentActionClick: (CommentView, actionId: Int) -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
     private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
@@ -116,20 +112,20 @@ class CommentListAdapter(
         }
         addItemType(Item.VisibleCommentItem::class, CommentListCommentItemBinding::inflate) { item, b, _ ->
             val post = item.commentView.post
-            val viewHolder = b.root.getTag(R.id.view_holder) as? PostAndCommentViewBuilder.CustomViewHolder
+            val viewHolder = b.root.getTag(R.id.view_holder) as? GeneralQuickActionsViewHolder
                 ?: run {
-                    val vh = PostAndCommentViewBuilder.CustomViewHolder(
+                    val vh = GeneralQuickActionsViewHolder(
                         root = b.root,
-                        controlsDivider = b.controlsDivider,
-                        addCommentButton = b.commentButton,
-                        controlsDivider2 = b.controlsDivider2,
-                        moreButton = b.moreButton,
+                        quickActionsTopBarrier = b.text,
                     )
                     b.root.setTag(R.id.view_holder, vh)
                     vh
                 }
 
-            postAndCommentViewBuilder.ensureContent(viewHolder)
+            postAndCommentViewBuilder.ensureCommentsActionButtons(
+                viewHolder,
+                viewHolder.root,
+            )
 
             b.postInfo.text = buildSpannedString {
                 appendLink(
@@ -207,38 +203,42 @@ class CommentListAdapter(
                 onLinkLongClick = onLinkLongClick,
             )
 
-            val scoreCount: TextView = viewHolder.upvoteCount!!
+            val scoreCount: TextView? = viewHolder.upvoteCount2
             val upvoteCount: TextView?
             val downvoteCount: TextView?
 
-            if (viewHolder.downvoteCount != null) {
-                upvoteCount = viewHolder.upvoteCount
-                downvoteCount = viewHolder.downvoteCount
-            } else {
-                upvoteCount = null
-                downvoteCount = null
+            if (scoreCount != null) {
+
+                if (viewHolder.downvoteCount2 != null) {
+                    upvoteCount = viewHolder.upvoteCount2
+                    downvoteCount = viewHolder.downvoteCount2
+                } else {
+                    upvoteCount = null
+                    downvoteCount = null
+                }
+
+                postAndCommentViewBuilder.voteUiHandler.bind(
+                    lifecycleOwner = requireNotNull(viewLifecycleOwner),
+                    instance = item.instance,
+                    commentView = item.commentView,
+                    upVoteView = viewHolder.upvoteButton,
+                    downVoteView = viewHolder.downvoteButton,
+                    scoreView = scoreCount,
+                    upvoteCount = upvoteCount,
+                    downvoteCount = downvoteCount,
+                    onUpdate = null,
+                    onSignInRequired = onSignInRequired,
+                    onInstanceMismatch = onInstanceMismatch,
+                )
             }
 
-            postAndCommentViewBuilder.voteUiHandler.bind(
-                lifecycleOwner = requireNotNull(viewLifecycleOwner),
-                instance = item.instance,
-                commentView = item.commentView,
-                upVoteView = viewHolder.upvoteButton,
-                downVoteView = viewHolder.downvoteButton,
-                scoreView = scoreCount,
-                upvoteCount = upvoteCount,
-                downvoteCount = downvoteCount,
-                onUpdate = null,
-                onSignInRequired = onSignInRequired,
-                onInstanceMismatch = onInstanceMismatch,
-            )
-
-            b.commentButton.isEnabled = !post.locked
-            b.commentButton.setOnClickListener {
-                onAddCommentClick(Either.Right(item.commentView))
-            }
-            b.moreButton.setOnClickListener {
-                onCommentMoreClick(item.commentView)
+            viewHolder.actionButtons.forEach {
+                it.setOnClickListener {
+                    onCommentActionClick(item.commentView, it.id)
+                }
+                if (it.id == R.id.ca_reply) {
+                    it.isEnabled = !item.commentView.post.locked
+                }
             }
 
             if (item.highlightForever) {
@@ -264,7 +264,7 @@ class CommentListAdapter(
                 onCommentClick(CommentRef(item.instance, item.commentView.comment.id))
             }
             b.root.setOnLongClickListener {
-                onCommentMoreClick(item.commentView)
+                onCommentActionClick(item.commentView, R.id.ca_more)
                 true
             }
         }
@@ -347,7 +347,7 @@ class CommentListAdapter(
                                 highlight = commentToHighlight?.id == comment.commentView.comment.id,
                                 highlightForever = commentToHighlightForever?.id == comment.commentView.comment.id,
                             )
-                    }
+                    },
                 )
             }
         }

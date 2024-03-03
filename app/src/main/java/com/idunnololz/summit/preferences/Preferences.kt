@@ -29,6 +29,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COLOR_SCHEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_X
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB_OFF_Y
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_SHOW_INLINE_MEDIA_AS_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_3
@@ -72,6 +73,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
@@ -844,6 +846,13 @@ class Preferences(
             prefs.putMoshiValue(KEY_TEXT_FIELD_TOOLBAR_SETTINGS, value)
         }
 
+    var postQuickActions: PostQuickActionsSettings?
+        get() =
+            prefs.getMoshiValue(KEY_POST_QUICK_ACTIONS)
+        set(value) {
+            prefs.putMoshiValue(KEY_POST_QUICK_ACTIONS, value)
+        }
+
     var commentQuickActions: CommentQuickActionsSettings?
         get() =
             prefs.getMoshiValue(KEY_COMMENT_QUICK_ACTIONS)
@@ -872,6 +881,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_FILTERED_POSTS, value)
+                .apply()
+        }
+
+    var commentsShowInlineMediaAsLinks: Boolean
+        get() = prefs.getBoolean(KEY_COMMENTS_SHOW_INLINE_MEDIA_AS_LINKS, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_COMMENTS_SHOW_INLINE_MEDIA_AS_LINKS, value)
                 .apply()
         }
 

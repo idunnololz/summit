@@ -175,4 +175,20 @@
     <item name="ca_reply" type="id" />
     <item name="ca_save_toggle" type="id" />
     <item name="is_single_line" type="id" />
+    <item name="set_default_sort_order" type="id" />
+    <item name="pa_reply" type="id" />
+    <item name="pa_save_toggle" type="id" />
+    <item name="pa_more" type="id" />
+    <item name="pa_screenshot" type="id" />
+    <item name="pa_view_source" type="id" />
+    <item name="pa_detailed_view" type="id" />
+    <item name="pa_save" type="id" />
+    <item name="pa_remove_from_saved" type="id" />
+    <item name="pa_block_user" type="id" />
+    <item name="pa_share" type="id" />
+    <item name="pa_share_fediverse_link" type="id" />
+    <item name="pa_admin_tools" type="id" />
+    <item name="pa_mod_tools" type="id" />
+    <item name="pa_cross_post" type="id" />
+    <item name="pa_community_info" type="id" />
 </resources>

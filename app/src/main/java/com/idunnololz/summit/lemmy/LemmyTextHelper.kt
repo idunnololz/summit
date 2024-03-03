@@ -19,6 +19,7 @@ import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
+import com.idunnololz.summit.util.ImagesAsLinksPlugin
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -43,6 +44,7 @@ object LemmyTextHelper {
     private const val TAG = "LemmyTextHelper"
 
     private var markwon: Markwon? = null
+    private var noMediaMarkwon: Markwon? = null
 
     var autoLinkPhoneNumbers: Boolean = true
 
@@ -51,6 +53,7 @@ object LemmyTextHelper {
         text: String,
         instance: String,
         highlight: HighlightTextData? = null,
+        showMediaAsLinks: Boolean = false,
 
         onImageClick: (url: String) -> Unit,
         onVideoClick: (url: String) -> Unit,
@@ -58,7 +61,7 @@ object LemmyTextHelper {
         onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
-        bindLemmyText(textView, text, highlight)
+        bindLemmyText(textView, text, highlight, showMediaAsLinks)
         textView.movementMethod = CustomLinkMovementMethod().apply {
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
@@ -102,8 +105,13 @@ object LemmyTextHelper {
         textView: TextView,
         text: String,
         highlight: HighlightTextData?,
+        showMediaAsLinks: Boolean,
     ) {
-        getMarkwon(textView.context).let {
+        if (showMediaAsLinks) {
+            getNoMediaMarkwon(textView.context)
+        } else {
+            getMarkwon(textView.context)
+        }.let {
             try {
                 val spanned = SpannableStringBuilder(it.toMarkdown(text))
                 postProcessDetails(spanned, textView)
@@ -254,17 +262,29 @@ object LemmyTextHelper {
     }
 
     fun resetMarkwon(context: Context) {
-        markwon = createMarkwon(context)
+        markwon = createMarkwon(context, inlineMedia = true)
+        noMediaMarkwon = null
     }
 
     private fun getMarkwon(context: Context) =
-        markwon ?: createMarkwon(context).also {
+        markwon ?: createMarkwon(context, inlineMedia = true).also {
             markwon = it
         }
 
-    private fun createMarkwon(context: Context): Markwon =
+    private fun getNoMediaMarkwon(context: Context) =
+        noMediaMarkwon ?: createMarkwon(context, inlineMedia = false).also {
+            noMediaMarkwon = it
+        }
+
+    private fun createMarkwon(context: Context, inlineMedia: Boolean): Markwon =
         Markwon.builder(context)
-            .usePlugin(CoilImagesPlugin.create(context, context.applicationContext.imageLoader))
+            .apply {
+                if (inlineMedia) {
+                    usePlugin(CoilImagesPlugin.create(context, context.applicationContext.imageLoader))
+                } else {
+                    usePlugin(ImagesAsLinksPlugin())
+                }
+            }
             .usePlugin(
                 LinkifyPlugin.create(
                     if (autoLinkPhoneNumbers) {

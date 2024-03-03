@@ -44,21 +44,10 @@ class VotesManager(
     }
 
     fun getScore(key: VotableRef, force: Boolean = false) =
-        when (key) {
-            is VotableRef.CommentRef -> {
-                if (!force && preferences.hideCommentScores) {
-                    null
-                } else {
-                    scores[key]
-                }
-            }
-            is VotableRef.PostRef -> {
-                if (!force && preferences.hidePostScores) {
-                    null
-                } else {
-                    scores[key]
-                }
-            }
+        if (shouldShowScore(key, force)) {
+            scores[key]
+        } else {
+            null
         }
 
     fun setUpvotes(key: VotableRef, count: Int) {
@@ -66,21 +55,10 @@ class VotesManager(
     }
 
     fun getUpvotes(key: VotableRef, force: Boolean = false) =
-        when (key) {
-            is VotableRef.CommentRef -> {
-                if (!force && preferences.hideCommentScores) {
-                    null
-                } else {
-                    upvotes[key]
-                }
-            }
-            is VotableRef.PostRef -> {
-                if (!force && preferences.hidePostScores) {
-                    null
-                } else {
-                    upvotes[key]
-                }
-            }
+        if (shouldShowScore(key, force)) {
+            upvotes[key]
+        } else {
+            null
         }
 
     fun setDownvotes(key: VotableRef, count: Int) {
@@ -88,20 +66,19 @@ class VotesManager(
     }
 
     fun getDownvotes(key: VotableRef, force: Boolean = false) =
+        if (shouldShowScore(key, force)) {
+            downvotes[key]
+        } else {
+            null
+        }
+
+    fun shouldShowScore(key: VotableRef, force: Boolean = false) =
         when (key) {
             is VotableRef.CommentRef -> {
-                if (!force && preferences.hideCommentScores) {
-                    null
-                } else {
-                    downvotes[key]
-                }
+                !(!force && preferences.hideCommentScores)
             }
             is VotableRef.PostRef -> {
-                if (!force && preferences.hidePostScores) {
-                    null
-                } else {
-                    downvotes[key]
-                }
+                !(!force && preferences.hidePostScores)
             }
         }
 
