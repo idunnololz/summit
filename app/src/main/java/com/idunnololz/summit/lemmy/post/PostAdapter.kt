@@ -1446,5 +1446,5 @@ class PostAdapter(
     }
 
     fun isPost(position: Int): Boolean =
-        items[position] is Item.HeaderItem
+        items[position] is HeaderItem
 }

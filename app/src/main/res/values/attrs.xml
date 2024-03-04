@@ -13,5 +13,6 @@
     </declare-styleable>
 
     <attr name="textColorNormal" format="color"/>
+    <attr name="summitTextButton" format="color"/>
 
 </resources>
