@@ -69,6 +69,7 @@
         <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/isLightTheme</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="summitTextButton">@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon</item>
     </style>
 
     <style name="OverlayThemeRegular">

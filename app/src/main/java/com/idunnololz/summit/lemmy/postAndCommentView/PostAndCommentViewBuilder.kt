@@ -7,6 +7,7 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.View.LAYOUT_DIRECTION_LTR
@@ -23,6 +24,7 @@ import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
+import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
@@ -100,6 +102,7 @@ import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
+import com.idunnololz.summit.view.AutoHorizontalScrollView
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
@@ -1307,7 +1310,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         if (removeOnly) return
 
-        val quickActionsBarContainer = HorizontalScrollView(context)
+        val quickActionsBarContainer = AutoHorizontalScrollView(context)
             .also {
                 quickActionsBar = it
             }

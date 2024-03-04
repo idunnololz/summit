@@ -4,11 +4,13 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.Barrier
@@ -22,6 +24,7 @@ import androidx.lifecycle.LifecycleOwner
 import coil.dispose
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -977,8 +980,10 @@ class PostListViewBuilder @Inject constructor(
         root.removeView(upvoteCount)
 
         if (showUpAndDownVotes) {
-            val commentButton = TextView(
-                context,
+            val commentButton = MaterialButton(
+                ContextThemeWrapper(root.context, R.style.MyApp_Widget_MaterialComponents_Button_TextButton_Icon),
+                null,
+                0,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
@@ -992,20 +997,10 @@ class PostListViewBuilder @Inject constructor(
                     }
                     topToBottom = R.id.bottom_barrier
                 }
-                setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.baseline_comment_18,
-                    0,
-                    0,
-                    0,
-                )
-                TextViewCompat.setCompoundDrawableTintList(
-                    this,
-                    ColorStateList.valueOf(normalTextColor),
-                )
+                setIconResource(R.drawable.outline_mode_comment_24)
                 compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
                 includeFontPadding = false
                 setPadding(context.getDimen(R.dimen.padding))
-                setBackgroundResource(selectableItemBackground)
             }.also {
                 commentButton = it
                 commentText = it
@@ -1051,8 +1046,11 @@ class PostListViewBuilder @Inject constructor(
             downvoteButton = buttons.downvoteButton
             downvoteCount = buttons.downvoteButton
         } else {
-            val commentButton = TextView(
+            val commentButton = MaterialButton(
                 context,
+                null,
+                R.attr.summitTextButton
+
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
@@ -1066,20 +1064,10 @@ class PostListViewBuilder @Inject constructor(
                     }
                     topToBottom = R.id.bottom_barrier
                 }
-                setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.baseline_comment_18,
-                    0,
-                    0,
-                    0,
-                )
-                TextViewCompat.setCompoundDrawableTintList(
-                    this,
-                    ColorStateList.valueOf(normalTextColor),
-                )
+                setIconResource(R.drawable.outline_mode_comment_24)
                 compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
                 includeFontPadding = false
                 setPadding(context.getDimen(R.dimen.padding))
-                setBackgroundResource(selectableItemBackground)
             }.also {
                 commentButton = it
                 commentText = it

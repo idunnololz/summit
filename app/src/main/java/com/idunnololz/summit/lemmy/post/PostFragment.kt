@@ -902,6 +902,7 @@ class PostFragment :
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
         if (!hasConsumedJumpToComments && args.jumpToComments) {
+            Log.d("TEST", "jumping to comments")
             hasConsumedJumpToComments = true
             (binding.recyclerView.layoutManager as LinearLayoutManager)
                 .scrollToPositionWithOffset(1, scrollOffsetTop)
