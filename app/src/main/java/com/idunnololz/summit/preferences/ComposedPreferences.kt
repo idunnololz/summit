@@ -1,6 +1,7 @@
 package com.idunnololz.summit.preferences
 
 import android.content.SharedPreferences
+import java.lang.ClassCastException
 
 class ComposedPreferences(
     private val preferences: List<SharedPreferences>,
@@ -36,7 +37,17 @@ class ComposedPreferences(
     override fun getFloat(key: String?, defValue: Float): Float =
         preferences.firstNotNullOfOrNull {
             if (it.contains(key)) {
-                it.getFloat(key, defValue)
+                try {
+                    getFloat(key, defValue)
+                } catch (e: ClassCastException) {
+                    if (contains(key)) {
+                        getInt(key, 0).toFloat()
+                    } else {
+                        defValue
+                    }
+                } catch (e: Exception) {
+                    defValue
+                }
             } else {
                 null
             }

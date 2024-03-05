@@ -521,7 +521,11 @@ class CommunityFragment :
             emptyScreenText = getString(R.string.select_a_post),
             fragmentContainerId = R.id.post_fragment_container,
         ).apply {
-            onPageSelectedListener = { isOpen ->
+            onPageSelectedListener = a@{ isOpen ->
+                if (!isBindingAvailable()) {
+                    return@a
+                }
+
                 if (!isOpen) {
                     val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
                     if (lastSelectedPost != null) {

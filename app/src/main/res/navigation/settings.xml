@@ -197,6 +197,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_settingPerCommunityFragment"
             app:destination="@id/settingPerCommunityFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingNotificationsFragment"
+            app:destination="@id/settingNotificationsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -414,4 +417,8 @@
         android:id="@+id/postQuickActionsFragment"
         android:name="com.idunnololz.summit.settings.postQuickActions.PostQuickActionsFragment"
         android:label="PostQuickActionsFragment" />
+    <fragment
+        android:id="@+id/settingNotificationsFragment"
+        android:name="com.idunnololz.summit.settings.notifications.SettingNotificationsFragment"
+        android:label="SettingNotificationsFragment" />
 </navigation>

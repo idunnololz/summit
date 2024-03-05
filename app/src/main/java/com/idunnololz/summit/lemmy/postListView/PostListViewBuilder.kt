@@ -981,9 +981,9 @@ class PostListViewBuilder @Inject constructor(
 
         if (showUpAndDownVotes) {
             val commentButton = MaterialButton(
-                ContextThemeWrapper(root.context, R.style.MyApp_Widget_MaterialComponents_Button_TextButton_Icon),
+                context,
                 null,
-                0,
+                R.attr.summitTextButton
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
@@ -1050,7 +1050,6 @@ class PostListViewBuilder @Inject constructor(
                 context,
                 null,
                 R.attr.summitTextButton
-
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(

@@ -393,7 +393,7 @@ class AccountAwareLemmyClient @Inject constructor(
             if (account == null) {
                 createAccountErrorResult()
             } else {
-                apiClient.fetchUnresolvedReportCount(force, account)
+                apiClient.fetchUnresolvedReportsCount(force, account)
                     .autoSignOut(account)
             }
         }

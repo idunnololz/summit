@@ -30,6 +30,7 @@ sealed interface InboxItem : Parcelable {
     val authorId: PersonId
     val authorName: String
     val authorInstance: String
+    val authorAvatar: String?
     val title: String
     val content: String
     val lastUpdate: String
@@ -45,6 +46,7 @@ sealed interface InboxItem : Parcelable {
         override val authorId: PersonId,
         override val authorName: String,
         override val authorInstance: String,
+        override val authorAvatar: String?,
         override val title: String,
         override val content: String,
         override val lastUpdate: String,
@@ -66,6 +68,7 @@ sealed interface InboxItem : Parcelable {
             reply.creator.id,
             reply.creator.name,
             reply.creator.instance,
+            reply.creator.avatar,
             reply.post.name,
             reply.comment.content,
             reply.comment.updated ?: reply.comment.published,
@@ -92,6 +95,7 @@ sealed interface InboxItem : Parcelable {
         override val authorId: PersonId,
         override val authorName: String,
         override val authorInstance: String,
+        override val authorAvatar: String?,
         override val title: String,
         override val content: String,
         override val lastUpdate: String,
@@ -113,6 +117,7 @@ sealed interface InboxItem : Parcelable {
             mention.creator.id,
             mention.creator.name,
             mention.creator.instance,
+            mention.creator.avatar,
             mention.post.name,
             mention.comment.content,
             mention.comment.updated ?: mention.comment.published,
@@ -139,6 +144,7 @@ sealed interface InboxItem : Parcelable {
         override val authorId: PersonId,
         override val authorName: String,
         override val authorInstance: String,
+        override val authorAvatar: String?,
         override val title: String,
         override val content: String,
         override val lastUpdate: String,
@@ -150,21 +156,22 @@ sealed interface InboxItem : Parcelable {
     ) : InboxItem {
 
         constructor(message: PrivateMessageView) : this(
-            message.private_message.id,
-            message.creator.id,
-            message.creator.name,
-            message.creator.instance,
-            message.creator.name,
-            message.private_message.content,
-            message.private_message.updated ?: message.private_message.published,
-            dateStringToTs(
+            id = message.private_message.id,
+            authorId = message.creator.id,
+            authorName = message.creator.name,
+            authorInstance = message.creator.instance,
+            authorAvatar = message.creator.avatar,
+            title = message.creator.name,
+            content = message.private_message.content,
+            lastUpdate = message.private_message.updated ?: message.private_message.published,
+            lastUpdateTs = dateStringToTs(
                 message.private_message.updated
                     ?: message.private_message.published,
             ),
-            null,
-            message.private_message.deleted,
+            score = null,
+            isDeleted = message.private_message.deleted,
             isRemoved = false,
-            message.private_message.read,
+            isRead = message.private_message.read,
         )
 
         override fun toString(): String =
@@ -177,6 +184,7 @@ sealed interface InboxItem : Parcelable {
         override val authorId: PersonId,
         override val authorName: String,
         override val authorInstance: String,
+        override val authorAvatar: String?,
         override val title: String,
         override val content: String,
         override val lastUpdate: String,
@@ -188,21 +196,22 @@ sealed interface InboxItem : Parcelable {
     ) : InboxItem {
 
         constructor(message: PrivateMessageReportView) : this(
-            message.private_message.id,
-            message.creator.id,
-            message.creator.name,
-            message.creator.instance,
-            message.creator.name,
-            message.private_message.content,
-            message.private_message.updated ?: message.private_message.published,
-            dateStringToTs(
+            id = message.private_message.id,
+            authorId = message.creator.id,
+            authorName = message.creator.name,
+            authorInstance = message.creator.instance,
+            authorAvatar = message.creator.avatar,
+            title = message.creator.name,
+            content = message.private_message.content,
+            lastUpdate = message.private_message.updated ?: message.private_message.published,
+            lastUpdateTs = dateStringToTs(
                 message.private_message.updated
                     ?: message.private_message.published,
             ),
-            null,
-            message.private_message.deleted,
+            score = null,
+            isDeleted = message.private_message.deleted,
             isRemoved = false,
-            message.private_message.read,
+            isRead = message.private_message.read,
         )
 
         override fun toString(): String =
@@ -215,6 +224,7 @@ sealed interface InboxItem : Parcelable {
         override val authorId: PersonId,
         override val authorName: String,
         override val authorInstance: String,
+        override val authorAvatar: String?,
         override val title: String,
         override val content: String,
         override val lastUpdate: String,
@@ -231,6 +241,7 @@ sealed interface InboxItem : Parcelable {
             authorId = reportView.creator.id,
             authorName = reportView.creator.name,
             authorInstance = reportView.creator.instance,
+            authorAvatar = reportView.creator.avatar,
             title = reportView.post.name,
             content = reportView.post_report.reason,
             lastUpdate = reportView.post_report.updated ?: reportView.post_report.published,
@@ -252,6 +263,7 @@ sealed interface InboxItem : Parcelable {
         override val authorId: PersonId,
         override val authorName: String,
         override val authorInstance: String,
+        override val authorAvatar: String?,
         override val title: String,
         override val content: String,
         override val lastUpdate: String,
@@ -270,6 +282,7 @@ sealed interface InboxItem : Parcelable {
             authorId = reportView.creator.id,
             authorName = reportView.creator.name,
             authorInstance = reportView.creator.instance,
+            authorAvatar = reportView.creator.avatar,
             title = reportView.post.name,
             content = reportView.comment_report.reason,
             lastUpdate = reportView.comment_report.updated ?: reportView.comment_report.published,
@@ -297,3 +310,18 @@ sealed interface InboxItem : Parcelable {
             is ReportPostInboxItem -> null
         }
 }
+
+fun CommentReplyView.toInboxItem() =
+    InboxItem.ReplyInboxItem(this)
+
+fun PersonMentionView.toInboxItem() =
+    InboxItem.MentionInboxItem(this)
+
+fun PrivateMessageView.toInboxItem() =
+    InboxItem.MessageInboxItem(this)
+
+fun CommentReportView.toInboxItem() =
+    InboxItem.ReportCommentInboxItem(this)
+
+fun PostReportView.toInboxItem() =
+    InboxItem.ReportPostInboxItem(this)

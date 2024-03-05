@@ -295,7 +295,6 @@
         <item name="backgroundColor">@color/colorSurface</item>
         <item name="android:colorBackground">@color/colorSurface</item>
         <item name="android:windowBackground">@color/colorSurface</item>
-        <item name="elevationOverlayEnabled">true</item>
     </style>
 
     <style name="Theme.App.Dialog.Alert.Transparent">

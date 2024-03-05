@@ -45,6 +45,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
@@ -145,6 +146,8 @@ object SettingPath {
                 context.getString(R.string.per_account_settings)
             ActionsSettings::class ->
                 context.getString(R.string.user_actions)
+            NotificationSettings::class ->
+                context.getString(R.string.notifications)
 
             else -> error("No name for $this")
         }
@@ -262,6 +265,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.downloads),
         context.getString(R.string.downloads_desc),
     )
+    val notificationSettings = BasicSettingItem(
+        R.drawable.outline_notifications_24,
+        context.getString(R.string.notifications),
+        context.getString(R.string.notifications_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -293,6 +301,7 @@ class MainSettings @Inject constructor(
                 navigationSettings,
                 userActionsSettings,
                 downloadSettings,
+                notificationSettings,
                 backupAndRestoreSettings,
                 settingAbout,
                 settingSummitCommunity,
@@ -2047,6 +2056,27 @@ class PerCommunitySettings @Inject constructor(
     )
 }
 
+@Singleton
+class NotificationSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val isNotificationsEnabled = OnOffSettingItem(
+        null,
+        context.getString(R.string.notifications),
+        null,
+        relatedKeys = listOf(KEY_IS_NOTIFICATIONS_ON),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        isNotificationsEnabled,
+    )
+}
+
 class AllSettings @Inject constructor(
     @ApplicationContext private val context: Context,
     mainSettings: MainSettings,
@@ -2069,6 +2099,7 @@ class AllSettings @Inject constructor(
     perAccountSettings: PerAccountSettings,
     downloadSettings: DownloadSettings,
     perCommunitySettings: PerCommunitySettings,
+    notificationSettings: NotificationSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -2091,6 +2122,7 @@ class AllSettings @Inject constructor(
         perAccountSettings,
         downloadSettings,
         perCommunitySettings,
+        notificationSettings,
     )
 
     init {

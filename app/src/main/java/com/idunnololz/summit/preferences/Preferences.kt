@@ -58,11 +58,13 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_NOTIFICATIONS_LAST_UPDATE_MS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
@@ -118,6 +120,7 @@ import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
+import java.lang.ClassCastException
 import java.time.Duration
 
 class Preferences(
@@ -889,6 +892,22 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_COMMENTS_SHOW_INLINE_MEDIA_AS_LINKS, value)
+                .apply()
+        }
+
+    var isNotificationsOn: Boolean
+        get() = prefs.getBoolean(KEY_IS_NOTIFICATIONS_ON, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_IS_NOTIFICATIONS_ON, value)
+                .apply()
+        }
+
+    var notificationsLastUpdateMs: Long
+        get() = prefs.getLong(KEY_NOTIFICATIONS_LAST_UPDATE_MS, 0L)
+        set(value) {
+            prefs.edit()
+                .putLong(KEY_NOTIFICATIONS_LAST_UPDATE_MS, value)
                 .apply()
         }
 

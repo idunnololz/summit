@@ -202,6 +202,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 launchDownloadsSettings()
                                 true
                             }
+                            mainSettings.notificationSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingNotificationsFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
                             else -> false
                         }
                     },
@@ -351,6 +357,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                         is PerCommunitySettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingPerCommunityFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+
+                        is NotificationSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingNotificationsFragment()
                             findNavController().navigateSafe(directions)
                         }
 

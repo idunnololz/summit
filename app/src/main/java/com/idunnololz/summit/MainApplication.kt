@@ -19,6 +19,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
@@ -49,6 +50,8 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
     @Inject
     lateinit var preferences: Preferences
+
+    private var notificationsUpdaterFactory: NotificationsUpdater.Factory? = null
 
     companion object {
         private val TAG = MainApplication::class.java.simpleName
@@ -214,6 +217,9 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         hiltEntryPoint.themeManager().onPreferencesChanged()
         Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInExternalApp
         LemmyTextHelper.autoLinkPhoneNumbers = hiltEntryPoint.preferences().autoLinkPhoneNumbers
+        notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
+
+        hiltEntryPoint.notificationsManager().start()
 
         GlobalSettings.refresh(hiltEntryPoint.preferences())
 
@@ -221,6 +227,10 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             FirebaseApp.initializeApp(this)
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
         }
+    }
+
+    fun runNotificationsUpdate() {
+        notificationsUpdaterFactory?.create()?.run()
     }
 
     override val workManagerConfiguration: androidx.work.Configuration
