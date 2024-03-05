@@ -630,6 +630,8 @@ class CommunityViewModel @Inject constructor(
             return
         }
 
+        Log.d(TAG, "New sort order set: $newSortOrder")
+
         postsRepository.setSortOrder(newSortOrder)
 
         if (initialPageFetched.value == true) {

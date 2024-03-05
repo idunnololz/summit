@@ -91,7 +91,10 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             emptyScreenText = getString(R.string.select_a_message),
             fragmentContainerId = R.id.message_fragment_container,
         ).apply {
-            onPageSelectedListener = { isOpen ->
+            onPageSelectedListener = a@{ isOpen ->
+                if (!isBindingAvailable()) {
+                    return@a
+                }
 
                 if (!isOpen) {
                     viewModel.removeAllButFirst()

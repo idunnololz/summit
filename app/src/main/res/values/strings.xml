@@ -904,6 +904,10 @@
     <string name="set_default_sort_order_for_this_feed">Set default sort order for this feed</string>
     <string name="show_inline_media_as_links">Show inline media as links</string>
     <string name="show_inline_media_as_links_desc">When enabled, images/gifs/videos within text will be shown as text links.</string>
+    <string name="account_notifications">Account notifications</string>
+    <string name="account_notifications_desc">Notifications for accounts such as private messages or replies to posts.</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_desc">Manage what notifications the app shows</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

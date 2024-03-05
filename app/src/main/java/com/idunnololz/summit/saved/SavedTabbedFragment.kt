@@ -105,7 +105,11 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
                 emptyScreenText = getString(R.string.select_a_post_or_comment),
                 fragmentContainerId = R.id.post_fragment_container,
             ).apply {
-                onPageSelectedListener = { isOpen ->
+                onPageSelectedListener = a@{ isOpen ->
+                    if (!isBindingAvailable()) {
+                        return@a
+                    }
+
                     if (!isOpen) {
                         val lastSelectedPost = viewModel.lastSelectedItem
                         if (lastSelectedPost != null) {

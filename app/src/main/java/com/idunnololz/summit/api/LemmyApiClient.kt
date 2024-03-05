@@ -623,7 +623,7 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun fetchUnresolvedReportCount(
+    suspend fun fetchUnresolvedReportsCount(
         force: Boolean,
         account: Account,
     ): Result<GetReportCountResponse> {
@@ -634,9 +634,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getReportCountNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getReportCountNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getReportCount(authorization = account?.bearer, form.serializeToMap())
+                api.getReportCount(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
