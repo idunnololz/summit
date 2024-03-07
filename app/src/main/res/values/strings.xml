@@ -933,6 +933,10 @@
         <item quantity="one">%1$s day</item>
         <item quantity="other">%1$s days</item>
     </plurals>
+    <plurals name="new_items_in_inbox_format">
+        <item quantity="one">%1$s new item in your inbox</item>
+        <item quantity="other">%1$s new items in your inbox</item>
+    </plurals>
 
 
     <string-array name="theme_type_entries">

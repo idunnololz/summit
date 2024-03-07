@@ -1,10 +1,13 @@
 package com.idunnololz.summit.notifications
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -14,6 +17,7 @@ import androidx.work.WorkManager
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.preferences.Preferences
@@ -36,6 +40,13 @@ class NotificationsManager @Inject constructor(
         private const val TAG = "NotificationsManager"
 
         private const val ChannelIdAccount = "account"
+
+        private const val GroupKeyPrefix = "com.idunnololz.summit."
+
+        private const val SummaryNotificationId = 1
+
+        private const val InboxNotificationStartId = 1000
+
     }
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -133,12 +144,31 @@ class NotificationsManager @Inject constructor(
     }
 
     fun showNotificationsForItems(account: Account, newItems: List<InboxItem>) {
+        if (newItems.isEmpty()) {
+            return
+        }
+
         createNotificationChannelIfNeeded()
+
+        val newInboxNotificationItems = mutableListOf<Notification>()
+        val groupKey = GroupKeyPrefix + account.fullName
+
+        val notificationSummaryInfo = NotificationCompat.InboxStyle()
+
+        val summaryNotificationBuilder = NotificationCompat.Builder(context, ChannelIdAccount)
+            .setContentTitle(account.fullName)
+            // Set content text to support devices running API level < 24.
+            .setContentText(context.resources.getQuantityString(
+                R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
+            .setSmallIcon(R.drawable.ic_logo_mono_24)
+
 
         newItems.forEach {
             var title: String = it.title
             var body: String = it.content
             var authorAvatar: String? = it.authorAvatar
+
+            notificationSummaryInfo.addLine(title)
 
             when (it) {
                 is InboxItem.MentionInboxItem -> {
@@ -161,13 +191,43 @@ class NotificationsManager @Inject constructor(
                 }
             }
 
-//            val newMessageNotification = NotificationCompat.Builder(context, ChannelIdAccount)
-//                .setSmallIcon(R.drawable.ic_logo_mono_24)
-//                .setContentTitle(title)
-//                .setContentText(body)
-//                .setLargeIcon()
-//                .setGroup(GROUP_KEY_WORK_EMAIL)
-//                .build()
+            val newMessageNotification = NotificationCompat.Builder(context, ChannelIdAccount)
+                .setSmallIcon(R.drawable.ic_logo_mono_24)
+                .setContentTitle(title)
+                .setContentText(body)
+//                .setLargeIcon(Icon.cre)
+                .setGroup(groupKey)
+                .build()
+
+            newInboxNotificationItems.add(newMessageNotification)
+        }
+
+
+        notificationSummaryInfo
+            .setBigContentTitle(context.resources.getQuantityString(
+                R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
+            .setSummaryText(account.fullName)
+
+        val summaryNotification = summaryNotificationBuilder
+            // Build summary info into InboxStyle template.
+            .setStyle(notificationSummaryInfo)
+            // Specify which group this notification belongs to.
+            .setGroup(groupKey)
+            // Set this notification as the summary for the group.
+            .setGroupSummary(true)
+            .build()
+
+        NotificationManagerCompat.from(context).apply {
+            try {
+                var id = InboxNotificationStartId
+                newInboxNotificationItems.forEach {
+                    notify(id++, it)
+                }
+                notify(SummaryNotificationId, summaryNotification)
+            } catch (e: SecurityException) {
+                preferences.isNotificationsOn = false
+                onPreferencesChanged()
+            }
         }
     }
 }

@@ -39,7 +39,7 @@
                     android:padding="@dimen/dialog_padding"
                     android:text="@string/coming_soon"
                     android:textAppearance="?textAppearanceBodyMedium"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
 
                 <include

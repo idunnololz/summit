@@ -38,13 +38,9 @@ class ComposedPreferences(
         preferences.firstNotNullOfOrNull {
             if (it.contains(key)) {
                 try {
-                    getFloat(key, defValue)
+                    it.getFloat(key, defValue)
                 } catch (e: ClassCastException) {
-                    if (contains(key)) {
-                        getInt(key, 0).toFloat()
-                    } else {
-                        defValue
-                    }
+                    it.getInt(key, 0).toFloat()
                 } catch (e: Exception) {
                     defValue
                 }
