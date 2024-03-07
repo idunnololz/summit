@@ -108,7 +108,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".util.UpgradeCompleteReceiver"
+            android:name=".util.receivers.UpgradeCompleteReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
