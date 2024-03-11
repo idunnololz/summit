@@ -2,6 +2,7 @@ package com.idunnololz.summit.notifications
 
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
@@ -24,7 +25,6 @@ class NotificationsUpdater @AssistedInject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val accountManager: AccountManager,
     private val apiClient: LemmyApiClient,
-    private val preferences: Preferences,
     private val notificationsManager: NotificationsManager,
 ) {
     companion object {
@@ -43,7 +43,9 @@ class NotificationsUpdater @AssistedInject constructor(
 
         coroutineScope.launch {
             for (account in accountManager.getAccounts()) {
-                updateNotificationsForAccount(account)
+                if (notificationsManager.isNotificationsEnabledForAccount(account)) {
+                    updateNotificationsForAccount(account)
+                }
             }
         }
     }
@@ -96,11 +98,16 @@ class NotificationsUpdater @AssistedInject constructor(
         inboxItems.addAll(j1.await())
         inboxItems.addAll(j2.await())
 
-        val thresholdTs = preferences.notificationsLastUpdateMs
+        val thresholdTs = notificationsManager.getLastNotificationItemTsForAccount(account)
 
         val newItems = inboxItems.filter { it.lastUpdateTs > thresholdTs }
+        val latestItemTs = inboxItems.maxByOrNull { it.lastUpdateTs }?.lastUpdateTs
 
         Log.d(TAG, "[${account.fullName}] Got ${inboxItems.size} unread content. ${newItems.size} are new!")
+
+        if (latestItemTs != null) {
+            notificationsManager.setLastNotificationItemTsForAccount(account, latestItemTs)
+        }
 
         withContext(Dispatchers.Main) {
             notificationsManager.showNotificationsForItems(account, newItems)

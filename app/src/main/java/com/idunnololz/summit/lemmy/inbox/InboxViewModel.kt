@@ -81,6 +81,7 @@ class InboxViewModel @Inject constructor(
 
                 allData.clear()
                 fetchingPages.clear()
+
                 inboxData.setValue(allData)
 
                 fetchInbox(pageIndex, requireNotNull(pageTypeFlow.value))

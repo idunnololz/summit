@@ -26,7 +26,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -89,7 +89,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                 getMainActivity()?.openVideo(url, videoType, state)
             },
             onVideoLongClickListener = { url ->
-                showMoreVideoOptions(url, actionsViewModel)
+                showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -129,7 +129,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                 onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
-                getMainActivity()?.showBottomMenuForLink(url, text)
+                getMainActivity()?.showMoreLinkOptions(url, text)
             },
         ).apply {
             alwaysRenderAsUnread = true

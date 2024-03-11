@@ -293,13 +293,24 @@ class PostAndCommentViewBuilder @Inject constructor(
                 }
 
         ensureContent(viewHolder)
-        viewHolder.ensureActionButtons(
-            root = root,
-            leftHandMode = leftHandMode,
-            showUpAndDownVotes = showUpAndDownVotes,
-            actions = postQuickActions.actions + PostQuickActionIds.More,
-            fullWidth = false,
-        )
+
+        if (screenshotConfig != null) {
+            viewHolder.ensureActionButtons(
+                root = root,
+                leftHandMode = leftHandMode,
+                showUpAndDownVotes = showUpAndDownVotes,
+                actions = listOf(PostQuickActionIds.Voting),
+                fullWidth = false,
+            )
+        } else {
+            viewHolder.ensureActionButtons(
+                root = root,
+                leftHandMode = leftHandMode,
+                showUpAndDownVotes = showUpAndDownVotes,
+                actions = postQuickActions.actions + PostQuickActionIds.More,
+                fullWidth = false,
+            )
+        }
 
         scaleTextSizes()
         viewHolder.scaleTextSizes()

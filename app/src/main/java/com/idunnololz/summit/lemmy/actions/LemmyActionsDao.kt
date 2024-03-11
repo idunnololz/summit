@@ -60,7 +60,7 @@ data class LemmyAction(
 class LemmyActionConverters(private val moshi: Moshi) {
 
     companion object {
-        private val TAG = "LemmyActionConverters"
+        private const val TAG = "LemmyActionConverters"
     }
 
     @TypeConverter

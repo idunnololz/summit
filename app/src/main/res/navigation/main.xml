@@ -74,7 +74,12 @@
     <fragment
         android:id="@+id/inboxTabbedFragment"
         android:name="com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment"
-        android:label="InboxFragment" />
+        android:label="InboxFragment">
+        <argument
+            android:name="notificationId"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/inboxFragment"
         android:name="com.idunnololz.summit.lemmy.inbox.InboxFragment"
@@ -223,4 +228,5 @@
             app:argType="com.idunnololz.summit.lemmy.CommunityRef"
             app:nullable="true"/>
     </fragment>
+    <action android:id="@+id/action_global_inboxTabbedFragment" app:destination="@id/inboxTabbedFragment"/>
 </navigation>

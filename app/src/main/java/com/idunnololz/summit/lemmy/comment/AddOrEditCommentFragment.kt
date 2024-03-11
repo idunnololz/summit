@@ -408,6 +408,8 @@ class AddOrEditCommentFragment :
             ) {
                 viewModel.addMessage(AddOrEditCommentViewModel.Message.ReplyTargetTooOld(replyTargetTs))
             }
+
+            binding.commentEditText.requestFocus()
         }
         setup(savedInstanceState)
     }

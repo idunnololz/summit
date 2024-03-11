@@ -23,7 +23,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -86,7 +86,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                 getMainActivity()?.openVideo(url, videoType, state)
             },
             onVideoLongClickListener = { url ->
-                showMoreVideoOptions(url, actionsViewModel)
+                showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -121,7 +121,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                 onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
-                getMainActivity()?.showBottomMenuForLink(url, text)
+                getMainActivity()?.showMoreLinkOptions(url, text)
             },
         ).apply {
             updateWithPreferences(preferences)

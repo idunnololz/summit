@@ -10,6 +10,8 @@ import com.idunnololz.summit.api.dto.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs
+import com.squareup.moshi.JsonClass
+import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
 
 interface CommentBackedItem {
@@ -24,6 +26,7 @@ interface CommentBackedItem {
 
 sealed interface ReportItem
 
+@JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface InboxItem : Parcelable {
 
     val id: Int
@@ -40,6 +43,8 @@ sealed interface InboxItem : Parcelable {
     val isRemoved: Boolean
     val isRead: Boolean
 
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("1")
     @Parcelize
     data class ReplyInboxItem(
         override val id: Int,
@@ -89,6 +94,8 @@ sealed interface InboxItem : Parcelable {
             "ReplyInboxItem { content = $content }"
     }
 
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("2")
     @Parcelize
     data class MentionInboxItem(
         override val id: Int,
@@ -138,6 +145,8 @@ sealed interface InboxItem : Parcelable {
             "MentionInboxItem { content = $content }"
     }
 
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("3")
     @Parcelize
     data class MessageInboxItem(
         override val id: Int,
@@ -178,6 +187,8 @@ sealed interface InboxItem : Parcelable {
             "MessageInboxItem { content = $content }"
     }
 
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("4")
     @Parcelize
     data class ReportMessageInboxItem(
         override val id: Int,
@@ -218,6 +229,8 @@ sealed interface InboxItem : Parcelable {
             "ReportInboxItem { content = $content }"
     }
 
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("5")
     @Parcelize
     data class ReportPostInboxItem(
         override val id: Int,
@@ -257,6 +270,8 @@ sealed interface InboxItem : Parcelable {
             "ReplyInboxItem { content = $content }"
     }
 
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("6")
     @Parcelize
     data class ReportCommentInboxItem(
         override val id: Int,
@@ -279,6 +294,7 @@ sealed interface InboxItem : Parcelable {
 
         constructor(reportView: CommentReportView) : this(
             id = reportView.comment_report.id,
+
             authorId = reportView.creator.id,
             authorName = reportView.creator.name,
             authorInstance = reportView.creator.instance,

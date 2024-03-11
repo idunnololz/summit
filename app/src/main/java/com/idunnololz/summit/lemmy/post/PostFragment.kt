@@ -84,7 +84,7 @@ import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -395,7 +395,7 @@ class PostFragment :
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel)
+                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -439,7 +439,7 @@ class PostFragment :
                     onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url, text ->
-                    getMainActivity()?.showBottomMenuForLink(url, text)
+                    getMainActivity()?.showMoreLinkOptions(url, text)
                 },
             ).apply {
                 stateRestorationPolicy =

@@ -1,13 +1,19 @@
 package com.idunnololz.summit.lemmy.utils
 
 import android.content.Intent
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.links.LinkPreviewDialogFragment
+import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -16,6 +22,7 @@ import java.io.IOException
 fun BaseFragment<*>.showMoreVideoOptions(
     url: String,
     actionsViewModel: MoreActionsViewModel,
+    fragmentManager: FragmentManager,
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
 
@@ -26,10 +33,33 @@ fun BaseFragment<*>.showMoreVideoOptions(
 
         addItemWithIcon(R.id.download, R.string.download_video, R.drawable.baseline_download_24)
 
+        addDivider()
+
+        addItemWithIcon(R.id.copy_link, R.string.copy_link_address, R.drawable.baseline_content_copy_24)
+        addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
+        addItemWithIcon(R.id.open_in_browser, R.string.open_in_browser, R.drawable.baseline_public_24)
+        addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
+        addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
+
         setOnMenuItemClickListener {
             when (it.id) {
                 R.id.download -> {
                     actionsViewModel.downloadVideo(context, url)
+                }
+                R.id.copy_link -> {
+                    Utils.copyToClipboard(context, url)
+                }
+                R.id.share_link -> {
+                    Utils.shareLink(context, url)
+                }
+                R.id.open_in_browser -> {
+                    onLinkClick(url, null, LinkType.Action)
+                }
+                R.id.open_link_incognito -> {
+                    Utils.openExternalLink(context, url, openNewIncognitoTab = true)
+                }
+                R.id.preview_link -> {
+                    LinkPreviewDialogFragment.show(fragmentManager, url)
                 }
             }
         }

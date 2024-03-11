@@ -15,4 +15,7 @@ object ContentUtils {
 
     fun isUrlMp4(url: String) =
         url.endsWith(".mp4")
+
+    fun isUrlHls(url: String) =
+        url.endsWith(".m3u8")
 }

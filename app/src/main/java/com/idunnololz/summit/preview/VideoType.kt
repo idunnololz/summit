@@ -5,4 +5,5 @@ enum class VideoType {
     Dash,
     Mp4,
     Webm,
+    Hls,
 }

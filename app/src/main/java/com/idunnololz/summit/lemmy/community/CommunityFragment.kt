@@ -75,7 +75,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -304,7 +304,7 @@ class CommunityFragment :
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel)
+                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -346,7 +346,7 @@ class CommunityFragment :
                     onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url, text ->
-                    getMainActivity()?.showBottomMenuForLink(url, text)
+                    getMainActivity()?.showMoreLinkOptions(url, text)
                 },
             ).apply {
                 stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY

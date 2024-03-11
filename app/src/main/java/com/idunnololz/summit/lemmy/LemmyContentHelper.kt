@@ -38,6 +38,7 @@ import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
+import com.idunnololz.summit.util.ContentUtils.isUrlHls
 import com.idunnololz.summit.util.ContentUtils.isUrlMp4
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
@@ -122,8 +123,7 @@ class LemmyContentHelper(
         val showImage = postViewType != PostViewType.TextOnly
         val showLink = postViewType == null ||
             screenshotConfig.postViewType == PostViewType.Full
-        val onlyImage = postViewType == PostViewType.ImageOnly ||
-            postViewType == PostViewType.TitleAndImageOnly
+        val onlyImage = postViewType == PostViewType.ImageOnly
 
         @Suppress("UNCHECKED_CAST")
         fun <T : View> getView(@LayoutRes resId: Int): T =
@@ -535,6 +535,8 @@ class LemmyContentHelper(
                     if (videoInfo != null) {
                         val videoType = if (isUrlMp4(videoInfo.videoUrl)) {
                             VideoType.Mp4
+                        } else if (isUrlHls(videoInfo.videoUrl)) {
+                            VideoType.Hls
                         } else {
                             VideoType.Dash
                         }

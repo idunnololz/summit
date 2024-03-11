@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -31,6 +32,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
+
+    private val args by navArgs<InboxTabbedFragmentArgs>()
 
     private val viewModel: InboxTabbedViewModel by viewModels()
     private val inboxViewModel: InboxViewModel by activityViewModels()
@@ -120,39 +123,28 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         if (savedInstanceState == null) {
             childFragmentManager.commit {
                 setReorderingAllowed(true)
-                replace(R.id.inbox_fragment_container, InboxFragment::class.java, InboxFragmentArgs(InboxViewModel.PageType.All).toBundle())
+                replace(
+                    R.id.inbox_fragment_container,
+                    InboxFragment::class.java,
+                    InboxFragmentArgs(InboxViewModel.PageType.All).toBundle()
+                )
             }
         }
 
-//        binding.viewPager.offscreenPageLimit = 99
-//        binding.viewPager.adapter = pagerAdapter
-//        binding.viewPager.setPageTransformer(DepthPageTransformer2())
-//        binding.viewPager.setCurrentItem(viewModel.pagePosition, false)
-//        binding.viewPager.registerOnPageChangeCallback(
-//            object : ViewPager2.OnPageChangeCallback() {
-//                override fun onPageScrolled(
-//                    position: Int,
-//                    positionOffset: Float,
-//                    positionOffsetPixels: Int,
-//                ) {
-//                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-//                    if (!binding.viewPager.isLaidOut) {
-//                        return
-//                    }
-//                    if (position == 0) {
-//                        getMainActivity()?.setNavUiOpenPercent(positionOffset)
-//                    }
-//                }
-//
-//                override fun onPageScrollStateChanged(state: Int) {
-//                    super.onPageScrollStateChanged(state)
-//
-//                    if (state == ViewPager2.SCROLL_STATE_IDLE) {
-//                        onPageChanged()
-//                    }
-//                }
-//            },
-//        )
+        viewModel.notificationInboxItem.observe(viewLifecycleOwner) {
+            it ?: return@observe
+
+            openMessage(it.inboxItem, it.instance)
+
+            val inboxFragment = childFragmentManager.findFragmentById(R.id.inbox_fragment_container)
+                as? InboxFragment
+
+            inboxFragment?.viewModel?.markAsRead(it.inboxItem, read = true, delete = false)
+        }
+
+        if (args.notificationId > 0) {
+            viewModel.findInboxItemFromNotificationId(args.notificationId)
+        }
 
         onPageChanged()
         viewModel.updateUnreadCount()

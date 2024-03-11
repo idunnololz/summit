@@ -13,7 +13,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 
 class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
@@ -107,7 +107,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                 onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
-                getMainActivity()?.showBottomMenuForLink(url, text)
+                getMainActivity()?.showMoreLinkOptions(url, text)
             },
         )
 

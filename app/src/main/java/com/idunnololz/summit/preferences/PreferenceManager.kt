@@ -54,4 +54,12 @@ class PreferenceManager @Inject constructor(
         val key = "account@${account.instance}@${account.id}"
         return context.getSharedPreferences(key, Context.MODE_PRIVATE)
     }
+
+    fun getAccountIdSharedPreferences(): SharedPreferences {
+        return context.getSharedPreferences("account_ids@", Context.MODE_PRIVATE)
+    }
+
+    fun getNotificationsSharedPreferences(): SharedPreferences {
+        return context.getSharedPreferences("notifications@", Context.MODE_PRIVATE)
+    }
 }

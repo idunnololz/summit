@@ -1,6 +1,7 @@
 package com.idunnololz.summit.main
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
@@ -38,8 +39,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
@@ -101,6 +104,25 @@ class MainActivity : BaseActivity() {
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
+
+        private const val ARG_ACCOUNT_FULL_NAME = "ARG_ACCOUNT_FULL_NAME"
+        private const val ARG_NOTIFICATION_ID = "ARG_NOTIFICATION_ID"
+
+        fun createInboxItemIntent(context: Context, account: Account, notificationId: Int): Intent {
+
+            return Intent(context, MainActivity::class.java).apply {
+                putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
+                putExtra(ARG_NOTIFICATION_ID, notificationId)
+                action = Intent.ACTION_VIEW
+            }
+        }
+
+        fun createInboxPageIntent(context: Context, account: Account): Intent {
+            return Intent(context, MainActivity::class.java).apply {
+                putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
+                action = Intent.ACTION_VIEW
+            }
+        }
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -560,6 +582,18 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleViewIntent(intent: Intent) {
+        Log.d("notification", "Intent extras: ${intent.extras?.keySet()?.joinToString()}")
+        if (intent.hasExtra(ARG_ACCOUNT_FULL_NAME)) {
+            val direction = MainDirections.actionGlobalInboxTabbedFragment(
+                intent.getIntExtra(ARG_NOTIFICATION_ID, 0)
+            )
+
+            runOnReady(this) {
+                currentNavController?.navigate(direction)
+            }
+            return
+        }
+
         val data = intent.data ?: return
         val page = LinkResolver.parseUrl(
             url = data.toString(),

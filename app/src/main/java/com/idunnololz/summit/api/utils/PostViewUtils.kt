@@ -1,6 +1,7 @@
 package com.idunnololz.summit.api.utils
 
 import android.net.Uri
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
@@ -51,7 +52,7 @@ fun PostView.getThumbnailPreviewInfo(): PreviewInfo? {
 }
 
 fun PostView.getVideoInfo(): VideoSizeHint? {
-    val url = if (post.embed_video_url != null) {
+    val originalUrl = if (post.embed_video_url != null) {
         post.embed_video_url
     } else if (isUrlVideo(post.thumbnail_url ?: "")) {
         post.thumbnail_url
@@ -61,7 +62,39 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
         null
     }
 
-    url ?: return null
+    originalUrl ?: return null
+
+    var url: String = originalUrl
+
+    try {
+        val uri = Uri.parse(url)
+        if (uri.host == "redgifs.com") {
+            val pathSegments = uri.pathSegments
+            if (pathSegments.getOrNull(0) == "watch") {
+                val videoKey = pathSegments.getOrNull(1)
+
+                if (videoKey != null) {
+                    url = "https://api.redgifs.com/v2/gifs/${videoKey}/sd.m3u8"
+                }
+            }
+        } else if (uri.host == "api.redgifs.com") {
+            // example:
+            // https://api.redgifs.com/v2/gifs/scarymilkyclam/files/ScaryMilkyClam-silent.mp4
+            val pathSegments = uri.pathSegments
+            if (pathSegments.getOrNull(0) == "v2" && pathSegments.getOrNull(1) == "gifs") {
+                val videoKey = pathSegments.getOrNull(2)
+
+                if (videoKey != null) {
+                    url = "https://api.redgifs.com/v2/gifs/${videoKey}/sd.m3u8"
+                }
+            }
+        }
+    } catch (e: Exception) {
+        // best effort!
+
+        FirebaseCrashlytics.getInstance()
+            .recordException(e)
+    }
 
     return VideoSizeHint(
         0,

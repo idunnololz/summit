@@ -39,7 +39,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -89,7 +89,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         val context = requireContext()
 
         requireMainActivity().apply {
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.appBar)
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomAppBar)
             insetsChangedLiveData.observe(viewLifecycleOwner) {
@@ -132,7 +132,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         onLinkClick(url, text, linkType)
                     },
                     onLinkLongClick = { url, text ->
-                        getMainActivity()?.showBottomMenuForLink(url, text)
+                        getMainActivity()?.showMoreLinkOptions(url, text)
                     },
                 )
             }
@@ -163,7 +163,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
-                getMainActivity()?.showBottomMenuForLink(url, text)
+                getMainActivity()?.showMoreLinkOptions(url, text)
             },
         )
 
@@ -453,7 +453,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel)
+                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -493,7 +493,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url, text ->
-                    getMainActivity()?.showBottomMenuForLink(url, text)
+                    getMainActivity()?.showMoreLinkOptions(url, text)
                 },
             ).apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
