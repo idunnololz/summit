@@ -164,7 +164,12 @@ class InboxViewModel @Inject constructor(
         }
     }
 
-    fun markAsRead(inboxItem: InboxItem, read: Boolean, delete: Boolean = false) {
+    fun markAsRead(
+        inboxItem: InboxItem,
+        read: Boolean,
+        delete: Boolean = false,
+        refreshAfter: Boolean = false,
+    ) {
         markAsReadResult.setIsLoading()
         markAsReadInViewData(
             inboxItem.id,
@@ -174,7 +179,7 @@ class InboxViewModel @Inject constructor(
         viewModelScope.launch {
             inboxRepository.markAsRead(inboxItem, read)
                 .onSuccess {
-                    if (!read) {
+                    if (!read || refreshAfter) {
                         fetchInbox(force = true)
                     }
                     markAsReadResult.postValue(Unit)

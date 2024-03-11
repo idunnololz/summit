@@ -164,6 +164,8 @@
         android:label="PersonTabbedFragment" >
         <argument
             android:name="personRef"
-            app:argType="com.idunnololz.summit.lemmy.PersonRef" />
+            android:defaultValue="@null"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef"
+            app:nullable="true"/>
     </fragment>
 </navigation>
