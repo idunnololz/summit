@@ -13,6 +13,7 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
+import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.idunnololz.summit.preview.VideoType
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -215,6 +216,9 @@ class ExoPlayerManager(
             VideoType.Webm,
             ->
                 ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(mediaItem)
+            VideoType.Hls ->
+                HlsMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(mediaItem)
         }
 

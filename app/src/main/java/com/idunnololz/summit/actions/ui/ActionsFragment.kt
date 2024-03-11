@@ -14,7 +14,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -67,7 +67,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
                 onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
-                getMainActivity()?.showBottomMenuForLink(url, text)
+                getMainActivity()?.showMoreLinkOptions(url, text)
             },
         )
 

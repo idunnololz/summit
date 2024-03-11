@@ -2,8 +2,11 @@ package com.idunnololz.summit.notifications
 
 import android.app.Notification
 import android.app.NotificationChannel
+import android.app.NotificationChannelGroup
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -17,14 +20,21 @@ import androidx.work.WorkManager
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
+import com.idunnololz.summit.lemmy.inbox.InboxEntry
 import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.preferences.NotificationsSharedPreference
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.APP_STARTUP_DELAY_MS
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,30 +45,47 @@ class NotificationsManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferences: Preferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val notificationsUpdaterFactory: NotificationsUpdater.Factory,
+    private val accountManager: AccountManager,
+    private val inboxEntriesDao: InboxEntriesDao,
+    @NotificationsSharedPreference private val notificationsSharedPreferences: SharedPreferences,
 ) {
     companion object {
         private const val TAG = "NotificationsManager"
 
-        private const val ChannelIdAccount = "account"
+        private const val ChannelIdAccountPrefix = "channel.account."
+        private const val ChannelGroupIdAccountPrefix = "channel_group.account."
 
-        private const val GroupKeyPrefix = "com.idunnololz.summit."
+        private const val InboxNotificationStartId  = 1000
+        private const val InboxNotificationLastId    = 9999
 
-        private const val SummaryNotificationId = 1
-
-        private const val InboxNotificationStartId = 1000
-
+        private const val AccountSummaryNotificationStartId = 20000
     }
+
+    class NotificationWithId(
+        val notificationId: Int,
+        val notification: Notification,
+    )
 
     private val coroutineScope = coroutineScopeFactory.create()
     private val workManager = WorkManager.getInstance(context)
     private val notificationManager: NotificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    private var channelCreated = false
+    private var channelsCreated = mutableSetOf<String>()
+
+    private var nextNotificationId = if (preferences.lastAccountNotificationId == 0) {
+        InboxNotificationStartId
+    } else {
+        preferences.lastAccountNotificationId
+    }
 
     fun start() {
         coroutineScope.launch {
             delay(APP_STARTUP_DELAY_MS)
             enqueueWorkersIfNeeded()
+
+            notificationsUpdaterFactory.create()
+                .run()
         }
     }
 
@@ -66,11 +93,16 @@ class NotificationsManager @Inject constructor(
         enqueueWorkersIfNeeded()
     }
 
+    fun reenqueue() {
+        cancelWorkers()
+        enqueueWorkersIfNeeded()
+    }
+
     fun enqueueWorkersIfNeeded() {
         Log.d(TAG, "enqueueWorkersIfNeeded(): ${preferences.isNotificationsOn}")
 
         if (preferences.isNotificationsOn) {
-            enqueueWorkers(0)
+            enqueueWorkers(preferences.notificationsCheckIntervalMs)
         } else {
             cancelWorkers()
         }
@@ -124,23 +156,40 @@ class NotificationsManager @Inject constructor(
         workManager.cancelAllWorkByTag(TAG)
     }
 
-    private fun createNotificationChannelIfNeeded() {
-        if (channelCreated) {
+    private fun createNotificationChannelIfNeededForAccount(account: Account) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return
         }
 
-        channelCreated = true
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = context.getString(R.string.account_notifications)
-            val descriptionText = context.getString(R.string.account_notifications_desc)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(ChannelIdAccount, name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            notificationManager.createNotificationChannel(channel)
+        val channelId = getChannelIdForAccount(account)
+        if (channelsCreated.contains(channelId)) {
+            return
         }
+
+        channelsCreated.add(channelId)
+
+        val groupKey = getChannelGroupIdForAccount(account)
+
+        notificationManager.createNotificationChannelGroup(
+            NotificationChannelGroup(
+                groupKey,
+                account.fullName
+            )
+        )
+
+        val name = context.getString(R.string.account_notifications)
+        val descriptionText = context.getString(R.string.account_notifications_desc)
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(
+            channelId,
+            name,
+            importance
+        ).apply {
+            description = descriptionText
+            group = groupKey
+        }
+        // Register the channel with the system
+        notificationManager.createNotificationChannel(channel)
     }
 
     fun showNotificationsForItems(account: Account, newItems: List<InboxItem>) {
@@ -148,86 +197,160 @@ class NotificationsManager @Inject constructor(
             return
         }
 
-        createNotificationChannelIfNeeded()
+        coroutineScope.launch {
 
-        val newInboxNotificationItems = mutableListOf<Notification>()
-        val groupKey = GroupKeyPrefix + account.fullName
+            withContext(Dispatchers.Main) {
+                createNotificationChannelIfNeededForAccount(account)
+            }
 
-        val notificationSummaryInfo = NotificationCompat.InboxStyle()
+            val channelId = getChannelIdForAccount(account)
+            val channelGroupId = getChannelGroupIdForAccount(account)
 
-        val summaryNotificationBuilder = NotificationCompat.Builder(context, ChannelIdAccount)
-            .setContentTitle(account.fullName)
-            // Set content text to support devices running API level < 24.
-            .setContentText(context.resources.getQuantityString(
-                R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
-            .setSmallIcon(R.drawable.ic_logo_mono_24)
+            val newInboxNotificationItems = mutableListOf<NotificationWithId>()
 
+            val notificationSummaryInfo = NotificationCompat.InboxStyle()
 
-        newItems.forEach {
-            var title: String = it.title
-            var body: String = it.content
-            var authorAvatar: String? = it.authorAvatar
+            val summaryNotificationBuilder = NotificationCompat.Builder(context, channelId)
+                .setContentTitle(account.fullName)
+                // Set content text to support devices running API level < 24.
+                .setContentText(context.resources.getQuantityString(
+                    R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
+                .setSmallIcon(R.drawable.ic_logo_mono_24)
 
-            notificationSummaryInfo.addLine(title)
+            newItems.forEach { inboxItem ->
 
-            when (it) {
-                is InboxItem.MentionInboxItem -> {
-                    title = it.title
+                val notificationId = nextNotificationId
+
+                if (nextNotificationId == InboxNotificationLastId) {
+                    nextNotificationId = InboxNotificationStartId
                 }
-                is InboxItem.MessageInboxItem -> {
-                    title = it.title
-                }
-                is InboxItem.ReplyInboxItem -> {
-                    title = it.title
-                }
-                is InboxItem.ReportCommentInboxItem -> {
 
-                }
-                is InboxItem.ReportMessageInboxItem -> {
+                nextNotificationId++
 
-                }
-                is InboxItem.ReportPostInboxItem -> {
+                val title: String = inboxItem.title
+                val body: String = inboxItem.content
+                val authorAvatar: String? = inboxItem.authorAvatar
 
+                notificationSummaryInfo.addLine(title)
+
+                val intent = MainActivity.createInboxItemIntent(context, account, notificationId)
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    nextNotificationId,
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT,
+                )
+
+                val newMessageNotification = NotificationCompat.Builder(context, channelId)
+                    .setSmallIcon(R.drawable.ic_logo_mono_24)
+                    .setContentTitle(title)
+                    .setContentText(body)
+//                .setLargeIcon(Icon.cre)
+                    .setGroup(channelGroupId)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setCategory(NotificationCompat.CATEGORY_EMAIL)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .build()
+
+                newInboxNotificationItems.add(
+                    NotificationWithId(
+                        notificationId = notificationId,
+                        notification = newMessageNotification,
+                    )
+                )
+
+                withContext(Dispatchers.IO) {
+                    inboxEntriesDao.insertEntry(
+                        InboxEntry(
+                            id = 0,
+                            ts = System.currentTimeMillis(),
+                            itemId = inboxItem.id,
+                            notificationId = notificationId,
+                            accountFullName = account.fullName,
+                            inboxItem = inboxItem,
+                        )
+                    )
                 }
             }
 
-            val newMessageNotification = NotificationCompat.Builder(context, ChannelIdAccount)
-                .setSmallIcon(R.drawable.ic_logo_mono_24)
-                .setContentTitle(title)
-                .setContentText(body)
-//                .setLargeIcon(Icon.cre)
-                .setGroup(groupKey)
+            preferences.lastAccountNotificationId = nextNotificationId
+
+            withContext(Dispatchers.IO) {
+                inboxEntriesDao.pruneDb()
+            }
+
+            notificationSummaryInfo
+                .setBigContentTitle(context.resources.getQuantityString(
+                    R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
+                .setSummaryText(account.fullName)
+
+            val localAccountId = accountManager.getLocalAccountId(account)
+            val summaryNotificationId = AccountSummaryNotificationStartId + localAccountId
+
+            val intent = MainActivity.createInboxPageIntent(context, account)
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                summaryNotificationId,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT,
+            )
+
+            val summaryNotification = summaryNotificationBuilder
+                // Build summary info into InboxStyle template.
+                .setStyle(notificationSummaryInfo)
+                // Specify which group this notification belongs to.
+                .setGroup(channelGroupId)
+                // Set this notification as the summary for the group.
+                .setGroupSummary(true)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 .build()
 
-            newInboxNotificationItems.add(newMessageNotification)
-        }
+            Log.d(TAG, "group key: $channelGroupId. localAccountId: $localAccountId")
 
-
-        notificationSummaryInfo
-            .setBigContentTitle(context.resources.getQuantityString(
-                R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
-            .setSummaryText(account.fullName)
-
-        val summaryNotification = summaryNotificationBuilder
-            // Build summary info into InboxStyle template.
-            .setStyle(notificationSummaryInfo)
-            // Specify which group this notification belongs to.
-            .setGroup(groupKey)
-            // Set this notification as the summary for the group.
-            .setGroupSummary(true)
-            .build()
-
-        NotificationManagerCompat.from(context).apply {
-            try {
-                var id = InboxNotificationStartId
-                newInboxNotificationItems.forEach {
-                    notify(id++, it)
+            NotificationManagerCompat.from(context).apply {
+                try {
+                    newInboxNotificationItems.forEach {
+                        Log.d(TAG, "Creating new notification. NoteId: ${it.notificationId}")
+                        notify(it.notificationId, it.notification)
+                    }
+                    notify(summaryNotificationId, summaryNotification)
+                } catch (e: SecurityException) {
+                    preferences.isNotificationsOn = false
+                    onPreferencesChanged()
                 }
-                notify(SummaryNotificationId, summaryNotification)
-            } catch (e: SecurityException) {
-                preferences.isNotificationsOn = false
-                onPreferencesChanged()
             }
         }
+    }
+
+    suspend fun findInboxItem(notificationId: Int): InboxEntry? {
+        return inboxEntriesDao.findInboxEntries(notificationId).firstOrNull {
+            it.inboxItem != null
+        }
+    }
+
+    private fun getChannelIdForAccount(account: Account) =
+        ChannelIdAccountPrefix + account.fullName
+
+    private fun getChannelGroupIdForAccount(account: Account) =
+        ChannelGroupIdAccountPrefix + account.fullName
+
+    fun isNotificationsEnabledForAccount(account: Account): Boolean =
+        notificationsSharedPreferences.getBoolean("${account.fullName}_isOn", false)
+
+    fun setNotificationsEnabledForAccount(account: Account, isEnabled: Boolean) {
+        notificationsSharedPreferences.edit()
+            .putBoolean("${account.fullName}_isOn", isEnabled)
+            .apply()
+    }
+
+    fun getLastNotificationItemTsForAccount(account: Account) =
+        notificationsSharedPreferences.getLong("${account.fullName}_lastItemTs", 0L)
+
+    fun setLastNotificationItemTsForAccount(account: Account, ts: Long) {
+        notificationsSharedPreferences.edit()
+            .putLong("${account.fullName}_lastItemTs", ts)
+            .apply()
     }
 }

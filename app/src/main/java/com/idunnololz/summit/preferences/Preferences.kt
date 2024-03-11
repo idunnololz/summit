@@ -59,12 +59,13 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_IS_NOTIFICATIONS_ON
+import com.idunnololz.summit.util.PreferenceUtil.KEY_LAST_ACCOUNT_NOTIFICATION_ID
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
-import com.idunnololz.summit.util.PreferenceUtil.KEY_NOTIFICATIONS_LAST_UPDATE_MS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
@@ -120,7 +121,6 @@ import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
-import java.lang.ClassCastException
 import java.time.Duration
 
 class Preferences(
@@ -557,7 +557,7 @@ class Preferences(
                 .apply()
         }
     var autoLinkPhoneNumbers: Boolean
-        get() = prefs.getBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, true)
+        get() = prefs.getBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, false)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, value)
@@ -903,11 +903,19 @@ class Preferences(
                 .apply()
         }
 
-    var notificationsLastUpdateMs: Long
-        get() = prefs.getLong(KEY_NOTIFICATIONS_LAST_UPDATE_MS, 0L)
+    var lastAccountNotificationId: Int
+        get() = prefs.getInt(KEY_LAST_ACCOUNT_NOTIFICATION_ID, 0)
         set(value) {
             prefs.edit()
-                .putLong(KEY_NOTIFICATIONS_LAST_UPDATE_MS, value)
+                .putInt(KEY_LAST_ACCOUNT_NOTIFICATION_ID, value)
+                .apply()
+        }
+
+    var notificationsCheckIntervalMs: Long
+        get() = prefs.getLong(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, 1000L * 60L * 15L)
+        set(value) {
+            prefs.edit()
+                .putLong(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, value)
                 .apply()
         }
 

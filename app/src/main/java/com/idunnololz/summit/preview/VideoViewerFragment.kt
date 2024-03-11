@@ -21,8 +21,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PreferenceUtil
@@ -50,6 +53,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     private var orientationListener: OrientationEventListener? = null
 
     private val viewModel: VideoViewerViewModel by viewModels()
+    private val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private val playerListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -286,7 +290,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                         binding.loadingView.showErrorText(R.string.unsupported_video_type)
                         (activity as? MainActivity)?.showSystemUI()
                     }
-                } else if (uri.path?.endsWith("mp4", ignoreCase = true) == true) {
+                } else if (ContentUtils.isUrlMp4(url)) {
                     loadVideo(context, url, VideoType.Mp4, videoState)
                 } else if (uri.path?.endsWith("webm", ignoreCase = true) == true) {
                     loadVideo(context, url, VideoType.Webm, videoState)
@@ -295,14 +299,10 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                     (activity as? MainActivity)?.showSystemUI()
                 }
             }
-            VideoType.Dash -> {
-                @Suppress("UnsafeOptInUsageError")
-                binding.playerView.player = ExoPlayerManager.get(viewLifecycleOwner)
-                    .getPlayerForUrl(url, videoType, videoState)
-                setupMoreButton(context, url, videoType)
-            }
+            VideoType.Dash,
             VideoType.Mp4,
             VideoType.Webm,
+            VideoType.Hls,
             -> {
                 @Suppress("UnsafeOptInUsageError")
                 binding.playerView.player = ExoPlayerManager.get(viewLifecycleOwner)
@@ -314,21 +314,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     private fun setupMoreButton(context: Context, url: String, videoType: VideoType) {
         binding.playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
-            PopupMenu(context, it).apply {
-                inflate(R.menu.video_menu)
-
-                setOnMenuItemClickListener {
-                    when (it.itemId) {
-                        R.id.ca_save -> {
-                            viewModel.downloadVideo(requireContext(), url)
-                            true
-                        }
-                        else -> false
-                    }
-                }
-
-                show()
-            }
+            showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
         }
     }
 }

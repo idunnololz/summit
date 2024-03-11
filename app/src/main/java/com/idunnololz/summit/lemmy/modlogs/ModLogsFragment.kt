@@ -39,7 +39,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.escapeMarkdown
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -121,7 +121,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                     onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url: String, text: String ->
-                    getMainActivity()?.showBottomMenuForLink(url, text)
+                    getMainActivity()?.showMoreLinkOptions(url, text)
                 },
             )
             val layoutManager = LinearLayoutManager(context)

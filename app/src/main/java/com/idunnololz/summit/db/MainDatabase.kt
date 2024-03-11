@@ -30,6 +30,9 @@ import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
+import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
+import com.idunnololz.summit.lemmy.inbox.InboxEntry
+import com.idunnololz.summit.lemmy.inbox.InboxEntryConverters
 import com.idunnololz.summit.user.UserCommunitiesConverters
 import com.idunnololz.summit.user.UserCommunitiesDao
 import com.idunnololz.summit.user.UserCommunityEntry
@@ -50,6 +53,7 @@ import com.idunnololz.summit.util.moshi
         HiddenPostEntry::class,
         FilterEntry::class,
         DraftEntry::class,
+        InboxEntry::class,
     ],
     autoMigrations = [
         AutoMigration(from = 20, to = 21),
@@ -57,8 +61,9 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 27, to = 28),
         AutoMigration(from = 29, to = 30),
         AutoMigration(from = 31, to = 32),
+        AutoMigration(from = 32, to = 33),
     ],
-    version = 32,
+    version = 34,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -74,6 +79,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun hiddenPostsDao(): HiddenPostsDao
     abstract fun contentFiltersDao(): ContentFiltersDao
     abstract fun draftsDao(): DraftsDao
+    abstract fun inboxEntriesDao(): InboxEntriesDao
 
     companion object {
 
@@ -99,6 +105,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .addTypeConverter(UserCommunitiesConverters(moshi))
                 .addTypeConverter(AccountInfoConverters(moshi))
                 .addTypeConverter(DraftConverters(moshi))
+                .addTypeConverter(InboxEntryConverters(moshi))
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_24)
@@ -107,6 +114,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_25_26)
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_30_31)
+                .addMigrations(MIGRATION_33_34)
                 .build()
         }
     }
@@ -165,5 +173,12 @@ val MIGRATION_30_31 = object : Migration(30, 31) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS lemmy_completed_actions;")
         database.execSQL("CREATE TABLE IF NOT EXISTS `lemmy_completed_actions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `cts` INTEGER NOT NULL, `info` TEXT)")
+    }
+}
+
+val MIGRATION_33_34 = object : Migration(33, 34) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS inbox_entries;")
+        database.execSQL("CREATE TABLE IF NOT EXISTS `inbox_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `item_id` INTEGER NOT NULL, `notification_id` INTEGER NOT NULL, `account_full_name` TEXT NOT NULL, `inbox_item` TEXT)")
     }
 }

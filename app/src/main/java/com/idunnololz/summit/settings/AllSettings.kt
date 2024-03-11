@@ -50,6 +50,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
@@ -2061,11 +2062,60 @@ class NotificationSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
 
+
+    private val refreshIntervalOptions =
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.refresh_interval_15_minutes,
+                context.getString(R.string.every_minutes_format, "15"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.refresh_interval_30_minutes,
+                context.getString(R.string.every_minutes_format, "30"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.refresh_interval_60_minutes,
+                context.getString(R.string.every_minutes_format, "60"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.refresh_interval_2_hours,
+                context.getString(R.string.every_hours_format, "2"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.refresh_interval_4_hours,
+                context.getString(R.string.every_hours_format, "4"),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.refresh_interval_12_hours,
+                context.getString(R.string.every_hours_format, "12"),
+                null,
+                null,
+            ),
+        )
+
     val isNotificationsEnabled = OnOffSettingItem(
         null,
         context.getString(R.string.notifications),
         null,
         relatedKeys = listOf(KEY_IS_NOTIFICATIONS_ON),
+    )
+
+    val checkInterval = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.check_interval),
+        null,
+        refreshIntervalOptions,
+        relatedKeys = listOf(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS),
     )
 
     override val parents: List<KClass<out SearchableSettings>> = listOf(

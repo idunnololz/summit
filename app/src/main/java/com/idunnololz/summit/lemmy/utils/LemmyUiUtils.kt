@@ -70,9 +70,6 @@ fun Preferences.getPostSwipeActions(context: Context): List<LemmySwipeActionCall
                 R.drawable.baseline_close_24
         }
 
-    val color2 = postGestureActionColor2
-    val color3 = postGestureActionColor3
-
     return listOf(
         LemmySwipeActionCallback.SwipeAction(
             postGestureAction1,
@@ -113,17 +110,17 @@ fun Preferences.getCommentSwipeActions(context: Context): List<LemmySwipeActionC
         LemmySwipeActionCallback.SwipeAction(
             commentGestureAction1,
             context.getDrawableCompat(commentGestureAction1.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_red),
+            commentGestureActionColor1 ?: context.getColorCompat(R.color.style_red),
         ),
         LemmySwipeActionCallback.SwipeAction(
             commentGestureAction2,
             context.getDrawableCompat(commentGestureAction2.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_blue),
+            commentGestureActionColor2 ?: context.getColorCompat(R.color.style_blue),
         ),
         LemmySwipeActionCallback.SwipeAction(
             commentGestureAction3,
             context.getDrawableCompat(commentGestureAction3.toIcon())!!.mutate(),
-            context.getColorCompat(R.color.style_amber),
+            commentGestureActionColor3 ?: context.getColorCompat(R.color.style_amber),
         ),
     ).filter { it.id != CommentGestureAction.None }
 }

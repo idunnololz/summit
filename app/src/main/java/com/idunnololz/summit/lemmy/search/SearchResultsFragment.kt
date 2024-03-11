@@ -73,7 +73,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.isLoading
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.showBottomMenuForLink
+import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -143,7 +143,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel)
+                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -199,7 +199,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkClick(url, text, linkType)
                 },
                 onLinkLongClick = { url, text ->
-                    getMainActivity()?.showBottomMenuForLink(url, text)
+                    getMainActivity()?.showMoreLinkOptions(url, text)
                 },
                 onCommentClick = {
                     parentFragment.slidingPaneController?.openComment(

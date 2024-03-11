@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 34
-        versionCode = 144
-        versionName = "1.28.4"
+        versionCode = 145
+        versionName = "1.29.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.media3.core)
     implementation(libs.media3.ui)
     implementation(libs.media3.dash)
+    implementation(libs.media3.hls)
 
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)

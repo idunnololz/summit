@@ -191,4 +191,11 @@
     <item name="pa_mod_tools" type="id" />
     <item name="pa_cross_post" type="id" />
     <item name="pa_community_info" type="id" />
+    <item name="refresh_interval_15_minutes" type="id" />
+    <item name="refresh_interval_30_minutes" type="id" />
+    <item name="refresh_interval_60_minutes" type="id" />
+    <item name="refresh_interval_2_hours" type="id" />
+    <item name="refresh_interval_4_hours" type="id" />
+    <item name="refresh_interval_12_hours" type="id" />
+    <item name="unknown" type="id" />
 </resources>

@@ -908,6 +908,10 @@
     <string name="account_notifications_desc">Notifications for accounts such as private messages or replies to posts.</string>
     <string name="notifications">Notifications</string>
     <string name="notifications_desc">Manage what notifications the app shows</string>
+    <string name="every_minutes_format">Every %1$s minutes</string>
+    <string name="every_hours_format">Every %1$s hours</string>
+    <string name="check_interval">Check interval</string>
+    <string name="notifications_per_account_settings_desc">Choose which accounts to check notifications for.</string>
 
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>

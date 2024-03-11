@@ -10,6 +10,7 @@ import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
+import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
 import com.idunnololz.summit.user.UserCommunitiesDao
 import dagger.Module
 import dagger.Provides
@@ -60,6 +61,10 @@ class DatabaseModule {
     @Provides
     fun provideDraftsDao(db: MainDatabase): DraftsDao =
         db.draftsDao()
+
+    @Provides
+    fun provideInboxEntriesDao(db: MainDatabase): InboxEntriesDao =
+        db.inboxEntriesDao()
 
     @Provides
     @Singleton

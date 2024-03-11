@@ -8,7 +8,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AccountIdsSharedPreference
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class NotificationsSharedPreference
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -25,4 +34,14 @@ class PreferencesModule {
     @Singleton
     fun provideSharedPreferences(): SharedPreferences =
         PreferenceUtil.preferences
+
+    @AccountIdsSharedPreference
+    @Provides
+    fun provideAccountIdsSharedPreference(preferenceManager: PreferenceManager): SharedPreferences =
+        preferenceManager.getAccountIdSharedPreferences()
+
+    @NotificationsSharedPreference
+    @Provides
+    fun provideNotificationsSharedPreference(preferenceManager: PreferenceManager): SharedPreferences =
+        preferenceManager.getAccountIdSharedPreferences()
 }

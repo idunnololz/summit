@@ -419,6 +419,6 @@
         android:label="PostQuickActionsFragment" />
     <fragment
         android:id="@+id/settingNotificationsFragment"
-        android:name="com.idunnololz.summit.settings.notifications.SettingNotificationsFragment"
+        android:name="com.idunnololz.summit.settings.notifications.SettingsNotificationsFragment"
         android:label="SettingNotificationsFragment" />
 </navigation>

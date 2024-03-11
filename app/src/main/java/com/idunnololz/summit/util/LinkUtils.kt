@@ -130,7 +130,7 @@ object LinkUtils {
         "https://$instance/c/$communityName"
 }
 
-fun MainActivity.showBottomMenuForLink(url: String, text: String?) {
+fun MainActivity.showMoreLinkOptions(url: String, text: String?) {
     val context = this
 
     BottomMenu(context).apply {

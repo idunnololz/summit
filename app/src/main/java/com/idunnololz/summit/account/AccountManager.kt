@@ -1,9 +1,11 @@
 package com.idunnololz.summit.account
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.preferences.AccountIdsSharedPreference
 import com.idunnololz.summit.preferences.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -11,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -24,7 +25,13 @@ class AccountManager @Inject constructor(
     private val accountDao: AccountDao,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val preferenceManager: PreferenceManager,
+    @AccountIdsSharedPreference private val accountIdsSharedPreference: SharedPreferences,
 ) {
+
+    companion object {
+        private const val KEY_ACCOUNT_ID_COUNTER = "#counter"
+        private const val ACCOUNT_ID_MAX_VALUE = 10000
+    }
 
     interface OnAccountChangedListener {
         suspend fun onAccountSigningOut(account: Account) {}
@@ -84,6 +91,9 @@ class AccountManager @Inject constructor(
                     accountDao.clearAndSetCurrent(firstAccount.id)
                 }
             }
+            accountIdsSharedPreference.edit()
+                .remove(account.fullName)
+                .apply()
 
             updateCurrentAccount()
         }
@@ -118,6 +128,27 @@ class AccountManager @Inject constructor(
 
     fun addOnAccountChangedListener(onAccountChangeListener: OnAccountChangedListener) {
         onAccountChangeListeners.add(onAccountChangeListener)
+    }
+
+    fun getLocalAccountId(account: Account): Int {
+        val accountKey = account.fullName
+        if (accountIdsSharedPreference.contains(accountKey)) {
+            return accountIdsSharedPreference.getInt(accountKey, 0)
+        } else {
+            val nextAccountId = accountIdsSharedPreference.getInt(KEY_ACCOUNT_ID_COUNTER, 0)
+            val newNextAccountId = if (nextAccountId + 1 == ACCOUNT_ID_MAX_VALUE) {
+                0
+            } else {
+                nextAccountId + 1
+            }
+
+            accountIdsSharedPreference.edit()
+                .putInt(KEY_ACCOUNT_ID_COUNTER, newNextAccountId)
+                .putInt(accountKey, nextAccountId)
+                .apply()
+
+            return nextAccountId
+        }
     }
 
     private suspend fun doSwitchAccountWork(newAccount: Account?) {
