@@ -39,9 +39,9 @@ class CommentExpandedViewHolder(
     override val quickActionsEndBarrier: View? = null,
     override val quickActionsTopBarrier: View,
 
-    override var scoreCount2: TextView? = null,
-    override var upvoteCount2: TextView? = null,
-    override var downvoteCount2: TextView? = null,
+    override var qaScoreCount: TextView? = null,
+    override var qaUpvoteCount: TextView? = null,
+    override var qaDownvoteCount: TextView? = null,
 ) : RecyclerView.ViewHolder(root), QuickActionsViewHolder {
 
     data class State(

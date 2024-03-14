@@ -510,14 +510,14 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkLongClick = onLinkLongClick,
                 )
 
-                val scoreCount: TextView? = viewHolder.scoreCount2
+                val scoreCount: TextView? = viewHolder.qaScoreCount
                 val upvoteCount: TextView?
                 val downvoteCount: TextView?
 
                 if (scoreCount != null) {
-                    if (viewHolder.downvoteCount2 != null) {
-                        upvoteCount = viewHolder.upvoteCount2
-                        downvoteCount = viewHolder.downvoteCount2
+                    if (viewHolder.qaDownvoteCount != null) {
+                        upvoteCount = viewHolder.qaUpvoteCount
+                        downvoteCount = viewHolder.qaDownvoteCount
                     } else {
                         upvoteCount = null
                         downvoteCount = null

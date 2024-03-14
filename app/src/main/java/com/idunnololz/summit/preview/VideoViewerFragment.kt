@@ -278,7 +278,11 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         when (videoType) {
             VideoType.Unknown -> {
                 val uri = Uri.parse(url)
-                if (uri.host?.endsWith("imgur.com", ignoreCase = true) == true) {
+                if (ContentUtils.isUrlMp4(uri.path ?: "")) {
+                    loadVideo(context, url, VideoType.Mp4, videoState)
+                } else if (ContentUtils.isUrlWebm(uri.path ?: "")) {
+                    loadVideo(context, url, VideoType.Webm, videoState)
+                } else if (uri.host?.endsWith("imgur.com", ignoreCase = true) == true) {
                     if (uri.path?.endsWith(".gifv", ignoreCase = true) == true) {
                         loadVideo(
                             context,
@@ -287,15 +291,11 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                             videoState,
                         )
                     } else {
-                        binding.loadingView.showErrorText(R.string.unsupported_video_type)
+                        showUnsupportedVideoTypeError(url)
                         (activity as? MainActivity)?.showSystemUI()
                     }
-                } else if (ContentUtils.isUrlMp4(url)) {
-                    loadVideo(context, url, VideoType.Mp4, videoState)
-                } else if (uri.path?.endsWith("webm", ignoreCase = true) == true) {
-                    loadVideo(context, url, VideoType.Webm, videoState)
                 } else {
-                    binding.loadingView.showErrorText(R.string.unsupported_video_type)
+                    showUnsupportedVideoTypeError(url)
                     (activity as? MainActivity)?.showSystemUI()
                 }
             }
@@ -310,6 +310,16 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 setupMoreButton(context, url, videoType)
             }
         }
+    }
+
+    private fun showUnsupportedVideoTypeError(url: String) {
+        binding.loadingView.showErrorWithButton(
+            getString(R.string.unsupported_video_type),
+            getString(R.string.more_actions),
+            {
+                showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
+            }
+        )
     }
 
     private fun setupMoreButton(context: Context, url: String, videoType: VideoType) {

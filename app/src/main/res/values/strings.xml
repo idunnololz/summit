@@ -4,8 +4,6 @@
     This string is specifically chosen by me so DO NOT change it. -->
     <string name="locale">en</string>
 
-    <string name="app_name">Summit</string>
-
     <string name="error_network">Network error. Please check your internet connection and try again.</string>
     <string name="error_network_timeout">Network error. The request took too long. Please try again.</string>
     <string name="error_unknown">Unknown error. Please try again.</string>
@@ -15,14 +13,8 @@
     <!-- Button text. -->
     <string name="retry">Retry</string>
     <string name="home">Home</string>
-    <string name="error_auth_state_tokens_do_not_match">Auth session invalid. Please try signing in again.</string>
-    <string name="error_auth_access_denied">Sign in failed.</string>
-    <string name="error_auth_unsupported_response_type">Client error. Unsupported response type.</string>
-    <string name="error_auth_invalid_scope">Client error. Invalid scope.</string>
-    <string name="offline">Offline</string>
     <string name="save">Save</string>
     <string name="save_success_format">File saved to %1$s</string>
-    <string name="image_viewer">Image viewer</string>
     <string name="view">View</string>
     <string name="error_external_activity_not_found">Could not find an app on this device for file type %1$s.</string>
     <string name="image_saved_format">Image saved at %1$s.</string>
@@ -31,8 +23,6 @@
     <string name="next">Next</string>
     <string name="normal_channel_name">Normal channel</string>
     <string name="normal_channel_description">General channel for most notifications</string>
-    <string name="offline_notification_message">Downloading offline data…</string>
-    <string name="offline_ticker_text">Downloading offline data</string>
     <string name="page_format">Page %1$s</string>
     <string name="nsfw">NSFW</string>
     <string name="all">All</string>
@@ -42,30 +32,18 @@
     <string name="reveal_warning_nsfw">This post is marked as NSFW</string>
     <string name="reveal_warning_default">This post is hidden</string>
     <string name="show_post_question">Show post?</string>
-    <string name="let_go_to_go_back">Let go to go back</string>
     <string name="share">Share</string>
     <string name="copy_link_address">Copy link address</string>
     <string name="share_link">Share link</string>
-    <string name="go_to_description">Enter a reddit link to visit</string>
-    <string name="url_hint">Url</string>
-    <string name="invalid_link">Invalid link</string>
     <string name="unsupported_video_type">Unsupported video type</string>
     <string name="server_results">Results</string>
     <string name="no_results_found">No results found</string>
     <string name="storage_usage_legend_format">%1$s - %2$s</string>
-    <string name="offline_files">Offline files</string>
-    <string name="download_offline_data">Download offline data</string>
-    <string name="schedule_offline_download">Schedule offline download</string>
     <string name="removed_by_mod_message">This post has been removed by the moderators of %1$s.</string>
     <string name="history">History</string>
     <string name="offline_scheduler_title_text">Pick a time to automatically refresh Reddit</string>
     <string name="enable">Enable</string>
-    <string name="last_fetched_format">Last fetched: %1$s.</string>
-    <string name="offline_data_not_downloaded_yet">Offline data not downloaded yet.</string>
-    <string name="downloading_offline_data">Downloading offline data…</string>
     <string name="search">Search</string>
-    <string name="account">Account</string>
-    <string name="basics">Basics</string>
     <string name="sign_out">Sign out</string>
     <string name="theme">Theme</string>
     <string name="locked_post_message">This thread has been locked by the moderators of %1$s. New comments cannot be posted.</string>
@@ -86,32 +64,21 @@
     <string name="removed_by_op_message">This post was deleted by the person who originally posted it.</string>
     <string name="subreddit_state_format">%1$s - Page %2$s</string>
     <string name="error_history_entry_corrupt">Error. The selected history item is corrupted and cannot be used.</string>
-    <string name="error_history_entry_deleted">Error. This history item was deleted.</string>
     <string name="clear_history">Clear history</string>
     <string name="sort_comments_by">Sort comments by</string>
-    <string name="raw_comment">Raw comment</string>
-    <string name="comments_coming_soon">Posting comments is currently not supported. This feature will be added soon.</string>
-    <string name="clear_offline_data">Clear offline data</string>
     <string name="auth_required_title">Authorization required</string>
     <string name="log_in">Log In</string>
     <string name="cancel">Cancel</string>
     <string name="auth_required_body">You must sign in to perform that action.</string>
-    <string name="processing_link">Processing link…</string>
     <string name="error_unable_to_handle_link">Unable to handle link %1$s</string>
     <string name="add_comment">Add comment</string>
-    <string name="posting_comment">Posting comment…</string>
     <string name="edit_comment">Edit comment</string>
     <string name="delete_comment">Delete comment</string>
-    <string name="save_edits">Save edits</string>
     <string name="about">About</string>
-    <string name="pref_key_about">pref_key_about</string>
-    <string name="pref_key_build_version">pref_key_build_version</string>
-    <string name="pref_title_build_version">Build version</string>
     <string name="build_version">Version %1$s</string>
     <string name="set_as_home_page">Set as home page</string>
     <string name="home_page_set">Home page will be changed on next app start.</string>
     <string name="open_in_browser">Open in browser</string>
-    <string name="save_hq">Save highest quality</string>
     <string name="local">Local</string>
     <string name="deleted_special">[deleted]</string>
     <string name="removed_special">[removed]</string>
@@ -122,17 +89,13 @@
     <string name="instance">Instance</string>
     <string name="email_or_username">Email or username</string>
     <string name="password">Password</string>
-    <string name="accounts">Accounts</string>
     <string name="incorrect_password">Incorrect password.</string>
     <string name="sort_order_active">Active</string>
     <string name="sort_order_most_comments">Most comments</string>
     <string name="sort_order_new_comments">New comments</string>
     <string name="sort_by">Sort by</string>
     <string name="sort_by_top">Sort by top</string>
-    <string name="your_communities_placeholder">Your communities will be shown here in a future update.</string>
-    <string name="community_info_placeholder">Community information will be shown here in a future update.</string>
     <string name="coming_soon">Coming soon</string>
-    <string name="saved_placeholder">Your saved pages will appear here in a future update.</string>
     <string name="saved">Saved</string>
     <string name="error_downloading_image_permission_denied">Unable to download image. Storage permission denied.</string>
     <string name="help">Help</string>
@@ -164,36 +127,29 @@
     <string name="refresh">Refresh</string>
     <string name="update_comment">Update comment</string>
     <string name="delete_comment_confirm">Delete comment?</string>
-    <string name="deleting">deleting</string>
     <string name="spoiler_text">Spoiler text</string>
     <string name="bold">Bold</string>
     <string name="italic">Italic</string>
     <string name="strikethrough">Strikethrough</string>
-    <string name="superscript">Superscript</string>
     <string name="quote">Quote</string>
     <string name="bulleted_list">Bulleted list</string>
     <string name="numbered_list">Numbered list</string>
     <string name="add_link_to_app">Add link to app</string>
     <string name="press_back_again_to_exit">Press BACK again to exit.</string>
-    <string name="list2">List 2</string>
-    <string name="new_post">New post</string>
     <string name="update_post">Update post</string>
     <string name="create_post">Create post</string>
     <string name="edit_post">Edit post</string>
     <string name="compose_post">Compose post</string>
-    <string name="url">Url</string>
     <string name="title">Title</string>
     <string name="url_optional">Url (optional)</string>
     <string name="required">Required</string>
     <string name="error_unable_to_send_post">Unable to sent post due to %1$s. Message: %2$s</string>
     <string name="no_options">No options</string>
-    <string name="post_options">Post options</string>
     <string name="delete_post">Delete post</string>
     <string name="add_image">Add image</string>
     <string name="settings">Settings</string>
     <string name="view_type">View type</string>
     <string name="view_type_settings_desc">Customize how posts look</string>
-    <string name="base_type">Base type</string>
     <string name="base_view_type">Base view type</string>
     <string name="compact">Compact</string>
     <string name="font_size">Font size</string>
@@ -205,7 +161,6 @@
     <string name="block_this_community_format">Block this community (%1$s)</string>
     <string name="block_this_user_format">Block this user (%1$s)</string>
     <string name="unblock_this_user_format">Unblock this user (%1$s)</string>
-    <string name="block_this_user">Block this user</string>
     <string name="theme_settings_desc">Change and customize the app theme</string>
     <string name="base_theme">Base theme</string>
     <string name="use_system_theme">Use system theme</string>
@@ -255,14 +210,12 @@
     <string name="black_theme_desc">Uses pure black as the background color</string>
     <string name="lemmy_web_preferences">Lemmy web preferences</string>
     <string name="lemmy_web_preferences_desc">Configure Lemmy web preferences</string>
-    <string name="content">Content</string>
     <string name="display_name">Display name</string>
     <string name="default_sort_type">Default sort type</string>
     <string name="show_nsfw">Show NSFW</string>
     <string name="error_no_settings_changed">No settings changed</string>
     <string name="error_no_settings_changed_desc">You did not make changes to any settings so nothing was saved.</string>
     <string name="settings_saved">Settings saved</string>
-    <string name="appearance">Appearance</string>
     <string name="systems">Systems</string>
     <string name="cache_info_and_preferences"><![CDATA[Cache info & preferences]]></string>
     <string name="cache">Cache</string>
@@ -278,20 +231,16 @@
     <string name="hide_read">Hide read</string>
     <string name="mark_posts_as_read_on_scroll">Mark posts as read on scroll</string>
     <string name="mark_posts_as_read_on_scroll_desc">If enabled, posts you scroll past will automatically be marked as read</string>
-    <string name="history_setting_desc">Change preferences related to browse history</string>
     <string name="gestures">Gestures</string>
     <string name="gestures_desc">Change which gestures to use</string>
     <string name="use_gesture_actions">Use gesture actions</string>
     <string name="use_gesture_actions_desc">Use gestures for actions instead of buttons</string>
-    <string name="setting_content_desc">Change how content is displayed</string>
-    <string name="behavior">Behavior</string>
     <string name="infinity">Infinity</string>
     <string name="no_your_limits">No your limits.</string>
     <string name="view_all_comments">View all comments</string>
     <string name="cake_day_on_format">Cake day on %1$s</string>
     <string name="posts">Posts</string>
     <string name="comments">Comments</string>
-    <string name="in_format">in %1$s</string>
     <string name="prefer_full_size_image">Prefer full size image</string>
     <string name="user_blocked">User blocked</string>
     <string name="user_unblocked">User unblocked</string>
@@ -301,13 +250,11 @@
     <string name="stats">Stats</string>
     <string name="post_score">Post score</string>
     <string name="comment_score">Comment score</string>
-    <string name="user_status">User status</string>
     <string name="admin">Admin</string>
     <string name="banned">Banned</string>
     <string name="deleted">Deleted</string>
     <string name="bot">Bot</string>
     <string name="normal">Normal</string>
-    <string name="account_info">Account info</string>
     <string name="banned_until_format">Banned until %1$s</string>
     <string name="account_type">Account type</string>
     <string name="hide_post">Hide post</string>
@@ -366,7 +313,6 @@
     <string name="choose_from_gallery_with_editor">Choose from gallery and edit</string>
     <string name="show_nsfw_posts">Show NSFW posts</string>
     <string name="blur_nsfw_posts">Blur NSFW posts</string>
-    <string name="community_name">Community name</string>
     <string name="current_community">Current community</string>
     <string name="error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden">Error. Cannot load NSFW community when NSFW posts are hidden.</string>
     <string name="description">Description</string>
@@ -379,13 +325,11 @@
     <string name="admins">Admins</string>
     <string name="comment_actions">Comment actions</string>
     <string name="collapse_or_expand">Collapse or expand</string>
-    <string name="error_unable_to_delete_post">Unable to delete post</string>
     <string name="unblock_this_community_format">Unblock this community (%1$s)</string>
     <string name="account_block_settings">Account block settings</string>
     <string name="account_block_settings_desc">Choose which community/accounts to block</string>
     <string name="blocked_users">Blocked users</string>
     <string name="blocked_communities">Blocked communities</string>
-    <string name="error_unblock_failed">Unable to unblock user.</string>
     <string name="filters">Filters</string>
     <string name="keyword_filters">Keyword filters</string>
     <string name="keyword_filters_desc">Filter posts based on title keywords</string>
@@ -466,8 +410,6 @@
     <string name="talha_e_green">Talha E.\'s Green</string>
     <string name="comment_gesture_size">Comment gesture size</string>
     <string name="view_source">View source</string>
-    <string name="compatibility_mode">Compatibility mode</string>
-    <string name="compatibility_mode_desc">May fix some bugs with loading posts on certain devices</string>
     <string name="talha_e_pink">Talha E.\'s Pink</string>
     <string name="peachie">Peachie</string>
     <string name="urls">Urls</string>
@@ -505,11 +447,9 @@
     <string name="unlock_post">Unlock post</string>
     <string name="lock_post">Lock post</string>
     <string name="error_unable_to_lock_post">Unable to lock/unlock post.</string>
-    <string name="error_unable_to_save_post">Unable to save post</string>
     <string name="undo_remove_post">Undo remove post</string>
     <string name="remove_post">Remove post</string>
     <string name="error_unable_to_remove_post">Unable to remove/re-add post.</string>
-    <string name="unban">Unban</string>
     <string name="ban_user">Ban user</string>
     <string name="unban_user">Unban user</string>
     <string name="reason_optional">Reason (optional)</string>
@@ -526,11 +466,7 @@
     <string name="error_unable_to_add_user_as_moderator">Unable to add/remove user as moderator.</string>
     <string name="undo_remove_comment">Undo remove comment</string>
     <string name="remove_comment">Remove comment</string>
-    <string name="speak_as_user">Speak as user</string>
-    <string name="speak_as_moderator">Speak as moderator</string>
     <string name="error_unable_to_update_comment">Unable to update comment.</string>
-    <string name="unhighlight">Unhighlight</string>
-    <string name="highlight">Highlight</string>
     <string name="error_unable_to_remove_comment">Unable to remove/add comment.</string>
     <string name="feature_comment">Feature comment</string>
     <string name="remove_feature_comment">Remove feature comment</string>
@@ -539,7 +475,6 @@
     <string name="multi_community_editor">Multi-community editor</string>
     <string name="default_multi_community_name">My multi-community</string>
     <string name="multi_community_name">Multi-community name</string>
-    <string name="choose_communities">Choose communities</string>
     <string name="selected_communities">Selected communities</string>
     <string name="error_no_communities_selected">No communities selected</string>
     <string name="error_no_communities_selected_desc">Please select at least one community to create a multi-community.</string>
@@ -562,7 +497,6 @@
     <string name="report_comment">Report comment</string>
     <string name="error_unable_to_send_report">Unable to send report</string>
     <string name="create_report">Create report</string>
-    <string name="switch_account_for_post">Switch account for post</string>
     <string name="switching_instance">Switching instance…</string>
     <string name="missing_comment_special">[missing comment (removed or deleted)]</string>
     <string name="show_up_and_down_votes">Show up and down votes</string>
@@ -594,7 +528,6 @@
     <string name="transparent_notification_bar">Fully transparent notification bar</string>
     <string name="lock_bottom_bar">Lock bottom navigation bar</string>
     <string name="lock_bottom_bar_desc">Prevents the bottom navigation bar from hiding on scroll.</string>
-    <string name="advanced">Advanced</string>
     <string name="update_complete_message">App updated to v%1$s!</string>
     <string name="changelog">Changelog</string>
     <string name="sarcasm">Sarcasm</string>
@@ -607,19 +540,15 @@
     <string name="preview_text_links">Preview text links</string>
     <string name="dont_preview_links">Don\'t preview links</string>
     <string name="preview_all_links">Preview all links</string>
-    <string name="full_url">Full url</string>
-    <string name="removed">Removed</string>
     <string name="moderated_communities">Moderated communities</string>
     <string name="error_no_moderated_communities">User is not the moderator of any communities.</string>
     <string name="preview_link">Preview link</string>
     <string name="take_screenshot">Take screenshot</string>
-    <string name="save_screenshot">Save screenshot</string>
     <string name="toggle_post_view">Toggle post view</string>
     <string name="full_post">Full post</string>
     <string name="post_image_only">Post image only</string>
     <string name="post_text_only">Post text only</string>
     <string name="compact_post">Compact post</string>
-    <string name="screenshot_size_settings">Screenshot size settings</string>
     <string name="screenshot_width">Screenshot width</string>
     <string name="screenshot_saved">Screenshot saved to %1$s.</string>
     <string name="logging">Logging</string>
@@ -688,7 +617,6 @@
     <string name="summit_account_settings">Summit account settings</string>
     <string name="summit_account_settings_desc">Configure local/client-sided account settings</string>
     <string name="choose_an_account">Choose an account</string>
-    <string name="account_settings_will_be_added_soon">Client-side account settings will be added soon</string>
     <string name="admin_tools">Admin tools</string>
     <string name="admin_actions">Admin actions</string>
     <string name="ban_user_from_site">Ban user from site</string>
@@ -817,7 +745,6 @@
     <string name="per_account_settings_desc">Settings you change here will override the settings set outside of the per-account page. These overrides will only take effect when the associated account is the current account. You can reset any overridden settings in the \"Manage settings\" page.</string>
     <string name="generate_your_own_lemming">Generate your own lemming avatar!</string>
     <string name="account_token_expired_format">Account token has expired for account %1$s. Please sign in again.</string>
-    <string name="mod">Mod</string>
     <string name="navigation_rail_mode">Navigation rail mode</string>
     <string name="navigation_rail_mode_desc">Determines when the navigation rail is used instead of the bottom navigation menu.</string>
     <string name="auto">Auto</string>
@@ -847,7 +774,6 @@
     <string name="watermark">Watermark</string>
     <string name="comment_header_layout">Comment header layout</string>
     <string name="single_line">Single line</string>
-    <string name="wrap">Wrap if necessary</string>
     <string name="multiline">Multiline</string>
     <string name="comment_header">Comment header</string>
     <string name="change_instance">Change instance</string>
@@ -941,11 +867,4 @@
         <item quantity="one">%1$s new item in your inbox</item>
         <item quantity="other">%1$s new items in your inbox</item>
     </plurals>
-
-
-    <string-array name="theme_type_entries">
-        <item>Day</item>
-        <item>Night</item>
-        <item>System default</item>
-    </string-array>
 </resources>

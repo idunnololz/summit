@@ -7,14 +7,12 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.View.LAYOUT_DIRECTION_LTR
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Space
@@ -24,7 +22,6 @@ import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
-import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
@@ -247,9 +244,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         override var upvoteButton: View? = null,
         override var downvoteButton: View? = null,
         override var quickActionsBar: ViewGroup? = null,
-        override var scoreCount2: TextView? = null,
-        override var upvoteCount2: TextView? = null,
-        override var downvoteCount2: TextView? = null,
+        override var qaScoreCount: TextView? = null,
+        override var qaUpvoteCount: TextView? = null,
+        override var qaDownvoteCount: TextView? = null,
         override var actionButtons: List<ImageView> = listOf(),
     ) : QuickActionsViewHolder
 
@@ -407,15 +404,15 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
         )
 
-        val scoreCount: TextView? = viewHolder.scoreCount2
-            ?: viewHolder.upvoteCount2
+        val scoreCount: TextView? = viewHolder.qaScoreCount
+            ?: viewHolder.qaUpvoteCount
         if (scoreCount != null) {
             val upvoteCount: TextView?
             val downvoteCount: TextView?
 
-            if (viewHolder.downvoteCount2 != null) {
-                upvoteCount = viewHolder.upvoteCount2
-                downvoteCount = viewHolder.downvoteCount2
+            if (viewHolder.qaDownvoteCount != null) {
+                upvoteCount = viewHolder.qaUpvoteCount
+                downvoteCount = viewHolder.qaDownvoteCount
             } else {
                 upvoteCount = null
                 downvoteCount = null
@@ -739,9 +736,9 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         val scoreCount = scoreCount
         if (scoreCount != null) {
-            val scoreCount2 = scoreCount2
-            val upvoteCount2 = upvoteCount2
-            val downvoteCount2 = downvoteCount2
+            val scoreCount2 = qaScoreCount
+            val upvoteCount2 = qaUpvoteCount
+            val downvoteCount2 = qaDownvoteCount
 
             voteUiHandler.bind(
                 lifecycleOwner = viewLifecycleOwner,
@@ -1381,11 +1378,11 @@ class PostAndCommentViewBuilder @Inject constructor(
                         quickActionsBar.addView(buttons.upvoteButton)
                         quickActionsBar.addView(buttons.downvoteButton)
 
-                        scoreCount2 = buttons.upvoteButton
+                        qaScoreCount = buttons.upvoteButton
                         upvoteButton = buttons.upvoteButton
-                        upvoteCount2 = buttons.upvoteButton
+                        qaUpvoteCount = buttons.upvoteButton
                         downvoteButton = buttons.downvoteButton
-                        downvoteCount2 = buttons.downvoteButton
+                        qaDownvoteCount = buttons.downvoteButton
                     } else {
                         val button1 = ImageView(
                             context,
@@ -1422,7 +1419,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                                 gravity = Gravity.CENTER_VERTICAL
                             }
                         }.also {
-                            scoreCount2 = it
+                            qaScoreCount = it
                         }
 
                         val button2 = ImageView(
@@ -1729,7 +1726,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     fun recycle(b: PostHeaderItemBinding): RecycledState {
         val recycledState = lemmyContentHelper.recycleFullContent(b.fullContent)
         offlineManager.cancelFetch(b.root)
-        (b.root.getTag(R.id.view_holder) as? PostViewHolder)?.upvoteCount2?.let {
+        (b.root.getTag(R.id.view_holder) as? PostViewHolder)?.qaUpvoteCount?.let {
             voteUiHandler.unbindVoteUi(it)
         }
         return recycledState
@@ -1807,9 +1804,9 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     private fun PostViewHolder.scaleTextSizes() {
-        upvoteCount2?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
-        downvoteCount2?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
-        scoreCount2?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+        qaUpvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+        qaDownvoteCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
+        qaScoreCount?.textSize = postUiConfig.footerTextSizeSp.toPostTextSize()
     }
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {

@@ -157,17 +157,17 @@ class ImageViewerActivity : BaseActivity() {
         window.enterTransition = Fade(Fade.IN).apply {
             duration = 200
             excludeTarget(R.id.dummy_image_view, true)
-            excludeTarget(R.id.imageView, true)
+            excludeTarget(R.id.image_view, true)
         }
         window.exitTransition = Fade(Fade.OUT).apply {
             duration = 200
             excludeTarget(R.id.dummy_image_view, true)
-            excludeTarget(R.id.imageView, true)
+            excludeTarget(R.id.image_view, true)
         }
         window.returnTransition = Fade(Fade.OUT).apply {
             duration = 200
             excludeTarget(R.id.dummy_image_view, true)
-            excludeTarget(R.id.imageView, true)
+            excludeTarget(R.id.image_view, true)
         }
 
         window.sharedElementEnterTransition = SharedElementTransition()
@@ -472,7 +472,7 @@ class ImageViewerActivity : BaseActivity() {
                 this@ImageViewerActivity.hideUi()
             }
 
-            var currentState = 0
+            var isExiting = false
             override fun overScroll(offX: Float, offY: Float, curZoom: Float) {
                 val exitOffsetScaled = Utils.convertDpToPixel(EXIT_OFFSET_DP) / curZoom
                 if (offY > exitOffsetScaled ||
@@ -480,18 +480,18 @@ class ImageViewerActivity : BaseActivity() {
                     offX > exitOffsetScaled ||
                     offX < -exitOffsetScaled
                 ) {
-                    if (currentState != R.id.exiting) {
-                        currentState = R.id.exiting
+                    if (!isExiting) {
+                        isExiting = true
                     }
                 } else {
-                    if (currentState != R.id.normal) {
-                        currentState = R.id.normal
+                    if (isExiting) {
+                        isExiting = false
                     }
                 }
             }
 
             override fun overScrollEnd(): Boolean {
-                if (currentState == R.id.exiting) {
+                if (isExiting) {
                     supportFinishAfterTransition()
                     return true
                 }
