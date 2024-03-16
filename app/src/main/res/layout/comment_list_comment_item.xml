@@ -34,7 +34,7 @@
         app:drawableStartCompat="@drawable/outline_mode_comment_16"
         app:drawableTint="@color/style_blue" />
 
-    <TextView
+    <com.idunnololz.summit.view.LinkifyTextView
         android:id="@+id/post_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

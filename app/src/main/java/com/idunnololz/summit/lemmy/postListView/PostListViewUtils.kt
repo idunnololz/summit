@@ -251,9 +251,9 @@ fun BaseFragment<*>.createPostActionHandler(
         }
         R.id.pa_save_toggle -> {
             if (postView.saved) {
-                actionsViewModel.savePost(postView.post.id, save = true)
-            } else {
                 actionsViewModel.savePost(postView.post.id, save = false)
+            } else {
+                actionsViewModel.savePost(postView.post.id, save = true)
             }
         }
         R.id.pa_save -> {

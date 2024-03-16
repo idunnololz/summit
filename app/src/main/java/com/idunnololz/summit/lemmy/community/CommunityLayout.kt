@@ -8,6 +8,7 @@ enum class CommunityLayout {
     Card2,
     Card3,
     Full,
+    ListWithCards,
 }
 
 fun CommunityLayout.usesDividers(): Boolean =
@@ -19,4 +20,5 @@ fun CommunityLayout.usesDividers(): Boolean =
         CommunityLayout.Card2 -> false
         CommunityLayout.Card3 -> false
         CommunityLayout.Full -> true
+        CommunityLayout.ListWithCards -> false
     }

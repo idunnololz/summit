@@ -20,6 +20,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
+import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.databinding.MainFooterItemBinding
 import com.idunnololz.summit.databinding.ManualLoadItemBinding
@@ -117,6 +118,7 @@ class ListingItemAdapter(
             CommunityLayout.Card2 -> R.layout.listing_item_card2
             CommunityLayout.Card3 -> R.layout.listing_item_card3
             CommunityLayout.Full -> R.layout.listing_item_full
+            CommunityLayout.ListWithCards -> R.layout.listing_item_list_with_cards
         }
         is Item.FilteredPostItem -> R.layout.filtered_post_item
         is Item.FooterItem -> R.layout.main_footer_item
@@ -146,6 +148,8 @@ class ListingItemAdapter(
                 ListingItemViewHolder.fromBinding(ListingItemCard3Binding.bind(v))
             R.layout.listing_item_full ->
                 ListingItemViewHolder.fromBinding(ListingItemFullBinding.bind(v))
+            R.layout.listing_item_list_with_cards ->
+                ListingItemViewHolder.fromBinding(ListingItemListWithCardsBinding.bind(v))
             R.layout.filtered_post_item -> ViewBindingViewHolder(FilteredPostItemBinding.bind(v))
             R.layout.main_footer_item -> ViewBindingViewHolder(MainFooterItemBinding.bind(v))
             R.layout.auto_load_item ->

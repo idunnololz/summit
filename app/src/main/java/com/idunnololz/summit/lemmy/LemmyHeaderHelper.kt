@@ -200,7 +200,7 @@ class LemmyHeaderHelper(
         }
 
         sb.appendSeparator()
-        dateStringToPretty(context, postView.post.updated ?: postView.post.published).let {
+        dateStringToPretty(context, postView.post.published).let {
             sb.append(it)
         }
 
@@ -458,7 +458,7 @@ class LemmyHeaderHelper(
             sb.append("  ")
         }
         sb.append(
-            dateStringToPretty(context, commentView.comment.updated ?: commentView.comment.published),
+            dateStringToPretty(context, commentView.comment.published),
         )
         headerContainer.getFlairView().visibility = View.GONE
 

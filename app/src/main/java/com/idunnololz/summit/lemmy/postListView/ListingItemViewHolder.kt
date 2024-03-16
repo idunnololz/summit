@@ -13,6 +13,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
+import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
 import com.idunnololz.summit.view.LemmyHeaderView
 
@@ -233,6 +234,27 @@ class ListingItemViewHolder(
                 layoutShowsFullContent = false,
                 createCommentButton = null,
                 moreButton = binding.moreButton,
+            )
+
+        fun fromBinding(binding: ListingItemListWithCardsBinding) =
+            ListingItemViewHolder(
+                rawBinding = binding,
+                root = binding.root,
+                headerContainer = binding.headerContainer,
+                image = binding.image,
+                title = binding.title,
+                commentText = null,
+                commentButton = null,
+                upvoteCount = null,
+                upvoteButton = null,
+                downvoteCount = null,
+                downvoteButton = null,
+                iconImage = binding.iconImage,
+                openLinkButton = null,
+                fullContentContainerView = binding.fullContent,
+                highlightBg = binding.highlightBg,
+                layoutShowsFullContent = false,
+                createCommentButton = null,
             )
     }
 }

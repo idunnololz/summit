@@ -214,6 +214,8 @@ class Preferences(
                 PreferenceUtil.KEY_POST_UI_CONFIG_CARD3
             CommunityLayout.Full ->
                 PreferenceUtil.KEY_POST_UI_CONFIG_FULL
+            CommunityLayout.ListWithCards ->
+                PreferenceUtil.KEY_POST_UI_CONFIG_LIST_WITH_CARDS
         }
 
     fun getBaseTheme(): BaseTheme {

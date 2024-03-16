@@ -26,6 +26,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
+import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
@@ -124,6 +125,7 @@ class SettingViewTypeFragment :
                 CommunityLayout.Card2 to getString(R.string.card2),
                 CommunityLayout.Card3 to getString(R.string.card3),
                 CommunityLayout.Full to getString(R.string.full),
+                CommunityLayout.ListWithCards to getString(R.string.list_with_cards),
             ),
             getCurrentChoice = {
                 preferences.getPostsLayout()
@@ -268,6 +270,10 @@ class SettingViewTypeFragment :
             CommunityLayout.Full ->
                 ListingItemViewHolder.fromBinding(
                     ListingItemFullBinding.inflate(inflater, binding.demoViewContainer, false),
+                )
+            CommunityLayout.ListWithCards ->
+                ListingItemViewHolder.fromBinding(
+                    ListingItemListWithCardsBinding.inflate(inflater, binding.demoViewContainer, false),
                 )
         }
 
