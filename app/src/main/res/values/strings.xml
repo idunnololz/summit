@@ -393,6 +393,7 @@
     <string name="view_image_on_single_tap">View image on single tap</string>
     <string name="view_image_on_single_tap_desc">If enabled, tapping on the thumbnail will open the image in the image viewer. If disabled, long pressing an image will open the image in the image viewer instead.</string>
     <string name="card3">Card 3</string>
+    <string name="list_with_cards">List with cards</string>
     <string name="large_list">Large list</string>
     <string name="font_color">Font color</string>
     <string name="calm">Calm</string>

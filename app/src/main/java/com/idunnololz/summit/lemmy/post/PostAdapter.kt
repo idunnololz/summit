@@ -556,7 +556,7 @@ class PostAdapter(
                     b.bottomDivider.visibility = View.GONE
                 }
 
-                updateScreenshotMode(holder, item.screenshotMode, b.startBarrier, b.root, item)
+                updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
             }
             is Item.VisibleCommentItem -> {
                 if (item.isExpanded) {

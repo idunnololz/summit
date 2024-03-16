@@ -87,6 +87,10 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig =
             PostInListUiConfig(
                 imageWidthPercent = 0.2f,
             )
+        CommunityLayout.ListWithCards ->
+            PostInListUiConfig(
+                imageWidthPercent = 0.2f,
+            )
         CommunityLayout.LargeList ->
             PostInListUiConfig(
                 imageWidthPercent = 1f,

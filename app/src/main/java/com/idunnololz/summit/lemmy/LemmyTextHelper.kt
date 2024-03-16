@@ -23,24 +23,22 @@ import com.idunnololz.summit.util.ImagesAsLinksPlugin
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.markwon.DetailsTagHandler
-import com.idunnololz.summit.util.markwon.postProcessDetails
+import com.idunnololz.summit.util.markwon.SpoilerPlugin
+import com.idunnololz.summit.util.markwon.SummitInlineParser
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonPlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
-import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.html.span.SuperScriptSpan
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
+import org.commonmark.parser.Parser
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object LemmyTextHelper {
-
     private const val TAG = "LemmyTextHelper"
 
     private var markwon: Markwon? = null
@@ -114,7 +112,6 @@ object LemmyTextHelper {
         }.let {
             try {
                 val spanned = SpannableStringBuilder(it.toMarkdown(text))
-                postProcessDetails(spanned, textView)
 
                 if (highlight != null) {
                     val highlightColor = textView.context.getColorFromAttribute(
@@ -180,11 +177,10 @@ object LemmyTextHelper {
         /**
          * Combination of 4 regexes "or'd" (|) together.
          * 1) Matches against words where the first character is a caret. Eg. '^hello'
-         * 2) Matches against spoiler blocks
-         * 3) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
-         * 4) Matches against full community names (!a@b.com)
+         * 2) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
+         * 3) Matches against full community names (!a@b.com)
          */
-        private val largeRegex = Pattern.compile("""\^(\S+)|:::\s*spoiler\s+(.*)\n((?:.*\n)*?)(:::\s*\n?|${'$'})\s*|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""")
+        private val largeRegex = Pattern.compile("""\^(\S+)|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""")
 
         private fun processAll(s: String): String {
             val matcher = largeRegex.matcher(s)
@@ -196,18 +192,8 @@ object LemmyTextHelper {
                     continue
                 }
 
-                val spoilerTitle: String? = matcher.group(2)?.trim()
-                val spoilerText: String? = matcher.group(3)?.trim()
-                if (!spoilerTitle.isNullOrBlank() && !spoilerText.isNullOrBlank()) {
-                    matcher.appendReplacement(
-                        sb,
-                        "<br><details><summary>$spoilerTitle</summary>$spoilerText<br></details>",
-                    )
-                    continue
-                }
-
-                val formattingChar = matcher.group(5)?.trim()
-                val rest = matcher.group(6)?.trim()
+                val formattingChar = matcher.group(2)?.trim()
+                val rest = matcher.group(3)?.trim()
                 if (formattingChar != null && rest != null) {
                     matcher.appendReplacement(
                         sb,
@@ -216,10 +202,10 @@ object LemmyTextHelper {
                     Log.d(TAG, "Fixed ${"$formattingChar $rest"}")
                 }
 
-                val linkStart = matcher.group(7)
-                val referenceTypeToken = matcher.group(8)
-                val name = matcher.group(9)
-                val instance = matcher.group(10)
+                val linkStart = matcher.group(4)
+                val referenceTypeToken = matcher.group(5)
+                val name = matcher.group(6)
+                val instance = matcher.group(7)
 
                 if (linkStart == null &&
                     referenceTypeToken != null &&
@@ -266,6 +252,10 @@ object LemmyTextHelper {
         noMediaMarkwon = null
     }
 
+    fun getMarkwonTheme(context: Context): MarkwonTheme {
+        return getMarkwon(context).configuration().theme()
+    }
+
     private fun getMarkwon(context: Context) =
         markwon ?: createMarkwon(context, inlineMedia = true).also {
             markwon = it
@@ -297,12 +287,13 @@ object LemmyTextHelper {
             .usePlugin(TablePlugin.create(context))
             .usePlugin(LemmyPlugin(context))
             .usePlugin(StrikethroughPlugin.create())
-            .usePlugin(HtmlPlugin.create())
+            .usePlugin(SpoilerPlugin())
             .usePlugin(
                 object : AbstractMarkwonPlugin() {
-                    override fun configure(registry: MarkwonPlugin.Registry) {
-                        registry.require(HtmlPlugin::class.java) {
-                            it.addHandler(DetailsTagHandler())
+                    override fun configureParser(builder: Parser.Builder) {
+                        super.configureParser(builder)
+                        builder.inlineParserFactory {
+                            SummitInlineParser(it)
                         }
                     }
                 },

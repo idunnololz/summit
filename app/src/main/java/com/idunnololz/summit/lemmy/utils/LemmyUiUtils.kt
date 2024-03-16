@@ -42,12 +42,21 @@ fun RecyclerView.setupDecoratorsForPostList(communityLayout: CommunityLayout) {
             },
         )
     } else {
-        this.addItemDecoration(
-            VerticalSpaceItemDecoration(
-                this.context.getDimen(R.dimen.padding),
-                true,
-            ),
-        )
+        if (communityLayout == CommunityLayout.ListWithCards) {
+            this.addItemDecoration(
+                VerticalSpaceItemDecoration(
+                    this.context.getDimen(R.dimen.padding_quarter),
+                    true,
+                ),
+            )
+        } else {
+            this.addItemDecoration(
+                VerticalSpaceItemDecoration(
+                    this.context.getDimen(R.dimen.padding),
+                    true,
+                ),
+            )
+        }
     }
 }
 

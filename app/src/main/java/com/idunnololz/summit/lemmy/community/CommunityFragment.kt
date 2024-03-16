@@ -1069,6 +1069,8 @@ class CommunityFragment :
                 _layoutSelectorMenu.setChecked(R.id.layout_card3)
             CommunityLayout.Full ->
                 _layoutSelectorMenu.setChecked(R.id.layout_full)
+            CommunityLayout.ListWithCards ->
+                _layoutSelectorMenu.setChecked(R.id.layout_list_with_card)
         }
 
         return _layoutSelectorMenu
@@ -1467,6 +1469,7 @@ class CommunityFragment :
         BottomMenu(requireContext()).apply {
             addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_view_list_24)
             addItemWithIcon(R.id.layout_large_list, R.string.large_list, R.drawable.baseline_view_list_24)
+            addItemWithIcon(R.id.layout_list_with_card, R.string.list_with_cards, R.drawable.baseline_view_list_24)
             addItemWithIcon(R.id.layout_compact, R.string.compact, R.drawable.baseline_list_24)
             addItemWithIcon(R.id.layout_card, R.string.card, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_card2, R.string.card2, R.drawable.baseline_article_24)
@@ -1490,6 +1493,8 @@ class CommunityFragment :
                         onLayoutSelected(CommunityLayout.Card3)
                     R.id.layout_full ->
                         onLayoutSelected(CommunityLayout.Full)
+                    R.id.layout_list_with_card ->
+                        onLayoutSelected(CommunityLayout.ListWithCards)
                 }
             }
         }
