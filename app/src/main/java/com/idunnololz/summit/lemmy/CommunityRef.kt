@@ -116,7 +116,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
             is ModeratedCommunities -> context.getString(R.string.moderated_communities)
         }
 
-    fun getFullName(context: Context): String =
+    fun getLocalizedFullName(context: Context): String =
         when (this) {
             is Local -> "${context.getString(R.string.local)}@${this.instance}"
             is All -> "${context.getString(R.string.all)}@${this.instance}"

@@ -81,7 +81,7 @@ class SettingPerCommunityViewModel @Inject constructor(
             communityConfigs.mapTo(allSettings) {
                 BasicSettingItem(
                     null,
-                    it.communityRef.getFullName(context),
+                    it.communityRef.getLocalizedFullName(context),
                     context.getString(R.string.view_type_format, it.layout),
                 )
             }

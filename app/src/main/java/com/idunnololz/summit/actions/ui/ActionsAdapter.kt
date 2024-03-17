@@ -66,7 +66,7 @@ class ActionsAdapter(
             when (actionInfo) {
                 is ActionInfo.CommentActionInfo -> {
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown))
+                        append(account?.name ?: context.getString(R.string.unknown_special))
                         append(" commented on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
@@ -77,7 +77,7 @@ class ActionsAdapter(
                 }
                 is ActionInfo.DeleteCommentActionInfo -> {
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown))
+                        append(account?.name ?: context.getString(R.string.unknown_special))
                         append(" deleted comment on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
@@ -88,7 +88,7 @@ class ActionsAdapter(
                 }
                 is ActionInfo.EditActionInfo -> {
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown))
+                        append(account?.name ?: context.getString(R.string.unknown_special))
                         append(" edited comment on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
@@ -99,7 +99,7 @@ class ActionsAdapter(
                 }
                 is ActionInfo.MarkPostAsReadActionInfo -> {
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown))
+                        append(account?.name ?: context.getString(R.string.unknown_special))
                         append(" marked a post as read (")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
@@ -110,7 +110,7 @@ class ActionsAdapter(
                 }
                 is ActionInfo.VoteActionInfo -> {
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown))
+                        append(account?.name ?: context.getString(R.string.unknown_special))
                         append(" ")
                         if (actionInfo.dir > 0) {
                             append("upvoted")
@@ -144,7 +144,7 @@ class ActionsAdapter(
                 }
             }
 
-            b.user.text = account?.name ?: context.getString(R.string.unknown)
+            b.user.text = account?.name ?: context.getString(R.string.unknown_special)
             b.date.text = dateStringToPretty(context, actionDate)
 
             LemmyTextHelper.bindText(

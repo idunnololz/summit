@@ -6,225 +6,439 @@
 
     <string name="error_network">Network error. Please check your internet connection and try again.</string>
     <string name="error_network_timeout">Network error. The request took too long. Please try again.</string>
+    <!-- Error string. Shown for generic errors. -->
     <string name="error_unknown">Unknown error. Please try again.</string>
     <string name="error_website">There was an error on the server. Please try again later.</string>
     <string name="error_server_maintenance">Server is under maintenance. Please try again later.</string>
-
-    <!-- Button text. -->
-    <string name="retry">Retry</string>
-    <string name="home">Home</string>
-    <string name="save">Save</string>
-    <string name="save_success_format">File saved to %1$s</string>
-    <string name="view">View</string>
     <string name="error_external_activity_not_found">Could not find an app on this device for file type %1$s.</string>
-    <string name="image_saved_format">Image saved at %1$s.</string>
     <string name="error_downloading_image">There was an error downloading the image.</string>
+
+    <!--
+    Retry is defined by the navigation component library.
+    <string name="retry">Retry</string>
+    -->
+    <!-- Keep short. Name for the home screen. -->
+    <string name="home">Home</string>
+    <!-- Keep short. Button text for the save action. -->
+    <string name="save">Save</string>
+    <!-- Brief message shown when a file is saved. -->
+    <string name="save_success_format">File saved to %1$s</string>
+    <!-- Keep short. Button text to view a saved file. -->
+    <string name="view">View</string>
+    <!-- Brief message shown when an image is saved. -->
+    <string name="image_saved_format">Image saved at %1$s.</string>
+    <!-- Keep short. Button text to navigate to the previous page. Shown when infinite scrolling is off. -->
     <string name="prev">Prev</string>
+    <!-- Keep short. Button text to navigate to the next page. Shown when infinite scrolling is off. -->
     <string name="next">Next</string>
-    <string name="normal_channel_name">Normal channel</string>
-    <string name="normal_channel_description">General channel for most notifications</string>
+    <!-- Keep short. Title of post pages; shows the current page number. -->
     <string name="page_format">Page %1$s</string>
+    <!-- Keep short. Label text shown for posts labeled Not Safe For Work (NSFW). -->
     <string name="nsfw">NSFW</string>
+    <!-- Name of the "All" post feed that has posts from every community and instance. -->
     <string name="all">All</string>
-    <string name="feeds">Feeds</string>
-    <string name="communities">Communities</string>
-    <string name="recents">Recents</string>
-    <string name="reveal_warning_nsfw">This post is marked as NSFW</string>
-    <string name="reveal_warning_default">This post is hidden</string>
-    <string name="show_post_question">Show post?</string>
-    <string name="share">Share</string>
-    <string name="copy_link_address">Copy link address</string>
-    <string name="share_link">Share link</string>
-    <string name="unsupported_video_type">Unsupported video type</string>
-    <string name="server_results">Results</string>
-    <string name="no_results_found">No results found</string>
-    <string name="storage_usage_legend_format">%1$s - %2$s</string>
-    <string name="removed_by_mod_message">This post has been removed by the moderators of %1$s.</string>
-    <string name="history">History</string>
-    <string name="offline_scheduler_title_text">Pick a time to automatically refresh Reddit</string>
-    <string name="enable">Enable</string>
-    <string name="search">Search</string>
-    <string name="sign_out">Sign out</string>
-    <string name="theme">Theme</string>
-    <string name="locked_post_message">This thread has been locked by the moderators of %1$s. New comments cannot be posted.</string>
-    <string name="sort">Sort…</string>
-    <string name="sort_order_hot">Hot</string>
-    <string name="sort_order_new">New</string>
-    <string name="sort_order_top">Top</string>
-    <string name="sort_order_old">Old</string>
-    <string name="time_frame_today">Today</string>
-    <string name="time_frame_this_week">This week</string>
-    <string name="time_frame_this_month">This month</string>
-    <string name="time_frame_this_year">This year</string>
-    <string name="time_frame_all_time">All time</string>
-    <string name="layout">Layout</string>
-    <string name="list">List</string>
-    <string name="card">Card</string>
-    <string name="full">Full</string>
-    <string name="removed_by_op_message">This post was deleted by the person who originally posted it.</string>
-    <string name="subreddit_state_format">%1$s - Page %2$s</string>
-    <string name="error_history_entry_corrupt">Error. The selected history item is corrupted and cannot be used.</string>
-    <string name="clear_history">Clear history</string>
-    <string name="sort_comments_by">Sort comments by</string>
-    <string name="auth_required_title">Authorization required</string>
-    <string name="log_in">Log In</string>
-    <string name="cancel">Cancel</string>
-    <string name="auth_required_body">You must sign in to perform that action.</string>
-    <string name="error_unable_to_handle_link">Unable to handle link %1$s</string>
-    <string name="add_comment">Add comment</string>
-    <string name="edit_comment">Edit comment</string>
-    <string name="delete_comment">Delete comment</string>
-    <string name="about">About</string>
-    <string name="build_version">Version %1$s</string>
-    <string name="set_as_home_page">Set as home page</string>
-    <string name="home_page_set">Home page will be changed on next app start.</string>
-    <string name="open_in_browser">Open in browser</string>
+    <!-- Name of the "Local" post feed. -->
     <string name="local">Local</string>
-    <string name="deleted_special">[deleted]</string>
-    <string name="removed_special">[removed]</string>
-    <string name="deleted_special2">[deleted]</string>
-    <string name="removed_special2">[removed]</string>
-    <string name="error_server">Server error. Code: %1$s.</string>
-    <string name="login">Login</string>
-    <string name="instance">Instance</string>
-    <string name="email_or_username">Email or username</string>
-    <string name="password">Password</string>
-    <string name="incorrect_password">Incorrect password.</string>
-    <string name="sort_order_active">Active</string>
-    <string name="sort_order_most_comments">Most comments</string>
-    <string name="sort_order_new_comments">New comments</string>
-    <string name="sort_by">Sort by</string>
-    <string name="sort_by_top">Sort by top</string>
-    <string name="coming_soon">Coming soon</string>
-    <string name="saved">Saved</string>
-    <string name="error_downloading_image_permission_denied">Unable to download image. Storage permission denied.</string>
-    <string name="help">Help</string>
-    <string name="error_account_instance_mismatch_title">Incompatible account instance</string>
-    <string name="error_account_instance_mismatch">There is a mismatch between the instance the account was created on (%1$s) and the instance the action is taken on (%2$s).\nYou can fix this by either signing in to an account on the instance %2$s or by loading this page from the %1$s instance.</string>
-    <string name="go_to_account_instance">Go to account instance</string>
-    <string name="error_server_timeout">Timeout waiting for server. The server is likely overloaded.</string>
-    <string name="add_account">Add account</string>
-    <string name="add_another_account">Add another account</string>
-    <string name="accounts_and_settings"><![CDATA[Accounts & Settings]]></string>
-    <string name="bookmarked_communities">Bookmarked communities</string>
-    <string name="subscriptions">Subscriptions</string>
-    <string name="no_subscriptions">No subscriptions</string>
-    <string name="error_socket_timeout">Timeout trying to reach the server. The server is either overloaded or there is an issue with your internet connection.</string>
-    <string name="no_posts">No posts found.</string>
-    <string name="remove_bookmark">Remove bookmark</string>
-    <string name="bookmark_community">Bookmark community</string>
-    <string name="subscribe">Subscribe</string>
-    <string name="unsubscribe">Unsubscribe</string>
-    <string name="remove">Remove</string>
-    <string name="mau_format">%1$s MAU</string>
-    <string name="error_page_not_found">Page not found.</string>
-    <string name="comment">Comment</string>
-    <string name="preview">Preview</string>
-    <string name="text_emojis">Text emojis</string>
-    <string name="send_comment">Send comment</string>
+    <!-- Name of the "Subscribed" post feed. -->
     <string name="subscribed">Subscribed</string>
-    <string name="unknown">[unknown]</string>
-    <string name="refresh">Refresh</string>
-    <string name="update_comment">Update comment</string>
-    <string name="delete_comment_confirm">Delete comment?</string>
-    <string name="spoiler_text">Spoiler text</string>
-    <string name="bold">Bold</string>
-    <string name="italic">Italic</string>
-    <string name="strikethrough">Strikethrough</string>
-    <string name="quote">Quote</string>
-    <string name="bulleted_list">Bulleted list</string>
-    <string name="numbered_list">Numbered list</string>
-    <string name="add_link_to_app">Add link to app</string>
-    <string name="press_back_again_to_exit">Press BACK again to exit.</string>
-    <string name="update_post">Update post</string>
-    <string name="create_post">Create post</string>
-    <string name="edit_post">Edit post</string>
-    <string name="compose_post">Compose post</string>
-    <string name="title">Title</string>
-    <string name="url_optional">Url (optional)</string>
-    <string name="required">Required</string>
-    <string name="error_unable_to_send_post">Unable to sent post due to %1$s. Message: %2$s</string>
-    <string name="no_options">No options</string>
-    <string name="delete_post">Delete post</string>
-    <string name="add_image">Add image</string>
-    <string name="settings">Settings</string>
-    <string name="view_type">View type</string>
-    <string name="view_type_settings_desc">Customize how posts look</string>
-    <string name="base_view_type">Base view type</string>
+    <!-- Title text for a list of feeds (eg. All, Subscribed, Local). -->
+    <string name="feeds">Feeds</string>
+    <!-- Title text for a list of communities. -->
+    <string name="communities">Communities</string>
+    <!-- Title text for a list of communities/feeds that the user has viewed recently. -->
+    <string name="recents">Recents</string>
+    <!-- Warning text shown when a user expands content marked NSFW. -->
+    <string name="reveal_warning_nsfw">This post is marked as NSFW</string>
+    <!-- Warning text shown when a user expands content that is hidden for some reason (maybe spoilers?). -->
+    <string name="reveal_warning_default">This post is hidden</string>
+    <!-- Keep short. Button text of button that will reveal hidden content (NSFW/spoiler) when clicked. -->
+    <string name="show_post">Show post</string>
+    <!-- Keep short. Button text of share button. -->
+    <string name="share">Share</string>
+    <!-- Keep short. Button text of copy URL/link button. -->
+    <string name="copy_link_address">Copy link address</string>
+    <!-- Keep short. Button text of share URL/link button. -->
+    <string name="share_link">Share link</string>
+    <!-- Error text shown when a user tries to play a video but the video type is not supported. -->
+    <string name="error_unsupported_video_type">Unsupported video type</string>
+    <!-- Title text for a list of results returned by the server (eg. when performing a search). -->
+    <string name="server_results">Results</string>
+    <!-- Text shown when a query has no results. -->
+    <string name="no_results_found">No results found</string>
+    <!-- Text shown when a post has been removed by the moderators of a community. -->
+    <string name="removed_by_mod_message">This post has been removed by the moderators of %1$s.</string>
+    <!-- Keep short. Button/title text of the browse history screen. -->
+    <string name="history">History</string>
+    <!-- Prompt text asking the user to choose a time to refresh for updates. -->
+    <string name="offline_scheduler_title_text">Pick a time to automatically refresh offline data.</string>
+    <!-- Keep short. Button text to enable a feature. -->
+    <string name="enable">Enable</string>
+    <!-- Keep short. Hint text for a search field. -->
+    <string name="search">Search</string>
+    <!-- Keep short. Button text of sign out button. -->
+    <string name="sign_out">Sign out</string>
+    <!-- Keep short. Title of theme settings page. -->
+    <string name="theme">Theme</string>
+    <!-- Warning text displayed when a post has been locked by moderators. -->
+    <string name="locked_post_message">This post has been locked by the moderators of %1$s. New comments cannot be posted.</string>
+    <!-- Keep short. Button text to pick a sort order for a list (eg. post list or comment list). -->
+    <string name="sort">Sort…</string>
+    <!-- Sort order name. -->
+    <string name="sort_order_hot">Hot</string>
+    <!-- Sort order name. -->
+    <string name="sort_order_new">New</string>
+    <!-- Sort order name. -->
+    <string name="sort_order_old">Old</string>
+    <!-- Sort order name. -->
+    <string name="time_frame_today">Today</string>
+    <!-- Sort order name. -->
+    <string name="sort_order_top">Top</string>
+    <!-- Top sort order subcategory. Sorts the list by score, but restricts the list to items published this week. -->
+    <string name="time_frame_this_week">This week</string>
+    <!-- Top sort order subcategory. Sorts the list by score, but restricts the list to items published this month. -->
+    <string name="time_frame_this_month">This month</string>
+    <!-- Top sort order subcategory. Sorts the list by score, but restricts the list to items published this year. -->
+    <string name="time_frame_this_year">This year</string>
+    <!-- Top sort order subcategory. Sorts the list by score, with no publish time restriction. -->
+    <string name="time_frame_all_time">All time</string>
+    <!-- Sort order name. -->
+    <string name="sort_order_active">Active</string>
+    <!-- Sort order name. -->
+    <string name="sort_order_most_comments">Most comments</string>
+    <!-- Sort order name. -->
+    <string name="sort_order_new_comments">New comments</string>
+
+    <!-- Keep short. Button text to pick the layout for posts in the post list. -->
+    <string name="layout">Layout</string>
+    <!-- Post layout style. -->
+    <string name="list">List</string>
+    <!-- Post layout style. -->
+    <string name="large_list">Large list</string>
+    <!-- Post layout style. -->
+    <string name="list_with_cards">List with cards</string>
+    <!-- Post layout style. -->
+    <string name="card">Card</string>
+    <!-- Post layout style. -->
+    <string name="card2">Card 2</string>
+    <!-- Post layout style. -->
+    <string name="card3">Card 3</string>
+    <!-- Post layout style. -->
+    <string name="full">Full</string>
+    <!-- Post layout style. -->
     <string name="compact">Compact</string>
+
+    <!-- Info text shown when viewing a post that was deleted by the original poster. -->
+    <string name="removed_by_op_message">This post was deleted by the person who originally posted it.</string>
+    <!-- Info text for a browsing history entry. Shows which community and page a user browsed. -->
+    <string name="community_state_format">%1$s - Page %2$s</string>
+    <!-- Error text for when a browing history entry was corrupted. -->
+    <string name="error_history_entry_corrupt">Error. The selected history item is corrupted and cannot be used.</string>
+    <!-- Keep short. Button text of delete browsing history button. -->
+    <string name="clear_history">Clear history</string>
+    <!-- Keep short. Button text to change the sort order of comments. -->
+    <string name="sort_comments_by">Sort comments by</string>
+    <!-- Keep short. Button text of cancel button. -->
+    <string name="cancel">Cancel</string>
+    <!-- Title text. Shown when a user attempts to perform and action that requires the user to be signed in. -->
+    <string name="auth_required_title">Authorization required</string>
+    <!-- Body text. Shown when a user attempts to perform and action that requires the user to be signed in. -->
+    <string name="auth_required_body">You must sign in to perform that action.</string>
+    <!-- Error text for when the user taps a link but the app was unable to resolve the link. -->
+    <string name="error_unable_to_handle_link">Unable to handle link %1$s</string>
+    <!-- Keep short. Button text of add comment button. -->
+    <string name="add_comment">Add comment</string>
+    <!-- Keep short. Button text of edit comment button. -->
+    <string name="edit_comment">Edit comment</string>
+    <!-- Keep short. Button text of delete comment button. -->
+    <string name="delete_comment">Delete comment</string>
+    <!-- Keep short. Title of tab that contains information about a lemmy user. -->
+    <string name="about">About</string>
+    <!-- Text which displays the version of the app. -->
+    <string name="build_version">Version %1$s</string>
+    <!-- Keep short. Menu button text. When clicked, sets the current community/feed as the home page. -->
+    <string name="set_as_home_page">Set as home page</string>
+    <!-- Info text shown when the home page is changed. -->
+    <string name="home_page_set">Home page will be changed on next app start.</string>
+    <!-- Keep short. Button text of a link action. When clicked, opens the link in an external browser. -->
+    <string name="open_in_browser">Open in browser</string>
+
+    <!-- Placeholder text. Shown in place of the original content if the original content was deleted by the creator. -->
+    <string name="deleted_special">[deleted]</string>
+    <!-- Placeholder text. Shown in place of the original content if the original content was removed by a moderator. -->
+    <string name="removed_special">[removed]</string>
+    <!-- Placeholder text. Shown in place of something if we could not decipher it. For example, if a comment was written by a user but the user was purged, a message might read "[unknown] added a comment". -->
+    <string name="unknown_special">[unknown]</string>
+
+    <!-- Error text displaying a generic server error. -->
+    <string name="error_server">Server error. Code: %1$s.</string>
+    <!-- Keep short. Button text of login button. -->
+    <string name="login">Login</string>
+    <!-- Hint text for instance field in the login form. -->
+    <string name="instance">Instance</string>
+    <!-- Hint text for email/username field in the login form. -->
+    <string name="email_or_username">Email or username</string>
+    <!-- Hint text for password field in the login form. -->
+    <string name="password">Password</string>
+    <!-- Error text shown when the password is incorrect. -->
+    <string name="incorrect_password">Incorrect password.</string>
+    <!-- Keep short. Button text to pick a sort order for a list (eg. post list or comment list). -->
+    <string name="sort_by">Sort by</string>
+    <!-- Title of sub-menu. Shown when the user chooses to sort by "Top". A list of options are displayed below (eg. last hour, last 6 hours, today, etc). -->
+    <string name="sort_by_top">Sort by top</string>
+    <!-- Text shown when the user visits a screen that has not been implemented yet. -->
+    <string name="coming_soon">Coming soon</string>
+    <!-- Keep short. Title of screen that displays all of the user's saved posts/comments. -->
+    <string name="saved">Saved</string>
+    <!-- Error text. Shown when download failed due to insufficient storage permissions. -->
+    <string name="error_downloading_image_permission_denied">Unable to download image. Storage permission denied.</string>
+    <!-- Keep short. Button text of button that opens a help article. -->
+    <string name="help">Help</string>
+    <!-- Error text. Title text shown when a signed in user attempts to perform an action on another instance. -->
+    <string name="error_account_instance_mismatch_title">Incompatible account instance</string>
+    <!-- Error text. Body text shown when a signed in user attempts to perform an action on another instance. -->
+    <string name="error_account_instance_mismatch">There is a mismatch between the instance the account was created on (%1$s) and the instance the action is taken on (%2$s).\nYou can fix this by either signing in to an account on the instance %2$s or by loading this page from the %1$s instance.</string>
+    <!-- Keep short. Button text which will take the user back to their instance. -->
+    <string name="go_to_account_instance">Go to account instance</string>
+    <!-- Error text. Shown when a network request times out while waiting for results from the server. The message suggests that the server might be overloaded but it could also be the user's internet connection. -->
+    <string name="error_server_timeout">Timeout waiting for server. The server is likely overloaded.</string>
+    <!-- Error text. Shown when a network request times out while trying to establish a connection. The message suggests that the server might be overloaded but it could also be the user's internet connection. -->
+    <string name="error_socket_timeout">Timeout trying to reach the server. The server is either overloaded or there is an issue with your internet connection.</string>
+    <!-- Keep short. Button text of button to add an account (sign in to an account). -->
+    <string name="add_account">Add account</string>
+    <!-- Keep short. Button text of button to add an account (sign in to an account). Shown when the user is already signed in to at least one account. -->
+    <string name="add_another_account">Add another account</string>
+    <!-- Keep short. Title text of screen that displays a list of all of the accounts the user is signed in to. Also displays shortcuts to settings. -->
+    <string name="accounts_and_settings"><![CDATA[Accounts & Settings]]></string>
+    <!-- Keep short. Title text of list of all bookmarked communities. -->
+    <string name="bookmarked_communities">Bookmarked communities</string>
+    <!-- Keep short. Title text of list of all community subscriptions. -->
+    <string name="subscriptions">Subscriptions</string>
+    <!-- Text shown when the user is not subscribed to any communities. -->
+    <string name="no_subscriptions">No subscriptions</string>
+    <!-- Text shown when the post list is empty. -->
+    <string name="no_posts">No posts.</string>
+    <!-- Keep short. Button text. Removes a bookmarked community when clicked. -->
+    <string name="remove_bookmark">Remove bookmark</string>
+    <!-- Keep short. Button text. Bookmarks a community when clicked. -->
+    <string name="bookmark_community">Bookmark community</string>
+    <!-- Keep short. Button text. Subscribes to a community when clicked. -->
+    <string name="subscribe">Subscribe</string>
+    <!-- Keep short. Button text. Unsubscribes from a community when clicked. -->
+    <string name="unsubscribe">Unsubscribe</string>
+    <!-- Keep short. Button text. Removes an item from a list when clicked. -->
+    <string name="remove">Remove</string>
+    <!-- Keep short. Describes the number of Monthly Active Users of a community/instance. -->
+    <string name="mau_format">%1$s MAU</string>
+    <!-- Error text. Shown when a page could not be loaded because it does not exist. -->
+    <string name="error_page_not_found">Page not found.</string>
+    <!-- Hint text for input field where the comment body is entered. -->
+    <string name="comment">Comment</string>
+
+    <!-- TextFieldToolbarOption -->
+
+    <!-- Keep short. Button text. Shows a preview of the content when clicked. -->
+    <string name="preview">Preview</string>
+    <!-- Keep short. Button text. Opens a menu where the user can pick from a list of emojis when clicked. -->
+    <string name="text_emojis">Text emojis</string>
+    <!-- Keep short. Button text. Bolds text in the text editor. -->
+    <string name="bold">Bold</string>
+    <!-- Keep short. Button text. Italicises text in the text editor. -->
+    <string name="italic">Italic</string>
+    <!-- Keep short. Button text. Crosses text out in the text editor. -->
+    <string name="strikethrough">Strikethrough</string>
+    <!-- Keep short. Button text. Applies a quote style to text in the text editor. -->
+    <string name="quote">Quote</string>
+    <!-- Keep short. Button text. Puts text in the text editor into a bulleted list. -->
+    <string name="bulleted_list">Bulleted list</string>
+    <!-- Keep short. Button text. Puts text in the text editor into a numbered list. -->
+    <string name="numbered_list">Numbered list</string>
+    <!-- Keep short. Button text. Adds a link to the Summit app in the text editor. -->
+    <string name="add_link_to_app">Add link to app</string>
+    <!-- Keep short. Button text. Creates a spoiler block in the text editor. -->
+    <string name="spoiler_text">Spoiler text</string>
+    <!-- Keep short. Button text. Adds an image in the text editor. -->
+    <string name="add_image">Add image</string>
+
+    <!-- Keep short. Button text of send comment button. -->
+    <string name="send_comment">Send comment</string>
+    <!-- Keep short. Button text of refresh button. -->
+    <string name="refresh">Refresh</string>
+    <!-- Keep short. Button text of update comment button. -->
+    <string name="update_comment">Update comment</string>
+    <!-- Warning text asking a user to confirm deletion of a comment. -->
+    <string name="delete_comment_confirm">Delete comment?</string>
+    <!-- Text that explains that the user needs to press back again in order to exit the app. -->
+    <string name="press_back_again_to_exit">Press BACK again to exit.</string>
+    <!-- Keep short. Button text of update post button. -->
+    <string name="update_post">Update post</string>
+    <!-- Keep short. Button text of create post button. -->
+    <string name="create_post">Create post</string>
+    <!-- Keep short. Button text of edit post button. -->
+    <string name="edit_post">Edit post</string>
+    <!-- Hint text for a text field where you enter the content of a post. -->
+    <string name="compose_post">Compose post</string>
+    <!-- Hint text for a text field where you enter the title of a post. -->
+    <string name="title">Title</string>
+    <!-- Hint text for a text field where you enter the url of a post. -->
+    <string name="url_optional">Url (optional)</string>
+    <!-- Error text shown when a required field is not filled in. -->
+    <string name="required">Required</string>
+    <!-- Error text displayed when a post was unable to be posted. -->
+    <string name="error_unable_to_send_post">Unable to sent post due to %1$s. Message: %2$s</string>
+    <!-- Text shown when a menu contains no items. -->
+    <string name="no_options">No options</string>
+    <!-- Keep short. Button text of delete post button. -->
+    <string name="delete_post">Delete post</string>
+    <!-- Keep short. Button/title text of settings page. -->
+    <string name="settings">Settings</string>
+    <!-- Keep short. Button/title text of page to customized how posts look in the post list. -->
+    <string name="post_appearance">Post appearance</string>
+    <!-- Body text explaining what post appearance settings do. -->
+    <string name="view_type_settings_desc">Customize how posts look</string>
+    <!-- Text showing what the current post list view type is. -->
+    <string name="base_view_type">Base view type</string>
+    <!-- Setting title text. Lets the user change the font size. -->
     <string name="font_size">Font size</string>
+    <!-- Warning text. Asks the user to confirm whether to reset styles to default or not. -->
     <string name="reset_view_to_default_styles">Reset view to default styles?</string>
+    <!-- Keep short. Button text. Resets post view styles to the default when clicked. -->
     <string name="reset_view_styles">Reset view styles</string>
+    <!-- Setting title text. Lets the user toggle between showing the image at the front or at the end. -->
     <string name="prefer_image_at_the_end">Prefer image at the end</string>
+    <!-- Keep short. Button text of community info button. -->
     <string name="community_info">Community info</string>
+    <!-- Title text of menu that displays more actions. -->
     <string name="more_actions">More actions</string>
+    <!-- Keep short. Button text. Blocks a community when tapped. -->
     <string name="block_this_community_format">Block this community (%1$s)</string>
+    <!-- Keep short. Button text. Blocks a user when tapped. -->
     <string name="block_this_user_format">Block this user (%1$s)</string>
+    <!-- Keep short. Button text. Unblocks a community when tapped. -->
     <string name="unblock_this_user_format">Unblock this user (%1$s)</string>
+    <!-- Setting body text. Explains what the theme settings do. -->
     <string name="theme_settings_desc">Change and customize the app theme</string>
+    <!-- Setting title text. Lets the user choose what the base theme is. -->
     <string name="base_theme">Base theme</string>
+    <!-- Setting option. Uses the system theme when selected. -->
     <string name="use_system_theme">Use system theme</string>
+    <!-- Setting option. Uses the light theme when selected. -->
     <string name="light_theme">Light theme</string>
+    <!-- Setting option. Uses the dark theme when selected. -->
     <string name="dark_theme">Dark theme</string>
+    <!-- Setting title text. Lets the user decide whether to enable "Material You": https://material.io/blog/announcing-material-you -->
     <string name="material_you">Material you</string>
+    <!-- Setting body text. Describes what the "Material you" setting does. -->
     <string name="personalized_theming_based_on_your_wallpaper">Personalized theming based on your wallpaper</string>
+    <!-- Title text for section that contains theme configurations. -->
     <string name="theme_config">Theme configuration</string>
+    <!-- Error text shown when Material You is not supported by the device. -->
     <string name="error_dynamic_color_not_supported">Material You is not supported by your device.</string>
-    <string name="post_and_comments">Post and comments</string>
+    <!-- Keep short. Button/title text for the post and comments settings page. -->
+    <string name="post_and_comments_appearance">Post and comments appearance</string>
+    <!-- Setting description text. Describes what the post and comment settings do. -->
     <string name="post_and_comments_settings_desc">Customize how post and comments look</string>
+    <!-- Title of section that contains settings to customize the appearance of comments. -->
     <string name="comment_settings">Comment settings</string>
+    <!-- Title of section that contains settings to customize the appearance of posts. -->
     <string name="post_settings">Post settings</string>
+    <!-- Button text. Resets the post styles to default when tapped. -->
     <string name="reset_post_styles">Reset post styles</string>
+    <!-- Button text. Resets the comment styles to default when tapped. -->
     <string name="reset_comment_styles">Reset comment styles</string>
+    <!-- Keep short. Button text. Continues with an action. Eg. if we want the user of something but they want to perform the action still. -->
     <string name="proceed_anyways">Proceed anyways</string>
     <string name="time_frame_last_hour">Last hour</string>
     <string name="time_frame_last_hours_format">Last %1$s hours</string>
     <string name="time_frame_last_months_format">Last %1$s months</string>
+    <!-- Keep short. Button text. Opens a pane which shows the bookmarked and subscribed communities when tapped. -->
     <string name="my_communities">My communities</string>
+    <!-- Keep short. Title text for the inbox screen. -->
     <string name="inbox">Inbox</string>
+    <!-- Keep short. Title text for the replies screen within the inbox. -->
     <string name="replies">Replies</string>
+    <!-- Keep short. Title text for the mentions screen within the inbox. -->
     <string name="mentions">Mentions</string>
+    <!-- Keep short. Title text for the messages screen within the inbox. -->
     <string name="messages">Messages</string>
-    <string name="there_doesnt_seem_to_be_anything_here">There doesn\'t seem to be anything here</string>
+    <!-- Keep short. Title text for the unread screen within the inbox. -->
     <string name="unread">Unread</string>
+    <!-- Generic text shown whenever a list is empty. -->
+    <string name="there_doesnt_seem_to_be_anything_here">There doesn\'t seem to be anything here</string>
+    <!-- Text shown at the end of a list. -->
     <string name="no_more_items">No more items</string>
+    <!-- Keep short. Button text. Marks an inbox item as read when tapped. -->
     <string name="mark_as_unread">Mark as unread</string>
+    <!-- Keep short. Button text of the reply button. -->
     <string name="reply">Reply</string>
+    <!-- Title text for section that gives context to a comment. -->
     <string name="context">Context</string>
+    <!-- Error text for when a message cannot be sent. -->
     <string name="error_unable_to_send_message">Unable to send message.</string>
+    <!-- Title for section that gives more information about an error. -->
     <string name="error_details">Error details</string>
+    <!-- Text that explains what the error was caused by. -->
     <string name="caused_by_format">Caused by %1$s</string>
+    <!-- Error text shown when a message was unable to be marked as read. -->
     <string name="error_unable_to_mark_message_as_read">Unable to mark message as read.</string>
+    <!-- Error text shown when a message was unable to be marked as read. -->
     <string name="message_actions">Message actions</string>
+    <!-- Text which displays who sent a message. -->
     <string name="from_format">From %1$s</string>
+    <!-- Keep short. Button text. Takes the user to the post when tapped. -->
     <string name="go_to_post">Go to post</string>
+    <!-- Error text shown when an action requires the user to be signed in. -->
     <string name="error_not_signed_in">Error. Not signed in.</string>
-    <string name="please_sign_in_to_view_your_inbox">Please sign in to view your inbox.</string>
-    <string name="sign_in">Sign in</string>
+    <!-- Text explaining the user must sign in to view their inbox. -->
+    <string name="please_login_to_view_your_inbox">Please login to view your inbox.</string>
+    <!-- Keep short. Button text. Opens the community browser when tapped. -->
     <string name="browse_communities">Browse communities</string>
+    <!-- Title text asking the user to enter their 2FA code. -->
     <string name="please_enter_2fa_code">Please enter 2FA code</string>
+    <!-- Body text asking the user to enter their 2FA code. -->
     <string name="two_factor_desc">Enter the 6-digit code generated by your authenticator app.</string>
+    <!-- Hint text for 2FA input field. -->
     <string name="two_factor_authentication_code">Two-factor authentication code</string>
+    <!-- Title text for settings section containing settings for dark theme. -->
     <string name="dark_theme_settings">Dark theme settings</string>
+    <!-- Setting title text. Lets the user toggle "black theme" which uses pure black for backgrounds. -->
     <string name="black_theme">Black theme</string>
+    <!-- Setting body text. Describes the black theme setting. -->
     <string name="black_theme_desc">Uses pure black as the background color</string>
+    <!-- Keep short. Setting title text for page where users can change preferences for their account. -->
     <string name="lemmy_web_preferences">Lemmy web preferences</string>
+    <!-- Description text explaining what Lemmy web settings do. -->
     <string name="lemmy_web_preferences_desc">Configure Lemmy web preferences</string>
+    <!-- Title text for the display name of the account. -->
     <string name="display_name">Display name</string>
+    <!-- Title text for the default sort order for the post list. -->
     <string name="default_sort_type">Default sort type</string>
+    <!-- Title text for whether to show NSFW content or not. -->
     <string name="show_nsfw">Show NSFW</string>
+    <!-- Error title text. Shown when the user taps save when no settings were changed. -->
     <string name="error_no_settings_changed">No settings changed</string>
+    <!-- Error description text. Shown when the user taps save when no settings were changed. -->
     <string name="error_no_settings_changed_desc">You did not make changes to any settings so nothing was saved.</string>
+    <!-- Text shown to confirm that the user settings have been saved. -->
     <string name="settings_saved">Settings saved</string>
+    <!-- Title text for a settings section that has to do with the internal workings of the app. -->
     <string name="systems">Systems</string>
-    <string name="cache_info_and_preferences"><![CDATA[Cache info & preferences]]></string>
+    <!-- Keep short. Title text cache settings. -->
     <string name="cache">Cache</string>
+    <!-- Body text. Describes what cache settings are. -->
+    <string name="cache_info_and_preferences"><![CDATA[Cache info & preferences]]></string>
+    <!-- Title text for a graph showing how much space is used for caching media files. -->
     <string name="media_cache">Media cache</string>
+    <!-- Button text. When tapped clears the media cache. -->
     <string name="clear_media_cache">Clear media cache</string>
+    <!-- Setting title text. Allows users to show/hide read posts. -->
     <string name="show_read_posts">Show read posts</string>
+    <!-- Setting title text. Allows users to change their account type to a bot account. -->
     <string name="bot_account">Bot account</string>
+    <!-- Setting title text. Allows users to choose whether to show bot accounts. -->
     <string name="show_bot_accounts">Show bot accounts</string>
+    <!-- Error title text. Shown when the user modifies a setting but press back without saving. -->
     <string name="error_unsaved_changes">Unsaved changes</string>
+    <!-- Error body text. Shown when the user modifies a setting but press back without saving. -->
     <string name="error_web_settings_unsaved_changes_desc">You have unsaved changes. Web preferences must be saved to the server in order for them to take effect.</string>
     <string name="discard_saves">Discard changes</string>
     <string name="send_notifications_to_email">Send notifications to email</string>
@@ -350,7 +564,7 @@
     <string name="show_video_posts">Show video posts</string>
     <string name="show_text_posts">Show text posts</string>
     <string name="error_content_type_filter_too_aggressive">Your content type filters are too aggressive for this community/instance. Please relax your content type filters or choose a different community/instance.</string>
-    <string name="card2">Card 2</string>
+
 
     <string name="comment_instance_filters_desc">Filter comments based on the instance name</string>
     <string name="comment_keyword_filters_desc">Filter comments based on title keywords</string>
@@ -392,9 +606,7 @@
     <string name="community_hint">community</string>
     <string name="view_image_on_single_tap">View image on single tap</string>
     <string name="view_image_on_single_tap_desc">If enabled, tapping on the thumbnail will open the image in the image viewer. If disabled, long pressing an image will open the image in the image viewer instead.</string>
-    <string name="card3">Card 3</string>
-    <string name="list_with_cards">List with cards</string>
-    <string name="large_list">Large list</string>
+
     <string name="font_color">Font color</string>
     <string name="calm">Calm</string>
     <string name="high_contrast">High contrast</string>
@@ -833,37 +1045,51 @@
     <string name="show_inline_media_as_links_desc">When enabled, images/gifs/videos within text will be shown as text links.</string>
     <string name="account_notifications">Account notifications</string>
     <string name="account_notifications_desc">Notifications for accounts such as private messages or replies to posts.</string>
+
+    <!-- Keep short. Button/title text of page where users can change notification settings. -->
     <string name="notifications">Notifications</string>
+    <!-- Description text. Explains what the notification settings do. -->
     <string name="notifications_desc">Manage what notifications the app shows</string>
+    <!-- Describes an interval of time in minutes. Eg. "Every 5 minutes". -->
     <string name="every_minutes_format">Every %1$s minutes</string>
+    <!-- Describes an interval of time in hours. Eg. "Every 5 hours". -->
     <string name="every_hours_format">Every %1$s hours</string>
+    <!-- Setting title text. Lets the user choose the interval to fetch account updates from the server. -->
     <string name="check_interval">Check interval</string>
+    <!-- Description text for a list of accounts. Lets the user know that the toggle for each account will enable notifications for that account. -->
     <string name="notifications_per_account_settings_desc">Choose which accounts to check notifications for.</string>
 
+    <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
         <item quantity="other">(%1$d children)</item>
     </plurals>
+    <!-- Text for the score of a post/comment. -->
     <plurals name="point_count_format">
         <item quantity="one">%1$s point</item>
         <item quantity="other">%1$s points</item>
     </plurals>
-    <plurals name="replies_format">
+    <!-- Text for how many more replies there are. -->
+    <plurals name="more_replies_format">
         <item quantity="one">%1$d more reply</item>
         <item quantity="other">%1$d more replies</item>
     </plurals>
+    <!-- Text for the number of posts. -->
     <plurals name="posts_format">
         <item quantity="one">%1$s post</item>
         <item quantity="other">%1$s posts</item>
     </plurals>
+    <!-- Text for the number of comments. -->
     <plurals name="comments_format">
         <item quantity="one">%1$s comment</item>
         <item quantity="other">%1$s comments</item>
     </plurals>
+    <!-- Text which displays a time interval in days. -->
     <plurals name="day_format">
         <item quantity="one">%1$s day</item>
         <item quantity="other">%1$s days</item>
     </plurals>
+    <!-- Notification text. Shows how many new items are in a user's inbox. -->
     <plurals name="new_items_in_inbox_format">
         <item quantity="one">%1$s new item in your inbox</item>
         <item quantity="other">%1$s new items in your inbox</item>

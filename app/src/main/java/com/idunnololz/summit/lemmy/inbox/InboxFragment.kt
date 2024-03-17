@@ -474,8 +474,8 @@ class InboxFragment :
                 binding.swipeRefreshLayout.isRefreshing = false
                 if (data.error is NotAuthenticatedException) {
                     binding.loadingView.showErrorWithRetry(
-                        getString(R.string.please_sign_in_to_view_your_inbox),
-                        getString(R.string.sign_in),
+                        getString(R.string.please_login_to_view_your_inbox),
+                        getString(R.string.login),
                     )
                 } else {
                     binding.loadingView.showDefaultErrorMessageFor(data.error)

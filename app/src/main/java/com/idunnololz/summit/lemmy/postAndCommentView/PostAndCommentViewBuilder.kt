@@ -652,7 +652,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         if (commentView.comment.deleted || isDeleting) {
             LemmyTextHelper.bindText(
                 textView = text,
-                text = context.getString(R.string.deleted_special2),
+                text = context.getString(R.string.deleted_special),
                 instance = instance,
                 highlight = highlightTextData,
                 onImageClick = {
@@ -668,7 +668,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         } else if (commentView.comment.removed || isRemoved) {
             LemmyTextHelper.bindText(
                 textView = text,
-                text = context.getString(R.string.removed_special2),
+                text = context.getString(R.string.removed_special),
                 instance = instance,
                 highlight = highlightTextData,
                 onImageClick = {
@@ -924,7 +924,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         val context = binding.root.context
 
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
-        headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown))
+        headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown_special))
         headerContainer.setTextSecondPart("")
 
         LemmyTextHelper.bindText(
@@ -974,7 +974,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         val context = holder.itemView.context
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
-        headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown))
+        headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown_special))
         headerContainer.setTextSecondPart("")
 
         expandSectionButton.setOnClickListener {

@@ -318,7 +318,7 @@ class LemmyContentHelper(
                     textView.setText(R.string.reveal_warning_default)
                 }
             }
-            button.setText(R.string.show_post_question)
+            button.setText(R.string.show_post)
             button.setOnClickListener {
                 onRevealContentClickedFn()
             }

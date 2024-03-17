@@ -30,7 +30,7 @@ class PreAuthDialogFragment : BaseDialogFragment<DialogFragmentPreAuthBinding>()
 
         builder.setMessage(R.string.auth_required_body)
 
-        builder.setPositiveButton(R.string.log_in) { _, _ ->
+        builder.setPositiveButton(R.string.login) { _, _ ->
             dismiss()
             (parentFragment as SignInNavigator).navigateToSignInScreen()
         }
