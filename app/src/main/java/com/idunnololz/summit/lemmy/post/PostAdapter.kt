@@ -728,7 +728,7 @@ class PostAdapter(
                     maxDepth = maxDepth,
                 )
                 b.moreButton.text = context.resources.getQuantityString(
-                    R.plurals.replies_format,
+                    R.plurals.more_replies_format,
                     item.moreCount,
                     item.moreCount,
                 )

@@ -121,7 +121,7 @@ object SettingPath {
             MainSettings::class ->
                 context.getString(R.string.settings)
             PostAndCommentsSettings::class ->
-                context.getString(R.string.post_and_comments)
+                context.getString(R.string.post_and_comments_appearance)
             PostListSettings::class ->
                 context.getString(R.string.post_list)
             ThemeSettings::class ->
@@ -129,7 +129,7 @@ object SettingPath {
             MiscSettings::class ->
                 context.getString(R.string.misc)
             ViewTypeSettings::class ->
-                context.getString(R.string.view_type)
+                context.getString(R.string.post_appearance)
             LoggingSettings::class ->
                 context.getString(R.string.logging)
             HistorySettings::class ->
@@ -171,12 +171,12 @@ class MainSettings @Inject constructor(
     )
     val settingViewType = BasicSettingItem(
         R.drawable.baseline_view_agenda_24,
-        context.getString(R.string.view_type),
+        context.getString(R.string.post_appearance),
         context.getString(R.string.view_type_settings_desc),
     )
     val settingPostAndComment = BasicSettingItem(
         R.drawable.baseline_mode_comment_24,
-        context.getString(R.string.post_and_comments),
+        context.getString(R.string.post_and_comments_appearance),
         context.getString(R.string.post_and_comments_settings_desc),
     )
     val settingLemmyWeb = BasicSettingItem(
@@ -1894,12 +1894,12 @@ class PerAccountSettings @Inject constructor(
     )
     val settingViewType = BasicSettingItem(
         R.drawable.baseline_view_agenda_24,
-        context.getString(R.string.view_type),
+        context.getString(R.string.post_appearance),
         context.getString(R.string.view_type_settings_desc),
     )
     val settingPostAndComment = BasicSettingItem(
         R.drawable.baseline_mode_comment_24,
-        context.getString(R.string.post_and_comments),
+        context.getString(R.string.post_and_comments_appearance),
         context.getString(R.string.post_and_comments_settings_desc),
     )
     val settingAccount = BasicSettingItem(

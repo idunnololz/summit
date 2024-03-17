@@ -29,7 +29,6 @@ import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.DataFiles
 import com.idunnololz.summit.util.LocaleHelper
-import com.idunnololz.summit.util.NotificationHelper
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.CustomVideoFrameDecoder
@@ -151,8 +150,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             Log.d(TAG, "Perf. MobileAds: " + (System.currentTimeMillis() - startTime))
             startTime = System.currentTimeMillis()
         }
-
-        NotificationHelper.registerNotificationChannels(context)
 
         // Needs to be initialized first
         ExoPlayerManager.initialize(context)

@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.community.CommunityViewModel
 import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.JsonClass
@@ -71,7 +70,7 @@ data class PageInfo(
 
 fun CommunityViewState.getShortDesc(context: Context): String =
     context.getString(
-        R.string.subreddit_state_format,
+        R.string.community_state_format,
         communityState.communityRef.getName(context),
         (communityState.currentPageIndex + 1).toString(),
     )

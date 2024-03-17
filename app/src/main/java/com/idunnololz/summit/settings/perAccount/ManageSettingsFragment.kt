@@ -150,7 +150,7 @@ class ManageSettingsFragment :
                 inflateFn = ImportSettingItemBinding::inflate,
             ) { item, b, h ->
                 b.settingTitle.text = item.relatedSettings.firstOrNull()?.title
-                    ?: context.getString(R.string.unknown)
+                    ?: context.getString(R.string.unknown_special)
                 b.settingKey.text = item.settingKey.lowercase()
                 b.settingValue.text = item.value.toString()
 

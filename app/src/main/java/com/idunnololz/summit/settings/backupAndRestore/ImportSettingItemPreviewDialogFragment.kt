@@ -85,7 +85,7 @@ class ImportSettingItemPreviewDialogFragment : BaseDialogFragment<DialogFragment
 
             relatedSettings.text =
                 if (relatedSettingItems.isNullOrEmpty()) {
-                    getString(R.string.unknown)
+                    getString(R.string.unknown_special)
                 } else {
                     relatedSettingItems.joinToString {
                         it.title

@@ -12,7 +12,6 @@ import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
@@ -314,7 +313,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     private fun showUnsupportedVideoTypeError(url: String) {
         binding.loadingView.showErrorWithButton(
-            getString(R.string.unsupported_video_type),
+            getString(R.string.error_unsupported_video_type),
             getString(R.string.more_actions),
             {
                 showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
