@@ -4,13 +4,18 @@
     <string name="app_name">Summit</string>
 
     <string name="storage_usage_legend_format">%1$s - %2$s</string>
+    <string name="c_summit">!summit@lemmy.world</string>
+    <string name="updoot_color">Updoot color</string>
+    <string name="downdoot_color">Downdoot color</string>
+    <string name="cross_posted_from_format">cross-posted from: %1$s</string>
+    <string name="font_sample_text">The quick brown fox jumped over the lazy dog.</string>
+    <string name="talha_e_purple">Talha E.\'s Purple</string>
+    <string name="talha_e_green">Talha E.\'s Green</string>
+    <string name="talha_e_pink">Talha E.\'s Pink</string>
+    <string name="hidden_posts_format">%1$s / %2$s</string>
+
 
     <string name="pref_key_app_language">app_language</string>
-
-
-    <string name="pref_key_account">pref_key_account</string>
-    <string name="pref_key_basics">pref_key_basics</string>
-    <string name="pref_key_sign_out">pref_key_sign_out</string>
 
 
     <string-array name="theme_type_values">

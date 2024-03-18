@@ -1371,7 +1371,7 @@ class CommunityFragment :
                 ),
             )
             addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
-            addItemWithIcon(R.id.sort_order, getString(R.string.sort_order), R.drawable.baseline_sort_24)
+            addItemWithIcon(R.id.sort_order, getString(R.string.sort_by), R.drawable.baseline_sort_24)
             addDivider()
             addItemWithIcon(R.id.reset_settings, R.string.reset_settings, R.drawable.baseline_reset_wrench_24)
 

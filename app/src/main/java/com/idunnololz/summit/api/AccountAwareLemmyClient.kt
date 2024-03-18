@@ -1007,7 +1007,7 @@ class AccountAwareLemmyClient @Inject constructor(
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
-                            context.getString(R.string.account_token_expired_format, account.name),
+                            context.getString(R.string.error_account_token_expired_format, account.name),
                             Toast.LENGTH_LONG,
                         ).show()
                     }

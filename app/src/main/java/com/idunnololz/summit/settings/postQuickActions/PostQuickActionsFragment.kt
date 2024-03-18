@@ -313,7 +313,7 @@ class PostQuickActionsFragment :
                     }
                     PostQuickActionIds.ViewSource -> {
                         icon = R.drawable.baseline_code_24
-                        name = context.getString(R.string.view_source)
+                        name = context.getString(R.string.view_raw)
                     }
                     PostQuickActionIds.DetailedView -> {
                         icon = R.drawable.baseline_open_in_full_24

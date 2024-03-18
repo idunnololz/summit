@@ -186,7 +186,7 @@ fun BaseFragment<*>.showMorePostOptions(
 //            R.id.switch_account_temp,
 //            R.string.switch_account_for_post,
 //            R.drawable.baseline_account_circle_24)
-        addItemWithIcon(R.id.pa_view_source, R.string.view_source, R.drawable.baseline_code_24)
+        addItemWithIcon(R.id.pa_view_source, R.string.view_raw, R.drawable.baseline_code_24)
         addItemWithIcon(R.id.pa_detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
 
         setOnMenuItemClickListener {

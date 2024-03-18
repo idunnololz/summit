@@ -89,7 +89,7 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
 
                 if (account == null) {
                     AlertDialogFragment.Builder()
-                        .setMessage(R.string.you_must_sign_in_to_create_a_post)
+                        .setMessage(R.string.error_you_must_sign_in_to_create_a_post)
                         .createAndShow(childFragmentManager, "asdf")
                     return@setOnClickListener
                 }

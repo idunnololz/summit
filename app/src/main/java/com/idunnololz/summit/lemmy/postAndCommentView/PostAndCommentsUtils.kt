@@ -145,7 +145,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
         )
         addDivider()
 
-        addItemWithIcon(R.id.ca_view_source, R.string.view_source, R.drawable.baseline_code_24)
+        addItemWithIcon(R.id.ca_view_source, R.string.view_raw, R.drawable.baseline_code_24)
         addItemWithIcon(R.id.ca_detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
 
         setOnMenuItemClickListener {
