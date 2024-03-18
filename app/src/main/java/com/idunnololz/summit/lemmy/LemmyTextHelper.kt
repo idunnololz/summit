@@ -93,10 +93,16 @@ object LemmyTextHelper {
         }
     }
 
-    fun getSpannable(context: Context, text: String): Spanned {
+    fun getSpannable(context: Context, text: String): Spanned = try {
         val markwon = getMarkwon(context)
 
-        return markwon.toMarkdown(text)
+        markwon.toMarkdown(text)
+    } catch (e: Exception) {
+        // java.lang.IndexOutOfBoundsException: setSpan (2445 ... 2449) ends beyond length 2448
+
+        Log.e(TAG, "Error parsing text", e)
+
+        SpannableStringBuilder(text)
     }
 
     private fun bindLemmyText(

@@ -4,5 +4,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textAppearance="?textAppearanceTitleMedium"
-    android:text="@string/comment_quick_actions_desc"
+    android:text="@string/choose_quick_actions_desc"
     android:layout_margin="@dimen/padding"/>

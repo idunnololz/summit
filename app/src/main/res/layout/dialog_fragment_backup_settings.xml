@@ -37,19 +37,6 @@
                     android:layout_weight="1"
                     android:paddingHorizontal="@dimen/padding">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/backup_name_text_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/backup_name">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/backup_name_edit_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
                     <!--            <CheckBox-->
                     <!--                android:layout_marginTop="16dp"-->
                     <!--                android:checked="true"-->

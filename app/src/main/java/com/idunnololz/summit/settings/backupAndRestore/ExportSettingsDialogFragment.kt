@@ -134,7 +134,7 @@ class ExportSettingsDialogFragment :
                                 startActivity(
                                     Intent.createChooser(
                                         sendIntent,
-                                        getString(R.string.send_backup),
+                                        getString(R.string.share_backup),
                                     ),
                                 )
                             }

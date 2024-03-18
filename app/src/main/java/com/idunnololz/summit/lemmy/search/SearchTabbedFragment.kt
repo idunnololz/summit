@@ -419,9 +419,11 @@ class SearchTabbedFragment :
 
             addItemWithIcon(
                 R.id.sort_order,
-                getString(R.string.sort_order),
+                getString(R.string.sort_by),
                 R.drawable.baseline_sort_24,
             )
+
+            addDivider()
 
             addItemWithIcon(
                 R.id.clear_search_history,

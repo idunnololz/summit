@@ -292,6 +292,7 @@ class ImportSettingsDialogFragment :
                 clazz = Item.ImportSettingItem::class,
                 inflateFn = ImportSettingItemBinding::inflate,
             ) { item, b, h ->
+                b.settingTitle.visibility = View.GONE
                 b.settingKey.text = item.settingKey.lowercase()
                 b.settingValue.text = item.value.toString()
                 b.root.setOnClickListener {

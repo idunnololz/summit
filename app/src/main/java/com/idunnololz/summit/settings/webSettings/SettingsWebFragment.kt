@@ -138,7 +138,7 @@ class SettingsWebFragment :
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
                     AlertDialogFragment.Builder()
-                        .setTitle(R.string.upload_failed)
+                        .setTitle(R.string.error_upload_failed)
                         .setMessage(it.error.toErrorMessage(context))
                         .setPositiveButton(android.R.string.ok)
                         .createAndShow(childFragmentManager, "asdf")

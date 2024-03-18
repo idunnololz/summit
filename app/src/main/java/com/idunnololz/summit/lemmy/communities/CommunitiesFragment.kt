@@ -326,6 +326,10 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                 h.itemView.setOnClickListener {
                     onPageClick(community.community.toCommunityRef())
                 }
+                h.itemView.setOnLongClickListener {
+                    showMoreOptionsMenu(item.data)
+                    true
+                }
                 b.moreButton.setOnClickListener {
                     showMoreOptionsMenu(item.data)
                 }

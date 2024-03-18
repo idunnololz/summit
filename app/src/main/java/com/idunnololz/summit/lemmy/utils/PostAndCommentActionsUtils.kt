@@ -58,7 +58,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
             is StatefulData.Error -> {
                 actionsViewModel.savePostResult.setIdle()
                 ErrorDialogFragment.show(
-                    getString(R.string.unable_to_save_post),
+                    getString(R.string.error_unable_to_save_post),
                     it.error,
                     childFragmentManager,
                 )
@@ -89,7 +89,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
             is StatefulData.Error -> {
                 actionsViewModel.saveCommentResult.setIdle()
                 ErrorDialogFragment.show(
-                    getString(R.string.unable_to_save_comment),
+                    getString(R.string.error_unable_to_save_comment),
                     it.error,
                     childFragmentManager,
                 )
