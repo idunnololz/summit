@@ -6,4 +6,5 @@
     <string name="home">首页</string>
     <string name="error_network">网路错误。请检查你的网路连线然后再试一次。</string>
     <string name="error_network_timeout">网路错误。资料请求时间过长。请稍后尝试。</string>
+    <string name="locale">zh-rCN</string>
 </resources>
