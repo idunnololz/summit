@@ -8,5 +8,4 @@
     <string name="error_network_timeout">网路错误。资料请求时间过长。请稍后尝试。</string>
     <string name="locale">zh-rCN</string>
     <string name="error_external_activity_not_found">在此设备上找不到的支援 %1$s 文件类型应用程序。</string>
-    <string name="per_community_settings_format"></string>
 </resources>
