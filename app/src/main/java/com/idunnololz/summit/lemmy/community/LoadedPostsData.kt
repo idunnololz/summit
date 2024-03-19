@@ -8,6 +8,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class LoadedPostsData(
+    // Used for filtering
+    val allPosts: List<LocalPostView>,
     val posts: List<LocalPostView>,
     val instance: String,
     val pageIndex: Int,

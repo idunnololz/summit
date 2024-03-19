@@ -157,14 +157,16 @@ class SavedViewModel @Inject constructor(
             apiClient.fetchSavedPostsWithRetry(pageIndex.toLemmyPageIndex(), PAGE_SIZE, force)
                 .onSuccess {
                     if (postListEngine.hasMore || force) {
+                        val posts = it.map {
+                            LocalPostView(it, null)
+                        }
                         postListEngine.addPage(
                             LoadedPostsData(
-                                it.map {
-                                    LocalPostView(it, null)
-                                },
-                                apiClient.instance,
-                                pageIndex,
-                                it.size == PAGE_SIZE,
+                                allPosts = posts,
+                                posts = posts,
+                                instance = apiClient.instance,
+                                pageIndex = pageIndex,
+                                hasMore = it.size == PAGE_SIZE,
                             ),
                         )
                         postListEngine.createItems()
@@ -178,10 +180,11 @@ class SavedViewModel @Inject constructor(
                     if (postListEngine.hasMore || force) {
                         postListEngine.addPage(
                             LoadedPostsData(
-                                listOf(),
-                                apiClient.instance,
-                                pageIndex,
-                                false,
+                                allPosts = listOf(),
+                                posts = listOf(),
+                                instance = apiClient.instance,
+                                pageIndex = pageIndex,
+                                hasMore = false,
                                 error = PostLoadError(
                                     errorCode = 0,
                                     errorMessage = it.toErrorMessage(context),

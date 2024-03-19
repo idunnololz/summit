@@ -117,7 +117,7 @@ class MultipleChoiceDialogFragment :
                 bottomMenu = it
             }
             .show(
-                mainActivity = requireMainActivity(),
+                bottomMenuContainer = requireMainActivity(),
                 bottomSheetContainer = binding.root,
                 handleBackPress = false,
                 expandFully = true,

@@ -50,7 +50,7 @@ class InboxViewModel @Inject constructor(
     val currentFullAccount = MutableLiveData<FullAccount?>()
     val markAsReadResult = StatefulLiveData<Unit>()
 
-    val inboxData = StatefulLiveData<List<LemmyListSource.PageResult<InboxItem>>>()
+    val inboxUpdate = StatefulLiveData<InboxUpdate>()
 
     val pageTypeFlow = MutableStateFlow<PageType>(PageType.Unread)
 
@@ -82,7 +82,12 @@ class InboxViewModel @Inject constructor(
                 allData.clear()
                 fetchingPages.clear()
 
-                inboxData.setValue(allData)
+                inboxUpdate.setValue(
+                    InboxUpdate(
+                        inboxData = allData,
+                        scrollToTop = false,
+                    )
+                )
 
                 fetchInbox(pageIndex, requireNotNull(pageTypeFlow.value))
             }
@@ -108,7 +113,13 @@ class InboxViewModel @Inject constructor(
 
                     allData.clear()
                     fetchingPages.clear()
-                    inboxData.setValue(allData)
+
+                    inboxUpdate.setValue(
+                        InboxUpdate(
+                            inboxData = allData,
+                            scrollToTop = false,
+                        )
+                    )
 
                     fetchInbox()
                 }
@@ -143,7 +154,7 @@ class InboxViewModel @Inject constructor(
         fetchInboxJob?.cancel()
         Log.d(TAG, "Loading inbox page $pageIndex. PageType: $pageType")
 
-        inboxData.setIsLoading()
+        inboxUpdate.setIsLoading()
         fetchInboxJob = viewModelScope.launch {
             val result = inboxRepository.getPage(pageIndex, pageType, force)
 
@@ -152,12 +163,18 @@ class InboxViewModel @Inject constructor(
             result
                 .onSuccess {
                     addData(it)
-                    inboxData.postValue(allData)
+
+                    inboxUpdate.setValue(
+                        InboxUpdate(
+                            inboxData = allData,
+                            scrollToTop = pageIndex == 0 && force,
+                        )
+                    )
 
                     fetchingPages.remove(pageIndex)
                 }
                 .onFailure {
-                    inboxData.postError(it)
+                    inboxUpdate.postError(it)
 
                     fetchingPages.remove(pageIndex)
                 }
@@ -238,7 +255,12 @@ class InboxViewModel @Inject constructor(
             )
         }
 
-        inboxData.setValue(allData)
+        inboxUpdate.setValue(
+            InboxUpdate(
+                inboxData = allData,
+                scrollToTop = false,
+            )
+        )
     }
 
     private fun addData(data: LemmyListSource.PageResult<InboxItem>) {
@@ -296,3 +318,8 @@ fun InboxViewModel.PageType.getName(context: Context) =
         InboxViewModel.PageType.Messages -> context.getString(R.string.messages)
         InboxViewModel.PageType.Reports -> context.getString(R.string.reports)
     }
+
+data class InboxUpdate(
+    val inboxData: List<LemmyListSource.PageResult<InboxItem>>,
+    val scrollToTop: Boolean,
+)

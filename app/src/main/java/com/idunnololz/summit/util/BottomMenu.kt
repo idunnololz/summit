@@ -27,7 +27,6 @@ import com.idunnololz.summit.databinding.MenuItemBinding
 import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
-import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.main.MainActivityInsets
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -118,14 +117,14 @@ class BottomMenu(
     }
 
     fun show(
-        mainActivity: MainActivity,
+        bottomMenuContainer: BottomMenuContainer,
         bottomSheetContainer: ViewGroup,
         expandFully: Boolean,
         handleBackPress: Boolean = true,
         handleInsets: Boolean = true,
     ) {
         if (handleInsets) {
-            mainActivity.lastInsetLiveData.observeForever(insetsObserver)
+            bottomMenuContainer.lastInsetLiveData.observeForever(insetsObserver)
         }
 
         parent = bottomSheetContainer
@@ -195,7 +194,7 @@ class BottomMenu(
                                 parent = null
                                 onBackPressedCallback.remove()
                                 bottomSheetContainer.removeView(rootView)
-                                mainActivity.lastInsetLiveData.removeObserver(insetsObserver)
+                                bottomMenuContainer.lastInsetLiveData.removeObserver(insetsObserver)
 
                                 onClose?.invoke()
                             }
@@ -217,7 +216,7 @@ class BottomMenu(
         )
 
         if (handleBackPress) {
-            mainActivity.onBackPressedDispatcher.addCallback(mainActivity, onBackPressedCallback)
+            bottomMenuContainer.onBackPressedDispatcher.addCallback(bottomMenuContainer, onBackPressedCallback)
         }
     }
 

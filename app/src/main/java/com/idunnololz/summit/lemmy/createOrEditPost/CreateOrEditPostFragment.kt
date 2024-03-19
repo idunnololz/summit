@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
@@ -334,7 +333,7 @@ class CreateOrEditPostFragment :
                     }
 
                     bottomMenu.show(
-                        mainActivity = requireMainActivity(),
+                        bottomMenuContainer = requireMainActivity(),
                         bottomSheetContainer = binding.root,
                         expandFully = true,
                         handleBackPress = false,
@@ -427,7 +426,7 @@ class CreateOrEditPostFragment :
             }
 
             bottomMenu.show(
-                mainActivity = requireMainActivity(),
+                bottomMenuContainer = requireMainActivity(),
                 bottomSheetContainer = binding.root,
                 expandFully = true,
                 handleBackPress = false,

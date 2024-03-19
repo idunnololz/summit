@@ -176,7 +176,7 @@ class InboxFragment :
             }, 100,)
         }
 
-        viewModel.inboxData.observe(viewLifecycleOwner) {
+        viewModel.inboxUpdate.observe(viewLifecycleOwner) {
             onUpdate()
         }
         viewModel.currentFullAccount.observe(viewLifecycleOwner) {
@@ -207,8 +207,8 @@ class InboxFragment :
             refresh()
         }
 
-        (viewModel.inboxData.value as? StatefulData.Success)?.data?.let {
-            adapter.setData(it)
+        (viewModel.inboxUpdate.value as? StatefulData.Success)?.data?.let {
+            adapter.setData(it.inboxData)
         }
 
         binding.recyclerView.adapter = adapter
@@ -223,7 +223,7 @@ class InboxFragment :
                         ?: return
 
                     if (layoutManager.findLastVisibleItemPosition() == adapter.itemCount - 1) {
-                        if (!viewModel.inboxData.isLoading && adapter.hasMore()) {
+                        if (!viewModel.inboxUpdate.isLoading && adapter.hasMore()) {
                             viewModel.pageIndex++
                             viewModel.fetchInbox()
                         }
@@ -469,7 +469,7 @@ class InboxFragment :
     }
 
     private fun onUpdate() {
-        when (val data = viewModel.inboxData.value) {
+        when (val data = viewModel.inboxUpdate.value) {
             is StatefulData.Error -> {
                 binding.swipeRefreshLayout.isRefreshing = false
                 if (data.error is NotAuthenticatedException) {
@@ -491,15 +491,21 @@ class InboxFragment :
                 binding.loadingView.hideAll()
                 binding.swipeRefreshLayout.isRefreshing = false
 
-                val itemCount = data.data.sumOf { it.items.size }
+                val inboxUpdate = data.data
+                val inboxData = inboxUpdate.inboxData
+                val itemCount = inboxData.sumOf { it.items.size }
                 if (itemCount == 0 && (adapter?.itemCount ?: 0) == 0) {
                     binding.loadingView.showErrorWithRetry(
                         getString(R.string.there_doesnt_seem_to_be_anything_here),
                         getString(R.string.refresh),
                     )
                 } else {
-                    Log.d(TAG, "onUpdate. Got ${data.data.sumOf { it.items.size }} items!")
-                    (binding.recyclerView.adapter as? InboxItemAdapter)?.setData(data.data)
+                    Log.d(TAG, "onUpdate. Got ${inboxData.sumOf { it.items.size }} items!")
+                    (binding.recyclerView.adapter as? InboxItemAdapter)?.setData(inboxData) {
+                        if (inboxUpdate.scrollToTop) {
+                            binding.recyclerView.scrollToPosition(0)
+                        }
+                    }
                 }
             }
         }
@@ -604,7 +610,7 @@ class InboxFragment :
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
 
-        private fun refreshItems() {
+        private fun refreshItems(cb: (() -> Unit)? = null) {
             val newItems = mutableListOf<Item>()
 
             allData.forEach { data ->
@@ -621,7 +627,7 @@ class InboxFragment :
                 }
             }
 
-            adapterHelper.setItems(newItems, this)
+            adapterHelper.setItems(newItems, this, cb)
         }
 
         fun hasMore(): Boolean = allData.lastOrNull()?.hasMore ?: true
@@ -635,9 +641,12 @@ class InboxFragment :
                 null -> null
             }
 
-        fun setData(allData: List<LemmyListSource.PageResult<InboxItem>>) {
+        fun setData(
+            allData: List<LemmyListSource.PageResult<InboxItem>>,
+            cb: (() -> Unit)? = null,
+        ) {
             this.allData = allData
-            refreshItems()
+            refreshItems(cb)
         }
     }
 

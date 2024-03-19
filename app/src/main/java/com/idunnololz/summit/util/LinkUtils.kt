@@ -6,6 +6,7 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
@@ -53,47 +54,6 @@ object LinkUtils {
     fun getLinkForCommunity(communityRef: CommunityRef): String =
         communityRef.toUrl("lemmy.world")
 
-    fun getLinkForMoreChildren(
-        linkId: String,
-        children: List<String>,
-        commentsSortOrder: String?,
-    ): String =
-        Uri.parse("https://www.reddit.com/api/morechildren.json")
-            .buildUpon()
-            .appendQueryParameter("link_id", linkId)
-            .appendQueryParameter("children", children.joinToString())
-            .appendQueryParameter("api_type", "json")
-            .apply {
-                if (commentsSortOrder != null) {
-                    appendQueryParameter("sort", commentsSortOrder)
-                }
-            }
-            .build()
-            .toString()
-
-    fun apiVote(): String =
-        "https://oauth.reddit.com/api/vote"
-
-    fun apiComment(): String =
-        "https://oauth.reddit.com/api/comment"
-
-    fun apiDeleteComment(): String =
-        "https://oauth.reddit.com/api/del"
-
-    fun apiEditUserText(): String =
-        "https://oauth.reddit.com/api/editusertext"
-
-    fun subreddits(sortOrder: String = "popular", limit: Int, showAll: Boolean): String =
-        Uri.parse("https://www.reddit.com/subreddits/$sortOrder.json")
-            .buildUpon()
-            .appendQueryParameter("limit", limit.toString())
-            .apply {
-                if (showAll) {
-                    appendQueryParameter("show", "all")
-                }
-            }
-            .toString()
-
     fun convertToHttps(url: String): String {
         val uri = Uri.parse(url)
         return if (uri.scheme == "http") {
@@ -131,53 +91,10 @@ object LinkUtils {
 }
 
 fun MainActivity.showMoreLinkOptions(url: String, text: String?) {
-    val context = this
-
-    BottomMenu(context).apply {
-        setTitle(R.string.link_actions)
-        addItemWithIcon(R.id.copy_link, R.string.copy_link_address, R.drawable.baseline_content_copy_24)
-        if (text != null) {
-            addItemWithIcon(
-                R.id.copy_link_text,
-                R.string.copy_link_text,
-                R.drawable.baseline_content_copy_24,
-            )
-        }
-        if (GlobalSettings.shareImagesDirectly && isUrlImage(url)) {
-            addItemWithIcon(R.id.share_image, R.string.share_image, R.drawable.baseline_share_24)
-        } else {
-            addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
-        }
-        addItemWithIcon(R.id.open_in_browser, R.string.open_in_browser, R.drawable.baseline_public_24)
-        addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
-        addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
-
-        setOnMenuItemClickListener {
-            when (it.id) {
-                R.id.copy_link -> {
-                    Utils.copyToClipboard(context, url)
-                }
-                R.id.copy_link_text -> {
-                    Utils.copyToClipboard(context, requireNotNull(text))
-                }
-                R.id.share_link -> {
-                    Utils.shareLink(context, url)
-                }
-                R.id.share_image -> {
-                    downloadAndShareImage(url)
-                }
-                R.id.open_in_browser -> {
-                    onLinkClick(url, null, LinkType.Action)
-                }
-                R.id.open_link_incognito -> {
-                    Utils.openExternalLink(context, url, openNewIncognitoTab = true)
-                }
-                R.id.preview_link -> {
-                    LinkPreviewDialogFragment.show(supportFragmentManager, url)
-                }
-            }
-        }
-    }.let {
-        showBottomMenu(it)
-    }
+    showMoreImageOrLinkOptions(
+        url,
+        actionsViewModel,
+        supportFragmentManager,
+        text,
+    )
 }

@@ -4,13 +4,19 @@
     This string is specifically chosen by me so DO NOT change it. -->
     <string name="locale">en</string>
 
+    <!-- Error string. -->
     <string name="error_network">Network error. Please check your internet connection and try again.</string>
+    <!-- Error string. -->
     <string name="error_network_timeout">Network error. The request took too long. Please try again.</string>
     <!-- Error string. Shown for generic errors. -->
     <string name="error_unknown">Unknown error. Please try again.</string>
+    <!-- Error string. -->
     <string name="error_website">There was an error on the server. Please try again later.</string>
+    <!-- Error string. -->
     <string name="error_server_maintenance">Server is under maintenance. Please try again later.</string>
+    <!-- Error string. -->
     <string name="error_external_activity_not_found">Could not find an app on this device for file type %1$s.</string>
+    <!-- Error string. -->
     <string name="error_downloading_image">There was an error downloading the image.</string>
 
     <!--
@@ -1631,6 +1637,14 @@
     <string name="error_account_token_expired_format">Account token has expired for account %1$s. Please sign in again.</string>
     <!-- Placeholder. Shown in place of a filtered post. -->
     <string name="post_filtered_format">This post has been filtered. Filter reason: %1$s.</string>
+    <!-- Message shown when a post is hidden. -->
+    <string name="post_hidden">Post hidden</string>
+    <!-- Keep short. Button text. -->
+    <string name="undo">Undo</string>
+    <!-- TItle text for a menu. -->
+    <string name="image_actions">Image actions</string>
+    <!-- Keep short. Button text. -->
+    <string name="download_image">Download image</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

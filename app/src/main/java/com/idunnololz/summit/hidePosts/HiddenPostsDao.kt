@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.idunnololz.summit.api.dto.PostId
 
 const val HIDDEN_POSTS_LIMIT = 1000
 
@@ -35,6 +36,9 @@ interface HiddenPostsDao {
 
     @Query("DELETE FROM hidden_posts WHERE id = :entryId")
     suspend fun deleteByEntryId(entryId: Long)
+
+    @Query("DELETE FROM hidden_posts WHERE instance = :instance and postId = :postId")
+    suspend fun deleteByPost(instance: String, postId: PostId)
 
     @Query("DELETE FROM hidden_posts")
     suspend fun clear()

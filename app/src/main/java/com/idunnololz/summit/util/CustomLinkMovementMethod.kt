@@ -239,7 +239,15 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                 }
             }
         } else if (clickableSpan is AsyncDrawableSpan) {
-            onImageClickListener?.invoke(clickableSpan.drawable.destination)
+            val handled = onLinkLongClickListener?.onLongClick(
+                textView,
+                clickableSpan.drawable.destination,
+                "",
+                bounds,
+            ) ?: false
+            if (!handled) {
+                onImageClickListener?.invoke(clickableSpan.drawable.destination)
+            }
         }
     }
 

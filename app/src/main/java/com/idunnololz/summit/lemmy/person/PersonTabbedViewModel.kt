@@ -150,14 +150,16 @@ class PersonTabbedViewModel @Inject constructor(
                     }
 
                     if (postListEngine.hasMore || force) {
+                        val posts = result.posts.map {
+                            LocalPostView(postView = it, filterReason = null)
+                        }
                         postListEngine.addPage(
                             LoadedPostsData(
-                                result.posts.map {
-                                    LocalPostView(postView = it, filterReason = null)
-                                },
-                                apiClient.instance,
-                                pageIndex,
-                                result.posts.size == PAGE_SIZE,
+                                allPosts = posts,
+                                posts = posts,
+                                instance = apiClient.instance,
+                                pageIndex = pageIndex,
+                                hasMore = result.posts.size == PAGE_SIZE,
                             ),
                         )
                         postListEngine.createItems()
@@ -189,10 +191,11 @@ class PersonTabbedViewModel @Inject constructor(
                     if (postListEngine.hasMore || force) {
                         postListEngine.addPage(
                             LoadedPostsData(
-                                listOf(),
-                                apiClient.instance,
-                                pageIndex,
-                                false,
+                                allPosts = listOf(),
+                                posts = listOf(),
+                                instance = apiClient.instance,
+                                pageIndex = pageIndex,
+                                hasMore = false,
                                 error = PostLoadError(
                                     errorCode = 0,
                                     errorMessage = it.toErrorMessage(context),

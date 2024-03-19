@@ -41,10 +41,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
-    private val offlineManager: OfflineManager,
     private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
     val communitySelectorControllerFactory: CommunitySelectorController.Factory,
@@ -59,7 +57,6 @@ class MainActivityViewModel @Inject constructor(
     val communities = StatefulLiveData<List<CommunityView>>()
     val currentAccount = MutableLiveData<AccountView?>(null)
     val unreadCount = accountInfoManager.unreadCount.asLiveData()
-    val downloadAndShareFile = StatefulLiveData<Uri>()
 
     private var communityRef: CommunityRef? = null
 
@@ -231,23 +228,6 @@ class MainActivityViewModel @Inject constructor(
     fun refetchCommunityOrSite(force: Boolean) {
         val communityRef = communityRef ?: return
         fetchCommunityOrSiteInfo(communityRef, force)
-    }
-
-    fun downloadAndShareImage(url: String) {
-        downloadAndShareFile.setIsLoading()
-
-        offlineManager.fetchImage(
-            url = url,
-            listener = { file ->
-                val fileUri = FileProviderHelper(context)
-                    .openTempFile("img_${file.name}") { os ->
-                        os.sink().buffer().use {
-                            it.writeAll(file.source())
-                        }
-                    }
-                downloadAndShareFile.postValue(fileUri)
-            },
-        )
     }
 
     private fun Flow<Int>.completeWhenDone(): Flow<Int> =
