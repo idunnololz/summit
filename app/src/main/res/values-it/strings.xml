@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="error_website">C\'era un errore del server. Riprova più tardi.</string>
+    <string name="about">Informazioni</string>
+    <string name="locale">it-rIT</string>
+    <string name="error_network">Errore di connessione. Controlla la tua connessione a internet e riprova.</string>
+    <string name="error_unknown">Errore sconosciuto. Riprova per favore.</string>
+    <string name="all">Tutti</string>
+    <string name="search">Cerca</string>
+</resources>
