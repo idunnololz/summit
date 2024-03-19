@@ -16,34 +16,44 @@ class HiddenPostsManager @Inject constructor(
 ) {
     private val coroutineScope = coroutineScopeFactory.create()
 
-    private val onHiddenPostsChange = mutableMapOf<String, MutableSharedFlow<Unit>>()
+    private val onHiddenPostsChange = mutableMapOf<String, InstanceFlows>()
     private val instanceToCache = mutableMapOf<String, MutableSet<PostId>>()
 
     val hiddenPostsLimit: Int
         get() = HIDDEN_POSTS_LIMIT
 
-    fun getOnHiddenPostsChangeFlow(instance: String): MutableSharedFlow<Unit> {
+    fun getInstanceFlows(instance: String): InstanceFlows {
         onHiddenPostsChange[instance]?.let {
             return it
         }
 
-        val flow = MutableSharedFlow<Unit>()
-        onHiddenPostsChange[instance] = flow
-        return flow
+        val instanceFlows = InstanceFlows()
+        onHiddenPostsChange[instance] = instanceFlows
+        return instanceFlows
     }
 
-    fun hidePost(postId: PostId, instance: String) {
+    fun hidePost(postId: PostId, instance: String, hide: Boolean = true) {
         coroutineScope.launch {
-            val entry = HiddenPostEntry(
-                0,
-                System.currentTimeMillis(),
-                instance,
-                postId,
-            )
-            hiddenPostsDao.insertHiddenPostRespectingTableLimit(entry)
-            getHiddenPostEntriesInternal(instance).add(postId)
+            if (hide) {
+                val entry = HiddenPostEntry(
+                    0,
+                    System.currentTimeMillis(),
+                    instance,
+                    postId,
+                )
+                hiddenPostsDao.insertHiddenPostRespectingTableLimit(entry)
+                getHiddenPostEntriesInternal(instance).add(postId)
 
-            getOnHiddenPostsChangeFlow(instance).emit(Unit)
+                getInstanceFlows(instance).apply {
+                    onHiddenPostsChangeFlow.emit(Unit)
+                    onHidePostFlow.emit(entry)
+                }
+            } else {
+                hiddenPostsDao.deleteByPost(instance, postId)
+                getHiddenPostEntriesInternal(instance).remove(postId)
+
+                getInstanceFlows(instance).onHiddenPostsChangeFlow.emit(Unit)
+            }
         }
     }
 
@@ -53,7 +63,7 @@ class HiddenPostsManager @Inject constructor(
             instanceToCache.clear()
 
             onHiddenPostsChange.forEach {
-                it.value.emit(Unit)
+                it.value.onHiddenPostsChangeFlow.emit(Unit)
             }
         }
     }
@@ -99,5 +109,10 @@ class HiddenPostsManager @Inject constructor(
         val hiddenPostId: PostId,
         val instance: String,
         val ts: Long,
+    )
+
+    class InstanceFlows(
+        val onHiddenPostsChangeFlow: MutableSharedFlow<Unit> = MutableSharedFlow(),
+        val onHidePostFlow: MutableSharedFlow<HiddenPostEntry> = MutableSharedFlow(),
     )
 }

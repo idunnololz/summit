@@ -837,6 +837,22 @@ class CommunityFragment :
                 }
             }
         }
+        viewModel.onHidePost.observe(viewLifecycleOwner) {
+            val hiddenPost = it ?: return@observe
+
+            viewModel.onHidePost.postValue(null)
+
+            Snackbar
+                .make(
+                    requireMainActivity().getSnackbarContainer(),
+                    R.string.post_hidden,
+                    Snackbar.LENGTH_LONG,
+                )
+                .setAction(R.string.undo) {
+                    viewModel.unhidePost(hiddenPost.postId, hiddenPost.instance)
+                }
+                .show()
+        }
 
         if (adapter?.items.isNullOrEmpty()) {
             viewModel.fetchInitialPage()

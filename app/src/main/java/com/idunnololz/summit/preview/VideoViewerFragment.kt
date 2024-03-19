@@ -139,61 +139,6 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             )
         }
 
-        viewModel.downloadVideoResult.observe(this) {
-            when (it) {
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Error -> {
-                    if (it.error is FileDownloadHelper.CustomDownloadLocationException) {
-                        Snackbar
-                            .make(
-                                parent.getSnackbarContainer(),
-                                R.string.error_downloading_image,
-                                Snackbar.LENGTH_LONG,
-                            )
-                            .setAction(R.string.downloads_settings) {
-                                getMainActivity()?.showDownloadsSettings()
-                            }
-                            .show()
-                    } else {
-                        FirebaseCrashlytics.getInstance().recordException(it.error)
-                        Snackbar
-                            .make(
-                                parent.getSnackbarContainer(),
-                                R.string.error_downloading_image,
-                                Snackbar.LENGTH_LONG,
-                            )
-                            .show()
-                    }
-                }
-                is StatefulData.Loading -> {}
-                is StatefulData.Success -> {
-                    try {
-                        val downloadResult = it.data
-                        val uri = downloadResult.uri
-                        val mimeType = downloadResult.mimeType
-
-                        val snackbarMsg = getString(R.string.video_saved_format, downloadResult.uri)
-                        Snackbar.make(
-                            parent.getSnackbarContainer(),
-                            snackbarMsg,
-                            Snackbar.LENGTH_LONG,
-                        ).setAction(R.string.view) {
-                            Utils.safeLaunchExternalIntentWithErrorDialog(
-                                context,
-                                childFragmentManager,
-                                Intent(Intent.ACTION_VIEW).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                    setDataAndType(uri, mimeType)
-                                },
-                            )
-                        }.show()
-                    } catch (e: IOException) { /* do nothing */
-                    }
-                }
-            }
-        }
-
         binding.playerView.setControllerVisibilityListener(
             ControllerVisibilityListener {
                 if (it == View.VISIBLE) {

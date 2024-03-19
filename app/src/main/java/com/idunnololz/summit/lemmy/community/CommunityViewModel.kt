@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -50,6 +51,7 @@ import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -123,6 +125,7 @@ class CommunityViewModel @Inject constructor(
 
     val defaultCommunity = MutableLiveData<CommunityRef>(null)
     val currentAccount = MutableLiveData<AccountView?>(null)
+    val onHidePost = MutableLiveData<HiddenPostEntry>(null)
 
     private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
 
@@ -424,6 +427,7 @@ class CommunityViewModel @Inject constructor(
                 .onSuccess {
                     val pageData =
                         LoadedPostsData(
+                            allPosts = it.posts,
                             posts = it.posts,
                             instance = it.instance,
                             pageIndex = pageToFetch,
@@ -446,6 +450,7 @@ class CommunityViewModel @Inject constructor(
                     postListEngine.setPersistentErrors(postsRepository.persistentErrors)
                     postListEngine.addPage(
                         LoadedPostsData(
+                            allPosts = listOf(),
                             posts = listOf(),
                             instance = postsRepository.apiInstance,
                             pageIndex = pageToFetch,
@@ -537,8 +542,11 @@ class CommunityViewModel @Inject constructor(
     private fun registerHiddenPostObserver() {
         Log.d(TAG, "Registering hidden post observer!")
         hiddenPostObserverJob?.cancel()
-        hiddenPostObserverJob = viewModelScope.launch(Dispatchers.Default) {
-            hiddenPostsManager.getOnHiddenPostsChangeFlow(apiInstance).collect {
+
+        val instanceFlows = hiddenPostsManager.getInstanceFlows(apiInstance)
+        val job = SupervisorJob()
+        viewModelScope.launch(Dispatchers.Default + job) {
+            instanceFlows.onHiddenPostsChangeFlow.collect {
                 Log.d(TAG, "Hidden posts changed. Refreshing!")
 
                 val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
@@ -551,7 +559,7 @@ class CommunityViewModel @Inject constructor(
                 val updatedPages = withContext(Dispatchers.Default) {
                     pagesCopy.map {
                         it.copy(
-                            posts = it.posts.filter { !hiddenPosts.contains(it.postView.post.id) },
+                            posts = it.allPosts.filter { !hiddenPosts.contains(it.postView.post.id) },
                             isReadPostUpdate = false,
                         )
                     }
@@ -568,6 +576,12 @@ class CommunityViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch(Dispatchers.Default + job) {
+            instanceFlows.onHidePostFlow.collect {
+                onHidePost.postValue(it)
+            }
+        }
+        hiddenPostObserverJob = job
     }
 
     fun createState(): CommunityViewState? {
@@ -700,6 +714,7 @@ class CommunityViewModel @Inject constructor(
         postListEngine.setPersistentErrors(postsRepository.persistentErrors)
         postListEngine.addPage(
             LoadedPostsData(
+                allPosts = listOf(),
                 posts = listOf(),
                 instance = postsRepository.apiInstance,
                 pageIndex = 0,
@@ -746,6 +761,10 @@ class CommunityViewModel @Inject constructor(
 
     fun hidePost(id: PostId) {
         hiddenPostsManager.hidePost(id, apiInstance)
+    }
+
+    fun unhidePost(id: PostId, instance: String,) {
+        hiddenPostsManager.hidePost(id, instance, hide = false)
     }
 
     fun recheckPreferences() {

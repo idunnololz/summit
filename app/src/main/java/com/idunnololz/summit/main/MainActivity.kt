@@ -16,6 +16,7 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.webkit.MimeTypeMap
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.viewModels
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.IntentCompat
@@ -36,7 +37,9 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.BuildConfig
+import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -51,6 +54,7 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LinkResolver
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -84,9 +88,12 @@ import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.BottomMenuContainer
+import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -95,12 +102,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.reflect.KClass
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), BottomMenuContainer {
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
@@ -130,6 +138,7 @@ class MainActivity : BaseActivity() {
     val windowInsets = MutableLiveData<Rect>(Rect())
 
     private val viewModel: MainActivityViewModel by viewModels()
+    val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var communitySelectorController: CommunitySelectorController? = null
 
@@ -142,7 +151,12 @@ class MainActivity : BaseActivity() {
     val keyPressRegistrationManager = KeyPressRegistrationManager()
 
     val insetsChangedLiveData = MutableLiveData<Int>()
-    val lastInsetLiveData = MutableLiveData<MainActivityInsets>()
+
+    override val context: Context
+        get() = this
+    override val mainApplication: MainApplication
+        get() = application as MainApplication
+    override val lastInsetLiveData = MutableLiveData<MainActivityInsets>()
 
     private val onNavigationItemReselectedListeners =
         mutableListOf<NavigationBarView.OnItemReselectedListener>()
@@ -194,7 +208,7 @@ class MainActivity : BaseActivity() {
         viewModel.communities.observe(this) {
             communitySelectorController?.setCommunities(it)
         }
-        viewModel.downloadAndShareFile.observe(this) {
+        actionsViewModel.downloadAndShareFile.observe(this) {
             when (it) {
                 is StatefulData.Error -> {}
                 is StatefulData.Loading -> {}
@@ -209,6 +223,70 @@ class MainActivity : BaseActivity() {
                         putExtra(Intent.EXTRA_STREAM, it.data)
                     }
                     startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                }
+            }
+        }
+        actionsViewModel.downloadResult.observe(this) {
+            when (it) {
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Error -> {
+                    Snackbar.make(
+                        getSnackbarContainer(),
+                        R.string.error_downloading_image,
+                        Snackbar.LENGTH_LONG,
+                    ).show()
+                }
+                is StatefulData.Loading -> {}
+                is StatefulData.Success -> {
+                    it.data
+                        .onSuccess { downloadResult ->
+                            try {
+                                val uri = downloadResult.uri
+                                val mimeType = downloadResult.mimeType
+
+                                val snackbarMsg = getString(R.string.image_saved_format, downloadResult.uri)
+                                Snackbar.make(
+                                    getSnackbarContainer(),
+                                    snackbarMsg,
+                                    Snackbar.LENGTH_LONG,
+                                ).setAction(R.string.view) {
+                                    Utils.safeLaunchExternalIntentWithErrorDialog(
+                                        context,
+                                        supportFragmentManager,
+                                        Intent(Intent.ACTION_VIEW).apply {
+                                            flags =
+                                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                            setDataAndType(uri, mimeType)
+                                        },
+                                    )
+                                }.show()
+                            } catch (e: IOException) { /* do nothing */
+                            }
+                        }
+                        .onFailure {
+                            if (it is FileDownloadHelper.CustomDownloadLocationException) {
+                                Snackbar
+                                    .make(
+                                        getSnackbarContainer(),
+                                        R.string.error_downloading_image,
+                                        Snackbar.LENGTH_LONG,
+                                    )
+                                    .setAction(R.string.downloads_settings) {
+                                        setResult(ErrorCustomDownloadLocation)
+                                        finish()
+                                    }
+                                    .show()
+                            } else {
+                                FirebaseCrashlytics.getInstance().recordException(it)
+                                Snackbar
+                                    .make(
+                                        getSnackbarContainer(),
+                                        R.string.error_downloading_image,
+                                        Snackbar.LENGTH_LONG,
+                                    )
+                                    .show()
+                            }
+                        }
                 }
             }
         }
@@ -900,15 +978,9 @@ class MainActivity : BaseActivity() {
     fun insetViewStartAndEndByPadding(
         lifecycleOwner: LifecycleOwner,
         rootView: View,
-        additionalPaddingBottom: Int = 0,
     ) {
         insetsChangedLiveData.observe(lifecycleOwner) {
             val insets = lastInsets
-
-            var bottomPadding = getBottomNavHeight()
-            if (bottomPadding == 0) {
-                bottomPadding = insets.bottomInset
-            }
 
             rootView.setPadding(
                 insets.leftInset,
@@ -1069,10 +1141,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean = true) {
+    override fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean) {
         currentBottomMenu?.close()
         bottomMenu.show(
-            mainActivity = this,
+            bottomMenuContainer = this,
             bottomSheetContainer = binding.root,
             expandFully = expandFully,
         )
@@ -1167,7 +1239,7 @@ class MainActivity : BaseActivity() {
     }
 
     fun downloadAndShareImage(url: String) {
-        viewModel.downloadAndShareImage(url)
+        actionsViewModel.downloadAndShareImage(url)
     }
 
     fun showDownloadsSettings() {

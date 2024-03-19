@@ -64,11 +64,6 @@ class CommunityAdapter(
         ) : Item
     }
 
-    data class SelectedCommunity(
-        val icon: String,
-        val communityRef: CommunityRef.CommunityRefByName,
-    )
-
     var subscribedCommunities: List<AccountSubscription>? = null
         set(value) {
             field = value

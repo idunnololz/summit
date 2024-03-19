@@ -1,8 +1,11 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.snackbar.Snackbar
+import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -17,18 +20,28 @@ import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.video.VideoDownloadManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okio.buffer
+import okio.sink
+import okio.source
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class MoreActionsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     var apiClient: AccountAwareLemmyClient,
     val accountManager: AccountManager,
     val accountInfoManager: AccountInfoManager,
@@ -37,6 +50,7 @@ class MoreActionsViewModel @Inject constructor(
     private val savedManager: SavedManager,
     private val videoDownloadManager: VideoDownloadManager,
     private val fileDownloadHelper: FileDownloadHelper,
+    private val offlineManager: OfflineManager,
 ) : ViewModel() {
 
     val currentAccount: Account?
@@ -52,6 +66,8 @@ class MoreActionsViewModel @Inject constructor(
     val deletePostResult = StatefulLiveData<PostView>()
 
     val downloadVideoResult = StatefulLiveData<FileDownloadHelper.DownloadResult>()
+    val downloadAndShareFile = StatefulLiveData<Uri>()
+    val downloadResult = StatefulLiveData<Result<FileDownloadHelper.DownloadResult>>()
 
     private var currentPageInstance: String? = null
 
@@ -236,6 +252,53 @@ class MoreActionsViewModel @Inject constructor(
         } else {
             onCorrectInstance()
         }
+    }
+
+    fun downloadAndShareImage(url: String) {
+        downloadAndShareFile.setIsLoading()
+
+        offlineManager.fetchImage(
+            url = url,
+            listener = { file ->
+                val fileUri = FileProviderHelper(context)
+                    .openTempFile("img_${file.name}") { os ->
+                        os.sink().buffer().use {
+                            it.writeAll(file.source())
+                        }
+                    }
+                downloadAndShareFile.postValue(fileUri)
+            },
+        )
+    }
+
+    fun downloadFile(
+        context: Context,
+        destFileName: String,
+        url: String,
+        mimeType: String? = null,
+    ) {
+        offlineManager.fetchImage(
+            url = url,
+            listener = {
+                viewModelScope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        fileDownloadHelper
+                            .downloadFile(
+                                c = context,
+                                destFileName = destFileName,
+                                url = url,
+                                cacheFile = it,
+                                mimeType = mimeType,
+                            )
+                    }
+
+                    downloadResult.postValue(result)
+                }
+            },
+            errorListener = {
+                downloadResult.postError(it)
+            }
+        )
     }
 }
 

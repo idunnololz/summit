@@ -3,6 +3,7 @@ package com.idunnololz.summit.video
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.webkit.URLUtil
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.NoOpCacheEvictor
@@ -17,6 +18,7 @@ import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.util.UrlUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -161,11 +163,7 @@ class VideoDownloadManager @Inject constructor(
     suspend fun downloadVideo(url: String): Result<File> {
         val request = DownloadVideoRequest(
             url = url,
-            finalFileName = if (url.contains("/")) {
-                url.substring(url.lastIndexOf("/"))
-            } else {
-                url
-            },
+            finalFileName = UrlUtils.getFileName(url),
             id = url,
         )
 

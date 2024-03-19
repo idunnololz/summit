@@ -149,7 +149,7 @@ class RichTextValueDialogFragment :
                     }
 
                     bottomMenu.show(
-                        mainActivity = requireMainActivity(),
+                        bottomMenuContainer = requireMainActivity(),
                         bottomSheetContainer = binding.root,
                         expandFully = true,
                         handleBackPress = false,

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.preview
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Animatable
@@ -18,6 +19,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.webkit.MimeTypeMap
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -26,21 +28,28 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.navArgs
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
-import com.idunnololz.summit.links.LinkType
-import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
+import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
+import com.idunnololz.summit.main.MainActivityInsets
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.BaseActivity
+import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementNames
@@ -54,9 +63,10 @@ import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.math.max
 
 @AndroidEntryPoint
-class ImageViewerActivity : BaseActivity() {
+class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
 
     companion object {
 
@@ -73,6 +83,9 @@ class ImageViewerActivity : BaseActivity() {
     private val args: ImageViewerActivityArgs by navArgs()
 
     private val viewModel: ImageViewerViewModel by viewModels()
+    private val actionsViewModel: MoreActionsViewModel by viewModels()
+
+    private var currentBottomMenu: BottomMenu? = null
 
     private lateinit var decorView: View
     private var showingUi = true
@@ -87,6 +100,12 @@ class ImageViewerActivity : BaseActivity() {
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    override val context: Context
+        get() = this
+    override val mainApplication: MainApplication
+        get() = application as MainApplication
+    override val lastInsetLiveData = MutableLiveData<MainActivityInsets>()
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -127,6 +146,15 @@ class ImageViewerActivity : BaseActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { _, insets ->
             val insetsCompat = WindowInsetsCompat(insets)
             val insetsSystemBars = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars())
+            val systemBarsInsets = insets.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.systemBars(),
+            )
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()) // keyboard
+            val imeHeight = imeInsets.bottom
+            val topInset = systemBarsInsets.top
+            val bottomInset = max(systemBarsInsets.bottom, imeHeight)
+            val leftInset = 0
+            val rightInset = 0
 
             binding.toolbar.layoutParams = binding.toolbar.layoutParams.apply {
                 (this as MarginLayoutParams).topMargin = insetsSystemBars.top
@@ -140,19 +168,18 @@ class ImageViewerActivity : BaseActivity() {
                 binding.statusBarBg.visibility = View.GONE
             }
 
-//            binding.imageView.updateLayoutParams<MarginLayoutParams> {
-//                topMargin = insetsSystemBars.top
-//            }
-//            binding.dummyImageView.updateLayoutParams<MarginLayoutParams> {
-//                topMargin = insetsSystemBars.top
-//            }
+            val lastInsets = MainActivityInsets(
+                imeHeight = imeHeight,
+                topInset = topInset,
+                bottomInset = bottomInset,
+                leftInset = leftInset,
+                rightInset = rightInset,
+            )
+
+            lastInsetLiveData.value = lastInsets
 
             insets
         }
-//        if (!LemmyUtils.isUrlAGif(args.url)) {
-//            sharedElementEnterTransition = SharedElementTransition()
-//            sharedElementReturnTransition = SharedElementTransition()
-//        }
 
         window.enterTransition = Fade(Fade.IN).apply {
             duration = 200
@@ -236,7 +263,7 @@ class ImageViewerActivity : BaseActivity() {
             supportFinishAfterTransition()
         }
 
-        viewModel.downloadAndShareFile.observe(this) {
+        actionsViewModel.downloadAndShareFile.observe(this) {
             when (it) {
                 is StatefulData.Error -> {}
                 is StatefulData.Loading -> {}
@@ -274,10 +301,16 @@ class ImageViewerActivity : BaseActivity() {
             startPostponedEnterTransition()
         }, 50,)
 
-        viewModel.downloadResult.observe(this) {
+        actionsViewModel.downloadResult.observe(this) {
             when (it) {
                 is StatefulData.NotStarted -> {}
-                is StatefulData.Error -> {}
+                is StatefulData.Error -> {
+                    Snackbar.make(
+                        getSnackbarContainer(),
+                        R.string.error_downloading_image,
+                        Snackbar.LENGTH_LONG,
+                    ).show()
+                }
                 is StatefulData.Loading -> {}
                 is StatefulData.Success -> {
                     it.data
@@ -356,20 +389,13 @@ class ImageViewerActivity : BaseActivity() {
                             }
                             true
                         }
-                        R.id.ca_share -> {
-                            if (GlobalSettings.shareImagesDirectly) {
-                                downloadAndShareImage(args.url)
-                            } else {
-                                Utils.shareLink(this@ImageViewerActivity, args.url)
-                            }
-                            true
-                        }
-                        R.id.copy_link -> {
-                            Utils.copyToClipboard(this@ImageViewerActivity, args.url)
-                            true
-                        }
-                        R.id.openInBrowser -> {
-                            onLinkClick(args.url, null, LinkType.Action)
+                        R.id.more -> {
+                            showMoreImageOrLinkOptions(
+                                args.url,
+                                actionsViewModel,
+                                supportFragmentManager,
+                                args.mimeType
+                            )
                             true
                         }
                         else -> false
@@ -377,6 +403,7 @@ class ImageViewerActivity : BaseActivity() {
             },
         )
     }
+
     override fun onDestroy() {
         offlineManager.cancelFetch(binding.root)
         showSystemUI()
@@ -398,6 +425,15 @@ class ImageViewerActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    private fun downloadImage() {
+        createImageOrLinkActionsHandler(
+            args.url,
+            actionsViewModel,
+            supportFragmentManager,
+            args.mimeType
+        )(R.id.download)
     }
 
     /**
@@ -438,7 +474,7 @@ class ImageViewerActivity : BaseActivity() {
         val imageName = args.title
         mimeType = args.mimeType
 
-        fileName = with(imageName ?: url ?: "unknown") {
+        fileName = with(imageName ?: url) {
             val s = substring(lastIndexOf('/') + 1)
             val indexOfDot = s.lastIndexOf('.')
             if (indexOfDot != -1) {
@@ -545,24 +581,6 @@ class ImageViewerActivity : BaseActivity() {
         ).show(WindowInsetsCompat.Type.systemBars())
     }
 
-    private fun downloadImage() {
-        offlineManager.fetchImageWithError(binding.root, url, {
-            viewModel.downloadFile(
-                context = this,
-                destFileName = fileName,
-                url = url,
-                cacheFile = it,
-                mimeType = mimeType,
-            )
-        }, {
-            Snackbar.make(
-                getSnackbarContainer(),
-                R.string.error_downloading_image,
-                Snackbar.LENGTH_LONG,
-            ).show()
-        },)
-    }
-
     private fun loadImageFromUrl(url: String) {
         Log.d(TAG, "loadImageFromUrl: $url")
 
@@ -650,6 +668,16 @@ class ImageViewerActivity : BaseActivity() {
     fun getSnackbarContainer(): View = binding.contentView
 
     fun downloadAndShareImage(url: String) {
-        viewModel.downloadAndShareImage(url)
+        actionsViewModel.downloadAndShareImage(url)
+    }
+
+    override fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean) {
+        currentBottomMenu?.close()
+        bottomMenu.show(
+            bottomMenuContainer = this,
+            bottomSheetContainer = binding.root,
+            expandFully = expandFully,
+        )
+        currentBottomMenu = bottomMenu
     }
 }
