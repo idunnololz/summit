@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="retry">重试</string>
+    <string name="error_unknown">未知的错误。请重试。</string>
+    <string name="error_website">伺服器发生错误，请稍候再重试</string>
+    <string name="home">首页</string>
+    <string name="error_network">网路错误。请检查你的网路连线然后再试一次。</string>
+    <string name="error_network_timeout">网路错误。资料请求时间过长。请稍后尝试。</string>
+    <string name="locale">zh-rCN</string>
+    <string name="error_external_activity_not_found">在此设备上找不到的支援 %1$s 文件类型应用程序。</string>
+</resources>
