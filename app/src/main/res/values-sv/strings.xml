@@ -78,7 +78,6 @@
     <string name="unknown_special">[okänd]</string>
     <string name="error_external_activity_not_found">Kunde inte hitta en app på denna enhet för filtypen %1$s.</string>
     <string name="error_downloading_image">Fel vid nedladdning av bilden.</string>
-    <string name="blank"></string>
     <string name="layout">Layout</string>
     <string name="list">Lista</string>
     <string name="card">Kort</string>
