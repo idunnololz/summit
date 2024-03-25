@@ -258,6 +258,8 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
                                         },
                                     )
                                 }.show()
+
+                                actionsViewModel.downloadResult.postIdle()
                             } catch (e: IOException) { /* do nothing */
                             }
                         }

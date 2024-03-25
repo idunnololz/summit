@@ -102,6 +102,7 @@ class StatefulLiveData<T> {
         data.value = StatefulData.NotStarted()
     }
 
+    @MainThread
     fun postIdle() {
         data.postValue(StatefulData.NotStarted())
     }
