@@ -851,4 +851,7 @@
     <string name="link">Link</string>
     <string name="error_account_token_expired_format">Il token di autenticazione è scaduto per l\'account %1$s. Effettuare nuovamente il login.</string>
     <string name="none">Nessuna</string>
+    <string name="edit_community">Modifica comunità</string>
+    <string name="translators_desc">Visualizza le persone che hanno contribuito a tradurre l\'app</string>
+    <string name="supporters">Sostenitori</string>
 </resources>
