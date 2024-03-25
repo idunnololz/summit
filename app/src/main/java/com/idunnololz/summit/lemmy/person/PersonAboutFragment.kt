@@ -1,20 +1,43 @@
 package com.idunnololz.summit.lemmy.person
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import coil.dispose
+import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.CommunityModeratorView
+import com.idunnololz.summit.api.dto.PersonView
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentPersonAboutBinding
+import com.idunnololz.summit.databinding.PersonInfoItemBinding
+import com.idunnololz.summit.databinding.PersonInfoModeratesItemBinding
+import com.idunnololz.summit.databinding.PersonInfoTitleBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
+
+    @Inject
+    lateinit var offlineManager: OfflineManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,17 +92,11 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
         val context = requireContext()
 
         val parentFragment = parentFragment as PersonTabbedFragment
-        val personView = data.personView
 
-        LemmyTextHelper.bindText(
-            binding.bio,
-            personView.person.bio
-                ?: buildString {
-                    append("*")
-                    append(getString(R.string.blank))
-                    append("*")
-                },
-            parentFragment.viewModel.instance,
+        val adapter = PersonInfoAdapter(
+            context = context,
+            instance = parentFragment.viewModel.instance,
+            offlineManager = offlineManager,
             onImageClick = { url ->
                 getMainActivity()?.openImage(
                     sharedElement = null,
@@ -100,41 +117,163 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showMoreLinkOptions(url, text)
-            },
+            }
         )
 
-        binding.accountInfo.text = buildString {
-            append(
-                if (personView.person.admin) {
-                    getString(R.string.admin)
-                } else if (personView.person.bot_account) {
-                    getString(R.string.bot)
-                } else {
-                    getString(R.string.normal)
-                },
-            )
+        adapter.setData(data)
 
-            val status =
-                if (personView.person.banned) {
-                    if (personView.person.ban_expires != null) {
-                        getString(
-                            R.string.banned_until_format,
-                            dateStringToPretty(context, personView.person.ban_expires),
-                        )
-                    } else {
-                        getString(R.string.banned)
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+            this.adapter = adapter
+        }
+    }
+
+    private class PersonInfoAdapter(
+        private val context: Context,
+        private val instance: String,
+        private val offlineManager: OfflineManager,
+        private val onImageClick: (url: String) -> Unit,
+        private val onVideoClick: (url: String) -> Unit,
+        private val onPageClick: (PageRef) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        private val onLinkLongClick: (url: String, text: String) -> Unit,
+    ) : Adapter<ViewHolder>() {
+
+        sealed interface Item {
+            data class InfoItem(
+                val personView: PersonView
+            ): Item
+
+            data class TitleItem(
+                val title: String
+            ): Item
+
+            data class ModeratedCommunity(
+                val community: CommunityModeratorView
+            ): Item
+        }
+
+        private val adapterHelper = AdapterHelper<Item>(
+            { old, new ->
+                when (old) {
+                    is Item.InfoItem -> true
+                    is Item.TitleItem ->
+                        old.title == (new as Item.TitleItem).title
+                    is Item.ModeratedCommunity ->
+                        old.community.community.id ==
+                            (new as Item.ModeratedCommunity).community.community.id
+                }
+            }
+        ).apply {
+            addItemType(Item.InfoItem::class, PersonInfoItemBinding::inflate) { item, b, h ->
+                val personView = item.personView
+
+                LemmyTextHelper.bindText(
+                    b.bio,
+                    personView.person.bio
+                        ?: buildString {
+                            append("*")
+                            append(context.getString(R.string.blank))
+                            append("*")
+                        },
+                    instance,
+                    onImageClick = onImageClick,
+                    onVideoClick = onVideoClick,
+                    onPageClick = onPageClick,
+                    onLinkClick = onLinkClick,
+                    onLinkLongClick = onLinkLongClick,
+                )
+
+                b.accountInfo.text = buildString {
+                    append(
+                        if (personView.person.admin) {
+                            context.getString(R.string.admin)
+                        } else if (personView.person.bot_account) {
+                            context.getString(R.string.bot)
+                        } else {
+                            context.getString(R.string.normal)
+                        },
+                    )
+
+                    val status =
+                        if (personView.person.banned) {
+                            if (personView.person.ban_expires != null) {
+                                context.getString(
+                                    R.string.banned_until_format,
+                                    dateStringToPretty(context, personView.person.ban_expires),
+                                )
+                            } else {
+                                context.getString(R.string.banned)
+                            }
+                        } else if (personView.person.deleted) {
+                            context.getString(R.string.deleted)
+                        } else {
+                            null
+                        }
+
+                    if (status != null) {
+                        append(" (")
+                        append(status)
+                        append(")")
                     }
-                } else if (personView.person.deleted) {
-                    getString(R.string.deleted)
+                }
+            }
+            addItemType(Item.TitleItem::class, PersonInfoTitleBinding::inflate) { item, b, h ->
+                b.title.text = item.title
+            }
+            addItemType(Item.ModeratedCommunity::class, PersonInfoModeratesItemBinding::inflate) { item, b, h ->
+                val community = item.community
+
+                if (community.community.icon == null) {
+                    b.icon.load(R.drawable.ic_subreddit_default)
                 } else {
-                    null
+                    b.icon.dispose()
+                    offlineManager.fetchImageWithError(
+                        rootView = h.itemView,
+                        url = community.community.icon,
+                        listener = {
+                            b.icon.load(it)
+                        },
+                        errorListener = {
+                            b.icon.load(R.drawable.ic_subreddit_default)
+                        },
+                    )
                 }
 
-            if (status != null) {
-                append(" (")
-                append(status)
-                append(")")
+                b.name.text = "${community.community.name}@${item.community.community.instance}"
+                b.root.setOnClickListener {
+                    onPageClick(community.community.toCommunityRef())
+                }
             }
+        }
+
+        override fun getItemViewType(position: Int): Int =
+            adapterHelper.getItemViewType(position)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+            adapterHelper.onCreateViewHolder(parent, viewType)
+
+        override fun getItemCount(): Int =
+            adapterHelper.itemCount
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+            adapterHelper.onBindViewHolder(holder, position)
+
+        fun setData(data: PersonTabbedViewModel.PersonDetailsData) {
+            val items = mutableListOf<Item>()
+
+            items.add(Item.InfoItem(data.personView))
+
+            if (data.moderates.isNotEmpty()) {
+                items.add(Item.TitleItem(context.getString(R.string.moderated_communities)))
+
+                for (community in data.moderates) {
+                    items.add(Item.ModeratedCommunity(community))
+                }
+            }
+
+            adapterHelper.setItems(items, this)
         }
     }
 }

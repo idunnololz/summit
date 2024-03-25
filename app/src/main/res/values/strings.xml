@@ -1642,11 +1642,14 @@
     <string name="post_hidden">Post hidden</string>
     <!-- Keep short. Button text. -->
     <string name="undo">Undo</string>
-    <!-- TItle text for a menu. -->
+    <!-- Title text for a menu. -->
     <string name="image_actions">Image actions</string>
     <!-- Keep short. Button text. -->
     <string name="download_image">Download image</string>
+    <!-- Keep short. Title text. -->
     <string name="supporters">Supporters</string>
+    <!-- Keep short. Button text. -->
+    <string name="edit_community">Edit community</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
