@@ -844,4 +844,7 @@
     <string name="single_line">एकल पंक्ति</string>
     <string name="multiline">बहुपंक्ति</string>
     <string name="browse_communities">समुदायों को ब्राउज़ करें</string>
+    <string name="edit_community">समुदाय संपादन</string>
+    <string name="translators_desc">उन लोगों को देखें जिन्होंने ऐप का अनुवाद करने में मदद की</string>
+    <string name="supporters">समर्थक</string>
 </resources>
