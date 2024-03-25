@@ -37,6 +37,7 @@ import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeletePost
 import com.idunnololz.summit.api.dto.DistinguishComment
 import com.idunnololz.summit.api.dto.EditComment
+import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
@@ -472,6 +473,22 @@ class LemmyApiClient(
             } else {
                 api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
             }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun updateCommunity(
+        account: Account?,
+        editCommunity: EditCommunity,
+    ): Result<CommunityResponse> {
+        return retrofitErrorHandler {
+            api.updateCommunity(authorization = account?.bearer, editCommunity = editCommunity)
         }.fold(
             onSuccess = {
                 Result.success(it)

@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityResponse
 import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetModlogResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
@@ -196,6 +197,14 @@ class AccountAwareLemmyClient @Inject constructor(
         account: Account? = accountForInstance(),
     ): Result<GetCommunityResponse> = retry {
         apiClient.getCommunity(account, idOrName, force)
+            .autoSignOut(account)
+    }
+
+    suspend fun updateCommunity(
+        account: Account?,
+        editCommunity: EditCommunity,
+    ): Result<CommunityResponse> = retry {
+        apiClient.updateCommunity(account, editCommunity)
             .autoSignOut(account)
     }
 

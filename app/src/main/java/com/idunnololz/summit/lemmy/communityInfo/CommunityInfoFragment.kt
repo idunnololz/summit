@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
@@ -465,6 +466,19 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         if (!isBindingAvailable()) return
 
         val bottomMenu = BottomMenu(requireContext()).apply {
+
+            val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
+            val isMod = fullAccount?.accountInfo?.isMod(communityView.community.id) == true
+
+            if (isMod) {
+                addItemWithIcon(
+                    id = R.id.edit_community,
+                    title = getString(R.string.edit_community),
+                    icon = R.drawable.baseline_edit_24,
+                )
+                addDivider()
+            }
+
             addItemWithIcon(
                 id = R.id.block_community,
                 title = getString(R.string.block_this_community_format, communityView.community.name),
@@ -494,6 +508,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
             setOnMenuItemClickListener {
                 when (it.id) {
+                    R.id.edit_community -> {
+
+                    }
                     R.id.block_community -> {
                         actionsViewModel.blockCommunity(communityView.community.id, true)
                     }

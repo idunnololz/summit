@@ -32,6 +32,7 @@ import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeletePost
 import com.idunnololz.summit.api.dto.DistinguishComment
 import com.idunnololz.summit.api.dto.EditComment
+import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
@@ -272,6 +273,15 @@ interface LemmyApi {
         @Header("Authorization") authorization: String?,
         @QueryMap form: Map<String, String>,
     ): Call<GetCommunityResponse>
+
+    /**
+     * Update a community.
+     */
+    @PUT("community")
+    fun updateCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body editCommunity: EditCommunity,
+    ): Call<CommunityResponse>
 
     /**
      * Get / fetch a community.

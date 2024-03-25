@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentId
@@ -95,9 +96,8 @@ fun BaseFragment<*>.showMoreCommentOptions(
             )
 
             addDivider()
-        } else if (miscAccountInfo
-            ?.modCommunityIds
-            ?.contains(commentView.community.id) == true
+        } else if (
+            fullAccount?.accountInfo?.isMod(commentView.community.id) == true
         ) {
             addDivider()
 
