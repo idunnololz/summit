@@ -10,7 +10,6 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -71,13 +70,6 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
         val parentFragment = parentFragment as PersonTabbedFragment
         val personView = data.personView
-
-        binding.postScore.text = PrettyPrintUtils.defaultDecimalFormat.format(
-            personView.counts.post_score,
-        )
-        binding.commentScore.text = PrettyPrintUtils.defaultDecimalFormat.format(
-            personView.counts.comment_score,
-        )
 
         LemmyTextHelper.bindText(
             binding.bio,

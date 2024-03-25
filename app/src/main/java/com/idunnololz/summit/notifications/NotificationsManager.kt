@@ -56,8 +56,8 @@ class NotificationsManager @Inject constructor(
         private const val ChannelIdAccountPrefix = "channel.account."
         private const val ChannelGroupIdAccountPrefix = "channel_group.account."
 
-        private const val InboxNotificationStartId  = 1000
-        private const val InboxNotificationLastId    = 9999
+        private const val InboxNotificationStartId = 1000
+        private const val InboxNotificationLastId = 9999
 
         private const val AccountSummaryNotificationStartId = 20000
     }
@@ -123,8 +123,10 @@ class NotificationsManager @Inject constructor(
 
         val work =
             PeriodicWorkRequestBuilder<NotificationsWorker>(
-                repeatInterval, TimeUnit.MILLISECONDS, // repeatInterval (the period cycle)
-                flexInterval, TimeUnit.MILLISECONDS // flexInterval
+                repeatInterval,
+                TimeUnit.MILLISECONDS, // repeatInterval (the period cycle)
+                flexInterval,
+                TimeUnit.MILLISECONDS, // flexInterval
             )
                 .setInitialDelay(repeatInterval, TimeUnit.MILLISECONDS)
                 .addTag(TAG)
@@ -173,8 +175,8 @@ class NotificationsManager @Inject constructor(
         notificationManager.createNotificationChannelGroup(
             NotificationChannelGroup(
                 groupKey,
-                account.fullName
-            )
+                account.fullName,
+            ),
         )
 
         val name = context.getString(R.string.account_notifications)
@@ -183,7 +185,7 @@ class NotificationsManager @Inject constructor(
         val channel = NotificationChannel(
             channelId,
             name,
-            importance
+            importance,
         ).apply {
             description = descriptionText
             group = groupKey
@@ -198,7 +200,6 @@ class NotificationsManager @Inject constructor(
         }
 
         coroutineScope.launch {
-
             withContext(Dispatchers.Main) {
                 createNotificationChannelIfNeededForAccount(account)
             }
@@ -213,8 +214,13 @@ class NotificationsManager @Inject constructor(
             val summaryNotificationBuilder = NotificationCompat.Builder(context, channelId)
                 .setContentTitle(account.fullName)
                 // Set content text to support devices running API level < 24.
-                .setContentText(context.resources.getQuantityString(
-                    R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
+                .setContentText(
+                    context.resources.getQuantityString(
+                        R.plurals.new_items_in_inbox_format,
+                        newItems.size,
+                        newItems.size.toString(),
+                    ),
+                )
                 .setSmallIcon(R.drawable.ic_logo_mono_24)
 
             newItems.forEach { inboxItem ->
@@ -257,7 +263,7 @@ class NotificationsManager @Inject constructor(
                     NotificationWithId(
                         notificationId = notificationId,
                         notification = newMessageNotification,
-                    )
+                    ),
                 )
 
                 withContext(Dispatchers.IO) {
@@ -269,7 +275,7 @@ class NotificationsManager @Inject constructor(
                             notificationId = notificationId,
                             accountFullName = account.fullName,
                             inboxItem = inboxItem,
-                        )
+                        ),
                     )
                 }
             }
@@ -281,8 +287,13 @@ class NotificationsManager @Inject constructor(
             }
 
             notificationSummaryInfo
-                .setBigContentTitle(context.resources.getQuantityString(
-                    R.plurals.new_items_in_inbox_format, newItems.size, newItems.size.toString()))
+                .setBigContentTitle(
+                    context.resources.getQuantityString(
+                        R.plurals.new_items_in_inbox_format,
+                        newItems.size,
+                        newItems.size.toString(),
+                    ),
+                )
                 .setSummaryText(account.fullName)
 
             val localAccountId = accountManager.getLocalAccountId(account)
@@ -325,7 +336,7 @@ class NotificationsManager @Inject constructor(
     }
 
     suspend fun findInboxItem(notificationId: Int): InboxEntry? {
-        return inboxEntriesDao.findInboxEntries(notificationId).firstOrNull {
+        return inboxEntriesDao.findInboxEntriesByNotificationId(notificationId).firstOrNull {
             it.inboxItem != null
         }
     }
@@ -352,5 +363,34 @@ class NotificationsManager @Inject constructor(
         notificationsSharedPreferences.edit()
             .putLong("${account.fullName}_lastItemTs", ts)
             .apply()
+    }
+
+    fun removeNotificationForInboxItem(inboxItem: InboxItem, account: Account) {
+        coroutineScope.launch {
+            val items = inboxEntriesDao.findInboxEntriesByItemId(inboxItem.id)
+            val entry = items.firstOrNull {
+                it.itemId == inboxItem.id && it.accountFullName == account.fullName
+            }
+
+            if (entry != null) {
+                notificationManager.cancel(entry.notificationId)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    val notifications = notificationManager.activeNotifications
+                    val channelGroupId = getChannelGroupIdForAccount(account)
+                    val accountNotifications = notifications.filter {
+                        it.groupKey == channelGroupId
+                    }
+                    val groupNotification = notifications.firstOrNull { it.isGroup }
+                    val otherNotifications = notifications.filter {
+                        !it.isGroup && it.id != entry.notificationId
+                    }
+
+                    if (otherNotifications.isEmpty() && groupNotification != null) {
+                        notificationManager.cancel(groupNotification.id)
+                    }
+                }
+            }
+        }
     }
 }

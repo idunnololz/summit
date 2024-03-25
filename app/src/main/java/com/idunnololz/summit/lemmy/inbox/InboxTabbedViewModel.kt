@@ -83,7 +83,7 @@ class InboxTabbedViewModel @Inject constructor(
                         InboxItemWithInstance(
                             inboxItem,
                             inboxItemAccount.instance,
-                        )
+                        ),
                     )
                 }
             }

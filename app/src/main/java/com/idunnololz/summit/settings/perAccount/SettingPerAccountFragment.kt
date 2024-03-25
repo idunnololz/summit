@@ -173,12 +173,6 @@ class SettingPerAccountFragment : BaseFragment<FragmentSettingPerAccountBinding>
                                 getMainActivity()?.launchPage(summitCommunityPage)
                                 true
                             }
-                            settings.patreonSettings.id -> {
-                                val directions = SettingsFragmentDirections
-                                    .actionSettingsFragmentToPatreonFragment()
-                                findNavController().navigateSafe(directions)
-                                true
-                            }
                             settings.miscSettings.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingMiscFragment()

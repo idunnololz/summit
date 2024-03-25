@@ -12,6 +12,15 @@
 8. Add to play store.
 9. Commit & tag release.
 
+### Update translation credit
+
+1. Go to https://translate.idunnololz.com/projects/summit/summit/#reports
+2. Choose report structure `json`.
+3. Change starting date to 1/1/1999.
+4. Change ending date to the current date.
+5. Click generate.
+6. Copy the result and paste the json into [app/src/main/res/raw/translate.json].
+
 ## Linter
 
 To run the linter do

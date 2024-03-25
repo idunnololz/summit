@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.snackbar.Snackbar
-import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -36,7 +34,6 @@ import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -297,7 +294,7 @@ class MoreActionsViewModel @Inject constructor(
             },
             errorListener = {
                 downloadResult.postError(it)
-            }
+            },
         )
     }
 }

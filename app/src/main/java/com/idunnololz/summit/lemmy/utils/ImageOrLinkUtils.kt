@@ -65,7 +65,7 @@ fun BottomMenuContainer.showMoreImageOrLinkOptions(
                 actionsViewModel = actionsViewModel,
                 fragmentManager = fragmentManager,
                 textOrFileName = textOrFileName,
-                mimeType = mimeType
+                mimeType = mimeType,
             )(it.id)
         }
     }
@@ -127,7 +127,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
                 fragmentManager = fragmentManager,
                 url = url,
                 text = null,
-                linkType = LinkType.Action
+                linkType = LinkType.Action,
             )
         }
         R.id.open_link_incognito -> {

@@ -1,7 +1,6 @@
 package com.idunnololz.summit.settings.notifications
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -65,7 +64,6 @@ class SettingsNotificationsFragment :
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -100,12 +98,12 @@ class SettingsNotificationsFragment :
                 val newState = !preferences.isNotificationsOn
 
                 if (newState &&
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                ) {
                     with(NotificationManagerCompat.from(context)) {
                         if (ActivityCompat.checkSelfPermission(
                                 context,
-                                Manifest.permission.POST_NOTIFICATIONS
+                                Manifest.permission.POST_NOTIFICATIONS,
                             ) != PackageManager.PERMISSION_GRANTED
                         ) {
                             requestPermissionLauncher.launch(
@@ -129,7 +127,7 @@ class SettingsNotificationsFragment :
             { setting, currentValue ->
                 MultipleChoiceDialogFragment.newInstance(setting, currentValue)
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-            }
+            },
         )
 //        binding.notifications.root.visibility = View.GONE
 
@@ -176,7 +174,6 @@ class SettingsNotificationsFragment :
         viewModel.onNotificationSettingsChanged()
         updateRendering()
     }
-
 
     private fun convertCheckIntervalToOptionId(value: Long) =
         when {

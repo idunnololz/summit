@@ -763,7 +763,7 @@ class CommunityViewModel @Inject constructor(
         hiddenPostsManager.hidePost(id, apiInstance)
     }
 
-    fun unhidePost(id: PostId, instance: String,) {
+    fun unhidePost(id: PostId, instance: String) {
         hiddenPostsManager.hidePost(id, instance, hide = false)
     }
 

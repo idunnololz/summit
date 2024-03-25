@@ -533,6 +533,7 @@
     <string name="view_image_on_single_tap_desc">If enabled, tapping on the thumbnail will open the image in the image viewer. If disabled, long pressing an image will open the image in the image viewer instead.</string>
     <!-- Title text of section that gives credit to Summit's translators. -->
     <string name="translators">Translators</string>
+    <string name="translators_desc">See the people who helped translate the app</string>
     <!-- Setting title text. -->
     <string name="font_color">Font color</string>
     <!-- Option for font color. -->
@@ -1645,6 +1646,7 @@
     <string name="image_actions">Image actions</string>
     <!-- Keep short. Button text. -->
     <string name="download_image">Download image</string>
+    <string name="supporters">Supporters</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

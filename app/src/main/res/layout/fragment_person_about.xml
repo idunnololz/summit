@@ -23,85 +23,85 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="96dp">
 
-                <TextView
-                    android:id="@+id/stat_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceTitleMedium"
-                    android:layout_margin="@dimen/padding"
-                    android:text="@string/stats"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+<!--                <TextView-->
+<!--                    android:id="@+id/stat_title"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textAppearance="?textAppearanceTitleMedium"-->
+<!--                    android:layout_margin="@dimen/padding"-->
+<!--                    android:text="@string/stats"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"/>-->
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/context_container"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    android:layout_marginTop="@dimen/padding"
-                    style="?attr/materialCardViewElevatedStyle"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/stat_title">
+<!--                <com.google.android.material.card.MaterialCardView-->
+<!--                    android:id="@+id/context_container"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="@dimen/padding"-->
+<!--                    android:layout_marginTop="@dimen/padding"-->
+<!--                    style="?attr/materialCardViewElevatedStyle"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/stat_title">-->
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/padding">
+<!--                    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:padding="@dimen/padding">-->
 
-                        <androidx.constraintlayout.helper.widget.Flow
-                            android:id="@+id/flow"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:flow_horizontalAlign="start"
-                            app:flow_horizontalBias="0"
-                            app:flow_wrapMode="aligned"
-                            app:flow_verticalGap="@dimen/padding"
-                            app:constraint_referenced_ids="post_score_container,comment_score_container"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
+<!--                        <androidx.constraintlayout.helper.widget.Flow-->
+<!--                            android:id="@+id/flow"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            app:flow_horizontalAlign="start"-->
+<!--                            app:flow_horizontalBias="0"-->
+<!--                            app:flow_wrapMode="aligned"-->
+<!--                            app:flow_verticalGap="@dimen/padding"-->
+<!--                            app:constraint_referenced_ids="post_score_container,comment_score_container"-->
+<!--                            app:layout_constraintTop_toTopOf="parent"-->
+<!--                            app:layout_constraintStart_toStartOf="parent"-->
+<!--                            app:layout_constraintEnd_toEndOf="parent" />-->
 
-                        <LinearLayout
-                            android:id="@+id/post_score_container"
-                            android:orientation="vertical"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
+<!--                        <LinearLayout-->
+<!--                            android:id="@+id/post_score_container"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_height="wrap_content">-->
 
-                            <TextView
-                                android:id="@+id/post_score"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="?textAppearanceTitleLarge"/>
+<!--                            <TextView-->
+<!--                                android:id="@+id/post_score"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:textAppearance="?textAppearanceTitleLarge"/>-->
 
-                            <TextView
-                                android:text="@string/post_score"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-                        </LinearLayout>
+<!--                            <TextView-->
+<!--                                android:text="@string/post_score"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"/>-->
+<!--                        </LinearLayout>-->
 
-                        <LinearLayout
-                            android:id="@+id/comment_score_container"
-                            android:orientation="vertical"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content">
+<!--                        <LinearLayout-->
+<!--                            android:id="@+id/comment_score_container"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_height="wrap_content">-->
 
-                            <TextView
-                                android:id="@+id/comment_score"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textAppearance="?textAppearanceTitleLarge"/>
+<!--                            <TextView-->
+<!--                                android:id="@+id/comment_score"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:textAppearance="?textAppearanceTitleLarge"/>-->
 
-                            <TextView
-                                android:text="@string/comment_score"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-                        </LinearLayout>
+<!--                            <TextView-->
+<!--                                android:text="@string/comment_score"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"/>-->
+<!--                        </LinearLayout>-->
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+<!--                    </androidx.constraintlayout.widget.ConstraintLayout>-->
 
-                </com.google.android.material.card.MaterialCardView>
+<!--                </com.google.android.material.card.MaterialCardView>-->
 
                 <TextView
                     android:id="@+id/bio_title"
@@ -109,11 +109,11 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?textAppearanceTitleMedium"
                     android:layout_marginHorizontal="@dimen/padding"
-                    android:layout_marginTop="@dimen/padding_two"
+                    android:layout_marginTop="@dimen/padding"
                     android:text="@string/biography"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/context_container"/>
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <TextView
                     android:id="@+id/bio"

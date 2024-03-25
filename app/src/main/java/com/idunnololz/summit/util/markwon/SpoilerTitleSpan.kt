@@ -16,17 +16,15 @@ import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
 
-
 abstract class DetailsClickableSpan : ClickableSpan()
 
 data class DetailsStartSpan(
     val title: CharSequence,
     var isExpanded: Boolean = false,
     var isProcessed: Boolean = false,
-    var spoilerText: SpannableStringBuilder? = null
+    var spoilerText: SpannableStringBuilder? = null,
 )
 class DetailsEndSpan
-
 
 private const val TAG = "SpoilerPlugin"
 
@@ -63,7 +61,9 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
             val spoilerCloses = spoilerCloseRegex.findAll(text)
             for (match in spoilerCloses) {
                 visitor.builder().apply {
-                    replaceRange(start, start + 3, "::: ")
+                    if (start + 4 >= this.length) {
+                        append(" ")
+                    }
                     setSpan(DetailsEndSpan(), start, start + 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
             }
@@ -106,7 +106,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                     val spoilerContent =
                         spanned.subSequence(
                             spanned.getSpanEnd(detailsStartSpan) + 1,
-                            spoilerEnd - 4,
+                            spoilerEnd - 3,
                         ) as SpannableStringBuilder
 
                     if (spoilerContent.last() != '\n') {
@@ -117,7 +117,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                         BlockQuoteSpan(LemmyTextHelper.getMarkwonTheme(textView.context)),
                         0,
                         spoilerContent.length,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                     )
 
                     detailsStartSpan.spoilerText = spoilerContent
@@ -131,7 +131,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                     )
                     spanned.insert(
                         spoilerStart + spoilerTitle.length,
-                        detailsStartSpan.spoilerText
+                        detailsStartSpan.spoilerText,
                     )
                     spanned.setSpan(
                         detailsStartSpan,
@@ -178,7 +178,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         } catch (e: Exception) {
             Log.d(TAG, "Spoiler error", e)
             FirebaseCrashlytics.getInstance().recordException(
-                RuntimeException("Spoiler error", e)
+                RuntimeException("Spoiler error", e),
             )
         }
     }

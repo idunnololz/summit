@@ -136,13 +136,6 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"/>
         <action
-            android:id="@+id/action_settingsFragment_to_patreonFragment"
-            app:destination="@id/patreonFragment"
-            app:enterAnim="@anim/slide_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out"  />
-        <action
             android:id="@+id/action_settingsFragment_to_settingMiscFragment"
             app:destination="@id/settingMiscFragment"
             app:enterAnim="@anim/slide_in"
@@ -204,7 +197,18 @@
     <fragment
         android:id="@+id/settingAboutFragment"
         android:name="com.idunnololz.summit.settings.about.SettingAboutFragment"
-        android:label="SettingAboutFragment" />
+        android:label="SettingAboutFragment" >
+        <action
+            android:id="@+id/action_settingAboutFragment_to_patreonFragment"
+            app:destination="@id/patreonFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"/>
+        <action
+            android:id="@+id/action_settingAboutFragment_to_translatorsFragment"
+            app:destination="@id/translatorsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/settingGesturesFragment"
         android:name="com.idunnololz.summit.settings.gestures.SettingGesturesFragment"
@@ -421,4 +425,8 @@
         android:id="@+id/settingNotificationsFragment"
         android:name="com.idunnololz.summit.settings.notifications.SettingsNotificationsFragment"
         android:label="SettingNotificationsFragment" />
+    <fragment
+        android:id="@+id/translatorsFragment"
+        android:name="com.idunnololz.summit.settings.translators.TranslatorsFragment"
+        android:label="TranslatorsFragment" />
 </navigation>

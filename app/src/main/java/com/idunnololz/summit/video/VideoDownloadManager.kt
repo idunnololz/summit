@@ -3,7 +3,6 @@ package com.idunnololz.summit.video
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.webkit.URLUtil
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.NoOpCacheEvictor

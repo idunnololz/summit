@@ -74,7 +74,7 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
                 val videoKey = pathSegments.getOrNull(1)
 
                 if (videoKey != null) {
-                    url = "https://api.redgifs.com/v2/gifs/${videoKey}/sd.m3u8"
+                    url = "https://api.redgifs.com/v2/gifs/$videoKey/sd.m3u8"
                 }
             }
         } else if (uri.host == "api.redgifs.com") {
@@ -85,7 +85,7 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
                 val videoKey = pathSegments.getOrNull(2)
 
                 if (videoKey != null) {
-                    url = "https://api.redgifs.com/v2/gifs/${videoKey}/sd.m3u8"
+                    url = "https://api.redgifs.com/v2/gifs/$videoKey/sd.m3u8"
                 }
             }
         }

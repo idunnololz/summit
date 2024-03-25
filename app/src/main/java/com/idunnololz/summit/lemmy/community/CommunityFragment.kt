@@ -1095,11 +1095,14 @@ class CommunityFragment :
     private fun showOverflowMenu() {
         val context = context ?: return
 
-        val currentCommunityRef = requireNotNull(viewModel.currentCommunityRef.value) {
-            "currentCommunityRef is null!"
-        }
+        val currentCommunityRef = viewModel.currentCommunityRef.value
         val currentDefaultPage = preferences.getDefaultPage()
-        val isBookmarked = userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
+        val isBookmarked =
+            if (currentCommunityRef == null) {
+                false
+            } else {
+                userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
+            }
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
 
         val bottomMenu = BottomMenu(context).apply {
@@ -1144,18 +1147,20 @@ class CommunityFragment :
                 )
             }
 
-            if (isBookmarked) {
-                addItemWithIcon(
-                    id = R.id.toggle_bookmark,
-                    title = R.string.remove_bookmark,
-                    icon = R.drawable.baseline_bookmark_remove_24,
-                )
-            } else {
-                addItemWithIcon(
-                    id = R.id.toggle_bookmark,
-                    title = R.string.bookmark_community,
-                    icon = R.drawable.baseline_bookmark_add_24,
-                )
+            if (currentCommunityRef != null) {
+                if (isBookmarked) {
+                    addItemWithIcon(
+                        id = R.id.toggle_bookmark,
+                        title = R.string.remove_bookmark,
+                        icon = R.drawable.baseline_bookmark_remove_24,
+                    )
+                } else {
+                    addItemWithIcon(
+                        id = R.id.toggle_bookmark,
+                        title = R.string.bookmark_community,
+                        icon = R.drawable.baseline_bookmark_add_24,
+                    )
+                }
             }
 
             val mainFragment = parentFragment?.parentFragment as? MainFragment
@@ -1169,15 +1174,17 @@ class CommunityFragment :
                 )
             }
 
-            addDivider()
-            addItemWithIcon(
-                id = R.id.per_community_settings,
-                title = getString(
-                    R.string.per_community_settings_format,
-                    currentCommunityRef.getName(context),
-                ),
-                icon = R.drawable.ic_community_24,
-            )
+            if (currentCommunityRef != null) {
+                addDivider()
+                addItemWithIcon(
+                    id = R.id.per_community_settings,
+                    title = getString(
+                        R.string.per_community_settings_format,
+                        currentCommunityRef.getName(context),
+                    ),
+                    icon = R.drawable.ic_community_24,
+                )
+            }
 
             if (getMainActivity()?.useBottomNavBar == false) {
                 addDivider()
@@ -1293,6 +1300,7 @@ class CommunityFragment :
                     }
 
                     R.id.set_as_default -> {
+                        currentCommunityRef ?: return@setOnMenuItemClickListener
                         viewModel.setDefaultPage(currentCommunityRef)
 
                         Snackbar.make(
@@ -1306,6 +1314,7 @@ class CommunityFragment :
                     }
 
                     R.id.community_info -> {
+                        currentCommunityRef ?: return@setOnMenuItemClickListener
                         getMainActivity()?.showCommunityInfo(currentCommunityRef)
                     }
 
@@ -1314,6 +1323,7 @@ class CommunityFragment :
                     }
 
                     R.id.toggle_bookmark -> {
+                        currentCommunityRef ?: return@setOnMenuItemClickListener
                         if (isBookmarked) {
                             userCommunitiesManager.removeCommunity(currentCommunityRef)
                         } else {
@@ -1367,6 +1377,7 @@ class CommunityFragment :
                         binding.recyclerView.scrollToPosition(0)
                     }
                     R.id.per_community_settings -> {
+                        currentCommunityRef ?: return@setOnMenuItemClickListener
                         showPerCommunitySettings(currentCommunityRef)
                     }
                 }

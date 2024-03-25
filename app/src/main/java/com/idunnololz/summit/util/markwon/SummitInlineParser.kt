@@ -41,10 +41,10 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
 
     init {
         delimiterProcessors = InlineParserImpl.calculateDelimiterProcessors(
-            context.customDelimiterProcessors
+            context.customDelimiterProcessors,
         )
         delimiterCharacters = calculateDelimiterCharacters(
-            delimiterProcessors.keys
+            delimiterProcessors.keys,
         )
         specialCharacters = calculateSpecialCharacters(delimiterCharacters)
     }
@@ -172,7 +172,7 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
         // Check previous text for trailing spaces.
         // The "endsWith" is an optimization to avoid an RE match in the common case.
         return if (previous is Text && previous.literal.endsWith(
-                " "
+                " ",
             )
         ) {
             val text = previous
@@ -204,7 +204,7 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
             node = HardLineBreak()
             index++
         } else if (index < input.length && ESCAPABLE.matcher(
-                input.substring(index, index + 1)
+                input.substring(index, index + 1),
             ).matches()
         ) {
             node = text(input, index, index + 1)
@@ -250,7 +250,7 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
      */
     private fun parseDelimiters(
         delimiterProcessor: DelimiterProcessor?,
-        delimiterChar: Char
+        delimiterChar: Char,
     ): Node? {
         val res = scanDelimiters(delimiterProcessor, delimiterChar) ?: return null
         val length = res.count
@@ -298,8 +298,8 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
                     node,
                     startIndex + 1,
                     lastBracket,
-                    lastDelimiter
-                )
+                    lastDelimiter,
+                ),
             )
             node
         } else {
@@ -352,7 +352,6 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
 
         // Maybe a reference link like `[foo][bar]`, `[foo][]` or `[foo]`
         if (!isLinkOrImage) {
-
             // See if there's a link label like `[bar]` or `[]`
             val beforeLabel = index
             parseLinkLabel()
@@ -553,7 +552,7 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
      */
     private fun scanDelimiters(
         delimiterProcessor: DelimiterProcessor?,
-        delimiterChar: Char
+        delimiterChar: Char,
     ): DelimiterData? {
         val startIndex = index
         var delimiterCount = 0
@@ -575,9 +574,9 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
         val afterIsPunctuation = PUNCTUATION.matcher(after).matches()
         val afterIsWhitespace = UNICODE_WHITESPACE_CHAR.matcher(after).matches()
         val leftFlanking = !afterIsWhitespace &&
-                (!afterIsPunctuation || beforeIsWhitespace || beforeIsPunctuation)
+            (!afterIsPunctuation || beforeIsWhitespace || beforeIsPunctuation)
         val rightFlanking = !beforeIsWhitespace &&
-                (!beforeIsPunctuation || afterIsWhitespace || afterIsPunctuation)
+            (!beforeIsPunctuation || afterIsWhitespace || afterIsPunctuation)
         val canOpen: Boolean
         val canClose: Boolean
         if (delimiterChar == '_') {
@@ -592,7 +591,7 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
     }
 
     private fun processDelimiters(stackBottom: Delimiter?) {
-        val openersBottom: MutableMap<Char, Delimiter> = HashMap()
+        val openersBottom: MutableMap<Char, Delimiter?> = HashMap()
 
         // find first closer above stackBottom:
         var closer = lastDelimiter
@@ -652,11 +651,11 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
             closer.length -= useDelims
             openerNode.literal = openerNode.literal.substring(
                 0,
-                openerNode.literal.length - useDelims
+                openerNode.literal.length - useDelims,
             )
             closerNode.literal = closerNode.literal.substring(
                 0,
-                closerNode.literal.length - useDelims
+                closerNode.literal.length - useDelims,
             )
             removeDelimitersBetween(opener, closer)
             // The delimiter processor can re-parent the nodes between opener and closer,
@@ -781,7 +780,7 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
     private class DelimiterData internal constructor(
         val count: Int,
         val canOpen: Boolean,
-        val canClose: Boolean
+        val canClose: Boolean,
     )
 
     companion object {
@@ -790,8 +789,10 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
         private const val DECLARATION = "<![A-Z]+\\s+[^>]*>"
         private const val CDATA = "<!\\[CDATA\\[[\\s\\S]*?\\]\\]>"
         private const val HTMLTAG =
-            ("(?:" + Parsing.OPENTAG + "|" + Parsing.CLOSETAG + "|" + HTMLCOMMENT
-                    + "|" + PROCESSINGINSTRUCTION + "|" + DECLARATION + "|" + CDATA + ")")
+            (
+                "(?:" + Parsing.OPENTAG + "|" + Parsing.CLOSETAG + "|" + HTMLCOMMENT +
+                    "|" + PROCESSINGINSTRUCTION + "|" + DECLARATION + "|" + CDATA + ")"
+                )
         private const val ASCII_PUNCTUATION =
             "!\"#\\$%&'\\(\\)\\*\\+,\\-\\./:;<=>\\?@\\[\\\\\\]\\^_`\\{\\|\\}~"
         private val PUNCTUATION = Pattern
@@ -835,7 +836,7 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
         private fun addDelimiterProcessorForChar(
             delimiterChar: Char,
             toAdd: DelimiterProcessor,
-            delimiterProcessors: MutableMap<Char, DelimiterProcessor>
+            delimiterProcessors: MutableMap<Char, DelimiterProcessor>,
         ) {
             val existing = delimiterProcessors.put(delimiterChar, toAdd)
             require(existing == null) { "Delimiter processor conflict with delimiter char '$delimiterChar'" }

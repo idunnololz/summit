@@ -150,12 +150,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 getMainActivity()?.launchPage(summitCommunityPage)
                                 true
                             }
-                            mainSettings.patreonSettings.id -> {
-                                val directions = SettingsFragmentDirections
-                                    .actionSettingsFragmentToPatreonFragment()
-                                findNavController().navigateSafe(directions)
-                                true
-                            }
                             mainSettings.miscSettings.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingMiscFragment()

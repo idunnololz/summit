@@ -37,29 +37,41 @@
                     android:id="@+id/version"
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/play_store_listing"
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/give_feedback"
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/section_title"
+                    android:text="@string/supporters"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingBottom="@dimen/padding_half"
+                    android:paddingTop="@dimen/padding_three"
+                    style="@style/SettingHeaderStyle"/>
+
+                <include
+                    android:id="@+id/patreon"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/translators"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

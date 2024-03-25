@@ -2,7 +2,6 @@ package com.idunnololz.summit.preview
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
@@ -16,8 +15,6 @@ import androidx.fragment.app.viewModels
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
@@ -25,16 +22,12 @@ import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
-import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PreferenceUtil
-import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.IOException
 
 @AndroidEntryPoint
 class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
@@ -262,7 +255,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             getString(R.string.more_actions),
             {
                 showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
-            }
+            },
         )
     }
 

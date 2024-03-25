@@ -1,8 +1,6 @@
 package com.idunnololz.summit.notifications
 
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
@@ -11,10 +9,8 @@ import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.toInboxItem
-import com.idunnololz.summit.preferences.Preferences
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -70,7 +66,7 @@ class NotificationsUpdater @AssistedInject constructor(
                         }
                         jobs.flatMap { it.await() }
                     },
-                    { listOf() }
+                    { listOf() },
                 )
         }
         val j2: Deferred<List<InboxItem>> = coroutineScope.async {
@@ -90,7 +86,7 @@ class NotificationsUpdater @AssistedInject constructor(
                         }
                         jobs.flatMap { it.await() }
                     },
-                    { listOf() }
+                    { listOf() },
                 )
         }
 
@@ -125,7 +121,7 @@ class NotificationsUpdater @AssistedInject constructor(
                 account = account,
             ).fold(
                 { it.map { it.toInboxItem() } },
-                { listOf() }
+                { listOf() },
             )
         }
 
@@ -139,7 +135,7 @@ class NotificationsUpdater @AssistedInject constructor(
                 account = account,
             ).fold(
                 { it.map { it.toInboxItem() } },
-                { listOf() }
+                { listOf() },
             )
         }
 
@@ -154,7 +150,7 @@ class NotificationsUpdater @AssistedInject constructor(
                 account = account,
             ).fold(
                 { it.map { it.toInboxItem() } },
-                { listOf() }
+                { listOf() },
             )
         }
 
@@ -168,7 +164,7 @@ class NotificationsUpdater @AssistedInject constructor(
                 force = true,
             ).fold(
                 { it.comment_reports.map { it.toInboxItem() } },
-                { listOf() }
+                { listOf() },
             )
         }
 
@@ -182,8 +178,7 @@ class NotificationsUpdater @AssistedInject constructor(
                 force = true,
             ).fold(
                 { it.post_reports.map { it.toInboxItem() } },
-                { listOf() }
+                { listOf() },
             )
         }
-
 }
