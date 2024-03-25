@@ -10,10 +10,8 @@ import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkType
 import com.idunnololz.summit.links.onLinkClick
-import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils

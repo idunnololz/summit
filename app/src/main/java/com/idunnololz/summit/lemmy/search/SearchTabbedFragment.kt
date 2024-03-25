@@ -33,6 +33,7 @@ import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.toLocalizedString
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
@@ -105,7 +106,7 @@ class SearchTabbedFragment :
         childFragmentManager.setFragmentResultListener(
             PersonPickerDialogFragment.REQUEST_KEY,
             this,
-        ) { key, bundle ->
+        ) { _, bundle ->
             val result = bundle.getParcelableCompat<PersonPickerDialogFragment.Result>(
                 PersonPickerDialogFragment.REQUEST_KEY_RESULT,
             )
@@ -203,7 +204,7 @@ class SearchTabbedFragment :
                 allTabs.forEach {
                     adapter.addFrag(
                         SearchResultsFragment::class.java,
-                        it.toLocalizedString(),
+                        it.toLocalizedString(context),
                         SearchResultsFragmentArgs(
                             it,
                         ).toBundle(),
@@ -431,8 +432,8 @@ class SearchTabbedFragment :
                 R.drawable.baseline_delete_24,
             )
 
-            setOnMenuItemClickListener {
-                when (it.id) {
+            setOnMenuItemClickListener { actionItem ->
+                when (actionItem.id) {
                     R.id.sort_order -> {
                         showSortTypeMenu(
                             getCurrentSortType = {
@@ -528,16 +529,6 @@ class SearchTabbedFragment :
         )
         suggestions.saveRecentQuery(query, null)
     }
-
-    fun SearchType.toLocalizedString() =
-        when (this) {
-            SearchType.All -> getString(R.string.all)
-            SearchType.Comments -> getString(R.string.comments)
-            SearchType.Posts -> getString(R.string.posts)
-            SearchType.Communities -> getString(R.string.communities)
-            SearchType.Users -> getString(R.string.users)
-            SearchType.Url -> getString(R.string.urls)
-        }
 
     private fun resetQuery() {
         viewModel.updateCurrentQuery("")

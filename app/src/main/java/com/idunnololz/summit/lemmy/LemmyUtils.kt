@@ -10,6 +10,7 @@ import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.NumberFormatUtil
 import com.idunnololz.summit.util.PreviewInfo
@@ -183,3 +184,13 @@ object LemmyUtils {
 
 fun Int.toLemmyPageIndex() =
     this + 1 // lemmy pages are 1 indexed
+
+fun SearchType.toLocalizedString(context: Context) =
+    when (this) {
+        SearchType.All -> context.getString(R.string.all)
+        SearchType.Comments -> context.getString(R.string.comments)
+        SearchType.Posts -> context.getString(R.string.posts)
+        SearchType.Communities -> context.getString(R.string.communities)
+        SearchType.Users -> context.getString(R.string.users)
+        SearchType.Url -> context.getString(R.string.urls)
+    }

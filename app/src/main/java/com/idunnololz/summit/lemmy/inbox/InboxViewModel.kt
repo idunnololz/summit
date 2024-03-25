@@ -16,6 +16,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,7 @@ class InboxViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
     private val inboxRepositoryFactory: InboxRepository.Factory,
+    private val notificationsManager: NotificationsManager,
 ) : ViewModel() {
 
     companion object {
@@ -86,7 +88,7 @@ class InboxViewModel @Inject constructor(
                     InboxUpdate(
                         inboxData = allData,
                         scrollToTop = false,
-                    )
+                    ),
                 )
 
                 fetchInbox(pageIndex, requireNotNull(pageTypeFlow.value))
@@ -118,7 +120,7 @@ class InboxViewModel @Inject constructor(
                         InboxUpdate(
                             inboxData = allData,
                             scrollToTop = false,
-                        )
+                        ),
                     )
 
                     fetchInbox()
@@ -168,7 +170,7 @@ class InboxViewModel @Inject constructor(
                         InboxUpdate(
                             inboxData = allData,
                             scrollToTop = pageIndex == 0 && force,
-                        )
+                        ),
                     )
 
                     fetchingPages.remove(pageIndex)
@@ -194,6 +196,11 @@ class InboxViewModel @Inject constructor(
             read,
         )
         viewModelScope.launch {
+            val currentAccount = currentAccount.value
+            if (currentAccount != null) {
+                notificationsManager.removeNotificationForInboxItem(inboxItem, currentAccount)
+            }
+
             inboxRepository.markAsRead(inboxItem, read)
                 .onSuccess {
                     if (!read || refreshAfter) {
@@ -259,7 +266,7 @@ class InboxViewModel @Inject constructor(
             InboxUpdate(
                 inboxData = allData,
                 scrollToTop = false,
-            )
+            ),
         )
     }
 

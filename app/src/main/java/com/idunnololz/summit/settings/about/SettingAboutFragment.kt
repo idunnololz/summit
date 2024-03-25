@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingAboutBinding
 import com.idunnololz.summit.preferences.Preferences
@@ -16,6 +17,7 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.util.startFeedbackIntent
 import com.idunnololz.summit.util.summitCommunityPage
@@ -107,6 +109,17 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
             }
 
             getMainActivity()?.showBottomMenu(bottomMenu)
+        }
+
+        aboutSettings.patreonSettings.bindTo(binding.patreon) {
+            val directions = SettingAboutFragmentDirections
+                .actionSettingAboutFragmentToPatreonFragment()
+            findNavController().navigateSafe(directions)
+        }
+        aboutSettings.translatorsSettings.bindTo(binding.translators) {
+            val directions = SettingAboutFragmentDirections
+                .actionSettingAboutFragmentToTranslatorsFragment()
+            findNavController().navigateSafe(directions)
         }
     }
 }

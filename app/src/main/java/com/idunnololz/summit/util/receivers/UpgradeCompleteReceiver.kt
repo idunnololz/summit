@@ -13,6 +13,5 @@ class UpgradeCompleteReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(TAG, "onReceive. Intent.action: ${intent?.action}")
-
     }
 }

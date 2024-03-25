@@ -49,7 +49,7 @@ class ActionsTabbedFragment :
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
         }
 
-        val actions = mutableListOf<ActionsFragment.ActionType>(
+        val actions = mutableListOf(
             ActionsFragment.ActionType.Pending,
             ActionsFragment.ActionType.Completed,
             ActionsFragment.ActionType.Failed,

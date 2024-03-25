@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.inbox
 
-import android.os.Parcelable
 import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,12 +8,7 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.idunnololz.summit.account.GuestOrUserAccount
-import com.idunnololz.summit.lemmy.actions.ActionInfo
-import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
-import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.squareup.moshi.Moshi
-import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "inbox_entries")
 @TypeConverters(InboxEntryConverters::class)

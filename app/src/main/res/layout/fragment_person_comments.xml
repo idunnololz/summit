@@ -18,7 +18,7 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="@dimen/padding"
+            android:paddingTop="@dimen/padding_half"
             android:paddingBottom="96dp"
             android:clipToPadding="false"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

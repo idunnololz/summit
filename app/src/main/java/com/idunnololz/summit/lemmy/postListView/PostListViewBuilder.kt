@@ -4,13 +4,11 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.util.Log
-import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.Barrier
@@ -983,7 +981,7 @@ class PostListViewBuilder @Inject constructor(
             val commentButton = MaterialButton(
                 context,
                 null,
-                R.attr.summitTextButton
+                R.attr.summitTextButton,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(
@@ -1049,7 +1047,7 @@ class PostListViewBuilder @Inject constructor(
             val commentButton = MaterialButton(
                 context,
                 null,
-                R.attr.summitTextButton
+                R.attr.summitTextButton,
             ).apply {
                 id = View.generateViewId()
                 layoutParams = ConstraintLayout.LayoutParams(

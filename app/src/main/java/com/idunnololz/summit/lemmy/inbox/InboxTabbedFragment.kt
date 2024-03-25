@@ -126,7 +126,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
                 replace(
                     R.id.inbox_fragment_container,
                     InboxFragment::class.java,
-                    InboxFragmentArgs(InboxViewModel.PageType.All).toBundle()
+                    InboxFragmentArgs(InboxViewModel.PageType.All).toBundle(),
                 )
             }
         }

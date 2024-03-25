@@ -16,7 +16,6 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.webkit.MimeTypeMap
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.viewModels
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.IntentCompat
@@ -117,7 +116,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
         private const val ARG_NOTIFICATION_ID = "ARG_NOTIFICATION_ID"
 
         fun createInboxItemIntent(context: Context, account: Account, notificationId: Int): Intent {
-
             return Intent(context, MainActivity::class.java).apply {
                 putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
                 putExtra(ARG_NOTIFICATION_ID, notificationId)
@@ -663,7 +661,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
         Log.d("notification", "Intent extras: ${intent.extras?.keySet()?.joinToString()}")
         if (intent.hasExtra(ARG_ACCOUNT_FULL_NAME)) {
             val direction = MainDirections.actionGlobalInboxTabbedFragment(
-                intent.getIntExtra(ARG_NOTIFICATION_ID, 0)
+                intent.getIntExtra(ARG_NOTIFICATION_ID, 0),
             )
 
             runOnReady(this) {

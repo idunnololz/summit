@@ -12,6 +12,8 @@ import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,7 +30,10 @@ class ActionsViewModel @Inject constructor(
     }
 
     fun loadActions() {
-        viewModelScope.launch {
+        actionsDataLiveData.setIsLoading()
+
+        viewModelScope.launch(Dispatchers.Default) {
+            delay(400)
             val pendingActions = pendingActionsManager.getAllPendingActions().sortedByDescending { it.ts }
             val completedActions = pendingActionsManager.getAllCompletedActions().sortedByDescending { it.ts }
             val failedAccountInfo = pendingActionsManager.getAllFailedActions().sortedByDescending { it.ts }

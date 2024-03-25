@@ -1,18 +1,12 @@
 package com.idunnololz.summit.util
 
 import android.net.Uri
-import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
-import com.idunnololz.summit.links.LinkPreviewDialogFragment
-import com.idunnololz.summit.links.LinkType
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.preferences.GlobalSettings
-import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import okhttp3.CacheControl
 import okhttp3.Request
 import okhttp3.Response

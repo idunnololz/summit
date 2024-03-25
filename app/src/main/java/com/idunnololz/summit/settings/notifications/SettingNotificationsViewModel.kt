@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.notifications.NotificationsManager
-import com.idunnololz.summit.preferences.Preferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

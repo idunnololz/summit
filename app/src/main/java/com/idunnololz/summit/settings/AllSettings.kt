@@ -226,11 +226,6 @@ class MainSettings @Inject constructor(
         context.getString(R.string.comment_list_desc),
     )
 
-    val patreonSettings = BasicSettingItem(
-        R.drawable.baseline_attach_money_24,
-        context.getString(R.string.patreon_supporters),
-        context.getString(R.string.patreon_supporters_desc),
-    )
     val miscSettings = BasicSettingItem(
         R.drawable.baseline_miscellaneous_services_24,
         context.getString(R.string.misc),
@@ -306,7 +301,6 @@ class MainSettings @Inject constructor(
                 backupAndRestoreSettings,
                 settingAbout,
                 settingSummitCommunity,
-                patreonSettings,
             ),
         ),
     )
@@ -1352,10 +1346,22 @@ class AboutSettings @Inject constructor(
         context.getString(R.string.give_feedback),
         context.getString(R.string.give_feedback_desc),
     )
+    val patreonSettings = BasicSettingItem(
+        R.drawable.baseline_attach_money_24,
+        context.getString(R.string.patreon_supporters),
+        context.getString(R.string.patreon_supporters_desc),
+    )
+    val translatorsSettings = BasicSettingItem(
+        R.drawable.baseline_translate_24,
+        context.getString(R.string.translators),
+        context.getString(R.string.translators_desc),
+    )
     override val allSettings: List<SettingItem> = listOf(
         version,
         googlePlayLink,
         giveFeedback,
+        patreonSettings,
+        translatorsSettings,
     )
 }
 
@@ -1943,12 +1949,6 @@ class PerAccountSettings @Inject constructor(
         context.getString(R.string.comment_list),
         context.getString(R.string.comment_list_desc),
     )
-
-    val patreonSettings = BasicSettingItem(
-        R.drawable.baseline_attach_money_24,
-        context.getString(R.string.patreon_supporters),
-        context.getString(R.string.patreon_supporters_desc),
-    )
     val miscSettings = BasicSettingItem(
         R.drawable.baseline_miscellaneous_services_24,
         context.getString(R.string.misc),
@@ -2061,7 +2061,6 @@ class PerCommunitySettings @Inject constructor(
 class NotificationSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
-
 
     private val refreshIntervalOptions =
         listOf(

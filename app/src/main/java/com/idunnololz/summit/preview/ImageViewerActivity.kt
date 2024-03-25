@@ -19,7 +19,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.webkit.MimeTypeMap
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -28,7 +27,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.navArgs
 import coil.imageLoader
@@ -44,7 +42,6 @@ import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
 import com.idunnololz.summit.main.MainActivityInsets
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.BaseActivity
@@ -284,6 +281,11 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
     }
 
     fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (intent.extras == null) {
+            finish()
+            return
+        }
+
         val context = this
 
         binding.dummyImageView.transitionName = args.transitionName
@@ -394,7 +396,7 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
                                 args.url,
                                 actionsViewModel,
                                 supportFragmentManager,
-                                args.mimeType
+                                args.mimeType,
                             )
                             true
                         }
@@ -432,7 +434,7 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
             args.url,
             actionsViewModel,
             supportFragmentManager,
-            args.mimeType
+            args.mimeType,
         )(R.id.download)
     }
 
