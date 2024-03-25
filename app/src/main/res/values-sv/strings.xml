@@ -85,4 +85,5 @@
     <string name="removed_by_op_message">Detta inlägg har raderas av personen som ursprungligen postat det.</string>
     <string name="compact">Kompakt</string>
     <string name="sort_order_scaled">Heta (skalad på gemenskapens storlek)</string>
+    <string name="locale">sv</string>
 </resources>
