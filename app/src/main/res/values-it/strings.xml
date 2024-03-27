@@ -854,4 +854,13 @@
     <string name="edit_community">Modifica comunità</string>
     <string name="translators_desc">Visualizza le persone che hanno contribuito a tradurre l\'app</string>
     <string name="supporters">Sostenitori</string>
+    <string name="icon">Icona</string>
+    <string name="edit_icon">Modifica icona</string>
+    <string name="delete_icon">Elimina icona</string>
+    <string name="banner">Banner</string>
+    <string name="edit_banner">Modifica banner</string>
+    <string name="delete_banner">Elimina banner</string>
+    <string name="publish">Pubblica</string>
+    <string name="error_update_community">Non è stato possibile aggiornare la comunità.</string>
+    <string name="create_community">Crea comunità</string>
 </resources>
