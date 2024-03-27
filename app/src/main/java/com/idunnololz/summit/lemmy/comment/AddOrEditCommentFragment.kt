@@ -37,6 +37,7 @@ import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -87,6 +88,7 @@ class AddOrEditCommentFragment :
     private val args by navArgs<AddOrEditCommentFragmentArgs>()
 
     private val viewModel: AddOrEditCommentViewModel by viewModels()
+    private val uploadImageViewModel: UploadImageViewModel by viewModels()
 
     private var currentBottomMenu: BottomMenu? = null
 
@@ -96,7 +98,7 @@ class AddOrEditCommentFragment :
                 val uri = it.data?.data
 
                 if (uri != null) {
-                    viewModel.uploadImage(args.instance, uri)
+                    uploadImageViewModel.uploadImage(uri)
                 }
             }
         }
@@ -149,7 +151,7 @@ class AddOrEditCommentFragment :
                 ChooseSavedImageDialogFragment.REQUEST_RESULT,
             )
             if (result != null) {
-                viewModel.uploadImage(args.instance, result.fileUri)
+                uploadImageViewModel.uploadImage(result.fileUri)
             }
         }
     }
@@ -359,7 +361,7 @@ class AddOrEditCommentFragment :
         binding.toolbar.setOnMenuItemClickListener a@{
             when (it.itemId) {
                 R.id.send_comment -> {
-                    if (viewModel.isUploading) {
+                    if (uploadImageViewModel.isUploading) {
                         AlertDialogFragment.Builder()
                             .setMessage(R.string.warn_upload_in_progress)
                             .setPositiveButton(R.string.proceed_anyways)
@@ -371,7 +373,7 @@ class AddOrEditCommentFragment :
                     true
                 }
                 R.id.update_comment -> {
-                    if (viewModel.isUploading) {
+                    if (uploadImageViewModel.isUploading) {
                         AlertDialogFragment.Builder()
                             .setMessage(R.string.warn_upload_in_progress)
                             .setPositiveButton(R.string.proceed_anyways)
@@ -544,7 +546,7 @@ class AddOrEditCommentFragment :
             dismiss()
             return
         }
-        viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
+        uploadImageViewModel.uploadImageResult.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
@@ -561,7 +563,7 @@ class AddOrEditCommentFragment :
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     binding.loadingView.hideAll()
-                    viewModel.uploadImageEvent.clear()
+                    uploadImageViewModel.uploadImageResult.clear()
 
                     textFormatterToolbar?.onImageUploaded(it.data.url)
                 }

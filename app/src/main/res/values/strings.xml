@@ -1650,6 +1650,15 @@
     <string name="supporters">Supporters</string>
     <!-- Keep short. Button text. -->
     <string name="edit_community">Edit community</string>
+    <string name="create_community">Create community</string>
+    <string name="icon">Icon</string>
+    <string name="edit_icon">Edit icon</string>
+    <string name="delete_icon">Delete icon</string>
+    <string name="banner">Banner</string>
+    <string name="edit_banner">Edit banner</string>
+    <string name="delete_banner">Delete banner</string>
+    <string name="publish">Publish</string>
+    <string name="error_update_community">Unable to update community.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

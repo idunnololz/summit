@@ -39,6 +39,7 @@ import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
@@ -75,6 +76,7 @@ class CreateOrEditPostFragment :
     private val args by navArgs<CreateOrEditPostFragmentArgs>()
 
     private val viewModel: CreateOrEditPostViewModel by viewModels()
+    private val uploadImageViewModel: UploadImageViewModel by viewModels()
 
     private var adapter: CommunitySearchResultsAdapter? = null
 
@@ -99,7 +101,7 @@ class CreateOrEditPostFragment :
                 val uri = it.data?.data
 
                 if (uri != null) {
-                    viewModel.uploadImage(uri)
+                    uploadImageViewModel.uploadImage(uri)
                 }
             }
         }
@@ -110,7 +112,7 @@ class CreateOrEditPostFragment :
                 val uri = it.data?.data
 
                 if (uri != null) {
-                    viewModel.uploadImageForUrl(uri)
+                    uploadImageViewModel.uploadImageForUrl(uri)
                 }
             }
         }
@@ -150,7 +152,7 @@ class CreateOrEditPostFragment :
                 ChooseSavedImageDialogFragment.REQUEST_RESULT,
             )
             if (result != null) {
-                viewModel.uploadImage(result.fileUri)
+                uploadImageViewModel.uploadImage(result.fileUri)
             }
         }
         childFragmentManager.setFragmentResultListener(
@@ -161,7 +163,7 @@ class CreateOrEditPostFragment :
                 ChooseSavedImageDialogFragment.REQUEST_RESULT,
             )
             if (result != null) {
-                viewModel.uploadImageForUrl(result.fileUri)
+                uploadImageViewModel.uploadImageForUrl(result.fileUri)
             }
         }
     }
@@ -214,7 +216,7 @@ class CreateOrEditPostFragment :
         binding.toolbar.setOnMenuItemClickListener a@{
             when (it.itemId) {
                 R.id.create_post -> {
-                    if (viewModel.isUploading) {
+                    if (uploadImageViewModel.isUploading) {
                         AlertDialogFragment.Builder()
                             .setMessage(R.string.warn_upload_in_progress)
                             .setPositiveButton(R.string.proceed_anyways)
@@ -227,7 +229,7 @@ class CreateOrEditPostFragment :
                     true
                 }
                 R.id.update_post -> {
-                    if (viewModel.isUploading) {
+                    if (uploadImageViewModel.isUploading) {
                         AlertDialogFragment.Builder()
                             .setMessage(R.string.warn_upload_in_progress)
                             .setPositiveButton(R.string.proceed_anyways)
@@ -470,7 +472,7 @@ class CreateOrEditPostFragment :
                 }
             }
         }
-        viewModel.uploadImageResult.observe(viewLifecycleOwner) {
+        uploadImageViewModel.uploadImageResult.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
@@ -487,13 +489,13 @@ class CreateOrEditPostFragment :
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     binding.loadingView.hideAll()
-                    viewModel.uploadImageResult.clear()
+                    uploadImageViewModel.uploadImageResult.clear()
 
                     textFormatToolbar?.onImageUploaded(it.data.url)
                 }
             }
         }
-        viewModel.uploadImageForUrlResult.observe(viewLifecycleOwner) {
+        uploadImageViewModel.uploadImageForUrlResult.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
@@ -510,7 +512,7 @@ class CreateOrEditPostFragment :
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     binding.loadingView.hideAll()
-                    viewModel.uploadImageResult.clear()
+                    uploadImageViewModel.uploadImageResult.clear()
 
                     binding.url.editText?.setText(it.data.url)
                 }
@@ -668,7 +670,7 @@ class CreateOrEditPostFragment :
             }
 
             if (extraImage != null) {
-                viewModel.uploadImageForUrl(extraImage)
+                uploadImageViewModel.uploadImageForUrl(extraImage)
             }
         }
 

@@ -176,6 +176,9 @@
         <action
             android:id="@+id/action_communityInfoFragment_to_modLogsFragment"
             app:destination="@id/modLogsFragment" />
+        <action
+            android:id="@+id/action_communityInfoFragment_to_createOrEditCommunityFragment"
+            app:destination="@id/createOrEditCommunityFragment" />
     </fragment>
     <action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
     <include app:graph="@navigation/settings"/>
@@ -229,4 +232,14 @@
             app:nullable="true"/>
     </fragment>
     <action android:id="@+id/action_global_inboxTabbedFragment" app:destination="@id/inboxTabbedFragment"/>
+    <fragment
+        android:id="@+id/createOrEditCommunityFragment"
+        android:name="com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment"
+        android:label="CreateOrEditCommunityFragment" >
+        <argument
+            android:name="community"
+            app:argType="com.idunnololz.summit.api.dto.Community"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 </navigation>

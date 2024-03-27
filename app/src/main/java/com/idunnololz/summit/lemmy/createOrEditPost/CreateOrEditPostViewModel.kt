@@ -38,12 +38,9 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class) // Flow.debounce()
 @HiltViewModel
 class CreateOrEditPostViewModel @Inject constructor(
-    private val context: Application,
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val state: SavedStateHandle,
-    private val preferences: Preferences,
-    private val uploadHelper: UploadHelper,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
@@ -55,8 +52,6 @@ class CreateOrEditPostViewModel @Inject constructor(
 
     var postPrefilled: Boolean = false
     val createOrEditPostResult = StatefulLiveData<PostView>()
-    val uploadImageResult = StatefulLiveData<UploadImageResult>()
-    val uploadImageForUrlResult = StatefulLiveData<UploadImageResult>()
     val searchResults = StatefulLiveData<List<CommunityView>>()
     val showSearch = MutableStateFlow<Boolean>(false)
     val showSearchLiveData = showSearch.asLiveData()
@@ -183,14 +178,6 @@ class CreateOrEditPostViewModel @Inject constructor(
         }
     }
 
-    fun uploadImage(uri: Uri) {
-        uploadImageInternal(uri, uploadImageResult)
-    }
-
-    fun uploadImageForUrl(uri: Uri) {
-        uploadImageInternal(uri, uploadImageForUrlResult)
-    }
-
     fun loadLinkMetadata(url: String) {
         linkMetadata.setIsLoading()
 
@@ -208,9 +195,6 @@ class CreateOrEditPostViewModel @Inject constructor(
             urlFlow.emit(url)
         }
     }
-
-    val isUploading: Boolean
-        get() = uploadHelper.isUploading
 
     private fun doQuery(query: String) {
         searchResults.setIsLoading()
@@ -237,25 +221,6 @@ class CreateOrEditPostViewModel @Inject constructor(
                     searchResults.setError(it)
                 }
         }
-    }
-
-    private fun uploadImageInternal(
-        uri: Uri,
-        imageLiveData: StatefulLiveData<UploadImageResult>,
-    ) {
-        imageLiveData.setIsLoading()
-
-        uploadHelper.upload(
-            coroutineScope = viewModelScope,
-            uri = uri,
-            rotateAccounts = preferences.rotateInstanceOnUploadFail,
-            onSuccess = {
-                imageLiveData.postValue(it)
-            },
-            onFailure = {
-                imageLiveData.postError(it)
-            },
-        )
     }
 
     class NoTitleError : RuntimeException()

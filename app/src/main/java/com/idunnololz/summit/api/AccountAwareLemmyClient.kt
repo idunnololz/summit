@@ -201,8 +201,8 @@ class AccountAwareLemmyClient @Inject constructor(
     }
 
     suspend fun updateCommunity(
-        account: Account?,
         editCommunity: EditCommunity,
+        account: Account? = accountForInstance(),
     ): Result<CommunityResponse> = retry {
         apiClient.updateCommunity(account, editCommunity)
             .autoSignOut(account)
