@@ -1141,6 +1141,14 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
         }
     }
 
+    fun showBottomNav() {
+        navBarController.showBottomNav()
+    }
+
+    fun hideBottomNav() {
+        navBarController.hideNavBar(animate = true)
+    }
+
     override fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean) {
         currentBottomMenu?.close()
         bottomMenu.show(

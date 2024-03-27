@@ -509,7 +509,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             setOnMenuItemClickListener {
                 when (it.id) {
                     R.id.edit_community -> {
-
+                        val directions = CommunityInfoFragmentDirections
+                            .actionCommunityInfoFragmentToCreateOrEditCommunityFragment(
+                                communityView.community,
+                            )
+                        findNavController().navigateSafe(directions)
                     }
                     R.id.block_community -> {
                         actionsViewModel.blockCommunity(communityView.community.id, true)

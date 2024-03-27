@@ -36,7 +36,6 @@ class AddOrEditCommentViewModel @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val state: SavedStateHandle,
     private val preferences: Preferences,
-    private val uploadHelper: UploadHelper,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
@@ -53,7 +52,6 @@ class AddOrEditCommentViewModel @Inject constructor(
     val currentAccount = accountManager.currentAccount.asAccountLiveData()
 
     val commentSentEvent = MutableLiveData<Event<Result<Unit>>>()
-    val uploadImageEvent = StatefulLiveData<UploadImageResult>()
 
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
@@ -162,22 +160,6 @@ class AddOrEditCommentViewModel @Inject constructor(
         }
     }
 
-    fun uploadImage(instance: String, uri: Uri) {
-        uploadImageEvent.setIsLoading()
-
-        uploadHelper.upload(
-            coroutineScope = viewModelScope,
-            uri = uri,
-            rotateAccounts = preferences.rotateInstanceOnUploadFail,
-            onSuccess = {
-                uploadImageEvent.postValue(it)
-            },
-            onFailure = {
-                uploadImageEvent.postError(it)
-            },
-        )
-    }
-
     fun sendComment(personId: PersonId, content: String) {
         viewModelScope.launch {
             authedApiClient
@@ -202,7 +184,4 @@ class AddOrEditCommentViewModel @Inject constructor(
     fun dismissMessage(message: Message) {
         messages.value = (messages.value ?: listOf()).filter { it != message }
     }
-
-    val isUploading: Boolean
-        get() = uploadHelper.isUploading
 }
