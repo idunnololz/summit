@@ -73,7 +73,7 @@ class CommunityViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
-    private val hiddenPostsManager: HiddenPostsManager,
+    val hiddenPostsManager: HiddenPostsManager,
     private val tabsManager: TabsManager,
     private val apiClient: AccountAwareLemmyClient,
     private val guestAccountManager: GuestAccountManager,
@@ -118,6 +118,8 @@ class CommunityViewModel @Inject constructor(
         get() = postsRepository.communityInstance
     val apiInstance: String
         get() = postsRepository.apiInstance
+    val apiInstanceFlow
+        get() = postsRepository.apiInstanceFlow
 
     private var initialPageFetched = state.getLiveData<Boolean>("_initialPageFetched")
 
@@ -533,12 +535,6 @@ class CommunityViewModel @Inject constructor(
         registerHiddenPostObserver()
     }
 
-    fun changeInstance(instance: String) {
-        apiClient.changeInstance(instance)
-
-        registerHiddenPostObserver()
-    }
-
     private fun registerHiddenPostObserver() {
         Log.d(TAG, "Registering hidden post observer!")
         hiddenPostObserverJob?.cancel()
@@ -574,11 +570,6 @@ class CommunityViewModel @Inject constructor(
                 withContext(Dispatchers.Main) {
                     loadedPostsData.setValue(PostUpdateInfo())
                 }
-            }
-        }
-        viewModelScope.launch(Dispatchers.Default + job) {
-            instanceFlows.onHidePostFlow.collect {
-                onHidePost.postValue(it)
             }
         }
         hiddenPostObserverJob = job
@@ -870,7 +861,6 @@ class CommunityViewModel @Inject constructor(
         )
 
         fun getSortOrder(): CommunitySortOrder? {
-            Log.d("HAHA", "currentCommunityRef: ${currentCommunityRef.value}")
             val currentCommunityRef = currentCommunityRef.value
             if (currentCommunityRef != null) {
                 val config = perCommunityPreferences.getCommunityConfig(currentCommunityRef)

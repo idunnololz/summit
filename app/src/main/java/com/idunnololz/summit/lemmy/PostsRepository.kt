@@ -215,6 +215,9 @@ class PostsRepository @Inject constructor(
     val apiInstance: String
         get() = apiClient.instance
 
+    val apiInstanceFlow
+        get() = apiClient.instanceFlow
+
     fun setCommunity(communityRef: CommunityRef?) {
         this.communityRef = communityRef ?: CommunityRef.All()
 

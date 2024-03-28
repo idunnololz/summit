@@ -1,7 +1,6 @@
 package com.idunnololz.summit.settings.translators
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
@@ -59,7 +58,7 @@ class TranslatorsViewModel @Inject constructor(
                             TranslationTranslatorStats(
                                 translatorName = name as? String ?: continue,
                                 stringsTranslated = stringsTranslated as? Double ?: continue,
-                            )
+                            ),
                         )
                     }
                 }

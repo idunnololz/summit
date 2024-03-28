@@ -47,7 +47,6 @@ class MultiModEventDataSource(
                     { this.id },
                     Unit,
                     { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->
-                        Log.d("HAHA", "[$type] fetchModLogs...")
                         apiClient.fetchModLogs(
                             personId = null,
                             communityId = communityIdOrNull,
@@ -64,9 +63,7 @@ class MultiModEventDataSource(
                             {
                                 Result.failure(it)
                             },
-                        ).also {
-                            Log.d("HAHA", "[$type] fetchModLogs...complete")
-                        }
+                        )
                     },
                     10,
                     type,

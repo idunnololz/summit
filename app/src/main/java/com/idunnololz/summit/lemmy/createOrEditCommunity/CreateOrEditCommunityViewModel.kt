@@ -55,7 +55,6 @@ class CreateOrEditCommunityViewModel @Inject constructor(
                     getCommunityResult.postError(it)
                 }
         }
-
     }
 
     private fun setCommunityIfNotSet(community: GetCommunityResponse?) {
@@ -95,7 +94,7 @@ class CreateOrEditCommunityViewModel @Inject constructor(
         val curCommunityData = currentCommunityData.value ?: return
 
         currentCommunityData.value = curCommunityData.copy(
-            community = updateFn(curCommunityData.community)
+            community = updateFn(curCommunityData.community),
         )
     }
 
@@ -117,7 +116,7 @@ class CreateOrEditCommunityViewModel @Inject constructor(
                     posting_restricted_to_mods = curCommunity.posting_restricted_to_mods,
                     discussion_languages = curCommunityData.discussionLanguages,
                     auth = "",
-                )
+                ),
             )
 
             result

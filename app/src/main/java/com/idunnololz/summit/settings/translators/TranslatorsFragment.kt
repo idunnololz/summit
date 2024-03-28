@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -84,13 +83,13 @@ class TranslatorsFragment : BaseFragment<DialogFragmentTranslatorsBinding>() {
         private sealed interface Item {
 
             data class LocaleItem(
-                val locale: String
-            ): Item
+                val locale: String,
+            ) : Item
 
             data class TranslatorItem(
                 val translatorName: String,
                 val stringsTranslated: Int,
-            ): Item
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -101,17 +100,17 @@ class TranslatorsFragment : BaseFragment<DialogFragmentTranslatorsBinding>() {
                     is Item.TranslatorItem ->
                         old.translatorName == (new as Item.TranslatorItem).translatorName
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.TranslatorItem::class,
-                inflateFn = TranslatorsTranslatorItemBinding::inflate
+                inflateFn = TranslatorsTranslatorItemBinding::inflate,
             ) { item, b, h ->
                 b.text.text = item.translatorName
             }
             addItemType(
                 clazz = Item.LocaleItem::class,
-                inflateFn = TranslatorsLocaleItemBinding::inflate
+                inflateFn = TranslatorsLocaleItemBinding::inflate,
             ) { item, b, h ->
                 b.title.text = item.locale
             }
@@ -143,8 +142,8 @@ class TranslatorsFragment : BaseFragment<DialogFragmentTranslatorsBinding>() {
                     items.add(
                         Item.TranslatorItem(
                             translatorName = translatorStats.translatorName,
-                            stringsTranslated = translatorStats.stringsTranslated.toInt()
-                        )
+                            stringsTranslated = translatorStats.stringsTranslated.toInt(),
+                        ),
                     )
                 }
             }

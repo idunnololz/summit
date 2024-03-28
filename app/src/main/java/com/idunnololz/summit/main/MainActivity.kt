@@ -1021,8 +1021,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
                 insets.rightInset,
                 insets.bottomInset + additionalPaddingBottom,
             )
-
-            Log.d("HAHA", "bottomInset: ${insets.bottomInset + additionalPaddingBottom}")
         }
     }
 

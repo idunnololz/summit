@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.viewModels
+import androidx.media3.ui.BuildConfig
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -466,11 +467,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         if (!isBindingAvailable()) return
 
         val bottomMenu = BottomMenu(requireContext()).apply {
-
             val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
             val isMod = fullAccount?.accountInfo?.isMod(communityView.community.id) == true
 
-            if (isMod) {
+            if (isMod && BuildConfig.DEBUG) {
                 addItemWithIcon(
                     id = R.id.edit_community,
                     title = getString(R.string.edit_community),
