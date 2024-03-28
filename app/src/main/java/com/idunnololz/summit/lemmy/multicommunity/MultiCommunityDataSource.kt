@@ -10,8 +10,14 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.getActiveRank
+import com.idunnololz.summit.lemmy.utils.getControversialRank
+import com.idunnololz.summit.lemmy.utils.getHotRank
+import com.idunnololz.summit.lemmy.utils.getScaledRank
 import com.idunnololz.summit.util.dateStringToTs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,6 +25,7 @@ import javax.inject.Inject
 class MultiCommunityDataSource(
     private val instance: String,
     private val sources: List<LemmyListSource<PostView, SortType>>,
+    private val apiClient: AccountAwareLemmyClient,
 ) : PostsDataSource {
 
     companion object {
@@ -58,7 +65,7 @@ class MultiCommunityDataSource(
                 )
             }.take(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
 
-            return MultiCommunityDataSource(instance, sources)
+            return MultiCommunityDataSource(instance, sources, apiClient)
         }
     }
 
@@ -73,6 +80,9 @@ class MultiCommunityDataSource(
     private var sortType: SortType? = null
     private var communityNotFoundOnInstance = mutableSetOf<CommunityRef.CommunityRefByName>()
 
+    private val communityToMau = mutableMapOf<String, Int>()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val pagesContext = Dispatchers.Default.limitedParallelism(1)
 
     private val validSources
@@ -172,8 +182,18 @@ class MultiCommunityDataSource(
                 }
 
                 when (sortType) {
-                    SortType.Active -> postView.counts.hot_rank_active ?: 0.0
-                    SortType.Hot -> postView.counts.hot_rank ?: 0.0
+                    SortType.Active ->
+                        postView.counts.hot_rank_active
+                            ?: postView.getActiveRank().also {
+                                postView.counts.hot_rank_active = it
+                            }
+
+                    SortType.Hot ->
+                        postView.counts.hot_rank
+                            ?: postView.getHotRank().also {
+                                postView.counts.hot_rank = it
+                            }
+
                     SortType.New -> dateStringToTs(postView.counts.published).toDouble()
                     SortType.Old -> -dateStringToTs(postView.counts.published).toDouble()
                     SortType.MostComments -> postView.counts.comments.toDouble()
@@ -196,10 +216,34 @@ class MultiCommunityDataSource(
                     SortType.TopSixMonths,
                     SortType.TopNineMonths,
                     -> postView.counts.score.toDouble()
-                    SortType.Controversial -> postView.counts.controversy_rank ?: 0.0
-                    SortType.Scaled -> postView.counts.scaled_rank ?: 0.0
+                    SortType.Controversial ->
+                        postView.counts.controversy_rank
+                            ?: postView.getControversialRank().also {
+                                postView.counts.controversy_rank = it
+                            }
+                    SortType.Scaled -> {
+                        val key = postView.community.toCommunityRef().fullName
+                        var communityMau = communityToMau[key]
+
+                        if (communityMau == null) {
+                            apiClient
+                                .fetchCommunityWithRetry(
+                                    idOrName = Either.Left(postView.community.id),
+                                    force = false,
+                                )
+                                .onSuccess {
+                                    communityToMau[key] = it.community_view.counts.users_active_month
+                                }
+                            communityMau = communityToMau[key]
+                        }
+
+                        postView.counts.scaled_rank
+                            ?: postView.getScaledRank(communityMau).also {
+                                postView.counts.scaled_rank = it
+                            }
+                    }
                     null ->
-                        postView.counts.score.toDouble() ?: 0.0
+                        postView.counts.score.toDouble()
                 }
             }
             val nextItem = nextSourceAndResult?.second?.getOrNull()

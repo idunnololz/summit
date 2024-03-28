@@ -117,7 +117,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             },
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showMoreLinkOptions(url, text)
-            }
+            },
         )
 
         adapter.setData(data)
@@ -142,16 +142,16 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
         sealed interface Item {
             data class InfoItem(
-                val personView: PersonView
-            ): Item
+                val personView: PersonView,
+            ) : Item
 
             data class TitleItem(
-                val title: String
-            ): Item
+                val title: String,
+            ) : Item
 
             data class ModeratedCommunity(
-                val community: CommunityModeratorView
-            ): Item
+                val community: CommunityModeratorView,
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -164,7 +164,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                         old.community.community.id ==
                             (new as Item.ModeratedCommunity).community.community.id
                 }
-            }
+            },
         ).apply {
             addItemType(Item.InfoItem::class, PersonInfoItemBinding::inflate) { item, b, h ->
                 val personView = item.personView

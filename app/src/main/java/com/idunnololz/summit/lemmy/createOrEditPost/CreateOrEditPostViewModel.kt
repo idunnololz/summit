@@ -1,7 +1,5 @@
 package com.idunnololz.summit.lemmy.createOrEditPost
 
-import android.app.Application
-import android.net.Uri
 import android.webkit.URLUtil
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,7 +11,6 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostId
@@ -22,9 +19,7 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
-import com.idunnololz.summit.lemmy.UploadHelper
 import com.idunnololz.summit.links.LinkMetadataHelper
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview

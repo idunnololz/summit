@@ -9,6 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -77,6 +82,9 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -417,6 +425,22 @@ class CommunityFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        var job: Job? = null
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.apiInstanceFlow.collect { instance ->
+                    job?.cancel()
+                    job = viewLifecycleOwner.lifecycleScope.launch {
+                        val instanceFlows =
+                            viewModel.hiddenPostsManager.getInstanceFlows(instance)
+                        instanceFlows.onHidePostFlow.collect {
+                            viewModel.onHidePost.postValue(it)
+                        }
+                    }
+                }
+            }
+        }
 
         viewModel.updatePreferences()
         binding.loadingView.hideAll()

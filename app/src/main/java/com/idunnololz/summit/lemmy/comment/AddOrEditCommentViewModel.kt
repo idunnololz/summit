@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.comment
 
 import android.app.Application
-import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -12,18 +11,15 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccountLiveData
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
-import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.UploadHelper
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Event
-import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -116,7 +116,6 @@ class VideoDownloadManager @Inject constructor(
         downloadManager.maxParallelDownloads = 3
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun onDownloadComplete(exoDownloadRequest: DownloadRequest) {
         coroutineScope.launch(Dispatchers.Default) {
             val downloadRequest = withContext(downloadRequestsContext) {
@@ -136,7 +135,6 @@ class VideoDownloadManager @Inject constructor(
                                 composition: Composition,
                                 exportResult: ExportResult,
                             ) {
-                                Log.d("HAHA", "onCompleted()")
                                 continuation.resume(Result.success(outputFile))
                             }
 
@@ -145,7 +143,6 @@ class VideoDownloadManager @Inject constructor(
                                 exportResult: ExportResult,
                                 exportException: ExportException,
                             ) {
-                                Log.d("HAHA", "onError()")
                                 continuation.resume(Result.failure(exportException))
                             }
                         },
@@ -154,7 +151,6 @@ class VideoDownloadManager @Inject constructor(
                 }
             }
 
-            Log.d("HAHA", "onDownloadComplete() - emit")
             downloadRequest.resultFlow.emit(Result.success(outputFile))
         }
     }

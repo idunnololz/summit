@@ -31,7 +31,6 @@ import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
-import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment.UploadResultTarget.*
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
 import com.idunnololz.summit.offline.OfflineManager
@@ -331,8 +330,8 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     }
                 }
             }
-
-        })
+        },
+        )
     }
 
     private fun onUploadComplete(
@@ -359,18 +358,18 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 result.clear()
 
                 when (target) {
-                    Description ->
+                    UploadResultTarget.Description ->
                         textFormatToolbar?.onImageUploaded(uploadResult.data.url)
-                    Icon ->
+                    UploadResultTarget.Icon ->
                         viewModel.update {
                             it.copy(
-                                icon = uploadResult.data.url
+                                icon = uploadResult.data.url,
                             )
                         }
-                    Banner ->
+                    UploadResultTarget.Banner ->
                         viewModel.update {
                             it.copy(
-                                banner = uploadResult.data.url
+                                banner = uploadResult.data.url,
                             )
                         }
                 }
@@ -448,6 +447,6 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
     enum class UploadResultTarget {
         Description,
         Icon,
-        Banner
+        Banner,
     }
 }
