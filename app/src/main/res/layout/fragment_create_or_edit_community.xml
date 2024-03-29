@@ -205,11 +205,44 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/toolbar_spacer"/>
 
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/nsfw_checkbox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nsfw"
+                    android:layout_marginTop="@dimen/padding_half"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    app:layout_constraintTop_toBottomOf="@+id/text_field_toolbar_placeholder"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/only_mod_checkbox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/only_mod_can_post"
+                    android:layout_marginTop="@dimen/padding_half"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    app:layout_constraintTop_toBottomOf="@+id/nsfw_checkbox"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <Button
+                    android:id="@+id/edit_languages_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit_languages"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:layout_marginTop="@dimen/padding"
+                    app:layout_constraintTop_toBottomOf="@+id/only_mod_checkbox"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
                 <Space
                     android:id="@+id/bottom_spacer"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/footer_spacer_height"
-                    app:layout_constraintTop_toBottomOf="@+id/text_field_toolbar_placeholder"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_languages_button"
                     app:layout_constraintStart_toStartOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

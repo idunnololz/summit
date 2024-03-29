@@ -470,14 +470,14 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
             val isMod = fullAccount?.accountInfo?.isMod(communityView.community.id) == true
 
-            if (isMod && BuildConfig.DEBUG) {
-                addItemWithIcon(
-                    id = R.id.edit_community,
-                    title = getString(R.string.edit_community),
-                    icon = R.drawable.baseline_edit_24,
-                )
-                addDivider()
-            }
+//            if (isMod) {
+//                addItemWithIcon(
+//                    id = R.id.edit_community,
+//                    title = getString(R.string.edit_community),
+//                    icon = R.drawable.baseline_edit_24,
+//                )
+//                addDivider()
+//            }
 
             addItemWithIcon(
                 id = R.id.block_community,

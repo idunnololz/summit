@@ -255,4 +255,15 @@ safeargs.
             app:argType="string"
             app:nullable="true"/>
     </dialog>
+    <dialog
+        android:id="@+id/languageSelectDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.languageSelect.LanguageSelectDialogFragment"
+        android:label="LanguageSelectDialogFragment" >
+        <argument
+            android:name="languages"
+            app:argType="com.idunnololz.summit.api.dto.Language[]" />
+        <argument
+            android:name="selected_languages"
+            app:argType="integer[]" />
+    </dialog>
 </navigation>

@@ -27,12 +27,14 @@ import com.idunnololz.summit.editTextToolbar.FloatingToolbarController
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
+import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
@@ -52,6 +54,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
     private val viewModel: CreateOrEditCommunityViewModel by viewModels()
     private val uploadImageViewModel: UploadImageViewModel by viewModels()
+    private val actionsViewModel: MoreActionsViewModel by viewModels()
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -396,6 +399,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
             if (community.icon == null) {
                 icon.load(R.drawable.ic_subreddit_default)
+                icon.setOnClickListener(null)
             } else {
                 icon.dispose()
                 offlineManager.fetchImageWithError(
@@ -408,6 +412,15 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                         icon.load(R.drawable.ic_subreddit_default)
                     },
                 )
+                icon.setOnClickListener {
+                    getMainActivity()?.let {
+                        it.showMoreImageOrLinkOptions(
+                            community.icon,
+                            it.actionsViewModel,
+                            childFragmentManager,
+                        )
+                    }
+                }
             }
 
             editIconButton.setOnClickListener {
@@ -426,6 +439,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
             if (community.banner == null) {
                 banner.load(null)
+                banner.setOnClickListener(null)
             } else {
                 banner.dispose()
                 offlineManager.fetchImageWithError(
@@ -438,9 +452,36 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                         banner.load(null)
                     },
                 )
+                banner.setOnClickListener {
+                    getMainActivity()?.let {
+                        it.showMoreImageOrLinkOptions(
+                            community.banner,
+                            it.actionsViewModel,
+                            childFragmentManager,
+                        )
+                    }
+                }
             }
 
             descriptionEditText.setText(community.description)
+
+            nsfwCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
+                viewModel.update {
+                    it.copy(
+                        nsfw = isChecked
+                    )
+                }
+            }
+            onlyModCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
+                viewModel.update {
+                    it.copy(
+                        posting_restricted_to_mods = isChecked
+                    )
+                }
+            }
+            editLanguagesButton.setOnClickListener {
+
+            }
         }
     }
 
