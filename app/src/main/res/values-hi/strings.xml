@@ -856,4 +856,6 @@
     <string name="error_update_community">समुदाय अपडेट करने में असमर्थ।</string>
     <string name="edit_icon">आइकन संपादन</string>
     <string name="edit_banner">बैनर संपादन</string>
+    <string name="edit_languages">भाषाएँ संपादन</string>
+    <string name="only_mod_can_post">केवल मॉडरेटर ही इस समुदाय में पोस्ट कर सकते हैं</string>
 </resources>
