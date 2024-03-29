@@ -1659,6 +1659,8 @@
     <string name="delete_banner">Delete banner</string>
     <string name="publish">Publish</string>
     <string name="error_update_community">Unable to update community.</string>
+    <string name="only_mod_can_post">Only moderators can post to this community</string>
+    <string name="edit_languages">Edit languages</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

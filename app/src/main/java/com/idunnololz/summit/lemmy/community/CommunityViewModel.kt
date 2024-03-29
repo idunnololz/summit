@@ -129,7 +129,7 @@ class CommunityViewModel @Inject constructor(
     val currentAccount = MutableLiveData<AccountView?>(null)
     val onHidePost = MutableLiveData<HiddenPostEntry>(null)
 
-    private var isHideReadEnabled = state.getLiveData<Boolean>("_isHideReadEnabled", false)
+    private var isHideReadEnabled = state.getLiveData("_isHideReadEnabled", false)
 
     var preferences: Preferences = preferenceManager.currentPreferences
 

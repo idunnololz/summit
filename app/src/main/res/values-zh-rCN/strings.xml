@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="retry">重试</string>
     <string name="error_unknown">未知的错误。请重试。</string>
     <string name="error_website">伺服器发生错误，请稍候再重试</string>
     <string name="home">首页</string>
