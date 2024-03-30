@@ -11,6 +11,9 @@ import com.idunnololz.summit.settings.HistorySettings
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

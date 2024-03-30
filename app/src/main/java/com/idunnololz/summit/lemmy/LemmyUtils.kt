@@ -28,7 +28,7 @@ object LemmyUtils {
 
     private var compactDecimalFormat: DecimalFormat? = null
 
-    fun formatAuthor(author: String): String = "u/%s".format(author)
+    fun formatAuthor(author: String): String = "@%s".format(author)
 
     fun abbrevNumber(number: Long?): String {
         if (number == null) {

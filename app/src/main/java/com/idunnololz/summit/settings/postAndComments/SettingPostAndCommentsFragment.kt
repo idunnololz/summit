@@ -40,7 +40,11 @@ import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
+import com.idunnololz.summit.util.makeTransition
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -228,14 +232,7 @@ class SettingPostAndCommentsFragment :
     private fun updateRendering() {
         if (!isBindingAvailable()) return
 
-        val set: Transition = TransitionSet()
-            .addTransition(Fade(Fade.IN or Fade.OUT))
-            .addTransition(ChangeBounds())
-            .addTransition(ChangeClipBounds())
-            .addTransition(ChangeImageTransform())
-            .setOrdering(TransitionSet.ORDERING_TOGETHER)
-            .setDuration(Utils.ANIMATION_DURATION_MS)
-        TransitionManager.beginDelayedTransition(binding.demoViewContainer, set)
+        TransitionManager.beginDelayedTransition(binding.demoViewContainer, makeTransition())
 
         binding.demoViewContainer.itemAnimator = null
         postAndCommentViewBuilder.onPreferencesChanged()

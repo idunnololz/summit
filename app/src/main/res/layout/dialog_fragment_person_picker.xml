@@ -33,7 +33,6 @@
             android:hint="@string/user_hint"
             android:paddingVertical="12dp"
             android:paddingHorizontal="@dimen/padding"
-            app:prefix="u/"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

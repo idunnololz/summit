@@ -29,6 +29,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.navArgs
+import androidx.transition.TransitionManager
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
@@ -40,7 +41,7 @@ import com.idunnololz.summit.databinding.FragmentImageViewerBinding
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
-import com.idunnololz.summit.main.MainActivityInsets
+import com.idunnololz.summit.main.ActivityInsets
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
@@ -48,6 +49,8 @@ import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.FileDownloadHelper
+import com.idunnololz.summit.util.InsetsHelper
+import com.idunnololz.summit.util.InsetsProvider
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.SharedElementTransition
@@ -56,6 +59,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAboveCutout
 import com.idunnololz.summit.util.isLightTheme
+import com.idunnololz.summit.util.makeTransition
 import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
@@ -63,7 +67,7 @@ import javax.inject.Inject
 import kotlin.math.max
 
 @AndroidEntryPoint
-class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
+class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by InsetsHelper(consumeInsets = false) {
 
     companion object {
 
@@ -102,7 +106,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
         get() = this
     override val mainApplication: MainApplication
         get() = application as MainApplication
-    override val lastInsetLiveData = MutableLiveData<MainActivityInsets>()
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -129,6 +132,7 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
         binding = FragmentImageViewerBinding.inflate(LayoutInflater.from(this))
 
         setContentView(binding.root)
+        registerInsetsHandler(binding.root)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         showAboveCutout()
@@ -140,42 +144,18 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
         binding.dummyAppBar.transitionName = SharedElementNames.AppBar
         binding.bottomNavigationView.transitionName = SharedElementNames.NavBar
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { _, insets ->
-            val insetsCompat = WindowInsetsCompat(insets)
-            val insetsSystemBars = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars())
-            val systemBarsInsets = insets.getInsetsIgnoringVisibility(
-                WindowInsetsCompat.Type.systemBars(),
-            )
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()) // keyboard
-            val imeHeight = imeInsets.bottom
-            val topInset = systemBarsInsets.top
-            val bottomInset = max(systemBarsInsets.bottom, imeHeight)
-            val leftInset = 0
-            val rightInset = 0
-
+        onInsetsChanged = { insets ->
             binding.toolbar.layoutParams = binding.toolbar.layoutParams.apply {
-                (this as MarginLayoutParams).topMargin = insetsSystemBars.top
+                (this as MarginLayoutParams).topMargin = insets.topInset
             }
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && isLightTheme()) {
                 binding.statusBarBg.layoutParams = binding.statusBarBg.layoutParams.apply {
-                    height = insetsSystemBars.top
+                    height = insets.topInset
                 }
                 binding.statusBarBg.visibility = View.VISIBLE
             } else {
                 binding.statusBarBg.visibility = View.GONE
             }
-
-            val lastInsets = MainActivityInsets(
-                imeHeight = imeHeight,
-                topInset = topInset,
-                bottomInset = bottomInset,
-                leftInset = leftInset,
-                rightInset = rightInset,
-            )
-
-            lastInsetLiveData.value = lastInsets
-
-            insets
         }
 
         window.enterTransition = Fade(Fade.IN).apply {
@@ -562,8 +542,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
     }
 
     fun hideSystemUI() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
         WindowInsetsControllerCompat(
             window,
             requireNotNull(window.decorView),
@@ -576,7 +554,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
     }
 
     fun showSystemUI() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(
             window,
             requireNotNull(window.decorView),
@@ -633,10 +610,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
     fun setupActionBar(
         title: CharSequence?,
         showUp: Boolean,
-        usingTabsHint: Boolean = false,
-        animateActionBarIn: Boolean = true,
-        scrollFlags: Int? = null,
-        resetFabState: Boolean = true,
     ) {
         setSupportActionBar(binding.toolbar)
 
@@ -648,6 +621,8 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
     }
 
     fun showActionBar() {
+        TransitionManager.beginDelayedTransition(binding.root, makeTransition())
+
         hideActionBar(false)
 
         val supportActionBar = supportActionBar ?: return
@@ -657,7 +632,9 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer {
         binding.statusBarBg.animate().alpha(1f)
     }
 
-    fun hideActionBar(hideToolbar: Boolean = true, hideStatusBar: Boolean = false) {
+    fun hideActionBar(hideToolbar: Boolean = true) {
+        TransitionManager.beginDelayedTransition(binding.root, makeTransition())
+
         if (hideToolbar) {
             val supportActionBar = supportActionBar ?: return
             if (!supportActionBar.isShowing) {

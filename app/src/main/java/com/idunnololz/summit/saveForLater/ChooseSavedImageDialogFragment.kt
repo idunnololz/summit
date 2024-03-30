@@ -88,10 +88,10 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
         )
 
         requireMainActivity().apply {
-            doOnInsetChanged(viewLifecycleOwner) { insets ->
-                binding.bottomSheet.updatePadding(bottom = insets.bottom)
+            insets.observe(viewLifecycleOwner) { insets ->
+                binding.bottomSheet.updatePadding(bottom = insets.bottomInset)
                 binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    topMargin = insets.top
+                    topMargin = insets.topInset
                 }
             }
         }

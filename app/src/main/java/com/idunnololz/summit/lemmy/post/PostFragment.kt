@@ -84,6 +84,11 @@ import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
+import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -137,7 +142,7 @@ class PostFragment :
     private var layoutManager: LinearLayoutManager? = null
 
     private val scrollOffsetTop
-        get() = (requireMainActivity().lastInsets.topInset + Utils.convertDpToPixel(56f)).toInt()
+        get() = ((requireMainActivity().insets.value?.topInset ?: 0) + Utils.convertDpToPixel(56f)).toInt()
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -498,7 +503,7 @@ class PostFragment :
                 boxEnd: Int,
                 snapPreference: Int,
             ): Int {
-                return boxStart - viewStart + (getMainActivity()?.lastInsets?.topInset ?: 0)
+                return boxStart - viewStart + (getMainActivity()?.insets?.value?.topInset ?: 0)
             }
         }
         viewModel.commentNavControlsState.observe(viewLifecycleOwner) {
@@ -686,7 +691,7 @@ class PostFragment :
                         left = 0,
                         top = 0,
                         right = 0,
-                        bottom = getMainActivity()?.lastInsets?.bottomInset ?: 0,
+                        bottom = getMainActivity()?.insets?.value?.bottomInset ?: 0,
                     )
 
                     screenshotModeAppBar.setOnMenuItemClickListener {

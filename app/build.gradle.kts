@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.appcompat)
     implementation(libs.core)
+    implementation(libs.activity.ktx)
     implementation(libs.fragment.ktx)
     implementation(libs.material)
     implementation(libs.cardview)

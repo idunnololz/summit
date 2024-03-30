@@ -50,6 +50,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
 import com.idunnololz.summit.util.ext.runAfterLayout
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.assisted.Assisted
@@ -115,7 +116,7 @@ class CommunitySelectorController @AssistedInject constructor(
         }
     }
 
-    private val insetObserver: Observer<MainActivityInsets> = Observer { insets ->
+    private val insetObserver: Observer<ActivityInsets> = Observer { insets ->
         binding.csBottomSheetContainerInner.updateLayoutParams<MarginLayoutParams> {
             topMargin = insets.topInset
             leftMargin = insets.leftInset
@@ -185,7 +186,7 @@ class CommunitySelectorController @AssistedInject constructor(
             },
         )
 
-        activity.lastInsetLiveData.observe(activity, insetObserver)
+        activity.insets.observe(activity, insetObserver)
         activity.insetViewExceptTopAutomaticallyByMargins(activity, binding.recyclerView)
     }
 

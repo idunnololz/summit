@@ -12,6 +12,8 @@ import com.idunnololz.summit.databinding.TabbedFragmentActionsBinding
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
+import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

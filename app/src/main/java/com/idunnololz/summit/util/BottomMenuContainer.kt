@@ -5,12 +5,11 @@ import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.idunnololz.summit.MainApplication
-import com.idunnololz.summit.main.MainActivityInsets
+import com.idunnololz.summit.main.ActivityInsets
 
-interface BottomMenuContainer : LifecycleOwner, OnBackPressedDispatcherOwner {
+interface BottomMenuContainer : LifecycleOwner, OnBackPressedDispatcherOwner, InsetsProvider {
     val context: Context
     val mainApplication: MainApplication
-    val lastInsetLiveData: MutableLiveData<MainActivityInsets>
 
     fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean = true)
 }

@@ -143,7 +143,7 @@ class MainActivityViewModel @Inject constructor(
 
     private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
         siteOrCommunity.setIsLoading()
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val result = when (communityRef) {
                 is CommunityRef.All -> {
                     Either.Left(apiClient.fetchSiteWithRetry(force))
@@ -191,7 +191,7 @@ class MainActivityViewModel @Inject constructor(
     }
 
     fun updateSubscriptionStatus(communityId: Int, subscribe: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val result = apiClient.followCommunityWithRetry(communityId, subscribe)
 
             subscribeEvent.postValue(Event(result))

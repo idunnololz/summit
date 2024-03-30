@@ -12,6 +12,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 
 class FloatingToolbarController(
     private val floatingPlaceholder: View,
@@ -52,8 +53,7 @@ class FloatingToolbarController(
                 }
             },
         )
-        mainActivityProvider()?.insetsChangedLiveData?.observe(lifecycleOwner) {
-            val insets = mainActivityProvider()?.lastInsets
+        mainActivityProvider()?.insets?.observe(lifecycleOwner) { insets ->
             val isImeOpen = (insets?.imeHeight ?: 0) > 0
 
             rootView.post {

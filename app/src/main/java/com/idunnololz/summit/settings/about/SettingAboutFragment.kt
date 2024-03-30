@@ -18,7 +18,10 @@ import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.launchChangelog
+import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.startFeedbackIntent
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint

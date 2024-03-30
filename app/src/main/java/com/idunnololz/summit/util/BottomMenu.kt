@@ -27,7 +27,7 @@ import com.idunnololz.summit.databinding.MenuItemBinding
 import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
-import com.idunnololz.summit.main.MainActivityInsets
+import com.idunnololz.summit.main.ActivityInsets
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
@@ -60,7 +60,7 @@ class BottomMenu(
         }
     }
 
-    private val insetsObserver = Observer<MainActivityInsets> {
+    private val insetsObserver = Observer<ActivityInsets> {
         setInsets(it.topInset, it.bottomInset)
     }
 
@@ -124,7 +124,7 @@ class BottomMenu(
         handleInsets: Boolean = true,
     ) {
         if (handleInsets) {
-            bottomMenuContainer.lastInsetLiveData.observeForever(insetsObserver)
+            bottomMenuContainer.insets.observeForever(insetsObserver)
         }
 
         parent = bottomSheetContainer
@@ -194,7 +194,7 @@ class BottomMenu(
                                 parent = null
                                 onBackPressedCallback.remove()
                                 bottomSheetContainer.removeView(rootView)
-                                bottomMenuContainer.lastInsetLiveData.removeObserver(insetsObserver)
+                                bottomMenuContainer.insets.removeObserver(insetsObserver)
 
                                 onClose?.invoke()
                             }

@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCE
 import com.idunnololz.summit.databinding.FragmentLoginBinding
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

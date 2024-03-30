@@ -24,6 +24,7 @@ import androidx.navigation.fragment.navArgs
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.google.android.material.navigation.NavigationBarView
+import com.idunnololz.summit.CommunityDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentMainBinding
 import com.idunnololz.summit.lemmy.CommentRef
@@ -50,8 +51,10 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.attachNavHostFragment
 import com.idunnololz.summit.util.ext.detachNavHostFragment
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.removeNavHostFragment
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -140,6 +143,13 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
             if (currentNavController?.navigateUp() == false) {
                 if (!findNavController().navigateUp()) {
+                    val tab = tabsManager.currentTab.value
+
+                    if (tab?.isHomeTab == false) {
+                        changeCommunity(tabsManager.getHomeTab())
+                        return
+                    }
+
                     if (doubleBackToExitPressedOnce) {
                         getMainActivity()?.finish()
                         return
@@ -456,12 +466,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 )
             }
             is PersonRef -> {
-                currentNavController?.navigate(
-                    R.id.personTabbedFragment,
-                    PersonTabbedFragmentArgs(
-                        page,
-                    ).toBundle(),
-                )
+                val direction = CommunityDirections.actionGlobalPersonTabbedFragment(page)
+                currentNavController?.navigateSafe(direction)
             }
         }
     }

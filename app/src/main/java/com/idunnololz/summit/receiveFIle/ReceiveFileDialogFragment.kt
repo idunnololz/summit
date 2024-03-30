@@ -74,9 +74,9 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
         )
 
         requireMainActivity().apply {
-            doOnInsetChanged(viewLifecycleOwner) { insets ->
+            insets.observe(viewLifecycleOwner) { insets ->
                 binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    topMargin = insets.top
+                    topMargin = insets.topInset
                 }
             }
         }

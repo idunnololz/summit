@@ -58,6 +58,7 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -528,8 +529,7 @@ class CreateOrEditPostFragment :
             },
         )
 
-        getMainActivity()?.insetsChangedLiveData?.observe(viewLifecycleOwner) {
-            val insets = getMainActivity()?.lastInsets
+        getMainActivity()?.insets?.observe(viewLifecycleOwner) { insets ->
             val isImeOpen = (insets?.imeHeight ?: 0) > 0
 
             binding.root.post {
@@ -729,7 +729,7 @@ class CreateOrEditPostFragment :
         }
 
         binding.postBodyToolbar.translationY = floatingLocation.y.toFloat() -
-            (getMainActivity()?.lastInsets?.topInset ?: 0)
+            (getMainActivity()?.insets?.value?.topInset ?: 0)
     }
 
     var hiding = false

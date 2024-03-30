@@ -11,6 +11,24 @@
 
     <action android:id="@+id/action_global_login" app:destination="@id/login"/>
     <action android:id="@+id/action_global_community" app:destination="@id/community"/>
+    <action
+        android:id="@+id/action_global_personTabbedFragment2"
+        app:destination="@id/personTabbedFragment2"
+        app:enterAnim="@anim/slide_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out" />
+    <action android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settings"
+        app:enterAnim="@anim/slide_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out">
+        <argument
+            android:name="link"
+            app:argType="string"
+            app:nullable="true" />
+    </action>
 
     <fragment
         android:id="@+id/mainFragment"
@@ -44,17 +62,6 @@
         android:id="@+id/historyFragment"
         android:name="com.idunnololz.summit.history.HistoryFragment"
         android:label="HistoryFragment" />
-    <action android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settings"
-        app:enterAnim="@anim/slide_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/slide_out">
-        <argument
-            android:name="link"
-            app:argType="string"
-            app:nullable="true" />
-    </action>
     <fragment
         android:id="@+id/videoViewerFragment"
         android:name="com.idunnololz.summit.preview.VideoViewerFragment"

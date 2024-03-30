@@ -21,7 +21,11 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

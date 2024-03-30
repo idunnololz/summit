@@ -38,7 +38,10 @@ import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.escapeMarkdown
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

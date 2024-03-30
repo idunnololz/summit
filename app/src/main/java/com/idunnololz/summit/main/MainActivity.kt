@@ -3,7 +3,6 @@ package com.idunnololz.summit.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -21,13 +20,10 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Pair
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -45,10 +41,8 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.ActivityMainBinding
-import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -57,38 +51,26 @@ import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.communities.CommunitiesFragment
-import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
-import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
-import com.idunnololz.summit.lemmy.modlogs.ModLogsFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
-import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
-import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
-import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.preview.ImageViewerActivity.Companion.ErrorCustomDownloadLocation
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
 import com.idunnololz.summit.preview.ImageViewerContract
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragment
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragmentArgs
-import com.idunnololz.summit.saved.SavedTabbedFragment
-import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.cache.SettingCacheFragment
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.FileDownloadHelper
+import com.idunnololz.summit.util.InsetsHelper
+import com.idunnololz.summit.util.InsetsProvider
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
@@ -103,11 +85,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.math.max
-import kotlin.reflect.KClass
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity(), BottomMenuContainer {
+class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by InsetsHelper(consumeInsets = true) {
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
@@ -133,8 +113,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
 
     private lateinit var binding: ActivityMainBinding
 
-    val windowInsets = MutableLiveData<Rect>(Rect())
-
     private val viewModel: MainActivityViewModel by viewModels()
     val actionsViewModel: MoreActionsViewModel by viewModels()
 
@@ -148,19 +126,15 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
 
     val keyPressRegistrationManager = KeyPressRegistrationManager()
 
-    val insetsChangedLiveData = MutableLiveData<Int>()
-
     override val context: Context
         get() = this
     override val mainApplication: MainApplication
         get() = application as MainApplication
-    override val lastInsetLiveData = MutableLiveData<MainActivityInsets>()
 
     private val onNavigationItemReselectedListeners =
         mutableListOf<NavigationBarView.OnItemReselectedListener>()
 
     private var currentBottomMenu: BottomMenu? = null
-    var lastInsets: MainActivityInsets = MainActivityInsets()
 
     var lockUiOpenness = false
 
@@ -304,6 +278,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
 
         setContentView(binding.root)
 
+        registerInsetsHandler(binding.root)
         registerInsetsHandler()
 
         viewModel.unreadCount.observe(this) { unreadCount ->
@@ -478,65 +453,32 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
     }
 
     private fun registerInsetsHandler() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val systemBarsInsets = insets.getInsetsIgnoringVisibility(
-                WindowInsetsCompat.Type.systemBars(),
-            )
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()) // keyboard
-            val imeHeight = imeInsets.bottom
-            val topInset = systemBarsInsets.top
-            val bottomInset = max(systemBarsInsets.bottom, imeHeight)
-            val leftInset = 0
-            val rightInset = 0
+        onInsetsChanged = {
+            with (it) {
+                Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
 
-            val mainLeftInset = systemBarsInsets.left
-            val mainRightInset = systemBarsInsets.right
+                navBarController.onInsetsChanged(
+                    leftInset = leftInset,
+                    topInset = topInset,
+                    rightInset = rightInset,
+                    bottomInset = bottomInset,
+                )
 
-            Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
+                binding.snackbarContainer.updateLayoutParams<MarginLayoutParams> {
+                    bottomMargin = navBarController.bottomNavHeight
+                }
 
-            navBarController.onInsetsChanged(
-                leftInset = leftInset,
-                topInset = topInset,
-                rightInset = rightInset,
-                bottomInset = bottomInset,
-            )
+                onStatusBarHeightChanged(topInset)
 
-            lastInsets = MainActivityInsets(
-                imeHeight = imeHeight,
-                topInset = topInset,
-                bottomInset = bottomInset,
-                leftInset = leftInset,
-                rightInset = rightInset,
-            )
+                binding.navBarBg.updateLayoutParams<LayoutParams> {
+                    height = bottomInset
+                }
 
-            // Move our RecyclerView below toolbar + 10dp
-            windowInsets.value = checkNotNull(windowInsets.value).apply {
-                left = leftInset
-                top = topInset
-                right = rightInset
-                bottom = bottomInset
+                binding.root.updateLayoutParams<MarginLayoutParams> {
+                    leftMargin = mainLeftInset
+                    rightMargin = mainRightInset
+                }
             }
-            binding.snackbarContainer.updateLayoutParams<MarginLayoutParams> {
-                bottomMargin = navBarController.bottomNavHeight
-            }
-
-            onStatusBarHeightChanged(topInset)
-
-            binding.navBarBg.updateLayoutParams<LayoutParams> {
-                height = bottomInset
-            }
-
-            binding.root.updateLayoutParams<MarginLayoutParams> {
-                leftMargin = mainLeftInset
-                rightMargin = mainRightInset
-            }
-
-            insetsChangedLiveData.postValue(0)
-            lastInsetLiveData.value = lastInsets
-
-//            currentBottomMenu?.setInsets(lastInsets.topInset, lastInsets.bottomInset)
-
-            WindowInsetsCompat.CONSUMED
         }
     }
 
@@ -547,12 +489,12 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
         handleIntent(intent)
     }
 
-    private fun showNotificationBarBg() {
+    fun showNotificationBarBg() {
         showNotificationBarBg = true
         showNotificationBarBgIfNeeded()
     }
 
-    private fun hideNotificationBarBg() {
+    fun hideNotificationBarBg() {
         showNotificationBarBg = false
         hideNotificationBarBgIfNeeded()
     }
@@ -714,8 +656,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
 
         when (page) {
             is CommunityRef -> {
-//                handleWithMainFragment()
-
                 currentNavController?.navigate(
                     R.id.action_global_community,
                     CommunityFragmentArgs(
@@ -749,12 +689,8 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
                 )
             }
             is PersonRef -> {
-                currentNavController?.navigate(
-                    R.id.personTabbedFragment2,
-                    PersonTabbedFragmentArgs(
-                        page,
-                    ).toBundle(),
-                )
+                val direction = MainDirections.actionGlobalPersonTabbedFragment2(page)
+                currentNavController?.navigateSafe(direction)
             }
         }
     }
@@ -857,96 +793,20 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
             )
     }
 
-    fun doOnInsetChanged(lifecycleOwner: LifecycleOwner, onInsetChanged: (Rect) -> Unit) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = checkNotNull(windowInsets.value)
-            onInsetChanged(insets)
-        }
-    }
-
-    fun insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val lp = rootView.layoutParams as MarginLayoutParams
-            val insets = checkNotNull(windowInsets.value)
-
-            lp.topMargin = insets.top
-            lp.bottomMargin = insets.bottom
-            lp.leftMargin = insets.left
-            lp.rightMargin = insets.right
-            rootView.requestLayout()
-        }
-    }
-
-    fun insetViewExceptBottomAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, view: View) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = checkNotNull(windowInsets.value)
-
-            view.updateLayoutParams<MarginLayoutParams> {
-                topMargin = insets.top
-                leftMargin = insets.left
-                rightMargin = insets.right
-            }
-        }
-    }
-
-    fun insetViewExceptTopAutomaticallyByPadding(
-        lifecycleOwner: LifecycleOwner,
-        rootView: View,
-        additionalPaddingBottom: Int = 0,
-    ) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
-            rootView.setPadding(
-                insets.leftInset,
-                0,
-                insets.rightInset,
-                insets.bottomInset + additionalPaddingBottom,
-            )
-        }
-    }
-
-    fun insetViewExceptBottomAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
-            rootView.setPadding(
-                insets.leftInset,
-                insets.topInset,
-                insets.rightInset,
-                0,
-            )
-        }
-    }
-
-    fun insetViewExceptTopAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
-            rootView.updateLayoutParams<MarginLayoutParams> {
-                bottomMargin = insets.bottomInset
-                leftMargin = insets.leftInset
-                rightMargin = insets.rightInset
-            }
-        }
-    }
-
     fun insetViewAutomaticallyByPaddingAndNavUi(
         lifecycleOwner: LifecycleOwner,
         rootView: View,
         additionalPaddingBottom: Int = 0,
     ) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
+        insets.observe(lifecycleOwner) {
             var bottomPadding = getBottomNavHeight()
             if (bottomPadding == 0) {
-                bottomPadding = insets.bottomInset
+                bottomPadding = it.bottomInset
             }
 
             rootView.setPadding(
                 navBarController.newLeftInset,
-                insets.topInset,
+                it.topInset,
                 navBarController.newRightInset,
                 bottomPadding + additionalPaddingBottom,
             )
@@ -958,9 +818,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
         rootView: View,
         additionalPaddingBottom: Int = 0,
     ) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
+        insets.observe(lifecycleOwner) { insets ->
             var bottomPadding = getBottomNavHeight()
             if (bottomPadding == 0) {
                 bottomPadding = insets.bottomInset
@@ -972,158 +830,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
                 insets.rightInset,
                 bottomPadding + additionalPaddingBottom,
             )
-        }
-    }
-
-    fun insetViewStartAndEndByPadding(
-        lifecycleOwner: LifecycleOwner,
-        rootView: View,
-    ) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
-            rootView.setPadding(
-                insets.leftInset,
-                0,
-                insets.rightInset,
-                0,
-            )
-        }
-    }
-
-    fun insetViewExceptTopAutomaticallyByMarginAndNavUi(
-        lifecycleOwner: LifecycleOwner,
-        rootView: View,
-        additionalPaddingBottom: Int = 0,
-    ) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
-            rootView.updateLayoutParams<MarginLayoutParams> {
-                bottomMargin = getBottomNavHeight() + additionalPaddingBottom
-                leftMargin = insets.leftInset
-                rightMargin = insets.rightInset
-            }
-        }
-    }
-
-    fun insetViewAutomaticallyByPadding(
-        lifecycleOwner: LifecycleOwner,
-        rootView: View,
-        additionalPaddingBottom: Int = 0,
-    ) {
-        insetsChangedLiveData.observe(lifecycleOwner) {
-            val insets = lastInsets
-
-            rootView.setPadding(
-                insets.leftInset,
-                insets.topInset,
-                insets.rightInset,
-                insets.bottomInset + additionalPaddingBottom,
-            )
-        }
-    }
-
-    inline fun <reified T> setupForFragment(animate: Boolean = true) {
-        setupForFragment(T::class, animate)
-    }
-
-    fun setupForFragment(t: KClass<*>, animate: Boolean) {
-        Log.d("MainActivity", "setupForFragment(): $t")
-
-        if (binding.root.height == 0) {
-            binding.root.viewTreeObserver.addOnPreDrawListener(
-                object : ViewTreeObserver.OnPreDrawListener {
-                    override fun onPreDraw(): Boolean {
-                        binding.root.viewTreeObserver.removeOnPreDrawListener(this)
-
-                        setupForFragment(t, animate)
-
-                        return false
-                    }
-                },
-            )
-
-            return
-        }
-
-        when (t) {
-            CommunityFragment::class -> {
-                navBarController.enableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            PostFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                showNotificationBarBg()
-            }
-            VideoViewerFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.hideNavBar(animate)
-                hideNotificationBarBg()
-            }
-            ImageViewerActivity::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.hideNavBar(animate)
-                hideNotificationBarBg()
-            }
-            SettingCacheFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            HistoryFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            LoginFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            SettingsFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.hideNavBar(animate)
-                hideNotificationBarBg()
-            }
-            PersonTabbedFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            CommunityInfoFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            SavedTabbedFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            InboxTabbedFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav(supportOpenness = true)
-                showNotificationBarBg()
-            }
-            ActionsTabbedFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.hideNavBar(animate)
-                hideNotificationBarBg()
-            }
-            CommunitiesFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            ModLogsFragment::class -> {
-                navBarController.disableBottomNavViewScrolling()
-                navBarController.showBottomNav()
-                showNotificationBarBg()
-            }
-            else ->
-                throw RuntimeException("No setup instructions for type: ${t.java.canonicalName}")
         }
     }
 
@@ -1145,6 +851,24 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
 
     fun hideBottomNav() {
         navBarController.hideNavBar(animate = true)
+    }
+
+    fun runWhenLaidOut(cb: () -> Unit) {
+        if (binding.root.height == 0) {
+            binding.root.viewTreeObserver.addOnPreDrawListener(
+                object : ViewTreeObserver.OnPreDrawListener {
+                    override fun onPreDraw(): Boolean {
+                        binding.root.viewTreeObserver.removeOnPreDrawListener(this)
+
+                        cb()
+
+                        return false
+                    }
+                },
+            )
+            return
+        }
+        cb()
     }
 
     override fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean) {
@@ -1242,10 +966,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer {
         val currentNavController = currentNavController ?: return
         val menuItem = navBarController.navBar.menu.findItem(menuId) ?: return
         NavigationUI.onNavDestinationSelected(menuItem, currentNavController)
-    }
-
-    fun downloadAndShareImage(url: String) {
-        actionsViewModel.downloadAndShareImage(url)
     }
 
     fun showDownloadsSettings() {
