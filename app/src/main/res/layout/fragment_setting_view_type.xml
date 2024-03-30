@@ -28,9 +28,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:paddingBottom="@dimen/footer_spacer_height"
                 android:clipToPadding="false">
 
@@ -79,12 +80,11 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/view_type_setting"/>
+                    style="@style/SettingsDivider"/>
 
                 <TextView
                     android:id="@+id/reset"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/padding"
                     android:background="?selectableItemBackground"
@@ -97,8 +97,7 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/reset"/>
+                    style="@style/SettingsDivider"/>
 
                 <include
                     android:id="@+id/text_scaling_setting"
@@ -113,10 +112,7 @@
                     android:id="@+id/prefer_image_at_the_end"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_scaling_setting"/>
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/prefer_full_size_image"
@@ -145,7 +141,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/prefer_title_text"/>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -382,4 +382,9 @@
         <item name="android:windowExitAnimation">@anim/fade_out</item>
     </style>
 
+    <style name="SettingsDivider">
+        <item name="android:layout_marginTop">@dimen/padding_half</item>
+        <item name="android:layout_marginBottom">@dimen/padding_half</item>
+    </style>
+
 </resources>
