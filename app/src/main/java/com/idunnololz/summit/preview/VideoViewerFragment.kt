@@ -24,6 +24,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
@@ -123,12 +124,12 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         val parent = requireMainActivity()
         parent.hideSystemUI()
 
-        parent.windowInsets.observe(viewLifecycleOwner) {
+        parent.insets.observe(viewLifecycleOwner) {
             binding.playerView.findViewById<View>(R.id.controller_root_view).setPadding(
-                it.left,
-                it.top,
-                it.right,
-                it.bottom,
+                it.leftInset,
+                it.topInset,
+                it.rightInset,
+                it.bottomInset,
             )
         }
 

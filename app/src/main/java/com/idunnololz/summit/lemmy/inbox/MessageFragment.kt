@@ -39,6 +39,8 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -92,8 +94,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomAppBar)
-            insetsChangedLiveData.observe(viewLifecycleOwner) {
-                binding.dummyAppBar.updatePadding(bottom = lastInsets.bottomInset * 2)
+            insets.observe(viewLifecycleOwner) { insets ->
+                binding.dummyAppBar.updatePadding(bottom = insets.bottomInset * 2)
             }
         }
 

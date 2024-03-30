@@ -16,7 +16,10 @@ import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlock
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel.BlockedInstanceItem
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

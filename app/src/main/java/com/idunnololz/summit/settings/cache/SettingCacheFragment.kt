@@ -16,6 +16,9 @@ import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
+import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.view.StorageUsageItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

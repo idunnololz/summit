@@ -38,6 +38,10 @@ import com.idunnololz.summit.settings.ViewTypeSettings
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils.ANIMATION_DURATION_MS
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
+import com.idunnololz.summit.util.makeTransition
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -219,14 +223,7 @@ class SettingViewTypeFragment :
     private fun updateRendering() {
         if (!isBindingAvailable()) return
 
-        val set: Transition = TransitionSet()
-            .addTransition(Fade(IN or OUT))
-            .addTransition(ChangeBounds())
-            .addTransition(ChangeClipBounds())
-            .addTransition(ChangeImageTransform())
-            .setOrdering(ORDERING_TOGETHER)
-            .setDuration(ANIMATION_DURATION_MS)
-        TransitionManager.beginDelayedTransition(binding.demoViewContainer, set)
+        TransitionManager.beginDelayedTransition(binding.demoViewContainer, makeTransition())
 
         binding.demoViewContainer.viewTreeObserver.addOnPreDrawListener(
             object : ViewTreeObserver.OnPreDrawListener {
