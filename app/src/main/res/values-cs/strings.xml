@@ -164,4 +164,10 @@
     <string name="subscribe">Odebírat</string>
     <string name="lemmy_web_preferences">Webové preference Lemmy</string>
     <string name="theme_settings_desc">Změnit a úpravit vzhled aplikace</string>
+    <string name="hidden_posts_desc">Resetovat skryté příspěvky a více</string>
+    <string name="reset_hidden_posts">Resetovat skryté příspěvky</string>
+    <string name="classic">Klasický</string>
+    <string name="email">Email</string>
+    <string name="profile_image">Profilový obrázek</string>
+    <string name="modern">Moderní</string>
 </resources>
