@@ -100,7 +100,7 @@ coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil"}
 json = { module = "org.json:json", version = "20230227" }
 jsoup = { module = "org.jsoup:jsoup", version = "1.16.1" }
 flow-layout = { module = "com.nex3z:flow-layout", version = "1.3.3" }
-material = { module = "com.google.android.material:material", version = "1.11.0" }
+material = { module = "com.google.android.material:material", version = "1.12.0-beta01" }
 mp-android-chart = { module = "com.github.PhilJay:MPAndroidChart", version = "v3.0.3" }
 disklrucache = { module = "com.jakewharton:disklrucache", version = "2.0.2" }
 billing-ktx = { module = "com.android.billingclient:billing-ktx", version = "6.2.0" }
