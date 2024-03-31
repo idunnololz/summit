@@ -267,7 +267,6 @@
     <string name="left_hand_mode">Režim pro leváky</string>
     <string name="left_hand_mode_desc">Změní polohu některých tlačítek tak, aby byly přístupnější pro leváky.</string>
     <string name="lock_bottom_bar">Uzamknout spodní navigační lištu</string>
-    <string name="logging"></string>
     <string name="restart_app">Restartovat Summit</string>
     <string name="auto_collapse_comment_threshold">Automaticky sbalit komentáře pod určitým procentem upvotů</string>
     <string name="never_auto_collapse_comments">Nikdy nesbalovat komentáře</string>
