@@ -967,4 +967,8 @@ class Preferences(
 
         editor.apply()
     }
+
+    fun clear() {
+        prefs.edit().clear().commit()
+    }
 }

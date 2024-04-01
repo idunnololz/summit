@@ -1871,6 +1871,12 @@ class ImportAndExportSettings @Inject constructor(
         context.getString(R.string.backup_settings_desc),
     )
 
+    val resetSettingsWithBackup = BasicSettingItem(
+        null,
+        context.getString(R.string.reset_settings_with_backup),
+        context.getString(R.string.reset_settings_with_backup_desc),
+    )
+
     val manageInternalSettingsBackups = BasicSettingItem(
         null,
         context.getString(R.string.manage_internal_settings_backups),
@@ -1884,6 +1890,7 @@ class ImportAndExportSettings @Inject constructor(
     override val allSettings: List<SettingItem> = listOf(
         importSettings,
         exportSettings,
+        resetSettingsWithBackup,
         manageInternalSettingsBackups,
     )
 }

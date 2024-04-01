@@ -32,6 +32,7 @@ import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
+import com.idunnololz.summit.lemmy.languageSelect.LanguageSelectDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
 import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
@@ -248,7 +249,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         floatingToolbarController?.setup(binding.root)
 
         viewModel.currentCommunityData.observe(viewLifecycleOwner) {
-            updateFields(it.community)
+            updateFields(it)
         }
         viewModel.getCommunityResult.observe(viewLifecycleOwner) {
             when (it) {
@@ -393,8 +394,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         }
     }
 
-    private fun updateFields(community: Community) {
+    private fun updateFields(communityData: CreateOrEditCommunityViewModel.CommunityData) {
         val context = requireContext()
+        val community = communityData.community
 
         with(binding) {
             displayNameEditText.setText(community.title)
@@ -467,6 +469,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
             descriptionEditText.setText(community.description)
 
+            nsfwCheckbox.isChecked = community.nsfw
             nsfwCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
                 viewModel.update {
                     it.copy(
@@ -474,6 +477,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     )
                 }
             }
+            onlyModCheckbox.isChecked = community.posting_restricted_to_mods
             onlyModCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
                 viewModel.update {
                     it.copy(
@@ -481,8 +485,17 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     )
                 }
             }
-            editLanguagesButton.setOnClickListener {
-
+            if (communityData.discussionLanguages == null) {
+                editLanguagesButton.visibility = View.GONE
+            } else {
+                editLanguagesButton.visibility = View.VISIBLE
+                editLanguagesButton.setOnClickListener {
+                    LanguageSelectDialogFragment.show(
+                        languages = communityData.allLanguages,
+                        selectedLanguages = communityData.discussionLanguages,
+                        fragmentManager = childFragmentManager
+                    )
+                }
             }
         }
     }

@@ -52,6 +52,15 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <include
+                    android:id="@+id/reset_settings_with_backup"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <include
                     android:id="@+id/manage_internal_settings_backups"
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
