@@ -72,8 +72,8 @@ class ExportSettingsViewModel @Inject constructor(
         return "backup-${dateFormatter.format(Calendar.getInstance().time)}.summitbackup"
     }
 
-    fun saveToInternalBackups() {
-        val file = settingsBackupManager.saveBackup(preferences.generateCode())
+    fun saveToInternalBackups(backupName: String = "settings_backup_%datetime%") {
+        val file = settingsBackupManager.saveBackup(preferences.generateCode(), backupName)
 
         backupFile.postValue(
             BackupResult(
@@ -83,6 +83,10 @@ class ExportSettingsViewModel @Inject constructor(
                 ),
             ),
         )
+    }
+
+    fun resetSettings() {
+        preferences.clear()
     }
 
     data class BackupConfig(
