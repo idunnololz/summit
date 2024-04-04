@@ -1666,6 +1666,9 @@
     <string name="app_restart_required_after_pref_cleared_desc">Settings have been cleared. An app restart is required to apply certain changes. Restart now?</string>
     <string name="reset_settings_prompt">Reset settings?</string>
     <string name="backup_and_reset_settings_desc">You are about to reset your settings. A backup will be created before your settings are reset. Proceed?</string>
+    <string name="languages">Languages</string>
+    <string name="select_all">Select all</string>
+    <string name="deselect_all">Deselect all</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
