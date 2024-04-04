@@ -34,7 +34,11 @@ class CreateOrEditCommunityViewModel @Inject constructor(
     val instance
         get() = apiClient.instance
 
-    fun loadCommunityInfo(communityRef: CommunityRef.CommunityRefByName?) {
+    fun loadCommunityInfoIfNeeded(communityRef: CommunityRef.CommunityRefByName?) {
+        if (getCommunityResult.isLoaded) {
+            return
+        }
+
         if (communityRef == null) {
             viewModelScope.launch(Dispatchers.Default) {
                 val siteResult = apiClient.fetchSiteWithRetry(force = false)
@@ -128,6 +132,14 @@ class CreateOrEditCommunityViewModel @Inject constructor(
 
         currentCommunityData.value = curCommunityData.copy(
             community = updateFn(curCommunityData.community),
+        )
+    }
+
+    fun updateLanguages(selectedLanguages: List<LanguageId>) {
+        val curCommunityData = currentCommunityData.value ?: return
+
+        currentCommunityData.value = curCommunityData.copy(
+            discussionLanguages = selectedLanguages
         )
     }
 

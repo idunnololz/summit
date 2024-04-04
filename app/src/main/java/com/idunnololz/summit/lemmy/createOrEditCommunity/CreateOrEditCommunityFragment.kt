@@ -20,7 +20,6 @@ import coil.load
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.UploadImageResult
-import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.databinding.FragmentCreateOrEditCommunityBinding
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
@@ -47,6 +46,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
@@ -124,7 +124,19 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
         val context = requireContext()
 
-        viewModel.loadCommunityInfo(args.community?.toCommunityRef())
+        viewModel.loadCommunityInfoIfNeeded(args.community?.toCommunityRef())
+
+        childFragmentManager.setFragmentResultListener(
+            LanguageSelectDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val result = bundle.getParcelableCompat<LanguageSelectDialogFragment.Result>(
+                LanguageSelectDialogFragment.REQUEST_RESULT,
+            )
+            if (result != null) {
+                viewModel.updateLanguages(result.selectedLanguages)
+            }
+        }
 
         requireMainActivity().apply {
             setupForFragment<CreateOrEditCommunityFragment>()

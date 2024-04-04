@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- programmatically, only one of the "check" buttons is shown -->
+    <item
+        android:id="@+id/check_all"
+        android:title="@string/select_all"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_check_box_24"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
+    <item
+        android:id="@+id/uncheck_all"
+        android:title="@string/deselect_all"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_check_box_outline_blank_24"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
+
+</menu>

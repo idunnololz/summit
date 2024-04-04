@@ -1670,6 +1670,9 @@
     <string name="community_name_field_desc">Unique identifier for the community; cannot be changed.</string>
     <string name="community_display_name_field_desc">Title of the community; can be changed.</string>
     <string name="error_create_community">Unable to create community.</string>
+    <string name="languages">Languages</string>
+    <string name="select_all">Select all</string>
+    <string name="deselect_all">Deselect all</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
