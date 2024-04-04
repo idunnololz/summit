@@ -24,6 +24,7 @@ import com.idunnololz.summit.api.dto.CommunityResponse
 import com.idunnololz.summit.api.dto.CreateComment
 import com.idunnololz.summit.api.dto.CreateCommentLike
 import com.idunnololz.summit.api.dto.CreateCommentReport
+import com.idunnololz.summit.api.dto.CreateCommunity
 import com.idunnololz.summit.api.dto.CreatePost
 import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.CreatePostReport
@@ -273,6 +274,15 @@ interface LemmyApi {
         @Header("Authorization") authorization: String?,
         @QueryMap form: Map<String, String>,
     ): Call<GetCommunityResponse>
+
+    /**
+     * Create a community.
+     */
+    @POST("community")
+    fun createCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body createCommunity: CreateCommunity,
+    ): Call<CommunityResponse>
 
     /**
      * Update a community.

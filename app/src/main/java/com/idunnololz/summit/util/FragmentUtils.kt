@@ -7,6 +7,7 @@ import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.communities.CommunitiesFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
+import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.modlogs.ModLogsFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
@@ -103,6 +104,11 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                     navBarController.disableBottomNavViewScrolling()
                     navBarController.showBottomNav()
                     showNotificationBarBg()
+                }
+                CreateOrEditCommunityFragment::class -> {
+                    navBarController.disableBottomNavViewScrolling()
+                    navBarController.hideNavBar(animate)
+                    hideNotificationBarBg()
                 }
                 else ->
                     throw RuntimeException("No setup instructions for type: ${t.java.canonicalName}")

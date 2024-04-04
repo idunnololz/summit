@@ -762,6 +762,7 @@ class PostFragment :
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView()")
+        Log.d("HAHA", "onDestroyView()")
 
         itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
 
@@ -1041,9 +1042,10 @@ class PostFragment :
     override fun onResume() {
         super.onResume()
 
+        setupForFragment<PostFragment>()
+
         if (args.isSinglePage) {
             requireMainActivity().apply {
-                setupForFragment<PostFragment>()
                 navBarController.hideNavBar(true)
                 if (!navBarController.useNavigationRail) {
                     navBarController.hideNavBar(animate = true)

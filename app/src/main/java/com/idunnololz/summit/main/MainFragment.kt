@@ -120,10 +120,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         NavController.OnDestinationChangedListener { _, destination, _ ->
             Log.d(TAG, "onDestinationChangedListener(): ${destination.label}")
 
-            if (destination.id == R.id.postFragment || destination.id == R.id.communityFragment) {
-                binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+            if (destination.id == R.id.communityFragment) {
+                // Let community fragment handle it...
             } else {
-                binding.rootView.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
+                setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
             }
         }
 

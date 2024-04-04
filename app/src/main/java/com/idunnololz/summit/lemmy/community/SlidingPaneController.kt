@@ -113,6 +113,7 @@ class SlidingPaneController(
         }
 
     fun init() {
+        Log.d("HAHA", "init: $this")
         slidingPaneLayout.addPanelSlideListener(panelSlideListener)
         slidingPaneLayout.post {
             if (!slidingPaneLayout.isSlideable) {
@@ -128,6 +129,13 @@ class SlidingPaneController(
                             EmptyScreenFragment.newInstance(emptyScreenText),
                         )
                     }
+                }
+            } else {
+                val firstChild = slidingPaneLayout.getChildAt(0) ?: return@post
+                firstChild.findViewById<View>(R.id.pane_divider)?.visibility = View.GONE
+
+                if (slidingPaneLayout.isOpen) {
+                    slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
                 }
             }
         }

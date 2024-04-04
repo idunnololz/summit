@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.createOrEditCommunity
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuProvider
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -47,11 +49,16 @@ import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunityBinding>() {
+
+    companion object {
+
+    }
 
     private val args by navArgs<CreateOrEditCommunityFragmentArgs>()
 
@@ -120,6 +127,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         viewModel.loadCommunityInfo(args.community?.toCommunityRef())
 
         requireMainActivity().apply {
+            setupForFragment<CreateOrEditCommunityFragment>()
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
@@ -128,7 +136,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title =
-                if (args.community == null) {
+                if (isCreateCommunity) {
                     getString(R.string.create_community)
                 } else {
                     getString(R.string.edit_community)
@@ -292,6 +300,30 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 }
             }
         }
+        viewModel.createCommunityResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    binding.loadingView.hideAll()
+                    setFormEnabled(enabled = true)
+
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_create_community),
+                        it.error,
+                        childFragmentManager,
+                    )
+                }
+                is StatefulData.Loading -> {
+                    binding.loadingView.showProgressBar()
+                    setFormEnabled(enabled = false)
+                }
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+                    setFormEnabled(enabled = true)
+                    findNavController().popBackStack()
+                }
+            }
+        }
 
         listOf(
             uploadImageViewModel.uploadImageResult to UploadResultTarget.Description,
@@ -307,7 +339,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_create_or_edit_community, menu)
 
-                if (args.community == null) {
+                if (isCreateCommunity) {
                     menu.findItem(R.id.publish).isVisible = true
                     menu.findItem(R.id.save).isVisible = false
                 } else {
@@ -319,6 +351,13 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.publish -> {
+                        viewModel.update {
+                            it.copy(
+                                title = binding.displayNameEditText.text?.toString() ?: it.title,
+                                description = binding.descriptionEditText.text?.toString(),
+                            )
+                        }
+                        viewModel.createCommunity()
                         true
                     }
                     R.id.save -> {
@@ -336,8 +375,37 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     }
                 }
             }
-        },
-        )
+        })
+
+        with(binding) {
+            nameEditText.doOnTextChanged a@{ text, start, before, count ->
+                text ?: return@a
+
+                viewModel.update {
+                    it.copy(
+                        name = text.toString()
+                    )
+                }
+            }
+            displayNameEditText.doOnTextChanged a@{ text, start, before, count ->
+                text ?: return@a
+
+                viewModel.update {
+                    it.copy(
+                        title = text.toString()
+                    )
+                }
+            }
+            descriptionEditText.doOnTextChanged a@{ text, start, before, count ->
+                text ?: return@a
+
+                viewModel.update {
+                    it.copy(
+                        description = text.toString()
+                    )
+                }
+            }
+        }
     }
 
     private fun onUploadComplete(
@@ -399,7 +467,19 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         val community = communityData.community
 
         with(binding) {
-            displayNameEditText.setText(community.title)
+            if (isCreateCommunity) {
+                nameInputLayout.visibility = View.VISIBLE
+            } else {
+                nameInputLayout.visibility = View.GONE
+            }
+
+            if (nameEditText.text.isNullOrBlank() && community.name.isNotBlank()) {
+                nameEditText.setText(community.name)
+            }
+
+            if (displayNameEditText.text.isNullOrBlank() && community.title.isNotBlank()) {
+                displayNameEditText.setText(community.title)
+            }
 
             if (community.icon == null) {
                 icon.load(R.drawable.ic_subreddit_default)
@@ -467,7 +547,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 }
             }
 
-            descriptionEditText.setText(community.description)
+            if (descriptionEditText.text.isNullOrBlank() && !community.description.isNullOrBlank()) {
+                descriptionEditText.setText(community.description)
+            }
 
             nsfwCheckbox.isChecked = community.nsfw
             nsfwCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -499,6 +581,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             }
         }
     }
+
+    val isCreateCommunity: Boolean
+        get() = args.community == null
 
     enum class UploadResultTarget {
         Description,

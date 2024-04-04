@@ -32,11 +32,42 @@
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/name_input_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    app:helperText="@string/community_name_field_desc"
+                    app:helperTextEnabled="true"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/name_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="no"
+                        android:background="@null"
+                        android:paddingHorizontal="@dimen/padding"
+                        android:paddingVertical="@dimen/padding_half"
+                        android:textIsSelectable="true"
+                        android:scrollbars="vertical"
+                        android:textAppearance="?textAppearanceBodyMedium"
+                        android:hint="@string/name"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/display_name_input_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/padding"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="@dimen/padding"
+                    app:helperText="@string/community_display_name_field_desc"
+                    app:helperTextEnabled="true"
+                    app:layout_constraintTop_toBottomOf="@+id/name_input_layout"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 

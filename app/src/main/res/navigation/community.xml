@@ -11,7 +11,7 @@
     <fragment
         android:id="@+id/communityFragment"
         android:name="com.idunnololz.summit.lemmy.community.CommunityFragment"
-        android:label="SubredditFragment">
+        android:label="CommunityFragment">
         <argument
             android:name="communityRef"
             android:defaultValue="@null"
