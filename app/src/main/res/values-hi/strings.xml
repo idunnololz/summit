@@ -863,4 +863,11 @@
     <string name="app_restart_required_after_pref_cleared_desc">सेटिंग्स साफ़ कर दी गई हैं। कुछ बदलावों को लागू करने के लिए ऐप को पुनरारंभ करना आवश्यक है। अभी पुनरारंभ करें?</string>
     <string name="reset_settings_prompt">सेटिंग्स रीसेट करें?</string>
     <string name="backup_and_reset_settings_desc">आप अपनी सेटिंग्स रीसेट करने वाले हैं। आपकी सेटिंग्स रीसेट होने से पहले एक बैकअप बनाया जाएगा। आगे बढ़ें?</string>
+    <string name="name">नाम</string>
+    <string name="deselect_all">सभी अचयनित करें</string>
+    <string name="languages">भाषाएँ</string>
+    <string name="select_all">सभी चुनें</string>
+    <string name="community_name_field_desc">समुदाय के लिए विशिष्ट पहचानकर्ता; बदला नहीं जा सकता।</string>
+    <string name="community_display_name_field_desc">समुदाय का शीर्षक; बदला जा सकता है।</string>
+    <string name="error_create_community">समुदाय बनाने में असमर्थ।</string>
 </resources>
