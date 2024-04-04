@@ -547,6 +547,17 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         if (!isBindingAvailable()) return
 
         val bottomMenu = BottomMenu(requireContext()).apply {
+
+
+            if (siteView.site.instance == viewModel.instance) {
+                addItemWithIcon(
+                    id = R.id.create_community,
+                    title = getString(R.string.create_community),
+                    icon = R.drawable.baseline_add_24,
+                )
+                addDivider()
+            }
+
             addItemWithIcon(
                 id = R.id.block_instance,
                 title = getString(R.string.block_this_instance_format, siteView.site.instance),
@@ -566,6 +577,13 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
             setOnMenuItemClickListener {
                 when (it.id) {
+                    R.id.create_community -> {
+                        val directions = CommunityInfoFragmentDirections
+                            .actionCommunityInfoFragmentToCreateOrEditCommunityFragment(
+                                null,
+                            )
+                        findNavController().navigateSafe(directions)
+                    }
                     R.id.block_instance -> {
                         actionsViewModel.blockInstance(siteView.site.instance_id, true)
                     }

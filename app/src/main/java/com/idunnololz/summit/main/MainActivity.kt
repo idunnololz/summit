@@ -799,17 +799,19 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
         additionalPaddingBottom: Int = 0,
     ) {
         insets.observe(lifecycleOwner) {
-            var bottomPadding = getBottomNavHeight()
-            if (bottomPadding == 0) {
-                bottomPadding = it.bottomInset
-            }
+            rootView.post {
+                var bottomPadding = getBottomNavHeight()
+                if (bottomPadding == 0) {
+                    bottomPadding = it.bottomInset
+                }
 
-            rootView.setPadding(
-                navBarController.newLeftInset,
-                it.topInset,
-                navBarController.newRightInset,
-                bottomPadding + additionalPaddingBottom,
-            )
+                rootView.setPadding(
+                    navBarController.newLeftInset,
+                    it.topInset,
+                    navBarController.newRightInset,
+                    bottomPadding + additionalPaddingBottom,
+                )
+            }
         }
     }
 
@@ -819,17 +821,20 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
         additionalPaddingBottom: Int = 0,
     ) {
         insets.observe(lifecycleOwner) { insets ->
-            var bottomPadding = getBottomNavHeight()
-            if (bottomPadding == 0) {
-                bottomPadding = insets.bottomInset
-            }
+            rootView.post {
+                var bottomPadding = getBottomNavHeight()
+                if (bottomPadding == 0) {
+                    bottomPadding = insets.bottomInset
+                }
+                Log.d("HAHA", "bottomPadding: $bottomPadding bottomNav: ${getBottomNavHeight()}")
 
-            rootView.setPadding(
-                insets.leftInset,
-                0,
-                insets.rightInset,
-                bottomPadding + additionalPaddingBottom,
-            )
+                rootView.setPadding(
+                    insets.leftInset,
+                    0,
+                    insets.rightInset,
+                    bottomPadding + additionalPaddingBottom,
+                )
+            }
         }
     }
 

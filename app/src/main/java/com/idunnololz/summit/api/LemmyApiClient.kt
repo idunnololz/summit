@@ -29,6 +29,7 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.CreateComment
 import com.idunnololz.summit.api.dto.CreateCommentLike
 import com.idunnololz.summit.api.dto.CreateCommentReport
+import com.idunnololz.summit.api.dto.CreateCommunity
 import com.idunnololz.summit.api.dto.CreatePost
 import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.CreatePostReport
@@ -473,6 +474,22 @@ class LemmyApiClient(
             } else {
                 api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
             }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun createCommunity(
+        account: Account?,
+        createCommunity: CreateCommunity,
+    ): Result<CommunityResponse> {
+        return retrofitErrorHandler {
+            api.createCommunity(authorization = account?.bearer, createCommunity = createCommunity)
         }.fold(
             onSuccess = {
                 Result.success(it)

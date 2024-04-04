@@ -7,6 +7,7 @@ import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.CommunityResponse
+import com.idunnololz.summit.api.dto.CreateCommunity
 import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.Language
@@ -28,6 +29,7 @@ class CreateOrEditCommunityViewModel @Inject constructor(
     val getCommunityResult = StatefulLiveData<GetCommunityResponse>()
     val currentCommunityData = MutableLiveData<CommunityData>()
     val updateCommunityResult = StatefulLiveData<CommunityResponse>()
+    val createCommunityResult = StatefulLiveData<CommunityResponse>()
 
     val instance
         get() = apiClient.instance
@@ -39,7 +41,9 @@ class CreateOrEditCommunityViewModel @Inject constructor(
 
                 siteResult
                     .onSuccess {
-                        setCommunityIfNotSet(null, it.all_languages)
+                        withContext(Dispatchers.Main) {
+                            setCommunityIfNotSet(null, it.all_languages)
+                        }
                     }
                     .onFailure {
                         getCommunityResult.postError(it)
@@ -154,6 +158,37 @@ class CreateOrEditCommunityViewModel @Inject constructor(
                 }
                 .onFailure {
                     updateCommunityResult.postError(it)
+                }
+        }
+    }
+
+    fun createCommunity() {
+        createCommunityResult.setIsLoading()
+
+        val curCommunityData = currentCommunityData.value ?: return
+        val curCommunity = curCommunityData.community
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val result = apiClient.createCommunity(
+                CreateCommunity(
+                    name = curCommunity.name,
+                    title = curCommunity.title,
+                    description = curCommunity.description,
+                    icon = curCommunity.icon,
+                    banner = curCommunity.banner,
+                    nsfw = curCommunity.nsfw,
+                    posting_restricted_to_mods = curCommunity.posting_restricted_to_mods,
+                    discussion_languages = curCommunityData.discussionLanguages,
+                    auth = "",
+                ),
+            )
+
+            result
+                .onSuccess {
+                    createCommunityResult.postValue(it)
+                }
+                .onFailure {
+                    createCommunityResult.postError(it)
                 }
         }
     }

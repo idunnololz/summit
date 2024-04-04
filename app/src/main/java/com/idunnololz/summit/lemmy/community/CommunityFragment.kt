@@ -429,6 +429,8 @@ class CommunityFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.d("HAHA", "onViewCreated()")
+
         var job: Job? = null
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -576,6 +578,7 @@ class CommunityFragment :
                             lockUiOpenness = true
                         }
                     }
+                    Log.d("HAHA", "SSS: $isSlideable")
                     if (isSlideable) {
                         val mainFragment = parentFragment?.parentFragment as? MainFragment
                         mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
@@ -622,6 +625,8 @@ class CommunityFragment :
 
     private fun onReady() {
         if (!isBindingAvailable()) return
+
+        Log.d("HAHA", "onReady()")
 
         val view = binding.root
         val context = requireContext()
@@ -1132,6 +1137,8 @@ class CommunityFragment :
             }
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
 
+        Log.d("HAHA", "currentCommunityRef: ${currentCommunityRef}")
+
         val bottomMenu = BottomMenu(context).apply {
             addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
 
@@ -1140,11 +1147,19 @@ class CommunityFragment :
 
             addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
             addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
-            addItemWithIcon(
-                id = R.id.community_info,
-                title = R.string.community_info,
-                icon = R.drawable.ic_subreddit_default,
-            )
+            if (currentCommunityRef is CommunityRef.All) {
+                addItemWithIcon(
+                    id = R.id.community_info,
+                    title = R.string.instance_info,
+                    icon = R.drawable.ic_subreddit_default,
+                )
+            } else {
+                addItemWithIcon(
+                    id = R.id.community_info,
+                    title = R.string.community_info,
+                    icon = R.drawable.ic_subreddit_default,
+                )
+            }
             addItemWithIcon(
                 id = R.id.my_communities,
                 title = R.string.my_communities,
