@@ -826,7 +826,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                 if (bottomPadding == 0) {
                     bottomPadding = insets.bottomInset
                 }
-                Log.d("HAHA", "bottomPadding: $bottomPadding bottomNav: ${getBottomNavHeight()}")
 
                 rootView.setPadding(
                     insets.leftInset,

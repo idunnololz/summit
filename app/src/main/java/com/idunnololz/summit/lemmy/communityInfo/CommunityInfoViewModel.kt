@@ -9,10 +9,15 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
+import com.idunnololz.summit.api.dto.Community
+import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.CommunityResponse
 import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.SubscribedType
+import com.idunnololz.summit.lemmy.BlockInstanceResult
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.Event
@@ -42,9 +47,10 @@ class CommunityInfoViewModel @Inject constructor(
 
     private var communityRef: CommunityRef? = null
 
-    val siteOrCommunity = StatefulLiveData<Either<GetSiteResponse, GetCommunityResponse>>()
+    val siteOrCommunity = StatefulLiveData<SiteOrCommunityResult>()
     val multiCommunity = StatefulLiveData<List<GetCommunityResponse>>()
     private val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
+    val deleteCommunityResult = StatefulLiveData<DeleteCommunityResult>()
 
     private var pollCommunityInfoJob: Job? = null
 
@@ -56,7 +62,7 @@ class CommunityInfoViewModel @Inject constructor(
             if (it !is StatefulData.Success) {
                 return@a
             }
-            val result = it.data.getOrNull() ?: return@a
+            val result = it.data.response.getOrNull() ?: return@a
             if (result.community_view.subscribed == SubscribedType.Pending) {
                 pollCommunityInfoForSubscribedStatus(result.community_view.community.toCommunityRef())
             }
@@ -106,7 +112,12 @@ class CommunityInfoViewModel @Inject constructor(
                 .onLeft {
                     it
                         .onSuccess {
-                            siteOrCommunity.postValue(Either.Left(it))
+                            siteOrCommunity.postValue(
+                                SiteOrCommunityResult(
+                                    response = Either.Left(it),
+                                    force = force,
+                                )
+                            )
                         }
                         .onFailure {
                             siteOrCommunity.postError(it)
@@ -115,7 +126,12 @@ class CommunityInfoViewModel @Inject constructor(
                 .onRight {
                     it
                         .onSuccess {
-                            siteOrCommunity.postValue(Either.Right(it))
+                            siteOrCommunity.postValue(
+                                SiteOrCommunityResult(
+                                    response = Either.Right(it),
+                                    force = force,
+                                )
+                            )
                         }
                         .onFailure {
                             siteOrCommunity.postError(it)
@@ -192,10 +208,19 @@ class CommunityInfoViewModel @Inject constructor(
             result
                 .onSuccess {
                     if (communityRef == it.community.toCommunityRef()) {
-                        siteOrCommunity.valueOrNull?.getOrNull()?.copy(
-                            community_view = it,
-                        )?.let {
-                            siteOrCommunity.postValue(Either.Right(it))
+                        val communityResult = siteOrCommunity.valueOrNull
+                        val communityView = communityResult?.response?.getOrNull()
+
+                        if (communityView != null) {
+                            siteOrCommunity.postValue(
+                                communityResult.copy(
+                                    response = Either.Right(
+                                        communityView.copy(
+                                            community_view = it,
+                                        )
+                                    )
+                                )
+                            )
                         }
                     }
 
@@ -219,4 +244,32 @@ class CommunityInfoViewModel @Inject constructor(
         val communityRef = communityRef ?: return
         fetchCommunityOrSiteInfo(communityRef, force)
     }
+
+    fun deleteCommunity(communityId: CommunityId, delete: Boolean) {
+        deleteCommunityResult.setIsLoading()
+        viewModelScope.launch {
+            apiClient.deleteCommunity(
+                DeleteCommunity(
+                    community_id = communityId,
+                    deleted = delete,
+                    auth = ""
+                )
+            )
+                .onFailure {
+                    deleteCommunityResult.postError(it)
+                }
+                .onSuccess {
+                    deleteCommunityResult.postValue(DeleteCommunityResult(it))
+                }
+        }
+    }
+
+    data class DeleteCommunityResult(
+        val communityResponse: CommunityResponse,
+    )
+
+    data class SiteOrCommunityResult(
+        val response: Either<GetSiteResponse, GetCommunityResponse>,
+        val force: Boolean,
+    )
 }

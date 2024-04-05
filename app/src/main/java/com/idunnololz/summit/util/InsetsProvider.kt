@@ -55,8 +55,6 @@ class InsetsHelper(
 
             onInsetsChanged?.invoke(newInsets)
 
-            Log.d("HAHA", "newInsets: $newInsets")
-
             _insets.value = newInsets
 
             if (consumeInsets) {

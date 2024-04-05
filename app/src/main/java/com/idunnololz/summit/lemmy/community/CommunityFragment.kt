@@ -429,8 +429,6 @@ class CommunityFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("HAHA", "onViewCreated()")
-
         var job: Job? = null
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -578,7 +576,7 @@ class CommunityFragment :
                             lockUiOpenness = true
                         }
                     }
-                    Log.d("HAHA", "SSS: $isSlideable")
+
                     if (isSlideable) {
                         val mainFragment = parentFragment?.parentFragment as? MainFragment
                         mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
@@ -625,8 +623,6 @@ class CommunityFragment :
 
     private fun onReady() {
         if (!isBindingAvailable()) return
-
-        Log.d("HAHA", "onReady()")
 
         val view = binding.root
         val context = requireContext()
@@ -1136,8 +1132,6 @@ class CommunityFragment :
                 userCommunitiesManager.isCommunityBookmarked(currentCommunityRef)
             }
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
-
-        Log.d("HAHA", "currentCommunityRef: ${currentCommunityRef}")
 
         val bottomMenu = BottomMenu(context).apply {
             addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)

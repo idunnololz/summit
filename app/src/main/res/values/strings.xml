@@ -1,4 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
 
     <!-- Please DO NOT change this. This is a specific value that is used by the app to select what language the champion/item/rune/mastery data should be in.
     This string is specifically chosen by me so DO NOT change it. -->
@@ -1673,6 +1674,10 @@
     <string name="languages">Languages</string>
     <string name="select_all">Select all</string>
     <string name="deselect_all">Deselect all</string>
+    <string name="delete_community">Delete community</string>
+    <string name="undo_delete_community">Undo delete community</string>
+    <string name="error_unable_to_delete_community">Unable to delete/restore community</string>
+    <string name="warn_community_deleted">This community has been deleted by it\'s creator. It will not be visible to regular users.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
