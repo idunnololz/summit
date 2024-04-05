@@ -30,6 +30,7 @@ import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.CreatePostReport
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.DeleteComment
+import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.DeletePost
 import com.idunnololz.summit.api.dto.DistinguishComment
 import com.idunnololz.summit.api.dto.EditComment
@@ -291,6 +292,15 @@ interface LemmyApi {
     fun updateCommunity(
         @Header("Authorization") authorization: String?,
         @Body editCommunity: EditCommunity,
+    ): Call<CommunityResponse>
+
+    /**
+     * Delete a community.
+     */
+    @POST("community/delete")
+    fun deleteCommunity(
+        @Header("Authorization") authorization: String?,
+        @Body deleteCommunity: DeleteCommunity,
     ): Call<CommunityResponse>
 
     /**

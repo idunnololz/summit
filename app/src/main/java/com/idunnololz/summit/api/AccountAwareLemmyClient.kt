@@ -20,6 +20,7 @@ import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityResponse
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.CreateCommunity
+import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetModlogResponse
@@ -214,6 +215,14 @@ class AccountAwareLemmyClient @Inject constructor(
         account: Account? = accountForInstance(),
     ): Result<CommunityResponse> = retry {
         apiClient.updateCommunity(account, editCommunity)
+            .autoSignOut(account)
+    }
+
+    suspend fun deleteCommunity(
+        deleteCommunity: DeleteCommunity,
+        account: Account? = accountForInstance(),
+    ): Result<CommunityResponse> = retry {
+        apiClient.deleteCommunity(account, deleteCommunity)
             .autoSignOut(account)
     }
 

@@ -35,6 +35,7 @@ import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.CreatePostReport
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.DeleteComment
+import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.DeletePost
 import com.idunnololz.summit.api.dto.DistinguishComment
 import com.idunnololz.summit.api.dto.EditComment
@@ -506,6 +507,22 @@ class LemmyApiClient(
     ): Result<CommunityResponse> {
         return retrofitErrorHandler {
             api.updateCommunity(authorization = account?.bearer, editCommunity = editCommunity)
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun deleteCommunity(
+        account: Account?,
+        deleteCommunity: DeleteCommunity,
+    ): Result<CommunityResponse> {
+        return retrofitErrorHandler {
+            api.deleteCommunity(authorization = account?.bearer, deleteCommunity = deleteCommunity)
         }.fold(
             onSuccess = {
                 Result.success(it)

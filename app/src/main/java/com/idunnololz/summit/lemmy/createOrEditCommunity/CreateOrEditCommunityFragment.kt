@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.createOrEditCommunity
 
 import android.app.Activity
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -10,8 +11,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -28,6 +31,7 @@ import com.idunnololz.summit.editTextToolbar.FloatingToolbarController
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
@@ -51,14 +55,21 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunityBinding>() {
 
     companion object {
-
+        const val REQUEST_KEY = "CreateOrEditCommunityFragment_req"
+        const val REQUEST_RESULT = "result"
     }
+
+    @Parcelize
+    data class Result(
+        val communityRef: CommunityRef.CommunityRefByName?
+    ): Parcelable
 
     private val args by navArgs<CreateOrEditCommunityFragmentArgs>()
 
@@ -330,6 +341,20 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+                    setFragmentResult(
+                        REQUEST_KEY,
+                        bundleOf(
+                            REQUEST_RESULT to Result(
+                                viewModel.currentCommunityData.value
+                                    ?.community
+                                    ?.toCommunityRef()
+                                    ?.copy(
+                                        instance = viewModel.instance
+                                    )
+                            )
+                        )
+                    )
+
                     binding.loadingView.hideAll()
                     setFormEnabled(enabled = true)
                     findNavController().popBackStack()

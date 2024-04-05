@@ -102,6 +102,10 @@ class BottomMenu(
         adapter.menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.DrawableIcon(drawable)))
     }
 
+    fun addDangerousItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
+        adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title), icon = MenuIcon.ResourceIcon(icon), modifier = ModifierIds.Danger))
+    }
+
     fun addDivider() {
         adapter.addDividerIfNeeded()
     }

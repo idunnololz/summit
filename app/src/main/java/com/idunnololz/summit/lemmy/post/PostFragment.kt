@@ -762,7 +762,6 @@ class PostFragment :
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView()")
-        Log.d("HAHA", "onDestroyView()")
 
         itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
 

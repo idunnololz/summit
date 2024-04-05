@@ -201,4 +201,6 @@
     <item name="layout_list_with_card" type="id" />
     <item name="edit_community" type="id" />
     <item name="create_community" type="id" />
+    <item name="delete_community" type="id" />
+    <item name="restore_community" type="id" />
 </resources>

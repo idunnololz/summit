@@ -113,7 +113,6 @@ class SlidingPaneController(
         }
 
     fun init() {
-        Log.d("HAHA", "init: $this")
         slidingPaneLayout.addPanelSlideListener(panelSlideListener)
         slidingPaneLayout.post {
             if (!slidingPaneLayout.isSlideable) {

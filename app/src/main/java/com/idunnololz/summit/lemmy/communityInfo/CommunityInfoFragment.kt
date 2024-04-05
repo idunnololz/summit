@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
+import arrow.core.firstOrNone
 import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.isMod
@@ -37,11 +39,14 @@ import com.idunnololz.summit.databinding.PageDataModItemBinding
 import com.idunnololz.summit.databinding.PageDataStatsItemBinding
 import com.idunnololz.summit.databinding.PageDataTitleItemBinding
 import com.idunnololz.summit.databinding.WarningItemBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.filterLists.FilterEntry
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.setup
@@ -50,6 +55,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.settings.postList.AddOrEditFilterDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -59,6 +65,7 @@ import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -99,6 +106,21 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         val context = binding.root.context
+
+        parentFragmentManager.setFragmentResultListener(
+            CreateOrEditCommunityFragment.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val result = bundle.getParcelableCompat<CreateOrEditCommunityFragment.Result>(
+                CreateOrEditCommunityFragment.REQUEST_RESULT,
+            )
+
+            if (result != null) {
+                result.communityRef?.let {
+                    getMainActivity()?.launchPage(it)
+                }
+            }
+        }
 
         requireMainActivity().apply {
             setupForFragment<CommunityInfoFragment>()
@@ -166,12 +188,16 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is StatefulData.Success -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
-                    val pageData = it.data.fold(
+                    val pageData = it.data.response.fold(
                         { it.toPageData() },
                         { it.toPageData() },
                     )
 
-                    adapter.data = pageData
+                    adapter.setData(pageData) {
+                        if (it.data.force) {
+                            binding.recyclerView.scrollToPosition(0)
+                        }
+                    }
                     binding.recyclerView.adapter = adapter
 
                     loadPage(pageData)
@@ -205,6 +231,27 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         binding.icon,
                         ColorStateList.valueOf(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal)),
                     )
+                }
+            }
+        }
+        viewModel.deleteCommunityResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is StatefulData.Error -> {
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_delete_community),
+                        it.error,
+                        childFragmentManager,
+                    )
+                }
+                is StatefulData.Loading -> {
+                    binding.loadingView.showProgressBar()
+                }
+                is StatefulData.NotStarted -> {
+                    binding.loadingView.hideAll()
+                }
+                is StatefulData.Success -> {
+                    binding.loadingView.hideAll()
+                    viewModel.refetchCommunityOrSite(force = true)
                 }
             }
         }
@@ -282,6 +329,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val content: String?,
         val isHidden: Boolean,
         val isRemoved: Boolean,
+        val isDeleted: Boolean,
 
         val postCount: Int,
         val commentCount: Int,
@@ -313,6 +361,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             content = communityView.community.description,
             isHidden = communityView.community.hidden,
             isRemoved = communityView.community.removed,
+            isDeleted = communityView.community.deleted,
 
             postCount = communityView.counts.posts,
             commentCount = communityView.counts.comments,
@@ -342,6 +391,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             content = siteView.site.sidebar,
             isHidden = false,
             isRemoved = false,
+            isDeleted = false,
 
             postCount = siteView.counts.posts,
             commentCount = siteView.counts.comments,
@@ -427,7 +477,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
                 binding.fab.visibility = View.VISIBLE
                 binding.fab.setOnClickListener {
-                    showOverflowMenu(communityView)
+                    showOverflowMenu(communityView, data.mods )
                 }
 
                 binding.instanceInfo.visibility = View.VISIBLE
@@ -464,12 +514,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         }
     }
 
-    private fun showOverflowMenu(communityView: CommunityView) {
+    private fun showOverflowMenu(communityView: CommunityView, mods: List<Person>) {
         if (!isBindingAvailable()) return
 
         val bottomMenu = BottomMenu(requireContext()).apply {
             val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
-            val isMod = fullAccount?.accountInfo?.isMod(communityView.community.id) == true
+            val isMod = mods.firstOrNull { it.id == fullAccount?.accountId } != null
 
             if (isMod) {
                 addItemWithIcon(
@@ -507,6 +557,23 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 icon = R.drawable.baseline_notes_24,
             )
 
+            if (isMod) {
+                addDivider()
+                if (communityView.community.deleted) {
+                    addDangerousItemWithIcon(
+                        id = R.id.restore_community,
+                        title = R.string.undo_delete_community,
+                        icon = R.drawable.baseline_restore_24,
+                    )
+                } else {
+                    addDangerousItemWithIcon(
+                        id = R.id.delete_community,
+                        title = R.string.delete_community,
+                        icon = R.drawable.baseline_delete_24,
+                    )
+                }
+            }
+
             setOnMenuItemClickListener {
                 when (it.id) {
                     R.id.edit_community -> {
@@ -535,6 +602,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                                 communityView.community.toCommunityRef(),
                             )
                         findNavController().navigateSafe(directions)
+                    }
+                    R.id.delete_community -> {
+                        viewModel.deleteCommunity(communityView.community.id, true)
+                    }
+                    R.id.restore_community -> {
+                        viewModel.deleteCommunity(communityView.community.id, false)
                     }
                 }
             }
@@ -648,12 +721,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             ) : Item
         }
 
-        var data: PageData? = null
-            set(value) {
-                field = value
-
-                refreshItems()
-            }
+        private var data: PageData? = null
         var multiCommunity: List<GetCommunityResponse>? = null
             set(value) {
                 field = value
@@ -782,7 +850,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
 
-        private fun refreshItems() {
+        private fun refreshItems(cb: () -> Unit = {}) {
             val data = data
             val multiCommunity = multiCommunity
             val newItems = mutableListOf<Item>()
@@ -792,6 +860,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     newItems.add(Item.WarningItem(context.getString(R.string.warn_community_removed)))
                 } else if (data.isHidden) {
                     newItems.add(Item.WarningItem(context.getString(R.string.warn_community_hidden)))
+                } else if (data.isDeleted) {
+                    newItems.add(Item.WarningItem(context.getString(R.string.warn_community_deleted)))
                 }
 
                 newItems.add(
@@ -829,7 +899,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 }
             }
 
-            adapterHelper.setItems(newItems, this)
+            adapterHelper.setItems(newItems, this, cb)
+        }
+
+        fun setData(data: PageData, cb: () -> Unit) {
+            this.data = data
+            refreshItems(cb)
         }
     }
 }

@@ -5,7 +5,7 @@
 1. Create a new release post on https://lemmy.world/c/summit. Feature post.
 2. Update [Changelog.kt] with the release post id.
 3. Push latest translations: https://translate.idunnololz.com/projects/summit/summit/#repository.
-4. Merge latest translations to main.
+4. Merge latest translations to main. (https://github.com/idunnololz/summit)
 5. Pull latest translations on local.
 6. Bump version code and string.
 7. Create a release build.
