@@ -870,4 +870,8 @@
     <string name="community_name_field_desc">समुदाय के लिए विशिष्ट पहचानकर्ता; बदला नहीं जा सकता।</string>
     <string name="community_display_name_field_desc">समुदाय का शीर्षक; बदला जा सकता है।</string>
     <string name="error_create_community">समुदाय बनाने में असमर्थ।</string>
+    <string name="delete_community">समुदाय मिटाएँ</string>
+    <string name="undo_delete_community">मिटाए गए समुदाय को पूर्ववत करें</string>
+    <string name="error_unable_to_delete_community">समुदाय मिटने/पुनर्स्थापित करने में असमर्थ</string>
+    <string name="warn_community_deleted">इस समुदाय को इसके निर्माता द्वारा हटा दिया गया है। यह नियमित उपयोगकर्ताओं को दिखाई नहीं देगा।</string>
 </resources>
