@@ -587,7 +587,6 @@
     <string name="fuchsia">Fucsia</string>
     <string name="minty">Menta</string>
     <string name="navigation">Navigazione</string>
-    <string name="share_images_directly">Condividi immagini direttamente</string>
     <string name="view_type_format">Tipo di visualizzazione: %1$s</string>
     <string name="block_this_user_format">Blocca questo utente (%1$s)</string>
     <string name="comment_list">Elenco commenti</string>
