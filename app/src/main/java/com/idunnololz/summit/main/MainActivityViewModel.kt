@@ -203,7 +203,9 @@ class MainActivityViewModel @Inject constructor(
 
                     delay(1000)
 
-                    refetchCommunityOrSite(force = true)
+                    withContext(Dispatchers.Main) {
+                        refetchCommunityOrSite(force = true)
+                    }
                     accountInfoManager.refreshAccountInfo()
 
                     Log.d(TAG, "subscription status: " + it.subscribed)
