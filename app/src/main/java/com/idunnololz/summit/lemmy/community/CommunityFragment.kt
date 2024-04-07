@@ -506,7 +506,7 @@ class CommunityFragment :
             }
             lemmyAppBarController.setup(
                 communitySelectedListener = { controller, communityRef ->
-                    val action = CommunityFragmentDirections.actionSubredditFragmentSwitchSubreddit(
+                    val action = CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
                         communityRef = communityRef,
                         tab = args.tab,
                     )

@@ -147,7 +147,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 val isSelected: Boolean,
                 val resetTabOnClick: Boolean,
             ) : Item
-            object NoSubscriptionsItem : Item
+            data object NoSubscriptionsItem : Item
 
             data class TabStateItem(
                 val parentKey: String,
