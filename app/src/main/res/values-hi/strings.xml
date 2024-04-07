@@ -367,7 +367,6 @@
     <string name="summit_account_settings_desc">स्थानीय/क्लाइंट-पक्षीय खाता सेटिंग्स विन्यस्त करें</string>
     <string name="backup_settings_desc">अपनी सभी सेटिंग्स से एक कोड जनरेट करें। इस कोड को किसी फाइल में सहेजा जा सकता है या साझा किया जा सकता है और बाद में या किसी अन्य डिवाइस पर आपकी सेटिंग्स को पुनर्स्थापित करने के लिए उपयोग किया जा सकता है।</string>
     <string name="select_a_message">संदेश चुनें</string>
-    <string name="share_images_directly_desc">सक्षम होने पर, छवि पर शेयर टैप करने से छवि का URL साझा करने के बजाय छवि फाइल डाउनलोड और शेयर हो जाएगी।</string>
     <string name="warn_when_replying_to_old_post_or_comment_desc">सक्षम होने पर, किसी पुरानी पोस्ट या टिप्पणी में टिप्पणी जोड़ते समय एक चेतावनी दिखाई जाती है। यह किसी पोस्ट के आकस्मिक पुनरुद्धार से बचने में सहायक है।</string>
     <string name="per_account_settings_desc">आपके द्वारा यहां बदली गई सेटिंग्स प्रति-खाता पेज के बाहर सेट की गई सेटिंग्स को ओवरराइड कर देंगी। ये ओवरराइड केवल तभी प्रभावी होंगे जब संबद्ध खाता चालू खाता हो। आप \"सेटिंग्स प्रबंधित करें\" पृष्ठ में किसी भी ओवरराइड सेटिंग्स को रीसेट कर सकते हैं।</string>
     <string name="customize_post_quick_actions">पोस्ट की त्वरित कार्रवाइयों को अनुकूलित करें</string>
@@ -467,7 +466,6 @@
     <string name="show_page_numbers_desc">पेजों के बीच एक पेज नंबर \"डिवाइडर\" जोड़ता है।</string>
     <string name="reset_hidden_posts_confirm_title">छुपे हुए पोस्ट रीसेट करें?</string>
     <string name="summit_account_settings">Summit खाता सेटिंग्स</string>
-    <string name="share_images_directly">छवियाँ सीधे शेयर करें</string>
     <string name="warn_when_replying_to_old_post_or_comment">पुरानी पोस्ट पुनर्जीवित करते समय चेतावनी दें</string>
     <string name="restore_settings_desc">किसी फाइल, सेटिंग कोड या आंतरिक सेटिंग बैकअप से सेटिंग्स लोड/पुनर्स्थापित करें।</string>
     <string name="gesture_action_1_color">इशारा क्रिया 1 रंग</string>

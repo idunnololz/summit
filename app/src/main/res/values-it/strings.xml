@@ -287,7 +287,6 @@
     <string name="backup_settings_desc">Genera codice contenente tutte le impostazioni. Tale codice può essere salvato su file o condiviso per ripristinare le impostazioni in un secondo momento o su un altro dispositivo.</string>
     <string name="text_field_toolbar_settings">Impostazioni barra degli strumenti per il testo</string>
     <string name="per_account_settings_desc">Le impostazioni che vengono modificate qui andranno a sovrascrivere le impostazioni configurate fuori della pagina specifica per account. La sovrascrittura avrà effetto solo quando l\'account associato corrisponde con quello corrente. È possibile resettare ognuna di queste impostazioni sovrascritte nella pagina \"Gestisci impostazioni\".</string>
-    <string name="share_images_directly_desc">Se abilitata, al tap su un\'immagine sarà scaricato e condiviso direttamente il file invece di condividere l\'URL dell\'immagine.</string>
     <string name="app_restart_required">Richiede riavvio dell\'app</string>
     <string name="show_inline_media_as_links_desc">Se abilitata, le immagini/GIF/video all\'interno del testo saranno visualizzati come link.</string>
     <string name="always_show_link_below_post">Mostra sempre link sotto al post</string>

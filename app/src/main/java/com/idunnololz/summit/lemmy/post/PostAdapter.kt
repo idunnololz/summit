@@ -1303,6 +1303,10 @@ class PostAdapter(
     }
 
     fun toggleSection(position: Int) {
+        if (position == RecyclerView.NO_POSITION) {
+            return
+        }
+
         val isCollapsed = when (val item = items[position]) {
             is Item.VisibleCommentItem -> collapsedItemIds.contains(item.view.id)
             is Item.FilteredCommentItem -> collapsedItemIds.contains(item.view.id)
