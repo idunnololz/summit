@@ -72,7 +72,7 @@ import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
@@ -269,7 +269,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onVideoLongClickListener: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-        onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -530,7 +530,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         collapseSection: (position: Int) -> Unit,
         toggleActionsExpanded: () -> Unit,
         onCommentActionClick: (CommentView, actionId: Int) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -839,7 +839,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         instance: String,
         expandSection: (position: Int) -> Unit,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) = with(binding) {
         scaleTextSizes()
@@ -915,7 +915,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         collapseSection: (position: Int) -> Unit,
     ) = with(binding) {
@@ -1008,7 +1008,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onMessageClick: (InboxItem) -> Unit,
         onAddCommentClick: (InboxItem) -> Unit,
         onOverflowMenuClick: (InboxItem) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
@@ -1029,11 +1029,17 @@ class PostAndCommentViewBuilder @Inject constructor(
             b.root.setTag(R.id.left_hand_mode, leftHandMode)
         }
 
+        val isMessageItem = item is InboxItem.MessageInboxItem
+
         b.author.text = buildSpannedString {
             run {
                 val s = length
                 appendLink(
-                    item.authorName,
+                    if (isMessageItem) {
+                        context.getString(R.string.message_from_format, item.authorName)
+                    } else {
+                        item.authorName
+                    },
                     LinkUtils.getLinkForPerson(item.authorInstance, item.authorName),
                     underline = false,
                 )
@@ -1177,9 +1183,15 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
         b.date.text = dateStringToPretty(context, item.lastUpdate)
 
+        val title = if (item is InboxItem.MessageInboxItem) {
+            context.getString(R.string.message_to_format, item.targetUserName)
+        } else {
+            item.title
+        }
+
         LemmyTextHelper.bindText(
             textView = b.title,
-            text = item.title,
+            text = title,
             instance = instance,
             onImageClick = {
                 onImageClick(it)
@@ -1750,7 +1762,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentView: CommentView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
         lemmyHeaderHelper.populateHeaderSpan(

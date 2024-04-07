@@ -9,7 +9,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
         android:layout_width="@dimen/sliding_pane_first_child_width"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clickable="true">
 
         <include
             android:id="@+id/custom_app_bar"

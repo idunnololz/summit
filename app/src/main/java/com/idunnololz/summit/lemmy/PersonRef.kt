@@ -14,6 +14,7 @@ sealed interface PersonRef : Parcelable, PageRef {
 
     @Parcelize
     @TypeLabel("1")
+    @JsonClass(generateAdapter = true)
     data class PersonRefByName(
         val name: String,
         /**

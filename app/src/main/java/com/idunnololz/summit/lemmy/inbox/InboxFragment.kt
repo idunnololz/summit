@@ -39,7 +39,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.utils.setup
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -540,7 +540,7 @@ class InboxFragment :
         private val onOverflowMenuClick: (InboxItem) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
-        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         private val onLinkLongClick: (String, String) -> Unit,
     ) : RecyclerView.Adapter<ViewHolder>() {
 

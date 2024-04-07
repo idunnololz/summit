@@ -718,10 +718,6 @@
     <!-- Keep short. Title text. -->
     <string name="choose_an_account">Choose an account</string>
     <!-- Setting title text. -->
-    <string name="share_images_directly">Share images directly</string>
-    <!-- Setting body text. -->
-    <string name="share_images_directly_desc">When enabled, tapping share on an image will download and share the image file instead of sharing the URL of the image.</string>
-    <!-- Setting title text. -->
     <string name="warn_when_replying_to_old_post_or_comment">Warn when reviving old posts</string>
     <!-- Setting body text. -->
     <string name="warn_when_replying_to_old_post_or_comment_desc">When enabled, a warning is shown when adding a comment to an old post or comment. This is helpful to avoid an accidental revival of a post.</string>
@@ -1678,6 +1674,22 @@
     <string name="undo_delete_community">Undo delete community</string>
     <string name="error_unable_to_delete_community">Unable to delete/restore community</string>
     <string name="warn_community_deleted">This community has been deleted by it\'s creator. It will not be visible to regular users.</string>
+    <string name="message_to_format">To: %1$s</string>
+    <string name="message_from_format">From: %1$s</string>
+    <!-- Keep short. Title. Used for links with a subtype. Eg. Link actions (instance link) -->
+    <string name="link_actions_format">Link actions (%1$s)</string>
+    <string name="link_type_instance_link">instance link</string>
+    <string name="link_type_image_link">image link</string>
+    <string name="link_type_video_link">video link</string>
+    <string name="link_type_comment_link">comment link</string>
+    <string name="link_type_community_link">community link</string>
+    <string name="link_type_user_link">user link</string>
+    <string name="link_type_post_link">post link</string>
+    <string name="more_user_options">More user options</string>
+    <string name="instance_blocked">Instance blocked</string>
+    <string name="community_blocked">Community blocked</string>
+    <string name="community_unblocked">Community unblocked</string>
+    <string name="instance_unblocked">Instance unblocked</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

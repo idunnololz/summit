@@ -43,7 +43,6 @@ import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentsSortOrder
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -61,9 +60,10 @@ import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
-import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
@@ -115,11 +115,13 @@ class PostFragment :
     private val args: PostFragmentArgs by navArgs()
 
     private val viewModel: PostViewModel by viewModels()
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var adapter: PostAdapter? = null
 
     private var hasConsumedJumpToComments: Boolean = false
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var historyManager: HistoryManager
@@ -164,7 +166,7 @@ class PostFragment :
         super.onCreate(savedInstanceState)
 
         preferences = viewModel.preferences
-        actionsViewModel.apiClient = viewModel.lemmyApiClient
+        moreActionsHelper.apiClient = viewModel.lemmyApiClient
 
         if (savedInstanceState == null) {
             viewModel.updatePostOrCommentRef(args.postOrCommentRef())
@@ -277,7 +279,7 @@ class PostFragment :
             // do things if this is a single page
         }
 
-        actionsViewModel.setPageInstance(getInstance())
+        moreActionsHelper.setPageInstance(getInstance())
     }
 
     private fun goBack() {
@@ -325,7 +327,7 @@ class PostFragment :
                 showMorePostOptions(
                     instance = viewModel.apiInstance,
                     postView = postView,
-                    actionsViewModel = actionsViewModel,
+                    moreActionsHelper = moreActionsHelper,
                     fragmentManager = childFragmentManager,
                     isPostMenu = true,
                     onSortOrderClick = {
@@ -400,7 +402,7 @@ class PostFragment :
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
+                    showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -409,7 +411,7 @@ class PostFragment :
                     createPostActionHandler(
                         instance = viewModel.apiInstance,
                         postView = postView,
-                        actionsViewModel = actionsViewModel,
+                        moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                         onScreenshotClick = {
                             getAdapter()?.selectItemForScreenshot(itemId)
@@ -421,7 +423,7 @@ class PostFragment :
                     createCommentActionHandler(
                         instance = viewModel.apiInstance,
                         commentView = commentView,
-                        actionsViewModel = actionsViewModel,
+                        moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                         onLoadComment = {
                             viewModel.updatePostOrCommentRef(Either.Right(CommentRef(getInstance(), it)))
@@ -453,7 +455,7 @@ class PostFragment :
         }
 
         installOnActionResultHandler(
-            actionsViewModel = actionsViewModel,
+            moreActionsHelper = moreActionsHelper,
             snackbarContainer = binding.coordinatorLayout,
             onPostUpdated = {
                 viewModel.fetchPostData(force = true)
@@ -597,7 +599,7 @@ class PostFragment :
         }
         viewModel.onPostOrCommentRefChange.observe(viewLifecycleOwner) {
             adapter?.instance = getInstance()
-            actionsViewModel.setPageInstance(getInstance())
+            moreActionsHelper.setPageInstance(getInstance())
         }
 
         binding.searchEditText.addTextChangedListener {
@@ -947,15 +949,15 @@ class PostFragment :
 
                     when (action.id) {
                         CommentGestureAction.Upvote -> {
-                            result = actionsViewModel.vote(commentView, dir = 1, toggle = true)
+                            result = moreActionsHelper.vote(commentView, dir = 1, toggle = true)
                         }
 
                         CommentGestureAction.Downvote -> {
-                            result = actionsViewModel.vote(commentView, dir = -1, toggle = true)
+                            result = moreActionsHelper.vote(commentView, dir = -1, toggle = true)
                         }
 
                         CommentGestureAction.Bookmark -> {
-                            actionsViewModel.saveComment(commentView.comment.id, true)
+                            moreActionsHelper.saveComment(commentView.comment.id, true)
                         }
 
                         CommentGestureAction.Reply -> {
@@ -1003,15 +1005,15 @@ class PostFragment :
     private fun performPostAction(id: Int, postView: PostView) {
         when (id) {
             PostGestureAction.Upvote -> {
-                actionsViewModel.vote(postView, 1, toggle = true)
+                moreActionsHelper.vote(postView, 1, toggle = true)
             }
 
             PostGestureAction.Downvote -> {
-                actionsViewModel.vote(postView, -1, toggle = true)
+                moreActionsHelper.vote(postView, -1, toggle = true)
             }
 
             PostGestureAction.Bookmark -> {
-                actionsViewModel.savePost(postView.post.id, save = true)
+                moreActionsHelper.savePost(postView.post.id, save = true)
             }
 
             PostGestureAction.Reply -> {
@@ -1029,11 +1031,11 @@ class PostFragment :
             }
 
             PostGestureAction.Hide -> {
-                actionsViewModel.hidePost(postView.post.id)
+                moreActionsHelper.hidePost(postView.post.id)
             }
 
             PostGestureAction.MarkAsRead -> {
-                actionsViewModel.onPostRead(postView, delayMs = 250)
+                moreActionsHelper.onPostRead(postView, delayMs = 250)
             }
         }
     }

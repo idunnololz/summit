@@ -266,4 +266,12 @@ safeargs.
             android:name="selected_languages"
             app:argType="integer[]" />
     </dialog>
+    <dialog
+        android:id="@+id/personOptionsDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.personOptions.PersonOptionsDialogFragment"
+        android:label="PersonOptionsDialogFragment" >
+        <argument
+            android:name="personRef"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef" />
+    </dialog>
 </navigation>

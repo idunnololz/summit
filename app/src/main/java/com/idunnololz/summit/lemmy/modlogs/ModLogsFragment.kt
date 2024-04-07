@@ -26,7 +26,7 @@ import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.utils.ListEngine
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment
@@ -120,8 +120,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 onLoadPageClick = {
                     viewModel.fetchModLogs(it)
                 },
-                onLinkClick = { url: String, text: String, linkType: LinkType ->
-                    onLinkClick(url, text, linkType)
+                onLinkClick = { url: String, text: String, linkContext: LinkContext ->
+                    onLinkClick(url, text, linkContext)
                 },
                 onLinkLongClick = { url: String, text: String ->
                     getMainActivity()?.showMoreLinkOptions(url, text)
@@ -200,7 +200,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         private val params: TextMeasurementUtils.TextMeasurementParams,
         private val onPageClick: (PageRef) -> Unit,
         private val onLoadPageClick: (Int) -> Unit,
-        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         private val onLinkLongClick: (url: String, text: String) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -687,7 +687,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             if (pageRef != null) {
                                 onPageClick(pageRef)
                             } else {
-                                onLinkClick(url, text, LinkType.Text)
+                                onLinkClick(url, text, LinkContext.Text)
                             }
                             return true
                         }

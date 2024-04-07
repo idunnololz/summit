@@ -12,8 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -43,7 +41,6 @@ import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
 import com.idunnololz.summit.lemmy.FilterTooAggressiveException
 import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.MultiCommunityException
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -58,8 +55,9 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
-import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
@@ -85,7 +83,6 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -103,9 +100,11 @@ class CommunityFragment :
     private val args: CommunityFragmentArgs by navArgs()
 
     private val viewModel: CommunityViewModel by viewModels()
-    val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var adapter: ListingItemAdapter? = null
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var historyManager: HistoryManager
@@ -315,7 +314,7 @@ class CommunityFragment :
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
+                    showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -343,7 +342,7 @@ class CommunityFragment :
                     showMorePostOptions(
                         instance = viewModel.apiInstance,
                         postView = it,
-                        actionsViewModel = actionsViewModel,
+                        moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                     )
                 },
@@ -465,10 +464,19 @@ class CommunityFragment :
         }
 
         installOnActionResultHandler(
-            actionsViewModel = actionsViewModel,
+            moreActionsHelper = moreActionsHelper,
             snackbarContainer = binding.fabSnackbarCoordinatorLayout,
             onPostUpdated = {
                 updatePost(it)
+            },
+            onBlockInstanceChanged = {
+                viewModel.onBlockSettingsChanged()
+            },
+            onBlockCommunityChanged = {
+                viewModel.onBlockSettingsChanged()
+            },
+            onBlockPersonChanged = {
+                viewModel.onBlockSettingsChanged()
             },
         )
 
@@ -813,58 +821,6 @@ class CommunityFragment :
                 }
             }
         }
-
-        actionsViewModel.blockCommunityResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    Snackbar.make(
-                        requireMainActivity().getSnackbarContainer(),
-                        R.string.error_unable_to_block_community,
-                        Snackbar.LENGTH_LONG,
-                    ).show()
-                }
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    actionsViewModel.blockCommunityResult.setIdle()
-                    viewModel.onBlockSettingsChanged()
-                }
-            }
-        }
-        actionsViewModel.blockPersonResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    Snackbar.make(
-                        requireMainActivity().getSnackbarContainer(),
-                        R.string.error_unable_to_block_person,
-                        Snackbar.LENGTH_LONG,
-                    ).show()
-                }
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    actionsViewModel.blockPersonResult.setIdle()
-                    viewModel.onBlockSettingsChanged()
-                }
-            }
-        }
-        actionsViewModel.blockInstanceResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    Snackbar.make(
-                        requireMainActivity().getSnackbarContainer(),
-                        R.string.error_unable_to_block_instance,
-                        Snackbar.LENGTH_LONG,
-                    ).show()
-                }
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    actionsViewModel.blockInstanceResult.setIdle()
-                    viewModel.onBlockSettingsChanged()
-                }
-            }
-        }
         viewModel.onHidePost.observe(viewLifecycleOwner) {
             val hiddenPost = it ?: return@observe
 
@@ -910,15 +866,15 @@ class CommunityFragment :
 
                     when (action.id) {
                         PostGestureAction.Upvote -> {
-                            actionsViewModel.vote(postView, 1, toggle = true)
+                            moreActionsHelper.vote(postView, 1, toggle = true)
                         }
 
                         PostGestureAction.Downvote -> {
-                            actionsViewModel.vote(postView, -1, toggle = true)
+                            moreActionsHelper.vote(postView, -1, toggle = true)
                         }
 
                         PostGestureAction.Bookmark -> {
-                            actionsViewModel.savePost(postView.post.id, save = true)
+                            moreActionsHelper.savePost(postView.post.id, save = true)
                         }
 
                         PostGestureAction.Reply -> {

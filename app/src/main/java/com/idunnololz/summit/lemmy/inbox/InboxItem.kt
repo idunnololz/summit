@@ -162,6 +162,7 @@ sealed interface InboxItem : Parcelable {
         override val isDeleted: Boolean,
         override val isRemoved: Boolean,
         override val isRead: Boolean,
+        val targetUserName: String?,
     ) : InboxItem {
 
         constructor(message: PrivateMessageView) : this(
@@ -181,6 +182,7 @@ sealed interface InboxItem : Parcelable {
             isDeleted = message.private_message.deleted,
             isRemoved = false,
             isRead = message.private_message.read,
+            targetUserName = message.recipient.name,
         )
 
         override fun toString(): String =

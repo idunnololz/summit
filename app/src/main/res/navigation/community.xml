@@ -125,6 +125,11 @@
             android:name="person_id"
             app:argType="long"
             android:defaultValue="0L" />
+        <argument
+            android:name="person_ref"
+            android:defaultValue="@null"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef"
+            app:nullable="true" />
     </fragment>
     <dialog
         android:id="@+id/createOrEditPostFragment"

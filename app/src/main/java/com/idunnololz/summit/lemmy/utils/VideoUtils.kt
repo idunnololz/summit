@@ -6,9 +6,9 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -19,7 +19,7 @@ import java.io.IOException
 
 fun BaseFragment<*>.showMoreVideoOptions(
     url: String,
-    actionsViewModel: MoreActionsViewModel,
+    moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
@@ -42,7 +42,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
         setOnMenuItemClickListener {
             when (it.id) {
                 R.id.download -> {
-                    actionsViewModel.downloadVideo(context, url)
+                    moreActionsHelper.downloadVideo(context, url)
                 }
                 R.id.copy_link -> {
                     Utils.copyToClipboard(context, url)
@@ -51,7 +51,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
                     Utils.shareLink(context, url)
                 }
                 R.id.open_in_browser -> {
-                    onLinkClick(url, null, LinkType.Action)
+                    onLinkClick(url, null, LinkContext.Action)
                 }
                 R.id.open_link_incognito -> {
                     Utils.openExternalLink(context, url, openNewIncognitoTab = true)
@@ -121,7 +121,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
         }
     }
 
-    actionsViewModel.downloadVideoResult.observe(viewLifecycleOwner, observer)
+    moreActionsHelper.downloadVideoResult.observe(viewLifecycleOwner, observer)
 
     return bottomMenu
 }

@@ -84,7 +84,6 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_F
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WATERMARK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
-import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
@@ -732,14 +731,6 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_INFINITY_PAGE_INDICATOR, value)
-                .apply()
-        }
-
-    var shareImagesDirectly: Boolean
-        get() = prefs.getBoolean(KEY_SHARE_IMAGES_DIRECTLY, true)
-        set(value) {
-            prefs.edit()
-                .putBoolean(KEY_SHARE_IMAGES_DIRECTLY, value)
                 .apply()
         }
 

@@ -12,11 +12,11 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.databinding.TabbedFragmentSavedBinding
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
-import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
@@ -32,8 +32,10 @@ import javax.inject.Inject
 class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNavigator {
 
     val viewModel: SavedViewModel by viewModels()
-    val actionsViewModel: MoreActionsViewModel by viewModels()
     var slidingPaneController: SlidingPaneController? = null
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var preferences: Preferences
@@ -129,7 +131,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
             }
 
             installOnActionResultHandler(
-                actionsViewModel = actionsViewModel,
+                moreActionsHelper = moreActionsHelper,
                 snackbarContainer = binding.coordinatorLayout,
                 onSavePostChanged = {
                     viewModel.onSavePostChanged(it)

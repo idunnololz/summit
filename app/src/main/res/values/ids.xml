@@ -203,4 +203,7 @@
     <item name="create_community" type="id" />
     <item name="delete_community" type="id" />
     <item name="restore_community" type="id" />
+    <item name="user_info" type="id" />
+    <item name="more_user_options" type="id" />
+    <item name="block_user" type="id" />
 </resources>

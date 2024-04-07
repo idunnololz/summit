@@ -17,7 +17,7 @@ import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.BaseFragment
@@ -29,6 +29,7 @@ import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
@@ -46,7 +47,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     private var orientationListener: OrientationEventListener? = null
 
     private val viewModel: VideoViewerViewModel by viewModels()
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     private val playerListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -255,14 +258,14 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             getString(R.string.error_unsupported_video_type),
             getString(R.string.more_actions),
             {
-                showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
+                showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
             },
         )
     }
 
     private fun setupMoreButton(context: Context, url: String, videoType: VideoType) {
         binding.playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
-            showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
+            showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
         }
     }
 }

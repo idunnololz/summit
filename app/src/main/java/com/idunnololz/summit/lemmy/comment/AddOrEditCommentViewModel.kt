@@ -13,13 +13,16 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Event
+import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,7 +50,7 @@ class AddOrEditCommentViewModel @Inject constructor(
 
     val currentAccount = accountManager.currentAccount.asAccountLiveData()
 
-    val commentSentEvent = MutableLiveData<Event<Result<Unit>>>()
+    val commentSentEvent = StatefulLiveData<Unit>()
 
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
@@ -65,14 +68,10 @@ class AddOrEditCommentViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (postRef.instance != account.instance) {
-                commentSentEvent.postValue(
-                    Event(
-                        Result.failure(
-                            AccountInstanceMismatchException(
-                                account.instance,
-                                postRef.instance,
-                            ),
-                        ),
+                commentSentEvent.postError(
+                    AccountInstanceMismatchException(
+                        account.instance,
+                        postRef.instance,
                     ),
                 )
                 return@launch
@@ -84,7 +83,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                 content,
             )
 
-            commentSentEvent.postValue(Event(Result.success(Unit)))
+            commentSentEvent.postValue(Unit)
         }
     }
 
@@ -97,14 +96,10 @@ class AddOrEditCommentViewModel @Inject constructor(
         viewModelScope.launch {
             if (inboxItem is CommentBackedItem) {
                 if (instance != account.instance) {
-                    commentSentEvent.postValue(
-                        Event(
-                            Result.failure(
-                                AccountInstanceMismatchException(
-                                    account.instance,
-                                    instance,
-                                ),
-                            ),
+                    commentSentEvent.postError(
+                        AccountInstanceMismatchException(
+                            account.instance,
+                            instance,
                         ),
                     )
                     return@launch
@@ -116,7 +111,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                     content,
                 )
 
-                commentSentEvent.postValue(Event(Result.success(Unit)))
+                commentSentEvent.postValue(Unit)
             } else {
                 when (inboxItem) {
                     is InboxItem.MentionInboxItem,
@@ -133,10 +128,10 @@ class AddOrEditCommentViewModel @Inject constructor(
                                 account = requireNotNull(currentAccount.value),
                             )
                             .onFailure {
-                                commentSentEvent.postValue(Event(Result.failure(it)))
+                                commentSentEvent.postError(it)
                             }
                             .onSuccess {
-                                commentSentEvent.postValue(Event(Result.success(Unit)))
+                                commentSentEvent.postValue(Unit)
                             }
                     }
                 }
@@ -152,7 +147,29 @@ class AddOrEditCommentViewModel @Inject constructor(
                 content,
             )
 
-            commentSentEvent.postValue(Event(Result.success(Unit)))
+            commentSentEvent.postValue(Unit)
+        }
+    }
+
+    fun sendComment(personRef: PersonRef, content: String) {
+        viewModelScope.launch {
+            authedApiClient
+                .fetchPersonByNameWithRetry(
+                    name = personRef.fullName,
+                    sortType = SortType.New,
+                    page = 1,
+                    limit = 1,
+                    force = false,
+                )
+                .onSuccess {
+                    sendComment(
+                        it.person_view.person.id,
+                        content
+                    )
+                }
+                .onFailure {
+                    commentSentEvent.postError(it)
+                }
         }
     }
 
@@ -165,10 +182,10 @@ class AddOrEditCommentViewModel @Inject constructor(
                     account = requireNotNull(currentAccount.value),
                 )
                 .onFailure {
-                    commentSentEvent.postValue(Event(Result.failure(it)))
+                    commentSentEvent.postError(it)
                 }
                 .onSuccess {
-                    commentSentEvent.postValue(Event(Result.success(Unit)))
+                    commentSentEvent.postValue(Unit)
                 }
         }
     }

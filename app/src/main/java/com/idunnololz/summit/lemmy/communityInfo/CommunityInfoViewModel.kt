@@ -9,7 +9,6 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityResponse
 import com.idunnololz.summit.api.dto.CommunityView
@@ -17,7 +16,6 @@ import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.SubscribedType
-import com.idunnololz.summit.lemmy.BlockInstanceResult
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.Event

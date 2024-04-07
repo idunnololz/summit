@@ -21,7 +21,7 @@ import com.idunnololz.summit.databinding.PersonInfoTitleBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
@@ -136,7 +136,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
         private val onImageClick: (url: String) -> Unit,
         private val onVideoClick: (url: String) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
-        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         private val onLinkLongClick: (url: String, text: String) -> Unit,
     ) : Adapter<ViewHolder>() {
 

@@ -51,7 +51,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
@@ -207,7 +207,7 @@ class PostListViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
-        onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
         val url = postView.post.url
@@ -645,7 +645,7 @@ class PostListViewBuilder @Inject constructor(
                             }
                         } else {
                             if (url != null && (postType == PostType.Text || postType == PostType.Link)) {
-                                onLinkClick(url, null, LinkType.Rich)
+                                onLinkClick(url, null, LinkContext.Rich)
                             } else {
                                 showImageOrVideo()
                             }
@@ -901,7 +901,7 @@ class PostListViewBuilder @Inject constructor(
                         val t = Uri.parse(url).host ?: url
                         linkText?.text = t
                         linkOverlay?.setOnClickListener {
-                            onLinkClick(url, null, LinkType.Rich)
+                            onLinkClick(url, null, LinkContext.Rich)
                         }
                         linkOverlay?.setOnLongClickListener {
                             onLinkLongClick(url, t)
@@ -913,7 +913,7 @@ class PostListViewBuilder @Inject constructor(
                         linkIcon?.visibility = View.GONE
                         linkOverlay?.visibility = View.GONE
                         openLinkButton?.setOnClickListener {
-                            onLinkClick(url, null, LinkType.Action)
+                            onLinkClick(url, null, LinkContext.Action)
                         }
                     }
                 }

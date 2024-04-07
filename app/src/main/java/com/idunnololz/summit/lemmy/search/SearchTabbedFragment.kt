@@ -27,7 +27,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
@@ -35,7 +34,8 @@ import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toLocalizedString
 import com.idunnololz.summit.lemmy.toSortOrder
-import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showSortTypeMenu
 import com.idunnololz.summit.preferences.Preferences
@@ -68,10 +68,12 @@ class SearchTabbedFragment :
     private val args by navArgs<SearchTabbedFragmentArgs>()
 
     val viewModel: SearchViewModel by viewModels()
-    val actionsViewModel: MoreActionsViewModel by viewModels()
     var slidingPaneController: SlidingPaneController? = null
 
     private var searchSuggestionsAdapter: CustomSearchSuggestionsAdapter? = null
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var preferences: Preferences
@@ -270,7 +272,7 @@ class SearchTabbedFragment :
             }
 
             installOnActionResultHandler(
-                actionsViewModel = actionsViewModel,
+                moreActionsHelper = moreActionsHelper,
                 snackbarContainer = binding.coordinatorLayout,
             )
 

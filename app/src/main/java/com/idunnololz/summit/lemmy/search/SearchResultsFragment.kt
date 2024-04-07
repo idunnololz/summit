@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
@@ -46,7 +45,6 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.LinkResolver
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -58,9 +56,10 @@ import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
@@ -97,7 +96,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
     @Inject
     lateinit var accountManager: AccountManager
 
-    val actionsViewModel: MoreActionsViewModel by viewModels()
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     private var adapter: SearchResultAdapter? = null
 
@@ -143,7 +143,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
+                    showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -165,7 +165,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     createPostActionHandler(
                         instance = parentFragment.viewModel.instance,
                         postView = postView,
-                        actionsViewModel = actionsViewModel,
+                        moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                     )(actionId)
                 },
@@ -173,7 +173,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     createCommentActionHandler(
                         instance = parentFragment.viewModel.instance,
                         commentView = commentView,
-                        actionsViewModel = actionsViewModel,
+                        moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                     )(actionId)
                 },
@@ -347,7 +347,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private val onCommentActionClick: (CommentView, actionId: Int) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,
-        private val onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
+        private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
         private val onLinkLongClick: (url: String, text: String?) -> Unit,
         private val onCommentClick: (CommentRef) -> Unit,
         private val onItemClick: (

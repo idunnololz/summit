@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.createOrEditCommunity
 import android.app.Activity
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -32,15 +31,15 @@ import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.languageSelect.LanguageSelectDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
-import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
+import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
@@ -75,7 +74,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
     private val viewModel: CreateOrEditCommunityViewModel by viewModels()
     private val uploadImageViewModel: UploadImageViewModel by viewModels()
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -535,9 +536,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 )
                 icon.setOnClickListener {
                     getMainActivity()?.let {
-                        it.showMoreImageOrLinkOptions(
+                        it.showAdvancedLinkOptions(
                             community.icon,
-                            it.actionsViewModel,
+                            it.moreActionsHelper,
                             childFragmentManager,
                         )
                     }
@@ -575,9 +576,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 )
                 banner.setOnClickListener {
                     getMainActivity()?.let {
-                        it.showMoreImageOrLinkOptions(
+                        it.showAdvancedLinkOptions(
                             community.banner,
-                            it.actionsViewModel,
+                            it.moreActionsHelper,
                             childFragmentManager,
                         )
                     }

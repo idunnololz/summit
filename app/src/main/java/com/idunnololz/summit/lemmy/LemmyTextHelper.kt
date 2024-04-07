@@ -13,7 +13,7 @@ import android.widget.TextView
 import coil.imageLoader
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.util.CoilImagesPlugin
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
@@ -56,7 +56,7 @@ object LemmyTextHelper {
         onImageClick: (url: String) -> Unit,
         onVideoClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) {
         bindLemmyText(textView, text, highlight, showMediaAsLinks)
@@ -77,7 +77,7 @@ object LemmyTextHelper {
                     } else if (pageRef != null) {
                         onPageClick(pageRef)
                     } else {
-                        onLinkClick(url, text, LinkType.Text)
+                        onLinkClick(url, text, LinkContext.Text)
                     }
                     return true
                 }
