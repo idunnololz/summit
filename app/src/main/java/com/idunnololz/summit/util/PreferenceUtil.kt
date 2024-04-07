@@ -170,7 +170,6 @@ object PreferenceUtil {
     const val KEY_USE_PREDICTIVE_BACK = "KEY_USE_PREDICTIVE_BACK"
     const val KEY_AUTO_LOAD_MORE_POSTS = "KEY_AUTO_LOAD_MORE_POSTS"
     const val KEY_INFINITY_PAGE_INDICATOR = "KEY_INFINITY_PAGE_INDICATOR"
-    const val KEY_SHARE_IMAGES_DIRECTLY = "KEY_SHARE_IMAGES_DIRECTLY"
     const val KEY_WARN_REPLY_TO_OLD_CONTENT = "KEY_WARN_REPLY_TO_OLD_CONTENT"
     const val KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS = "KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS"
     const val KEY_CHECK_INTERVAL = "KEY_CHECK_INTERVAL"
@@ -199,6 +198,10 @@ object PreferenceUtil {
     const val KEY_NOTIFICATIONS_CHECK_INTERVAL_MS = "KEY_NOTIFICATIONS_CHECK_INTERVAL_MS"
 
     const val KEY_PREF_VERSION = "pref_version"
+
+
+    // Unused/dead keys
+    const val DEAD_KEY_SHARE_IMAGES_DIRECTLY = "KEY_SHARE_IMAGES_DIRECTLY"
 
     fun initialize(context: Context) {
         if (!::preferences.isInitialized) {

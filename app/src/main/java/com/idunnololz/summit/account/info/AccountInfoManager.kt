@@ -12,6 +12,8 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -156,6 +158,24 @@ class AccountInfoManager @Inject constructor(
                 showReadPosts = response.my_user?.local_user_view?.local_user?.show_read_posts,
                 modCommunityIds = response.my_user?.moderates?.map { it.community.id },
                 isAdmin = response.admins.firstOrNull { it.person.id == account.id } != null,
+                blockedPersons = response.my_user?.person_blocks?.map {
+                    BlockedPerson(
+                        personId = it.target.id,
+                        personRef = it.target.toPersonRef(),
+                    )
+                },
+                blockedCommunities = response.my_user?.community_blocks?.map {
+                    BlockedCommunity(
+                        it.community.id,
+                        it.community.toCommunityRef(),
+                    )
+                },
+                blockedInstances = response.my_user?.instance_blocks?.map {
+                    BlockedInstance(
+                        it.instance.id,
+                        it.instance.domain,
+                    )
+                }
             ),
         )
         val fullAccount = FullAccount(

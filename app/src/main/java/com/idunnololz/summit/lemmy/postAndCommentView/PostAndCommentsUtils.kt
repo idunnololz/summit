@@ -11,7 +11,6 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.lemmy.CommentRef
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -21,6 +20,7 @@ import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
@@ -53,14 +53,14 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
 fun BaseFragment<*>.showMoreCommentOptions(
     instance: String,
     commentView: CommentView,
-    actionsViewModel: MoreActionsViewModel,
+    moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
     onLoadComment: ((CommentId) -> Unit)? = null,
     onScreenshotClick: (() -> Unit)? = null,
 ): BottomMenu? {
     if (!isBindingAvailable()) return null
 
-    val currentAccount = actionsViewModel.accountManager.currentAccount.asAccount
+    val currentAccount = moreActionsHelper.accountManager.currentAccount.asAccount
 
     val bottomMenu = BottomMenu(requireContext()).apply {
         setTitle(R.string.more_actions)
@@ -77,7 +77,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
             addItemWithIcon(R.id.ca_save, R.string.save, R.drawable.baseline_bookmark_add_24)
         }
 
-        val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
+        val fullAccount = moreActionsHelper.accountInfoManager.currentFullAccount.value
         val miscAccountInfo = fullAccount
             ?.accountInfo
             ?.miscAccountInfo
@@ -152,7 +152,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
             createCommentActionHandler(
                 instance = instance,
                 commentView = commentView,
-                actionsViewModel = actionsViewModel,
+                moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,
                 onLoadComment = onLoadComment,
                 onScreenshotClick = onScreenshotClick,
@@ -167,14 +167,14 @@ fun BaseFragment<*>.showMoreCommentOptions(
 fun BaseFragment<*>.createCommentActionHandler(
     instance: String,
     commentView: CommentView,
-    actionsViewModel: MoreActionsViewModel,
+    moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
     onLoadComment: ((CommentId) -> Unit)? = null,
     onScreenshotClick: (() -> Unit)? = null,
 ): (Int) -> Unit = outer@{ id: Int ->
 
     val context = requireContext()
-    val currentAccount = actionsViewModel.accountManager.currentAccount.asAccount
+    val currentAccount = moreActionsHelper.accountManager.currentAccount.asAccount
 
     val onEditCommentClick: (CommentView) -> Unit = a@{
         if (currentAccount == null) {
@@ -220,16 +220,16 @@ fun BaseFragment<*>.createCommentActionHandler(
         }
         R.id.ca_save_toggle -> {
             if (commentView.saved) {
-                actionsViewModel.saveComment(commentView.comment.id, false)
+                moreActionsHelper.saveComment(commentView.comment.id, false)
             } else {
-                actionsViewModel.saveComment(commentView.comment.id, true)
+                moreActionsHelper.saveComment(commentView.comment.id, true)
             }
         }
         R.id.ca_save -> {
-            actionsViewModel.saveComment(commentView.comment.id, true)
+            moreActionsHelper.saveComment(commentView.comment.id, true)
         }
         R.id.ca_remove_from_saved -> {
-            actionsViewModel.saveComment(commentView.comment.id, false)
+            moreActionsHelper.saveComment(commentView.comment.id, false)
         }
         R.id.ca_share -> {
             Utils.shareLink(
@@ -264,7 +264,7 @@ fun BaseFragment<*>.createCommentActionHandler(
             ModActionsDialogFragment.show(commentView, childFragmentManager)
         }
         R.id.ca_reply -> {
-            if (actionsViewModel.accountManager.currentAccount.value == null) {
+            if (moreActionsHelper.accountManager.currentAccount.value == null) {
                 PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                     .show(childFragmentManager, "PreAuthDialogFragment")
                 return@outer
@@ -277,7 +277,7 @@ fun BaseFragment<*>.createCommentActionHandler(
             )
         }
         R.id.ca_block_user -> {
-            actionsViewModel.blockPerson(commentView.creator.id)
+            moreActionsHelper.blockPerson(commentView.creator.id)
         }
         R.id.ca_report_comment -> {
             ReportContentDialogFragment.show(
@@ -299,7 +299,7 @@ fun BaseFragment<*>.createCommentActionHandler(
             showMoreCommentOptions(
                 instance = instance,
                 commentView = commentView,
-                actionsViewModel = actionsViewModel,
+                moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,
                 onLoadComment = onLoadComment,
                 onScreenshotClick = onScreenshotClick,

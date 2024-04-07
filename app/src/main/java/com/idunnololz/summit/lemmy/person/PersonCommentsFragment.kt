@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,11 +14,11 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonCommentsBinding
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
@@ -43,7 +42,9 @@ class PersonCommentsFragment :
     }
 
     private var adapter: CommentListAdapter? = null
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
@@ -82,7 +83,7 @@ class PersonCommentsFragment :
                 createCommentActionHandler(
                     instance = parentFragment.viewModel.instance,
                     commentView = commentView,
-                    actionsViewModel = actionsViewModel,
+                    moreActionsHelper = moreActionsHelper,
                     fragmentManager = childFragmentManager,
                 )(actionId)
             },
@@ -241,7 +242,7 @@ class PersonCommentsFragment :
                 val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
                 val postRef = dialog.arguments?.getParcelableCompat<PostRef>(EXTRA_POST_REF)
                 if (commentId != null && postRef != null) {
-                    actionsViewModel.deleteComment(postRef, commentId.toInt())
+                    moreActionsHelper.deleteComment(postRef, commentId.toInt())
                 }
             }
         }

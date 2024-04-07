@@ -65,7 +65,6 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
-import com.idunnololz.summit.util.PreferenceUtil.KEY_SHARE_IMAGES_DIRECTLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
@@ -1524,13 +1523,6 @@ class MiscSettings @Inject constructor(
         relatedKeys = listOf(KEY_USE_PREDICTIVE_BACK),
     )
 
-    val shareImagesDirectly = OnOffSettingItem(
-        null,
-        context.getString(R.string.share_images_directly),
-        context.getString(R.string.share_images_directly_desc),
-        relatedKeys = listOf(KEY_SHARE_IMAGES_DIRECTLY),
-    )
-
     val warnReplyToOldContentThresholdMs = RadioGroupSettingItem(
         null,
         context.getString(R.string.warn_when_replying_to_old_post_or_comment),
@@ -1645,7 +1637,6 @@ class MiscSettings @Inject constructor(
         transparentNotificationBar,
         previewLinks,
         usePredictiveBack,
-        shareImagesDirectly,
         perCommunitySettings,
         largeScreenSupport,
     )

@@ -15,7 +15,10 @@ import androidx.room.TypeConverters
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.InstanceId
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.PersonRef
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -41,6 +44,9 @@ data class MiscAccountInfo(
      * List of community ids that this account is the mod of.
      */
     val modCommunityIds: List<Int>? = null,
+    val blockedPersons: List<BlockedPerson>? = null,
+    val blockedCommunities: List<BlockedCommunity>? = null,
+    val blockedInstances: List<BlockedInstance>? = null,
     val isAdmin: Boolean? = null,
 )
 
@@ -61,6 +67,24 @@ data class AccountSubscription(
     val hidden: Boolean,
     val posting_restricted_to_mods: Boolean,
     val instanceId: InstanceId,
+)
+
+@JsonClass(generateAdapter = true)
+data class BlockedPerson(
+    val personId: PersonId,
+    val personRef: PersonRef,
+)
+
+@JsonClass(generateAdapter = true)
+data class BlockedCommunity(
+    val communityId: CommunityId,
+    val communityRef: CommunityRef.CommunityRefByName,
+)
+
+@JsonClass(generateAdapter = true)
+data class BlockedInstance(
+    val instanceId: InstanceId,
+    val instanceName: String,
 )
 
 val AccountSubscription.instance: String?

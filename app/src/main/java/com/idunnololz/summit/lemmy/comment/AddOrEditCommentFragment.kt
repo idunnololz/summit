@@ -321,10 +321,21 @@ class AddOrEditCommentFragment :
         }
 
         viewModel.commentSentEvent.observe(viewLifecycleOwner) {
-            val result = it.contentIfNotHandled ?: return@observe
+            when (it) {
+                is StatefulData.Error -> {
+                    viewModel.commentSentEvent.setIdle()
 
-            result
-                .onSuccess {
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_send_message),
+                        it.error,
+                        childFragmentManager,
+                    )
+                }
+                is StatefulData.Loading -> {}
+                is StatefulData.NotStarted -> {}
+                is StatefulData.Success -> {
+                    viewModel.commentSentEvent.setIdle()
+
                     setFragmentResult(
                         requestKey = REQUEST_KEY,
                         result = bundleOf(REQUEST_KEY_RESULT to Result.CommentSent),
@@ -332,13 +343,7 @@ class AddOrEditCommentFragment :
 
                     dismiss()
                 }
-                .onFailure {
-                    ErrorDialogFragment.show(
-                        getString(R.string.error_unable_to_send_message),
-                        it,
-                        childFragmentManager,
-                    )
-                }
+            }
         }
 
         viewModel.messages.observe(viewLifecycleOwner) {
@@ -347,7 +352,11 @@ class AddOrEditCommentFragment :
 
         binding.toolbar.inflateMenu(R.menu.menu_add_or_edit_comment)
 
-        binding.toolbar.title = getString(R.string.comment)
+        if (isDm) {
+            binding.toolbar.title = getString(R.string.send_message)
+        } else {
+            binding.toolbar.title = getString(R.string.comment)
+        }
         if (isEdit()) {
             binding.toolbar.menu.findItem(R.id.send_comment)?.isVisible = false
         } else {
@@ -447,9 +456,15 @@ class AddOrEditCommentFragment :
 
         val inboxItem = args.inboxItem
         val personId = args.personId
+        val personRef = args.personRef
         if (personId != 0L) {
             viewModel.sendComment(
                 personId,
+                binding.commentEditor.editText?.text.toString(),
+            )
+        } else if (personRef != null) {
+            viewModel.sendComment(
+                personRef,
                 binding.commentEditor.editText?.text.toString(),
             )
         } else if (inboxItem != null) {
@@ -517,7 +532,6 @@ class AddOrEditCommentFragment :
         val postView = args.postView
         val commentView = args.commentView
         val inboxItem = args.inboxItem
-        val personId = args.personId
 
         val commentEditor = binding.commentEditor
         if (isEdit()) {
@@ -541,7 +555,7 @@ class AddOrEditCommentFragment :
             }
         } else if (inboxItem != null) {
             binding.replyingTo.text = inboxItem.content
-        } else if (personId != 0L) {
+        } else if (isDm) {
             binding.scrollView.visibility = View.GONE
             binding.divider.visibility = View.GONE
         } else {
@@ -674,4 +688,7 @@ class AddOrEditCommentFragment :
 
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
+
+    private val isDm: Boolean
+        get() = args.personId != 0L || args.personRef != null
 }

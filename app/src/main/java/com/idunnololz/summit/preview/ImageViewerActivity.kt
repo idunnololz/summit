@@ -23,11 +23,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.navArgs
 import androidx.transition.TransitionManager
 import coil.imageLoader
@@ -38,10 +36,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
-import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
-import com.idunnololz.summit.main.ActivityInsets
+import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
@@ -64,7 +61,6 @@ import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.math.max
 
 @AndroidEntryPoint
 class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by InsetsHelper(consumeInsets = false) {
@@ -84,7 +80,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
     private val args: ImageViewerActivityArgs by navArgs()
 
     private val viewModel: ImageViewerViewModel by viewModels()
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var currentBottomMenu: BottomMenu? = null
 
@@ -98,6 +93,9 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
     private var websiteAdapterLoader: WebsiteAdapterLoader? = null
 
     private lateinit var binding: FragmentImageViewerBinding
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -240,7 +238,7 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
             supportFinishAfterTransition()
         }
 
-        actionsViewModel.downloadAndShareFile.observe(this) {
+        moreActionsHelper.downloadAndShareFile.observe(this) {
             when (it) {
                 is StatefulData.Error -> {}
                 is StatefulData.Loading -> {}
@@ -283,7 +281,7 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
             startPostponedEnterTransition()
         }, 50,)
 
-        actionsViewModel.downloadResult.observe(this) {
+        moreActionsHelper.downloadResult.observe(this) {
             when (it) {
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Error -> {
@@ -372,9 +370,9 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
                             true
                         }
                         R.id.more -> {
-                            showMoreImageOrLinkOptions(
+                            showAdvancedLinkOptions(
                                 args.url,
-                                actionsViewModel,
+                                moreActionsHelper,
                                 supportFragmentManager,
                                 args.mimeType,
                             )
@@ -412,7 +410,7 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
     private fun downloadImage() {
         createImageOrLinkActionsHandler(
             args.url,
-            actionsViewModel,
+            moreActionsHelper,
             supportFragmentManager,
             args.mimeType,
         )(R.id.download)
@@ -647,7 +645,7 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
     fun getSnackbarContainer(): View = binding.contentView
 
     fun downloadAndShareImage(url: String) {
-        actionsViewModel.downloadAndShareImage(url)
+        moreActionsHelper.downloadAndShareImage(url)
     }
 
     override fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean) {

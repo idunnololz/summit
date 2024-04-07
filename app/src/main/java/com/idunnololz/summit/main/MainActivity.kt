@@ -47,7 +47,6 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LinkResolver
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -56,6 +55,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity.Companion.ErrorCustomDownloadLocation
@@ -114,7 +114,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: MainActivityViewModel by viewModels()
-    val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var communitySelectorController: CommunitySelectorController? = null
 
@@ -140,6 +139,9 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
 
     val useBottomNavBar: Boolean
         get() = navBarController.useBottomNavBar
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var themeManager: ThemeManager
@@ -180,7 +182,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
         viewModel.communities.observe(this) {
             communitySelectorController?.setCommunities(it)
         }
-        actionsViewModel.downloadAndShareFile.observe(this) {
+        moreActionsHelper.downloadAndShareFile.observe(this) {
             when (it) {
                 is StatefulData.Error -> {}
                 is StatefulData.Loading -> {}
@@ -198,7 +200,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                 }
             }
         }
-        actionsViewModel.downloadResult.observe(this) {
+        moreActionsHelper.downloadResult.observe(this) {
             when (it) {
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Error -> {
@@ -233,7 +235,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                                     )
                                 }.show()
 
-                                actionsViewModel.downloadResult.postIdle()
+                                moreActionsHelper.downloadResult.postIdle()
                             } catch (e: IOException) { /* do nothing */
                             }
                         }

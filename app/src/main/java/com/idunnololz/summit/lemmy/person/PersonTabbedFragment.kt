@@ -26,7 +26,6 @@ import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.FragmentPersonBinding
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -35,7 +34,8 @@ import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.SortTypeMenuHelper
-import com.idunnololz.summit.lemmy.utils.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
@@ -76,9 +76,11 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     @Inject
     lateinit var accountManager: AccountManager
 
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
+
     val viewModel: PersonTabbedViewModel by viewModels()
     var slidingPaneController: SlidingPaneController? = null
-    val actionsViewModel: MoreActionsViewModel by viewModels()
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
@@ -155,7 +157,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             }
             binding.fab.setup(preferences)
 
-            actionsViewModel.blockPersonResult.observe(viewLifecycleOwner) {
+            moreActionsHelper.blockPersonResult.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {
                         Snackbar.make(
@@ -169,7 +171,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     is StatefulData.Success -> {
                         Snackbar.make(
                             binding.coordinatorLayout,
-                            if (it.data.blockedPerson) {
+                            if (it.data.blocked) {
                                 getString(R.string.user_blocked)
                             } else {
                                 getString(R.string.user_unblocked)
@@ -229,7 +231,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 }
             }
 
-            installOnActionResultHandler(actionsViewModel, coordinatorLayout)
+            installOnActionResultHandler(moreActionsHelper, coordinatorLayout)
         }
 
         binding.fab.setOnClickListener {
@@ -305,10 +307,10 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         ).show()
                     }
                     R.id.ca_block_user -> {
-                        actionsViewModel.blockPerson(person.id)
+                        moreActionsHelper.blockPerson(person.id)
                     }
                     R.id.unblock_user -> {
-                        actionsViewModel.blockPerson(person.id, false)
+                        moreActionsHelper.blockPerson(person.id, false)
                     }
                     R.id.message -> {
                         AddOrEditCommentFragment()

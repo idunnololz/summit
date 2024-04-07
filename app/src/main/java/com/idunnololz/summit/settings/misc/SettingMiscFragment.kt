@@ -162,13 +162,6 @@ class SettingMiscFragment :
         } else {
             binding.usePredictiveBack.root.visibility = View.GONE
         }
-        settings.shareImagesDirectly.bindTo(
-            binding.shareImagesDirectly,
-            { preferences.shareImagesDirectly },
-            {
-                preferences.shareImagesDirectly = it
-            },
-        )
         settings.warnReplyToOldContentThresholdMs.bindTo(
             binding.warnReplyToOldContentThresholdMs,
             { convertThresholdMsToOptionId(preferences.warnReplyToOldContentThresholdMs) },

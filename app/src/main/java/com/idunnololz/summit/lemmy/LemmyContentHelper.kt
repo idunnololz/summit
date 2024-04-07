@@ -34,12 +34,14 @@ import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.postListView.FullContentConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel.PostViewType
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
+import com.idunnololz.summit.util.ContentUtils.getVideoType
 import com.idunnololz.summit.util.ContentUtils.isUrlHls
 import com.idunnololz.summit.util.ContentUtils.isUrlMp4
+import com.idunnololz.summit.util.ContentUtils.isUrlWebm
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
@@ -105,7 +107,7 @@ class LemmyContentHelper(
         onItemClickListener: () -> Unit,
         onRevealContentClickedFn: () -> Unit,
         onLemmyUrlClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String?, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
     ) {
         assertMainThread()
@@ -396,12 +398,12 @@ class LemmyContentHelper(
                             customPlayerView?.getVideoState(),
                         )
                     } else {
-                        onLinkClick(thumbnailUrl, null, LinkType.Rich)
+                        onLinkClick(thumbnailUrl, null, LinkContext.Rich)
                     }
                 } else if (uri.host == "imgur.com") {
                     onImageClickListener(url)
                 } else {
-                    onLinkClick(url, null, LinkType.Rich)
+                    onLinkClick(url, null, LinkContext.Rich)
                 }
             }
             externalContentView.setOnLongClickListener {
@@ -533,13 +535,7 @@ class LemmyContentHelper(
 
                     val videoInfo = targetPostView.getVideoInfo()
                     if (videoInfo != null) {
-                        val videoType = if (isUrlMp4(videoInfo.videoUrl)) {
-                            VideoType.Mp4
-                        } else if (isUrlHls(videoInfo.videoUrl)) {
-                            VideoType.Hls
-                        } else {
-                            VideoType.Dash
-                        }
+                        val videoType = getVideoType(videoInfo.videoUrl)
 
                         val bestSize = LemmyUtils.calculateBestVideoSize(
                             context,

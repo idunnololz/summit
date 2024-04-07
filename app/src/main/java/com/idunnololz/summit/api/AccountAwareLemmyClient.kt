@@ -237,9 +237,9 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun fetchPersonByNameWithRetry(
         name: String,
-        sortType: SortType,
-        page: Int,
-        limit: Int,
+        sortType: SortType = SortType.New,
+        page: Int = 1,
+        limit: Int = 1,
         account: Account? = accountForInstance(),
         force: Boolean,
     ): Result<GetPersonDetailsResponse> = retry {

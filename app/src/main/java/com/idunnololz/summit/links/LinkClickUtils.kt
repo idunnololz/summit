@@ -9,25 +9,25 @@ import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 
-fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkType: LinkType) {
+fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
     onLinkClick(
         context ?: return,
         (activity?.application as? MainApplication) ?: return,
         childFragmentManager,
         url,
         text,
-        linkType,
+        linkContext,
     )
 }
 
-fun BaseActivity.onLinkClick(url: String, text: String?, linkType: LinkType) {
+fun BaseActivity.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
     onLinkClick(
         this,
         (application as? MainApplication) ?: return,
         supportFragmentManager,
         url,
         text,
-        linkType,
+        linkContext,
     )
 }
 
@@ -37,7 +37,7 @@ fun onLinkClick(
     fragmentManager: FragmentManager,
     url: String,
     text: String?,
-    linkType: LinkType,
+    linkContext: LinkContext,
 ) {
     val preferences = application.preferences
 
@@ -49,7 +49,7 @@ fun onLinkClick(
             LinkPreviewDialogFragment.show(fragmentManager, url)
         }
         else -> {
-            if (linkType == LinkType.Text) {
+            if (linkContext == LinkContext.Text) {
                 LinkPreviewDialogFragment.show(fragmentManager, url)
             } else {
                 Utils.openExternalLink(context, url)
@@ -61,7 +61,7 @@ fun onLinkClick(
 /**
  * The location of the link. Special logic may be triggered based on where the click was.
  */
-enum class LinkType {
+enum class LinkContext {
     Text,
 
     /**

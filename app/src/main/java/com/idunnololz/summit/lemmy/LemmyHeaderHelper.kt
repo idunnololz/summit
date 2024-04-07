@@ -18,7 +18,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
@@ -58,7 +58,7 @@ class LemmyHeaderHelper(
         postView: PostView,
         instance: String,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
         listAuthor: Boolean = true,
@@ -177,18 +177,13 @@ class LemmyHeaderHelper(
 
         if (displayFullName) {
             sb.appendLink(
-                postView.community.name,
-                LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
-            )
-            val start = sb.length
-            sb.appendLink(
-                "@$postInstance",
+                "${postView.community.name}@$postInstance",
                 LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
             )
             val end = sb.length
             sb.setSpan(
                 ForegroundColorSpan(unimportantColor),
-                start,
+                end - postInstance.length - 1,
                 end,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
@@ -310,7 +305,7 @@ class LemmyHeaderHelper(
         instance: String,
         score: Int?,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
         displayInstanceStyle: Int,
         showUpvotePercentage: Boolean,
@@ -353,60 +348,6 @@ class LemmyHeaderHelper(
             )
         }
 
-        val creatorName = commentView.creator.name.trim()
-
-        val s = sb.length
-        sb.appendLink(
-            text = creatorName,
-            url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
-            underline = false,
-        )
-        val e = sb.length
-
-        if (commentView.creator_is_admin == true) {
-            sb.setSpan(
-                ForegroundColorSpan(adminColor),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-            sb.setSpan(
-                StyleSpan(Typeface.BOLD),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-        } else if (commentView.creator_is_moderator == true) {
-            sb.setSpan(
-                ForegroundColorSpan(modColor),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-            sb.setSpan(
-                StyleSpan(Typeface.BOLD),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-        } else {
-            sb.setSpan(
-                ForegroundColorSpan(regularColor),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-        }
-
-        if (commentView.creator_banned_from_community) {
-            sb.setSpan(
-                StrikethroughSpan(),
-                s,
-                e,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-        }
-
         val displayFullName = when (displayInstanceStyle) {
             DisplayInstanceOptions.NeverDisplayInstance -> {
                 false
@@ -419,19 +360,72 @@ class LemmyHeaderHelper(
             }
             else -> false
         }
+        val creatorName = commentView.creator.name.trim()
+
+        val nameStart = sb.length
+        val nameEnd = nameStart + creatorName.length
 
         if (displayFullName) {
-            val s = sb.length
+            val fullNameEnd = nameEnd + 1 + creatorInstance.length
             sb.appendLink(
-                text = "@$creatorInstance",
+                text = "${creatorName}@$creatorInstance",
                 url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
                 underline = false,
             )
-            val e = sb.length
             sb.setSpan(
                 ForegroundColorSpan(unimportantColor),
-                s,
-                e,
+                nameEnd,
+                fullNameEnd,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        } else {
+            sb.appendLink(
+                text = creatorName,
+                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
+                underline = false,
+            )
+        }
+
+        if (commentView.creator_is_admin == true) {
+            sb.setSpan(
+                ForegroundColorSpan(adminColor),
+                nameStart,
+                nameEnd,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.setSpan(
+                StyleSpan(Typeface.BOLD),
+                nameStart,
+                nameEnd,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        } else if (commentView.creator_is_moderator == true) {
+            sb.setSpan(
+                ForegroundColorSpan(modColor),
+                nameStart,
+                nameEnd,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.setSpan(
+                StyleSpan(Typeface.BOLD),
+                nameStart,
+                nameEnd,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        } else {
+            sb.setSpan(
+                ForegroundColorSpan(regularColor),
+                nameStart,
+                nameEnd,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
+
+        if (commentView.creator_banned_from_community) {
+            sb.setSpan(
+                StrikethroughSpan(),
+                nameStart,
+                nameEnd,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
         }
@@ -527,7 +521,7 @@ class LemmyHeaderHelper(
     private fun makeMovementMethod(
         instance: String,
         onPageClick: (PageRef) -> Unit,
-        onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
     ) =
         CustomLinkMovementMethod().apply {
@@ -544,7 +538,7 @@ class LemmyHeaderHelper(
                     if (pageRef != null) {
                         onPageClick(pageRef)
                     } else {
-                        onLinkClick(url, text, LinkType.Text)
+                        onLinkClick(url, text, LinkContext.Text)
                     }
                     return true
                 }

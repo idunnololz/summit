@@ -13,7 +13,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.utils.VotableRef
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.dateStringToPretty
@@ -25,7 +25,7 @@ class ActionsAdapter(
     private val onImageClick: (String, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
-    private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+    private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

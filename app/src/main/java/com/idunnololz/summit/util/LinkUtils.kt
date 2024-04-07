@@ -4,8 +4,10 @@ import android.net.Uri
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LinkResolver
+import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.toUrl
-import com.idunnololz.summit.lemmy.utils.showMoreImageOrLinkOptions
+import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.main.MainActivity
 import okhttp3.CacheControl
 import okhttp3.Request
@@ -59,6 +61,25 @@ object LinkUtils {
         }
     }
 
+    fun analyzeLink(url: String, instance: String): AdvancedLink {
+        if (ContentUtils.isUrlImage(url)) {
+            return AdvancedLink.ImageLink(url)
+        } else if (ContentUtils.isUrlVideo(url)) {
+            return AdvancedLink.VideoLink(url)
+        } else {
+            val pageRef = LinkResolver.parseUrl(
+                url = url,
+                currentInstance = instance,
+                mustHandle = false
+            )
+            if (pageRef != null) {
+                return AdvancedLink.PageLink(url, pageRef)
+            } else {
+                return AdvancedLink.OtherLink(url)
+            }
+        }
+    }
+
     fun subredditsSearch(query: CharSequence?): String =
         "https://www.reddit.com/subreddits/search.json?q=$query"
 
@@ -84,10 +105,31 @@ object LinkUtils {
         "https://$instance/c/$communityName"
 }
 
+sealed interface AdvancedLink {
+    val url: String
+
+    data class PageLink(
+        override val url: String,
+        val pageRef: PageRef,
+    ): AdvancedLink
+
+    data class ImageLink(
+        override val url: String,
+    ): AdvancedLink
+
+    data class VideoLink(
+        override val url: String,
+    ): AdvancedLink
+
+    data class OtherLink(
+        override val url: String,
+    ): AdvancedLink
+}
+
 fun MainActivity.showMoreLinkOptions(url: String, text: String?) {
-    showMoreImageOrLinkOptions(
+    showAdvancedLinkOptions(
         url,
-        actionsViewModel,
+        moreActionsHelper,
         supportFragmentManager,
         text,
     )

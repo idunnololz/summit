@@ -19,7 +19,6 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -31,6 +30,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
@@ -58,8 +58,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     private val args by navArgs<MessageFragmentArgs>()
 
     private val viewModel: MessageViewModel by viewModels()
-    val actionsViewModel: MoreActionsViewModel by viewModels()
     val inboxViewModel: InboxViewModel by activityViewModels()
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
@@ -455,7 +457,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, actionsViewModel, childFragmentManager)
+                    showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
                 },
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
@@ -464,7 +466,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     showMorePostOptions(
                         instance = viewModel.apiInstance,
                         postView = postView,
-                        actionsViewModel = actionsViewModel,
+                        moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                     )
                 },
@@ -472,7 +474,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     createCommentActionHandler(
                         instance = viewModel.apiInstance,
                         commentView = commentView,
-                        actionsViewModel = actionsViewModel,
+                        moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                     )(actionId)
                 },

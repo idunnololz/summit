@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,16 +11,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.viewModels
-import androidx.media3.ui.BuildConfig
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
-import arrow.core.firstOrNone
 import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
@@ -40,22 +36,20 @@ import com.idunnololz.summit.databinding.PageDataStatsItemBinding
 import com.idunnololz.summit.databinding.PageDataTitleItemBinding
 import com.idunnololz.summit.databinding.WarningItemBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
-import com.idunnololz.summit.filterLists.FilterEntry
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.setup
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.settings.postList.AddOrEditFilterDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -79,7 +73,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private val args by navArgs<CommunityInfoFragmentArgs>()
 
     private val viewModel: CommunityInfoViewModel by viewModels()
-    private val actionsViewModel: MoreActionsViewModel by viewModels()
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -518,7 +514,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         if (!isBindingAvailable()) return
 
         val bottomMenu = BottomMenu(requireContext()).apply {
-            val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
+            val fullAccount = moreActionsHelper.accountInfoManager.currentFullAccount.value
             val isMod = mods.firstOrNull { it.id == fullAccount?.accountId } != null
 
             if (isMod) {
@@ -584,16 +580,16 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         findNavController().navigateSafe(directions)
                     }
                     R.id.block_community -> {
-                        actionsViewModel.blockCommunity(communityView.community.id, true)
+                        moreActionsHelper.blockCommunity(communityView.community.id, true)
                     }
                     R.id.unblock_community -> {
-                        actionsViewModel.blockCommunity(communityView.community.id, false)
+                        moreActionsHelper.blockCommunity(communityView.community.id, false)
                     }
                     R.id.block_instance -> {
-                        actionsViewModel.blockInstance(communityView.community.instance_id, true)
+                        moreActionsHelper.blockInstance(communityView.community.instance_id, true)
                     }
                     R.id.unblock_instance -> {
-                        actionsViewModel.blockInstance(communityView.community.instance_id, false)
+                        moreActionsHelper.blockInstance(communityView.community.instance_id, false)
                     }
                     R.id.view_mod_log -> {
                         val directions = CommunityInfoFragmentDirections
@@ -658,10 +654,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         findNavController().navigateSafe(directions)
                     }
                     R.id.block_instance -> {
-                        actionsViewModel.blockInstance(siteView.site.instance_id, true)
+                        moreActionsHelper.blockInstance(siteView.site.instance_id, true)
                     }
                     R.id.unblock_instance -> {
-                        actionsViewModel.blockInstance(siteView.site.instance_id, false)
+                        moreActionsHelper.blockInstance(siteView.site.instance_id, false)
                     }
                     R.id.view_mod_log -> {
                         val directions = CommunityInfoFragmentDirections
@@ -685,7 +681,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val onImageClick: (String, View?, String) -> Unit,
         private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
-        private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         private val onLinkLongClick: (url: String, text: String) -> Unit,
         private val onCommunityInfoClick: (communityRef: CommunityRef) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

@@ -7,7 +7,6 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.lemmy.MoreActionsViewModel
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -19,6 +18,7 @@ import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialog
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
@@ -28,7 +28,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 fun BaseFragment<*>.showMorePostOptions(
     instance: String,
     postView: PostView,
-    actionsViewModel: MoreActionsViewModel,
+    moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
     isPostMenu: Boolean = false,
     onSortOrderClick: () -> Unit = {},
@@ -71,12 +71,12 @@ fun BaseFragment<*>.showMorePostOptions(
             addDivider()
         }
 
-        if (postView.post.creator_id == actionsViewModel.accountManager.currentAccount.asAccount?.id) {
+        if (postView.post.creator_id == moreActionsHelper.accountManager.currentAccount.asAccount?.id) {
             addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
             addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
         }
 
-        val fullAccount = actionsViewModel.accountInfoManager.currentFullAccount.value
+        val fullAccount = moreActionsHelper.accountInfoManager.currentFullAccount.value
         val miscAccountInfo = fullAccount
             ?.accountInfo
             ?.miscAccountInfo
@@ -193,7 +193,7 @@ fun BaseFragment<*>.showMorePostOptions(
             createPostActionHandler(
                 instance = instance,
                 postView = postView,
-                actionsViewModel = actionsViewModel,
+                moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,
                 onSortOrderClick = onSortOrderClick,
                 onRefreshClick = onRefreshClick,
@@ -209,7 +209,7 @@ fun BaseFragment<*>.showMorePostOptions(
 fun BaseFragment<*>.createPostActionHandler(
     instance: String,
     postView: PostView,
-    actionsViewModel: MoreActionsViewModel,
+    moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
     onSortOrderClick: () -> Unit = {},
     onRefreshClick: () -> Unit = {},
@@ -220,7 +220,7 @@ fun BaseFragment<*>.createPostActionHandler(
 
     when (id) {
         R.id.pa_reply -> {
-            if (actionsViewModel.accountManager.currentAccount.value == null) {
+            if (moreActionsHelper.accountManager.currentAccount.value == null) {
                 PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                     .show(childFragmentManager, "PreAuthDialogFragment")
                 return@a
@@ -236,7 +236,7 @@ fun BaseFragment<*>.createPostActionHandler(
             CreateOrEditPostFragment()
                 .apply {
                     arguments = CreateOrEditPostFragmentArgs(
-                        instance = actionsViewModel.apiInstance,
+                        instance = moreActionsHelper.apiInstance,
                         post = postView.post,
                         communityName = null,
                     ).toBundle()
@@ -244,35 +244,35 @@ fun BaseFragment<*>.createPostActionHandler(
                 .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
         }
         R.id.delete -> {
-            actionsViewModel.deletePost(postView.post.id)
+            moreActionsHelper.deletePost(postView.post.id)
         }
         R.id.hide_post -> {
-            actionsViewModel.hidePost(postView.post.id)
+            moreActionsHelper.hidePost(postView.post.id)
         }
         R.id.pa_save_toggle -> {
             if (postView.saved) {
-                actionsViewModel.savePost(postView.post.id, save = false)
+                moreActionsHelper.savePost(postView.post.id, save = false)
             } else {
-                actionsViewModel.savePost(postView.post.id, save = true)
+                moreActionsHelper.savePost(postView.post.id, save = true)
             }
         }
         R.id.pa_save -> {
-            actionsViewModel.savePost(postView.post.id, save = true)
+            moreActionsHelper.savePost(postView.post.id, save = true)
         }
         R.id.pa_remove_from_saved -> {
-            actionsViewModel.savePost(postView.post.id, save = false)
+            moreActionsHelper.savePost(postView.post.id, save = false)
         }
         R.id.pa_community_info -> {
             getMainActivity()?.showCommunityInfo(postView.community.toCommunityRef())
         }
         R.id.block_community -> {
-            actionsViewModel.blockCommunity(postView.community.id)
+            moreActionsHelper.blockCommunity(postView.community.id)
         }
         R.id.pa_block_user -> {
-            actionsViewModel.blockPerson(postView.creator.id)
+            moreActionsHelper.blockPerson(postView.creator.id)
         }
         R.id.block_instance -> {
-            actionsViewModel.blockInstance(postView.community.instance_id)
+            moreActionsHelper.blockInstance(postView.community.instance_id)
         }
         R.id.pa_share -> {
             Utils.shareLink(
@@ -284,7 +284,7 @@ fun BaseFragment<*>.createPostActionHandler(
             CreateOrEditPostFragment()
                 .apply {
                     arguments = CreateOrEditPostFragmentArgs(
-                        instance = actionsViewModel.apiInstance,
+                        instance = moreActionsHelper.apiInstance,
                         post = null,
                         communityName = null,
                         crosspost = postView.post,
@@ -357,7 +357,7 @@ fun BaseFragment<*>.createPostActionHandler(
             showMorePostOptions(
                 instance = instance,
                 postView = postView,
-                actionsViewModel = actionsViewModel,
+                moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,
                 onSortOrderClick = onSortOrderClick,
                 onRefreshClick = onRefreshClick,

@@ -34,7 +34,7 @@ import com.idunnololz.summit.lemmy.VisibleCommentItem
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.postAndCommentView.GeneralQuickActionsViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.links.LinkType
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
@@ -54,7 +54,7 @@ class CommentListAdapter(
     private val onCommentActionClick: (CommentView, actionId: Int) -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
-    private val onLinkClick: (url: String, text: String, linkType: LinkType) -> Unit,
+    private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
 ) : Adapter<ViewHolder>() {
 
