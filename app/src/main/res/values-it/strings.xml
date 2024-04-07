@@ -877,4 +877,8 @@
     <string name="community_name_field_desc">Identificatore univoco per la comunità; non potrà essere modificato.</string>
     <string name="community_display_name_field_desc">Titolo della comunità; può essere modificato.</string>
     <string name="error_create_community">Non è stato possibile creare la comunità.</string>
+    <string name="delete_community">Elimina comunità</string>
+    <string name="undo_delete_community">Annulla eliminazione comunità</string>
+    <string name="error_unable_to_delete_community">Non è stato possibile eliminare/ripristinare la comunità</string>
+    <string name="warn_community_deleted">Questa comunità è stata eliminata dal creatore. Non sarà visibile agli utenti normali.</string>
 </resources>
