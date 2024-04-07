@@ -879,4 +879,19 @@
     <string name="undo_delete_community">Annulla eliminazione comunità</string>
     <string name="error_unable_to_delete_community">Non è stato possibile eliminare/ripristinare la comunità</string>
     <string name="warn_community_deleted">Questa comunità è stata eliminata dal creatore. Non sarà visibile agli utenti normali.</string>
+    <string name="message_to_format">A: %1$s</string>
+    <string name="link_actions_format">Azioni link (%1$s)</string>
+    <string name="message_from_format">Da: %1$s</string>
+    <string name="link_type_instance_link">link istanza</string>
+    <string name="link_type_image_link">link immagine</string>
+    <string name="link_type_video_link">link video</string>
+    <string name="link_type_comment_link">link commento</string>
+    <string name="link_type_community_link">link comunità</string>
+    <string name="link_type_user_link">link utente</string>
+    <string name="link_type_post_link">link post</string>
+    <string name="more_user_options">Altre opzioni utente</string>
+    <string name="instance_blocked">Istanza bloccata</string>
+    <string name="community_blocked">Comunità bloccata</string>
+    <string name="community_unblocked">Comunità sbloccata</string>
+    <string name="instance_unblocked">Istanza sbloccata</string>
 </resources>
