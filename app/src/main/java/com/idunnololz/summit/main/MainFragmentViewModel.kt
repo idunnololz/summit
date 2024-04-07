@@ -1,6 +1,8 @@
 package com.idunnololz.summit.main
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainFragmentViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val userCommunitiesManager: UserCommunitiesManager,
 ) : ViewModel() {
 

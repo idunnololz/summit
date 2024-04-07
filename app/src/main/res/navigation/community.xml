@@ -37,7 +37,7 @@
             app:destination="@id/communityFragment"
             app:launchSingleTop="true" />
         <action
-            android:id="@+id/action_subredditFragment_switchSubreddit"
+            android:id="@+id/action_communityFragment_switchCommunity"
             app:destination="@id/communityFragment" />
         <action
             android:id="@+id/action_communityFragment_to_login"
