@@ -520,7 +520,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             }
 
             if (community.icon == null) {
-                icon.load(R.drawable.ic_subreddit_default)
+                icon.load(R.drawable.ic_community_default)
                 icon.setOnClickListener(null)
             } else {
                 icon.dispose()
@@ -531,7 +531,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                         icon.load(it)
                     },
                     errorListener = {
-                        icon.load(R.drawable.ic_subreddit_default)
+                        icon.load(R.drawable.ic_community_default)
                     },
                 )
                 icon.setOnClickListener {

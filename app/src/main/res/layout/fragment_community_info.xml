@@ -78,6 +78,7 @@
                     android:foreground="@drawable/account_ripple"
                     android:scaleType="centerCrop"
                     android:padding="2dp"
+                    android:background="?backgroundColor"
                     style="@style/RoundImageView"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="parent"

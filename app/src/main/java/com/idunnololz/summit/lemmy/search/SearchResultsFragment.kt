@@ -556,7 +556,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             addItemType(Item.CommunityItem::class, CommunityItemBinding::inflate) { item, b, h ->
                 val community = item.communityView
 
-                b.icon.load(R.drawable.ic_subreddit_default)
+                b.icon.load(R.drawable.ic_community_default)
                 offlineManager.fetchImage(h.itemView, community.community.icon) {
                     b.icon.load(it)
                 }

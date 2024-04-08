@@ -201,4 +201,35 @@ fun BaseFragment<*>.installOnActionResultHandler(
             }
         }
     }
+    moreActionsHelper.subscribeResult.observe(viewLifecycleOwner) {
+        when (it) {
+            is StatefulData.Error -> {
+                moreActionsHelper.subscribeResult.setIdle()
+                ErrorDialogFragment.show(
+                    getString(R.string.error_unable_to_update_subscription),
+                    it.error,
+                    childFragmentManager,
+                )
+            }
+            is StatefulData.Loading -> {}
+            is StatefulData.NotStarted -> {}
+            is StatefulData.Success -> {
+                moreActionsHelper.subscribeResult.setIdle()
+                Snackbar
+                    .make(
+                        snackbarContainer,
+                        if (it.data.subscribe) {
+                            R.string.subscribed
+                        } else {
+                            R.string.unsubscribed
+                        },
+                        Snackbar.LENGTH_SHORT,
+                    )
+                    .setAction(R.string.undo) { _ ->
+                        moreActionsHelper.updateSubscription(it.data.communityId, !it.data.subscribe)
+                    }
+                    .show()
+            }
+        }
+    }
 }

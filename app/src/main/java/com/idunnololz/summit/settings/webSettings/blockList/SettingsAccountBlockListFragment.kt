@@ -62,7 +62,7 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
             )
 
             BasicSettingItem(
-                R.drawable.ic_subreddit_default,
+                R.drawable.ic_community_default,
                 getString(R.string.blocked_communities),
                 null,
             ).bindTo(

@@ -41,7 +41,6 @@ typealias OnCommunitySelected = (Either<UserCommunityItem, CommunityRef>, resetT
 
 class CommunitiesPaneController @AssistedInject constructor(
     private val offlineManager: OfflineManager,
-    private val userCommunitiesManager: UserCommunitiesManager,
     private val tabsManager: TabsManager,
     @Assisted private val viewModel: CommunitiesPaneViewModel,
     @Assisted private val binding: CommunitiesPaneBinding,
@@ -221,7 +220,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 clazz = Item.BookmarkedCommunityItem::class,
                 inflateFn = GenericCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.setImageResource(R.drawable.ic_subreddit_default)
+                b.icon.setImageResource(R.drawable.ic_community_default)
                 b.selectedIndicator.visibility = if (item.isSelected) {
                     View.VISIBLE
                 } else {
@@ -244,7 +243,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                         is CommunityRef.All ->
                             loadIcon(R.drawable.ic_subreddit_all)
                         is CommunityRef.CommunityRefByName ->
-                            loadIcon(R.drawable.ic_subreddit_default)
+                            loadIcon(R.drawable.ic_community_default)
                         is CommunityRef.Local ->
                             loadIcon(R.drawable.ic_subreddit_home)
                         is CommunityRef.MultiCommunity ->
@@ -314,7 +313,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 clazz = Item.SubscribedCommunityItem::class,
                 inflateFn = GenericCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.load(R.drawable.ic_subreddit_default)
+                b.icon.load(R.drawable.ic_community_default)
                 offlineManager.fetchImage(h.itemView, item.iconUrl) {
                     b.icon.load(it)
                 }

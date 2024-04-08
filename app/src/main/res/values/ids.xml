@@ -206,4 +206,5 @@
     <item name="user_info" type="id" />
     <item name="more_user_options" type="id" />
     <item name="block_user" type="id" />
+    <item name="unsubscribe" type="id" />
 </resources>

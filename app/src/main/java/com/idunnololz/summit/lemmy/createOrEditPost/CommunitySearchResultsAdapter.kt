@@ -74,7 +74,7 @@ class CommunitySearchResultsAdapter(
             clazz = Item.SearchResultCommunityItem::class,
             inflateFn = CommunitySearchResultCommunityItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_subreddit_default)
+            b.icon.load(R.drawable.ic_community_default)
             offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
                 b.icon.load(it)
             }

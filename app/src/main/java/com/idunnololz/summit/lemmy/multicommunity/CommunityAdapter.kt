@@ -118,12 +118,12 @@ class CommunityAdapter(
         ) { item, b, h ->
             if (item.icon != null) {
                 b.icon.load(item.icon) {
-                    placeholder(R.drawable.ic_subreddit_default)
-                    fallback(R.drawable.ic_subreddit_default)
+                    placeholder(R.drawable.ic_community_default)
+                    fallback(R.drawable.ic_community_default)
                 }
             } else {
                 b.icon.dispose()
-                b.icon.setImageResource(R.drawable.ic_subreddit_default)
+                b.icon.setImageResource(R.drawable.ic_community_default)
             }
 
             b.title.text = item.communityRef.name
@@ -143,7 +143,7 @@ class CommunityAdapter(
             clazz = Item.SearchResultCommunityItem::class,
             inflateFn = CommunitySelectorSearchResultCommunityItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_subreddit_default)
+            b.icon.load(R.drawable.ic_community_default)
             offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
                 b.icon.load(it)
             }
@@ -180,7 +180,7 @@ class CommunityAdapter(
             clazz = Item.SubscribedCommunityItem::class,
             inflateFn = CommunitySelectorSearchResultCommunityItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_subreddit_default)
+            b.icon.load(R.drawable.ic_community_default)
             offlineManager.fetchImage(h.itemView, item.subscribedCommunity.icon) {
                 b.icon.load(it)
             }

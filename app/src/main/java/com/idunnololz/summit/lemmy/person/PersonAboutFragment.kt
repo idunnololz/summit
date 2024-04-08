@@ -226,7 +226,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                 val community = item.community
 
                 if (community.community.icon == null) {
-                    b.icon.load(R.drawable.ic_subreddit_default)
+                    b.icon.load(R.drawable.ic_community_default)
                 } else {
                     b.icon.dispose()
                     offlineManager.fetchImageWithError(
@@ -236,7 +236,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                             b.icon.load(it)
                         },
                         errorListener = {
-                            b.icon.load(R.drawable.ic_subreddit_default)
+                            b.icon.load(R.drawable.ic_community_default)
                         },
                     )
                 }
