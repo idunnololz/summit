@@ -19,6 +19,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.account.info.isPersonBlocked
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
@@ -33,6 +34,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.SortTypeMenuHelper
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
@@ -114,7 +116,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = ""
 
-            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
+            insetViewAutomaticallyByMarginAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
         }
 
         onPersonChanged()
@@ -156,31 +158,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 }
             }
             binding.fab.setup(preferences)
-
-            moreActionsHelper.blockPersonResult.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        Snackbar.make(
-                            binding.coordinatorLayout,
-                            it.error.toErrorMessage(context),
-                            Snackbar.LENGTH_LONG,
-                        ).show()
-                    }
-                    is StatefulData.Loading -> {}
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        Snackbar.make(
-                            binding.coordinatorLayout,
-                            if (it.data.blocked) {
-                                getString(R.string.user_blocked)
-                            } else {
-                                getString(R.string.user_unblocked)
-                            },
-                            Snackbar.LENGTH_LONG,
-                        ).show()
-                    }
-                }
-            }
 
             slidingPaneController = SlidingPaneController(
                 fragment = this@PersonTabbedFragment,
@@ -270,8 +247,10 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     private fun showOverflowMenu() {
         if (!isBindingAvailable()) return
 
+        val context = requireContext()
         val personData = viewModel.personData.valueOrNull ?: return
         val person = personData.personView.person
+        val personRef = person.toPersonRef()
 
         val bottomMenu = BottomMenu(requireContext()).apply {
             addItemWithIcon(
@@ -280,21 +259,26 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 icon = R.drawable.baseline_sort_24,
             )
             addDivider()
-            addItemWithIcon(
-                id = R.id.ca_block_user,
-                title = getString(R.string.block_this_user_format, person.name),
-                icon = R.drawable.baseline_person_off_24,
-            )
-            addItemWithIcon(
-                id = R.id.unblock_user,
-                title = getString(R.string.unblock_this_user_format, person.name),
-                icon = R.drawable.baseline_person_24,
-            )
+
             addItemWithIcon(
                 id = R.id.message,
-                title = getString(R.string.send_message),
+                title = R.string.send_message,
                 icon = R.drawable.baseline_message_24,
             )
+
+            if (moreActionsHelper.fullAccount?.isPersonBlocked(personRef) == true) {
+                addItemWithIcon(
+                    id = R.id.unblock_user,
+                    title = context.getString(R.string.unblock_this_user_format, personRef.name),
+                    icon = R.drawable.baseline_person_24,
+                )
+            } else {
+                addItemWithIcon(
+                    id = R.id.block_user,
+                    title = context.getString(R.string.block_this_user_format, personRef.name),
+                    icon = R.drawable.baseline_person_off_24,
+                )
+            }
 
             setOnMenuItemClickListener {
                 when (it.id) {
@@ -306,11 +290,11 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                             { viewModel.sortType = it },
                         ).show()
                     }
-                    R.id.ca_block_user -> {
-                        moreActionsHelper.blockPerson(person.id)
+                    R.id.block_user -> {
+                        moreActionsHelper.blockPerson(id = person.id, block = true)
                     }
                     R.id.unblock_user -> {
-                        moreActionsHelper.blockPerson(person.id, false)
+                        moreActionsHelper.blockPerson(id = person.id, block = false)
                     }
                     R.id.message -> {
                         AddOrEditCommentFragment()

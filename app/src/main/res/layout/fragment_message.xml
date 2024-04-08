@@ -176,7 +176,6 @@
 
     </FrameLayout>
 
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/fab_container"
         android:layout_width="match_parent"

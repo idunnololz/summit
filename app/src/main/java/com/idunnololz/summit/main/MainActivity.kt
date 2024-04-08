@@ -200,72 +200,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                 }
             }
         }
-        moreActionsHelper.downloadResult.observe(this) {
-            when (it) {
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Error -> {
-                    Snackbar.make(
-                        getSnackbarContainer(),
-                        R.string.error_downloading_image,
-                        Snackbar.LENGTH_LONG,
-                    ).show()
-                }
-                is StatefulData.Loading -> {}
-                is StatefulData.Success -> {
-                    it.data
-                        .onSuccess { downloadResult ->
-                            try {
-                                val uri = downloadResult.uri
-                                val mimeType = downloadResult.mimeType
-
-                                val snackbarMsg = getString(R.string.image_saved_format, downloadResult.uri)
-                                Snackbar.make(
-                                    getSnackbarContainer(),
-                                    snackbarMsg,
-                                    Snackbar.LENGTH_LONG,
-                                ).setAction(R.string.view) {
-                                    Utils.safeLaunchExternalIntentWithErrorDialog(
-                                        context,
-                                        supportFragmentManager,
-                                        Intent(Intent.ACTION_VIEW).apply {
-                                            flags =
-                                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                            setDataAndType(uri, mimeType)
-                                        },
-                                    )
-                                }.show()
-
-                                moreActionsHelper.downloadResult.postIdle()
-                            } catch (e: IOException) { /* do nothing */
-                            }
-                        }
-                        .onFailure {
-                            if (it is FileDownloadHelper.CustomDownloadLocationException) {
-                                Snackbar
-                                    .make(
-                                        getSnackbarContainer(),
-                                        R.string.error_downloading_image,
-                                        Snackbar.LENGTH_LONG,
-                                    )
-                                    .setAction(R.string.downloads_settings) {
-                                        setResult(ErrorCustomDownloadLocation)
-                                        finish()
-                                    }
-                                    .show()
-                            } else {
-                                FirebaseCrashlytics.getInstance().recordException(it)
-                                Snackbar
-                                    .make(
-                                        getSnackbarContainer(),
-                                        R.string.error_downloading_image,
-                                        Snackbar.LENGTH_LONG,
-                                    )
-                                    .show()
-                            }
-                        }
-                }
-            }
-        }
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
 
@@ -813,6 +747,33 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                     navBarController.newRightInset,
                     bottomPadding + additionalPaddingBottom,
                 )
+            }
+        }
+    }
+
+    fun insetViewAutomaticallyByMarginAndNavUi(
+        lifecycleOwner: LifecycleOwner,
+        rootView: View,
+        applyTopInset: Boolean = true,
+        additionalPaddingBottom: Int = 0,
+    ) {
+        insets.observe(lifecycleOwner) {
+            rootView.post {
+                var bottomPadding = getBottomNavHeight()
+                if (bottomPadding == 0) {
+                    bottomPadding = it.bottomInset
+                }
+
+                rootView.updateLayoutParams<MarginLayoutParams> {
+                    leftMargin = navBarController.newLeftInset
+                    topMargin = if (applyTopInset) {
+                        it.topInset
+                    } else {
+                        this.topMargin
+                    }
+                    rightMargin = navBarController.newRightInset
+                    bottomMargin = bottomPadding + additionalPaddingBottom
+                }
             }
         }
     }
