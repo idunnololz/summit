@@ -488,7 +488,7 @@ class MultiCommunityEditorDialogFragment :
                 clazz = Item.SelectedCommunityItem::class,
                 inflateFn = MultiCommunitySelectedCommunityBinding::inflate,
             ) { item, b, _ ->
-                b.icon.load(R.drawable.ic_subreddit_default)
+                b.icon.load(R.drawable.ic_community_default)
 
                 b.title.text = item.communityRef.name
 

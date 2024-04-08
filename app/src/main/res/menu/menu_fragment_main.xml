@@ -21,7 +21,7 @@
         android:id="@+id/community_info"
         android:title="@string/community_info"
         android:orderInCategory="450"
-        android:icon="@drawable/ic_subreddit_default"
+        android:icon="@drawable/ic_community_default"
         app:iconTint="?attr/colorControlNormal">
     </item>
     <item

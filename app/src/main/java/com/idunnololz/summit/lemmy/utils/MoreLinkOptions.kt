@@ -10,16 +10,15 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.util.AdvancedLink
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
-import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -81,11 +80,31 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                                 icon = R.drawable.ic_community_24,
                             )
 
+                            val isSubbed = moreActionsHelper
+                                .accountInfoManager
+                                .subscribedCommunities
+                                .value
+                                .any { it.toCommunityRef() == pageRef }
+
+                            if (isSubbed) {
+                                addItemWithIcon(
+                                    id = R.id.unsubscribe,
+                                    title = R.string.unsubscribe,
+                                    icon = R.drawable.baseline_subscriptions_remove_24,
+                                )
+                            } else {
+                                addItemWithIcon(
+                                    id = R.id.subscribe,
+                                    title = R.string.subscribe,
+                                    icon = R.drawable.baseline_subscriptions_add_24,
+                                )
+                            }
+
                             if (moreActionsHelper.fullAccount?.isCommunityBlocked(pageRef) == true) {
                                 addItemWithIcon(
                                     id = R.id.unblock_community,
                                     title = context.getString(R.string.unblock_this_community_format, pageRef.name),
-                                    icon = R.drawable.ic_subreddit_default,
+                                    icon = R.drawable.ic_community_default,
                                 )
                             } else {
                                 addItemWithIcon(
@@ -330,6 +349,17 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
             (advancedLink as? AdvancedLink.PageLink)?.let {
                 (it.pageRef as? PersonRef)?.let {
 
+                }
+            }
+        }
+        R.id.subscribe,
+        R.id.unsubscribe -> {
+            (advancedLink as? AdvancedLink.PageLink)?.let {
+                (it.pageRef as? CommunityRef.CommunityRefByName)?.let {
+                    moreActionsHelper.updateSubscription(
+                        communityRef = it,
+                        subscribe = id == R.id.subscribe
+                    )
                 }
             }
         }

@@ -2,6 +2,8 @@ package com.idunnololz.summit.lemmy.utils.actions
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
@@ -24,9 +26,12 @@ import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.video.VideoDownloadManager
@@ -71,6 +76,7 @@ class MoreActionsHelper @Inject constructor(
     val saveCommentResult = StatefulLiveData<CommentView>()
     val savePostResult = StatefulLiveData<PostView>()
     val deletePostResult = StatefulLiveData<PostView>()
+    val subscribeResult = StatefulLiveData<SubscribeResult>()
 
     val downloadVideoResult = StatefulLiveData<FileDownloadHelper.DownloadResult>()
     val downloadAndShareFile = StatefulLiveData<Uri>()
@@ -318,6 +324,50 @@ class MoreActionsHelper @Inject constructor(
         )
     }
 
+    fun updateSubscription(communityRef: CommunityRef.CommunityRefByName, subscribe: Boolean) {
+        subscribeResult.setIsLoading()
+
+        coroutineScope.launch {
+            ensureRightInstance {
+                apiClient.fetchCommunityWithRetry(
+                    idOrName = Either.Right(communityRef.getServerId(apiInstance)),
+                    force = false,
+                )
+            }
+                .onSuccess {
+                    updateSubscriptionInternal(it.community_view.community.id, subscribe)
+                }
+                .onFailure {
+                    subscribeResult.postError(it)
+                }
+        }
+    }
+
+    fun updateSubscription(communityId: Int, subscribe: Boolean) {
+        subscribeResult.setIsLoading()
+
+        coroutineScope.launch {
+            updateSubscriptionInternal(communityId, subscribe)
+        }
+    }
+
+    private suspend fun updateSubscriptionInternal(communityId: Int, subscribe: Boolean) {
+        ensureRightInstance { apiClient.followCommunityWithRetry(communityId, subscribe) }
+            .onSuccess {
+                subscribeResult.postValue(
+                    SubscribeResult(
+                        subscribe = subscribe,
+                        communityId = communityId,
+                    )
+                )
+
+                accountInfoManager.refreshAccountInfo()
+            }
+            .onFailure {
+                subscribeResult.postError(it)
+            }
+    }
+
     private suspend fun blockPersonInternal(id: PersonId, block: Boolean = true) {
         ensureRightInstance { apiClient.blockPerson(id, block) }
             .onFailure {
@@ -380,5 +430,10 @@ data class BlockInstanceResult(
 
 data class BlockCommunityResult(
     val blocked: Boolean,
+    val communityId: CommunityId,
+)
+
+data class SubscribeResult(
+    val subscribe: Boolean,
     val communityId: CommunityId,
 )

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -54,6 +55,7 @@ import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
@@ -1090,26 +1092,95 @@ class CommunityFragment :
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
 
         val bottomMenu = BottomMenu(context).apply {
+
+            val isCommunityMenu = currentCommunityRef is CommunityRef.CommunityRefByName
+
+            if (isCommunityMenu) {
+                setTitle(R.string.community_options)
+            } else {
+                setTitle(R.string.instance_options)
+            }
+
             addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
 
             addItemWithIcon(R.id.ca_share, R.string.share, R.drawable.baseline_share_24)
             addItemWithIcon(R.id.hide_read, R.string.hide_read, R.drawable.baseline_clear_all_24)
 
             addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
-            addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
-            if (currentCommunityRef is CommunityRef.All) {
+            if (isCommunityMenu) {
                 addItemWithIcon(
                     id = R.id.community_info,
-                    title = R.string.instance_info,
-                    icon = R.drawable.ic_subreddit_default,
+                    title = R.string.community_info,
+                    icon = R.drawable.ic_community_default,
+                )
+            } else if (currentCommunityRef is CommunityRef.MultiCommunity) {
+                addItemWithIcon(
+                    id = R.id.community_info,
+                    title = R.string.multi_community_info,
+                    icon = R.drawable.baseline_dynamic_feed_24,
                 )
             } else {
                 addItemWithIcon(
                     id = R.id.community_info,
-                    title = R.string.community_info,
-                    icon = R.drawable.ic_subreddit_default,
+                    title = R.string.instance_info,
+                    icon = R.drawable.baseline_web_24,
                 )
             }
+
+            if (!isCurrentPageDefault) {
+                addItemWithIcon(
+                    id = R.id.set_as_default,
+                    title = R.string.set_as_home_page,
+                    icon = R.drawable.baseline_home_24,
+                )
+            }
+
+            if (currentCommunityRef != null) {
+                if (isBookmarked) {
+                    addItemWithIcon(
+                        id = R.id.toggle_bookmark,
+                        title = R.string.remove_bookmark,
+                        icon = R.drawable.baseline_bookmark_remove_24,
+                    )
+                } else {
+                    if (isCommunityMenu) {
+                        addItemWithIcon(
+                            id = R.id.toggle_bookmark,
+                            title = R.string.bookmark_community,
+                            icon = R.drawable.baseline_bookmark_add_24,
+                        )
+                    } else {
+                        addItemWithIcon(
+                            id = R.id.toggle_bookmark,
+                            title = R.string.bookmark_feed,
+                            icon = R.drawable.baseline_bookmark_add_24,
+                        )
+                    }
+                }
+            }
+
+            if (isCommunityMenu) {
+                val isSubbed = accountInfoManager.subscribedCommunities.value
+                    .any { it.toCommunityRef() == currentCommunityRef }
+
+                if (isSubbed) {
+                    addItemWithIcon(
+                        id = R.id.unsubscribe,
+                        title = R.string.unsubscribe,
+                        icon = R.drawable.baseline_subscriptions_remove_24,
+                    )
+                } else {
+                    addItemWithIcon(
+                        id = R.id.subscribe,
+                        title = R.string.subscribe,
+                        icon = R.drawable.baseline_subscriptions_add_24,
+                    )
+                }
+            }
+
+            addDivider()
+
+            addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
             addItemWithIcon(
                 id = R.id.my_communities,
                 title = R.string.my_communities,
@@ -1130,30 +1201,6 @@ class CommunityFragment :
                 title = R.string.settings,
                 icon = R.drawable.baseline_settings_24,
             )
-
-            if (!isCurrentPageDefault) {
-                addItemWithIcon(
-                    id = R.id.set_as_default,
-                    title = R.string.set_as_home_page,
-                    icon = R.drawable.baseline_home_24,
-                )
-            }
-
-            if (currentCommunityRef != null) {
-                if (isBookmarked) {
-                    addItemWithIcon(
-                        id = R.id.toggle_bookmark,
-                        title = R.string.remove_bookmark,
-                        icon = R.drawable.baseline_bookmark_remove_24,
-                    )
-                } else {
-                    addItemWithIcon(
-                        id = R.id.toggle_bookmark,
-                        title = R.string.bookmark_community,
-                        icon = R.drawable.baseline_bookmark_add_24,
-                    )
-                }
-            }
 
             val mainFragment = parentFragment?.parentFragment as? MainFragment
 
@@ -1316,8 +1363,20 @@ class CommunityFragment :
 
                     R.id.toggle_bookmark -> {
                         currentCommunityRef ?: return@setOnMenuItemClickListener
+
                         if (isBookmarked) {
-                            userCommunitiesManager.removeCommunity(currentCommunityRef)
+                            if (currentCommunityRef is CommunityRef.MultiCommunity) {
+                                MaterialAlertDialogBuilder(context)
+                                    .setTitle(R.string.prompt_delete_multicommunity)
+                                    .setMessage(R.string.prompt_delete_multicommunity_desc)
+                                    .setPositiveButton(R.string.delete) { _, _ ->
+                                        userCommunitiesManager.removeCommunity(currentCommunityRef)
+                                    }
+                                    .setNegativeButton(R.string.cancel) { _, _ -> }
+                                    .show()
+                            } else {
+                                userCommunitiesManager.removeCommunity(currentCommunityRef)
+                            }
                         } else {
                             userCommunitiesManager.addUserCommunity(
                                 currentCommunityRef,
@@ -1371,6 +1430,15 @@ class CommunityFragment :
                     R.id.per_community_settings -> {
                         currentCommunityRef ?: return@setOnMenuItemClickListener
                         showPerCommunitySettings(currentCommunityRef)
+                    }
+                    R.id.subscribe,
+                    R.id.unsubscribe -> {
+                        if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+                            moreActionsHelper.updateSubscription(
+                                currentCommunityRef,
+                                menuItem.id == R.id.subscribe
+                            )
+                        }
                     }
                 }
             }

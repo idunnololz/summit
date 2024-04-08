@@ -415,8 +415,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         with(binding) {
             icon.load(data.iconUrl) {
                 allowHardware(false)
-                placeholder(R.drawable.ic_subreddit_default)
-                fallback(R.drawable.ic_subreddit_default)
+                placeholder(R.drawable.ic_community_default)
+                fallback(R.drawable.ic_community_default)
             }
 
             offlineManager.fetchImage(root, data.bannerUrl) {
@@ -534,7 +534,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             addItemWithIcon(
                 id = R.id.unblock_community,
                 title = getString(R.string.unblock_this_community_format, communityView.community.name),
-                icon = R.drawable.ic_subreddit_default,
+                icon = R.drawable.ic_community_default,
             )
             addItemWithIcon(
                 id = R.id.block_instance,
@@ -817,7 +817,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 Item.CommunityItem::class,
                 CommunityInfoCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.load(R.drawable.ic_subreddit_default)
+                b.icon.load(R.drawable.ic_community_default)
                 offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
                     b.icon.load(it)
                 }
