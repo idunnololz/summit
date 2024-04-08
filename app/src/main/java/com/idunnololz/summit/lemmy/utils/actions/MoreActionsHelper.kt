@@ -2,8 +2,6 @@ package com.idunnololz.summit.lemmy.utils.actions
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
@@ -26,12 +24,9 @@ import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.video.VideoDownloadManager
@@ -73,8 +68,8 @@ class MoreActionsHelper @Inject constructor(
     val blockCommunityResult = StatefulLiveData<BlockCommunityResult>()
     val blockPersonResult = StatefulLiveData<BlockPersonResult>()
     val blockInstanceResult = StatefulLiveData<BlockInstanceResult>()
-    val saveCommentResult = StatefulLiveData<CommentView>()
-    val savePostResult = StatefulLiveData<PostView>()
+    val saveCommentResult = StatefulLiveData<SaveCommentResult>()
+    val savePostResult = StatefulLiveData<SavePostResult>()
     val deletePostResult = StatefulLiveData<PostView>()
     val subscribeResult = StatefulLiveData<SubscribeResult>()
 
@@ -97,7 +92,7 @@ class MoreActionsHelper @Inject constructor(
                     blockCommunityInternal(it.community_view.community.id, block)
                 }
                 .onFailure {
-                    blockCommunityResult.postError(it)
+                    blockCommunityResult.postErrorAndClear(it)
                 }
         }
     }
@@ -116,7 +111,7 @@ class MoreActionsHelper @Inject constructor(
                 apiClient.fetchPersonByNameWithRetry(personRef.fullName, force = false)
             }
                 .onFailure {
-                    blockPersonResult.postError(it)
+                    blockPersonResult.postErrorAndClear(it)
                 }
                 .onSuccess {
                     blockPersonInternal(it.person_view.person.id, block)
@@ -136,7 +131,7 @@ class MoreActionsHelper @Inject constructor(
         coroutineScope.launch {
             ensureRightInstance { apiClient.blockInstance(id, block) }
                 .onSuccess {
-                    blockInstanceResult.postValue(
+                    blockInstanceResult.postValueAndClear(
                         BlockInstanceResult(
                             blocked = block,
                             instanceId = id,
@@ -144,7 +139,7 @@ class MoreActionsHelper @Inject constructor(
                     )
                 }
                 .onFailure {
-                    blockInstanceResult.postError(it)
+                    blockInstanceResult.postErrorAndClear(it)
                 }
         }
     }
@@ -154,10 +149,10 @@ class MoreActionsHelper @Inject constructor(
         coroutineScope.launch {
             ensureRightInstance { apiClient.deletePost(postId) }
                 .onSuccess {
-                    deletePostResult.postValue(it)
+                    deletePostResult.postValueAndClear(it)
                 }
                 .onFailure {
-                    deletePostResult.postError(it)
+                    deletePostResult.postErrorAndClear(it)
                 }
         }
     }
@@ -205,11 +200,16 @@ class MoreActionsHelper @Inject constructor(
         coroutineScope.launch {
             ensureRightInstance { apiClient.savePost(id, save) }
                 .onSuccess {
-                    savePostResult.postValue(it)
+                    savePostResult.postValueAndClear(
+                        SavePostResult(
+                            postId = id,
+                            save = save,
+                        )
+                    )
                     savedManager.onPostSaveChanged()
                 }
                 .onFailure {
-                    savePostResult.postError(it)
+                    savePostResult.postErrorAndClear(it)
                 }
         }
     }
@@ -218,11 +218,16 @@ class MoreActionsHelper @Inject constructor(
         coroutineScope.launch {
             ensureRightInstance { apiClient.saveComment(id, save) }
                 .onSuccess {
-                    saveCommentResult.postValue(it)
+                    saveCommentResult.postValueAndClear(
+                        SaveCommentResult(
+                            commentId = id,
+                            save = save,
+                        )
+                    )
                     savedManager.onCommentSaveChanged()
                 }
                 .onFailure {
-                    saveCommentResult.postError(it)
+                    saveCommentResult.postErrorAndClear(it)
                 }
         }
     }
@@ -265,14 +270,14 @@ class MoreActionsHelper @Inject constructor(
                             cacheFile = file,
                         )
                         .onSuccess {
-                            downloadVideoResult.postValue(it)
+                            downloadVideoResult.postValueAndClear(it)
                         }
                         .onFailure {
-                            downloadVideoResult.postError(it)
+                            downloadVideoResult.postErrorAndClear(it)
                         }
                 }
                 .onFailure {
-                    downloadVideoResult.postError(it)
+                    downloadVideoResult.postErrorAndClear(it)
                 }
         }
     }
@@ -315,11 +320,13 @@ class MoreActionsHelper @Inject constructor(
                             )
                     }
 
-                    downloadResult.postValue(result)
+                    downloadResult.postValueAndClear(result)
                 }
             },
             errorListener = {
-                downloadResult.postError(it)
+                coroutineScope.launch {
+                    downloadResult.postErrorAndClear(it)
+                }
             },
         )
     }
@@ -338,7 +345,7 @@ class MoreActionsHelper @Inject constructor(
                     updateSubscriptionInternal(it.community_view.community.id, subscribe)
                 }
                 .onFailure {
-                    subscribeResult.postError(it)
+                    subscribeResult.postErrorAndClear(it)
                 }
         }
     }
@@ -354,7 +361,7 @@ class MoreActionsHelper @Inject constructor(
     private suspend fun updateSubscriptionInternal(communityId: Int, subscribe: Boolean) {
         ensureRightInstance { apiClient.followCommunityWithRetry(communityId, subscribe) }
             .onSuccess {
-                subscribeResult.postValue(
+                subscribeResult.postValueAndClear(
                     SubscribeResult(
                         subscribe = subscribe,
                         communityId = communityId,
@@ -364,18 +371,18 @@ class MoreActionsHelper @Inject constructor(
                 accountInfoManager.refreshAccountInfo()
             }
             .onFailure {
-                subscribeResult.postError(it)
+                subscribeResult.postErrorAndClear(it)
             }
     }
 
     private suspend fun blockPersonInternal(id: PersonId, block: Boolean = true) {
         ensureRightInstance { apiClient.blockPerson(id, block) }
             .onFailure {
-                blockPersonResult.postError(it)
+                blockPersonResult.postErrorAndClear(it)
             }
             .onSuccess {
                 accountInfoManager.refreshAccountInfo()
-                blockPersonResult.postValue(
+                blockPersonResult.postValueAndClear(
                     BlockPersonResult(
                         blocked = block,
                         personFullName = it.person.toPersonRef().fullName,
@@ -388,7 +395,7 @@ class MoreActionsHelper @Inject constructor(
     private suspend fun blockCommunityInternal(id: CommunityId, block: Boolean = true) {
         ensureRightInstance { apiClient.blockCommunity(id, block) }
             .onSuccess {
-                blockCommunityResult.postValue(
+                blockCommunityResult.postValueAndClear(
                     BlockCommunityResult(
                         blocked = block,
                         communityId = id,
@@ -396,7 +403,7 @@ class MoreActionsHelper @Inject constructor(
                 )
             }
             .onFailure {
-                blockCommunityResult.postError(it)
+                blockCommunityResult.postErrorAndClear(it)
             }
     }
 
@@ -413,6 +420,20 @@ class MoreActionsHelper @Inject constructor(
             )
         } else {
             onCorrectInstance()
+        }
+    }
+
+    private suspend fun <T> StatefulLiveData<T>.postValueAndClear(value: T) {
+        withContext(Dispatchers.Main) {
+            setValue(value)
+            setIdle()
+        }
+    }
+
+    private suspend fun <T> StatefulLiveData<T>.postErrorAndClear(error: Throwable) {
+        withContext(Dispatchers.Main) {
+            setError(error)
+            setIdle()
         }
     }
 }
@@ -436,4 +457,14 @@ data class BlockCommunityResult(
 data class SubscribeResult(
     val subscribe: Boolean,
     val communityId: CommunityId,
+)
+
+data class SaveCommentResult(
+    val commentId: CommentId,
+    val save: Boolean,
+)
+
+data class SavePostResult(
+    val postId: PostId,
+    val save: Boolean,
 )

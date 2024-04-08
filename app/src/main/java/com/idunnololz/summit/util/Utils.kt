@@ -34,6 +34,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -605,7 +606,7 @@ object Utils {
      */
     fun safeLaunchExternalIntentWithErrorDialog(
         context: Context,
-        fm: androidx.fragment.app.FragmentManager?,
+        fm: FragmentManager?,
         intent: Intent,
     ) {
         try {

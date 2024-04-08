@@ -23,6 +23,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
@@ -31,6 +32,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
@@ -331,6 +333,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }
             updateContextState()
         }
+
+        installOnActionResultHandler(
+            moreActionsHelper = moreActionsHelper,
+            snackbarContainer = binding.root,
+        )
 
         if (inboxItem is ReportItem) {
             viewModel.isContextShowing = true

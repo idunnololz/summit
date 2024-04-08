@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -74,6 +75,7 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -467,7 +469,7 @@ class CommunityFragment :
 
         installOnActionResultHandler(
             moreActionsHelper = moreActionsHelper,
-            snackbarContainer = binding.fabSnackbarCoordinatorLayout,
+            snackbarContainer = binding.coordinatorLayout,
             onPostUpdated = {
                 updatePost(it)
             },
@@ -642,16 +644,24 @@ class CommunityFragment :
         requireMainActivity().apply {
             insetViewExceptTopAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
-                binding.fabSnackbarCoordinatorLayout,
-            )
-            insetViewExceptTopAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner,
                 binding.recyclerView,
             )
             insetViewStartAndEndByPadding(
                 viewLifecycleOwner,
                 binding.fastScroller,
             )
+
+            val customFabBehavior =
+                (binding.fab.layoutParams as? CoordinatorLayout.LayoutParams)?.behavior as? CustomFabWithBottomNavBehavior
+
+            customFabBehavior?.apply {
+                updateBottomNavHeight(getBottomNavHeight().toFloat())
+                binding.fab.translationY = -getBottomNavHeight().toFloat()
+            }
+
+            insets.observe(viewLifecycleOwner) {
+                customFabBehavior?.updateBottomInset(it.bottomInset)
+            }
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {

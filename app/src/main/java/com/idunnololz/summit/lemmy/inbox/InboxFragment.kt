@@ -38,6 +38,8 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
@@ -73,6 +75,9 @@ class InboxFragment :
     private val args by navArgs<InboxFragmentArgs>()
 
     val viewModel: InboxViewModel by activityViewModels()
+
+    @Inject
+    lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
@@ -134,7 +139,11 @@ class InboxFragment :
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-//            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
+            insetViewAutomaticallyByMarginAndNavUi(
+                lifecycleOwner = viewLifecycleOwner,
+                rootView = binding.coordinatorLayout,
+                applyTopInset = false
+            )
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPane)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
         }
@@ -380,6 +389,11 @@ class InboxFragment :
         binding.fab.setup(preferences)
 
         viewModel.fetchInbox()
+
+        installOnActionResultHandler(
+            moreActionsHelper = moreActionsHelper,
+            snackbarContainer = binding.coordinatorLayout,
+        )
     }
 
     private fun setModReportsVisibility(isVisible: Boolean) {

@@ -456,7 +456,7 @@ class PostFragment :
 
         installOnActionResultHandler(
             moreActionsHelper = moreActionsHelper,
-            snackbarContainer = binding.coordinatorLayout,
+            snackbarContainer = binding.fabSnackbarCoordinatorLayout,
             onPostUpdated = {
                 viewModel.fetchPostData(force = true)
                 (parentFragment as? CommunityFragment)?.updatePost(it)

@@ -23,6 +23,8 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.utils.actions.SaveCommentResult
+import com.idunnololz.summit.lemmy.utils.actions.SavePostResult
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
@@ -254,17 +256,17 @@ class SavedViewModel @Inject constructor(
     private fun Int.toLemmyPageIndex() =
         this + 1 // lemmy pages are 1 indexed
 
-    fun onSavePostChanged(it: PostView) {
-        if (!it.saved) {
-            postListEngine.removePost(it.post.id)
+    fun onSavePostChanged(savePostResult: SavePostResult) {
+        if (!savePostResult.save) {
+            postListEngine.removePost(savePostResult.postId)
             postListEngine.createItems()
             postsState.postValue(Unit)
         }
     }
 
-    fun onSaveCommentChanged(it: CommentView) {
-        if (!it.saved) {
-            commentListEngine.removeComment(it.comment.id)
+    fun onSaveCommentChanged(saveCommentResult: SaveCommentResult) {
+        if (!saveCommentResult.save) {
+            commentListEngine.removeComment(saveCommentResult.commentId)
             commentsState.postValue(Unit)
         }
     }
