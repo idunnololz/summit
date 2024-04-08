@@ -872,4 +872,27 @@
     <string name="undo_delete_community">मिटाए गए समुदाय को पूर्ववत करें</string>
     <string name="error_unable_to_delete_community">समुदाय मिटने/पुनर्स्थापित करने में असमर्थ</string>
     <string name="warn_community_deleted">इस समुदाय को इसके निर्माता द्वारा हटा दिया गया है। यह नियमित उपयोगकर्ताओं को दिखाई नहीं देगा।</string>
+    <string name="community_options">समुदाय विकल्प</string>
+    <string name="error_unable_to_update_subscription">सदस्यता अद्यतन करने में असमर्थ</string>
+    <string name="instance_options">इंस्टेंस विकल्प</string>
+    <string name="bookmark_feed">फ़ीड को बुकमार्क करें</string>
+    <string name="unsubscribed">सदस्यता छोड़ दी गई</string>
+    <string name="multi_community_info">बहु-समुदाय जानकारी</string>
+    <string name="prompt_delete_multicommunity">बहु-समुदाय हटाएँ?</string>
+    <string name="message_to_format">प्रति: %1$s</string>
+    <string name="message_from_format">प्रेषक: %1$s</string>
+    <string name="prompt_delete_multicommunity_desc">किसी बहु-समुदाय से बुकमार्क हटाने से बहु-समुदाय हट जाएगा।</string>
+    <string name="link_actions_format">लिंक क्रियाएँ (%1$s)</string>
+    <string name="link_type_instance_link">इंस्टेंस लिंक</string>
+    <string name="link_type_image_link">छवि लिंक</string>
+    <string name="link_type_video_link">वीडियो लिंक</string>
+    <string name="link_type_comment_link">टिप्पणी लिंक</string>
+    <string name="link_type_community_link">समुदाय लिंक</string>
+    <string name="link_type_user_link">उपयोक्ता लिंक</string>
+    <string name="link_type_post_link">पोस्ट लिंक</string>
+    <string name="more_user_options">अधिक उपयोगकर्ता विकल्प</string>
+    <string name="instance_blocked">इंस्टैंस अवरुद्ध किया गया</string>
+    <string name="community_blocked">समुदाय अवरुद्ध</string>
+    <string name="community_unblocked">समुदाय अनवरोधित</string>
+    <string name="instance_unblocked">इंस्टेंस अनवरोधित</string>
 </resources>
