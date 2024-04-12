@@ -44,6 +44,8 @@ import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
+import com.idunnololz.summit.lemmy.utils.mentions.MentionsResultAdapter
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -91,6 +93,9 @@ class CreateOrEditPostFragment :
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var mentionsHelper: MentionsHelper
 
     private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -258,20 +263,30 @@ class CreateOrEditPostFragment :
             viewModel.setUrl(text.toString())
         }
 
+        mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, binding.postEditText)
         binding.postEditText.addTextChangedListener {
-            binding.root.postDelayed({
-                onScrollUpdated()
-            }, 10,)
+            binding.root.postDelayed(
+                {
+                    onScrollUpdated()
+                },
+                10,
+            )
         }
         binding.titleEditText.addTextChangedListener {
-            binding.root.postDelayed({
-                onScrollUpdated()
-            }, 10,)
+            binding.root.postDelayed(
+                {
+                    onScrollUpdated()
+                },
+                10,
+            )
         }
         binding.urlEditText.addTextChangedListener {
-            binding.root.postDelayed({
-                onScrollUpdated()
-            }, 10,)
+            binding.root.postDelayed(
+                {
+                    onScrollUpdated()
+                },
+                10,
+            )
         }
 
         textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {

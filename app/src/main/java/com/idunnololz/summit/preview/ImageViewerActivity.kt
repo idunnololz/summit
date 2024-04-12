@@ -1,28 +1,22 @@
 package com.idunnololz.summit.preview
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.Transition
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.webkit.MimeTypeMap
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
-import androidx.core.view.MenuProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -48,14 +42,13 @@ import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAboveCutout
-import com.idunnololz.summit.util.isLightTheme
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.makeTransition
 import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,11 +56,10 @@ import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by InsetsHelper(consumeInsets = false) {
+class ImageViewerActivity :
+    BaseActivity(), BottomMenuContainer, InsetsProvider by InsetsHelper(consumeInsets = false) {
 
     companion object {
-
-        private const val PERMISSION_REQUEST_EXTERNAL_WRITE = 1
 
         @Suppress("unused")
         private val TAG = ImageViewerActivity::class.java.canonicalName
@@ -83,7 +75,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
 
     private var currentBottomMenu: BottomMenu? = null
 
-    private lateinit var decorView: View
     private var showingUi = true
 
     private var url: String? = null
@@ -105,39 +96,30 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
     override val mainApplication: MainApplication
         get() = application as MainApplication
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission(),
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                downloadImage()
-            } else {
-                Snackbar.make(
-                    binding.root,
-                    R.string.error_downloading_image_permission_denied,
-                    Snackbar.LENGTH_LONG,
-                ).setAction(R.string.help) {
-                    val i = Intent(Intent.ACTION_VIEW)
-                    i.data = Uri.parse(LinkUtils.APP_PERMISSIONS_HELP_ARTICLE)
-                    Utils.safeLaunchExternalIntent(this, i)
-                }.show()
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge(
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+        )
         postponeEnterTransition()
+
         super.onCreate(savedInstanceState)
         binding = FragmentImageViewerBinding.inflate(LayoutInflater.from(this))
 
         setContentView(binding.root)
         registerInsetsHandler(binding.root)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         showAboveCutout()
 
-        onViewCreated(binding.root, savedInstanceState)
+        onViewCreated()
 
-        setupActionBar(args.title, true)
+        setSupportActionBar(binding.toolbar)
+
+        val actionBar = supportActionBar
+        actionBar?.setDisplayShowHomeEnabled(true)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.title = ""
 
         binding.dummyAppBar.transitionName = SharedElementNames.AppBar
         binding.bottomNavigationView.transitionName = SharedElementNames.NavBar
@@ -145,14 +127,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
         onInsetsChanged = { insets ->
             binding.toolbar.layoutParams = binding.toolbar.layoutParams.apply {
                 (this as MarginLayoutParams).topMargin = insets.topInset
-            }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && isLightTheme()) {
-                binding.statusBarBg.layoutParams = binding.statusBarBg.layoutParams.apply {
-                    height = insets.topInset
-                }
-                binding.statusBarBg.visibility = View.VISIBLE
-            } else {
-                binding.statusBarBg.visibility = View.GONE
             }
         }
 
@@ -210,17 +184,13 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
                         .translationY(-200f)
                 }
 
-                override fun onTransitionEnd(p0: Transition?) {
-                }
+                override fun onTransitionEnd(p0: Transition?) {}
 
-                override fun onTransitionCancel(p0: Transition?) {
-                }
+                override fun onTransitionCancel(p0: Transition?) {}
 
-                override fun onTransitionPause(p0: Transition?) {
-                }
+                override fun onTransitionPause(p0: Transition?) {}
 
-                override fun onTransitionResume(p0: Transition?) {
-                }
+                override fun onTransitionResume(p0: Transition?) {}
             },
         )
 
@@ -258,10 +228,14 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
         }
     }
 
-    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    fun onViewCreated() {
         if (intent.extras == null) {
             finish()
             return
+        }
+
+        insets.observe(this) {
+            insetViewExceptTopAutomaticallyByPadding(this, binding.bottomBar)
         }
 
         val context = this
@@ -272,8 +246,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
         binding.loadingView.setOnRefreshClickListener {
             loadImage(args.url)
         }
-
-        decorView = window.decorView
 
         loadImage(args.url)
 
@@ -346,42 +318,31 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
             }
         }
 
-        addMenuProvider(
-            object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(R.menu.menu_image_viewer, menu)
-                }
+        binding.shareButton.setOnClickListener {
+            createImageOrLinkActionsHandler(
+                args.url,
+                moreActionsHelper,
+                supportFragmentManager,
+                args.mimeType,
+            )(R.id.share_image)
+        }
+        binding.downloadButton.setOnClickListener {
+            createImageOrLinkActionsHandler(
+                args.url,
+                moreActionsHelper,
+                supportFragmentManager,
+                args.mimeType,
+            )(R.id.download)
+        }
+        binding.moreButton.setOnClickListener {
 
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                    when (menuItem.itemId) {
-                        R.id.ca_save -> {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
-                                ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                    ) != PackageManager.PERMISSION_GRANTED
-                            ) {
-                                requestPermissionLauncher.launch(
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                )
-                            } else {
-                                downloadImage()
-                            }
-                            true
-                        }
-                        R.id.more -> {
-                            showAdvancedLinkOptions(
-                                args.url,
-                                moreActionsHelper,
-                                supportFragmentManager,
-                                args.mimeType,
-                            )
-                            true
-                        }
-                        else -> false
-                    }
-            },
-        )
+            showAdvancedLinkOptions(
+                args.url,
+                moreActionsHelper,
+                supportFragmentManager,
+                args.mimeType,
+            )
+        }
     }
 
     override fun onDestroy() {
@@ -389,22 +350,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
         showSystemUI()
         websiteAdapterLoader?.destroy()
         super.onDestroy()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSION_REQUEST_EXTERNAL_WRITE -> {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    downloadImage()
-                }
-            }
-        }
     }
 
     private fun downloadImage() {
@@ -473,8 +418,6 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
             }
         }
 
-        setupActionBar(title, true)
-
         binding.imageView.callback = object : GalleryImageView.Callback {
             override fun togggleUi() {
                 this@ImageViewerActivity.togggleUi()
@@ -485,6 +428,10 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
             }
 
             override fun hideUi() {
+                this@ImageViewerActivity.hideUi()
+            }
+
+            override fun zoom(curZoom: Float) {
                 this@ImageViewerActivity.hideUi()
             }
 
@@ -531,27 +478,28 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
         showingUi = true
         showActionBar()
         showSystemUI()
+        binding.bottomBar.animate().translationY(0f)
     }
 
     private fun hideUi() {
         showingUi = false
-        hideActionBar(true)
+        hideActionBar()
         hideSystemUI()
+        binding.bottomBar.animate().translationY(binding.bottomBar.height.toFloat())
     }
 
-    fun hideSystemUI() {
+    private fun hideSystemUI() {
         WindowInsetsControllerCompat(
             window,
             requireNotNull(window.decorView),
         ).let {
-            it.isAppearanceLightStatusBars
             it.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             it.hide(WindowInsetsCompat.Type.systemBars())
         }
     }
 
-    fun showSystemUI() {
+    private fun showSystemUI() {
         WindowInsetsControllerCompat(
             window,
             requireNotNull(window.decorView),
@@ -605,48 +553,19 @@ class ImageViewerActivity : BaseActivity(), BottomMenuContainer, InsetsProvider 
         },)
     }
 
-    fun setupActionBar(
-        title: CharSequence?,
-        showUp: Boolean,
-    ) {
-        setSupportActionBar(binding.toolbar)
-
-        val actionBar = supportActionBar
-        actionBar?.setDisplayShowHomeEnabled(true)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-
-        binding.toolbar.title = title
-    }
-
-    fun showActionBar() {
+    private fun showActionBar() {
         TransitionManager.beginDelayedTransition(binding.root, makeTransition())
 
-        hideActionBar(false)
-
-        val supportActionBar = supportActionBar ?: return
-        if (supportActionBar.isShowing) return
-        supportActionBar.show()
-
-        binding.statusBarBg.animate().alpha(1f)
+        binding.appBar.animate().translationY(0f)
     }
 
-    fun hideActionBar(hideToolbar: Boolean = true) {
+    private fun hideActionBar() {
         TransitionManager.beginDelayedTransition(binding.root, makeTransition())
 
-        if (hideToolbar) {
-            val supportActionBar = supportActionBar ?: return
-            if (!supportActionBar.isShowing) {
-                return
-            }
-            supportActionBar.hide()
-        }
-        binding.statusBarBg.animate().alpha(0f)
+        binding.appBar.animate().translationY((-binding.appBar.height).toFloat())
     }
-    fun getSnackbarContainer(): View = binding.contentView
 
-    fun downloadAndShareImage(url: String) {
-        moreActionsHelper.downloadAndShareImage(url)
-    }
+    private fun getSnackbarContainer(): View = binding.contentView
 
     override fun showBottomMenu(bottomMenu: BottomMenu, expandFully: Boolean) {
         currentBottomMenu?.close()

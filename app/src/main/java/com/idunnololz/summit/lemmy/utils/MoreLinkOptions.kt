@@ -52,6 +52,10 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                     )
                 )
 
+                if (mainActivity != null) {
+                    addItemWithIcon(R.id.preview_image, R.string.preview_image, R.drawable.baseline_image_24)
+                }
+
                 addItemWithIcon(R.id.download, R.string.download_image, R.drawable.baseline_download_24)
                 addItemWithIcon(R.id.share_image, R.string.share_image, R.drawable.baseline_share_24)
 
@@ -263,6 +267,15 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
     }
 
     when (id) {
+        R.id.preview_image -> {
+            mainActivity?.openImage(
+                sharedElement = null,
+                appBar = null,
+                title = null,
+                url = url,
+                mimeType = mimeType
+            )
+        }
         R.id.download -> {
             moreActionsHelper.downloadFile(
                 context = context,

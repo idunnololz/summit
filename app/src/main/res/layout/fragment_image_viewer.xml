@@ -12,7 +12,6 @@
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/motion_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -43,12 +42,59 @@
                 android:layout_height="match_parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/black50"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageButton
+                    android:id="@+id/share_button"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/baseline_share_24"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    android:layout_marginBottom="@dimen/padding"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/download_button"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <ImageButton
+                    android:id="@+id/download_button"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/baseline_download_24"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    app:layout_constraintStart_toEndOf="@+id/share_button"
+                    app:layout_constraintEnd_toStartOf="@+id/more_button"
+                    app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+
+                <ImageButton
+                    android:id="@+id/more_button"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/baseline_more_horiz_24"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:layout_marginHorizontal="@dimen/padding"
+                    app:layout_constraintStart_toEndOf="@+id/download_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/dummy_app_bar"
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:background="?backgroundColor">
+            android:background="@color/black50">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/dummy_toolbar"
@@ -60,7 +106,8 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent">
+            android:layout_width="match_parent"
+            android:background="@color/black50">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -79,15 +126,5 @@
             app:labelVisibilityMode="labeled" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-    <View
-        android:id="@+id/status_bar_bg"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="top"
-        android:background="@color/black50"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -34,6 +34,9 @@ class GalleryImageView : ShapeableImageView {
         fun togggleUi()
         fun showUi()
         fun hideUi()
+
+        fun zoom(curZoom: Float)
+
         fun overScroll(offX: Float, offY: Float, curZoom: Float)
 
         /**
@@ -443,6 +446,8 @@ class GalleryImageView : ShapeableImageView {
         if (curZoom == prevZoom) {
             return
         }
+
+        callback?.zoom(curZoom)
 
         val diffW = imageW * curZoom - imageW * prevZoom
         val diffH = imageH * curZoom - imageH * prevZoom

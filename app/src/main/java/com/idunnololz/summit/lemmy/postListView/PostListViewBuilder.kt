@@ -41,6 +41,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
+import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyContentHelper
@@ -450,7 +451,6 @@ class PostListViewBuilder @Inject constructor(
                                 this.dimensionRatio = null
                             }
                         }
-
                         is ListingItemLargeListBinding -> {
                             rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
                                 this.dimensionRatio = null
@@ -484,28 +484,6 @@ class PostListViewBuilder @Inject constructor(
 
                 holder.state.preferFullSizeImages = preferFullSizeImages
             }
-
-            val finalContentMaxWidth =
-                when (val rb = rawBinding) {
-                    is ListingItemCardBinding -> {
-                        val lp = rb.root.layoutParams as MarginLayoutParams
-                        contentMaxWidth - lp.marginStart - lp.marginEnd
-                    }
-                    is ListingItemCard2Binding -> {
-                        val lp = rb.root.layoutParams as MarginLayoutParams
-                        contentMaxWidth - lp.marginStart - lp.marginEnd
-                    }
-                    is ListingItemCard3Binding -> {
-                        val lp = rb.root.layoutParams as MarginLayoutParams
-                        contentMaxWidth - lp.marginStart - lp.marginEnd
-                    }
-                    is ListingItemLargeListBinding -> {
-                        val lp = rb.image.layoutParams as MarginLayoutParams
-                        contentMaxWidth - lp.marginStart - lp.marginEnd
-                    }
-                    else -> contentMaxWidth
-                }
-            val postImageWidth = (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
 
             fun onItemClick() {
                 val videoState = if (fullContentContainerView == null) {
@@ -548,17 +526,39 @@ class PostListViewBuilder @Inject constructor(
                 )
 
                 fun showDefaultImage() {
-                    image?.visibility = View.GONE
+                    imageView?.visibility = View.GONE
                     iconImage?.visibility = View.VISIBLE
                     iconImage?.setImageResource(R.drawable.baseline_article_24)
                 }
+
+                val finalContentMaxWidth =
+                    when (val rb = rawBinding) {
+                        is ListingItemCardBinding -> {
+                            val lp = rb.root.layoutParams as MarginLayoutParams
+                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                        }
+                        is ListingItemCard2Binding -> {
+                            val lp = rb.root.layoutParams as MarginLayoutParams
+                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                        }
+                        is ListingItemCard3Binding -> {
+                            val lp = rb.root.layoutParams as MarginLayoutParams
+                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                        }
+                        is ListingItemLargeListBinding -> {
+                            val lp = rb.image.layoutParams as MarginLayoutParams
+                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                        }
+                        else -> contentMaxWidth
+                    }
+                val postImageWidth = (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
 
                 fun loadAndShowImage() {
                     if (postView.post.removed) {
                         // Do not show the image if the post is removed.
                         return
                     }
-                    val image = image ?: return
+                    val imageView = imageView ?: return
 
                     val thumbnailImageUrl = if (thumbnailUrl != null &&
                         ContentUtils.isUrlImage(thumbnailUrl)
@@ -585,22 +585,22 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     if (imageUrl.isNullOrBlank()) {
-                        image.visibility = View.GONE
+                        imageView.visibility = View.GONE
                         return
                     }
 
                     val isUrlMp4 = ContentUtils.isUrlMp4(imageUrl)
 
                     if (!ContentUtils.isUrlImage(imageUrl) && !isUrlMp4) {
-                        image.visibility = View.GONE
+                        imageView.visibility = View.GONE
                         return
                     }
 
-                    image.visibility = View.VISIBLE
+                    imageView.visibility = View.VISIBLE
                     iconImage?.visibility = View.GONE
 
-                    image.dispose()
-                    image.setImageResource(R.drawable.thumbnail_placeholder_16_9)
+                    imageView.dispose()
+                    imageView.setImageResource(R.drawable.thumbnail_placeholder_16_9)
 
                     fun loadImage(useBackupUrl: Boolean = false) {
                         val urlToLoad = if (useBackupUrl) {
@@ -612,12 +612,12 @@ class PostListViewBuilder @Inject constructor(
                         urlToLoad ?: return
 
                         loadImage(
-                            itemView,
-                            image,
-                            urlToLoad,
-                            state.preferFullSizeImages,
-                            contentMaxWidth,
-                            !isRevealed && postView.post.nsfw,
+                            rootView = itemView,
+                            imageView = imageView,
+                            imageUrl = urlToLoad,
+                            preferFullSizeImage = state.preferFullSizeImages,
+                            imageViewWidth = postImageWidth,
+                            shouldBlur = !isRevealed && postView.post.nsfw,
                         ) {
                             if (!useBackupUrl && backupImageUrl != null) {
                                 loadImage(true)
@@ -631,12 +631,12 @@ class PostListViewBuilder @Inject constructor(
                         if (isUrlMp4) {
                             onVideoClick(imageUrl, VideoType.Mp4, null)
                         } else {
-                            onImageClick(postView, image, imageUrl)
+                            onImageClick(postView, imageView, imageUrl)
                         }
                     }
 
-                    image.transitionName = "image_$absoluteAdapterPosition"
-                    image.setOnClickListener {
+                    imageView.transitionName = "image_$absoluteAdapterPosition"
+                    imageView.setOnClickListener {
                         if (fullContentContainerView != null) {
                             if (singleTapToViewImage) {
                                 showImageOrVideo()
@@ -653,7 +653,7 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     if (fullContentContainerView != null) {
-                        image.setOnLongClickListener {
+                        imageView.setOnLongClickListener {
                             if (singleTapToViewImage) {
                                 toggleItem(postView)
                             } else {
@@ -662,8 +662,8 @@ class PostListViewBuilder @Inject constructor(
                             true
                         }
                     } else {
-                        image.setOnLongClickListener {
-                            showImageOrVideo()
+                        imageView.setOnLongClickListener {
+                            onLinkLongClick(imageUrl, null)
                             true
                         }
                     }
@@ -672,8 +672,8 @@ class PostListViewBuilder @Inject constructor(
                 iconImage?.visibility = View.GONE
                 iconImage?.setOnClickListener(null)
                 iconImage?.isClickable = false
-                image?.setOnClickListener(null)
-                image?.isClickable = false
+                imageView?.setOnClickListener(null)
+                imageView?.isClickable = false
 
                 fun showFullContent() {
                     fullContentContainerView ?: return
@@ -742,7 +742,7 @@ class PostListViewBuilder @Inject constructor(
                     PostType.Text,
                     -> {
                         if (thumbnailUrl == null) {
-                            image?.visibility = View.GONE
+                            imageView?.visibility = View.GONE
 
                             // see if this text post has additional content
                             val hasAdditionalContent =
@@ -769,8 +769,8 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
 
-                if (image != null && image.width != postImageWidth) {
-                    image.updateLayoutParams {
+                if (imageView != null && imageView.width != postImageWidth) {
+                    imageView.updateLayoutParams {
                         width = postImageWidth
                     }
                 }
@@ -1159,7 +1159,7 @@ class PostListViewBuilder @Inject constructor(
         imageView: ImageView,
         imageUrl: String,
         preferFullSizeImage: Boolean,
-        contentMaxWidth: Int,
+        imageViewWidth: Int,
         shouldBlur: Boolean,
         errorListener: TaskFailedListener?,
     ) {
@@ -1170,7 +1170,7 @@ class PostListViewBuilder @Inject constructor(
         if (preferFullSizeImage) {
             if (tempSize.width > 0 && tempSize.height > 0) {
                 val thumbnailMaxHeight =
-                    (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+                    (imageViewWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
 
                 Log.d(TAG, "Reserving space for image ${thumbnailMaxHeight}h")
                 imageView.updateLayoutParams<LayoutParams> {
@@ -1204,13 +1204,14 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 if (w != null && h != null) {
+                    Log.d("HAHA", "w: $w h: $h")
                     this.size(w, h)
                 }
                 placeholder(R.drawable.thumbnail_placeholder_16_9)
                 // fallback(R.drawable.thumbnail_placeholder_16_9)
 
                 if (shouldBlur) {
-                    val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+                    val sampling = (imageViewWidth * 0.04f).coerceAtLeast(10f)
 
                     if (isUrlMp4) {
                         transformations(
@@ -1226,6 +1227,7 @@ class PostListViewBuilder @Inject constructor(
                     result.drawable.getSize(size)
 
                     if (size.width > 0 && size.height > 0) {
+                        Log.d("HAHA", "setting image size: $size")
                         offlineManager.setImageSizeHint(
                             imageUrl,
                             size.width,

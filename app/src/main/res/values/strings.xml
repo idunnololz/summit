@@ -1698,6 +1698,9 @@
     <string name="multi_community_info">Multi-community info</string>
     <string name="prompt_delete_multicommunity">Delete multi-community?</string>
     <string name="prompt_delete_multicommunity_desc">Removing a bookmark to a multi-community will delete the multi-community.</string>
+    <string name="no_bio">No bio</string>
+    <string name="keep_typing_to_see_suggestions">Keep typing to see suggestions</string>
+    <string name="preview_image">Preview image</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

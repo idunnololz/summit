@@ -22,7 +22,10 @@ class LemmyAppBarController(
     private val accountInfoManager: AccountInfoManager,
 ) {
 
-    private val TAG = "RedditAppBarController"
+    companion object {
+
+        private const val TAG = "RedditAppBarController"
+    }
 
     private val context = mainActivity
 

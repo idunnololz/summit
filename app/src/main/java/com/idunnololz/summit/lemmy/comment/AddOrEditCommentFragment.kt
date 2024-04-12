@@ -38,6 +38,7 @@ import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadImageViewModel
+import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -110,6 +111,9 @@ class AddOrEditCommentFragment :
 
     @Inject
     lateinit var textFieldToolbarManager: TextFieldToolbarManager
+
+    @Inject
+    lateinit var mentionsHelper: MentionsHelper
 
     private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
 
@@ -407,6 +411,8 @@ class AddOrEditCommentFragment :
             }
         }
 
+        mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, binding.commentEditText)
+
         if (savedInstanceState == null) {
             val replyTargetTs =
                 args.commentView?.let {
@@ -591,6 +597,7 @@ class AddOrEditCommentFragment :
             val data = it.data
             if (data is DraftData.CommentDraftData) {
                 binding.commentEditText.setText(data.content)
+                binding.commentEditText.setSelection(binding.commentEditText.length())
             }
 
             viewModel.currentDraftEntry.postValue(null)

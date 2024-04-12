@@ -6,6 +6,7 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.main.MainActivity
@@ -88,6 +89,9 @@ object LinkUtils {
 
     fun postIdToLink(instance: String, postId: Int) =
         "https://$instance/post/$postId"
+
+    fun getLinkForPerson(personRef: PersonRef.PersonRefByName) =
+        getLinkForPerson(personRef.instance, personRef.name)
 
     fun getLinkForPerson(instance: String, name: String): String =
         "https://$instance/u/$name"

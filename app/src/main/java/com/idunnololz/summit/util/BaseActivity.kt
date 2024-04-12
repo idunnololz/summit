@@ -26,17 +26,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     var isMaterialYou = false
 
-    fun runOnUiThreadSafe(f: () -> Unit) {
-        if (!isFinishing) {
-            runOnUiThread {
-                try {
-                    f()
-                } catch (e: IllegalStateException) { /* meh */
-                }
-            }
-        }
-    }
-
     override fun attachBaseContext(base: Context) {
         if (PreferenceUtil.usingCustomFont) {
             super.attachBaseContext(
