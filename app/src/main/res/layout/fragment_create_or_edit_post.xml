@@ -172,7 +172,7 @@
                             app:boxStrokeWidthFocused="0dp"
                             app:hintEnabled="false">
 
-                            <com.google.android.material.textfield.TextInputEditText
+                            <com.idunnololz.summit.view.CustomTextInputEditText
                                 android:id="@+id/post_edit_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"

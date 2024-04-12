@@ -90,7 +90,6 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
         val commentView = args.commentView
         val postView = args.postView
 
@@ -218,12 +217,12 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                             image.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
                             postListViewBuilder.loadImage(
-                                root,
-                                image,
-                                o.content.imageUrl,
-                                true,
-                                binding.image.width,
-                                false,
+                                rootView = root,
+                                imageView = image,
+                                imageUrl = o.content.imageUrl,
+                                preferFullSizeImage = true,
+                                imageViewWidth = binding.image.width,
+                                shouldBlur = false,
                             ) {}
                         }
                     },

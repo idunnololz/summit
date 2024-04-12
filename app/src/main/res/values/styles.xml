@@ -106,6 +106,9 @@
     <style name="Theme.App.Transparent">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+
     </style>
 
     <style name="Theme.App.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">

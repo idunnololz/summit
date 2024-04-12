@@ -294,7 +294,10 @@ class MoreActionsHelper @Inject constructor(
                             it.writeAll(file.source())
                         }
                     }
-                downloadAndShareFile.postValue(fileUri)
+
+                coroutineScope.launch {
+                    downloadAndShareFile.postValueAndClear(fileUri)
+                }
             },
         )
     }

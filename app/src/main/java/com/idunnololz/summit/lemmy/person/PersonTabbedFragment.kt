@@ -26,6 +26,7 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
@@ -73,7 +74,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     lateinit var preferences: Preferences
 
     @Inject
-    lateinit var accountImageGenerator: AccountImageGenerator
+    lateinit var avatarHelper: AvatarHelper
 
     @Inject
     lateinit var accountManager: AccountManager
@@ -362,21 +363,14 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     }
                 }
             }
-            if (data.personView.person.avatar == null) {
-                profileIcon.setImageDrawable(
-                    accountImageGenerator.generateDrawableForPerson(data.personView.person),
-                )
-
+            avatarHelper.loadAvatar(profileIcon, data.personView.person)
+            if (data.personView.person.avatar.isNullOrBlank()) {
                 profileIcon.setOnClickListener {
                     AlertDialogFragment.Builder()
                         .setMessage(R.string.error_user_has_no_profile_image)
                         .createAndShow(childFragmentManager, "error_user_has_no_profile_image")
                 }
             } else {
-                profileIcon.load(data.personView.person.avatar) {
-                    fallback(R.drawable.thumbnail_placeholder_square)
-                    allowHardware(false)
-                }
                 ViewCompat.setTransitionName(profileIcon, "profileIcon")
 
                 profileIcon.setOnClickListener {

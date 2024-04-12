@@ -88,8 +88,8 @@ class AccountActionsManager @Inject constructor(
             lifecycleOwner: LifecycleOwner,
             currentVote: Int,
             currentScore: Int,
-            upvotes: Int,
-            downvotes: Int,
+            upVotes: Int,
+            downVotes: Int,
             instance: String,
             ref: VotableRef,
             upVoteView: View?,
@@ -101,8 +101,8 @@ class AccountActionsManager @Inject constructor(
         ) {
             votesManager.setVoteIfNoneSet(ref, currentVote)
             votesManager.setScoreIfNoneSet(ref, currentScore)
-            votesManager.setUpvotesIfNoneSet(ref, upvotes)
-            votesManager.setDownvotesIfNoneSet(ref, downvotes)
+            votesManager.setUpvotesIfNoneSet(ref, upVotes)
+            votesManager.setDownvotesIfNoneSet(ref, downVotes)
 
             val existingRegId = scoreView.getTag(R.id.account_actions_manager_reg_id)
             if (existingRegId != null) {

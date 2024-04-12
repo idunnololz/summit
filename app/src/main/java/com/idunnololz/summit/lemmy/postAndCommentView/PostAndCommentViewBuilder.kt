@@ -36,12 +36,12 @@ import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
-import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
@@ -118,7 +118,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val preferenceManager: PreferenceManager,
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val accountImageGenerator: AccountImageGenerator,
+    private val avatarHelper: AvatarHelper,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -624,29 +624,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
 
         if (showProfileIcons) {
-            (headerView.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
             val iconImageView = headerView.getIconImageView()
-
-            if (commentView.creator.avatar != null) {
-                iconImageView.load(commentView.creator.avatar) {
-                    placeholder(R.drawable.thumbnail_placeholder_square)
-                    allowHardware(false)
-                }
-            } else {
-                val job = coroutineScope.launch {
-                    val d = accountImageGenerator.generateDrawableForPerson(commentView.creator)
-
-                    withContext(Dispatchers.Main) {
-                        iconImageView.dispose()
-                        iconImageView.setImageDrawable(d)
-                    }
-                }
-                headerView.setTag(R.id.generate_profile_icon_job, job)
-            }
-
-            iconImageView.setOnClickListener {
-                onPageClick(commentView.creator.toPersonRef())
-            }
+            avatarHelper.loadAvatar(iconImageView, commentView.creator)
         }
 
         if (commentView.comment.deleted || isDeleting) {

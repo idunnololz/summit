@@ -1,0 +1,109 @@
+package com.idunnololz.summit.lemmy.utils.mentions
+
+import android.annotation.SuppressLint
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import coil.load
+import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.avatar.AvatarHelper
+import com.idunnololz.summit.databinding.MentionQueryResultItemBinding
+import com.idunnololz.summit.databinding.MentionsEmptyItemBinding
+import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.SinglePostsDataSource
+import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+
+class MentionsResultAdapter @AssistedInject constructor(
+    private val avatarHelper: AvatarHelper,
+    private val offlineManager: OfflineManager,
+) : Adapter<ViewHolder>() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(): MentionsResultAdapter
+    }
+
+    var onResultSelected: ((ResultItem) -> Unit)? = null
+
+    private var items: List<MentionsAutoCompleteItem> = listOf()
+
+    private val adapterHelper = AdapterHelper<MentionsAutoCompleteItem>(
+        areItemsTheSame = { old, new ->
+            old::class == new::class && when (old) {
+                EmptyItem -> true
+                is CommunityResultItem ->
+                    old.communityView.community.id ==
+                        (new as CommunityResultItem).communityView.community.id
+                is PersonResultItem ->
+                    old.personView.person.id ==
+                        (new as PersonResultItem).personView.person.id
+            }
+        },
+    ).apply {
+        addItemType(
+            clazz = CommunityResultItem::class,
+            inflateFn = MentionQueryResultItemBinding::inflate,
+        ) { item, b, h ->
+            b.icon.load(R.drawable.ic_community_default)
+            offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
+                b.icon.load(it)
+            }
+            b.text.text = item.communityView.community.fullName
+            val mauString = LemmyUtils.abbrevNumber(
+                item.communityView.counts.users_active_month.toLong())
+            @Suppress("SetTextI18n")
+            b.subtitle.text = "${b.root.context.getString(R.string.community)} " +
+                "● ${b.root.context.getString(R.string.mau_format, mauString)}"
+
+            b.root.setOnClickListener {
+                onResultSelected?.invoke(item)
+            }
+        }
+        addItemType(
+            clazz = PersonResultItem::class,
+            inflateFn = MentionQueryResultItemBinding::inflate,
+        ) { item, b, h ->
+            avatarHelper.loadAvatar(b.icon, item.personView.person)
+            b.text.text = item.personView.person.fullName
+            @Suppress("SetTextI18n")
+            b.subtitle.text = "${b.root.context.getString(R.string.person)} " +
+                "● ${item.bio ?: b.root.context.getString(R.string.no_bio)}"
+
+            b.root.setOnClickListener {
+                onResultSelected?.invoke(item)
+            }
+        }
+        addItemType(
+            clazz = EmptyItem::class,
+            inflateFn = MentionsEmptyItemBinding::inflate,
+        ) { item, b, h ->
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int =
+        adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+        adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int =
+        adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+        adapterHelper.onBindViewHolder(holder, position)
+
+    fun setItems(items: List<MentionsAutoCompleteItem>, cb: () -> Unit = {}) {
+        this.items = items
+
+        refreshItems(cb)
+    }
+
+    private fun refreshItems(cb: () -> Unit) {
+        adapterHelper.setItems(items, this, cb)
+    }
+}

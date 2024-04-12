@@ -183,6 +183,9 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
             communitySelectorController?.setCommunities(it)
         }
         moreActionsHelper.downloadAndShareFile.observe(this) {
+            if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                return@observe
+            }
             when (it) {
                 is StatefulData.Error -> {}
                 is StatefulData.Loading -> {}
