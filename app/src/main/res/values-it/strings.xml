@@ -902,4 +902,7 @@
     <string name="prompt_delete_multicommunity">Eliminare multi-comunità?</string>
     <string name="prompt_delete_multicommunity_desc">Rimuovere il segnalibro di una multi-comunità comporta l\'eliminazione della multi-comunità.</string>
     <string name="community_options">Opzioni comunità</string>
+    <string name="no_bio">Nessuna bio</string>
+    <string name="keep_typing_to_see_suggestions">Continua a digitare per vedere i suggerimenti</string>
+    <string name="preview_image">Anteprima immagine</string>
 </resources>
