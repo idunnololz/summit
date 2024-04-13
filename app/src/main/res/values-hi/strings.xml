@@ -895,4 +895,7 @@
     <string name="community_blocked">समुदाय अवरुद्ध</string>
     <string name="community_unblocked">समुदाय अनवरोधित</string>
     <string name="instance_unblocked">इंस्टेंस अनवरोधित</string>
+    <string name="no_bio">कोई जीवनी नहीं</string>
+    <string name="keep_typing_to_see_suggestions">सुझाव देखने के लिए टाइप करते रहें</string>
+    <string name="preview_image">छवि का पूर्वावलोकन करें</string>
 </resources>
