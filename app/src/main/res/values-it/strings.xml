@@ -894,4 +894,15 @@
     <string name="community_blocked">Comunità bloccata</string>
     <string name="community_unblocked">Comunità sbloccata</string>
     <string name="instance_unblocked">Istanza sbloccata</string>
+    <string name="instance_options">Opzioni istanza</string>
+    <string name="bookmark_feed">Aggiungi feed a preferiti</string>
+    <string name="error_unable_to_update_subscription">Non è stato possibile aggiornare l\'iscrizione</string>
+    <string name="unsubscribed">Disiscritto</string>
+    <string name="multi_community_info">Informazioni multi-comunità</string>
+    <string name="prompt_delete_multicommunity">Eliminare multi-comunità?</string>
+    <string name="prompt_delete_multicommunity_desc">Rimuovere il segnalibro di una multi-comunità comporta l\'eliminazione della multi-comunità.</string>
+    <string name="community_options">Opzioni comunità</string>
+    <string name="no_bio">Nessuna bio</string>
+    <string name="keep_typing_to_see_suggestions">Continua a digitare per vedere i suggerimenti</string>
+    <string name="preview_image">Anteprima immagine</string>
 </resources>
