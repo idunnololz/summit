@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginBottom="@dimen/padding"
-        android:layout_marginTop="@dimen/padding_two"/>
+        android:layout_marginTop="@dimen/padding"/>
 
     <TextView
         android:id="@+id/text"

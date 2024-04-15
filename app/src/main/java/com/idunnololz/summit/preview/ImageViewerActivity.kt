@@ -24,6 +24,8 @@ import androidx.navigation.navArgs
 import androidx.transition.TransitionManager
 import coil.imageLoader
 import coil.request.ImageRequest
+import coil.size.OriginalSize
+import coil.size.Scale
 import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -62,7 +64,7 @@ class ImageViewerActivity :
     companion object {
 
         @Suppress("unused")
-        private val TAG = ImageViewerActivity::class.java.canonicalName
+        private const val TAG = "ImageViewerActivity"
 
         private const val EXIT_OFFSET_DP = 60f
 
@@ -532,6 +534,8 @@ class ImageViewerActivity :
                         override fun onSuccess(result: Drawable) {
                             super.onSuccess(result)
 
+                            Log.d(TAG, "Image drawable size: w${result.intrinsicWidth} h${result.intrinsicHeight}")
+
                             startPostponedEnterTransition()
                             binding.loadingView.hideAll()
 
@@ -542,8 +546,10 @@ class ImageViewerActivity :
                                 result.start()
                             }
                         }
+
                     },
                 )
+                .size(coil.size.Size.ORIGINAL)
                 .build()
             binding.imageView.context.imageLoader.enqueue(request)
         }, {
@@ -554,13 +560,13 @@ class ImageViewerActivity :
     }
 
     private fun showActionBar() {
-        TransitionManager.beginDelayedTransition(binding.root, makeTransition())
+//        TransitionManager.beginDelayedTransition(binding.root, makeTransition())
 
         binding.appBar.animate().translationY(0f)
     }
 
     private fun hideActionBar() {
-        TransitionManager.beginDelayedTransition(binding.root, makeTransition())
+//        TransitionManager.beginDelayedTransition(binding.root, makeTransition())
 
         binding.appBar.animate().translationY((-binding.appBar.height).toFloat())
     }

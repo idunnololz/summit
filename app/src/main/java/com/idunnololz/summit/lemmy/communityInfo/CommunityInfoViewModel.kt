@@ -46,7 +46,7 @@ class CommunityInfoViewModel @Inject constructor(
     private var communityRef: CommunityRef? = null
 
     val siteOrCommunity = StatefulLiveData<SiteOrCommunityResult>()
-    val multiCommunity = StatefulLiveData<List<GetCommunityResponse>>()
+    val multiCommunity = StatefulLiveData<MultiCommunityData>()
     private val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
     val deleteCommunityResult = StatefulLiveData<DeleteCommunityResult>()
 
@@ -70,12 +70,14 @@ class CommunityInfoViewModel @Inject constructor(
     private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
         siteOrCommunity.setIsLoading()
         viewModelScope.launch {
+            delay(250)
+
             if (communityRef is CommunityRef.MultiCommunity) {
                 siteOrCommunity.postError(RuntimeException())
                 return@launch
             } else if (communityRef is CommunityRef.ModeratedCommunities) {
                 siteOrCommunity.setIdle()
-                fetchModeratedCommunities()
+                fetchModeratedCommunities(communityRef)
                 return@launch
             }
 
@@ -163,7 +165,7 @@ class CommunityInfoViewModel @Inject constructor(
         }
     }
 
-    private suspend fun fetchModeratedCommunities() {
+    private suspend fun fetchModeratedCommunities(communityRef: CommunityRef) {
         multiCommunity.setIsLoading()
         val fullAccount = accountInfoManager.currentFullAccount.value
 
@@ -195,7 +197,12 @@ class CommunityInfoViewModel @Inject constructor(
             }
         }
 
-        multiCommunity.setValue(successResults)
+        multiCommunity.setValue(
+            MultiCommunityData(
+                communityRef = communityRef,
+                communitiesData = successResults
+            )
+        )
     }
 
     fun updateSubscriptionStatus(communityId: Int, subscribe: Boolean) {
@@ -269,5 +276,10 @@ class CommunityInfoViewModel @Inject constructor(
     data class SiteOrCommunityResult(
         val response: Either<GetSiteResponse, GetCommunityResponse>,
         val force: Boolean,
+    )
+
+    data class MultiCommunityData(
+        val communityRef: CommunityRef,
+        val communitiesData: List<GetCommunityResponse>,
     )
 }

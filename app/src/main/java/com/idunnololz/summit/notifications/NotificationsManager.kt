@@ -22,6 +22,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
 import com.idunnololz.summit.lemmy.inbox.InboxEntry
@@ -363,6 +364,21 @@ class NotificationsManager @Inject constructor(
         notificationsSharedPreferences.edit()
             .putLong("${account.fullName}_lastItemTs", ts)
             .apply()
+    }
+
+    fun removeAllInboxNotificationsForAccount(account: Account) {
+        coroutineScope.launch {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val notifications = notificationManager.activeNotifications
+                val channelGroupId = getChannelGroupIdForAccount(account)
+                val accountNotifications = notifications.filter {
+                    it.groupKey == channelGroupId
+                }
+                notifications.forEach {
+                    notificationManager.cancel(it.id)
+                }
+            }
+        }
     }
 
     fun removeNotificationForInboxItem(inboxItem: InboxItem, account: Account) {

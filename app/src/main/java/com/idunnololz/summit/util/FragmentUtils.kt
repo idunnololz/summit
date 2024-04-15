@@ -78,7 +78,7 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                 CommunityInfoFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()
                     navBarController.showBottomNav()
-                    showNotificationBarBg()
+                    hideNotificationBarBg()
                 }
                 SavedTabbedFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()

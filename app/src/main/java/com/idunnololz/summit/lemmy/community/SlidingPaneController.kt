@@ -62,6 +62,9 @@ class SlidingPaneController(
     val isSlideable: Boolean
         get() = slidingPaneLayout.isSlideable
 
+    val isOpen: Boolean
+        get() = slidingPaneLayout.isOpen
+
     private val panelSlideListener =
         object : PanelSlideListener {
             override fun onPanelSlide(panel: View, slideOffset: Float) {

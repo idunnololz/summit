@@ -494,7 +494,7 @@ class CommunityFragment :
                 navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
             }
             binding.customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
-                if (viewModel.lockBottomBar) {
+                if (!isBindingAvailable() || viewModel.lockBottomBar) {
                     return@addOnOffsetChangedListener
                 }
 
@@ -660,7 +660,12 @@ class CommunityFragment :
             }
 
             insets.observe(viewLifecycleOwner) {
-                customFabBehavior?.updateBottomInset(it.bottomInset)
+                binding.coordinatorLayout.post {
+                    customFabBehavior?.updateBottomNavHeight(getBottomNavHeight().toFloat())
+                    customFabBehavior?.updateBottomInset(it.bottomInset)
+                    customFabBehavior?.onDependentViewChanged(
+                        binding.coordinatorLayout, binding.fab, binding.coordinatorLayout)
+                }
             }
         }
 
