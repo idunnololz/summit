@@ -24,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -67,6 +68,10 @@ class InboxViewModel @Inject constructor(
     private val allData: MutableList<LemmyListSource.PageResult<InboxItem>> = mutableListOf()
     private var hasMore = true
     private val fetchingPages = mutableSetOf<Int>()
+
+    val isUserOnInboxScreen = MutableStateFlow<Boolean>(false)
+    val lastInboxUnreadLoadTimeMs = MutableStateFlow<Long>(0)
+    var clearInboxNotificationsJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -138,6 +143,17 @@ class InboxViewModel @Inject constructor(
         viewModelScope.launch {
             accountInfoManager.currentFullAccount.collect {
                 currentFullAccount.value = it
+            }
+        }
+
+        viewModelScope.launch {
+            isUserOnInboxScreen.collect {
+                checkIfDismissInboxNotifications()
+            }
+        }
+        viewModelScope.launch {
+            lastInboxUnreadLoadTimeMs.collect {
+                checkIfDismissInboxNotifications()
             }
         }
         inboxRepository.onServerChanged()
@@ -303,6 +319,26 @@ class InboxViewModel @Inject constructor(
     override fun onCleared() {
         fetchInboxJob?.cancel()
         super.onCleared()
+    }
+
+    private fun checkIfDismissInboxNotifications() {
+        val inboxStaleTimeMs = System.currentTimeMillis() - lastInboxUnreadLoadTimeMs.value
+        if (isUserOnInboxScreen.value && inboxStaleTimeMs < 10_000) {
+            clearInboxNotificationsJob = viewModelScope.launch {
+                delay(2000)
+
+                Log.d(TAG, "User has been on inbox screen for long enough. Clearing inbox notifications.")
+                clearInboxNotifications()
+            }
+        } else {
+            clearInboxNotificationsJob?.cancel()
+        }
+    }
+
+    fun clearInboxNotifications() {
+        currentAccount.value?.let {
+            notificationsManager.removeAllInboxNotificationsForAccount(it)
+        }
     }
 
     @Parcelize

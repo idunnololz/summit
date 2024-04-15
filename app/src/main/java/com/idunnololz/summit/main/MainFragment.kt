@@ -229,14 +229,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch {
-            while (true) {
-                Log.d(TAG, "Current frags: ${childFragmentManager.fragments.joinToString { it.tag ?: "nullTag" }}")
-
-                delay(5000)
-            }
-        }
-
         val context = requireContext()
 
         communitiesPaneController = communitiesPaneViewModel.createController(

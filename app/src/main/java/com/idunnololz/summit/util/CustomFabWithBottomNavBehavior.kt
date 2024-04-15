@@ -2,7 +2,9 @@ package com.idunnololz.summit.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.appbar.AppBarLayout
@@ -20,15 +22,25 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
     private val snackBarBottomMargin = context.resources.getDimensionPixelSize(R.dimen.padding)
 
     fun updateBottomNavHeight(height: Float) {
+        Log.d("HAHA", "updateBottomNavHeight: $height")
         bottomNavHeight = height
     }
 
     fun updateBottomInset(bottomInset: Int) {
+        Log.d("HAHA", "bottomInset: $bottomInset")
         this.bottomInset = bottomInset
     }
 
+    override fun getInsetDodgeRect(
+        parent: CoordinatorLayout,
+        child: FloatingActionButton,
+        rect: Rect,
+    ): Boolean {
+        return super.getInsetDodgeRect(parent, child, rect)
+    }
+
     override fun layoutDependsOn(parent: CoordinatorLayout, child: FloatingActionButton, dependency: View): Boolean {
-//        Log.d("HAHA", "dep: $dependency")
+        Log.d("HAHA", "dep: $dependency")
         if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
         }
@@ -62,6 +74,8 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
         val oldTranslation = fab.translationY
         val newTranslation = -bottomNavHeight - snackbarHeight
         fab.translationY = newTranslation
+
+        Log.d("HAHA", "translationY: $newTranslation")
 
         return oldTranslation != newTranslation
     }

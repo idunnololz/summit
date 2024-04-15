@@ -35,15 +35,16 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@drawable/person_banner_gradient"
-                app:layout_collapseMode="pin"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                <View
+                    android:id="@+id/banner_gradient"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@drawable/person_banner_gradient"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/collapsing_toolbar_content"
@@ -74,7 +75,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_marginHorizontal="@dimen/padding"
-                    android:layout_marginTop="?attr/actionBarSize"
+                    android:layout_marginTop="-32dp"
                     android:foreground="@drawable/account_ripple"
                     android:scaleType="centerCrop"
                     android:padding="2dp"
@@ -83,82 +84,23 @@
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/banner_dummy"
                     app:strokeColor="?colorOnSurface"
                     app:strokeWidth="2dp"/>
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceTitleLarge"
-                    android:layout_marginTop="@dimen/padding"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:gravity="center"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/icon"/>
-
-                <TextView
-                    android:id="@+id/subtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceBodyMedium"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:layout_marginTop="@dimen/padding_half"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    android:gravity="center"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/name"/>
-
-                <!-- Text is set programmatically -->
-                <Button
-                    android:id="@+id/subscribe"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/padding"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/subtitle"/>
-
-                <Button
-                    android:id="@+id/instance_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/instance_info"
-                    android:layout_marginTop="@dimen/padding_half"
-                    android:layout_marginHorizontal="@dimen/padding"
-                    style="?attr/materialButtonOutlinedStyle"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/subscribe"/>
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/padding_half"
-                    app:layout_constraintTop_toBottomOf="@+id/subscribe"
-                    app:layout_constraintStart_toStartOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="wrap_content"
                 app:layout_collapseMode="pin">
 
                 <TextView
                     android:id="@+id/title"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
                     android:textAppearance="?attr/textAppearanceTitleLarge"/>
             </androidx.appcompat.widget.Toolbar>
 

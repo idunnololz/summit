@@ -805,7 +805,6 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
     fun getBottomNavHeight() = navBarController.bottomNavHeight
-    fun getNavRailWidth() = navBarController.navRailWidth
 
     fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {
         viewModel.isReady.observe(lifecycleOwner) {

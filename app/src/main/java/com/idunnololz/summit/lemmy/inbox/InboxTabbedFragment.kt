@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.inbox
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -112,12 +113,22 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
                             remove(fragment)
                         }
                     }
+
+                    inboxViewModel.isUserOnInboxScreen.value = true
                 } else {
                     getMainActivity()?.setNavUiOpenPercent(1f)
+
+                    inboxViewModel.isUserOnInboxScreen.value = false
                 }
             }
 
             init()
+        }
+
+        binding.root.post {
+            if (!slidingPaneController.isOpen) {
+                inboxViewModel.isUserOnInboxScreen.value = true
+            }
         }
 
         if (savedInstanceState == null) {
@@ -156,6 +167,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     }
 
     override fun onPause() {
+        inboxViewModel.isUserOnInboxScreen.value = false
         inboxViewModel.pauseUnreadUpdates = false
         super.onPause()
     }

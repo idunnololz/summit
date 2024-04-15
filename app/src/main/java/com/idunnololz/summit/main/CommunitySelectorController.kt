@@ -829,9 +829,7 @@ class CommunitySelectorController @AssistedInject constructor(
                 if (serverQueryItems.isNotEmpty() || serverResultsInProgress) {
                     newItems.addAll(serverQueryItems)
                 } else {
-                    if (newItems.isEmpty()) {
-                        newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
-                    }
+                    newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
                 }
             }
             withContext(Dispatchers.Main) {
@@ -886,7 +884,7 @@ class CommunitySelectorController @AssistedInject constructor(
         }
 
         fun setQueryServerResultsInProgress() {
-            serverQueryResults = listOf()
+//            serverQueryResults = listOf()
             serverResultsInProgress = true
 
             refreshItems({})

@@ -8,19 +8,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import arrow.core.Either
+import androidx.window.layout.WindowMetrics
+import androidx.window.layout.WindowMetricsCalculator
+import coil.decode.SvgDecoder
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.GetCommunityResponse
-import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.SiteView
@@ -28,6 +31,7 @@ import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunityInfoCommunityItemBinding
+import com.idunnololz.summit.databinding.CommunityInfoHeaderItemBinding
 import com.idunnololz.summit.databinding.FragmentCommunityInfoBinding
 import com.idunnololz.summit.databinding.PageDataAdminItemBinding
 import com.idunnololz.summit.databinding.PageDataDescriptionItemBinding
@@ -55,11 +59,11 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -85,6 +89,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
+
+    private var wasLoadedBefore: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -126,10 +132,20 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = ""
 
-            binding.title.text = args.communityRef.getName(context)
-            binding.name.text = args.communityRef.getName(context)
-
-            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
+            insetViewExceptTopAutomaticallyByPaddingAndNavUi(
+                viewLifecycleOwner,
+                binding.coordinatorLayout
+            )
+            insets.observe(viewLifecycleOwner) {
+                val previousPadding = binding.toolbar.paddingTop
+                val newToolbarHeight = binding.toolbar.measuredHeight - previousPadding + it.topInset
+                binding.toolbar.updatePadding(top = it.topInset)
+                binding.collapsingToolbarLayout.scrimVisibleHeightTrigger =
+                    (newToolbarHeight + Utils.convertDpToPixel(16f)).toInt()
+                binding.bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
+                    height = newToolbarHeight
+                }
+            }
         }
 
         val adapter = PageDataAdapter(
@@ -160,6 +176,26 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             onCommunityInfoClick = { communityRef ->
                 getMainActivity()?.showCommunityInfo(communityRef)
             },
+            onSubscribeClick = { communityId, subscribe ->
+                viewModel.updateSubscriptionStatus(
+                    communityId = communityId,
+                    subscribe = subscribe,
+                )
+            },
+            onInstanceInfoClick = { instance ->
+                getMainActivity()?.showCommunityInfo(
+                    CommunityRef.Local(
+                        instance,
+                    ),
+                )
+            },
+            onCommunitiesClick = { instance ->
+                val directions = CommunityInfoFragmentDirections
+                    .actionCommunityInfoFragmentToCommunitiesFragment(
+                        instance,
+                    )
+                findNavController().navigateSafe(directions)
+            }
         )
 
         binding.loadingView.setOnRefreshClickListener {
@@ -177,10 +213,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
-                is StatefulData.NotStarted -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    binding.loadingView.hideAll()
-                }
+                is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
@@ -209,10 +242,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
-                is StatefulData.NotStarted -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    binding.loadingView.hideAll()
-                }
+                is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
@@ -220,7 +250,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     adapter.multiCommunity = it.data
                     binding.recyclerView.adapter = adapter
 
-                    binding.subtitle.text = viewModel.instance
                     binding.icon.setImageResource(R.drawable.outline_shield_24)
                     binding.icon.strokeWidth = 0f
                     ImageViewCompat.setImageTintList(
@@ -242,9 +271,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 is StatefulData.Loading -> {
                     binding.loadingView.showProgressBar()
                 }
-                is StatefulData.NotStarted -> {
-                    binding.loadingView.hideAll()
-                }
+                is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
                     binding.loadingView.hideAll()
                     viewModel.refetchCommunityOrSite(force = true)
@@ -254,29 +281,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
         // setup initial view state so animations aren't messy
         with(binding) {
-            when (args.communityRef) {
-                is CommunityRef.All,
-                is CommunityRef.Local,
-                is CommunityRef.Subscribed,
-                is CommunityRef.MultiCommunity,
-                is CommunityRef.ModeratedCommunities,
-                -> {
-                    subscribe.visibility = View.GONE
-                }
-                is CommunityRef.CommunityRefByName -> {
-                    subscribe.visibility = View.VISIBLE
-                }
-            }
-
-            if (args.communityRef is CommunityRef.Local || args.communityRef is CommunityRef.All) {
-                instanceInfo.visibility = View.GONE
-                subscribe.visibility = View.VISIBLE
-            } else {
-                instanceInfo.visibility = View.VISIBLE
-            }
-
             banner.transitionName = "banner_image"
-            instanceInfo.visibility = View.GONE
+
+            if (!wasLoadedBefore && savedInstanceState == null) {
+                title.alpha = 0f
+            }
         }
 
         val actionBarHeight = context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize)
@@ -295,7 +304,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     isAnimatingTitleOut = false
                     binding.title.animate().alpha(1f)
                 }
-            } else if (percentCollapsed < 0.66) {
+            } else if (percentCollapsed < 0.5) {
                 if (!isAnimatingTitleOut) {
                     isAnimatingTitleOut = true
                     isAnimatingTitleIn = false
@@ -310,99 +319,13 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         }
 
         viewModel.onCommunityChanged(args.communityRef)
+
+        if (savedInstanceState == null && !wasLoadedBefore) {
+            wasLoadedBefore = true
+        }
     }
 
-    data class PageData(
-        val backingObject: Either<CommunityView, SiteView>,
-        val name: String,
-        val fullName: String,
-        val iconUrl: String?,
-        val bannerUrl: String?,
-        val instance: String,
-        val publishTs: Int,
-        val subscribedStatus: SubscribedType,
-        val canSubscribe: Boolean,
-        val content: String?,
-        val isHidden: Boolean,
-        val isRemoved: Boolean,
-        val isDeleted: Boolean,
-
-        val postCount: Int,
-        val commentCount: Int,
-        val userCount: Int,
-        val usersPerDay: Int,
-        val usersPerWeek: Int,
-        val usersPerMonth: Int,
-        val usersPerSixMonth: Int,
-
-        val mods: List<Person>,
-        val admins: List<PersonView>,
-    )
-
-    private fun GetCommunityResponse.toPageData(): PageData {
-        val communityView = this.community_view
-        val name = communityView.community.name
-        val instance = communityView.community.instance
-
-        return PageData(
-            backingObject = Either.Left(communityView),
-            name = name,
-            fullName = "!$name@$instance",
-            iconUrl = communityView.community.icon,
-            bannerUrl = communityView.community.banner,
-            instance = communityView.community.instance,
-            publishTs = dateStringToTs(communityView.community.published).toInt(),
-            subscribedStatus = communityView.subscribed,
-            canSubscribe = true,
-            content = communityView.community.description,
-            isHidden = communityView.community.hidden,
-            isRemoved = communityView.community.removed,
-            isDeleted = communityView.community.deleted,
-
-            postCount = communityView.counts.posts,
-            commentCount = communityView.counts.comments,
-            userCount = communityView.counts.subscribers,
-            usersPerDay = communityView.counts.users_active_day,
-            usersPerWeek = communityView.counts.users_active_week,
-            usersPerMonth = communityView.counts.users_active_month,
-            usersPerSixMonth = communityView.counts.users_active_half_year,
-
-            mods = this.moderators.map { it.moderator },
-            admins = listOf(),
-        )
-    }
-
-    private fun GetSiteResponse.toPageData(): PageData {
-        val siteView = this.site_view
-        return PageData(
-            backingObject = Either.Right(siteView),
-            name = siteView.site.name,
-            fullName = "!${siteView.site.instance}",
-            iconUrl = siteView.site.icon,
-            bannerUrl = siteView.site.banner,
-            instance = siteView.site.instance,
-            publishTs = dateStringToTs(siteView.site.published).toInt(),
-            subscribedStatus = SubscribedType.NotSubscribed,
-            canSubscribe = false,
-            content = siteView.site.sidebar,
-            isHidden = false,
-            isRemoved = false,
-            isDeleted = false,
-
-            postCount = siteView.counts.posts,
-            commentCount = siteView.counts.comments,
-            userCount = siteView.counts.users,
-            usersPerDay = siteView.counts.users_active_day,
-            usersPerWeek = siteView.counts.users_active_week,
-            usersPerMonth = siteView.counts.users_active_month,
-            usersPerSixMonth = siteView.counts.users_active_half_year,
-
-            mods = listOf(),
-            admins = this.admins,
-        )
-    }
-
-    private fun loadPage(data: PageData) {
+    private fun loadPage(data: CommunityInfoData) {
         if (!isBindingAvailable()) return
 
         val context = requireContext()
@@ -413,10 +336,27 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
 
         with(binding) {
+            title.text = data.name
+
             icon.load(data.iconUrl) {
                 allowHardware(false)
                 placeholder(R.drawable.ic_community_default)
                 fallback(R.drawable.ic_community_default)
+            }
+            if (data.iconUrl != null) {
+                ViewCompat.setTransitionName(icon, "profileIcon")
+
+                icon.setOnClickListener {
+                    getMainActivity()?.openImage(
+                        icon,
+                        toolbar,
+                        null,
+                        data.iconUrl,
+                        null,
+                    )
+                }
+            } else {
+                icon.setOnClickListener(null)
             }
 
             offlineManager.fetchImage(root, data.bannerUrl) {
@@ -425,10 +365,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 }
             }
             if (data.bannerUrl != null) {
-                icon.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    this.topToBottom = bannerDummy.id
-                    this.topToTop = ConstraintLayout.LayoutParams.UNSET
-                    this.topMargin = -Utils.convertDpToPixel(32f).toInt()
+                banner.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    dimensionRatio = "H,16:9"
+                }
+                bannerDummy.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    dimensionRatio = "H,16:9"
                 }
 
                 banner.setOnClickListener {
@@ -441,70 +382,28 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     )
                 }
             } else {
+                banner.load("file:///android_asset/banner_placeholder.svg") {
+                    decoderFactory { result, options, _ -> SvgDecoder(result.source, options) }
+
+                    val windowMetrics = WindowMetricsCalculator.getOrCreate()
+                        .computeCurrentWindowMetrics(context)
+                    size(windowMetrics.bounds.width(), (windowMetrics.bounds.width() * (9/16.0)).toInt())
+                }
                 banner.setOnClickListener(null)
             }
 
-            subtitle.text = data.fullName
-
             if (communityView != null) {
-                subscribe.visibility = View.VISIBLE
-
-                when (data.subscribedStatus) {
-                    SubscribedType.Subscribed -> {
-                        subscribe.text = getString(R.string.unsubscribe)
-                        subscribe.isEnabled = true
-                    }
-                    SubscribedType.NotSubscribed -> {
-                        subscribe.text = getString(R.string.subscribe)
-                        subscribe.isEnabled = true
-                    }
-                    SubscribedType.Pending -> {
-                        subscribe.text = getString(R.string.subscription_pending)
-                        subscribe.isEnabled = false
-                    }
-                }
-
-                subscribe.setOnClickListener {
-                    viewModel.updateSubscriptionStatus(
-                        communityId = communityView.community.id,
-                        subscribe = data.subscribedStatus != SubscribedType.Subscribed,
-                    )
-                }
-
                 binding.fab.visibility = View.VISIBLE
                 binding.fab.setOnClickListener {
                     showOverflowMenu(communityView, data.mods )
-                }
-
-                binding.instanceInfo.visibility = View.VISIBLE
-                binding.instanceInfo.setOnClickListener {
-                    getMainActivity()?.showCommunityInfo(
-                        CommunityRef.Local(
-                            communityView.community.instance,
-                        ),
-                    )
                 }
             } else if (siteView != null) {
                 binding.fab.visibility = View.VISIBLE
                 binding.fab.setOnClickListener {
                     showOverflowMenu(siteView)
                 }
-
-                binding.instanceInfo.visibility = View.GONE
-
-                subscribe.visibility = View.VISIBLE
-                subscribe.text = getString(R.string.communities)
-                subscribe.setOnClickListener {
-                    val directions = CommunityInfoFragmentDirections
-                        .actionCommunityInfoFragmentToCommunitiesFragment(
-                            siteView.site.instance,
-                        )
-                    findNavController().navigateSafe(directions)
-                }
             } else {
                 binding.fab.visibility = View.GONE
-                subscribe.visibility = View.GONE
-                binding.instanceInfo.visibility = View.GONE
             }
             binding.fab.setup(preferences)
         }
@@ -684,9 +583,24 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         private val onLinkLongClick: (url: String, text: String) -> Unit,
         private val onCommunityInfoClick: (communityRef: CommunityRef) -> Unit,
+        private val onSubscribeClick: (communityId: CommunityId, subscribe: Boolean) -> Unit,
+        private val onInstanceInfoClick: (instance: String) -> Unit,
+        private val onCommunitiesClick: (instance: String) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private sealed interface Item {
+            data class CommunityHeaderItem(
+                val communityView: CommunityView,
+                val subscribedStatus: SubscribedType,
+            ) : Item
+            data class InstanceHeaderItem(
+                val siteView: SiteView,
+                val title: String,
+                val subtitle: String,
+            ) : Item
+            data class MultiCommunityHeaderItem(
+                val title: String,
+            ) : Item
             data class WarningItem(
                 val message: String,
             ) : Item
@@ -717,8 +631,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             ) : Item
         }
 
-        private var data: PageData? = null
-        var multiCommunity: List<GetCommunityResponse>? = null
+        private var data: CommunityInfoData? = null
+        var multiCommunity: CommunityInfoViewModel.MultiCommunityData? = null
             set(value) {
                 field = value
 
@@ -745,9 +659,68 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     is Item.CommunityItem ->
                         old.communityView.community.id ==
                             (new as Item.CommunityItem).communityView.community.id
+
+                    is Item.CommunityHeaderItem -> true
+                    is Item.InstanceHeaderItem -> true
+                    is Item.MultiCommunityHeaderItem -> true
                 }
             },
         ).apply {
+            addItemType(
+                clazz = Item.MultiCommunityHeaderItem::class,
+                inflateFn = CommunityInfoHeaderItemBinding::inflate
+            ) { item, b, _ ->
+                b.subscribe.visibility = View.GONE
+                b.instanceInfo.visibility = View.GONE
+            }
+            addItemType(
+                clazz = Item.InstanceHeaderItem::class,
+                inflateFn = CommunityInfoHeaderItemBinding::inflate
+            ) { item, b, _ ->
+                b.name.text = item.title
+                b.subtitle.text = item.subtitle
+
+                b.instanceInfo.visibility = View.GONE
+
+                b.subscribe.visibility = View.VISIBLE
+                b.subscribe.text = context.getString(R.string.communities)
+                b.subscribe.setOnClickListener {
+                    onCommunitiesClick(item.siteView.site.instance)
+                }
+            }
+            addItemType(
+                clazz = Item.CommunityHeaderItem::class,
+                inflateFn = CommunityInfoHeaderItemBinding::inflate
+            ) { item, b, _ ->
+                b.name.text = item.communityView.community.title
+                b.subtitle.text = item.communityView.community.fullName
+
+                b.subscribe.visibility = View.VISIBLE
+
+                when (item.subscribedStatus) {
+                    SubscribedType.Subscribed -> {
+                        b.subscribe.text = context.getString(R.string.unsubscribe)
+                    }
+                    SubscribedType.NotSubscribed -> {
+                        b.subscribe.text = context.getString(R.string.subscribe)
+                    }
+                    SubscribedType.Pending -> {
+                        b.subscribe.text = context.getString(R.string.subscription_pending)
+                    }
+                }
+
+                b.subscribe.setOnClickListener {
+                    onSubscribeClick(
+                        item.communityView.community.id,
+                        item.subscribedStatus == SubscribedType.NotSubscribed,
+                    )
+                }
+
+                b.instanceInfo.visibility = View.VISIBLE
+                b.instanceInfo.setOnClickListener {
+                    onInstanceInfoClick(item.communityView.community.instance)
+                }
+            }
             addItemType(
                 clazz = Item.WarningItem::class,
                 inflateFn = WarningItemBinding::inflate,
@@ -848,10 +821,18 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
         private fun refreshItems(cb: () -> Unit = {}) {
             val data = data
-            val multiCommunity = multiCommunity
+            val multiCommunityData = multiCommunity
             val newItems = mutableListOf<Item>()
 
             if (data != null) {
+                data.backingObject
+                    .onLeft {
+                        newItems += Item.CommunityHeaderItem(it, data.subscribedStatus)
+                    }
+                    .onRight {
+                        newItems += Item.InstanceHeaderItem(it, data.name, data.fullName)
+                    }
+
                 if (data.isRemoved) {
                     newItems.add(Item.WarningItem(context.getString(R.string.warn_community_removed)))
                 } else if (data.isHidden) {
@@ -859,18 +840,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 } else if (data.isDeleted) {
                     newItems.add(Item.WarningItem(context.getString(R.string.warn_community_deleted)))
                 }
-
-                newItems.add(
-                    Item.StatsItem(
-                        data.postCount,
-                        data.commentCount,
-                        data.userCount,
-                        data.usersPerDay,
-                        data.usersPerWeek,
-                        data.usersPerMonth,
-                        data.usersPerSixMonth,
-                    ),
-                )
                 newItems.add(Item.DescriptionItem(data.content ?: ""))
 
                 if (data.admins.isNotEmpty()) {
@@ -885,8 +854,32 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         Item.ModItem(it)
                     }
                 }
-            } else if (multiCommunity != null) {
-                for (community in multiCommunity) {
+
+                newItems.add(
+                    Item.StatsItem(
+                        data.postCount,
+                        data.commentCount,
+                        data.userCount,
+                        data.usersPerDay,
+                        data.usersPerWeek,
+                        data.usersPerMonth,
+                        data.usersPerSixMonth,
+                    ),
+                )
+            } else if (multiCommunityData != null) {
+                newItems += Item.MultiCommunityHeaderItem(
+                    when (multiCommunityData.communityRef) {
+                        is CommunityRef.All -> TODO()
+                        is CommunityRef.CommunityRefByName -> TODO()
+                        is CommunityRef.Local -> TODO()
+                        is CommunityRef.ModeratedCommunities ->
+                            context.getString(R.string.moderated_communities)
+                        is CommunityRef.MultiCommunity -> TODO()
+                        is CommunityRef.Subscribed -> TODO()
+                    }
+                )
+
+                for (community in multiCommunityData.communitiesData) {
                     newItems.add(
                         Item.CommunityItem(
                             community.community_view,
@@ -898,7 +891,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             adapterHelper.setItems(newItems, this, cb)
         }
 
-        fun setData(data: PageData, cb: () -> Unit) {
+        fun setData(data: CommunityInfoData, cb: () -> Unit) {
             this.data = data
             refreshItems(cb)
         }

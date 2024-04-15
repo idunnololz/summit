@@ -524,6 +524,12 @@ class InboxFragment :
                         }
                     }
                 }
+
+                if (viewModel.pageType.value == InboxViewModel.PageType.All ||
+                    viewModel.pageType.value == InboxViewModel.PageType.Unread) {
+
+                    viewModel.lastInboxUnreadLoadTimeMs.value = System.currentTimeMillis()
+                }
             }
         }
     }

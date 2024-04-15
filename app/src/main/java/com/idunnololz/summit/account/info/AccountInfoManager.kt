@@ -206,6 +206,8 @@ class AccountInfoManager @Inject constructor(
                 .onSuccess {
                     unreadCount.emit(
                         unreadCount.value.copy(
+                            lastUpdateTimeMs = System.currentTimeMillis(),
+                            account = account,
                             totalUnreadCount = it.mentions + it.private_messages + it.replies,
                         ),
                     )
@@ -216,6 +218,8 @@ class AccountInfoManager @Inject constructor(
                 .onSuccess {
                     unreadCount.emit(
                         unreadCount.value.copy(
+                            lastUpdateTimeMs = System.currentTimeMillis(),
+                            account = account,
                             totalUnresolvedReportsCount =
                             it.comment_reports +
                                 it.post_reports +
@@ -269,6 +273,8 @@ class AccountInfoManager @Inject constructor(
     }
 
     data class UnreadCount(
+        val lastUpdateTimeMs: Long = 0,
+        val account: Account? = null,
         val totalUnreadCount: Int = 0,
         val totalUnresolvedReportsCount: Int = 0,
     )
