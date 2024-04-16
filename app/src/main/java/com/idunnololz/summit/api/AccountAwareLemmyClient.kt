@@ -47,13 +47,13 @@ import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.io.InputStream
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class AccountAwareLemmyClient @Inject constructor(
@@ -69,7 +69,12 @@ class AccountAwareLemmyClient @Inject constructor(
         private val accountManager: AccountManager,
         private val coroutineScopeFactory: CoroutineScopeFactory,
     ) {
-        fun create() = AccountAwareLemmyClient(context, apiClient, accountManager, coroutineScopeFactory)
+        fun create() = AccountAwareLemmyClient(
+            context,
+            apiClient,
+            accountManager,
+            coroutineScopeFactory,
+        )
     }
 
     companion object {
@@ -99,38 +104,36 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int? = null,
         force: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<List<PostView>> =
-        if (account != null) {
-            retry {
-                apiClient.fetchSavedPosts(
-                    account = account,
-                    limit = limit,
-                    page = page,
-                    force = force,
-                ).autoSignOut(account)
-            }
-        } else {
-            createAccountErrorResult()
+    ): Result<List<PostView>> = if (account != null) {
+        retry {
+            apiClient.fetchSavedPosts(
+                account = account,
+                limit = limit,
+                page = page,
+                force = force,
+            ).autoSignOut(account)
         }
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun fetchSavedCommentsWithRetry(
         page: Int,
         limit: Int? = null,
         force: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<List<CommentView>> =
-        if (account != null) {
-            retry {
-                apiClient.fetchSavedComments(
-                    account = account,
-                    limit = limit,
-                    page = page,
-                    force = force,
-                ).autoSignOut(account)
-            }
-        } else {
-            createAccountErrorResult()
+    ): Result<List<CommentView>> = if (account != null) {
+        retry {
+            apiClient.fetchSavedComments(
+                account = account,
+                limit = limit,
+                page = page,
+                force = force,
+            ).autoSignOut(account)
         }
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun fetchPosts(
         communityIdOrName: Either<Int, String>? = null,
@@ -268,21 +271,20 @@ class AccountAwareLemmyClient @Inject constructor(
         creatorId: Long? = null,
         account: Account? = accountForInstance(),
         force: Boolean = false,
-    ): Result<SearchResponse> =
-        apiClient.search(
-            account = account,
-            communityId = communityId,
-            communityName = communityName,
-            sortType = sortType,
-            listingType = listingType,
-            searchType = searchType,
-            page = page,
-            limit = limit,
-            query = query,
-            creatorId = creatorId,
-            force = force,
-        )
-            .autoSignOut(account)
+    ): Result<SearchResponse> = apiClient.search(
+        account = account,
+        communityId = communityId,
+        communityName = communityName,
+        sortType = sortType,
+        listingType = listingType,
+        searchType = searchType,
+        page = page,
+        limit = limit,
+        query = query,
+        creatorId = creatorId,
+        force = force,
+    )
+        .autoSignOut(account)
 
     suspend fun fetchCommunitiesWithRetry(
         sortType: SortType,
@@ -316,114 +318,106 @@ class AccountAwareLemmyClient @Inject constructor(
         reason: String?,
         expiresDays: Int?,
         account: Account? = accountForInstance(),
-    ): Result<BanFromCommunityResponse> =
-        if (account != null) {
-            apiClient
-                .banUserFromCommunity(
-                    communityId = communityId,
-                    personId = personId,
-                    ban = ban,
-                    removeData = removeData,
-                    reason = reason,
-                    expiresDays = expiresDays,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<BanFromCommunityResponse> = if (account != null) {
+        apiClient
+            .banUserFromCommunity(
+                communityId = communityId,
+                personId = personId,
+                ban = ban,
+                removeData = removeData,
+                reason = reason,
+                expiresDays = expiresDays,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun modUser(
         communityId: CommunityId,
         personId: PersonId,
         add: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<AddModToCommunityResponse> =
-        if (account != null) {
-            apiClient
-                .modUser(
-                    communityId = communityId,
-                    personId = personId,
-                    add = add,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<AddModToCommunityResponse> = if (account != null) {
+        apiClient
+            .modUser(
+                communityId = communityId,
+                personId = personId,
+                add = add,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun distinguishComment(
         commentId: CommentId,
         distinguish: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<CommentResponse> =
-        if (account != null) {
-            apiClient
-                .distinguishComment(
-                    commentId = commentId,
-                    distinguish = distinguish,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<CommentResponse> = if (account != null) {
+        apiClient
+            .distinguishComment(
+                commentId = commentId,
+                distinguish = distinguish,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun removeComment(
         commentId: CommentId,
         remove: Boolean,
         reason: String?,
         account: Account? = accountForInstance(),
-    ): Result<CommentResponse> =
-        if (account != null) {
-            apiClient
-                .removeComment(
-                    commentId = commentId,
-                    remove = remove,
-                    reason = reason,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<CommentResponse> = if (account != null) {
+        apiClient
+            .removeComment(
+                commentId = commentId,
+                remove = remove,
+                reason = reason,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun login(
         instance: String,
         username: String,
         password: String,
         twoFactorCode: String?,
-    ): Result<String?> =
-        apiClient.login(instance, username, password, twoFactorCode)
+    ): Result<String?> = apiClient.login(instance, username, password, twoFactorCode)
 
     suspend fun fetchSiteWithRetry(
         force: Boolean,
         auth: String? = currentAccount?.jwt,
-    ): Result<GetSiteResponse> =
-        apiClient.fetchSiteWithRetry(auth, force)
+    ): Result<GetSiteResponse> = apiClient.fetchSiteWithRetry(auth, force)
 
     suspend fun fetchUnreadCountWithRetry(
         force: Boolean,
         account: Account? = currentAccount,
-    ): Result<GetUnreadCountResponse> =
-        retry {
-            if (account == null) {
-                createAccountErrorResult()
-            } else {
-                apiClient.fetchUnreadCount(force, account)
-                    .autoSignOut(account)
-            }
+    ): Result<GetUnreadCountResponse> = retry {
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchUnreadCount(force, account)
+                .autoSignOut(account)
         }
+    }
 
-    suspend fun fetchUnresolvedReportsCountWithRetry(force: Boolean, account: Account) =
-        retry {
-            if (account == null) {
-                createAccountErrorResult()
-            } else {
-                apiClient.fetchUnresolvedReportsCount(force, account)
-                    .autoSignOut(account)
-            }
+    suspend fun fetchUnresolvedReportsCountWithRetry(force: Boolean, account: Account) = retry {
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.fetchUnresolvedReportsCount(force, account)
+                .autoSignOut(account)
         }
+    }
 
     suspend fun deletePost(
         id: PostId,
@@ -485,13 +479,12 @@ class AccountAwareLemmyClient @Inject constructor(
         isNsfw: Boolean,
         account: Account? = accountForInstance(),
         communityId: CommunityId,
-    ): Result<PostView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.createPost(name, body, url, isNsfw, account, communityId)
-                .autoSignOut(account)
-        }
+    ): Result<PostView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.createPost(name, body, url, isNsfw, account, communityId)
+            .autoSignOut(account)
+    }
 
     suspend fun editPost(
         postId: PostId,
@@ -500,61 +493,56 @@ class AccountAwareLemmyClient @Inject constructor(
         url: String?,
         isNsfw: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<PostView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.editPost(postId, name, body, url, isNsfw, account)
-                .autoSignOut(account)
-        }
+    ): Result<PostView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.editPost(postId, name, body, url, isNsfw, account)
+            .autoSignOut(account)
+    }
 
     suspend fun uploadImage(
         fileName: String,
         imageIs: InputStream,
         account: Account? = accountForInstance(),
-    ): Result<UploadImageResult> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.uploadImage(account, fileName, imageIs)
-                .autoSignOut(account)
-        }
+    ): Result<UploadImageResult> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.uploadImage(account, fileName, imageIs)
+            .autoSignOut(account)
+    }
 
     suspend fun blockCommunity(
         communityId: CommunityId,
         block: Boolean,
         account: Account? = accountForInstance(),
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.blockCommunity(communityId, block, account)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.blockCommunity(communityId, block, account)
+            .autoSignOut(account)
+    }
 
     suspend fun blockPerson(
         personId: PersonId,
         block: Boolean,
         account: Account? = accountForInstance(),
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.blockPerson(personId, block, account)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.blockPerson(personId, block, account)
+            .autoSignOut(account)
+    }
 
     suspend fun blockInstance(
         instanceId: InstanceId,
         block: Boolean,
         account: Account? = accountForInstance(),
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.blockInstance(instanceId, block, account)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.blockInstance(instanceId, block, account)
+            .autoSignOut(account)
+    }
 
     suspend fun fetchReplies(
         sort: CommentSortType? /* "Hot" | "Top" | "New" | "Old" */ = null,
@@ -592,13 +580,12 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int? = 20,
         account: Account? = accountForInstance(),
         force: Boolean,
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.fetchPrivateMessages(unreadOnly, page, limit, account, force)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.fetchPrivateMessages(unreadOnly, page, limit, account, force)
+            .autoSignOut(account)
+    }
 
     suspend fun fetchReportMessages(
         unresolvedOnly: Boolean? = null,
@@ -606,13 +593,12 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int? = 20,
         account: Account? = accountForInstance(),
         force: Boolean,
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.fetchReportMessages(unresolvedOnly, page, limit, account, force)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.fetchReportMessages(unresolvedOnly, page, limit, account, force)
+            .autoSignOut(account)
+    }
 
     suspend fun fetchPostReports(
         unresolvedOnly: Boolean? = null,
@@ -620,25 +606,23 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int? = 20,
         account: Account? = accountForInstance(),
         force: Boolean,
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.fetchPostReports(unresolvedOnly, page, limit, account, force)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.fetchPostReports(unresolvedOnly, page, limit, account, force)
+            .autoSignOut(account)
+    }
 
     suspend fun resolvePostReport(
         reportId: PostReportId,
         resolved: Boolean,
         account: Account? = accountForInstance(),
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.resolvePostReport(reportId, resolved, account)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.resolvePostReport(reportId, resolved, account)
+            .autoSignOut(account)
+    }
 
     suspend fun fetchCommentReports(
         unresolvedOnly: Boolean? = null,
@@ -646,136 +630,122 @@ class AccountAwareLemmyClient @Inject constructor(
         limit: Int? = 20,
         account: Account? = accountForInstance(),
         force: Boolean,
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.fetchCommentReports(unresolvedOnly, page, limit, account, force)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.fetchCommentReports(unresolvedOnly, page, limit, account, force)
+            .autoSignOut(account)
+    }
 
     suspend fun resolveCommentReport(
         reportId: CommentReportId,
         resolved: Boolean,
         account: Account? = accountForInstance(),
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.resolveCommentReport(reportId, resolved, account)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.resolveCommentReport(reportId, resolved, account)
+            .autoSignOut(account)
+    }
 
     suspend fun markReplyAsRead(
         id: CommentReplyId,
         read: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<CommentView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.markReplyAsRead(id, read, account)
-                .autoSignOut(account)
-        }
+    ): Result<CommentView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.markReplyAsRead(id, read, account)
+            .autoSignOut(account)
+    }
 
     suspend fun markMentionAsRead(
         id: PersonMentionId,
         read: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<PersonMentionView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.markMentionAsRead(id, read, account)
-                .autoSignOut(account)
-        }
+    ): Result<PersonMentionView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.markMentionAsRead(id, read, account)
+            .autoSignOut(account)
+    }
 
     suspend fun markPrivateMessageAsRead(
         id: PrivateMessageId,
         read: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<PrivateMessageView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.markPrivateMessageAsRead(id, read, account)
-                .autoSignOut(account)
-        }
+    ): Result<PrivateMessageView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.markPrivateMessageAsRead(id, read, account)
+            .autoSignOut(account)
+    }
 
     suspend fun markAllAsRead(
         account: Account? = accountForInstance(),
-    ): Result<GetRepliesResponse> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.markAllAsRead(account)
-                .autoSignOut(account)
-        }
+    ): Result<GetRepliesResponse> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.markAllAsRead(account)
+            .autoSignOut(account)
+    }
 
     suspend fun createPrivateMessage(
         content: String,
         recipient: PersonId,
         account: Account? = accountForInstance(),
-    ): Result<PrivateMessageView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.createPrivateMessage(content, recipient, account)
-                .autoSignOut(account)
-        }
+    ): Result<PrivateMessageView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.createPrivateMessage(content, recipient, account)
+            .autoSignOut(account)
+    }
 
     suspend fun savePost(
         postId: PostId,
         save: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<PostView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.savePost(postId, save, account)
-                .autoSignOut(account)
-        }
+    ): Result<PostView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.savePost(postId, save, account)
+            .autoSignOut(account)
+    }
 
     suspend fun saveComment(
         commentId: CommentId,
         save: Boolean,
         account: Account? = accountForInstance(),
-    ): Result<CommentView> =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.saveComment(commentId, save, account)
-                .autoSignOut(account)
-        }
+    ): Result<CommentView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.saveComment(commentId, save, account)
+            .autoSignOut(account)
+    }
 
     suspend fun createPostReport(
         postId: PostId,
         reason: String,
         account: Account? = accountForInstance(),
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.createPostReport(postId, reason, account)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.createPostReport(postId, reason, account)
+            .autoSignOut(account)
+    }
 
     suspend fun createCommentReport(
         commentId: CommentId,
         reason: String,
         account: Account? = accountForInstance(),
-    ) =
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.createCommentReport(commentId, reason, account)
-                .autoSignOut(account)
-        }
+    ) = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient.createCommentReport(commentId, reason, account)
+            .autoSignOut(account)
+    }
 
-    suspend fun resolveObject(
-        q: String,
-        account: Account? = accountForInstance(),
-    ) =
+    suspend fun resolveObject(q: String, account: Account? = accountForInstance()) =
         if (account == null) {
             createAccountErrorResult()
         } else {
@@ -790,134 +760,128 @@ class AccountAwareLemmyClient @Inject constructor(
         reason: String?,
         expiresDays: Int?,
         account: Account? = accountForInstance(),
-    ): Result<BanPersonResponse> =
-        if (account != null) {
-            apiClient
-                .banUserFromSite(
-                    personId = personId,
-                    ban = ban,
-                    removeData = removeData,
-                    reason = reason,
-                    expiresDays = expiresDays,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<BanPersonResponse> = if (account != null) {
+        apiClient
+            .banUserFromSite(
+                personId = personId,
+                ban = ban,
+                removeData = removeData,
+                reason = reason,
+                expiresDays = expiresDays,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun removeCommunity(
         communityId: CommunityId,
         remove: Boolean,
         reason: String?,
         account: Account? = accountForInstance(),
-    ): Result<CommunityResponse> =
-        if (account != null) {
-            apiClient
-                .removeCommunity(
-                    communityId = communityId,
-                    remove = remove,
-                    reason = reason,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<CommunityResponse> = if (account != null) {
+        apiClient
+            .removeCommunity(
+                communityId = communityId,
+                remove = remove,
+                reason = reason,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun hideCommunity(
         communityId: CommunityId,
         hide: Boolean,
         reason: String?,
         account: Account? = accountForInstance(),
-    ): Result<SuccessResponse> =
-        if (account != null) {
-            apiClient
-                .hideCommunity(
-                    communityId = communityId,
-                    hide = hide,
-                    reason = reason,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<SuccessResponse> = if (account != null) {
+        apiClient
+            .hideCommunity(
+                communityId = communityId,
+                hide = hide,
+                reason = reason,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun purgePerson(
         personId: PersonId,
         reason: String?,
         account: Account? = accountForInstance(),
-    ): Result<SuccessResponse> =
-        if (account != null) {
-            apiClient
-                .purgePerson(
-                    personId = personId,
-                    reason = reason,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<SuccessResponse> = if (account != null) {
+        apiClient
+            .purgePerson(
+                personId = personId,
+                reason = reason,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun purgeCommunity(
         communityId: CommunityId,
         reason: String?,
         account: Account? = accountForInstance(),
-    ): Result<SuccessResponse> =
-        if (account != null) {
-            apiClient
-                .purgeCommunity(
-                    communityId = communityId,
-                    reason = reason,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<SuccessResponse> = if (account != null) {
+        apiClient
+            .purgeCommunity(
+                communityId = communityId,
+                reason = reason,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun purgePost(
         postId: PostId,
         reason: String?,
         account: Account? = accountForInstance(),
-    ): Result<SuccessResponse> =
-        if (account != null) {
-            apiClient
-                .purgePost(
-                    postId = postId,
-                    reason = reason,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<SuccessResponse> = if (account != null) {
+        apiClient
+            .purgePost(
+                postId = postId,
+                reason = reason,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun purgeComment(
         commentId: CommentId,
         reason: String?,
         account: Account? = accountForInstance(),
-    ): Result<SuccessResponse> =
-        if (account != null) {
-            apiClient
-                .purgeComment(
-                    commentId = commentId,
-                    reason = reason,
-                    account = account,
-                )
-                .autoSignOut(account)
-        } else {
-            createAccountErrorResult()
-        }
+    ): Result<SuccessResponse> = if (account != null) {
+        apiClient
+            .purgeComment(
+                commentId = commentId,
+                reason = reason,
+                account = account,
+            )
+            .autoSignOut(account)
+    } else {
+        createAccountErrorResult()
+    }
 
     suspend fun fetchModLogs(
         personId: PersonId? = null,
         communityId: CommunityId? = null,
         page: Int? = null,
         limit: Int? = null,
-        actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ = null,
+        actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ =
+            null,
         otherPersonId: PersonId? = null,
         force: Boolean,
         account: Account? = accountForInstance(),
@@ -939,8 +903,7 @@ class AccountAwareLemmyClient @Inject constructor(
             createAccountErrorResult()
         }
 
-    fun changeInstance(site: String) =
-        apiClient.changeInstance(site)
+    fun changeInstance(site: String) = apiClient.changeInstance(site)
 
     fun defaultInstance() {
         val currentAccount = currentAccount
@@ -1034,7 +997,10 @@ class AccountAwareLemmyClient @Inject constructor(
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
-                            context.getString(R.string.error_account_token_expired_format, account.name),
+                            context.getString(
+                                R.string.error_account_token_expired_format,
+                                account.name,
+                            ),
                             Toast.LENGTH_LONG,
                         ).show()
                     }

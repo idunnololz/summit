@@ -15,8 +15,7 @@ enum class PostType {
     Link,
 }
 
-fun PostView.getUniqueKey(): String =
-    "${post.community_id.toULong()}_${post.id.toULong()}"
+fun PostView.getUniqueKey(): String = "${post.community_id.toULong()}_${post.id.toULong()}"
 
 fun PostView.shouldHideItem(): Boolean = post.nsfw
 
@@ -28,16 +27,15 @@ fun PostView.getLowestResHiddenPreviewInfo(): PreviewInfo? {
     )
 }
 
-fun PostView.getThumbnailUrl(reveal: Boolean): String? =
-    if (shouldHideItem()) {
-        if (reveal) {
-            post.thumbnail_url
-        } else {
-            getLowestResHiddenPreviewInfo()?.getUrl()
-        }
-    } else {
+fun PostView.getThumbnailUrl(reveal: Boolean): String? = if (shouldHideItem()) {
+    if (reveal) {
         post.thumbnail_url
+    } else {
+        getLowestResHiddenPreviewInfo()?.getUrl()
     }
+} else {
+    post.thumbnail_url
+}
 
 fun PostView.getPreviewInfo(): PreviewInfo? {
     return null

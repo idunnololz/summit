@@ -11,13 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import androidx.transition.ChangeBounds
-import androidx.transition.ChangeClipBounds
-import androidx.transition.ChangeImageTransform
-import androidx.transition.Fade
-import androidx.transition.Transition
 import androidx.transition.TransitionManager
-import androidx.transition.TransitionSet
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
@@ -423,8 +417,7 @@ class SettingPostAndCommentsFragment :
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)

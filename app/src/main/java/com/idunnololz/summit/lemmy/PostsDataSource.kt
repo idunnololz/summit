@@ -26,26 +26,20 @@ class SinglePostsDataSource @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(
-            communityName: String?,
-            listingType: ListingType?,
-        ): SinglePostsDataSource
+        fun create(communityName: String?, listingType: ListingType?): SinglePostsDataSource
     }
 
-    override suspend fun fetchPosts(
-        sortType: SortType?,
-        page: Int,
-        force: Boolean,
-    ) = apiClient.fetchPosts(
-        if (communityName == null) {
-            null
-        } else {
-            Either.Right(communityName)
-        },
-        sortType,
-        listingType ?: ListingType.All,
-        page.toLemmyPageIndex(),
-        DEFAULT_PAGE_SIZE,
-        force,
-    )
+    override suspend fun fetchPosts(sortType: SortType?, page: Int, force: Boolean) =
+        apiClient.fetchPosts(
+            if (communityName == null) {
+                null
+            } else {
+                Either.Right(communityName)
+            },
+            sortType,
+            listingType ?: ListingType.All,
+            page.toLemmyPageIndex(),
+            DEFAULT_PAGE_SIZE,
+            force,
+        )
 }

@@ -414,9 +414,7 @@ class ListingItemAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    fun onItemsChanged(
-        animate: Boolean = true,
-    ) {
+    fun onItemsChanged(animate: Boolean = true) {
         refreshItems(animate)
     }
 

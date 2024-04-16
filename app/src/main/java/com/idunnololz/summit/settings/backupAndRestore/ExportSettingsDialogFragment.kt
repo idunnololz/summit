@@ -36,9 +36,7 @@ class ExportSettingsDialogFragment :
 
     companion object {
 
-        fun show(
-            fragmentManager: FragmentManager,
-        ) {
+        fun show(fragmentManager: FragmentManager) {
             ExportSettingsDialogFragment()
                 .showAllowingStateLoss(fragmentManager, "BackupSettingsDialogFragment")
         }
@@ -161,7 +159,10 @@ class ExportSettingsDialogFragment :
                                         withContext(Dispatchers.Main) {
                                             AlertDialogFragment.Builder()
                                                 .setMessage(R.string.error_generating_backup)
-                                                .createAndShow(childFragmentManager, "error_generating_backup")
+                                                .createAndShow(
+                                                    childFragmentManager,
+                                                    "error_generating_backup",
+                                                )
                                         }
                                     }
                                 }

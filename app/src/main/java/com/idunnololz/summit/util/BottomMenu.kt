@@ -83,7 +83,9 @@ class BottomMenu(
     }
 
     fun addItem(@IdRes id: Int, @StringRes title: Int, @DrawableRes checkIcon: Int) {
-        adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title), checkIcon = checkIcon))
+        adapter.menuItems.add(
+            MenuItem.ActionItem(id, context.getString(title), checkIcon = checkIcon),
+        )
     }
 
     fun addItem(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
@@ -99,11 +101,20 @@ class BottomMenu(
     }
 
     fun addItemWithIcon(@IdRes id: Int, title: String, drawable: Drawable) {
-        adapter.menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.DrawableIcon(drawable)))
+        adapter.menuItems.add(
+            MenuItem.ActionItem(id, title, icon = MenuIcon.DrawableIcon(drawable)),
+        )
     }
 
     fun addDangerousItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
-        adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title), icon = MenuIcon.ResourceIcon(icon), modifier = ModifierIds.Danger))
+        adapter.menuItems.add(
+            MenuItem.ActionItem(
+                id,
+                context.getString(title),
+                icon = MenuIcon.ResourceIcon(icon),
+                modifier = ModifierIds.Danger,
+            ),
+        )
     }
 
     fun addDivider() {
@@ -116,7 +127,9 @@ class BottomMenu(
         this.checked = checked
     }
 
-    fun setOnMenuItemClickListener(onMenuItemClickListener: (menuItem: MenuItem.ActionItem) -> Unit) {
+    fun setOnMenuItemClickListener(
+        onMenuItemClickListener: (menuItem: MenuItem.ActionItem) -> Unit,
+    ) {
         this.onMenuItemClickListener = onMenuItemClickListener
     }
 
@@ -220,7 +233,10 @@ class BottomMenu(
         )
 
         if (handleBackPress) {
-            bottomMenuContainer.onBackPressedDispatcher.addCallback(bottomMenuContainer, onBackPressedCallback)
+            bottomMenuContainer.onBackPressedDispatcher.addCallback(
+                bottomMenuContainer,
+                onBackPressedCallback,
+            )
         }
     }
 
@@ -268,7 +284,7 @@ class BottomMenu(
         )
         private val defaultTextColor = ContextCompat.getColor(context, R.color.colorTextTitle)
 
-        private val adapterHelper = AdapterHelper<Item> (
+        private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
                     Item.FooterItem -> true
@@ -331,9 +347,15 @@ class BottomMenu(
                 }
 
                 if (menuItem.modifier == ModifierIds.Danger) {
-                    ImageViewCompat.setImageTintList(b.icon, ColorStateList.valueOf(dangerTextColor))
+                    ImageViewCompat.setImageTintList(
+                        b.icon,
+                        ColorStateList.valueOf(dangerTextColor),
+                    )
                 } else {
-                    ImageViewCompat.setImageTintList(b.icon, b.icon.getTag(R.id.icon_tint) as? ColorStateList)
+                    ImageViewCompat.setImageTintList(
+                        b.icon,
+                        b.icon.getTag(R.id.icon_tint) as? ColorStateList,
+                    )
                 }
 
                 val icon = menuItem.icon
@@ -425,8 +447,7 @@ class BottomMenu(
             adapterHelper.setItems(newItems, this, cb)
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)

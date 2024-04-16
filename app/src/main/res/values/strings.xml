@@ -1701,6 +1701,10 @@
     <string name="no_bio">No bio</string>
     <string name="keep_typing_to_see_suggestions">Keep typing to see suggestions</string>
     <string name="preview_image">Preview image</string>
+    <string name="feed_info">Feed info</string>
+    <string name="home_fab_quick_action">FAB quick action</string>
+    <string name="home_fab_quick_action_desc">Choose an action to perform when the floating action button on the post list screen (button near the bottom of the screen) is long pressed.</string>
+    <string name="no_action">No action</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

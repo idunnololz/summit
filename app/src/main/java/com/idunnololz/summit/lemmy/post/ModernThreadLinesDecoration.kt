@@ -44,8 +44,12 @@ class ModernThreadLinesDecoration(
         strokeWidth = Utils.convertDpToPixel(2f)
     }
     private val dividerPaint = Paint().apply {
-        val color1 = context.getColorFromAttribute(com.google.android.material.R.attr.colorOnSurface)
-        val color2 = context.getColorFromAttribute(com.google.android.material.R.attr.backgroundColor)
+        val color1 = context.getColorFromAttribute(
+            com.google.android.material.R.attr.colorOnSurface,
+        )
+        val color2 = context.getColorFromAttribute(
+            com.google.android.material.R.attr.backgroundColor,
+        )
 
         color = ColorUtils.blendARGB(color1, color2, 0.88f)
         strokeWidth = Utils.convertDpToPixel(1f)

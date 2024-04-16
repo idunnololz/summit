@@ -29,10 +29,10 @@ import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class PersonTabbedViewModel @Inject constructor(
@@ -248,8 +248,7 @@ class PersonTabbedViewModel @Inject constructor(
         val moderates: List<CommunityModeratorView>,
     )
 
-    private fun Int.toLemmyPageIndex() =
-        this + 1 // lemmy pages are 1 indexed
+    private fun Int.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
 
     data class UpdateInfo(
         val isReset: Boolean,

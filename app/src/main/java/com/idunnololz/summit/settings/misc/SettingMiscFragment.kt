@@ -241,19 +241,18 @@ class SettingMiscFragment :
         }
     }
 
-    private fun convertOptionIdToThresholdMs(@IdRes id: Int) =
-        when (id) {
-            R.id.warn_reply_to_old_dont_warn -> 0L
-            R.id.warn_reply_to_old_1_day -> A_DAY_MS
-            R.id.warn_reply_to_old_2_day -> A_DAY_MS * 2
-            R.id.warn_reply_to_old_3_day -> A_DAY_MS * 3
-            R.id.warn_reply_to_old_4_day -> A_DAY_MS * 4
-            R.id.warn_reply_to_old_5_day -> A_DAY_MS * 5
-            R.id.warn_reply_to_old_week -> A_DAY_MS * 7
-            R.id.warn_reply_to_old_month -> A_DAY_MS * 30
-            R.id.warn_reply_to_old_year -> A_DAY_MS * 365
-            else -> null
-        }
+    private fun convertOptionIdToThresholdMs(@IdRes id: Int) = when (id) {
+        R.id.warn_reply_to_old_dont_warn -> 0L
+        R.id.warn_reply_to_old_1_day -> A_DAY_MS
+        R.id.warn_reply_to_old_2_day -> A_DAY_MS * 2
+        R.id.warn_reply_to_old_3_day -> A_DAY_MS * 3
+        R.id.warn_reply_to_old_4_day -> A_DAY_MS * 4
+        R.id.warn_reply_to_old_5_day -> A_DAY_MS * 5
+        R.id.warn_reply_to_old_week -> A_DAY_MS * 7
+        R.id.warn_reply_to_old_month -> A_DAY_MS * 30
+        R.id.warn_reply_to_old_year -> A_DAY_MS * 365
+        else -> null
+    }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {

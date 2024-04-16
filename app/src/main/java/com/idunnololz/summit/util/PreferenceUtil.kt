@@ -196,9 +196,9 @@ object PreferenceUtil {
     const val KEY_IS_NOTIFICATIONS_ON = "KEY_IS_NOTIFICATIONS_ON"
     const val KEY_LAST_ACCOUNT_NOTIFICATION_ID = "KEY_LAST_ACCOUNT_NOTIFICATION_ID"
     const val KEY_NOTIFICATIONS_CHECK_INTERVAL_MS = "KEY_NOTIFICATIONS_CHECK_INTERVAL_MS"
+    const val KEY_HOME_FAB_QUICK_ACTION = "KEY_HOME_FAB_QUICK_ACTION"
 
     const val KEY_PREF_VERSION = "pref_version"
-
 
     // Unused/dead keys
     const val DEAD_KEY_SHARE_IMAGES_DIRECTLY = "KEY_SHARE_IMAGES_DIRECTLY"
@@ -218,11 +218,7 @@ object PreferenceUtil {
         }.apply()
     }
 
-    fun getArray(
-        prefs: SharedPreferences,
-        arrayName: String,
-        defaultArr: IntArray,
-    ): IntArray {
+    fun getArray(prefs: SharedPreferences, arrayName: String, defaultArr: IntArray): IntArray {
         val size = prefs.getInt(arrayName + "_size", -1)
         if (size == -1) return defaultArr
         return IntArray(size) { i ->

@@ -830,8 +830,14 @@ open class OverlappingPanelsLayout : FrameLayout {
             isLeftToRight && x <= 0F -> PanelState.Closed
             !isLeftToRight && x >= 0f -> PanelState.Closed
             x == startPanelOpenedCenterPanelX -> PanelState.Opened
-            isLeftToRight && x > previousX -> PanelState.Opening(x, x / startPanelOpenedCenterPanelX)
-            !isLeftToRight && x < previousX -> PanelState.Opening(x, x / startPanelOpenedCenterPanelX)
+            isLeftToRight && x > previousX -> PanelState.Opening(
+                x,
+                x / startPanelOpenedCenterPanelX,
+            )
+            !isLeftToRight && x < previousX -> PanelState.Opening(
+                x,
+                x / startPanelOpenedCenterPanelX,
+            )
             else -> PanelState.Closing(x, x / startPanelOpenedCenterPanelX)
         }
     }

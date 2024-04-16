@@ -33,10 +33,10 @@ import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.html.span.SuperScriptSpan
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
-import org.commonmark.parser.Parser
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import org.commonmark.parser.Parser
 
 object LemmyTextHelper {
     private const val TAG = "LemmyTextHelper"
@@ -52,7 +52,6 @@ object LemmyTextHelper {
         instance: String,
         highlight: HighlightTextData? = null,
         showMediaAsLinks: Boolean = false,
-
         onImageClick: (url: String) -> Unit,
         onVideoClick: (url: String) -> Unit,
         onPageClick: (PageRef) -> Unit,
@@ -186,7 +185,9 @@ object LemmyTextHelper {
          * 2) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
          * 3) Matches against full community names (!a@b.com)
          */
-        private val largeRegex = Pattern.compile("""\^(\S+)|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""")
+        private val largeRegex = Pattern.compile(
+            """\^(\S+)|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""",
+        )
 
         private fun processAll(s: String): String {
             val matcher = largeRegex.matcher(s)
@@ -226,7 +227,9 @@ object LemmyTextHelper {
 
                             matcher.appendReplacement(
                                 sb,
-                                "[${matcher.group(0)}](${LinkUtils.getLinkForCommunity(communityRef)})",
+                                "[${matcher.group(
+                                    0,
+                                )}](${LinkUtils.getLinkForCommunity(communityRef)})",
                             )
                         }
                         "@", "u/", "/u/" -> {
@@ -243,8 +246,7 @@ object LemmyTextHelper {
             return sb.toString()
         }
 
-        override fun processMarkdown(markdown: String): String =
-            processAll(markdown)
+        override fun processMarkdown(markdown: String): String = processAll(markdown)
 
         override fun configureTheme(builder: MarkwonTheme.Builder) {
             builder.blockQuoteColor(context.getColorCompat(R.color.colorQuoteLine))
@@ -276,7 +278,9 @@ object LemmyTextHelper {
         Markwon.builder(context)
             .apply {
                 if (inlineMedia) {
-                    usePlugin(CoilImagesPlugin.create(context, context.applicationContext.imageLoader))
+                    usePlugin(
+                        CoilImagesPlugin.create(context, context.applicationContext.imageLoader),
+                    )
                 } else {
                     usePlugin(ImagesAsLinksPlugin())
                 }

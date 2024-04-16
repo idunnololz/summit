@@ -18,7 +18,11 @@ class FixedBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-    override fun onInterceptTouchEvent(parent: CoordinatorLayout, child: V, event: MotionEvent): Boolean {
+    override fun onInterceptTouchEvent(
+        parent: CoordinatorLayout,
+        child: V,
+        event: MotionEvent,
+    ): Boolean {
         return try {
             super.onInterceptTouchEvent(parent, child, event)
         } catch (ignored: NullPointerException) {

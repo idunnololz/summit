@@ -14,13 +14,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 class CustomSearchSuggestionsAdapter(
     private val context: Context,
@@ -226,11 +226,10 @@ class CustomSearchSuggestionsAdapter(
         diff.dispatchUpdatesTo(this)
     }
 
-    override fun getItemViewType(position: Int): Int =
-        when (items[position]) {
-            Item.FooterItem -> R.layout.generic_space_footer_item
-            is Item.SuggestionItem -> R.layout.custom_search_suggestion
-        }
+    override fun getItemViewType(position: Int): Int = when (items[position]) {
+        Item.FooterItem -> R.layout.generic_space_footer_item
+        is Item.SuggestionItem -> R.layout.custom_search_suggestion
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val v = inflater.inflate(viewType, parent, false)

@@ -7,11 +7,11 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class TabsManager @Inject constructor(
@@ -44,15 +44,14 @@ class TabsManager @Inject constructor(
         }
     }
 
-    fun getTab(tabObj: Either<UserCommunityItem, CommunityRef>) =
-        tabObj.fold(
-            {
-                it.toTab()
-            },
-            {
-                it.toTab()
-            },
-        )
+    fun getTab(tabObj: Either<UserCommunityItem, CommunityRef>) = tabObj.fold(
+        {
+            it.toTab()
+        },
+        {
+            it.toTab()
+        },
+    )
 
     fun updateCurrentTab(tabObj: Either<UserCommunityItem, CommunityRef>) {
         updateCurrentTab(getTab(tabObj))
@@ -74,11 +73,9 @@ class TabsManager @Inject constructor(
         currentTab.value = tab
     }
 
-    fun getHomeTab(): Tab =
-        userCommunitiesManager.getHomeItem().toTab()
+    fun getHomeTab(): Tab = userCommunitiesManager.getHomeItem().toTab()
 
-    fun getTabState(): Map<Tab, TabState> =
-        tabState
+    fun getTabState(): Map<Tab, TabState> = tabState
 
     fun updateTabState(tab: Tab, communityRef: CommunityRef) {
         val newTabState = (tabState[tab] ?: makeDefaultState(tab)).copy(
@@ -91,8 +88,7 @@ class TabsManager @Inject constructor(
         }
     }
 
-    private fun makeDefaultState(tab: Tab): TabState =
-        TabState(tab.communityRef)
+    private fun makeDefaultState(tab: Tab): TabState = TabState(tab.communityRef)
 
     sealed interface Tab : Parcelable {
 
@@ -112,11 +108,9 @@ class TabsManager @Inject constructor(
     )
 }
 
-fun UserCommunityItem.toTab(): TabsManager.Tab =
-    TabsManager.Tab.UserCommunityTab(this)
+fun UserCommunityItem.toTab(): TabsManager.Tab = TabsManager.Tab.UserCommunityTab(this)
 
-fun CommunityRef.toTab(): TabsManager.Tab =
-    TabsManager.Tab.SubscribedCommunityTab(this)
+fun CommunityRef.toTab(): TabsManager.Tab = TabsManager.Tab.SubscribedCommunityTab(this)
 
 val TabsManager.Tab.communityRef: CommunityRef
     get() = when (this) {
@@ -135,15 +129,13 @@ val UserCommunityItem.isHomeTab: Boolean
     get() =
         this.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID
 
-fun TabsManager.Tab.hasTabId(id: Long): Boolean =
-    when (this) {
-        is TabsManager.Tab.SubscribedCommunityTab -> false
-        is TabsManager.Tab.UserCommunityTab ->
-            this.userCommunityItem.id == id
-    }
+fun TabsManager.Tab.hasTabId(id: Long): Boolean = when (this) {
+    is TabsManager.Tab.SubscribedCommunityTab -> false
+    is TabsManager.Tab.UserCommunityTab ->
+        this.userCommunityItem.id == id
+}
 
-fun TabsManager.Tab.isSubscribedCommunity(communityRef: CommunityRef): Boolean =
-    when (this) {
-        is TabsManager.Tab.SubscribedCommunityTab -> this.communityRef == communityRef
-        is TabsManager.Tab.UserCommunityTab -> false
-    }
+fun TabsManager.Tab.isSubscribedCommunity(communityRef: CommunityRef): Boolean = when (this) {
+    is TabsManager.Tab.SubscribedCommunityTab -> this.communityRef == communityRef
+    is TabsManager.Tab.UserCommunityTab -> false
+}

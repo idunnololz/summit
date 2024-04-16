@@ -507,11 +507,7 @@ class TextResize : Transition {
                 FONT_SIZE,
             )
 
-        private fun setTextViewData(
-            view: TextView,
-            data: TextResizeData?,
-            fontSize: Float,
-        ) {
+        private fun setTextViewData(view: TextView, data: TextResizeData?, fontSize: Float) {
             view.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
             view.setPadding(
                 data!!.paddingLeft,
@@ -555,11 +551,7 @@ class TextResize : Transition {
             return bitmap
         }
 
-        private fun interpolate(
-            start: Float,
-            end: Float,
-            fraction: Float,
-        ): Float {
+        private fun interpolate(start: Float, end: Float, fraction: Float): Float {
             return start + fraction * (end - start)
         }
     }

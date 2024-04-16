@@ -29,10 +29,9 @@ class PerCommunityPreferences @Inject constructor(
         preferences.putMoshiValue(communityRef.getKey(), config)
     }
 
-    fun getAllCommunityConfigs(): List<CommunityConfig> =
-        preferences.all.keys.mapNotNull {
-            getCommunityConfig(it)
-        }
+    fun getAllCommunityConfigs(): List<CommunityConfig> = preferences.all.keys.mapNotNull {
+        getCommunityConfig(it)
+    }
 
     fun clear() {
         preferences.edit().clear().apply()

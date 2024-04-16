@@ -58,10 +58,10 @@ import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class InboxFragment :
@@ -142,7 +142,7 @@ class InboxFragment :
             insetViewAutomaticallyByMarginAndNavUi(
                 lifecycleOwner = viewLifecycleOwner,
                 rootView = binding.coordinatorLayout,
-                applyTopInset = false
+                applyTopInset = false,
             )
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPane)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
@@ -185,7 +185,7 @@ class InboxFragment :
                 if (isBindingAvailable()) {
                     binding.recyclerView.scrollToPosition(0)
                 }
-            }, 100,)
+            }, 100)
         }
 
         viewModel.inboxUpdate.observe(viewLifecycleOwner) {
@@ -526,8 +526,8 @@ class InboxFragment :
                 }
 
                 if (viewModel.pageType.value == InboxViewModel.PageType.All ||
-                    viewModel.pageType.value == InboxViewModel.PageType.Unread) {
-
+                    viewModel.pageType.value == InboxViewModel.PageType.Unread
+                ) {
                     viewModel.lastInboxUnreadLoadTimeMs.value = System.currentTimeMillis()
                 }
             }
@@ -552,7 +552,11 @@ class InboxFragment :
         private val instance: String,
         private val lifecycleOwner: LifecycleOwner,
         private val onImageClick: (String) -> Unit,
-        private val onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+        private val onVideoClick: (
+            url: String,
+            videoType: VideoType,
+            videoState: VideoState?,
+        ) -> Unit,
         private val onMarkAsRead: (InboxItem, Boolean) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onMessageClick: (InboxItem) -> Unit,
@@ -621,14 +625,12 @@ class InboxFragment :
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

@@ -55,6 +55,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GUEST_ACCOUNT_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
@@ -119,8 +120,8 @@ import com.idunnololz.summit.util.ext.putMoshiValue
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.json.JSONObject
 import java.time.Duration
+import org.json.JSONObject
 
 class Preferences(
     @ApplicationContext private val context: Context,
@@ -159,15 +160,14 @@ class Preferences(
             .apply()
     }
 
-    fun getPostsLayout(): CommunityLayout =
-        try {
-            CommunityLayout.valueOf(
-                PreferenceUtil.preferences
-                    .getString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, null) ?: "",
-            )
-        } catch (e: IllegalArgumentException) {
-            CommunityLayout.List
-        }
+    fun getPostsLayout(): CommunityLayout = try {
+        CommunityLayout.valueOf(
+            PreferenceUtil.preferences
+                .getString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, null) ?: "",
+        )
+    } catch (e: IllegalArgumentException) {
+        CommunityLayout.List
+    }
 
     fun setPostsLayout(layout: CommunityLayout) {
         PreferenceUtil.preferences.edit()
@@ -197,25 +197,24 @@ class Preferences(
         prefs.putMoshiValue(KEY_POST_AND_COMMENTS_UI_CONFIG, config)
     }
 
-    private fun getPostUiConfigKey(layout: CommunityLayout) =
-        when (layout) {
-            CommunityLayout.Compact ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_COMPACT
-            CommunityLayout.List ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_LIST
-            CommunityLayout.LargeList ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_LARGE_LIST
-            CommunityLayout.Card ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_CARD
-            CommunityLayout.Card2 ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_CARD2
-            CommunityLayout.Card3 ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_CARD3
-            CommunityLayout.Full ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_FULL
-            CommunityLayout.ListWithCards ->
-                PreferenceUtil.KEY_POST_UI_CONFIG_LIST_WITH_CARDS
-        }
+    private fun getPostUiConfigKey(layout: CommunityLayout) = when (layout) {
+        CommunityLayout.Compact ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_COMPACT
+        CommunityLayout.List ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_LIST
+        CommunityLayout.LargeList ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_LARGE_LIST
+        CommunityLayout.Card ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_CARD
+        CommunityLayout.Card2 ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_CARD2
+        CommunityLayout.Card3 ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_CARD3
+        CommunityLayout.Full ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_FULL
+        CommunityLayout.ListWithCards ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_LIST_WITH_CARDS
+    }
 
     fun getBaseTheme(): BaseTheme {
         return prefs.getMoshiValue<BaseTheme>(KEY_BASE_THEME)
@@ -495,7 +494,10 @@ class Preferences(
         }
 
     var commentsNavigationFabOffY: Int
-        get() = prefs.getInt(KEY_COMMENTS_NAVIGATION_FAB_OFF_Y, -Utils.convertDpToPixel(24f).toInt())
+        get() = prefs.getInt(
+            KEY_COMMENTS_NAVIGATION_FAB_OFF_Y,
+            -Utils.convertDpToPixel(24f).toInt(),
+        )
         set(value) {
             prefs.edit()
                 .putInt(KEY_COMMENTS_NAVIGATION_FAB_OFF_Y, value)
@@ -573,7 +575,10 @@ class Preferences(
         }
 
     var displayInstanceStyle: Int
-        get() = prefs.getInt(KEY_DISPLAY_INSTANCE_STYLE, DisplayInstanceOptions.OnlyDisplayNonLocalInstances)
+        get() = prefs.getInt(
+            KEY_DISPLAY_INSTANCE_STYLE,
+            DisplayInstanceOptions.OnlyDisplayNonLocalInstances,
+        )
         set(value) {
             prefs.edit()
                 .putInt(KEY_DISPLAY_INSTANCE_STYLE, value)
@@ -743,7 +748,10 @@ class Preferences(
         }
 
     var warnReplyToOldContentThresholdMs: Long
-        get() = prefs.getLong(KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS, Duration.ofDays(2).toMillis())
+        get() = prefs.getLong(
+            KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS,
+            Duration.ofDays(2).toMillis(),
+        )
         set(value) {
             prefs.edit()
                 .putLong(KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS, value)
@@ -909,6 +917,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putLong(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, value)
+                .apply()
+        }
+
+    var homeFabQuickAction: Int
+        get() = prefs.getInt(KEY_HOME_FAB_QUICK_ACTION, HomeFabQuickActionIds.None)
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_HOME_FAB_QUICK_ACTION, value)
                 .apply()
         }
 

@@ -24,6 +24,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import info.debatty.java.stringsimilarity.NGram
+import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -35,7 +36,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.max
 
 private const val TAG = "MentionsController"
 
@@ -52,7 +52,7 @@ class MentionsController @AssistedInject constructor(
     interface Factory {
         fun create(
             lifecycleOwner: LifecycleOwner,
-            editText: CustomTextInputEditText
+            editText: CustomTextInputEditText,
         ): MentionsController
     }
 
@@ -175,9 +175,9 @@ class MentionsController @AssistedInject constructor(
                 editText.text?.replace(
                     position - query.length,
                     position,
-                    "$it "
+                    "$it ",
                 )
-            }
+            },
         ).apply {
             adapter.setItems(queryResult.results) {
                 currentQueryPopupWindow?.binding?.recyclerView?.scrollToPosition(0)
@@ -205,9 +205,7 @@ class MentionsController @AssistedInject constructor(
                 bottomInset = editText.rootView.height - visibleDisplayFrame.bottom
             }
 
-
             val yOffset = lineTop + anchorPos[1] + anchor.paddingTop
-
 
             val distanceToBottom = visibleDisplayFrame.bottom - yOffset
             val distanceToTop: Int = yOffset - visibleDisplayFrame.top
@@ -236,7 +234,6 @@ class MentionsController @AssistedInject constructor(
 //                    (getMainActivity()?.insets?.value?.imeHeight ?: 0) +
                     bottomInset + (visibleDisplayFrame.bottom - (yOffset)) + popupMargin,
                 )
-
             }
         }
     }
@@ -291,8 +288,8 @@ class MentionsAutoCompleteRepository(
                     instanceQuery = "",
                     rawQuery = queryString,
                     isLoading = false,
-                    isQueryBlank = true
-                )
+                    isQueryBlank = true,
+                ),
             )
             return@a
         }
@@ -316,11 +313,9 @@ class MentionsAutoCompleteRepository(
         queryJob?.cancel()
         queryJob = coroutineScope.launch a@{
             coroutineScope {
-
                 val results = if (currentResult?.nameQuery == nameQuery) {
                     currentResult.results
                 } else {
-
                     val communityQuery = async(Dispatchers.IO) {
                         apiClient
                             .search(
@@ -362,7 +357,7 @@ class MentionsAutoCompleteRepository(
                                         personView = it,
                                         mentionPrefix = queryPrefix,
                                         sortKey = it.person.fullName,
-                                        bio = it.person.bio?.take(100)
+                                        bio = it.person.bio?.take(100),
                                     )
                                 }
                             }
@@ -388,7 +383,7 @@ class MentionsAutoCompleteRepository(
                         rawQuery = queryString,
                         isLoading = false,
                         isQueryBlank = false,
-                    )
+                    ),
                 )
             }
         }

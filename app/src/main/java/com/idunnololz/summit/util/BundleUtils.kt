@@ -9,5 +9,4 @@ inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? 
 
 inline fun <reified T : Parcelable> Bundle.getParcelableArrayListCompat(
     key: String,
-): ArrayList<T>? =
-    BundleCompat.getParcelableArrayList(this, key, T::class.java)
+): ArrayList<T>? = BundleCompat.getParcelableArrayList(this, key, T::class.java)

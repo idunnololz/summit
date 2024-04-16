@@ -38,11 +38,11 @@ import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.color.ColorManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class AccountActionsManager @Inject constructor(
@@ -201,11 +201,9 @@ class AccountActionsManager @Inject constructor(
         override val downvoteColor: Int
             get() = preferences.downvoteColor
 
-        override fun neutralColor(context: Context): Int =
-            colorManager.textColor
+        override fun neutralColor(context: Context): Int = colorManager.textColor
 
-        override fun controlColor(context: Context): Int =
-            colorManager.controlColor
+        override fun controlColor(context: Context): Int = colorManager.controlColor
     }
 
     private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {
@@ -287,7 +285,11 @@ class AccountActionsManager @Inject constructor(
                 }
                 is ActionInfo.EditActionInfo -> {
                     coroutineScope.launch {
-                        pendingCommentsManager.onEditCommentActionFailed(action.id, action.info, reason)
+                        pendingCommentsManager.onEditCommentActionFailed(
+                            action.id,
+                            action.info,
+                            reason,
+                        )
                         onCommentActionChanged.emit(Unit)
                     }
                 }
@@ -405,11 +407,7 @@ class AccountActionsManager @Inject constructor(
         pendingActionsManager.addActionCompleteListener(onActionChangedListener)
     }
 
-    suspend fun createComment(
-        postRef: PostRef,
-        parentId: CommentId?,
-        content: String,
-    ) {
+    suspend fun createComment(postRef: PostRef, parentId: CommentId?, content: String) {
         val account = accountManager.currentAccount.asAccount ?: return
         pendingActionsManager.comment(
             postRef,
@@ -419,11 +417,7 @@ class AccountActionsManager @Inject constructor(
         )
     }
 
-    suspend fun editComment(
-        postRef: PostRef,
-        commentId: CommentId,
-        content: String,
-    ) {
+    suspend fun editComment(postRef: PostRef, commentId: CommentId, content: String) {
         val account = accountManager.currentAccount.asAccount ?: return
         pendingActionsManager.editComment(
             postRef,
@@ -433,10 +427,7 @@ class AccountActionsManager @Inject constructor(
         )
     }
 
-    suspend fun deleteComment(
-        postRef: PostRef,
-        commentId: CommentId,
-    ) {
+    suspend fun deleteComment(postRef: PostRef, commentId: CommentId) {
         val account = accountManager.currentAccount.asAccount ?: return
         pendingActionsManager.deleteComment(
             postRef,
@@ -445,11 +436,7 @@ class AccountActionsManager @Inject constructor(
         )
     }
 
-    fun vote(
-        instance: String,
-        ref: VotableRef,
-        dir: Int,
-    ): Result<Unit> {
+    fun vote(instance: String, ref: VotableRef, dir: Int): Result<Unit> {
         val account = accountManager.currentAccount.asAccount
             ?: return Result.failure(NotAuthenticatedException())
         return voteOn(instance, ref, dir, account)
@@ -464,7 +451,11 @@ class AccountActionsManager @Inject constructor(
         )
     }
 
-    private fun registerVoteHandler(existingRegId: Long, ref: VotableRef, registration: Registration) {
+    private fun registerVoteHandler(
+        existingRegId: Long,
+        ref: VotableRef,
+        registration: Registration,
+    ) {
         regIdToRegistration[existingRegId] = VoteHandlerRegistration(ref, registration)
         val list = voteRefToRegistrations.getOrPut(ref) { mutableListOf() }
         list.add(registration)
@@ -496,8 +487,7 @@ class AccountActionsManager @Inject constructor(
         return Result.success(Unit)
     }
 
-    fun getPendingComments(postRef: PostRef) =
-        pendingCommentsManager.getPendingComments(postRef)
+    fun getPendingComments(postRef: PostRef) = pendingCommentsManager.getPendingComments(postRef)
 
     fun removePendingComment(pendingComment: PendingCommentView) {
         pendingCommentsManager.removePendingComment(pendingComment)
@@ -507,11 +497,9 @@ class AccountActionsManager @Inject constructor(
         votesManager.setScore(ref, score)
     }
 
-    fun getScore(ref: VotableRef) =
-        votesManager.getScore(ref)
+    fun getScore(ref: VotableRef) = votesManager.getScore(ref)
 
-    fun getVote(ref: VotableRef) =
-        votesManager.getVote(ref)
+    fun getVote(ref: VotableRef) = votesManager.getVote(ref)
 
     private fun handleApiResponse(response: Response<*>) {
         if (!response.isSuccessful) return

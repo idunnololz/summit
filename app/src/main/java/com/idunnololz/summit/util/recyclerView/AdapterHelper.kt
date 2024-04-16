@@ -170,11 +170,7 @@ class AdapterHelper<T : Any>(
     val itemCount: Int
         get() = differ.currentList.size
 
-    fun setItems(
-        newItems: List<T>,
-        adapter: Adapter<ViewHolder>,
-        cb: (() -> Unit)? = null,
-    ) {
+    fun setItems(newItems: List<T>, adapter: Adapter<ViewHolder>, cb: (() -> Unit)? = null) {
         this.adapter = adapter
 
         differ.submitList(newItems, cb)
@@ -186,8 +182,7 @@ class ViewBindingViewHolder<T : ViewBinding>(
 ) : ViewHolder(binding.root)
 
 @Suppress("unchecked_cast")
-fun <T : ViewBinding> ViewHolder.getBinding() =
-    (this as ViewBindingViewHolder<T>).binding
+fun <T : ViewBinding> ViewHolder.getBinding() = (this as ViewBindingViewHolder<T>).binding
 
 @Suppress("unchecked_cast")
 inline fun <reified T : ViewBinding> ViewHolder.isBinding() =

@@ -48,7 +48,9 @@ constructor(
 
     private var orientation: Int = orientation
         set(value) {
-            require(!(orientation != HORIZONTAL && orientation != VERTICAL)) { "Invalid orientation. It should be either HORIZONTAL or VERTICAL" }
+            require(!(orientation != HORIZONTAL && orientation != VERTICAL)) {
+                "Invalid orientation. It should be either HORIZONTAL or VERTICAL"
+            }
             field = value
         }
 
@@ -75,11 +77,7 @@ constructor(
         this.drawable = drawable
     }
 
-    override fun onDraw(
-        c: Canvas,
-        parent: RecyclerView,
-        state: RecyclerView.State,
-    ) {
+    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (parent.layoutManager == null || drawable == null) {
             return
         }

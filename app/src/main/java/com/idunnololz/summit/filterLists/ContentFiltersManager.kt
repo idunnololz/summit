@@ -6,12 +6,12 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Singleton
 class ContentFiltersManager @Inject constructor(

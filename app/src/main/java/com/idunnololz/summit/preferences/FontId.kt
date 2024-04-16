@@ -9,10 +9,9 @@ object FontIds {
     const val OpenSans: FontId = 3
 }
 
-fun FontId.toFontAsset(): String? =
-    when (this) {
-        FontIds.Roboto -> "fonts/Roboto-Regular.ttf"
-        FontIds.RobotoSerif -> "fonts/RobotoSerif-Regular.ttf"
-        FontIds.OpenSans -> "fonts/OpenSans-Regular.ttf"
-        else -> null
-    }
+fun FontId.toFontAsset(): String? = when (this) {
+    FontIds.Roboto -> "fonts/Roboto-Regular.ttf"
+    FontIds.RobotoSerif -> "fonts/RobotoSerif-Regular.ttf"
+    FontIds.OpenSans -> "fonts/OpenSans-Regular.ttf"
+    else -> null
+}

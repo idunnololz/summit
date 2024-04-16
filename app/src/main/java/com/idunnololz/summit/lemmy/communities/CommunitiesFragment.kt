@@ -354,8 +354,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)

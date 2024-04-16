@@ -68,6 +68,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
@@ -87,9 +88,9 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class CommunityFragment :
@@ -154,7 +155,10 @@ class CommunityFragment :
         makeSortByMenu(requireContext()).apply {
             addDivider()
 
-            addItem(R.id.set_default_sort_order, getString(R.string.set_default_sort_order_for_this_feed))
+            addItem(
+                R.id.set_default_sort_order,
+                getString(R.string.set_default_sort_order_for_this_feed),
+            )
 
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.id) {
@@ -213,54 +217,52 @@ class CommunityFragment :
         }
     }
 
-    private fun makeSortByMenu(context: Context) =
-        BottomMenu(requireContext()).apply {
-            setTitle(R.string.sort_by)
-            addItem(R.id.sort_order_active, R.string.sort_order_active)
-            addItem(R.id.sort_order_hot, R.string.sort_order_hot)
-            addItem(
-                R.id.sort_order_top,
-                R.string.sort_order_top,
-                R.drawable.baseline_chevron_right_24,
-            )
-            addItem(R.id.sort_order_new, R.string.sort_order_new)
-            addItem(R.id.sort_order_old, R.string.sort_order_old)
-            addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
-            addItem(R.id.sort_order_new_comments, R.string.sort_order_new_comments)
-            addItem(R.id.sort_order_controversial, R.string.sort_order_controversial)
-            addItem(R.id.sort_order_scaled, R.string.sort_order_scaled)
-        }
+    private fun makeSortByMenu(context: Context) = BottomMenu(requireContext()).apply {
+        setTitle(R.string.sort_by)
+        addItem(R.id.sort_order_active, R.string.sort_order_active)
+        addItem(R.id.sort_order_hot, R.string.sort_order_hot)
+        addItem(
+            R.id.sort_order_top,
+            R.string.sort_order_top,
+            R.drawable.baseline_chevron_right_24,
+        )
+        addItem(R.id.sort_order_new, R.string.sort_order_new)
+        addItem(R.id.sort_order_old, R.string.sort_order_old)
+        addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
+        addItem(R.id.sort_order_new_comments, R.string.sort_order_new_comments)
+        addItem(R.id.sort_order_controversial, R.string.sort_order_controversial)
+        addItem(R.id.sort_order_scaled, R.string.sort_order_scaled)
+    }
 
-    private fun makeSortByTopMenu(context: Context) =
-        BottomMenu(requireContext()).apply {
-            setTitle(R.string.sort_by_top)
-            addItem(R.id.sort_order_top_last_hour, R.string.time_frame_last_hour)
-            addItem(
-                R.id.sort_order_top_last_six_hour,
-                getString(R.string.time_frame_last_hours_format, "6"),
-            )
-            addItem(
-                R.id.sort_order_top_last_twelve_hour,
-                getString(R.string.time_frame_last_hours_format, "12"),
-            )
-            addItem(R.id.sort_order_top_day, R.string.time_frame_today)
-            addItem(R.id.sort_order_top_week, R.string.time_frame_this_week)
-            addItem(R.id.sort_order_top_month, R.string.time_frame_this_month)
-            addItem(
-                R.id.sort_order_top_last_three_month,
-                getString(R.string.time_frame_last_months_format, "3"),
-            )
-            addItem(
-                R.id.sort_order_top_last_six_month,
-                getString(R.string.time_frame_last_months_format, "6"),
-            )
-            addItem(
-                R.id.sort_order_top_last_nine_month,
-                getString(R.string.time_frame_last_months_format, "9"),
-            )
-            addItem(R.id.sort_order_top_year, R.string.time_frame_this_year)
-            addItem(R.id.sort_order_top_all_time, R.string.time_frame_all_time)
-        }
+    private fun makeSortByTopMenu(context: Context) = BottomMenu(requireContext()).apply {
+        setTitle(R.string.sort_by_top)
+        addItem(R.id.sort_order_top_last_hour, R.string.time_frame_last_hour)
+        addItem(
+            R.id.sort_order_top_last_six_hour,
+            getString(R.string.time_frame_last_hours_format, "6"),
+        )
+        addItem(
+            R.id.sort_order_top_last_twelve_hour,
+            getString(R.string.time_frame_last_hours_format, "12"),
+        )
+        addItem(R.id.sort_order_top_day, R.string.time_frame_today)
+        addItem(R.id.sort_order_top_week, R.string.time_frame_this_week)
+        addItem(R.id.sort_order_top_month, R.string.time_frame_this_month)
+        addItem(
+            R.id.sort_order_top_last_three_month,
+            getString(R.string.time_frame_last_months_format, "3"),
+        )
+        addItem(
+            R.id.sort_order_top_last_six_month,
+            getString(R.string.time_frame_last_months_format, "6"),
+        )
+        addItem(
+            R.id.sort_order_top_last_nine_month,
+            getString(R.string.time_frame_last_months_format, "9"),
+        )
+        addItem(R.id.sort_order_top_year, R.string.time_frame_this_year)
+        addItem(R.id.sort_order_top_all_time, R.string.time_frame_all_time)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -432,6 +434,7 @@ class CommunityFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
         var job: Job? = null
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -546,6 +549,23 @@ class CommunityFragment :
         binding.fab.setOnClickListener a@{
             showOverflowMenu()
         }
+        binding.fab.setOnLongClickListener {
+            when (preferences.homeFabQuickAction) {
+                HomeFabQuickActionIds.CreatePost -> {
+                    createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+                        R.id.create_post,
+                    )
+                    true
+                }
+                HomeFabQuickActionIds.HideRead -> {
+                    createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+                        R.id.hide_read,
+                    )
+                    true
+                }
+                else -> false
+            }
+        }
 
         requireActivity().onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, onBackPressedHandler)
@@ -642,9 +662,12 @@ class CommunityFragment :
         checkNotNull(view.findNavController()) { "NavController was null!" }
 
         requireMainActivity().apply {
-            insetViewExceptTopAutomaticallyByPaddingAndNavUi(
+            insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
                 binding.recyclerView,
+                applyTopInset = false,
+                applyLeftInset = false,
+                applyRightInset = false,
             )
             insetViewStartAndEndByPadding(
                 viewLifecycleOwner,
@@ -664,7 +687,10 @@ class CommunityFragment :
                     customFabBehavior?.updateBottomNavHeight(getBottomNavHeight().toFloat())
                     customFabBehavior?.updateBottomInset(it.bottomInset)
                     customFabBehavior?.onDependentViewChanged(
-                        binding.coordinatorLayout, binding.fab, binding.coordinatorLayout)
+                        binding.coordinatorLayout,
+                        binding.fab,
+                        binding.coordinatorLayout,
+                    )
                 }
             }
         }
@@ -772,13 +798,17 @@ class CommunityFragment :
 
                     if (it.error is LoadNsfwCommunityWhenNsfwDisabled) {
                         binding.recyclerView.visibility = View.GONE
-                        binding.loadingView.showErrorText(R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden)
+                        binding.loadingView.showErrorText(
+                            R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden,
+                        )
                     } else if (it.error is FilterTooAggressiveException) {
                         binding.recyclerView.visibility = View.GONE
                         binding.loadingView.showErrorText(R.string.error_filter_too_aggressive)
                     } else if (it.error is ContentTypeFilterTooAggressiveException) {
                         binding.recyclerView.visibility = View.GONE
-                        binding.loadingView.showErrorText(R.string.error_content_type_filter_too_aggressive)
+                        binding.loadingView.showErrorText(
+                            R.string.error_content_type_filter_too_aggressive,
+                        )
                     } else if (viewModel.infinity) {
                         binding.loadingView.hideAll()
                         adapter?.onItemsChanged()
@@ -1058,14 +1088,20 @@ class CommunityFragment :
 
     private fun getDefaultSortOrderSortByMenu(): BottomMenu {
         when (viewModel.getCurrentSortOrder()) {
-            is CommunitySortOrder.TopOrder -> _defaultSortOrderSortByMenu.setChecked(R.id.sort_order_top)
-            else -> _defaultSortOrderSortByMenu.setChecked(viewModel.getCurrentSortOrder().toApiSortOrder().toId())
+            is CommunitySortOrder.TopOrder -> _defaultSortOrderSortByMenu.setChecked(
+                R.id.sort_order_top,
+            )
+            else -> _defaultSortOrderSortByMenu.setChecked(
+                viewModel.getCurrentSortOrder().toApiSortOrder().toId(),
+            )
         }
 
         return _defaultSortOrderSortByMenu
     }
     private fun getDefaultSortOrderSortByTopMenu(): BottomMenu {
-        _defaultSortOrderSortByTopMenu.setChecked(viewModel.getCurrentSortOrder().toApiSortOrder().toId())
+        _defaultSortOrderSortByTopMenu.setChecked(
+            viewModel.getCurrentSortOrder().toApiSortOrder().toId(),
+        )
 
         return _defaultSortOrderSortByTopMenu
     }
@@ -1107,7 +1143,6 @@ class CommunityFragment :
         val isCurrentPageDefault = currentCommunityRef == currentDefaultPage
 
         val bottomMenu = BottomMenu(context).apply {
-
             val isCommunityMenu = currentCommunityRef is CommunityRef.CommunityRefByName
 
             if (isCommunityMenu) {
@@ -1122,24 +1157,46 @@ class CommunityFragment :
             addItemWithIcon(R.id.hide_read, R.string.hide_read, R.drawable.baseline_clear_all_24)
 
             addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
-            if (isCommunityMenu) {
-                addItemWithIcon(
-                    id = R.id.community_info,
-                    title = R.string.community_info,
-                    icon = R.drawable.ic_community_default,
-                )
-            } else if (currentCommunityRef is CommunityRef.MultiCommunity) {
-                addItemWithIcon(
-                    id = R.id.community_info,
-                    title = R.string.multi_community_info,
-                    icon = R.drawable.baseline_dynamic_feed_24,
-                )
-            } else {
-                addItemWithIcon(
-                    id = R.id.community_info,
-                    title = R.string.instance_info,
-                    icon = R.drawable.baseline_web_24,
-                )
+
+            when (currentCommunityRef) {
+                is CommunityRef.CommunityRefByName -> {
+                    addItemWithIcon(
+                        id = R.id.community_info,
+                        title = R.string.community_info,
+                        icon = R.drawable.ic_community_default,
+                    )
+                }
+                is CommunityRef.ModeratedCommunities -> {
+                    addItemWithIcon(
+                        id = R.id.feed_info,
+                        title = R.string.feed_info,
+                        icon = R.drawable.baseline_dynamic_feed_24,
+                    )
+                }
+                is CommunityRef.MultiCommunity -> {
+                    addItemWithIcon(
+                        id = R.id.community_info,
+                        title = R.string.multi_community_info,
+                        icon = R.drawable.baseline_dynamic_feed_24,
+                    )
+                }
+                is CommunityRef.Subscribed -> {
+                    addItemWithIcon(
+                        id = R.id.feed_info,
+                        title = R.string.feed_info,
+                        icon = R.drawable.baseline_dynamic_feed_24,
+                    )
+                }
+                is CommunityRef.Local,
+                is CommunityRef.All,
+                null,
+                -> {
+                    addItemWithIcon(
+                        id = R.id.community_info,
+                        title = R.string.instance_info,
+                        icon = R.drawable.baseline_web_24,
+                    )
+                }
             }
 
             if (!isCurrentPageDefault) {
@@ -1153,20 +1210,20 @@ class CommunityFragment :
             if (currentCommunityRef != null) {
                 if (isBookmarked) {
                     addItemWithIcon(
-                        id = R.id.toggle_bookmark,
+                        id = R.id.remove_bookmark,
                         title = R.string.remove_bookmark,
                         icon = R.drawable.baseline_bookmark_remove_24,
                     )
                 } else {
                     if (isCommunityMenu) {
                         addItemWithIcon(
-                            id = R.id.toggle_bookmark,
+                            id = R.id.add_bookmark,
                             title = R.string.bookmark_community,
                             icon = R.drawable.baseline_bookmark_add_24,
                         )
                     } else {
                         addItemWithIcon(
-                            id = R.id.toggle_bookmark,
+                            id = R.id.add_bookmark,
                             title = R.string.bookmark_feed,
                             icon = R.drawable.baseline_bookmark_add_24,
                         )
@@ -1294,172 +1351,184 @@ class CommunityFragment :
             }
 
             setOnMenuItemClickListener { menuItem ->
-                when (menuItem.id) {
-                    R.id.create_post -> {
-                        val currentCommunity = viewModel.currentCommunityRef.value
-                        var communityName: String? = null
-                        when (currentCommunity) {
-                            is CommunityRef.All -> {}
-                            is CommunityRef.CommunityRefByName -> {
-                                communityName = currentCommunity.name
-                            }
-                            is CommunityRef.Local -> {}
-                            is CommunityRef.Subscribed -> {}
-                            is CommunityRef.MultiCommunity -> {}
-                            is CommunityRef.ModeratedCommunities -> {}
-                            null -> {}
-                        }
-
-                        CreateOrEditPostFragment()
-                            .apply {
-                                arguments = CreateOrEditPostFragmentArgs(
-                                    instance = viewModel.communityInstance,
-                                    communityName = communityName,
-                                ).toBundle()
-                            }
-                            .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
-                    }
-                    R.id.ca_share -> {
-                        try {
-                            val sendIntent: Intent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(
-                                    Intent.EXTRA_TEXT,
-                                    viewModel.getSharedLinkForCurrentPage(),
-                                )
-                                type = "text/plain"
-                            }
-
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            startActivity(shareIntent)
-                        } catch (e: MultiCommunityException) {
-                            AlertDialogFragment.Builder()
-                                .setMessage(R.string.error_cannot_share_multi_community)
-                                .createAndShow(childFragmentManager, "sdafx")
-                        }
-                    }
-                    R.id.hide_read -> {
-                        val anchors = mutableSetOf<Int>()
-                        val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-                            it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
-                        }
-                        range?.mapNotNullTo(anchors) {
-                            (adapter?.items?.getOrNull(it) as? Item.VisiblePostItem)?.postView?.post?.id
-                        }
-                        viewModel.onHideRead(anchors)
-                    }
-
-                    R.id.sort -> {
-                        getMainActivity()?.showBottomMenu(getSortByMenu())
-                    }
-
-                    R.id.set_as_default -> {
-                        currentCommunityRef ?: return@setOnMenuItemClickListener
-                        viewModel.setDefaultPage(currentCommunityRef)
-
-                        Snackbar.make(
-                            requireMainActivity().getSnackbarContainer(),
-                            R.string.home_page_set,
-                            Snackbar.LENGTH_LONG,
-                        ).show()
-                    }
-                    R.id.layout -> {
-                        getMainActivity()?.showBottomMenu(getLayoutMenu())
-                    }
-
-                    R.id.community_info -> {
-                        currentCommunityRef ?: return@setOnMenuItemClickListener
-                        getMainActivity()?.showCommunityInfo(currentCommunityRef)
-                    }
-
-                    R.id.my_communities -> {
-                        (parentFragment?.parentFragment as? MainFragment)?.expandStartPane()
-                    }
-
-                    R.id.toggle_bookmark -> {
-                        currentCommunityRef ?: return@setOnMenuItemClickListener
-
-                        if (isBookmarked) {
-                            if (currentCommunityRef is CommunityRef.MultiCommunity) {
-                                MaterialAlertDialogBuilder(context)
-                                    .setTitle(R.string.prompt_delete_multicommunity)
-                                    .setMessage(R.string.prompt_delete_multicommunity_desc)
-                                    .setPositiveButton(R.string.delete) { _, _ ->
-                                        userCommunitiesManager.removeCommunity(currentCommunityRef)
-                                    }
-                                    .setNegativeButton(R.string.cancel) { _, _ -> }
-                                    .show()
-                            } else {
-                                userCommunitiesManager.removeCommunity(currentCommunityRef)
-                            }
-                        } else {
-                            userCommunitiesManager.addUserCommunity(
-                                currentCommunityRef,
-                                when (currentCommunityRef) {
-                                    is CommunityRef.CommunityRefByName ->
-                                        viewModel.postListEngine.getCommunityIcon()
-                                    is CommunityRef.All,
-                                    is CommunityRef.Local,
-                                    is CommunityRef.ModeratedCommunities,
-                                    is CommunityRef.MultiCommunity,
-                                    is CommunityRef.Subscribed,
-                                    -> null
-                                },
-                            )
-                        }
-                    }
-                    R.id.browse_communities -> {
-                        lemmyAppBarController.showCommunitySelector()
-                    }
-                    R.id.settings -> {
-                        requireMainActivity().openSettings()
-                    }
-                    R.id.create_multi_community -> {
-                        MultiCommunityEditorDialogFragment.show(
-                            childFragmentManager,
-                            CommunityRef.MultiCommunity(
-                                getString(R.string.default_multi_community_name),
-                                null,
-                                listOf(),
-                            ),
-                        )
-                    }
-                    R.id.mainFragment -> {
-                        getMainActivity()?.navigateTopLevel(menuItem.id)
-                    }
-                    R.id.savedFragment -> {
-                        getMainActivity()?.navigateTopLevel(menuItem.id)
-                    }
-                    R.id.searchFragment -> {
-                        getMainActivity()?.navigateTopLevel(menuItem.id)
-                    }
-                    R.id.historyFragment -> {
-                        getMainActivity()?.navigateTopLevel(menuItem.id)
-                    }
-                    R.id.inboxTabbedFragment -> {
-                        getMainActivity()?.navigateTopLevel(menuItem.id)
-                    }
-                    R.id.back_to_the_beginning -> {
-                        binding.recyclerView.scrollToPosition(0)
-                    }
-                    R.id.per_community_settings -> {
-                        currentCommunityRef ?: return@setOnMenuItemClickListener
-                        showPerCommunitySettings(currentCommunityRef)
-                    }
-                    R.id.subscribe,
-                    R.id.unsubscribe -> {
-                        if (currentCommunityRef is CommunityRef.CommunityRefByName) {
-                            moreActionsHelper.updateSubscription(
-                                currentCommunityRef,
-                                menuItem.id == R.id.subscribe
-                            )
-                        }
-                    }
-                }
+                createMoreMenuActionHandler(context, currentCommunityRef)(menuItem.id)
             }
         }
 
         getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
+    }
+
+    private fun createMoreMenuActionHandler(
+        context: Context,
+        currentCommunityRef: CommunityRef?,
+    ): (Int) -> Unit = a@{ actionId ->
+        when (actionId) {
+            R.id.create_post -> {
+                val currentCommunity = viewModel.currentCommunityRef.value
+                var communityName: String? = null
+                when (currentCommunity) {
+                    is CommunityRef.All -> {}
+                    is CommunityRef.CommunityRefByName -> {
+                        communityName = currentCommunity.name
+                    }
+                    is CommunityRef.Local -> {}
+                    is CommunityRef.Subscribed -> {}
+                    is CommunityRef.MultiCommunity -> {}
+                    is CommunityRef.ModeratedCommunities -> {}
+                    null -> {}
+                }
+
+                CreateOrEditPostFragment()
+                    .apply {
+                        arguments = CreateOrEditPostFragmentArgs(
+                            instance = viewModel.communityInstance,
+                            communityName = communityName,
+                        ).toBundle()
+                    }
+                    .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+            }
+            R.id.ca_share -> {
+                try {
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(
+                            Intent.EXTRA_TEXT,
+                            viewModel.getSharedLinkForCurrentPage(),
+                        )
+                        type = "text/plain"
+                    }
+
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    startActivity(shareIntent)
+                } catch (e: MultiCommunityException) {
+                    AlertDialogFragment.Builder()
+                        .setMessage(R.string.error_cannot_share_multi_community)
+                        .createAndShow(childFragmentManager, "sdafx")
+                }
+            }
+            R.id.hide_read -> {
+                val anchors = mutableSetOf<Int>()
+                val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+                    it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
+                }
+                range?.mapNotNullTo(anchors) {
+                    (adapter?.items?.getOrNull(it) as? Item.VisiblePostItem)?.postView?.post?.id
+                }
+                viewModel.onHideRead(anchors)
+            }
+
+            R.id.sort -> {
+                getMainActivity()?.showBottomMenu(getSortByMenu())
+            }
+
+            R.id.set_as_default -> {
+                currentCommunityRef ?: return@a
+                viewModel.setDefaultPage(currentCommunityRef)
+
+                Snackbar.make(
+                    requireMainActivity().getSnackbarContainer(),
+                    R.string.home_page_set,
+                    Snackbar.LENGTH_LONG,
+                ).show()
+            }
+            R.id.layout -> {
+                getMainActivity()?.showBottomMenu(getLayoutMenu())
+            }
+
+            R.id.feed_info,
+            R.id.community_info,
+            -> {
+                currentCommunityRef ?: return@a
+                getMainActivity()?.showCommunityInfo(currentCommunityRef)
+            }
+
+            R.id.my_communities -> {
+                (parentFragment?.parentFragment as? MainFragment)?.expandStartPane()
+            }
+
+            R.id.add_bookmark -> {
+                currentCommunityRef ?: return@a
+
+                userCommunitiesManager.addUserCommunity(
+                    currentCommunityRef,
+                    when (currentCommunityRef) {
+                        is CommunityRef.CommunityRefByName ->
+                            viewModel.postListEngine.getCommunityIcon()
+                        is CommunityRef.All,
+                        is CommunityRef.Local,
+                        is CommunityRef.ModeratedCommunities,
+                        is CommunityRef.MultiCommunity,
+                        is CommunityRef.Subscribed,
+                        -> null
+                    },
+                )
+            }
+
+            R.id.remove_bookmark -> {
+                currentCommunityRef ?: return@a
+
+                if (currentCommunityRef is CommunityRef.MultiCommunity) {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.prompt_delete_multicommunity)
+                        .setMessage(R.string.prompt_delete_multicommunity_desc)
+                        .setPositiveButton(R.string.delete) { _, _ ->
+                            userCommunitiesManager.removeCommunity(currentCommunityRef)
+                        }
+                        .setNegativeButton(R.string.cancel) { _, _ -> }
+                        .show()
+                } else {
+                    userCommunitiesManager.removeCommunity(currentCommunityRef)
+                }
+            }
+            R.id.browse_communities -> {
+                lemmyAppBarController.showCommunitySelector()
+            }
+            R.id.settings -> {
+                requireMainActivity().openSettings()
+            }
+            R.id.create_multi_community -> {
+                MultiCommunityEditorDialogFragment.show(
+                    childFragmentManager,
+                    CommunityRef.MultiCommunity(
+                        getString(R.string.default_multi_community_name),
+                        null,
+                        listOf(),
+                    ),
+                )
+            }
+            R.id.mainFragment -> {
+                getMainActivity()?.navigateTopLevel(actionId)
+            }
+            R.id.savedFragment -> {
+                getMainActivity()?.navigateTopLevel(actionId)
+            }
+            R.id.searchFragment -> {
+                getMainActivity()?.navigateTopLevel(actionId)
+            }
+            R.id.historyFragment -> {
+                getMainActivity()?.navigateTopLevel(actionId)
+            }
+            R.id.inboxTabbedFragment -> {
+                getMainActivity()?.navigateTopLevel(actionId)
+            }
+            R.id.back_to_the_beginning -> {
+                binding.recyclerView.scrollToPosition(0)
+            }
+            R.id.per_community_settings -> {
+                currentCommunityRef ?: return@a
+                showPerCommunitySettings(currentCommunityRef)
+            }
+            R.id.subscribe,
+            R.id.unsubscribe,
+            -> {
+                if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+                    moreActionsHelper.updateSubscription(
+                        currentCommunityRef,
+                        actionId == R.id.subscribe,
+                    )
+                }
+            }
+        }
     }
 
     private fun showPerCommunitySettings(currentCommunityRef: CommunityRef) {
@@ -1473,9 +1542,17 @@ class CommunityFragment :
                 ),
             )
             addItemWithIcon(R.id.layout, R.string.layout, R.drawable.baseline_view_comfy_24)
-            addItemWithIcon(R.id.sort_order, getString(R.string.sort_by), R.drawable.baseline_sort_24)
+            addItemWithIcon(
+                R.id.sort_order,
+                getString(R.string.sort_by),
+                R.drawable.baseline_sort_24,
+            )
             addDivider()
-            addItemWithIcon(R.id.reset_settings, R.string.reset_settings, R.drawable.baseline_reset_wrench_24)
+            addItemWithIcon(
+                R.id.reset_settings,
+                R.string.reset_settings,
+                R.drawable.baseline_reset_wrench_24,
+            )
 
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.id) {
@@ -1565,13 +1642,19 @@ class CommunityFragment :
         attachGestureHandlerToRecyclerViewIfNeeded()
     }
 
-    private fun makeLayoutSelectorMenu(
-        onLayoutSelected: (CommunityLayout) -> Unit,
-    ): BottomMenu =
+    private fun makeLayoutSelectorMenu(onLayoutSelected: (CommunityLayout) -> Unit): BottomMenu =
         BottomMenu(requireContext()).apply {
             addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_view_list_24)
-            addItemWithIcon(R.id.layout_large_list, R.string.large_list, R.drawable.baseline_view_list_24)
-            addItemWithIcon(R.id.layout_list_with_card, R.string.list_with_cards, R.drawable.baseline_view_list_24)
+            addItemWithIcon(
+                R.id.layout_large_list,
+                R.string.large_list,
+                R.drawable.baseline_view_list_24,
+            )
+            addItemWithIcon(
+                R.id.layout_list_with_card,
+                R.string.list_with_cards,
+                R.drawable.baseline_view_list_24,
+            )
             addItemWithIcon(R.id.layout_compact, R.string.compact, R.drawable.baseline_list_24)
             addItemWithIcon(R.id.layout_card, R.string.card, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_card2, R.string.card2, R.drawable.baseline_article_24)

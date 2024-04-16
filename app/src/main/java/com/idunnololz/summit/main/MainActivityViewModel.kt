@@ -22,6 +22,7 @@ import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +30,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
@@ -224,10 +224,9 @@ class MainActivityViewModel @Inject constructor(
         fetchCommunityOrSiteInfo(communityRef, force)
     }
 
-    private fun Flow<Int>.completeWhenDone(): Flow<Int> =
-        transformWhile { readyCount ->
-            emit(readyCount) // always emit progress
+    private fun Flow<Int>.completeWhenDone(): Flow<Int> = transformWhile { readyCount ->
+        emit(readyCount) // always emit progress
 
-            readyCount < 2
-        }
+        readyCount < 2
+    }
 }

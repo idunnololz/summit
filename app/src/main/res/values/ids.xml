@@ -208,4 +208,11 @@
     <item name="block_user" type="id" />
     <item name="unsubscribe" type="id" />
     <item name="preview_image" type="id" />
+    <item name="feed_info" type="id" />
+    <item name="remove_bookmark" type="id" />
+    <item name="add_bookmark" type="id" />
+    <item name="layout" type="id" />
+    <item name="community_info" type="id" />
+    <item name="sort" type="id" />
+    <item name="set_as_default" type="id" />
 </resources>

@@ -7,8 +7,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
-import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -33,10 +33,22 @@ fun BaseFragment<*>.showMoreVideoOptions(
 
         addDivider()
 
-        addItemWithIcon(R.id.copy_link, R.string.copy_link_address, R.drawable.baseline_content_copy_24)
+        addItemWithIcon(
+            R.id.copy_link,
+            R.string.copy_link_address,
+            R.drawable.baseline_content_copy_24,
+        )
         addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
-        addItemWithIcon(R.id.open_in_browser, R.string.open_in_browser, R.drawable.baseline_public_24)
-        addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
+        addItemWithIcon(
+            R.id.open_in_browser,
+            R.string.open_in_browser,
+            R.drawable.baseline_public_24,
+        )
+        addItemWithIcon(
+            R.id.open_link_incognito,
+            R.string.open_in_incognito,
+            R.drawable.ic_incognito_24,
+        )
         addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
 
         setOnMenuItemClickListener {
@@ -115,7 +127,8 @@ fun BaseFragment<*>.showMoreVideoOptions(
                             },
                         )
                     }.show()
-                } catch (e: IOException) { /* do nothing */
+                } catch (e: IOException) {
+                    /* do nothing */
                 }
             }
         }

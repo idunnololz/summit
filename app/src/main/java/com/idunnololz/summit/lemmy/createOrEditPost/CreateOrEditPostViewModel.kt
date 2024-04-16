@@ -22,13 +22,13 @@ import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.links.LinkMetadataHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(FlowPreview::class) // Flow.debounce()
 @HiltViewModel
@@ -105,7 +105,9 @@ class CreateOrEditPostViewModel @Inject constructor(
                     )
 
             if (communityIdResult.isFailure) {
-                createOrEditPostResult.postError(requireNotNull(communityIdResult.exceptionOrNull()))
+                createOrEditPostResult.postError(
+                    requireNotNull(communityIdResult.exceptionOrNull()),
+                )
                 return@launch
             }
 

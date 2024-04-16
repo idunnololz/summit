@@ -9,11 +9,11 @@ import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ModActionsViewModel @Inject constructor(

@@ -49,7 +49,11 @@ class AccountImageGenerator @Inject constructor(
 
     fun generateDrawableForPerson(person: Person): Drawable {
         val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
-        val bitmap = Bitmap.createBitmap(accountImageSize, accountImageSize, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(
+            accountImageSize,
+            accountImageSize,
+            Bitmap.Config.ARGB_8888,
+        )
         val personDrawable = context.getDrawableCompat(R.drawable.lemmy_profile_4)
 
         with(Canvas(bitmap)) {
@@ -67,7 +71,11 @@ class AccountImageGenerator @Inject constructor(
 
     fun generateDrawableForKey(key: String): Drawable {
         val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
-        val bitmap = Bitmap.createBitmap(accountImageSize, accountImageSize, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(
+            accountImageSize,
+            accountImageSize,
+            Bitmap.Config.ARGB_8888,
+        )
         val personDrawable = context.getDrawableCompat(R.drawable.lemmy_profile_4)
 
         with(Canvas(bitmap)) {
@@ -85,7 +93,11 @@ class AccountImageGenerator @Inject constructor(
 
     private fun generateImageForAccount(account: Account): Bitmap {
         val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
-        val bitmap = Bitmap.createBitmap(accountImageSize, accountImageSize, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(
+            accountImageSize,
+            accountImageSize,
+            Bitmap.Config.ARGB_8888,
+        )
 
         val accountFirstCharacter = account.name.firstOrNull {
             val lowerChar = it.lowercase(Locale.US)[0]
@@ -140,8 +152,7 @@ class AccountImageGenerator @Inject constructor(
 
         val accountHash = hash(key)
 
-        fun normalizeHash(hash: Int, min: Int, max: Int) =
-            hash % (max - min) + min
+        fun normalizeHash(hash: Int, min: Int, max: Int) = hash % (max - min) + min
 
         val h = normalizeHash(accountHash, 0, 3600)
         val s = normalizeHash(accountHash / 100, 500, 800)
@@ -162,8 +173,7 @@ class AccountImageGenerator @Inject constructor(
 
         val accountHash = key.hashCode()
 
-        fun normalizeHash(hash: Int, min: Int, max: Int) =
-            hash % (max - min) + min
+        fun normalizeHash(hash: Int, min: Int, max: Int) = hash % (max - min) + min
 
         val h = normalizeHash(accountHash, hRange.first, hRange.last)
 

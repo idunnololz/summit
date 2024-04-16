@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import java.net.URI
 import java.net.URISyntaxException
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LinkPreviewViewModel @Inject constructor() : ViewModel() {

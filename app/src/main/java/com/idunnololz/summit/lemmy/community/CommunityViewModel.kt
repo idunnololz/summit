@@ -49,6 +49,8 @@ import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.toErrorMessage
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.RuntimeException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -56,8 +58,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
-import javax.inject.Inject
-import kotlin.RuntimeException
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
@@ -206,7 +206,9 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             accountInfoManager.currentFullAccount.collect { fullAccount ->
                 if (fullAccount != null) {
-                    val accountView = accountInfoManager.getAccountViewForAccount(fullAccount.account)
+                    val accountView = accountInfoManager.getAccountViewForAccount(
+                        fullAccount.account,
+                    )
 
                     currentAccount.postValue(accountView)
                 }
@@ -507,7 +509,10 @@ class CommunityViewModel @Inject constructor(
         FirebaseCrashlytics.getInstance().apply {
             setCustomKey("community", communityRef.toString())
             setCustomKey("view_type", preferences.getPostsLayout().name)
-            setCustomKey("prefer_full_size_images", preferences.getPostInListUiConfig().preferFullSizeImages)
+            setCustomKey(
+                "prefer_full_size_images",
+                preferences.getPostInListUiConfig().preferFullSizeImages,
+            )
         }
 
         currentCommunityRef.value = communityRefSafe
@@ -555,7 +560,11 @@ class CommunityViewModel @Inject constructor(
                 val updatedPages = withContext(Dispatchers.Default) {
                     pagesCopy.map {
                         it.copy(
-                            posts = it.allPosts.filter { !hiddenPosts.contains(it.postView.post.id) },
+                            posts = it.allPosts.filter {
+                                !hiddenPosts.contains(
+                                    it.postView.post.id,
+                                )
+                            },
                             isReadPostUpdate = false,
                         )
                     }
@@ -597,8 +606,7 @@ class CommunityViewModel @Inject constructor(
         pagePositions = ArrayList(state.pageScrollStates)
     }
 
-    fun getSharedLinkForCurrentPage(): String? =
-        createState()?.toUrl(apiInstance)
+    fun getSharedLinkForCurrentPage(): String? = createState()?.toUrl(apiInstance)
 
     fun setPagePositionAtTop(pageIndex: Int) {
         getPagePosition(pageIndex).apply {
@@ -807,7 +815,11 @@ class CommunityViewModel @Inject constructor(
                     postListEngine.biggestPageIndex ?: 0,
                 )
                 .onSuccess {
-                    val position = it.posts.indexOfFirst { anchorPosts.contains(it.postView.post.id) }
+                    val position = it.posts.indexOfFirst {
+                        anchorPosts.contains(
+                            it.postView.post.id,
+                        )
+                    }
                     var scrollToTop = false
 
                     if (position != -1) {

@@ -11,8 +11,8 @@ import com.idunnololz.summit.lemmy.toLemmyPageIndex
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CommunitiesViewModel @Inject constructor(

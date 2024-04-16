@@ -6,12 +6,12 @@ import android.widget.Toast
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class DraftsManager @Inject constructor(
@@ -31,19 +31,13 @@ class DraftsManager @Inject constructor(
         }
     }
 
-    fun saveDraftAsync(
-        draftData: DraftData,
-        showToast: Boolean,
-    ) {
+    fun saveDraftAsync(draftData: DraftData, showToast: Boolean) {
         coroutineScope.launch {
             saveDraft(draftData, showToast)
         }
     }
 
-    suspend fun saveDraft(
-        draftData: DraftData,
-        showToast: Boolean,
-    ): Long {
+    suspend fun saveDraft(draftData: DraftData, showToast: Boolean): Long {
         val id = withContext(dbContext) {
             draftsDao.insert(
                 DraftEntry(
@@ -65,11 +59,7 @@ class DraftsManager @Inject constructor(
         return id
     }
 
-    fun updateDraftAsync(
-        entryId: Long,
-        draftData: DraftData,
-        showToast: Boolean,
-    ) {
+    fun updateDraftAsync(entryId: Long, draftData: DraftData, showToast: Boolean) {
         if (entryId == 0L) {
             saveDraftAsync(draftData, showToast)
             return
@@ -84,7 +74,11 @@ class DraftsManager @Inject constructor(
             )
             if (showToast) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, context.getString(R.string.draft_saved), Toast.LENGTH_LONG)
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.draft_saved),
+                        Toast.LENGTH_LONG,
+                    )
                         .show()
                 }
             }
@@ -94,11 +88,9 @@ class DraftsManager @Inject constructor(
     suspend fun getDraftsByType(draftType: Int, limit: Int, updateTs: Long) =
         draftsDao.getDraftsByType(draftType, limit, updateTs)
 
-    suspend fun getAllDrafts(limit: Int, updateTs: Long) =
-        draftsDao.getAllDrafts(limit, updateTs)
+    suspend fun getAllDrafts(limit: Int, updateTs: Long) = draftsDao.getAllDrafts(limit, updateTs)
 
-    suspend fun deleteAll(draftType: Int) =
-        draftsDao.deleteAll(draftType)
+    suspend fun deleteAll(draftType: Int) = draftsDao.deleteAll(draftType)
 
     suspend fun deleteDraft(entry: DraftEntry) = withContext(dbContext) {
         draftsDao.delete(entry)

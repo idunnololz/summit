@@ -4,10 +4,10 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 @Singleton
 class PostReadManager @Inject constructor(
@@ -63,10 +63,8 @@ class PostReadManager @Inject constructor(
         }
     }
 
-    private fun PostRef.toKey(): String =
-        toKey(instance, id)
+    private fun PostRef.toKey(): String = toKey(instance, id)
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun toKey(instance: String, postId: PostId): String =
-        "$postId@$instance"
+    private inline fun toKey(instance: String, postId: PostId): String = "$postId@$instance"
 }

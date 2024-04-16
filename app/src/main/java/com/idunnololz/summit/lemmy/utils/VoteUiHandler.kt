@@ -240,21 +240,37 @@ fun VoteUiHandler.bind(
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun voteSuccess(newVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
+            override fun voteSuccess(
+                newVote: Int,
+                totalScore: Int?,
+                upvotes: Int?,
+                downvotes: Int?,
+            ) {
                 update(newVote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun votePending(pendingVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
+            override fun votePending(
+                pendingVote: Int,
+                totalScore: Int?,
+                upvotes: Int?,
+                downvotes: Int?,
+            ) {
                 update(pendingVote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
                 downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
             }
 
-            override fun voteFailed(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?, e: Throwable) {
+            override fun voteFailed(
+                vote: Int,
+                totalScore: Int?,
+                upvotes: Int?,
+                downvotes: Int?,
+                e: Throwable,
+            ) {
                 update(vote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
                 upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
@@ -289,12 +305,10 @@ sealed interface VotableRef {
     ) : VotableRef
 }
 
-fun PostView.toVotableRef() =
-    VotableRef.PostRef(
-        this.post.id,
-    )
+fun PostView.toVotableRef() = VotableRef.PostRef(
+    this.post.id,
+)
 
-fun CommentView.toVotableRef() =
-    VotableRef.CommentRef(
-        this.comment.id,
-    )
+fun CommentView.toVotableRef() = VotableRef.CommentRef(
+    this.comment.id,
+)

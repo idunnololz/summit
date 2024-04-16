@@ -57,10 +57,9 @@ class ModActionWithReasonDialogFragment :
         val modAction = args.modAction as ModActionWithReason
 
         with(binding) {
-            fun getReasonText() =
-                reasonEditText.text.toString().ifBlank {
-                    null
-                }
+            fun getReasonText() = reasonEditText.text.toString().ifBlank {
+                null
+            }
 
             when (modAction) {
                 is ModActionWithReason.RemoveComment -> {

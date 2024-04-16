@@ -13,10 +13,9 @@ class PreferencesViewModel @Inject constructor(
     private val preferences: Preferences,
 ) : ViewModel() {
 
-    fun getPreferences(account: Account?) =
-        if (account == null) {
-            preferences
-        } else {
-            preferenceManager.getOnlyPreferencesForAccount(account)
-        }
+    fun getPreferences(account: Account?) = if (account == null) {
+        preferences
+    } else {
+        preferenceManager.getOnlyPreferencesForAccount(account)
+    }
 }

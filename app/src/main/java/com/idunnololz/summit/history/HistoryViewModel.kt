@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import okhttp3.internal.toImmutableList
-import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel

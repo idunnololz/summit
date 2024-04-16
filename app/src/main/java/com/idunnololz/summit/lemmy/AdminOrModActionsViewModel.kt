@@ -17,8 +17,8 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AdminOrModActionsViewModel @Inject constructor(
@@ -161,10 +161,7 @@ class AdminOrModActionsViewModel @Inject constructor(
         }
     }
 
-    fun distinguishComment(
-        commentId: CommentId,
-        distinguish: Boolean,
-    ) {
+    fun distinguishComment(commentId: CommentId, distinguish: Boolean) {
         distinguishCommentResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {
@@ -209,11 +206,7 @@ class AdminOrModActionsViewModel @Inject constructor(
         }
     }
 
-    fun removeCommunity(
-        communityId: CommunityId,
-        remove: Boolean,
-        reason: String?,
-    ) {
+    fun removeCommunity(communityId: CommunityId, remove: Boolean, reason: String?) {
         removeCommunityResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {
@@ -232,11 +225,7 @@ class AdminOrModActionsViewModel @Inject constructor(
         }
     }
 
-    fun hideCommunity(
-        communityId: CommunityId,
-        hide: Boolean,
-        reason: String?,
-    ) {
+    fun hideCommunity(communityId: CommunityId, hide: Boolean, reason: String?) {
         hideCommunityResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {
@@ -255,10 +244,7 @@ class AdminOrModActionsViewModel @Inject constructor(
         }
     }
 
-    fun purgeCommunity(
-        communityId: CommunityId,
-        reason: String?,
-    ) {
+    fun purgeCommunity(communityId: CommunityId, reason: String?) {
         purgeCommunityResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {
@@ -276,10 +262,7 @@ class AdminOrModActionsViewModel @Inject constructor(
         }
     }
 
-    fun purgePost(
-        postId: PostId,
-        reason: String?,
-    ) {
+    fun purgePost(postId: PostId, reason: String?) {
         purgePostResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {
@@ -297,10 +280,7 @@ class AdminOrModActionsViewModel @Inject constructor(
         }
     }
 
-    fun purgePerson(
-        personId: PersonId,
-        reason: String?,
-    ) {
+    fun purgePerson(personId: PersonId, reason: String?) {
         purgeUserResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {
@@ -318,10 +298,7 @@ class AdminOrModActionsViewModel @Inject constructor(
         }
     }
 
-    fun purgeComment(
-        commentId: CommentId,
-        reason: String?,
-    ) {
+    fun purgeComment(commentId: CommentId, reason: String?) {
         purgeCommentResult.setIsLoading()
         viewModelScope.launch {
             ensureRightInstance {

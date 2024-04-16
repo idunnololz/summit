@@ -21,7 +21,9 @@ interface HistoryDao {
     @Query("SELECT id, url, shortDesc, ts, type, reason FROM history ORDER BY ts DESC")
     suspend fun getAllLiteHistoryEntries(): List<LiteHistoryEntry>
 
-    @Query("SELECT id, url, shortDesc, ts, type, reason FROM history WHERE ts < :ts ORDER BY ts DESC LIMIT 1000")
+    @Query(
+        "SELECT id, url, shortDesc, ts, type, reason FROM history WHERE ts < :ts ORDER BY ts DESC LIMIT 1000",
+    )
     suspend fun getLiteHistoryEntriesFrom(ts: Long): List<LiteHistoryEntry>
 
     @Query("SELECT * FROM history WHERE id = :entryId")
@@ -45,7 +47,9 @@ interface HistoryDao {
     @Query("DELETE FROM history")
     suspend fun deleteAllHistoryEntries()
 
-    @Query("SELECT id, url, shortDesc, ts, type, reason FROM history WHERE shortDesc LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' ORDER BY ts DESC LIMIT 1000")
+    @Query(
+        "SELECT id, url, shortDesc, ts, type, reason FROM history WHERE shortDesc LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' ORDER BY ts DESC LIMIT 1000",
+    )
     suspend fun query(query: String): List<LiteHistoryEntry>
 
     @Query("SELECT COUNT(*) FROM history")

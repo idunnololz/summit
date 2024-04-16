@@ -13,16 +13,10 @@ class MoshiDiskCache(
     companion object {
         const val TAG = "MoshiDiskCache"
 
-        fun create(
-            moshi: Moshi,
-            dir: File,
-            appVersion: Int,
-            maxSize: Long,
-        ) =
-            MoshiDiskCache(
-                moshi,
-                SimpleDiskCache(dir, appVersion, maxSize),
-            )
+        fun create(moshi: Moshi, dir: File, appVersion: Int, maxSize: Long) = MoshiDiskCache(
+            moshi,
+            SimpleDiskCache(dir, appVersion, maxSize),
+        )
     }
 
     inline fun <reified T> getCachedObject(key: String): T? {

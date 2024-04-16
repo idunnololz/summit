@@ -9,11 +9,9 @@ fun Comment.getDepth(): Int {
     return Integer.max(depth, 0)
 }
 
-fun CommentView.getDepth(): Int =
-    comment.getDepth()
+fun CommentView.getDepth(): Int = comment.getDepth()
 
-fun CommentView.getUniqueKey(): String =
-    "comment_${comment.id}"
+fun CommentView.getUniqueKey(): String = "comment_${comment.id}"
 
 val CommentView.instance: String
     get() = Uri.parse(this.post.ap_id).host

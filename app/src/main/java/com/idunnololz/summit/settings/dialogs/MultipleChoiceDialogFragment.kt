@@ -23,10 +23,7 @@ class MultipleChoiceDialogFragment :
         private const val ARG_SETTING_ITEM = "ARG_SETTING_ITEM"
         private const val ARG_CURRENT_VALUE = "ARG_CURRENT_VALUE"
 
-        fun newInstance(
-            settingItem: RadioGroupSettingItem,
-            currentValue: Int?,
-        ) =
+        fun newInstance(settingItem: RadioGroupSettingItem, currentValue: Int?) =
             MultipleChoiceDialogFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(ARG_SETTING_ITEM, settingItem)

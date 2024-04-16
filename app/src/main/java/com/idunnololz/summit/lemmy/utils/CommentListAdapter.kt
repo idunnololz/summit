@@ -110,7 +110,10 @@ class CommentListAdapter(
         addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { _, b, _ ->
             b.loadingView.showProgressBar()
         }
-        addItemType(Item.VisibleCommentItem::class, CommentListCommentItemBinding::inflate) { item, b, _ ->
+        addItemType(
+            Item.VisibleCommentItem::class,
+            CommentListCommentItemBinding::inflate,
+        ) { item, b, _ ->
             val post = item.commentView.post
             val viewHolder = b.root.getTag(R.id.view_holder) as? GeneralQuickActionsViewHolder
                 ?: run {
@@ -267,7 +270,10 @@ class CommentListAdapter(
                 true
             }
         }
-        addItemType(Item.FilteredCommentItem::class, PostCommentFilteredItemBinding::inflate) { item, b, _ ->
+        addItemType(
+            Item.FilteredCommentItem::class,
+            PostCommentFilteredItemBinding::inflate,
+        ) { item, b, _ ->
             b.root.setOnClickListener {
                 showFilteredMessage(item.commentView.comment.id)
             }
@@ -302,8 +308,7 @@ class CommentListAdapter(
         refreshItems()
     }
 
-    override fun getItemViewType(position: Int): Int =
-        adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         adapterHelper.onCreateViewHolder(parent, viewType)

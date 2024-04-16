@@ -1,15 +1,11 @@
 package com.idunnololz.summit.util
 
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.idunnololz.summit.main.ActivityInsets
-import com.idunnololz.summit.main.MainActivity
 import kotlin.math.max
 
 interface InsetsProvider {
@@ -19,7 +15,7 @@ interface InsetsProvider {
 }
 
 class InsetsHelper(
-    private val consumeInsets: Boolean
+    private val consumeInsets: Boolean,
 ) : InsetsProvider {
 
     private val _insets = MutableLiveData<ActivityInsets>()
@@ -64,5 +60,4 @@ class InsetsHelper(
             }
         }
     }
-
 }

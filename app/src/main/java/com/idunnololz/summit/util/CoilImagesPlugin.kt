@@ -17,8 +17,8 @@ import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableLoader
 import io.noties.markwon.image.DrawableUtils
 import io.noties.markwon.image.ImageSpanFactory
-import org.commonmark.node.Image
 import java.util.concurrent.atomic.AtomicBoolean
+import org.commonmark.node.Image
 
 /**
  * @author Tyler Wong
@@ -147,10 +147,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             )
         }
 
-        fun create(
-            context: Context,
-            imageLoader: ImageLoader,
-        ): CoilImagesPlugin {
+        fun create(context: Context, imageLoader: ImageLoader): CoilImagesPlugin {
             return create(
                 object : CoilStore {
                     override fun load(drawable: AsyncDrawable): ImageRequest {
@@ -168,10 +165,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             )
         }
 
-        fun create(
-            coilStore: CoilStore,
-            imageLoader: ImageLoader,
-        ): CoilImagesPlugin {
+        fun create(coilStore: CoilStore, imageLoader: ImageLoader): CoilImagesPlugin {
             return CoilImagesPlugin(coilStore, imageLoader)
         }
     }

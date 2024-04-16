@@ -10,9 +10,9 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class PersonPickerViewModel @Inject constructor(

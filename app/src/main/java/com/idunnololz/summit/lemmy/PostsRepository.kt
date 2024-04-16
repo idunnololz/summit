@@ -16,10 +16,10 @@ import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.min
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @ViewModelScoped
 class PostsRepository @Inject constructor(
@@ -86,16 +86,15 @@ class PostsRepository @Inject constructor(
     suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> =
         updateStateMaintainingPosition({
             hideRead = true
-        }, anchors, maxPage,)
+        }, anchors, maxPage)
 
     suspend fun updateShowNsfwReadPosts(
         showNsfw: Boolean,
         anchors: Set<PostId>,
         maxPage: Int,
-    ): Result<PageResult> =
-        updateStateMaintainingPosition({
-            this.showNsfwPosts = showNsfw
-        }, anchors, maxPage,)
+    ): Result<PageResult> = updateStateMaintainingPosition({
+        this.showNsfwPosts = showNsfw
+    }, anchors, maxPage)
 
     suspend fun updateStateMaintainingPosition(
         performChanges: PostsRepository.() -> Unit,
@@ -170,7 +169,9 @@ class PostsRepository @Inject constructor(
                 }
 
                 if (hasMoreResult.isFailure) {
-                    return@withContext Result.failure(requireNotNull(hasMoreResult.exceptionOrNull()))
+                    return@withContext Result.failure(
+                        requireNotNull(hasMoreResult.exceptionOrNull()),
+                    )
                 } else {
                     hasMore = hasMoreResult.getOrThrow()
                     currentPageInternal++

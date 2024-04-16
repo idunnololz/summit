@@ -36,51 +36,46 @@ class VotesManager(
         votes.getOrPut(key) { like }
     }
 
-    fun getVote(key: VotableRef): Int? =
-        pendingVotes[key] ?: votes[key]
+    fun getVote(key: VotableRef): Int? = pendingVotes[key] ?: votes[key]
 
     fun setScore(key: VotableRef, count: Int) {
         scores[key] = count
     }
 
-    fun getScore(key: VotableRef, force: Boolean = false) =
-        if (shouldShowScore(key, force)) {
-            scores[key]
-        } else {
-            null
-        }
+    fun getScore(key: VotableRef, force: Boolean = false) = if (shouldShowScore(key, force)) {
+        scores[key]
+    } else {
+        null
+    }
 
     fun setUpvotes(key: VotableRef, count: Int) {
         upvotes[key] = count
     }
 
-    fun getUpvotes(key: VotableRef, force: Boolean = false) =
-        if (shouldShowScore(key, force)) {
-            upvotes[key]
-        } else {
-            null
-        }
+    fun getUpvotes(key: VotableRef, force: Boolean = false) = if (shouldShowScore(key, force)) {
+        upvotes[key]
+    } else {
+        null
+    }
 
     fun setDownvotes(key: VotableRef, count: Int) {
         downvotes[key] = count
     }
 
-    fun getDownvotes(key: VotableRef, force: Boolean = false) =
-        if (shouldShowScore(key, force)) {
-            downvotes[key]
-        } else {
-            null
-        }
+    fun getDownvotes(key: VotableRef, force: Boolean = false) = if (shouldShowScore(key, force)) {
+        downvotes[key]
+    } else {
+        null
+    }
 
-    fun shouldShowScore(key: VotableRef, force: Boolean = false) =
-        when (key) {
-            is VotableRef.CommentRef -> {
-                !(!force && preferences.hideCommentScores)
-            }
-            is VotableRef.PostRef -> {
-                !(!force && preferences.hidePostScores)
-            }
+    fun shouldShowScore(key: VotableRef, force: Boolean = false) = when (key) {
+        is VotableRef.CommentRef -> {
+            !(!force && preferences.hideCommentScores)
         }
+        is VotableRef.PostRef -> {
+            !(!force && preferences.hidePostScores)
+        }
+    }
 
     fun setScoreIfNoneSet(key: VotableRef, score: Int) {
         scores.getOrPut(key) { score }

@@ -63,7 +63,10 @@ fun Throwable.toErrorMessage(context: Context): String {
                     context.getString(R.string.error_network)
             }
         is MultiCommunityDataSource.CommunityNotFoundException ->
-            context.getString(R.string.error_community_not_found_on_instance, t.communityRef.fullName)
+            context.getString(
+                R.string.error_community_not_found_on_instance,
+                t.communityRef.fullName,
+            )
         is NoModeratedCommunitiesException ->
             context.getString(R.string.error_no_moderated_communities)
         else -> {

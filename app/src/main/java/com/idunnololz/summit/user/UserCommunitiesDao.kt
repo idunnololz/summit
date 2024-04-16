@@ -62,14 +62,13 @@ data class UserCommunityItem(
     val iconUrl: String? = null,
 ) : Parcelable
 
-fun UserCommunityItem.toEntry() =
-    UserCommunityEntry(
-        id,
-        sortOrder,
-        communitySortOrder,
-        communityRef,
-        iconUrl,
-    )
+fun UserCommunityItem.toEntry() = UserCommunityEntry(
+    id,
+    sortOrder,
+    communitySortOrder,
+    communityRef,
+    iconUrl,
+)
 
 fun UserCommunityEntry.toItem(): UserCommunityItem? {
     return UserCommunityItem(
@@ -89,13 +88,12 @@ class UserCommunitiesConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToCommunitySortOrder(value: String): CommunitySortOrder =
-        try {
-            moshi.adapter(CommunitySortOrder::class.java).fromJson(value)
-                ?: CommunitySortOrder.Active
-        } catch (e: Exception) {
-            CommunitySortOrder.Active
-        }
+    fun stringToCommunitySortOrder(value: String): CommunitySortOrder = try {
+        moshi.adapter(CommunitySortOrder::class.java).fromJson(value)
+            ?: CommunitySortOrder.Active
+    } catch (e: Exception) {
+        CommunitySortOrder.Active
+    }
 
     @TypeConverter
     fun communityRefToString(value: CommunityRef): String {
@@ -103,10 +101,9 @@ class UserCommunitiesConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToCommunityRef(value: String): CommunityRef? =
-        try {
-            moshi.adapter(CommunityRef::class.java).fromJson(value)
-        } catch (e: Exception) {
-            null
-        }
+    fun stringToCommunityRef(value: String): CommunityRef? = try {
+        moshi.adapter(CommunityRef::class.java).fromJson(value)
+    } catch (e: Exception) {
+        null
+    }
 }

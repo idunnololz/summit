@@ -2,8 +2,6 @@ package com.idunnololz.summit.util
 
 import android.os.Build
 import android.util.Log
-import okhttp3.OkHttpClient
-import okhttp3.TlsVersion
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
@@ -14,6 +12,8 @@ import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
+import okhttp3.OkHttpClient
+import okhttp3.TlsVersion
 
 /**
  * Implementation of [SSLSocketFactory] that adds [TlsVersion.TLS_1_2] as an enabled protocol for every [SSLSocket]

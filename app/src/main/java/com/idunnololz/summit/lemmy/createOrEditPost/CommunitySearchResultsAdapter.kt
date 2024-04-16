@@ -44,7 +44,7 @@ class CommunitySearchResultsAdapter(
 
     private var query: String? = null
 
-    private val adapterHelper = AdapterHelper<Item> (
+    private val adapterHelper = AdapterHelper<Item>(
         areItemsTheSame = { old, new ->
             old::class == new::class && when (old) {
                 is Item.GroupHeaderItem -> {
@@ -98,8 +98,7 @@ class CommunitySearchResultsAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int =
-        adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         adapterHelper.onCreateViewHolder(parent, viewType)

@@ -94,8 +94,8 @@ fun BaseFragment<*>.showMorePostOptions(
 
             addDivider()
         } else if (miscAccountInfo
-            ?.modCommunityIds
-            ?.contains(postView.community.id) == true
+                ?.modCommunityIds
+                ?.contains(postView.community.id) == true
         ) {
             addDivider()
 
@@ -187,7 +187,11 @@ fun BaseFragment<*>.showMorePostOptions(
 //            R.string.switch_account_for_post,
 //            R.drawable.baseline_account_circle_24)
         addItemWithIcon(R.id.pa_view_source, R.string.view_raw, R.drawable.baseline_code_24)
-        addItemWithIcon(R.id.pa_detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
+        addItemWithIcon(
+            R.id.pa_detailed_view,
+            R.string.detailed_view,
+            R.drawable.baseline_open_in_full_24,
+        )
 
         setOnMenuItemClickListener {
             createPostActionHandler(

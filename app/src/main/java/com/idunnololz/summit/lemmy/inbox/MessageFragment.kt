@@ -23,7 +23,6 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
@@ -400,7 +399,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 TODO()
             }
             is InboxItem.ReportCommentInboxItem -> {
-                viewModel.fetchCommentContext(inboxItem.postId, inboxItem.reportedCommentPath, force)
+                viewModel.fetchCommentContext(
+                    inboxItem.postId,
+                    inboxItem.reportedCommentPath,
+                    force,
+                )
             }
             is InboxItem.ReportPostInboxItem -> {
                 viewModel.fetchCommentContext(inboxItem.reportedPostId, null, force)

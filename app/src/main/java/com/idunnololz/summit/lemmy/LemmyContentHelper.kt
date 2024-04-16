@@ -39,9 +39,6 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.getVideoType
-import com.idunnololz.summit.util.ContentUtils.isUrlHls
-import com.idunnololz.summit.util.ContentUtils.isUrlMp4
-import com.idunnololz.summit.util.ContentUtils.isUrlWebm
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
@@ -87,11 +84,9 @@ class LemmyContentHelper(
         tempSize: Size,
         videoViewMaxHeight: Int,
         contentMaxWidth: Int,
-
         fullImageViewTransitionName: String,
         postView: PostView,
         instance: String,
-
         rootView: View,
         fullContentContainerView: ViewGroup,
         lazyUpdate: Boolean = false,
@@ -99,7 +94,6 @@ class LemmyContentHelper(
         contentMaxLines: Int = -1,
         highlight: HighlightTextData? = null,
         screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
-
         onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
         onVideoClickListener: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
@@ -128,19 +122,18 @@ class LemmyContentHelper(
         val onlyImage = postViewType == PostViewType.ImageOnly
 
         @Suppress("UNCHECKED_CAST")
-        fun <T : View> getView(@LayoutRes resId: Int): T =
-            (
-                viewRecycler.getRecycledView(resId)
-                    ?: inflater.inflate(
-                        resId,
-                        fullContentContainerView,
-                        false,
-                    )
+        fun <T : View> getView(@LayoutRes resId: Int): T = (
+            viewRecycler.getRecycledView(resId)
+                ?: inflater.inflate(
+                    resId,
+                    fullContentContainerView,
+                    false,
                 )
-                .also {
-                    it.setTag(R.id.view_type, resId)
-                    fullContentContainerView.addView(it)
-                } as T
+            )
+            .also {
+                it.setTag(R.id.view_type, resId)
+                fullContentContainerView.addView(it)
+            } as T
 
         fun addFooter() {
             if (lazyUpdate) {
@@ -571,7 +564,9 @@ class LemmyContentHelper(
                                 videoInfo.videoUrl,
                                 videoType,
                                 customPlayerView?.getVideoState()?.let {
-                                    it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
+                                    it.copy(
+                                        currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS,
+                                    )
                                 },
                             )
                         }
@@ -618,10 +613,10 @@ class LemmyContentHelper(
             }
 
             if ((
-                alwaysShowLinkBelowPost ||
-                    postType == PostType.Link ||
-                    postType == PostType.Text
-                ) && showLink
+                    alwaysShowLinkBelowPost ||
+                        postType == PostType.Link ||
+                        postType == PostType.Text
+                    ) && showLink
             ) {
                 if (targetPostView.post.embed_video_url != null) {
                     appendUiForExternalOrInternalUrl(targetPostView.post.embed_video_url)
@@ -652,14 +647,10 @@ class LemmyContentHelper(
         addFooter()
     }
 
-    fun recycleFullContent(
-        fullContentContainerView: ViewGroup,
-    ): RecycledState = getState(fullContentContainerView, recycle = true)
+    fun recycleFullContent(fullContentContainerView: ViewGroup): RecycledState =
+        getState(fullContentContainerView, recycle = true)
 
-    fun getState(
-        fullContentContainerView: ViewGroup,
-        recycle: Boolean = false,
-    ): RecycledState {
+    fun getState(fullContentContainerView: ViewGroup, recycle: Boolean = false): RecycledState {
         assertMainThread()
 
         val stateBuilder = RecycledState.Builder()
@@ -692,6 +683,5 @@ class LemmyContentHelper(
         return stateBuilder.build()
     }
 
-    private fun Float.toTextSize(): Float =
-        this * textSizeMultiplier * globalFontSizeMultiplier
+    private fun Float.toTextSize(): Float = this * textSizeMultiplier * globalFontSizeMultiplier
 }

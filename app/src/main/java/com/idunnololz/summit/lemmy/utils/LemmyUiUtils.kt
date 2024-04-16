@@ -61,23 +61,22 @@ fun RecyclerView.setupDecoratorsForPostList(communityLayout: CommunityLayout) {
 }
 
 fun Preferences.getPostSwipeActions(context: Context): List<LemmySwipeActionCallback.SwipeAction> {
-    fun Int.toIcon() =
-        when (this) {
-            PostGestureAction.Upvote ->
-                R.drawable.baseline_arrow_upward_24
-            PostGestureAction.Downvote ->
-                R.drawable.baseline_arrow_downward_24
-            PostGestureAction.Bookmark ->
-                R.drawable.baseline_bookmark_add_24
-            PostGestureAction.Hide ->
-                R.drawable.baseline_hide_24
-            PostGestureAction.MarkAsRead ->
-                R.drawable.baseline_check_24
-            PostGestureAction.Reply ->
-                R.drawable.baseline_reply_24
-            else ->
-                R.drawable.baseline_close_24
-        }
+    fun Int.toIcon() = when (this) {
+        PostGestureAction.Upvote ->
+            R.drawable.baseline_arrow_upward_24
+        PostGestureAction.Downvote ->
+            R.drawable.baseline_arrow_downward_24
+        PostGestureAction.Bookmark ->
+            R.drawable.baseline_bookmark_add_24
+        PostGestureAction.Hide ->
+            R.drawable.baseline_hide_24
+        PostGestureAction.MarkAsRead ->
+            R.drawable.baseline_check_24
+        PostGestureAction.Reply ->
+            R.drawable.baseline_reply_24
+        else ->
+            R.drawable.baseline_close_24
+    }
 
     return listOf(
         LemmySwipeActionCallback.SwipeAction(
@@ -98,22 +97,23 @@ fun Preferences.getPostSwipeActions(context: Context): List<LemmySwipeActionCall
     ).filter { it.id != PostGestureAction.None }
 }
 
-fun Preferences.getCommentSwipeActions(context: Context): List<LemmySwipeActionCallback.SwipeAction> {
-    fun Int.toIcon() =
-        when (this) {
-            CommentGestureAction.Upvote ->
-                R.drawable.baseline_arrow_upward_24
-            CommentGestureAction.Downvote ->
-                R.drawable.baseline_arrow_downward_24
-            CommentGestureAction.Bookmark ->
-                R.drawable.baseline_bookmark_add_24
-            CommentGestureAction.Reply ->
-                R.drawable.baseline_reply_24
-            CommentGestureAction.CollapseOrExpand ->
-                R.drawable.baseline_unfold_less_24
-            else ->
-                R.drawable.baseline_close_24
-        }
+fun Preferences.getCommentSwipeActions(
+    context: Context,
+): List<LemmySwipeActionCallback.SwipeAction> {
+    fun Int.toIcon() = when (this) {
+        CommentGestureAction.Upvote ->
+            R.drawable.baseline_arrow_upward_24
+        CommentGestureAction.Downvote ->
+            R.drawable.baseline_arrow_downward_24
+        CommentGestureAction.Bookmark ->
+            R.drawable.baseline_bookmark_add_24
+        CommentGestureAction.Reply ->
+            R.drawable.baseline_reply_24
+        CommentGestureAction.CollapseOrExpand ->
+            R.drawable.baseline_unfold_less_24
+        else ->
+            R.drawable.baseline_close_24
+    }
 
     return listOf(
         LemmySwipeActionCallback.SwipeAction(

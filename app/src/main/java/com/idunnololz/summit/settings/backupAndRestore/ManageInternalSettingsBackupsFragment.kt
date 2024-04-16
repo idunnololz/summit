@@ -96,7 +96,9 @@ class ManageInternalSettingsBackupsFragment :
                     }
                     is StatefulData.Success -> {
                         if (it.data.isEmpty()) {
-                            loadingView.showErrorText(R.string.there_doesnt_seem_to_be_anything_here)
+                            loadingView.showErrorText(
+                                R.string.there_doesnt_seem_to_be_anything_here,
+                            )
                         } else {
                             loadingView.hideAll()
                             adapter.backupData = it.data
@@ -151,14 +153,12 @@ class ManageInternalSettingsBackupsFragment :
             adapterHelper.setItems(newItems, this)
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

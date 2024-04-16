@@ -27,13 +27,11 @@ class PreferencesModule {
     fun providePreferences(
         @ApplicationContext context: Context,
         sharedPreferences: SharedPreferences,
-    ): Preferences =
-        Preferences(context, sharedPreferences)
+    ): Preferences = Preferences(context, sharedPreferences)
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(): SharedPreferences =
-        PreferenceUtil.preferences
+    fun provideSharedPreferences(): SharedPreferences = PreferenceUtil.preferences
 
     @AccountIdsSharedPreference
     @Provides
@@ -42,6 +40,7 @@ class PreferencesModule {
 
     @NotificationsSharedPreference
     @Provides
-    fun provideNotificationsSharedPreference(preferenceManager: PreferenceManager): SharedPreferences =
-        preferenceManager.getAccountIdSharedPreferences()
+    fun provideNotificationsSharedPreference(
+        preferenceManager: PreferenceManager,
+    ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
 }

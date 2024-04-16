@@ -19,6 +19,7 @@ import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,7 +29,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
-import javax.inject.Inject
 
 @HiltViewModel
 class InboxViewModel @Inject constructor(
@@ -352,15 +352,14 @@ class InboxViewModel @Inject constructor(
     }
 }
 
-fun InboxViewModel.PageType.getName(context: Context) =
-    when (this) {
-        InboxViewModel.PageType.Unread -> context.getString(R.string.unread)
-        InboxViewModel.PageType.All -> context.getString(R.string.all)
-        InboxViewModel.PageType.Replies -> context.getString(R.string.replies)
-        InboxViewModel.PageType.Mentions -> context.getString(R.string.mentions)
-        InboxViewModel.PageType.Messages -> context.getString(R.string.messages)
-        InboxViewModel.PageType.Reports -> context.getString(R.string.reports)
-    }
+fun InboxViewModel.PageType.getName(context: Context) = when (this) {
+    InboxViewModel.PageType.Unread -> context.getString(R.string.unread)
+    InboxViewModel.PageType.All -> context.getString(R.string.all)
+    InboxViewModel.PageType.Replies -> context.getString(R.string.replies)
+    InboxViewModel.PageType.Mentions -> context.getString(R.string.mentions)
+    InboxViewModel.PageType.Messages -> context.getString(R.string.messages)
+    InboxViewModel.PageType.Reports -> context.getString(R.string.reports)
+}
 
 data class InboxUpdate(
     val inboxData: List<LemmyListSource.PageResult<InboxItem>>,

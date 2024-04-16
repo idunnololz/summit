@@ -23,7 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingBackupAndRestoreFragment : BaseFragment<FragmentSettingBackupAndRestoreBinding>(),
+class SettingBackupAndRestoreFragment :
+    BaseFragment<FragmentSettingBackupAndRestoreBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
@@ -78,7 +79,7 @@ class SettingBackupAndRestoreFragment : BaseFragment<FragmentSettingBackupAndRes
             }
 
             settings.resetSettingsWithBackup.bindTo(
-                resetSettingsWithBackup
+                resetSettingsWithBackup,
             ) {
                 AlertDialogFragment.Builder()
                     .setTitle(R.string.reset_settings_prompt)
@@ -101,7 +102,9 @@ class SettingBackupAndRestoreFragment : BaseFragment<FragmentSettingBackupAndRes
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
         when (tag) {
             "reset_settings" -> {
-                exportSettingsViewModel.saveToInternalBackups(backupName = "reset_settings_backup_%datetime%")
+                exportSettingsViewModel.saveToInternalBackups(
+                    backupName = "reset_settings_backup_%datetime%",
+                )
                 exportSettingsViewModel.resetSettings()
 
                 AlertDialogFragment.Builder()

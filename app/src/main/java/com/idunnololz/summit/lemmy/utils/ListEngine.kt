@@ -30,11 +30,11 @@ class ListEngine<T> {
         val pages = pages.values.sortedBy { it.pageIndex }
 
         if (pages.isEmpty() || pages.all {
-            it.data.fold(
+                it.data.fold(
                     onSuccess = { it.items.isEmpty() },
                     onFailure = { false },
                 )
-        }
+            }
         ) {
             @Suppress("UNCHECKED_CAST")
             items.add(Item.EmptyItem())

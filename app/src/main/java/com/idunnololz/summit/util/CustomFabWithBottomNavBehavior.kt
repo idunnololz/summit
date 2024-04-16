@@ -39,8 +39,11 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
         return super.getInsetDodgeRect(parent, child, rect)
     }
 
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: FloatingActionButton, dependency: View): Boolean {
-        Log.d("HAHA", "dep: $dependency")
+    override fun layoutDependsOn(
+        parent: CoordinatorLayout,
+        child: FloatingActionButton,
+        dependency: View,
+    ): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
         }
@@ -59,7 +62,11 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
         return updateFab(child)
     }
 
-    override fun onDependentViewRemoved(parent: CoordinatorLayout, child: FloatingActionButton, dependency: View) {
+    override fun onDependentViewRemoved(
+        parent: CoordinatorLayout,
+        child: FloatingActionButton,
+        dependency: View,
+    ) {
         if (dependency is Snackbar.SnackbarLayout) {
             snackbarHeight = 0f
         }
@@ -74,8 +81,6 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
         val oldTranslation = fab.translationY
         val newTranslation = -bottomNavHeight - snackbarHeight
         fab.translationY = newTranslation
-
-        Log.d("HAHA", "translationY: $newTranslation")
 
         return oldTranslation != newTranslation
     }

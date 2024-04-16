@@ -1,5 +1,7 @@
 package com.idunnololz.summit.util.markwon
 
+import java.util.BitSet
+import java.util.regex.Pattern
 import org.commonmark.internal.Bracket
 import org.commonmark.internal.Delimiter
 import org.commonmark.internal.InlineParserImpl
@@ -18,8 +20,6 @@ import org.commonmark.node.Text
 import org.commonmark.parser.InlineParser
 import org.commonmark.parser.InlineParserContext
 import org.commonmark.parser.delimiter.DelimiterProcessor
-import java.util.BitSet
-import java.util.regex.Pattern
 
 class SummitInlineParser(private val context: InlineParserContext) : InlineParser {
     private val specialCharacters: BitSet
@@ -804,7 +804,9 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
         private val TICKS = Pattern.compile("`+")
         private val TICKS_HERE = Pattern.compile("^`+")
         private val EMAIL_AUTOLINK = Pattern
-            .compile("^<([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>")
+            .compile(
+                "^<([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>",
+            )
         private val AUTOLINK = Pattern
             .compile("^<[a-zA-Z][a-zA-Z0-9.+-]{1,31}:[^<>\u0000-\u0020]*>")
         private val SPNL = Pattern.compile("^ *(?:\n *)?")
@@ -839,7 +841,9 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
             delimiterProcessors: MutableMap<Char, DelimiterProcessor>,
         ) {
             val existing = delimiterProcessors.put(delimiterChar, toAdd)
-            require(existing == null) { "Delimiter processor conflict with delimiter char '$delimiterChar'" }
+            require(
+                existing == null,
+            ) { "Delimiter processor conflict with delimiter char '$delimiterChar'" }
         }
     }
 }

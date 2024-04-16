@@ -13,12 +13,11 @@ class EmptyScreenFragment : BaseFragment<FragmentEmptyScreenBinding>() {
 
         private const val ARG_TEXT = "ARG_TEXT"
 
-        fun newInstance(text: String) =
-            EmptyScreenFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_TEXT, text)
-                }
+        fun newInstance(text: String) = EmptyScreenFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARG_TEXT, text)
             }
+        }
     }
 
     override fun onCreateView(

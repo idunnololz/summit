@@ -2,12 +2,12 @@ package com.idunnololz.summit.links
 
 import android.webkit.URLUtil
 import com.idunnololz.summit.util.LinkUtils
+import java.net.URI
+import java.net.URISyntaxException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import java.net.URI
-import java.net.URISyntaxException
 
 class LinkMetadataHelper {
 

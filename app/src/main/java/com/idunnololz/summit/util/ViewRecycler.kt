@@ -24,7 +24,9 @@ class ViewRecycler<T : View> {
      */
     fun addRecycledView(view: T, type: Int = 0) {
         if (view.parent != null) {
-            throw RuntimeException("Attempted to recycle view with parent. This may cause memory leaks.")
+            throw RuntimeException(
+                "Attempted to recycle view with parent. This may cause memory leaks.",
+            )
         }
         views.getOrPut(type) { Stack() }.push(view)
     }

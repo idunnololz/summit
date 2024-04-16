@@ -8,11 +8,11 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.toCommunityRef
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
-import javax.inject.Inject
 
 class ModeratedCommunitiesDataSource(
     private val apiClient: AccountAwareLemmyClient,
@@ -47,19 +47,18 @@ class ModeratedCommunitiesDataSource(
         sortType: SortType?,
         page: Int,
         force: Boolean,
-    ): Result<List<PostView>> =
-        getDataSource().fold(
-            onSuccess = {
-                if (it.sourcesCount == 0) {
-                    Result.failure(NoModeratedCommunitiesException())
-                } else {
-                    it.fetchPosts(sortType, page, force)
-                }
-            },
-            onFailure = {
-                Result.failure(it)
-            },
-        )
+    ): Result<List<PostView>> = getDataSource().fold(
+        onSuccess = {
+            if (it.sourcesCount == 0) {
+                Result.failure(NoModeratedCommunitiesException())
+            } else {
+                it.fetchPosts(sortType, page, force)
+            }
+        },
+        onFailure = {
+            Result.failure(it)
+        },
+    )
 
     private suspend fun getDataSource(): Result<MultiCommunityDataSource> {
         val dataSource = dataSource

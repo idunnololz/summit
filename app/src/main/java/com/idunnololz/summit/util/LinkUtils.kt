@@ -48,8 +48,7 @@ object LinkUtils {
         return Client.get().newCall(request).execute()
     }
 
-    fun getLinkForCommunity(communityRef: CommunityRef): String =
-        communityRef.toUrl("lemmy.world")
+    fun getLinkForCommunity(communityRef: CommunityRef): String = communityRef.toUrl("lemmy.world")
 
     fun convertToHttps(url: String): String {
         val uri = Uri.parse(url)
@@ -71,7 +70,7 @@ object LinkUtils {
             val pageRef = LinkResolver.parseUrl(
                 url = url,
                 currentInstance = instance,
-                mustHandle = false
+                mustHandle = false,
             )
             if (pageRef != null) {
                 return AdvancedLink.PageLink(url, pageRef)
@@ -84,26 +83,21 @@ object LinkUtils {
     fun subredditsSearch(query: CharSequence?): String =
         "https://www.reddit.com/subreddits/search.json?q=$query"
 
-    fun getRedirectLink(thingId: String): String =
-        "https://www.reddit.com/$thingId"
+    fun getRedirectLink(thingId: String): String = "https://www.reddit.com/$thingId"
 
-    fun postIdToLink(instance: String, postId: Int) =
-        "https://$instance/post/$postId"
+    fun postIdToLink(instance: String, postId: Int) = "https://$instance/post/$postId"
 
     fun getLinkForPerson(personRef: PersonRef.PersonRefByName) =
         getLinkForPerson(personRef.instance, personRef.name)
 
-    fun getLinkForPerson(instance: String, name: String): String =
-        "https://$instance/u/$name"
+    fun getLinkForPerson(instance: String, name: String): String = "https://$instance/u/$name"
 
-    fun getLinkForPost(instance: String, id: PostId): String =
-        "https://$instance/post/$id"
+    fun getLinkForPost(instance: String, id: PostId): String = "https://$instance/post/$id"
 
     fun getLinkForComment(instance: String, commentId: CommentId): String =
         "https://$instance/comment/$commentId"
 
-    fun getLinkForInstance(instance: String): String =
-        "https://$instance/"
+    fun getLinkForInstance(instance: String): String = "https://$instance/"
 
     fun getLinkForCommunity(instance: String, communityName: String): String =
         "https://$instance/c/$communityName"
@@ -115,19 +109,19 @@ sealed interface AdvancedLink {
     data class PageLink(
         override val url: String,
         val pageRef: PageRef,
-    ): AdvancedLink
+    ) : AdvancedLink
 
     data class ImageLink(
         override val url: String,
-    ): AdvancedLink
+    ) : AdvancedLink
 
     data class VideoLink(
         override val url: String,
-    ): AdvancedLink
+    ) : AdvancedLink
 
     data class OtherLink(
         override val url: String,
-    ): AdvancedLink
+    ) : AdvancedLink
 }
 
 fun MainActivity.showMoreLinkOptions(url: String, text: String?) {

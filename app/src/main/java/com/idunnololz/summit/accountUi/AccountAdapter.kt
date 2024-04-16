@@ -51,7 +51,7 @@ class AccountAdapter(
             is Item.AddAccountItem -> true
             is Item.GuestAccountItem -> true
         }
-    },).apply {
+    }).apply {
         addItemType(
             clazz = Item.CurrentAccountItem::class,
             inflateFn = CurrentAccountItemBinding::inflate,
@@ -118,8 +118,7 @@ class AccountAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int =
-        adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         adapterHelper.onCreateViewHolder(parent, viewType)

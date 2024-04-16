@@ -16,11 +16,11 @@ import com.idunnololz.summit.lemmy.utils.getControversialRank
 import com.idunnololz.summit.lemmy.utils.getHotRank
 import com.idunnololz.summit.lemmy.utils.getScaledRank
 import com.idunnololz.summit.util.dateStringToTs
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 class MultiCommunityDataSource(
     private val instance: String,
@@ -132,9 +132,7 @@ class MultiCommunityDataSource(
     val sourcesCount: Int
         get() = sources.size
 
-    private suspend fun fetchPage(
-        pageIndex: Int,
-    ): Result<Page> = withContext(pagesContext) a@{
+    private suspend fun fetchPage(pageIndex: Int): Result<Page> = withContext(pagesContext) a@{
         while (pagesCache.size <= pageIndex) {
             if (pagesCache.lastOrNull()?.hasMore == false) {
                 return@a Result.failure(EndReachedException())

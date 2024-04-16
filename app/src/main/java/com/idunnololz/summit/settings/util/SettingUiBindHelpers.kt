@@ -23,10 +23,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
-fun BasicSettingItem.bindTo(
-    b: BasicSettingItemBinding,
-    onValueChanged: () -> Unit,
-) {
+fun BasicSettingItem.bindTo(b: BasicSettingItemBinding, onValueChanged: () -> Unit) {
     if (this.icon == null) {
         b.icon.visibility = View.GONE
     } else {
@@ -262,7 +259,9 @@ fun ColorSettingItem.bindTo(
             .setBottomSpace(12) // set a bottom space between the last slidebar and buttons.
             .apply {
                 if (defaultValue != null) {
-                    setNeutralButton(context.getString(R.string.reset_to_default)) { dialogInterface, i ->
+                    setNeutralButton(
+                        context.getString(R.string.reset_to_default),
+                    ) { dialogInterface, i ->
                         dialogInterface.dismiss()
 
                         onValueChanged(defaultValue())

@@ -37,10 +37,7 @@ class ViewPagerAdapter(
     init {
         lifecycle.addObserver(
             object : LifecycleEventObserver {
-                override fun onStateChanged(
-                    source: LifecycleOwner,
-                    event: Lifecycle.Event,
-                ) {
+                override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                     if (event == Lifecycle.Event.ON_DESTROY) {
                         source.lifecycle.removeObserver(this)
                     }
@@ -73,8 +70,7 @@ class ViewPagerAdapter(
         items.add(PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes))
     }
 
-    fun findIndexOfPage(className: String): Int =
-        items.indexOfFirst { it.clazz.name == className }
+    fun findIndexOfPage(className: String): Int = items.indexOfFirst { it.clazz.name == className }
 
     fun getIdForPosition(position: Int): String = items[position].clazz.simpleName
 

@@ -6,16 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.fragment.app.viewModels
-import androidx.transition.ChangeBounds
-import androidx.transition.ChangeClipBounds
-import androidx.transition.ChangeImageTransform
-import androidx.transition.Fade
-import androidx.transition.Fade.IN
-import androidx.transition.Fade.OUT
-import androidx.transition.Transition
 import androidx.transition.TransitionManager
-import androidx.transition.TransitionSet
-import androidx.transition.TransitionSet.ORDERING_TOGETHER
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingViewTypeBinding
@@ -37,7 +28,6 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.ViewTypeSettings
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.Utils.ANIMATION_DURATION_MS
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.makeTransition
@@ -270,7 +260,11 @@ class SettingViewTypeFragment :
                 )
             CommunityLayout.ListWithCards ->
                 ListingItemViewHolder.fromBinding(
-                    ListingItemListWithCardsBinding.inflate(inflater, binding.demoViewContainer, false),
+                    ListingItemListWithCardsBinding.inflate(
+                        inflater,
+                        binding.demoViewContainer,
+                        false,
+                    ),
                 )
         }
 

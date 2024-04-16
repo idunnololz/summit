@@ -101,7 +101,9 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
                         adapter.data = it.data
 
                         if (it.data.isEmpty()) {
-                            loadingView.showErrorText(R.string.there_doesnt_seem_to_be_anything_here)
+                            loadingView.showErrorText(
+                                R.string.there_doesnt_seem_to_be_anything_here,
+                            )
                         }
                     }
                 }
@@ -146,8 +148,7 @@ class SettingsUserBlockListFragment : BaseFragment<FragmentSettingsUserBlockList
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

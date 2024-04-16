@@ -12,12 +12,10 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -37,7 +35,6 @@ import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.main.communitiesPane.CommunitiesPaneController
 import com.idunnololz.summit.main.communitiesPane.CommunitiesPaneViewModel
@@ -51,19 +48,16 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.attachNavHostFragment
-import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.obtainNavHostFragment
-import com.idunnololz.summit.util.ext.removeNavHostFragment
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainFragment : BaseFragment<FragmentMainBinding>() {
@@ -76,18 +70,18 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         private fun getTagForTab(tabId: Long): String = "innerFragment:$tabId"
         private fun getTagForTab(communityRef: CommunityRef): String = "innerFragment:$communityRef"
 
-        private fun getTagForTab(tab: TabsManager.Tab): String =
-            when (tab) {
-                is TabsManager.Tab.SubscribedCommunityTab ->
-                    getTagForTab(tab.communityRef)
-                is TabsManager.Tab.UserCommunityTab ->
-                    getTagForTab(tab.userCommunityItem.id)
-            }
+        private fun getTagForTab(tab: TabsManager.Tab): String = when (tab) {
+            is TabsManager.Tab.SubscribedCommunityTab ->
+                getTagForTab(tab.communityRef)
+            is TabsManager.Tab.UserCommunityTab ->
+                getTagForTab(tab.userCommunityItem.id)
+        }
 
-        private fun getIdFromTag(tag: String): Long? =
-            try {
-                tag.split(":")[1].toLong()
-            } catch (e: Exception) { null }
+        private fun getIdFromTag(tag: String): Long? = try {
+            tag.split(":")[1].toLong()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private val args: MainFragmentArgs by navArgs()
@@ -342,7 +336,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
             paneOnBackPressHandler.remove()
 
-            Log.d(TAG, "updatePaneBackPressHandler(): selected panel: ${binding.rootView.getSelectedPanel()}")
+            Log.d(
+                TAG,
+                "updatePaneBackPressHandler(): selected panel: ${binding.rootView.getSelectedPanel()}",
+            )
             if (binding.rootView.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
                 requireMainActivity().onBackPressedDispatcher
                     .addCallback(viewLifecycleOwner, paneOnBackPressHandler)

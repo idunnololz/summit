@@ -29,9 +29,8 @@ inline fun <reified T> SharedPreferences.putMoshiValue(key: String, value: T) {
         .apply()
 }
 
-fun SharedPreferences.getIntOrNull(key: String) =
-    if (this.contains(key)) {
-        this.getInt(key, 0)
-    } else {
-        null
-    }
+fun SharedPreferences.getIntOrNull(key: String) = if (this.contains(key)) {
+    this.getInt(key, 0)
+} else {
+    null
+}

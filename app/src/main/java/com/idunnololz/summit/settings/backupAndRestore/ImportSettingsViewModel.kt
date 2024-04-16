@@ -14,12 +14,12 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
-import javax.inject.Inject
 
 @HiltViewModel
 class ImportSettingsViewModel @Inject constructor(

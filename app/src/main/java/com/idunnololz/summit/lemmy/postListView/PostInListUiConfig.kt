@@ -18,11 +18,10 @@ data class PostInListUiConfig(
     val preferTitleText: Boolean = false,
     val contentMaxLines: Int = -1,
 ) {
-    fun updateTextSizeMultiplier(it: Float): PostInListUiConfig =
-        this.copy(
-            textSizeMultiplier = it,
-            fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
-        )
+    fun updateTextSizeMultiplier(it: Float): PostInListUiConfig = this.copy(
+        textSizeMultiplier = it,
+        fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
+    )
 }
 
 @JsonClass(generateAdapter = true)
@@ -39,11 +38,10 @@ data class PostUiConfig(
     val footerTextSizeSp: Float = 14f,
     val fullContentConfig: FullContentConfig = FullContentConfig(),
 ) {
-    fun updateTextSizeMultiplier(it: Float): PostUiConfig =
-        this.copy(
-            textSizeMultiplier = it,
-            fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
-        )
+    fun updateTextSizeMultiplier(it: Float): PostUiConfig = this.copy(
+        textSizeMultiplier = it,
+        fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
+    )
 }
 
 @JsonClass(generateAdapter = true)
@@ -54,15 +52,13 @@ data class CommentUiConfig(
     val contentTextSizeSp: Float = 14f,
     val indentationPerLevelDp: Int = 16,
 ) {
-    fun updateTextSizeMultiplier(it: Float): CommentUiConfig =
-        this.copy(
-            textSizeMultiplier = it,
-        )
+    fun updateTextSizeMultiplier(it: Float): CommentUiConfig = this.copy(
+        textSizeMultiplier = it,
+    )
 
-    fun updateIndentationPerLevelDp(it: Float): CommentUiConfig =
-        this.copy(
-            indentationPerLevelDp = it.toInt(),
-        )
+    fun updateIndentationPerLevelDp(it: Float): CommentUiConfig = this.copy(
+        indentationPerLevelDp = it.toInt(),
+    )
 }
 
 @JsonClass(generateAdapter = true)
@@ -72,44 +68,42 @@ data class FullContentConfig(
     val textSizeMultiplier: Float = 1f,
 )
 
-fun getDefaultPostAndCommentsUiConfig() =
-    PostAndCommentsUiConfig()
+fun getDefaultPostAndCommentsUiConfig() = PostAndCommentsUiConfig()
 
-fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig =
-    when (this) {
-        CommunityLayout.Compact ->
-            PostInListUiConfig(
-                imageWidthPercent = 0.2f,
-                headerTextSizeSp = 12f,
-                footerTextSizeSp = 12f,
-            )
-        CommunityLayout.List ->
-            PostInListUiConfig(
-                imageWidthPercent = 0.2f,
-            )
-        CommunityLayout.ListWithCards ->
-            PostInListUiConfig(
-                imageWidthPercent = 0.2f,
-            )
-        CommunityLayout.LargeList ->
-            PostInListUiConfig(
-                imageWidthPercent = 1f,
-            )
-        CommunityLayout.Card ->
-            PostInListUiConfig(
-                imageWidthPercent = 1f,
-            )
-        CommunityLayout.Card2 ->
-            PostInListUiConfig(
-                imageWidthPercent = 1f,
-            )
-        CommunityLayout.Card3 ->
-            PostInListUiConfig(
-                titleTextSizeSp = 16f,
-                imageWidthPercent = 1f,
-            )
-        CommunityLayout.Full ->
-            PostInListUiConfig(
-                imageWidthPercent = 0.2f,
-            )
-    }
+fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig = when (this) {
+    CommunityLayout.Compact ->
+        PostInListUiConfig(
+            imageWidthPercent = 0.2f,
+            headerTextSizeSp = 12f,
+            footerTextSizeSp = 12f,
+        )
+    CommunityLayout.List ->
+        PostInListUiConfig(
+            imageWidthPercent = 0.2f,
+        )
+    CommunityLayout.ListWithCards ->
+        PostInListUiConfig(
+            imageWidthPercent = 0.2f,
+        )
+    CommunityLayout.LargeList ->
+        PostInListUiConfig(
+            imageWidthPercent = 1f,
+        )
+    CommunityLayout.Card ->
+        PostInListUiConfig(
+            imageWidthPercent = 1f,
+        )
+    CommunityLayout.Card2 ->
+        PostInListUiConfig(
+            imageWidthPercent = 1f,
+        )
+    CommunityLayout.Card3 ->
+        PostInListUiConfig(
+            titleTextSizeSp = 16f,
+            imageWidthPercent = 1f,
+        )
+    CommunityLayout.Full ->
+        PostInListUiConfig(
+            imageWidthPercent = 0.2f,
+        )
+}

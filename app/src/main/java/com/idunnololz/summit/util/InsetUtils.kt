@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 
-
 fun InsetsProvider.insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
     insets.observe(lifecycleOwner) {
         val lp = rootView.layoutParams as ViewGroup.MarginLayoutParams
@@ -18,7 +17,10 @@ fun InsetsProvider.insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwne
     }
 }
 
-fun InsetsProvider.insetViewExceptBottomAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, view: View) {
+fun InsetsProvider.insetViewExceptBottomAutomaticallyByMargins(
+    lifecycleOwner: LifecycleOwner,
+    view: View,
+) {
     insets.observe(lifecycleOwner) {
         view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             topMargin = it.topInset
@@ -45,7 +47,10 @@ fun InsetsProvider.insetViewExceptTopAutomaticallyByPadding(
     }
 }
 
-fun InsetsProvider.insetViewExceptBottomAutomaticallyByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
+fun InsetsProvider.insetViewExceptBottomAutomaticallyByPadding(
+    lifecycleOwner: LifecycleOwner,
+    rootView: View,
+) {
     insets.observe(lifecycleOwner) {
         rootView.setPadding(
             it.leftInset,
@@ -56,7 +61,10 @@ fun InsetsProvider.insetViewExceptBottomAutomaticallyByPadding(lifecycleOwner: L
     }
 }
 
-fun InsetsProvider.insetViewExceptTopAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
+fun InsetsProvider.insetViewExceptTopAutomaticallyByMargins(
+    lifecycleOwner: LifecycleOwner,
+    rootView: View,
+) {
     insets.observe(lifecycleOwner) {
         rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             bottomMargin = it.bottomInset
@@ -66,10 +74,7 @@ fun InsetsProvider.insetViewExceptTopAutomaticallyByMargins(lifecycleOwner: Life
     }
 }
 
-fun InsetsProvider.insetViewStartAndEndByPadding(
-    lifecycleOwner: LifecycleOwner,
-    rootView: View,
-) {
+fun InsetsProvider.insetViewStartAndEndByPadding(lifecycleOwner: LifecycleOwner, rootView: View) {
     insets.observe(lifecycleOwner) { insets ->
         rootView.setPadding(
             insets.leftInset,

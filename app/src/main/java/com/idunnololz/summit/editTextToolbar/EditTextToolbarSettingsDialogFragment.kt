@@ -84,7 +84,9 @@ class EditTextToolbarSettingsDialogFragment :
         with(binding) {
             toolbar.title = getString(R.string.text_field_toolbar_settings)
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-            toolbar.setNavigationIconTint(context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+            toolbar.setNavigationIconTint(
+                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+            )
             toolbar.setNavigationOnClickListener {
                 onBackPressed()
             }
@@ -94,7 +96,11 @@ class EditTextToolbarSettingsDialogFragment :
             val shownOptions = textFieldToolbarSettings.toolbarOptions
             val data = ToolbarData(
                 options = shownOptions,
-                hiddenOptions = TextFieldToolbarOption.entries.filter { !shownOptions.contains(it) },
+                hiddenOptions = TextFieldToolbarOption.entries.filter {
+                    !shownOptions.contains(
+                        it,
+                    )
+                },
             )
 
             val adapter = ReorderableListAdapter(data)
@@ -199,8 +205,7 @@ class EditTextToolbarSettingsDialogFragment :
                     recyclerView: RecyclerView,
                     current: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder,
-                ): Boolean =
-                    items[target.bindingAdapterPosition] is Item.ToolbarItem
+                ): Boolean = items[target.bindingAdapterPosition] is Item.ToolbarItem
 
                 override fun isLongPressDragEnabled(): Boolean {
                     return false
@@ -272,11 +277,9 @@ class EditTextToolbarSettingsDialogFragment :
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

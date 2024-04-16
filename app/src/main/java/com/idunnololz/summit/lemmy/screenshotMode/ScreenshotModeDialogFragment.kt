@@ -40,8 +40,6 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.shareUri
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
@@ -50,6 +48,8 @@ import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class ScreenshotModeDialogFragment :
@@ -232,7 +232,10 @@ class ScreenshotModeDialogFragment :
                 }
                 R.id.screenshot_settings -> {
                     ScreenshotSettingsDialogFragment()
-                        .showAllowingStateLoss(childFragmentManager, "ScreenshotSettingsDialogFragment")
+                        .showAllowingStateLoss(
+                            childFragmentManager,
+                            "ScreenshotSettingsDialogFragment",
+                        )
                 }
             }
 
@@ -329,25 +332,37 @@ class ScreenshotModeDialogFragment :
 
         when (screenshotConfig?.postViewType) {
             ScreenshotModeViewModel.PostViewType.Full -> {
-                screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
+                screenshotStage.contentContainer.updatePadding(
+                    top = context.getDimen(R.dimen.padding),
+                )
             }
             ScreenshotModeViewModel.PostViewType.ImageOnly -> {
                 screenshotStage.contentContainer.updatePadding(top = 0)
             }
             ScreenshotModeViewModel.PostViewType.TextOnly -> {
-                screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
+                screenshotStage.contentContainer.updatePadding(
+                    top = context.getDimen(R.dimen.padding),
+                )
             }
             ScreenshotModeViewModel.PostViewType.TitleOnly -> {
-                screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
+                screenshotStage.contentContainer.updatePadding(
+                    top = context.getDimen(R.dimen.padding),
+                )
             }
             ScreenshotModeViewModel.PostViewType.TitleAndImageOnly -> {
-                screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
+                screenshotStage.contentContainer.updatePadding(
+                    top = context.getDimen(R.dimen.padding),
+                )
             }
             ScreenshotModeViewModel.PostViewType.Compact -> {
-                screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
+                screenshotStage.contentContainer.updatePadding(
+                    top = context.getDimen(R.dimen.padding),
+                )
             }
             null -> {
-                screenshotStage.contentContainer.updatePadding(top = context.getDimen(R.dimen.padding))
+                screenshotStage.contentContainer.updatePadding(
+                    top = context.getDimen(R.dimen.padding),
+                )
             }
         }
 

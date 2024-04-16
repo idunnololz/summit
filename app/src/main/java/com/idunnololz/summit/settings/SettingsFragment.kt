@@ -488,14 +488,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             refreshItems()
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

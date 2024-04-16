@@ -34,10 +34,7 @@ class PrefixedEditText : com.google.android.material.textfield.TextInputEditText
         }
     }
 
-    override fun onMeasure(
-        widthMeasureSpec: Int,
-        heightMeasureSpec: Int,
-    ) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         calculatePrefix()
     }

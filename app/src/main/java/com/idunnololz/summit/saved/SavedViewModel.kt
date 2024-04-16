@@ -12,8 +12,6 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentRef
@@ -29,11 +27,11 @@ import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class SavedViewModel @Inject constructor(
@@ -253,8 +251,7 @@ class SavedViewModel @Inject constructor(
         }
     }
 
-    private fun Int.toLemmyPageIndex() =
-        this + 1 // lemmy pages are 1 indexed
+    private fun Int.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
 
     fun onSavePostChanged(savePostResult: SavePostResult) {
         if (!savePostResult.save) {

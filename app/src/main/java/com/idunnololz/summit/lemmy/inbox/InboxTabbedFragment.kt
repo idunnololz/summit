@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.inbox
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -175,7 +174,11 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     fun openMessage(item: InboxItem, instance: String) {
         childFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(R.id.message_fragment_container, MessageFragment::class.java, MessageFragmentArgs(item, instance).toBundle())
+            replace(
+                R.id.message_fragment_container,
+                MessageFragment::class.java,
+                MessageFragmentArgs(item, instance).toBundle(),
+            )
             // If it's already open and the detail pane is visible, crossfade
             // between the fragments.
             if (binding.slidingPaneLayout.isOpen) {
@@ -205,8 +208,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             return items[position].id
         }
 
-        override fun containsItem(itemId: Long): Boolean =
-            items.any { it.id == itemId }
+        override fun containsItem(itemId: Long): Boolean = items.any { it.id == itemId }
 
         override fun createFragment(position: Int): Fragment {
             val fragment = items[position].clazz.newInstance() as Fragment
@@ -234,7 +236,10 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
             val diff = DiffUtil.calculateDiff(
                 object : DiffUtil.Callback() {
-                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    override fun areItemsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int,
+                    ): Boolean {
                         return oldItems[oldItemPosition].id == newItems[newItemPosition].id
                     }
 

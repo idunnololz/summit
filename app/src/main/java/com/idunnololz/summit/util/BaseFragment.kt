@@ -57,9 +57,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         )
     }
 
-    fun runAfterLayout(
-        callback: () -> Unit,
-    ) {
+    fun runAfterLayout(callback: () -> Unit) {
         if (!isBindingAvailable()) return
 
         binding.root.runAfterLayout(callback)

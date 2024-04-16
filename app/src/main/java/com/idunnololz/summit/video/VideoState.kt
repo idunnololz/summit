@@ -10,8 +10,7 @@ data class VideoState(
     val volume: Float,
 ) : Parcelable
 
-fun Player.getVideoState(): VideoState =
-    VideoState(
-        currentTime = currentPosition,
-        volume = volume,
-    )
+fun Player.getVideoState(): VideoState = VideoState(
+    currentTime = currentPosition,
+    volume = volume,
+)

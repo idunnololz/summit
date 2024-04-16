@@ -13,14 +13,29 @@ fun BaseFragment<*>.showSortTypeMenu(
     val _sortByTopMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
             addItem(R.id.sort_order_top_last_hour, R.string.time_frame_last_hour)
-            addItem(R.id.sort_order_top_last_six_hour, getString(R.string.time_frame_last_hours_format, "6"))
-            addItem(R.id.sort_order_top_last_twelve_hour, getString(R.string.time_frame_last_hours_format, "12"))
+            addItem(
+                R.id.sort_order_top_last_six_hour,
+                getString(R.string.time_frame_last_hours_format, "6"),
+            )
+            addItem(
+                R.id.sort_order_top_last_twelve_hour,
+                getString(R.string.time_frame_last_hours_format, "12"),
+            )
             addItem(R.id.sort_order_top_day, R.string.time_frame_today)
             addItem(R.id.sort_order_top_week, R.string.time_frame_this_week)
             addItem(R.id.sort_order_top_month, R.string.time_frame_this_month)
-            addItem(R.id.sort_order_top_last_three_month, getString(R.string.time_frame_last_months_format, "3"))
-            addItem(R.id.sort_order_top_last_six_month, getString(R.string.time_frame_last_months_format, "6"))
-            addItem(R.id.sort_order_top_last_nine_month, getString(R.string.time_frame_last_months_format, "9"))
+            addItem(
+                R.id.sort_order_top_last_three_month,
+                getString(R.string.time_frame_last_months_format, "3"),
+            )
+            addItem(
+                R.id.sort_order_top_last_six_month,
+                getString(R.string.time_frame_last_months_format, "6"),
+            )
+            addItem(
+                R.id.sort_order_top_last_nine_month,
+                getString(R.string.time_frame_last_months_format, "9"),
+            )
             addItem(R.id.sort_order_top_year, R.string.time_frame_this_year)
             addItem(R.id.sort_order_top_all_time, R.string.time_frame_all_time)
             setTitle(R.string.sort_by_top)
@@ -70,7 +85,11 @@ fun BaseFragment<*>.showSortTypeMenu(
         BottomMenu(requireContext()).apply {
             addItem(R.id.sort_order_active, R.string.sort_order_active)
             addItem(R.id.sort_order_hot, R.string.sort_order_hot)
-            addItem(R.id.sort_order_top, R.string.sort_order_top, R.drawable.baseline_chevron_right_24)
+            addItem(
+                R.id.sort_order_top,
+                R.string.sort_order_top,
+                R.drawable.baseline_chevron_right_24,
+            )
             addItem(R.id.sort_order_new, R.string.sort_order_new)
             addItem(R.id.sort_order_old, R.string.sort_order_old)
             addItem(R.id.sort_order_most_comments, R.string.sort_order_most_comments)
@@ -101,7 +120,9 @@ fun BaseFragment<*>.showSortTypeMenu(
             CommunitySortOrder.MostComments -> _sortByMenu.setChecked(R.id.sort_order_most_comments)
             CommunitySortOrder.NewComments -> _sortByMenu.setChecked(R.id.sort_order_new_comments)
             CommunitySortOrder.Old -> _sortByMenu.setChecked(R.id.sort_order_old)
-            CommunitySortOrder.Controversial -> _sortByMenu.setChecked(R.id.sort_order_controversial)
+            CommunitySortOrder.Controversial -> _sortByMenu.setChecked(
+                R.id.sort_order_controversial,
+            )
             CommunitySortOrder.Scaled -> _sortByMenu.setChecked(R.id.sort_order_scaled)
         }
 

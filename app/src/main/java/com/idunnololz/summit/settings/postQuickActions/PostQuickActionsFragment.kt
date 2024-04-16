@@ -232,14 +232,12 @@ class PostQuickActionsFragment :
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

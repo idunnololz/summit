@@ -17,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.window.layout.WindowMetrics
 import androidx.window.layout.WindowMetricsCalculator
 import coil.decode.SvgDecoder
 import coil.load
@@ -63,7 +62,6 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -111,7 +109,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
         parentFragmentManager.setFragmentResultListener(
             CreateOrEditCommunityFragment.REQUEST_KEY,
-            viewLifecycleOwner
+            viewLifecycleOwner,
         ) { _, bundle ->
             val result = bundle.getParcelableCompat<CreateOrEditCommunityFragment.Result>(
                 CreateOrEditCommunityFragment.REQUEST_RESULT,
@@ -132,9 +130,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = ""
 
-            insetViewExceptTopAutomaticallyByPaddingAndNavUi(
+            insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
-                binding.coordinatorLayout
+                binding.coordinatorLayout,
+                applyTopInset = false,
             )
             insets.observe(viewLifecycleOwner) {
                 val previousPadding = binding.toolbar.paddingTop
@@ -195,7 +194,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         instance,
                     )
                 findNavController().navigateSafe(directions)
-            }
+            },
         )
 
         binding.loadingView.setOnRefreshClickListener {
@@ -250,12 +249,28 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     adapter.multiCommunity = it.data
                     binding.recyclerView.adapter = adapter
 
-                    binding.icon.setImageResource(R.drawable.outline_shield_24)
+                    binding.icon.setImageResource(it.data.icon)
                     binding.icon.strokeWidth = 0f
                     ImageViewCompat.setImageTintList(
                         binding.icon,
-                        ColorStateList.valueOf(context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal)),
+                        ColorStateList.valueOf(
+                            context.getColorFromAttribute(
+                                androidx.appcompat.R.attr.colorControlNormal,
+                            ),
+                        ),
                     )
+
+                    binding.banner.load("file:///android_asset/banner_placeholder.svg") {
+                        decoderFactory { result, options, _ -> SvgDecoder(result.source, options) }
+
+                        val windowMetrics = WindowMetricsCalculator.getOrCreate()
+                            .computeCurrentWindowMetrics(context)
+                        size(
+                            windowMetrics.bounds.width(),
+                            (windowMetrics.bounds.width() * (9 / 16.0)).toInt(),
+                        )
+                    }
+                    binding.banner.setOnClickListener(null)
                 }
             }
         }
@@ -387,7 +402,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
                     val windowMetrics = WindowMetricsCalculator.getOrCreate()
                         .computeCurrentWindowMetrics(context)
-                    size(windowMetrics.bounds.width(), (windowMetrics.bounds.width() * (9/16.0)).toInt())
+                    size(
+                        windowMetrics.bounds.width(),
+                        (windowMetrics.bounds.width() * (9 / 16.0)).toInt(),
+                    )
                 }
                 banner.setOnClickListener(null)
             }
@@ -395,7 +413,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             if (communityView != null) {
                 binding.fab.visibility = View.VISIBLE
                 binding.fab.setOnClickListener {
-                    showOverflowMenu(communityView, data.mods )
+                    showOverflowMenu(communityView, data.mods)
                 }
             } else if (siteView != null) {
                 binding.fab.visibility = View.VISIBLE
@@ -427,22 +445,34 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
             addItemWithIcon(
                 id = R.id.block_community,
-                title = getString(R.string.block_this_community_format, communityView.community.name),
+                title = getString(
+                    R.string.block_this_community_format,
+                    communityView.community.name,
+                ),
                 icon = R.drawable.baseline_block_24,
             )
             addItemWithIcon(
                 id = R.id.unblock_community,
-                title = getString(R.string.unblock_this_community_format, communityView.community.name),
+                title = getString(
+                    R.string.unblock_this_community_format,
+                    communityView.community.name,
+                ),
                 icon = R.drawable.ic_community_default,
             )
             addItemWithIcon(
                 id = R.id.block_instance,
-                title = getString(R.string.block_this_instance_format, communityView.community.instance),
+                title = getString(
+                    R.string.block_this_instance_format,
+                    communityView.community.instance,
+                ),
                 icon = R.drawable.baseline_public_off_24,
             )
             addItemWithIcon(
                 id = R.id.unblock_instance,
-                title = getString(R.string.unblock_this_instance_format, communityView.community.instance),
+                title = getString(
+                    R.string.unblock_this_instance_format,
+                    communityView.community.instance,
+                ),
                 icon = R.drawable.baseline_public_24,
             )
             addDivider()
@@ -515,8 +545,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         if (!isBindingAvailable()) return
 
         val bottomMenu = BottomMenu(requireContext()).apply {
-
-
             if (siteView.site.instance == viewModel.instance) {
                 addItemWithIcon(
                     id = R.id.create_community,
@@ -600,6 +628,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             ) : Item
             data class MultiCommunityHeaderItem(
                 val title: String,
+                val subtitle: String,
             ) : Item
             data class WarningItem(
                 val message: String,
@@ -668,14 +697,17 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         ).apply {
             addItemType(
                 clazz = Item.MultiCommunityHeaderItem::class,
-                inflateFn = CommunityInfoHeaderItemBinding::inflate
+                inflateFn = CommunityInfoHeaderItemBinding::inflate,
             ) { item, b, _ ->
+                b.name.text = item.title
+                b.subtitle.text = item.subtitle
+
                 b.subscribe.visibility = View.GONE
                 b.instanceInfo.visibility = View.GONE
             }
             addItemType(
                 clazz = Item.InstanceHeaderItem::class,
-                inflateFn = CommunityInfoHeaderItemBinding::inflate
+                inflateFn = CommunityInfoHeaderItemBinding::inflate,
             ) { item, b, _ ->
                 b.name.text = item.title
                 b.subtitle.text = item.subtitle
@@ -690,7 +722,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
             addItemType(
                 clazz = Item.CommunityHeaderItem::class,
-                inflateFn = CommunityInfoHeaderItemBinding::inflate
+                inflateFn = CommunityInfoHeaderItemBinding::inflate,
             ) { item, b, _ ->
                 b.name.text = item.communityView.community.title
                 b.subtitle.text = item.communityView.community.fullName
@@ -796,7 +828,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 }
 
                 b.title.text = item.communityView.community.name
-                val mauString = LemmyUtils.abbrevNumber(item.communityView.counts.users_active_month.toLong())
+                val mauString = LemmyUtils.abbrevNumber(
+                    item.communityView.counts.users_active_month.toLong(),
+                )
 
                 @Suppress("SetTextI18n")
                 b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
@@ -808,8 +842,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
@@ -834,11 +867,17 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     }
 
                 if (data.isRemoved) {
-                    newItems.add(Item.WarningItem(context.getString(R.string.warn_community_removed)))
+                    newItems.add(
+                        Item.WarningItem(context.getString(R.string.warn_community_removed)),
+                    )
                 } else if (data.isHidden) {
-                    newItems.add(Item.WarningItem(context.getString(R.string.warn_community_hidden)))
+                    newItems.add(
+                        Item.WarningItem(context.getString(R.string.warn_community_hidden)),
+                    )
                 } else if (data.isDeleted) {
-                    newItems.add(Item.WarningItem(context.getString(R.string.warn_community_deleted)))
+                    newItems.add(
+                        Item.WarningItem(context.getString(R.string.warn_community_deleted)),
+                    )
                 }
                 newItems.add(Item.DescriptionItem(data.content ?: ""))
 
@@ -868,15 +907,17 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 )
             } else if (multiCommunityData != null) {
                 newItems += Item.MultiCommunityHeaderItem(
-                    when (multiCommunityData.communityRef) {
+                    title = when (multiCommunityData.communityRef) {
                         is CommunityRef.All -> TODO()
                         is CommunityRef.CommunityRefByName -> TODO()
                         is CommunityRef.Local -> TODO()
                         is CommunityRef.ModeratedCommunities ->
                             context.getString(R.string.moderated_communities)
                         is CommunityRef.MultiCommunity -> TODO()
-                        is CommunityRef.Subscribed -> TODO()
-                    }
+                        is CommunityRef.Subscribed ->
+                            context.getString(R.string.subscribed_communities)
+                    },
+                    subtitle = multiCommunityData.instance,
                 )
 
                 for (community in multiCommunityData.communitiesData) {

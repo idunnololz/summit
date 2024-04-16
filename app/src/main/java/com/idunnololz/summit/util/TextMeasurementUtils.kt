@@ -32,7 +32,9 @@ object TextMeasurementUtils {
                 builder.setUseLineSpacingFromFallbacks(params.useFallbackLineSpacing)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                builder.setTextDirection((params.textDirectionHeuristic as TextDirectionHeuristic?)!!)
+                builder.setTextDirection(
+                    (params.textDirectionHeuristic as TextDirectionHeuristic?)!!,
+                )
             }
             builder.build()
         } else {

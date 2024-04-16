@@ -10,10 +10,7 @@ fun TabLayoutMediator.attachWithAutoDetachUsingLifecycle(
 ): TabLayoutMediator {
     lifecycleOwner.lifecycle.addObserver(
         object : LifecycleEventObserver {
-            override fun onStateChanged(
-                source: LifecycleOwner,
-                event: Lifecycle.Event,
-            ) {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 if (event == Lifecycle.Event.ON_DESTROY) {
                     detach()
                     source.lifecycle.removeObserver(this)

@@ -99,7 +99,10 @@ class NotificationsUpdater @AssistedInject constructor(
         val newItems = inboxItems.filter { it.lastUpdateTs > thresholdTs }
         val latestItemTs = inboxItems.maxByOrNull { it.lastUpdateTs }?.lastUpdateTs
 
-        Log.d(TAG, "[${account.fullName}] Got ${inboxItems.size} unread content. ${newItems.size} are new!")
+        Log.d(
+            TAG,
+            "[${account.fullName}] Got ${inboxItems.size} unread content. ${newItems.size} are new!",
+        )
 
         if (latestItemTs != null) {
             notificationsManager.setLastNotificationItemTsForAccount(account, latestItemTs)
@@ -110,20 +113,19 @@ class NotificationsUpdater @AssistedInject constructor(
         }
     }
 
-    private fun runMentionsJob(account: Account): Deferred<List<InboxItem>> =
-        coroutineScope.async {
-            apiClient.fetchMentions(
-                sort = CommentSortType.New,
-                page = 1,
-                limit = 10,
-                unreadOnly = true,
-                force = true,
-                account = account,
-            ).fold(
-                { it.map { it.toInboxItem() } },
-                { listOf() },
-            )
-        }
+    private fun runMentionsJob(account: Account): Deferred<List<InboxItem>> = coroutineScope.async {
+        apiClient.fetchMentions(
+            sort = CommentSortType.New,
+            page = 1,
+            limit = 10,
+            unreadOnly = true,
+            force = true,
+            account = account,
+        ).fold(
+            { it.map { it.toInboxItem() } },
+            { listOf() },
+        )
+    }
 
     private fun runPrivateMessagesJob(account: Account): Deferred<List<InboxItem>> =
         coroutineScope.async {
@@ -139,20 +141,19 @@ class NotificationsUpdater @AssistedInject constructor(
             )
         }
 
-    private fun runRepliesJob(account: Account): Deferred<List<InboxItem>> =
-        coroutineScope.async {
-            apiClient.fetchReplies(
-                sort = CommentSortType.New,
-                page = 1,
-                limit = 10,
-                unreadOnly = true,
-                force = true,
-                account = account,
-            ).fold(
-                { it.map { it.toInboxItem() } },
-                { listOf() },
-            )
-        }
+    private fun runRepliesJob(account: Account): Deferred<List<InboxItem>> = coroutineScope.async {
+        apiClient.fetchReplies(
+            sort = CommentSortType.New,
+            page = 1,
+            limit = 10,
+            unreadOnly = true,
+            force = true,
+            account = account,
+        ).fold(
+            { it.map { it.toInboxItem() } },
+            { listOf() },
+        )
+    }
 
     private fun runCommentReportsJob(account: Account): Deferred<List<InboxItem>> =
         coroutineScope.async {

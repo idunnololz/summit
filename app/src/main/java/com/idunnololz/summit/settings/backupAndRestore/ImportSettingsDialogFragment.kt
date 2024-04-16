@@ -43,9 +43,7 @@ class ImportSettingsDialogFragment :
 
     companion object {
 
-        fun show(
-            fragmentManager: FragmentManager,
-        ) {
+        fun show(fragmentManager: FragmentManager) {
             ImportSettingsDialogFragment()
                 .showAllowingStateLoss(fragmentManager, "ImportSettingsDialogFragment")
         }
@@ -265,7 +263,10 @@ class ImportSettingsDialogFragment :
 
     private class SettingDataAdapter(
         private val settingsDataPreview: SettingsDataPreview,
-        private val onSettingPreviewClick: (settingKey: String, settingsDataPreview: SettingsDataPreview) -> Unit,
+        private val onSettingPreviewClick: (
+            settingKey: String,
+            settingsDataPreview: SettingsDataPreview,
+        ) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         private sealed interface Item {
@@ -341,8 +342,7 @@ class ImportSettingsDialogFragment :
             updateItems()
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
@@ -422,14 +422,12 @@ class ImportSettingsDialogFragment :
             adapterHelper.setItems(newItems, this)
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

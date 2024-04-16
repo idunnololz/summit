@@ -121,17 +121,16 @@ class AccountInfoConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToSubscriptions(value: String): List<AccountSubscription>? =
-        try {
-            moshi.adapter<List<AccountSubscription>>(
-                Types.newParameterizedType(List::class.java, AccountSubscription::class.java),
-            )
-                .fromJson(value)
-        } catch (e: Exception) {
-            Log.e(TAG, "", e)
-            FirebaseCrashlytics.getInstance().recordException(e)
-            null
-        }
+    fun stringToSubscriptions(value: String): List<AccountSubscription>? = try {
+        moshi.adapter<List<AccountSubscription>>(
+            Types.newParameterizedType(List::class.java, AccountSubscription::class.java),
+        )
+            .fromJson(value)
+    } catch (e: Exception) {
+        Log.e(TAG, "", e)
+        FirebaseCrashlytics.getInstance().recordException(e)
+        null
+    }
 
     @TypeConverter
     fun miscAccountInfoToString(miscAccountInfo: MiscAccountInfo): String {
@@ -140,13 +139,12 @@ class AccountInfoConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToMiscAccountInfo(value: String): MiscAccountInfo? =
-        try {
-            moshi.adapter(MiscAccountInfo::class.java)
-                .fromJson(value)
-        } catch (e: Exception) {
-            Log.e(TAG, "", e)
-            FirebaseCrashlytics.getInstance().recordException(e)
-            null
-        }
+    fun stringToMiscAccountInfo(value: String): MiscAccountInfo? = try {
+        moshi.adapter(MiscAccountInfo::class.java)
+            .fromJson(value)
+    } catch (e: Exception) {
+        Log.e(TAG, "", e)
+        FirebaseCrashlytics.getInstance().recordException(e)
+        null
+    }
 }

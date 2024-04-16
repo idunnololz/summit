@@ -77,7 +77,7 @@ class CommunityAdapter(
 
     private var query: String? = null
 
-    private val adapterHelper = AdapterHelper<Item> (
+    private val adapterHelper = AdapterHelper<Item>(
         areItemsTheSame = { old, new ->
             old::class == new::class && when (old) {
                 is Item.SelectedCommunityItem -> {
@@ -162,11 +162,17 @@ class CommunityAdapter(
             }
             b.checkbox.isChecked = item.isChecked
             b.checkbox.setOnClickListener {
-                toggleCommunity(item.communityView.community.toCommunityRef(), item.communityView.community.icon)
+                toggleCommunity(
+                    item.communityView.community.toCommunityRef(),
+                    item.communityView.community.icon,
+                )
             }
             h.itemView.setOnClickListener {
                 if (canSelectMultipleCommunities) {
-                    toggleCommunity(item.communityView.community.toCommunityRef(), item.communityView.community.icon)
+                    toggleCommunity(
+                        item.communityView.community.toCommunityRef(),
+                        item.communityView.community.icon,
+                    )
                 } else {
                     onSingleCommunitySelected(
                         item.communityView.community.toCommunityRef(),
@@ -196,11 +202,17 @@ class CommunityAdapter(
             }
             b.checkbox.isChecked = item.isChecked
             b.checkbox.setOnClickListener {
-                toggleCommunity(item.subscribedCommunity.toCommunityRef(), item.subscribedCommunity.icon)
+                toggleCommunity(
+                    item.subscribedCommunity.toCommunityRef(),
+                    item.subscribedCommunity.icon,
+                )
             }
             h.itemView.setOnClickListener {
                 if (canSelectMultipleCommunities) {
-                    toggleCommunity(item.subscribedCommunity.toCommunityRef(), item.subscribedCommunity.icon)
+                    toggleCommunity(
+                        item.subscribedCommunity.toCommunityRef(),
+                        item.subscribedCommunity.icon,
+                    )
                 } else {
                     onSingleCommunitySelected(
                         item.subscribedCommunity.toCommunityRef(),
@@ -232,8 +244,7 @@ class CommunityAdapter(
         refreshItems { }
     }
 
-    override fun getItemViewType(position: Int): Int =
-        adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         adapterHelper.onCreateViewHolder(parent, viewType)

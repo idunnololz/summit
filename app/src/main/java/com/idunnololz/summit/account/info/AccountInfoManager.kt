@@ -16,6 +16,9 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,9 +27,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class AccountInfoManager @Inject constructor(
@@ -175,7 +175,7 @@ class AccountInfoManager @Inject constructor(
                         it.instance.id,
                         it.instance.domain,
                     )
-                }
+                },
             ),
         )
         val fullAccount = FullAccount(
@@ -291,21 +291,20 @@ class AccountInfoManager @Inject constructor(
 //    )
 }
 
-private fun Community.toAccountSubscription() =
-    AccountSubscription(
-        this.id,
-        this.name,
-        this.title,
-        this.removed,
-        this.published,
-        this.updated,
-        this.deleted,
-        this.nsfw,
-        this.actor_id,
-        this.local,
-        this.icon,
-        this.banner,
-        this.hidden,
-        this.posting_restricted_to_mods,
-        this.instance_id,
-    )
+private fun Community.toAccountSubscription() = AccountSubscription(
+    this.id,
+    this.name,
+    this.title,
+    this.removed,
+    this.published,
+    this.updated,
+    this.deleted,
+    this.nsfw,
+    this.actor_id,
+    this.local,
+    this.icon,
+    this.banner,
+    this.hidden,
+    this.posting_restricted_to_mods,
+    this.instance_id,
+)

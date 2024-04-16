@@ -7,17 +7,17 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class AvatarHelper @Inject constructor(
     private val accountImageGenerator: AccountImageGenerator,
-    coroutineScopeFactory: CoroutineScopeFactory
+    coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()

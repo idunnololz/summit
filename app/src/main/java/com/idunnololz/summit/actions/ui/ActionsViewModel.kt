@@ -12,10 +12,10 @@ import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ActionsViewModel @Inject constructor(
@@ -57,37 +57,34 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-    private fun List<LemmyAction>.pendingToActions(): List<Action> =
-        this.map {
-            Action(
-                id = it.id,
-                info = it.info,
-                ts = it.ts,
-                details = ActionDetails.PendingDetails,
-            )
-        }
+    private fun List<LemmyAction>.pendingToActions(): List<Action> = this.map {
+        Action(
+            id = it.id,
+            info = it.info,
+            ts = it.ts,
+            details = ActionDetails.PendingDetails,
+        )
+    }
 
-    private fun List<LemmyCompletedAction>.completedToActions(): List<Action> =
-        this.map {
-            Action(
-                id = it.id,
-                info = it.info,
-                ts = it.ts,
-                details = ActionDetails.SuccessDetails,
-            )
-        }
+    private fun List<LemmyCompletedAction>.completedToActions(): List<Action> = this.map {
+        Action(
+            id = it.id,
+            info = it.info,
+            ts = it.ts,
+            details = ActionDetails.SuccessDetails,
+        )
+    }
 
-    private fun List<LemmyFailedAction>.failedToActions(): List<Action> =
-        this.map {
-            Action(
-                id = it.id,
-                info = it.info,
-                ts = it.ts,
-                details = ActionDetails.FailureDetails(
-                    it.error,
-                ),
-            )
-        }
+    private fun List<LemmyFailedAction>.failedToActions(): List<Action> = this.map {
+        Action(
+            id = it.id,
+            info = it.info,
+            ts = it.ts,
+            details = ActionDetails.FailureDetails(
+                it.error,
+            ),
+        )
+    }
 
     fun deleteCompletedActions() {
         viewModelScope.launch {
