@@ -131,5 +131,5 @@ firebase-crashlytics-gradle = { id = "com.google.firebase.crashlytics", version 
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android-extensions = { id = "org.jetbrains.kotlin.android.extensions", version.ref = "kotlin" }
 navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "11.3.1" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.1.0" }
 versions = { id = "com.github.ben-manes.versions", version = "0.47.0" }

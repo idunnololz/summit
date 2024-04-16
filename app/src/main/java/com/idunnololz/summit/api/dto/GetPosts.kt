@@ -2,7 +2,8 @@ package com.idunnololz.summit.api.dto
 
 data class GetPosts(
     val type_: ListingType? /* "All" | "Local" | "Subscribed" */ = null,
-    val sort: SortType? /* "Active" | "Hot" | "New" | "Old" | "TopDay" | "TopWeek" | "TopMonth" | "TopYear" | "TopAll" | "MostComments" | "NewComments" */ = null,
+    val sort: SortType? /* "Active" | "Hot" | "New" | "Old" | "TopDay" | "TopWeek" | "TopMonth" | "TopYear" | "TopAll" | "MostComments" | "NewComments" */ =
+        null,
     val page: Int? = null,
     val limit: Int? = null,
     val community_id: CommunityId? = null,

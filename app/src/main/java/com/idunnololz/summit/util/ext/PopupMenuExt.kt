@@ -41,10 +41,7 @@ fun PopupMenu.insertMenuIcons(context: Context) {
 /**
  * Moves icons from the PopupMenu's MenuItems' icon fields into the menu title as a Spannable with the icon and title text.
  */
-private fun insertMenuItemIcons(
-    context: Context,
-    popupMenu: PopupMenu,
-) {
+private fun insertMenuItemIcons(context: Context, popupMenu: PopupMenu) {
     val menu: Menu = popupMenu.menu
     if (hasIcon(menu)) {
         for (i in 0 until menu.size()) {

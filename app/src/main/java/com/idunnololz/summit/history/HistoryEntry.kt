@@ -43,24 +43,22 @@ enum class HistorySaveReason {
 
 class HistoryConverters {
     @TypeConverter
-    fun fromReasonInt(value: Int?): HistorySaveReason? =
-        when (value) {
-            0 -> HistorySaveReason.UNKNOWN
-            1 -> HistorySaveReason.LOADING
-            2 -> HistorySaveReason.LOADED
-            3 -> HistorySaveReason.LEAVE_SCREEN
-            4 -> HistorySaveReason.CLOSE
-            else -> HistorySaveReason.UNKNOWN
-        }
+    fun fromReasonInt(value: Int?): HistorySaveReason? = when (value) {
+        0 -> HistorySaveReason.UNKNOWN
+        1 -> HistorySaveReason.LOADING
+        2 -> HistorySaveReason.LOADED
+        3 -> HistorySaveReason.LEAVE_SCREEN
+        4 -> HistorySaveReason.CLOSE
+        else -> HistorySaveReason.UNKNOWN
+    }
 
     @TypeConverter
-    fun reasonToInt(date: HistorySaveReason?): Int =
-        when (date) {
-            HistorySaveReason.UNKNOWN -> 0
-            HistorySaveReason.LOADING -> 1
-            HistorySaveReason.LOADED -> 2
-            HistorySaveReason.LEAVE_SCREEN -> 3
-            HistorySaveReason.CLOSE -> 4
-            null -> 0
-        }
+    fun reasonToInt(date: HistorySaveReason?): Int = when (date) {
+        HistorySaveReason.UNKNOWN -> 0
+        HistorySaveReason.LOADING -> 1
+        HistorySaveReason.LOADED -> 2
+        HistorySaveReason.LEAVE_SCREEN -> 3
+        HistorySaveReason.CLOSE -> 4
+        null -> 0
+    }
 }

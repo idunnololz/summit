@@ -129,7 +129,9 @@ class FastScroller : LinearLayout {
         val horizontalInset = if (!isVertical()) 0 else Utils.convertDpToPixel(16f).toInt()
         val verticalInset = if (isVertical()) 0 else Utils.convertDpToPixel(16f).toInt()
         val drawable = ContextCompat.getDrawable(context, R.drawable.fastscroll__default_handle)
-        val tinted = drawable?.tint(context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary))
+        val tinted = drawable?.tint(
+            context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary),
+        )
         val handleBg = InsetDrawable(
             tinted,
             horizontalInset,
@@ -140,9 +142,13 @@ class FastScroller : LinearLayout {
         ViewCompat.setBackground(handle, handleBg)
 
         val handleWidth =
-            res.getDimensionPixelSize(if (isVertical()) R.dimen.fastscroll__handle_clickable_width else R.dimen.fastscroll__handle_height)
+            res.getDimensionPixelSize(
+                if (isVertical()) R.dimen.fastscroll__handle_clickable_width else R.dimen.fastscroll__handle_height,
+            )
         val handleHeight =
-            res.getDimensionPixelSize(if (isVertical()) R.dimen.fastscroll__handle_height else R.dimen.fastscroll__handle_clickable_width)
+            res.getDimensionPixelSize(
+                if (isVertical()) R.dimen.fastscroll__handle_height else R.dimen.fastscroll__handle_clickable_width,
+            )
         handle.layoutParams = ViewGroup.LayoutParams(handleWidth, handleHeight)
         addView(handle)
         ViewCompat.setElevation(handle, Utils.convertDpToPixel(2f))
@@ -209,7 +215,7 @@ class FastScroller : LinearLayout {
         recyclerView?.let {
             it.postDelayed({
                 scrollListener.onScrolled(it, 0, 0)
-            }, 250,)
+            }, 250)
         }
     }
 

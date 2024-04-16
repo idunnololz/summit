@@ -2,8 +2,8 @@ package com.idunnololz.summit.scrape
 
 import android.util.Log
 import com.idunnololz.summit.util.isGif
-import org.jsoup.Jsoup
 import java.net.URL
+import org.jsoup.Jsoup
 
 class ImgurWebsiteAdapter(
     val url: String,

@@ -60,13 +60,9 @@ class LemmySwipeActionCallback(
     private fun ViewHolder.isSwipeEnabled() =
         this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
 
-    private fun ViewHolder.isSwipeable() =
-        this.itemView.getTag(R.id.swipeable) as? Boolean == true
+    private fun ViewHolder.isSwipeable() = this.itemView.getTag(R.id.swipeable) as? Boolean == true
 
-    override fun getMovementFlags(
-        recyclerView: RecyclerView,
-        viewHolder: ViewHolder,
-    ): Int {
+    override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int {
         return if (viewHolder.isSwipeable()) {
             makeMovementFlags(0, ItemTouchHelper.LEFT)
         } else {
@@ -131,7 +127,15 @@ class LemmySwipeActionCallback(
                 itemView.bottom,
             )
             disabledBackground.draw(c)
-            super.onChildDraw(c, recyclerView, viewHolder, finalDx, dY, actionState, isCurrentlyActive)
+            super.onChildDraw(
+                c,
+                recyclerView,
+                viewHolder,
+                finalDx,
+                dY,
+                actionState,
+                isCurrentlyActive,
+            )
             return
         }
 

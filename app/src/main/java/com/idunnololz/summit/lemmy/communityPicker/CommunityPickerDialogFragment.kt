@@ -25,8 +25,8 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class CommunityPickerDialogFragment :

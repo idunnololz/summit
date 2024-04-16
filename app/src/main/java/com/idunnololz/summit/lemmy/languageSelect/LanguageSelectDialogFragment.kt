@@ -25,7 +25,8 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import kotlinx.parcelize.Parcelize
 
-class LanguageSelectDialogFragment : BaseDialogFragment<DialogFragmentLanguageSelectBinding>(),
+class LanguageSelectDialogFragment :
+    BaseDialogFragment<DialogFragmentLanguageSelectBinding>(),
     FullscreenDialogFragment {
 
     companion object {
@@ -51,7 +52,7 @@ class LanguageSelectDialogFragment : BaseDialogFragment<DialogFragmentLanguageSe
     @Parcelize
     data class Result(
         val selectedLanguages: List<LanguageId>,
-    ): Parcelable
+    ) : Parcelable
 
     private val args: LanguageSelectDialogFragmentArgs by navArgs()
 
@@ -142,9 +143,11 @@ class LanguageSelectDialogFragment : BaseDialogFragment<DialogFragmentLanguageSe
         setFragmentResult(
             REQUEST_KEY,
             bundleOf(
-                REQUEST_RESULT to Result(adapter?.selectedLanguages?.toList()
-                    ?: listOf())
-            )
+                REQUEST_RESULT to Result(
+                    adapter?.selectedLanguages?.toList()
+                        ?: listOf(),
+                ),
+            ),
         )
 
         super.onDestroyView()
@@ -174,7 +177,7 @@ class LanguageSelectDialogFragment : BaseDialogFragment<DialogFragmentLanguageSe
                     is Item.LanguageItem ->
                         old.languageId == (new as Item.LanguageItem).languageId
                 }
-            }
+            },
         ).apply {
             addItemType(Item.LanguageItem::class, LanguageItemBinding::inflate) { item, b, h ->
                 b.checkbox.isChecked = item.isChecked
@@ -196,14 +199,12 @@ class LanguageSelectDialogFragment : BaseDialogFragment<DialogFragmentLanguageSe
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -219,7 +220,7 @@ class LanguageSelectDialogFragment : BaseDialogFragment<DialogFragmentLanguageSe
                 Item.LanguageItem(
                     it.name,
                     it.id,
-                    selectedLanguages.contains(it.id)
+                    selectedLanguages.contains(it.id),
                 )
             }
 
@@ -241,13 +242,12 @@ class LanguageSelectDialogFragment : BaseDialogFragment<DialogFragmentLanguageSe
             refreshItems()
         }
 
-        fun isAllSelected(): Boolean =
-            languages.all {
-                if (it.code == "und") {
-                    true
-                } else {
-                    selectedLanguages.contains(it.id)
-                }
+        fun isAllSelected(): Boolean = languages.all {
+            if (it.code == "und") {
+                true
+            } else {
+                selectedLanguages.contains(it.id)
             }
+        }
     }
 }

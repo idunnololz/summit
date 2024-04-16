@@ -1,21 +1,11 @@
 package com.idunnololz.summit.util.ext
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.SparseArray
-import androidx.core.util.forEach
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commitNow
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
-fun detachNavHostFragment(
-    fragmentManager: FragmentManager,
-    navHostFragment: NavHostFragment,
-) {
+fun detachNavHostFragment(fragmentManager: FragmentManager, navHostFragment: NavHostFragment) {
     fragmentManager.beginTransaction()
         .detach(navHostFragment)
         .commitNow()
@@ -36,10 +26,7 @@ fun attachNavHostFragment(
         .commitNow()
 }
 
-fun removeNavHostFragment(
-    fragmentManager: FragmentManager,
-    fragmentTag: String,
-) {
+fun removeNavHostFragment(fragmentManager: FragmentManager, fragmentTag: String) {
     val existingFragment = fragmentManager.findFragmentByTag(fragmentTag) as NavHostFragment?
 
     existingFragment ?: return

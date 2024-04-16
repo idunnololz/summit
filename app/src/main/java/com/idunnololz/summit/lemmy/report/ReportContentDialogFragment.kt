@@ -26,11 +26,7 @@ class ReportContentDialogFragment :
     BackPressHandler {
 
     companion object {
-        fun show(
-            fragmentManager: FragmentManager,
-            postRef: PostRef?,
-            commentRef: CommentRef?,
-        ) {
+        fun show(fragmentManager: FragmentManager, postRef: PostRef?, commentRef: CommentRef?) {
             ReportContentDialogFragment()
                 .apply {
                     arguments = ReportContentDialogFragmentArgs(postRef, commentRef).toBundle()

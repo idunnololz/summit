@@ -13,13 +13,12 @@ class PreAuthDialogFragment : BaseDialogFragment<DialogFragmentPreAuthBinding>()
     companion object {
         private const val ARG_TAG = "ARG_TAG"
 
-        fun newInstance(tag: Int = 0): PreAuthDialogFragment =
-            PreAuthDialogFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putInt(ARG_TAG, tag)
-                    }
+        fun newInstance(tag: Int = 0): PreAuthDialogFragment = PreAuthDialogFragment()
+            .apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_TAG, tag)
                 }
+            }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

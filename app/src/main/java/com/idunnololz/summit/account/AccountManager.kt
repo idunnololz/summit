@@ -7,6 +7,8 @@ import androidx.lifecycle.map
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.AccountIdsSharedPreference
 import com.idunnololz.summit.preferences.PreferenceManager
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -101,7 +101,9 @@ class AccountManager @Inject constructor(
         deferred.await()
     }
 
-    suspend fun setCurrentAccount(guestOrUserAccount: GuestOrUserAccount?) = withContext(Dispatchers.IO) {
+    suspend fun setCurrentAccount(guestOrUserAccount: GuestOrUserAccount?) = withContext(
+        Dispatchers.IO,
+    ) {
         val deferred = coroutineScope.async {
             val account = guestOrUserAccount as? Account
             accountDao.clearAndSetCurrent(account?.id)
@@ -177,8 +179,6 @@ class AccountManager @Inject constructor(
 val StateFlow<GuestOrUserAccount?>.asAccount
     get() = value as? Account
 
-fun StateFlow<GuestOrUserAccount?>.asAccountLiveData() =
-    this.asLiveData().map { it as? Account }
+fun StateFlow<GuestOrUserAccount?>.asAccountLiveData() = this.asLiveData().map { it as? Account }
 
-private fun Account.fix() =
-    copy(instance = instance.trim())
+private fun Account.fix() = copy(instance = instance.trim())

@@ -23,16 +23,13 @@ import javax.inject.Singleton
 @Module
 class DatabaseModule {
     @Provides
-    fun provideAccountDao(db: MainDatabase): AccountDao =
-        db.accountDao()
+    fun provideAccountDao(db: MainDatabase): AccountDao = db.accountDao()
 
     @Provides
-    fun provideUserCommunitiesDao(db: MainDatabase): UserCommunitiesDao =
-        db.userCommunitiesDao()
+    fun provideUserCommunitiesDao(db: MainDatabase): UserCommunitiesDao = db.userCommunitiesDao()
 
     @Provides
-    fun provideLemmyActionsDao(db: MainDatabase): LemmyActionsDao =
-        db.lemmyActionsDao()
+    fun provideLemmyActionsDao(db: MainDatabase): LemmyActionsDao = db.lemmyActionsDao()
 
     @Provides
     fun provideLemmyFailedActionsDao(db: MainDatabase): LemmyFailedActionsDao =
@@ -43,28 +40,22 @@ class DatabaseModule {
         db.lemmyCompletedActionsDao()
 
     @Provides
-    fun provideHistoryDao(db: MainDatabase): HistoryDao =
-        db.historyDao()
+    fun provideHistoryDao(db: MainDatabase): HistoryDao = db.historyDao()
 
     @Provides
-    fun provideAccountInfoDao(db: MainDatabase): AccountInfoDao =
-        db.accountInfoDao()
+    fun provideAccountInfoDao(db: MainDatabase): AccountInfoDao = db.accountInfoDao()
 
     @Provides
-    fun provideHiddenPostsDao(db: MainDatabase): HiddenPostsDao =
-        db.hiddenPostsDao()
+    fun provideHiddenPostsDao(db: MainDatabase): HiddenPostsDao = db.hiddenPostsDao()
 
     @Provides
-    fun provideContentFiltersDao(db: MainDatabase): ContentFiltersDao =
-        db.contentFiltersDao()
+    fun provideContentFiltersDao(db: MainDatabase): ContentFiltersDao = db.contentFiltersDao()
 
     @Provides
-    fun provideDraftsDao(db: MainDatabase): DraftsDao =
-        db.draftsDao()
+    fun provideDraftsDao(db: MainDatabase): DraftsDao = db.draftsDao()
 
     @Provides
-    fun provideInboxEntriesDao(db: MainDatabase): InboxEntriesDao =
-        db.inboxEntriesDao()
+    fun provideInboxEntriesDao(db: MainDatabase): InboxEntriesDao = db.inboxEntriesDao()
 
     @Provides
     @Singleton

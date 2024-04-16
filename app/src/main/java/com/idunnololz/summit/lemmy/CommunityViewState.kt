@@ -68,12 +68,11 @@ data class PageInfo(
     var flags: Int,
 )
 
-fun CommunityViewState.getShortDesc(context: Context): String =
-    context.getString(
-        R.string.community_state_format,
-        communityState.communityRef.getName(context),
-        (communityState.currentPageIndex + 1).toString(),
-    )
+fun CommunityViewState.getShortDesc(context: Context): String = context.getString(
+    R.string.community_state_format,
+    communityState.communityRef.getName(context),
+    (communityState.currentPageIndex + 1).toString(),
+)
 
 class MultiCommunityException : Exception()
 class ModeratedCommunitiesException : Exception()

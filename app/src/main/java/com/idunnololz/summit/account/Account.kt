@@ -32,5 +32,4 @@ data class Account(
 val Account.fullName
     get() = "${this.name}@${this.instance}"
 
-fun Account.toPersonRef() =
-    PersonRef.PersonRefByName(name = name, instance = instance)
+fun Account.toPersonRef() = PersonRef.PersonRefByName(name = name, instance = instance)

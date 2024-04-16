@@ -107,7 +107,9 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
                         loadingView.hideAll()
 
                         if (it.data.isEmpty()) {
-                            loadingView.showErrorText(R.string.there_doesnt_seem_to_be_anything_here)
+                            loadingView.showErrorText(
+                                R.string.there_doesnt_seem_to_be_anything_here,
+                            )
                         }
 
                         adapter.data = it.data
@@ -175,8 +177,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
                 refreshItems()
             }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)

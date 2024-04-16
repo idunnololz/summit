@@ -100,11 +100,7 @@ class ExoPlayerManager(
         val videoState: VideoState? = null,
     )
 
-    fun getPlayerForUrl(
-        url: String,
-        videoType: VideoType,
-        videoState: VideoState?,
-    ): ExoPlayer =
+    fun getPlayerForUrl(url: String, videoType: VideoType, videoState: VideoState?): ExoPlayer =
         getPlayer().also {
             val config = ExoPlayerConfig(
                 url = url,
@@ -171,35 +167,34 @@ class ExoPlayerManager(
         }
     }
 
-    private fun getPlayer(): ExoPlayer =
-        if (players.isNotEmpty()) {
-            players.pop()
-        } else {
-            ExoPlayer.Builder(context)
-                .build()
-                .apply {
-                    addListener(
-                        object : Player.Listener {
-                            override fun onEvents(player: Player, events: Player.Events) {
-                                super.onEvents(player, events)
+    private fun getPlayer(): ExoPlayer = if (players.isNotEmpty()) {
+        players.pop()
+    } else {
+        ExoPlayer.Builder(context)
+            .build()
+            .apply {
+                addListener(
+                    object : Player.Listener {
+                        override fun onEvents(player: Player, events: Player.Events) {
+                            super.onEvents(player, events)
 
-                                if (events.containsAny(Player.EVENT_REPEAT_MODE_CHANGED)) {
-                                    if (!player.isPlaying && player.repeatMode != Player.REPEAT_MODE_OFF) {
-                                        Util.handlePlayPauseButtonAction(player)
-                                    }
+                            if (events.containsAny(Player.EVENT_REPEAT_MODE_CHANGED)) {
+                                if (!player.isPlaying && player.repeatMode != Player.REPEAT_MODE_OFF) {
+                                    Util.handlePlayPauseButtonAction(player)
                                 }
                             }
-                        },
-                    )
-                }
-        }.also {
-            allocatedPlayers.push(it)
+                        }
+                    },
+                )
+            }
+    }.also {
+        allocatedPlayers.push(it)
 
-            Log.d(
-                TAG,
-                "Allocating another player. Alloced: ${allocatedPlayers.size} Total: ${allocatedPlayers.size + players.size}",
-            )
-        }
+        Log.d(
+            TAG,
+            "Allocating another player. Alloced: ${allocatedPlayers.size} Total: ${allocatedPlayers.size + players.size}",
+        )
+    }
 
     private fun setupPlayer(player: ExoPlayer, config: ExoPlayerConfig) {
         // Create a data source factory.

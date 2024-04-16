@@ -1,10 +1,10 @@
 package com.idunnololz.summit.util
 
 import android.util.Log
-import okhttp3.Cache
-import okhttp3.OkHttpClient
 import java.io.File
 import java.util.concurrent.TimeUnit
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 
 object Client {
     private val TAG = Client::class.java.simpleName

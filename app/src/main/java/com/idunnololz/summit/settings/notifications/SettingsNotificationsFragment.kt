@@ -178,41 +178,39 @@ class SettingsNotificationsFragment :
         updateRendering()
     }
 
-    private fun convertCheckIntervalToOptionId(value: Long) =
-        when {
-            value >= 1000L * 60L * 60L * 13L -> {
-                R.id.unknown
-            }
-            value >= 1000L * 60L * 60L * 12L -> {
-                R.id.refresh_interval_12_hours
-            }
-            value >= 1000L * 60L * 60L * 4L -> {
-                R.id.refresh_interval_4_hours
-            }
-            value >= 1000L * 60L * 60L * 2L -> {
-                R.id.refresh_interval_2_hours
-            }
-            value >= 1000L * 60L * 60L -> {
-                R.id.refresh_interval_60_minutes
-            }
-            value >= 1000L * 60L * 30L -> {
-                R.id.refresh_interval_30_minutes
-            }
-            else -> {
-                R.id.refresh_interval_15_minutes
-            }
+    private fun convertCheckIntervalToOptionId(value: Long) = when {
+        value >= 1000L * 60L * 60L * 13L -> {
+            R.id.unknown
         }
+        value >= 1000L * 60L * 60L * 12L -> {
+            R.id.refresh_interval_12_hours
+        }
+        value >= 1000L * 60L * 60L * 4L -> {
+            R.id.refresh_interval_4_hours
+        }
+        value >= 1000L * 60L * 60L * 2L -> {
+            R.id.refresh_interval_2_hours
+        }
+        value >= 1000L * 60L * 60L -> {
+            R.id.refresh_interval_60_minutes
+        }
+        value >= 1000L * 60L * 30L -> {
+            R.id.refresh_interval_30_minutes
+        }
+        else -> {
+            R.id.refresh_interval_15_minutes
+        }
+    }
 
-    private fun convertOptionIdToCheckInterval(@IdRes id: Int) =
-        when (id) {
-            R.id.refresh_interval_12_hours -> 1000L * 60L * 60L * 12L
-            R.id.refresh_interval_4_hours -> 1000L * 60L * 60L * 4L
-            R.id.refresh_interval_2_hours -> 1000L * 60L * 60L * 2L
-            R.id.refresh_interval_60_minutes -> 1000L * 60L * 60L
-            R.id.refresh_interval_30_minutes -> 1000L * 60L * 30L
-            R.id.refresh_interval_15_minutes -> 1000L * 60L * 15L
-            else -> null
-        }
+    private fun convertOptionIdToCheckInterval(@IdRes id: Int) = when (id) {
+        R.id.refresh_interval_12_hours -> 1000L * 60L * 60L * 12L
+        R.id.refresh_interval_4_hours -> 1000L * 60L * 60L * 4L
+        R.id.refresh_interval_2_hours -> 1000L * 60L * 60L * 2L
+        R.id.refresh_interval_60_minutes -> 1000L * 60L * 60L
+        R.id.refresh_interval_30_minutes -> 1000L * 60L * 30L
+        R.id.refresh_interval_15_minutes -> 1000L * 60L * 15L
+        else -> null
+    }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {

@@ -92,12 +92,12 @@ import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.IOException
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostFragment :
@@ -514,7 +514,9 @@ class PostFragment :
             }
 
             if (it != null) {
-                binding.fab.setImageDrawable(context.getDrawableCompat(R.drawable.baseline_close_24))
+                binding.fab.setImageDrawable(
+                    context.getDrawableCompat(R.drawable.baseline_close_24),
+                )
                 commentNavViewController?.show(
                     it,
                     onNextClick = {
@@ -534,7 +536,9 @@ class PostFragment :
                 )
             } else {
                 commentNavViewController?.hide()
-                binding.fab.setImageDrawable(context.getDrawableCompat(R.drawable.outline_navigation_24))
+                binding.fab.setImageDrawable(
+                    context.getDrawableCompat(R.drawable.outline_navigation_24),
+                )
             }
         }
 
@@ -756,11 +760,10 @@ class PostFragment :
         }
     }
 
-    private fun getInstance() =
-        viewModel.postOrCommentRef?.fold(
-            { it.instance },
-            { it.instance },
-        ) ?: args.instance
+    private fun getInstance() = viewModel.postOrCommentRef?.fold(
+        { it.instance },
+        { it.instance },
+    ) ?: args.instance
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView()")
@@ -786,7 +789,10 @@ class PostFragment :
                 additionalPaddingBottom = context.getDimen(R.dimen.footer_spacer_height),
             )
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.fabSnackbarCoordinatorLayout)
+            insetViewAutomaticallyByPadding(
+                viewLifecycleOwner,
+                binding.fabSnackbarCoordinatorLayout,
+            )
         }
 
         with(binding.toolbar) {
@@ -1150,12 +1156,11 @@ class PostFragment :
         // do nothing
     }
 
-    private fun PostFragmentArgs.postOrCommentRef() =
-        if (this.id > 0) {
-            Either.Left(PostRef(this.instance, this.id))
-        } else {
-            Either.Right(CommentRef(this.instance, this.commentId))
-        }
+    private fun PostFragmentArgs.postOrCommentRef() = if (this.id > 0) {
+        Either.Left(PostRef(this.instance, this.id))
+    } else {
+        Either.Right(CommentRef(this.instance, this.commentId))
+    }
 
     fun getAdapter() = adapter
 }

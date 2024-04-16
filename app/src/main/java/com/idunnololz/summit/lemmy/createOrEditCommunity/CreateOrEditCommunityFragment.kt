@@ -38,8 +38,8 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.languageSelect.LanguageSelectDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
-import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
+import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
@@ -54,8 +54,8 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunityBinding>() {
@@ -67,8 +67,8 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
     @Parcelize
     data class Result(
-        val communityRef: CommunityRef.CommunityRefByName?
-    ): Parcelable
+        val communityRef: CommunityRef.CommunityRefByName?,
+    ) : Parcelable
 
     private val args by navArgs<CreateOrEditCommunityFragmentArgs>()
 
@@ -183,11 +183,31 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)
-                        addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
-                        addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
-                        addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
-                        addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
-                        addItemWithIcon(R.id.use_a_saved_image, R.string.use_a_saved_image, R.drawable.baseline_save_24)
+                        addItemWithIcon(
+                            R.id.from_camera,
+                            R.string.take_a_photo,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery,
+                            R.string.choose_from_gallery,
+                            R.drawable.baseline_image_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_camera_with_editor,
+                            R.string.take_a_photo_with_editor,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery_with_editor,
+                            R.string.choose_from_gallery_with_editor,
+                            R.drawable.baseline_image_24,
+                        )
+                        addItemWithIcon(
+                            R.id.use_a_saved_image,
+                            R.string.use_a_saved_image,
+                            R.drawable.baseline_save_24,
+                        )
 
                         setOnMenuItemClickListener {
                             when (it.id) {
@@ -224,7 +244,10 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                                         .apply {
                                             arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
                                         }
-                                        .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")
+                                        .showAllowingStateLoss(
+                                            childFragmentManager,
+                                            "ChooseSavedImageDialogFragment",
+                                        )
                                 }
                             }
                         }
@@ -350,10 +373,10 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                                     ?.community
                                     ?.toCommunityRef()
                                     ?.copy(
-                                        instance = viewModel.instance
-                                    )
-                            )
-                        )
+                                        instance = viewModel.instance,
+                                    ),
+                            ),
+                        ),
                     )
 
                     binding.loadingView.hideAll()
@@ -373,47 +396,49 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             }
         }
 
-        addMenuProvider2(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_create_or_edit_community, menu)
+        addMenuProvider2(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.menu_create_or_edit_community, menu)
 
-                if (isCreateCommunity) {
-                    menu.findItem(R.id.publish).isVisible = true
-                    menu.findItem(R.id.save).isVisible = false
-                } else {
-                    menu.findItem(R.id.publish).isVisible = false
-                    menu.findItem(R.id.save).isVisible = true
-                }
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.publish -> {
-                        viewModel.update {
-                            it.copy(
-                                title = binding.displayNameEditText.text?.toString() ?: it.title,
-                                description = binding.descriptionEditText.text?.toString(),
-                            )
-                        }
-                        viewModel.createCommunity()
-                        true
-                    }
-                    R.id.save -> {
-                        viewModel.update {
-                            it.copy(
-                                title = binding.displayNameEditText.text?.toString() ?: it.title,
-                                description = binding.descriptionEditText.text?.toString(),
-                            )
-                        }
-                        viewModel.saveChanges()
-                        true
-                    }
-                    else -> {
-                        false
+                    if (isCreateCommunity) {
+                        menu.findItem(R.id.publish).isVisible = true
+                        menu.findItem(R.id.save).isVisible = false
+                    } else {
+                        menu.findItem(R.id.publish).isVisible = false
+                        menu.findItem(R.id.save).isVisible = true
                     }
                 }
-            }
-        })
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.publish -> {
+                            viewModel.update {
+                                it.copy(
+                                    title = binding.displayNameEditText.text?.toString() ?: it.title,
+                                    description = binding.descriptionEditText.text?.toString(),
+                                )
+                            }
+                            viewModel.createCommunity()
+                            true
+                        }
+                        R.id.save -> {
+                            viewModel.update {
+                                it.copy(
+                                    title = binding.displayNameEditText.text?.toString() ?: it.title,
+                                    description = binding.descriptionEditText.text?.toString(),
+                                )
+                            }
+                            viewModel.saveChanges()
+                            true
+                        }
+                        else -> {
+                            false
+                        }
+                    }
+                }
+            },
+        )
 
         with(binding) {
             nameEditText.doOnTextChanged a@{ text, start, before, count ->
@@ -421,7 +446,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
                 viewModel.update {
                     it.copy(
-                        name = text.toString()
+                        name = text.toString(),
                     )
                 }
             }
@@ -430,7 +455,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
                 viewModel.update {
                     it.copy(
-                        title = text.toString()
+                        title = text.toString(),
                     )
                 }
             }
@@ -439,7 +464,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
                 viewModel.update {
                     it.copy(
-                        description = text.toString()
+                        description = text.toString(),
                     )
                 }
             }
@@ -593,7 +618,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             nsfwCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
                 viewModel.update {
                     it.copy(
-                        nsfw = isChecked
+                        nsfw = isChecked,
                     )
                 }
             }
@@ -601,7 +626,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             onlyModCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
                 viewModel.update {
                     it.copy(
-                        posting_restricted_to_mods = isChecked
+                        posting_restricted_to_mods = isChecked,
                     )
                 }
             }
@@ -613,7 +638,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     LanguageSelectDialogFragment.show(
                         languages = communityData.allLanguages,
                         selectedLanguages = communityData.discussionLanguages,
-                        fragmentManager = childFragmentManager
+                        fragmentManager = childFragmentManager,
                     )
                 }
             }

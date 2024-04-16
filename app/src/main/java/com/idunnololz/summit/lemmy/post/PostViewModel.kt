@@ -39,6 +39,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -46,7 +47,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
@@ -179,9 +179,7 @@ class PostViewModel @Inject constructor(
             null
         }
 
-    fun updatePostOrCommentRef(
-        postOrCommentRef: Either<PostRef, CommentRef>,
-    ) {
+    fun updatePostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
         this.postOrCommentRef = postOrCommentRef
 
         onPostOrCommentRefChange.postValue(postOrCommentRef)
@@ -595,10 +593,16 @@ class PostViewModel @Inject constructor(
                                     ?: continue
 
                                 if (oldComment.comment.updated == newComment.comment.updated) {
-                                    Log.d(TAG, "1 completed pending comment was not updated on the server.")
+                                    Log.d(
+                                        TAG,
+                                        "1 completed pending comment was not updated on the server.",
+                                    )
                                     allCommentsUpdates = false
                                 } else {
-                                    Log.d(TAG, "1 completed pending comment was updated on the server. New content: '${newComment.comment.content}'")
+                                    Log.d(
+                                        TAG,
+                                        "1 completed pending comment was updated on the server. New content: '${newComment.comment.content}'",
+                                    )
                                 }
                             }
                         }
@@ -680,7 +684,10 @@ class PostViewModel @Inject constructor(
 
         val postDataValue = PostData(
             postView = ListView.PostListView(post),
-            commentTree = CommentTreeBuilder(accountManager, contentFiltersManager).buildCommentsTreeListView(
+            commentTree = CommentTreeBuilder(
+                accountManager,
+                contentFiltersManager,
+            ).buildCommentsTreeListView(
                 post = post,
                 comments = comments,
                 parentComment = true,

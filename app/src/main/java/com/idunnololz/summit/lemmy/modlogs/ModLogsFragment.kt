@@ -286,10 +286,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                         description = context.getString(
                             R.string.purged_post_format,
                             "[${modEvent.event.community.name}](${
-                            LinkUtils.getLinkForCommunity(
-                                modEvent.event.community.instance,
-                                modEvent.event.community.name,
-                            )})",
+                                LinkUtils.getLinkForCommunity(
+                                    modEvent.event.community.instance,
+                                    modEvent.event.community.name,
+                                )})",
                         )
                         reason = modEvent.event.admin_purge_post.reason
                     }
@@ -301,10 +301,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 R.string.removed_moderator_for_community_format,
                                 "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )})",
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )})",
                             )
                         } else {
                             b.icon.setImageResource(R.drawable.outline_add_moderator_24)
@@ -313,10 +313,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                                 R.string.added_moderator_for_community_format,
                                 "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )})",
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )})",
                             )
                         }
                     }
@@ -327,10 +327,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.removed_moderator_for_site_format,
                                 "[${modEvent.event.modded_person.name}](${
-                                LinkUtils.getLinkForPerson(
-                                    instance,
-                                    modEvent.event.modded_person.name,
-                                )
+                                    LinkUtils.getLinkForPerson(
+                                        instance,
+                                        modEvent.event.modded_person.name,
+                                    )
                                 })",
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
@@ -340,10 +340,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.added_moderator_for_site_format,
                                 "[${modEvent.event.modded_person.name}](${
-                                LinkUtils.getLinkForPerson(
-                                    instance,
-                                    modEvent.event.modded_person.name,
-                                )
+                                    LinkUtils.getLinkForPerson(
+                                        instance,
+                                        modEvent.event.modded_person.name,
+                                    )
                                 })",
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
@@ -356,16 +356,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.banned_person_from_community_format,
                                 "[${modEvent.event.banned_person.name}](${
-                                LinkUtils.getLinkForPerson(
-                                    instance,
-                                    modEvent.event.banned_person.name,
-                                )
+                                    LinkUtils.getLinkForPerson(
+                                        instance,
+                                        modEvent.event.banned_person.name,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         } else {
@@ -374,16 +374,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unbanned_person_from_community_format,
                                 "[${modEvent.event.banned_person.name}](${
-                                LinkUtils.getLinkForPerson(
-                                    instance,
-                                    modEvent.event.banned_person.name,
-                                )
+                                    LinkUtils.getLinkForPerson(
+                                        instance,
+                                        modEvent.event.banned_person.name,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         }
@@ -396,10 +396,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.banned_person_from_site_format,
                                 "[${modEvent.event.banned_person.name}](${
-                                LinkUtils.getLinkForPerson(
-                                    instance,
-                                    modEvent.event.banned_person.name,
-                                )
+                                    LinkUtils.getLinkForPerson(
+                                        instance,
+                                        modEvent.event.banned_person.name,
+                                    )
                                 })",
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
@@ -409,10 +409,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unbanned_person_from_site_format,
                                 "[${modEvent.event.banned_person.name}](${
-                                LinkUtils.getLinkForPerson(
-                                    instance,
-                                    modEvent.event.banned_person.name,
-                                )
+                                    LinkUtils.getLinkForPerson(
+                                        instance,
+                                        modEvent.event.banned_person.name,
+                                    )
                                 })",
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
@@ -426,16 +426,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.featured_post_in_community_format,
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         } else {
@@ -444,16 +444,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unfeatured_post_in_community_format,
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         }
@@ -465,10 +465,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.hidden_community_format,
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         } else {
@@ -477,10 +477,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unhidden_community_format,
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         }
@@ -493,16 +493,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.locked_post_format,
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         } else {
@@ -511,16 +511,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unlocked_post_format,
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         }
@@ -532,16 +532,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.removed_comment_format,
                                 "[${modEvent.event.comment.content.summarize()}](${
-                                LinkUtils.getLinkForComment(
-                                    instance,
-                                    modEvent.event.comment.id,
-                                )
+                                    LinkUtils.getLinkForComment(
+                                        instance,
+                                        modEvent.event.comment.id,
+                                    )
                                 })",
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                             )
                         } else {
@@ -550,16 +550,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unremoved_comment_format,
                                 "[${modEvent.event.comment.content.summarize()}](${
-                                LinkUtils.getLinkForComment(
-                                    instance,
-                                    modEvent.event.comment.id,
-                                )
+                                    LinkUtils.getLinkForComment(
+                                        instance,
+                                        modEvent.event.comment.id,
+                                    )
                                 })",
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                             )
                         }
@@ -572,10 +572,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.removed_community_format,
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
@@ -585,10 +585,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unremoved_community_format,
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
                             )
@@ -602,16 +602,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.removed_post_format,
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         } else {
@@ -620,16 +620,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                             description = context.getString(
                                 R.string.unremoved_post_format,
                                 "[${modEvent.event.post.name.summarize()}](${
-                                LinkUtils.getLinkForPost(
-                                    instance,
-                                    modEvent.event.post.id,
-                                )
+                                    LinkUtils.getLinkForPost(
+                                        instance,
+                                        modEvent.event.post.id,
+                                    )
                                 })",
                                 "[${modEvent.event.community.name}](${
-                                LinkUtils.getLinkForCommunity(
-                                    modEvent.event.community.instance,
-                                    modEvent.event.community.name,
-                                )
+                                    LinkUtils.getLinkForCommunity(
+                                        modEvent.event.community.instance,
+                                        modEvent.event.community.name,
+                                    )
                                 })",
                             )
                         }
@@ -641,10 +641,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                         description = context.getString(
                             R.string.transferred_ownership_of_community_format,
                             "[${modEvent.event.community.name}](${
-                            LinkUtils.getLinkForCommunity(
-                                modEvent.event.community.instance,
-                                modEvent.event.community.name,
-                            )})",
+                                LinkUtils.getLinkForCommunity(
+                                    modEvent.event.community.instance,
+                                    modEvent.event.community.name,
+                                )})",
                             "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
                         )
                     }
@@ -737,8 +737,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
@@ -758,11 +757,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             updateItems(cb)
         }
 
-        private fun String.summarize() =
-            if (this.length > summaryCharLength + 3) {
-                this.take(summaryCharLength) + "…"
-            } else {
-                this
-            }.escapeMarkdown()
+        private fun String.summarize() = if (this.length > summaryCharLength + 3) {
+            this.take(summaryCharLength) + "…"
+        } else {
+            this
+        }.escapeMarkdown()
     }
 }

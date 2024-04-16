@@ -7,8 +7,8 @@ import com.idunnololz.summit.preferences.PostQuickActionId
 import com.idunnololz.summit.preferences.PostQuickActionsSettings
 import com.idunnololz.summit.preferences.Preferences
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PostQuickActionsViewModel @Inject constructor(

@@ -69,14 +69,13 @@ class LemmyActionConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToActionInfo(value: String): ActionInfo? =
-        try {
-            moshi.adapter(ActionInfo::class.java).fromJson(value)
-        } catch (e: Exception) {
-            Log.e(TAG, "", e)
-            FirebaseCrashlytics.getInstance().recordException(e)
-            null
-        }
+    fun stringToActionInfo(value: String): ActionInfo? = try {
+        moshi.adapter(ActionInfo::class.java).fromJson(value)
+    } catch (e: Exception) {
+        Log.e(TAG, "", e)
+        FirebaseCrashlytics.getInstance().recordException(e)
+        null
+    }
 
     @TypeConverter
     fun lemmyActionFailureReasonToString(value: LemmyActionFailureReason): String {
@@ -84,14 +83,13 @@ class LemmyActionConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToLemmyActionFailureReason(value: String): LemmyActionFailureReason? =
-        try {
-            moshi.adapter(LemmyActionFailureReason::class.java).fromJson(value)
-        } catch (e: Exception) {
-            Log.e(TAG, "", e)
-            FirebaseCrashlytics.getInstance().recordException(e)
-            null
-        }
+    fun stringToLemmyActionFailureReason(value: String): LemmyActionFailureReason? = try {
+        moshi.adapter(LemmyActionFailureReason::class.java).fromJson(value)
+    } catch (e: Exception) {
+        Log.e(TAG, "", e)
+        FirebaseCrashlytics.getInstance().recordException(e)
+        null
+    }
 }
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
@@ -185,14 +183,13 @@ sealed interface ActionInfo {
         override val isAffectedByRateLimit: Boolean = true
     }
 
-    fun incRetries() =
-        when (this) {
-            is CommentActionInfo -> this.copy(retries = this.retries + 1)
-            is DeleteCommentActionInfo -> this.copy(retries = this.retries + 1)
-            is EditActionInfo -> this.copy(retries = this.retries + 1)
-            is VoteActionInfo -> this.copy(retries = this.retries + 1)
-            is MarkPostAsReadActionInfo -> this.copy(retries = this.retries + 1)
-        }
+    fun incRetries() = when (this) {
+        is CommentActionInfo -> this.copy(retries = this.retries + 1)
+        is DeleteCommentActionInfo -> this.copy(retries = this.retries + 1)
+        is EditActionInfo -> this.copy(retries = this.retries + 1)
+        is VoteActionInfo -> this.copy(retries = this.retries + 1)
+        is MarkPostAsReadActionInfo -> this.copy(retries = this.retries + 1)
+    }
 }
 
 interface LemmyActionResult<T : ActionInfo, R> {

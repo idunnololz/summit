@@ -90,14 +90,13 @@ fun tsToShortDate(ts: Long): String {
     return localDateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
 }
 
-fun dateStringToTs(dateString: String): Long =
-    Instant.parse(
-        if (dateString.endsWith("Z")) {
-            dateString
-        } else {
-            dateString + "Z"
-        },
-    ).toEpochMilli()
+fun dateStringToTs(dateString: String): Long = Instant.parse(
+    if (dateString.endsWith("Z")) {
+        dateString
+    } else {
+        dateString + "Z"
+    },
+).toEpochMilli()
 
 fun abbrevNumber(number: Long): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

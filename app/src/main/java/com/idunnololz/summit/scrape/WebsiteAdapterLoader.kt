@@ -15,15 +15,15 @@ import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.IDataCache
 import com.idunnololz.summit.util.LinkUtils
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.util.concurrent.atomic.AtomicInteger
 import okhttp3.CacheControl
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.HttpStatusException
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.util.concurrent.atomic.AtomicInteger
 
 class WebsiteAdapterLoader {
 
@@ -400,7 +400,8 @@ class WebsiteAdapterLoader {
             if (debugLoadDelay > 0) {
                 try {
                     Thread.sleep(debugLoadDelay)
-                } catch (e: InterruptedException) { /* do nothing */
+                } catch (e: InterruptedException) {
+                    /* do nothing */
                 }
             }
         }

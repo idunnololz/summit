@@ -7,8 +7,8 @@ import com.idunnololz.summit.preferences.CommentQuickActionId
 import com.idunnololz.summit.preferences.CommentQuickActionsSettings
 import com.idunnololz.summit.preferences.Preferences
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CustomQuickActionsViewModel @Inject constructor(

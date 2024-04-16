@@ -89,46 +89,42 @@ class MultiModEventDataSource(
     private val validSources
         get() = sources
 
-    suspend fun fetchModEvents(
-        page: Int,
-        force: Boolean,
-    ): Result<List<ModEvent>> = withContext(Dispatchers.Default) {
-        if (force) {
-            reset()
-        }
-
-        // prefetch if needed
-        val prefetchJobs = validSources.map {
-            async {
-                it.peekNextItem()
+    suspend fun fetchModEvents(page: Int, force: Boolean): Result<List<ModEvent>> =
+        withContext(Dispatchers.Default) {
+            if (force) {
+                reset()
             }
-        }
-        prefetchJobs.forEach {
-            it.await()
-        }
 
-        fetchPage(
-            page,
-        ).fold(
-            onSuccess = {
-                Result.success(it.events)
-            },
-            onFailure = {
-                if (it is EndReachedException) {
-                    Result.success(listOf())
-                } else {
-                    Result.failure(it)
+            // prefetch if needed
+            val prefetchJobs = validSources.map {
+                async {
+                    it.peekNextItem()
                 }
-            },
-        )
-    }
+            }
+            prefetchJobs.forEach {
+                it.await()
+            }
+
+            fetchPage(
+                page,
+            ).fold(
+                onSuccess = {
+                    Result.success(it.events)
+                },
+                onFailure = {
+                    if (it is EndReachedException) {
+                        Result.success(listOf())
+                    } else {
+                        Result.failure(it)
+                    }
+                },
+            )
+        }
 
     val sourcesCount: Int
         get() = sources.size
 
-    private suspend fun fetchPage(
-        pageIndex: Int,
-    ): Result<Page> = withContext(pagesContext) a@{
+    private suspend fun fetchPage(pageIndex: Int): Result<Page> = withContext(pagesContext) a@{
         while (pagesCache.size <= pageIndex) {
             if (pagesCache.lastOrNull()?.hasMore == false) {
                 return@a Result.failure(EndReachedException())

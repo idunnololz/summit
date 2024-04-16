@@ -1,8 +1,8 @@
 package com.idunnololz.summit.api
 
-import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
+import retrofit2.Response
 
 typealias ApiListener = (Response<*>) -> Unit
 

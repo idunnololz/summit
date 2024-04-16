@@ -6,12 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.navArgs
-import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.DialogFragmentModActionsBinding
 import com.idunnololz.summit.databinding.DialogFragmentPersonOptionsBinding
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
-import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
@@ -46,7 +43,5 @@ class PersonOptionsDialogFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
     }
 }

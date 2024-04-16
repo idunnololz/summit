@@ -15,10 +15,7 @@ class SettingsBackupManager @Inject constructor(
 
     private val settingBackupsDir: File = directoryHelper.settingBackupsDir
 
-    fun saveBackup(
-        backup: String,
-        backupName: String = "settings_backup_%datetime%",
-    ): File {
+    fun saveBackup(backup: String, backupName: String = "settings_backup_%datetime%"): File {
         val currentDateTimeString = ZonedDateTime.now(ZoneOffset.UTC)
             .format(DateTimeFormatter.ISO_INSTANT)
         val fileName = backupName.replace("%datetime%", currentDateTimeString)
@@ -33,10 +30,9 @@ class SettingsBackupManager @Inject constructor(
         return backupFile
     }
 
-    fun getBackups(): List<BackupInfo> =
-        settingBackupsDir.listFiles()?.map {
-            BackupInfo(it)
-        } ?: listOf()
+    fun getBackups(): List<BackupInfo> = settingBackupsDir.listFiles()?.map {
+        BackupInfo(it)
+    } ?: listOf()
 
     fun deleteBackup(backupInfo: BackupInfo) {
         backupInfo.file.delete()

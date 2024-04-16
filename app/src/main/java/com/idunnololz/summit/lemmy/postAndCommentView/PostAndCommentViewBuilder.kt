@@ -30,8 +30,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
-import coil.dispose
-import coil.load
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -68,7 +66,6 @@ import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
-import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -103,11 +100,8 @@ import com.idunnololz.summit.view.AutoHorizontalScrollView
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @ActivityScoped
 class PostAndCommentViewBuilder @Inject constructor(
@@ -1260,26 +1254,23 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
     }
 
-    private fun makeCommentActionButton(
-        @IdRes idRes: Int,
-    ) =
-        ImageView(
-            context,
-        ).apply {
-            id = idRes
-            layoutParams = LinearLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-            )
-            setPadding(
-                paddingIcon,
-                paddingHalf,
-                paddingIcon,
-                paddingHalf,
-            )
-            setBackgroundResource(selectableItemBackgroundBorderless)
-            imageTintList = ColorStateList.valueOf(normalTextColor)
-        }
+    private fun makeCommentActionButton(@IdRes idRes: Int) = ImageView(
+        context,
+    ).apply {
+        id = idRes
+        layoutParams = LinearLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+        )
+        setPadding(
+            paddingIcon,
+            paddingHalf,
+            paddingIcon,
+            paddingHalf,
+        )
+        setBackgroundResource(selectableItemBackgroundBorderless)
+        imageTintList = ColorStateList.valueOf(normalTextColor)
+    }
 
     fun ensureCommentsActionButtons(
         vh: QuickActionsViewHolder,

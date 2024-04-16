@@ -39,7 +39,9 @@ class CommentTreeBuilder(
         val firstComment = comments?.firstOrNull()?.comment
         val idToPendingComments = pendingComments?.associateBy { it.commentId } ?: mapOf()
 
-        val depthOffset = if (!parentComment) { 0 } else {
+        val depthOffset = if (!parentComment) {
+            0
+        } else {
             comments?.minOfOrNull { it.getDepth() } ?: 0
         }
 
@@ -203,7 +205,9 @@ class CommentTreeBuilder(
                         CommentNodeData(
                             listView = PostViewModel.ListView.PendingCommentListView(
                                 pendingComment,
-                                author = accountManager.getAccountById(pendingComment.accountId)?.name,
+                                author = accountManager.getAccountById(
+                                    pendingComment.accountId,
+                                )?.name,
                             ),
                             children = mutableListOf(),
                             depth = it.depth + 1,
@@ -340,9 +344,7 @@ private val Comment.parentParentNodeId
         .lastOrNull()
         ?.toIntOrNull()
 
-fun List<CommentNodeData>.flatten(
-    collapsedItemIds: Set<Long>,
-): MutableList<CommentNodeData> {
+fun List<CommentNodeData>.flatten(collapsedItemIds: Set<Long>): MutableList<CommentNodeData> {
     val result = mutableListOf<CommentNodeData>()
 
     fun CommentNodeData.flatten(result: MutableList<CommentNodeData>) {

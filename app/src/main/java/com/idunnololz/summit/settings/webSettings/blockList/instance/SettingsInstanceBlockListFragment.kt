@@ -77,7 +77,9 @@ class SettingsInstanceBlockListFragment : BaseFragment<FragmentSettingsCommunity
                         adapter.data = it.data
 
                         if (it.data.isEmpty()) {
-                            loadingView.showErrorText(R.string.there_doesnt_seem_to_be_anything_here)
+                            loadingView.showErrorText(
+                                R.string.there_doesnt_seem_to_be_anything_here,
+                            )
                         }
                     }
                 }
@@ -101,7 +103,10 @@ class SettingsInstanceBlockListFragment : BaseFragment<FragmentSettingsCommunity
                 old.blockedInstance.instance.id == new.blockedInstance.instance.id
             },
         ).apply {
-            addItemType(BlockedInstanceItem::class, BlockListInstanceItemBinding::inflate) { item, b, h ->
+            addItemType(
+                BlockedInstanceItem::class,
+                BlockListInstanceItemBinding::inflate,
+            ) { item, b, h ->
                 b.title.text = item.blockedInstance.instance.domain
 
                 if (item.isRemoving) {
@@ -121,8 +126,7 @@ class SettingsInstanceBlockListFragment : BaseFragment<FragmentSettingsCommunity
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

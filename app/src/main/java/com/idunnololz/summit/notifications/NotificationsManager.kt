@@ -22,7 +22,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
 import com.idunnololz.summit.lemmy.inbox.InboxEntry
@@ -32,14 +31,14 @@ import com.idunnololz.summit.preferences.NotificationsSharedPreference
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.APP_STARTUP_DELAY_MS
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.max
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Singleton
 class NotificationsManager @Inject constructor(
@@ -137,7 +136,10 @@ class NotificationsManager @Inject constructor(
         workManager.enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.KEEP, work)
 
         val minuteMs = 1000 * 60
-        Log.d(TAG, "Work scheduled to run in ${repeatInterval / minuteMs} minutes, every ${repeatInterval / minuteMs} minutes.")
+        Log.d(
+            TAG,
+            "Work scheduled to run in ${repeatInterval / minuteMs} minutes, every ${repeatInterval / minuteMs} minutes.",
+        )
 
         printDebugWorkersInfo()
     }
@@ -150,7 +152,10 @@ class NotificationsManager @Inject constructor(
         val infos = workManager.getWorkInfosByTag(TAG).get()
         for (info in infos) {
             Log.d(TAG, "Worker ${info.id}")
-            Log.d(TAG, "Work in ${(info.nextScheduleTimeMillis - System.currentTimeMillis()) / minuteMs} minutes")
+            Log.d(
+                TAG,
+                "Work in ${(info.nextScheduleTimeMillis - System.currentTimeMillis()) / minuteMs} minutes",
+            )
         }
     }
 
@@ -342,8 +347,7 @@ class NotificationsManager @Inject constructor(
         }
     }
 
-    private fun getChannelIdForAccount(account: Account) =
-        ChannelIdAccountPrefix + account.fullName
+    private fun getChannelIdForAccount(account: Account) = ChannelIdAccountPrefix + account.fullName
 
     private fun getChannelGroupIdForAccount(account: Account) =
         ChannelGroupIdAccountPrefix + account.fullName

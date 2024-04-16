@@ -21,11 +21,10 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AddOrEditCommentViewModel @Inject constructor(
@@ -60,12 +59,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         accountActionsManager
     }
 
-    fun sendComment(
-        account: Account,
-        postRef: PostRef,
-        parentId: CommentId?,
-        content: String,
-    ) {
+    fun sendComment(account: Account, postRef: PostRef, parentId: CommentId?, content: String) {
         viewModelScope.launch {
             if (postRef.instance != account.instance) {
                 commentSentEvent.postError(
@@ -87,12 +81,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         }
     }
 
-    fun sendComment(
-        account: Account,
-        instance: String,
-        inboxItem: InboxItem,
-        content: String,
-    ) {
+    fun sendComment(account: Account, instance: String, inboxItem: InboxItem, content: String) {
         viewModelScope.launch {
             if (inboxItem is CommentBackedItem) {
                 if (instance != account.instance) {
@@ -164,7 +153,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                 .onSuccess {
                     sendComment(
                         it.person_view.person.id,
-                        content
+                        content,
                     )
                 }
                 .onFailure {

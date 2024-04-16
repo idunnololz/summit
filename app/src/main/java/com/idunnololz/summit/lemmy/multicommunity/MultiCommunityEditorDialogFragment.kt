@@ -64,15 +64,14 @@ class MultiCommunityEditorDialogFragment :
             fragmentManager: FragmentManager,
             multiCommunity: CommunityRef.MultiCommunity,
             dbId: Long = 0,
-        ) =
-            MultiCommunityEditorDialogFragment()
-                .apply {
-                    arguments = MultiCommunityEditorDialogFragmentArgs(
-                        multiCommunity,
-                        dbId,
-                    ).toBundle()
-                }
-                .showAllowingStateLoss(fragmentManager, "MultiCommunityEditorDialogFragment")
+        ) = MultiCommunityEditorDialogFragment()
+            .apply {
+                arguments = MultiCommunityEditorDialogFragmentArgs(
+                    multiCommunity,
+                    dbId,
+                ).toBundle()
+            }
+            .showAllowingStateLoss(fragmentManager, "MultiCommunityEditorDialogFragment")
     }
 
     private val args by navArgs<MultiCommunityEditorDialogFragmentArgs>()
@@ -150,7 +149,9 @@ class MultiCommunityEditorDialogFragment :
         with(binding) {
             toolbar.title = getString(R.string.multi_community_editor)
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-            toolbar.setNavigationIconTint(context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+            toolbar.setNavigationIconTint(
+                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+            )
             toolbar.setNavigationOnClickListener {
                 dismiss()
             }
@@ -415,7 +416,7 @@ class MultiCommunityEditorDialogFragment :
 
         private val iconAdapter = IconAdapter(context, offlineManager, onIconSelected)
 
-        private val adapterHelper = AdapterHelper<Item> (
+        private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
                     is Item.SelectedCommunityItem -> {
@@ -451,7 +452,12 @@ class MultiCommunityEditorDialogFragment :
                             ) {
                             }
 
-                            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                            override fun onTextChanged(
+                                p0: CharSequence?,
+                                p1: Int,
+                                p2: Int,
+                                p3: Int,
+                            ) {
                             }
 
                             override fun afterTextChanged(p0: Editable?) {
@@ -511,7 +517,9 @@ class MultiCommunityEditorDialogFragment :
                     )
                     recyclerView.addItemDecoration(
                         HorizontalSpaceItemDecoration(
-                            sizePx = context.resources.getDimensionPixelOffset(R.dimen.padding_half),
+                            sizePx = context.resources.getDimensionPixelOffset(
+                                R.dimen.padding_half,
+                            ),
                             startAndEndSpacePx = 0,
                         ),
                     )
@@ -528,8 +536,7 @@ class MultiCommunityEditorDialogFragment :
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
@@ -671,8 +678,7 @@ class MultiCommunityEditorDialogFragment :
             refreshItems {}
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
@@ -681,8 +687,7 @@ class MultiCommunityEditorDialogFragment :
             adapterHelper.onBindViewHolder(holder, position)
         }
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         fun setIcons(data: List<String>, cb: () -> Unit) {
             this.data = data

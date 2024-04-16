@@ -15,9 +15,9 @@ import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class CommunitiesPaneViewModel @Inject constructor(
@@ -75,15 +75,14 @@ class CommunitiesPaneViewModel @Inject constructor(
         onCommunitySelected: OnCommunitySelected,
         onEditMultiCommunity: (UserCommunityItem) -> Unit,
         onAddBookmarkClick: () -> Unit,
-    ) =
-        communitiesPaneControllerFactory.create(
-            this,
-            binding,
-            viewLifecycleOwner,
-            onCommunitySelected,
-            onEditMultiCommunity,
-            onAddBookmarkClick,
-        )
+    ) = communitiesPaneControllerFactory.create(
+        this,
+        binding,
+        viewLifecycleOwner,
+        onCommunitySelected,
+        onEditMultiCommunity,
+        onAddBookmarkClick,
+    )
 
     fun loadCommunities() {
         userCommunities = userCommunitiesManager.getAllUserCommunities()

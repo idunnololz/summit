@@ -47,9 +47,10 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
                 try {
                     r.run()
-                } catch (e: IllegalStateException) { /* do nothing */
+                } catch (e: IllegalStateException) {
+                    /* do nothing */
                 }
-            },)
+            })
         }
     }
 

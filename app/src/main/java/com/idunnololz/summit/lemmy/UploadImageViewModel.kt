@@ -39,10 +39,7 @@ class UploadImageViewModel @Inject constructor(
         uploadImageInternal(uri, uploadImageForCommunityBanner)
     }
 
-    private fun uploadImageInternal(
-        uri: Uri,
-        imageLiveData: StatefulLiveData<UploadImageResult>,
-    ) {
+    private fun uploadImageInternal(uri: Uri, imageLiveData: StatefulLiveData<UploadImageResult>) {
         imageLiveData.setIsLoading()
 
         uploadHelper.upload(

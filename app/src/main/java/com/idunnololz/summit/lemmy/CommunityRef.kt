@@ -106,57 +106,56 @@ sealed interface CommunityRef : PageRef, Parcelable {
         val instance: String?,
     ) : CommunityRef
 
-    fun getName(context: Context): String =
-        when (this) {
-            is Local -> context.getString(R.string.local)
-            is All -> context.getString(R.string.all)
-            is CommunityRefByName -> this.name
-            is Subscribed -> context.getString(R.string.subscribed)
-            is MultiCommunity -> this.name
-            is ModeratedCommunities -> context.getString(R.string.moderated_communities)
-        }
+    fun getName(context: Context): String = when (this) {
+        is Local -> context.getString(R.string.local)
+        is All -> context.getString(R.string.all)
+        is CommunityRefByName -> this.name
+        is Subscribed -> context.getString(R.string.subscribed)
+        is MultiCommunity -> this.name
+        is ModeratedCommunities -> context.getString(R.string.moderated_communities)
+    }
 
-    fun getLocalizedFullName(context: Context): String =
-        when (this) {
-            is Local -> "${context.getString(R.string.local)}@${this.instance}"
-            is All -> "${context.getString(R.string.all)}@${this.instance}"
-            is CommunityRefByName -> this.fullName
-            is Subscribed -> "${context.getString(R.string.subscribed)}@${this.instance}"
-            is MultiCommunity -> this.name
-            is ModeratedCommunities -> "${context.getString(R.string.moderated_communities)}@${this.instance}"
-        }
+    fun getLocalizedFullName(context: Context): String = when (this) {
+        is Local -> "${context.getString(R.string.local)}@${this.instance}"
+        is All -> "${context.getString(R.string.all)}@${this.instance}"
+        is CommunityRefByName -> this.fullName
+        is Subscribed -> "${context.getString(R.string.subscribed)}@${this.instance}"
+        is MultiCommunity -> this.name
+        is ModeratedCommunities -> "${context.getString(
+            R.string.moderated_communities,
+        )}@${this.instance}"
+    }
 
-    fun getKey(): String =
-        when (this) {
-            is Local ->
-                if (this.instance != null) {
-                    "local@${this.instance}"
-                } else {
-                    "local"
-                }
-            is All ->
-                if (this.instance != null) {
-                    "all@${this.instance}"
-                } else {
-                    "all"
-                }
-            is CommunityRefByName -> this.fullName
-            is Subscribed ->
-                if (this.instance != null) {
-                    "subscribed@${this.instance}"
-                } else {
-                    "subscribed"
-                }
-            is MultiCommunity ->
-                "multicommunity@${this.name}"
+    fun getKey(): String = when (this) {
+        is Local ->
+            if (this.instance != null) {
+                "local@${this.instance}"
+            } else {
+                "local"
+            }
+        is All ->
+            if (this.instance != null) {
+                "all@${this.instance}"
+            } else {
+                "all"
+            }
+        is CommunityRefByName -> this.fullName
+        is Subscribed ->
+            if (this.instance != null) {
+                "subscribed@${this.instance}"
+            } else {
+                "subscribed"
+            }
+        is MultiCommunity ->
+            "multicommunity@${this.name}"
 
-            is ModeratedCommunities ->
-                if (this.instance != null) {
-                    "mc@${this.instance}"
-                } else {
-                    "mc"
-                }
-        }
+        is ModeratedCommunities ->
+            if (this.instance != null) {
+                "mc@${this.instance}"
+            } else {
+                "mc"
+            }
+    }
 }
 
 fun Community.toCommunityRef(): CommunityRef.CommunityRefByName {

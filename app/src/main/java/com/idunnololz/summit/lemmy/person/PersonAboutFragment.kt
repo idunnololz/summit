@@ -222,7 +222,10 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             addItemType(Item.TitleItem::class, PersonInfoTitleBinding::inflate) { item, b, h ->
                 b.title.text = item.title
             }
-            addItemType(Item.ModeratedCommunity::class, PersonInfoModeratesItemBinding::inflate) { item, b, h ->
+            addItemType(
+                Item.ModeratedCommunity::class,
+                PersonInfoModeratesItemBinding::inflate,
+            ) { item, b, h ->
                 val community = item.community
 
                 if (community.community.icon == null) {
@@ -248,14 +251,12 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

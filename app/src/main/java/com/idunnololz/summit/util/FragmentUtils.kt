@@ -1,7 +1,6 @@
 package com.idunnololz.summit.util
 
 import android.util.Log
-import android.view.ViewTreeObserver
 import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.lemmy.communities.CommunitiesFragment
@@ -29,7 +28,6 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
         Log.d("MainActivity", "setupForFragment(): $t")
 
         runWhenLaidOut {
-
             when (t) {
                 CommunityFragment::class -> {
                     navBarController.enableBottomNavViewScrolling()
@@ -73,7 +71,7 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                 PersonTabbedFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()
                     navBarController.showBottomNav()
-                    showNotificationBarBg()
+                    hideNotificationBarBg()
                 }
                 CommunityInfoFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()
@@ -111,7 +109,9 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                     hideNotificationBarBg()
                 }
                 else ->
-                    throw RuntimeException("No setup instructions for type: ${t.java.canonicalName}")
+                    throw RuntimeException(
+                        "No setup instructions for type: ${t.java.canonicalName}",
+                    )
             }
         }
     }

@@ -387,11 +387,7 @@ class PostAdapter(
         }
     }
 
-    override fun onBindViewHolder(
-        holder: ViewHolder,
-        position: Int,
-        payloads: MutableList<Any>,
-    ) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
         when (val item = items[position]) {
             is HeaderItem -> {
                 if (payloads.isEmpty()) {
@@ -608,7 +604,13 @@ class PostAdapter(
                         onInstanceMismatch = onInstanceMismatch,
                     )
 
-                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
+                    updateScreenshotMode(
+                        holder,
+                        item.screenshotMode,
+                        b.startGuideline,
+                        b.root,
+                        item,
+                    )
                 } else {
                     // collapsed
                     val b = holder.getBinding<PostCommentCollapsedItemBinding>()
@@ -684,7 +686,13 @@ class PostAdapter(
                         collapseSection = ::collapseSection,
                     )
 
-                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
+                    updateScreenshotMode(
+                        holder,
+                        item.screenshotMode,
+                        b.startGuideline,
+                        b.root,
+                        item,
+                    )
                 } else {
                     // collapsed
                     val b = holder.getBinding<PostPendingCommentCollapsedItemBinding>()
@@ -703,7 +711,13 @@ class PostAdapter(
                         expandSection = ::collapseSection,
                     )
 
-                    updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
+                    updateScreenshotMode(
+                        holder,
+                        item.screenshotMode,
+                        b.startGuideline,
+                        b.root,
+                        item,
+                    )
                 }
                 holder.itemView.setTag(R.id.expanded, item.isExpanded)
             }
@@ -1166,20 +1180,19 @@ class PostAdapter(
         return changed
     }
 
-    fun getPositionOfComment(commentId: CommentId): Int =
-        items.indexOfFirst {
-            when (it) {
-                is Item.VisibleCommentItem -> it.commentId == commentId
-                is Item.FilteredCommentItem -> it.commentId == commentId
-                is HeaderItem -> false
-                is MoreCommentsItem -> false
-                is PendingCommentItem -> it.commentId == commentId
-                is ProgressOrErrorItem -> false
-                FooterItem -> false
-                is Item.ViewAllComments -> false
-                is Item.MissingCommentItem -> false
-            }
+    fun getPositionOfComment(commentId: CommentId): Int = items.indexOfFirst {
+        when (it) {
+            is Item.VisibleCommentItem -> it.commentId == commentId
+            is Item.FilteredCommentItem -> it.commentId == commentId
+            is HeaderItem -> false
+            is MoreCommentsItem -> false
+            is PendingCommentItem -> it.commentId == commentId
+            is ProgressOrErrorItem -> false
+            FooterItem -> false
+            is Item.ViewAllComments -> false
+            is Item.MissingCommentItem -> false
         }
+    }
 
     fun getPrevTopLevelCommentPosition(position: Int): Int? {
         val topLevelPosition = absolutionPositionToTopLevelCommentPosition.getOrNull(position)
@@ -1449,6 +1462,5 @@ class PostAdapter(
         }
     }
 
-    fun isPost(position: Int): Boolean =
-        items[position] is HeaderItem
+    fun isPost(position: Int): Boolean = items[position] is HeaderItem
 }

@@ -41,7 +41,6 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
-import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyContentHelper
@@ -69,8 +68,8 @@ import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @ActivityScoped
 class PostListViewBuilder @Inject constructor(
@@ -490,7 +489,9 @@ class PostListViewBuilder @Inject constructor(
                     null
                 } else {
                     lemmyContentHelper.getState(fullContentContainerView).videoState?.let {
-                        it.copy(currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS)
+                        it.copy(
+                            currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS,
+                        )
                     }
                 }
                 onItemClick(
@@ -958,8 +959,7 @@ class PostListViewBuilder @Inject constructor(
         downvoteCount?.textSize = postUiConfig.footerTextSizeSp.toTextSize()
     }
 
-    private fun Float.toTextSize(): Float =
-        this * textSizeMultiplier * globalFontSizeMultiplier
+    private fun Float.toTextSize(): Float = this * textSizeMultiplier * globalFontSizeMultiplier
 
     fun recycle(holder: ListingItemViewHolder) {
         if (holder.fullContentContainerView != null) {

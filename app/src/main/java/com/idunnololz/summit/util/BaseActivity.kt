@@ -76,7 +76,9 @@ abstract class BaseActivity : AppCompatActivity() {
                 val blue = Color.blue(navigationBarColor)
 
                 if (red * 0.299 + green * 0.587 + blue * 0.114 > 186) {
-                    requestWindowFeature(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                    requestWindowFeature(
+                        WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS,
+                    )
                     var flags = window.decorView.systemUiVisibility
                     flags = flags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
                     window.decorView.systemUiVisibility = flags

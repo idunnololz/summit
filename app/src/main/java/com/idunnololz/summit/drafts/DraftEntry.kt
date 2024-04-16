@@ -45,14 +45,13 @@ class DraftConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToDraftData(value: String): DraftData? =
-        try {
-            moshi.adapter(DraftData::class.java).fromJson(value)
-        } catch (e: Exception) {
-            Log.e(TAG, "", e)
-            FirebaseCrashlytics.getInstance().recordException(e)
-            null
-        }
+    fun stringToDraftData(value: String): DraftData? = try {
+        moshi.adapter(DraftData::class.java).fromJson(value)
+    } catch (e: Exception) {
+        Log.e(TAG, "", e)
+        FirebaseCrashlytics.getInstance().recordException(e)
+        null
+    }
 }
 
 object DraftTypes {

@@ -2,21 +2,22 @@ package com.idunnololz.summit.lemmy.person
 
 import android.os.Bundle
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.isPersonBlocked
@@ -54,13 +55,15 @@ import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import javax.inject.Inject
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
@@ -108,6 +111,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
+        val mainActivity = requireMainActivity()
 
         requireMainActivity().apply {
             setupForFragment<PersonTabbedFragment>()
@@ -117,7 +121,26 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = ""
 
-            insetViewAutomaticallyByMarginAndNavUi(viewLifecycleOwner, binding.coordinatorLayout)
+            insetViewAutomaticallyByPaddingAndNavUi(
+                viewLifecycleOwner,
+                binding.coordinatorLayout,
+                applyTopInset = false,
+            )
+            insets.observe(viewLifecycleOwner) {
+                val previousPadding = binding.toolbar.paddingTop
+                val newToolbarHeight = binding.toolbar.measuredHeight - previousPadding + it.topInset
+
+                binding.bannerDummy.updateLayoutParams<MarginLayoutParams> {
+                    topMargin = -it.topInset
+                }
+
+                binding.coordinatorLayout.updatePadding(top = it.topInset)
+                binding.collapsingToolbarLayout.scrimVisibleHeightTrigger =
+                    (newToolbarHeight + Utils.convertDpToPixel(16f)).toInt()
+                binding.bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
+                    height = newToolbarHeight
+                }
+            }
         }
 
         onPersonChanged()
@@ -125,6 +148,19 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         with(binding) {
             binding.fab.hide()
             binding.tabLayoutContainer.visibility = View.GONE
+
+            appBar.addOnOffsetChangedListener { appBar, offset ->
+                Log.d("HAHA", "progress: ${offset.toFloat() / appBar.totalScrollRange}")
+
+                val topInset = mainActivity.insets.value?.topInset ?: 0
+
+                val fixedTotalRange = appBar.totalScrollRange - topInset
+
+                val progress = min(1f, abs(offset.toFloat() / fixedTotalRange))
+                val scrimEndProgress = 0.7f
+
+                bannerContainer.alpha = max(0f, 1f - progress / scrimEndProgress)
+            }
 
             if (args.personRef == null) {
                 viewModel.currentAccountView.observe(viewLifecycleOwner) {
@@ -184,7 +220,9 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
             binding.banner.transitionName = "banner_image"
 
-            val actionBarHeight = context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize)
+            val actionBarHeight = context.getDimenFromAttribute(
+                androidx.appcompat.R.attr.actionBarSize,
+            )
             binding.appBar.addOnOffsetChangedListener { _, verticalOffset ->
                 if (!isBindingAvailable()) {
                     return@addOnOffsetChangedListener
@@ -348,7 +386,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     this.topMargin = -Utils.convertDpToPixel(32f).toInt()
                 }
 
-                banner.setOnClickListener {
+                bannerDummy.setOnClickListener {
                     getMainActivity()?.openImage(
                         banner,
                         null,
@@ -362,6 +400,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         allowHardware(false)
                     }
                 }
+            } else {
+                bannerDummy.setOnClickListener(null)
             }
             avatarHelper.loadAvatar(profileIcon, data.personView.person)
             if (data.personView.person.avatar.isNullOrBlank()) {

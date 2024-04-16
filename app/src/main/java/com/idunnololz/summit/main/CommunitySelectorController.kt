@@ -175,7 +175,12 @@ class CommunitySelectorController @AssistedInject constructor(
             object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {}
 
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {}
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     adapter.setQuery(s?.toString()) {
@@ -190,10 +195,7 @@ class CommunitySelectorController @AssistedInject constructor(
         activity.insetViewExceptTopAutomaticallyByMargins(activity, binding.recyclerView)
     }
 
-    fun show(
-        bottomSheetContainer: ViewGroup,
-        activity: MainActivity,
-    ) {
+    fun show(bottomSheetContainer: ViewGroup, activity: MainActivity) {
         val rootView = rootView ?: return
 
         if (rootView.parent != null) {
@@ -253,7 +255,7 @@ class CommunitySelectorController @AssistedInject constructor(
         rootView.runAfterLayout {
             rootView.postDelayed({
                 bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
-            }, 100,)
+            }, 100)
         }
     }
 
@@ -379,7 +381,7 @@ class CommunitySelectorController @AssistedInject constructor(
             onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
 
-        private val adapterHelper = AdapterHelper<Item> (
+        private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
                 old.id == new.id
             },
@@ -488,12 +490,18 @@ class CommunitySelectorController @AssistedInject constructor(
                         if (item.communityView.subscribed != SubscribedType.Subscribed) {
                             b.subscribe.text = context.getString(R.string.subscribe)
                             b.subscribe.setOnClickListener {
-                                viewModel.updateSubscriptionStatus(item.communityView.community.id, true)
+                                viewModel.updateSubscriptionStatus(
+                                    item.communityView.community.id,
+                                    true,
+                                )
                             }
                         } else {
                             b.subscribe.text = context.getString(R.string.unsubscribe)
                             b.subscribe.setOnClickListener {
-                                viewModel.updateSubscriptionStatus(item.communityView.community.id, false)
+                                viewModel.updateSubscriptionStatus(
+                                    item.communityView.community.id,
+                                    false,
+                                )
                             }
                         }
                         b.moreInfo.visibility = View.VISIBLE
@@ -745,10 +753,10 @@ class CommunitySelectorController @AssistedInject constructor(
                         ),
                     )
                     if (accountInfoManager.currentFullAccount.value
-                        ?.accountInfo
-                        ?.miscAccountInfo
-                        ?.modCommunityIds
-                        ?.isNotEmpty() == true
+                            ?.accountInfo
+                            ?.miscAccountInfo
+                            ?.modCommunityIds
+                            ?.isNotEmpty() == true
                     ) {
                         newItems.add(
                             Item.StaticChildItem(
@@ -841,8 +849,7 @@ class CommunitySelectorController @AssistedInject constructor(
             adapterHelper.setItems(listOf(Item.LoadingItem), this)
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)

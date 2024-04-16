@@ -274,7 +274,10 @@ class QueryEngine(
                                     items.sortedBy {
                                         when (it) {
                                             is SearchResultView.CommentResultView ->
-                                                trigram.distance(it.commentView.comment.content, currentQuery)
+                                                trigram.distance(
+                                                    it.commentView.comment.content,
+                                                    currentQuery,
+                                                )
                                             is SearchResultView.CommunityResultView -> {
                                                 trigram.distance(
                                                     it.communityView.community.name,
@@ -286,7 +289,10 @@ class QueryEngine(
                                                 trigram.distance(toMatch, currentQuery)
                                             }
                                             is SearchResultView.UserResultView ->
-                                                trigram.distance(it.personView.person.name, currentQuery)
+                                                trigram.distance(
+                                                    it.personView.person.name,
+                                                    currentQuery,
+                                                )
                                         }
                                     }
                                 } else {
@@ -371,13 +377,25 @@ class QueryEngine(
                                     items.sortedBy { view ->
                                         when (view) {
                                             is SearchResultView.CommentResultView ->
-                                                trigram.distance(view.commentView.comment.ap_id, currentQuery)
+                                                trigram.distance(
+                                                    view.commentView.comment.ap_id,
+                                                    currentQuery,
+                                                )
                                             is SearchResultView.CommunityResultView ->
-                                                trigram.distance(view.communityView.community.actor_id, currentQuery)
+                                                trigram.distance(
+                                                    view.communityView.community.actor_id,
+                                                    currentQuery,
+                                                )
                                             is SearchResultView.PostResultView ->
-                                                trigram.distance(view.postView.post.ap_id, currentQuery)
+                                                trigram.distance(
+                                                    view.postView.post.ap_id,
+                                                    currentQuery,
+                                                )
                                             is SearchResultView.UserResultView ->
-                                                trigram.distance(view.personView.person.actor_id, currentQuery)
+                                                trigram.distance(
+                                                    view.personView.person.actor_id,
+                                                    currentQuery,
+                                                )
                                         }
                                     }
                                 } else {
@@ -517,9 +535,7 @@ class QueryEngine(
         activePageQueries.clear()
     }
 
-    private fun Int.toLemmyPageIndex() =
-        this + 1 // lemmy pages are 1 indexed
+    private fun Int.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
 
-    fun getItems() =
-        _items
+    fun getItems() = _items
 }

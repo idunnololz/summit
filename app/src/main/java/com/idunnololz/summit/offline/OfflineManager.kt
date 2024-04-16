@@ -18,6 +18,12 @@ import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.assertMainThread
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.util.LinkedList
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,12 +34,6 @@ import okhttp3.Request
 import okio.BufferedSink
 import okio.buffer
 import okio.sink
-import java.io.File
-import java.util.LinkedList
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
 
 @SuppressLint("UnsafeOptInUsageError")
 @Singleton
@@ -81,7 +81,12 @@ class OfflineManager @Inject constructor(
         fetchImageWithError(rootView, url, listener, null)
     }
 
-    fun fetchImageWithError(rootView: View, url: String?, listener: TaskListener, errorListener: TaskFailedListener?) {
+    fun fetchImageWithError(
+        rootView: View,
+        url: String?,
+        listener: TaskListener,
+        errorListener: TaskFailedListener?,
+    ) {
         Log.d(TAG, "fetchImageWithError(): $url")
         url ?: return
         val registrations: MutableList<Registration> = (
@@ -96,7 +101,11 @@ class OfflineManager @Inject constructor(
         )
     }
 
-    fun cancelFetch(url: String, listener: TaskListener, errorListener: TaskFailedListener? = null) {
+    fun cancelFetch(
+        url: String,
+        listener: TaskListener,
+        errorListener: TaskFailedListener? = null,
+    ) {
         assertMainThread()
 
         val task = downloadTasks[url]
@@ -152,7 +161,9 @@ class OfflineManager @Inject constructor(
         }
     }
 
-    fun hasMaxImageSizeHint(file: File): Boolean = maxImageSizeHint.containsKey(file.toUri().toString())
+    fun hasMaxImageSizeHint(file: File): Boolean = maxImageSizeHint.containsKey(
+        file.toUri().toString(),
+    )
 
     fun getMaxImageSizeHint(file: File, size: Size): Size =
         getMaxImageSizeHint(file.toUri().toString(), size)
@@ -545,7 +556,9 @@ class OfflineManager @Inject constructor(
 //        }
 //    }
 
-    fun addOfflineDownloadProgressListener(listener: OfflineDownloadProgressListener): OfflineDownloadProgressListener {
+    fun addOfflineDownloadProgressListener(
+        listener: OfflineDownloadProgressListener,
+    ): OfflineDownloadProgressListener {
         offlineDownloadProgressListeners.add(listener)
         return listener
     }

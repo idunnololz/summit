@@ -22,6 +22,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Pair
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +33,6 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.MainDirections
@@ -68,26 +68,28 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
-import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by InsetsHelper(consumeInsets = true) {
+class MainActivity :
+    BaseActivity(),
+    BottomMenuContainer,
+    InsetsProvider by InsetsHelper(
+        consumeInsets = true,
+    ) {
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
@@ -349,8 +351,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean =
-        currentNavController?.navigateUp() ?: false
+    override fun onSupportNavigateUp(): Boolean = currentNavController?.navigateUp() ?: false
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         val handled = keyPressRegistrationManager.onKeyDown(keyCode, event)
@@ -393,7 +394,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
 
     private fun registerInsetsHandler() {
         onInsetsChanged = {
-            with (it) {
+            with(it) {
                 Log.d(TAG, "Updated insets: top: $topInset bottom: $bottomInset")
 
                 navBarController.onInsetsChanged(
@@ -681,7 +682,9 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                 communitySelectorController = it
             }
 
-    fun showCommunitySelector(currentCommunityRef: CommunityRef? = null): CommunitySelectorController {
+    fun showCommunitySelector(
+        currentCommunityRef: CommunityRef? = null,
+    ): CommunitySelectorController {
         val communitySelectorController = createOrGetSubredditSelectorController()
 
         viewModel.communities.value.let {
@@ -735,7 +738,10 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
     fun insetViewAutomaticallyByPaddingAndNavUi(
         lifecycleOwner: LifecycleOwner,
         rootView: View,
-        additionalPaddingBottom: Int = 0,
+        applyLeftInset: Boolean = true,
+        applyTopInset: Boolean = true,
+        applyRightInset: Boolean = true,
+        applyBottomInset: Boolean = true,
     ) {
         insets.observe(lifecycleOwner) {
             rootView.post {
@@ -745,10 +751,26 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                 }
 
                 rootView.setPadding(
-                    navBarController.newLeftInset,
-                    it.topInset,
-                    navBarController.newRightInset,
-                    bottomPadding + additionalPaddingBottom,
+                    if (applyLeftInset) {
+                        navBarController.newLeftInset
+                    } else {
+                        rootView.paddingLeft
+                    },
+                    if (applyTopInset) {
+                        it.topInset
+                    } else {
+                        rootView.paddingTop
+                    },
+                    if (applyRightInset) {
+                        navBarController.newRightInset
+                    } else {
+                        rootView.paddingRight
+                    },
+                    if (applyBottomInset) {
+                        bottomPadding
+                    } else {
+                        rootView.paddingBottom
+                    },
                 )
             }
         }
@@ -793,11 +815,10 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
                     bottomPadding = insets.bottomInset
                 }
 
-                rootView.setPadding(
-                    insets.leftInset,
-                    0,
-                    insets.rightInset,
-                    bottomPadding + additionalPaddingBottom,
+                rootView.updatePadding(
+                    left = insets.leftInset,
+                    right = insets.rightInset,
+                    bottom = bottomPadding + additionalPaddingBottom,
                 )
             }
         }
@@ -885,11 +906,7 @@ class MainActivity : BaseActivity(), BottomMenuContainer, InsetsProvider by Inse
         }
     }
 
-    fun openVideo(
-        url: String,
-        videoType: VideoType,
-        videoState: VideoState?,
-    ) {
+    fun openVideo(url: String, videoType: VideoType, videoState: VideoState?) {
         val direction = MainDirections.actionGlobalVideoViewerFragment(url, videoType, videoState)
         currentNavController?.navigateSafe(direction)
     }

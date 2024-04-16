@@ -6,12 +6,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.mod.ModActionResult
-import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
@@ -231,7 +228,10 @@ fun BaseFragment<*>.installOnActionResultHandler(
                         Snackbar.LENGTH_SHORT,
                     )
                     .setAction(R.string.undo) { _ ->
-                        moreActionsHelper.updateSubscription(it.data.communityId, !it.data.subscribe)
+                        moreActionsHelper.updateSubscription(
+                            it.data.communityId,
+                            !it.data.subscribe,
+                        )
                     }
                     .show()
             }
@@ -256,7 +256,8 @@ fun BaseFragment<*>.installOnActionResultHandler(
                             val uri = downloadResult.uri
                             val mimeType = downloadResult.mimeType
 
-                            val snackbarMsg = getString(R.string.image_saved_format, downloadResult.uri)
+                            val snackbarMsg =
+                                getString(R.string.image_saved_format, downloadResult.uri)
                             Snackbar.make(
                                 snackbarContainer,
                                 snackbarMsg,
@@ -274,7 +275,8 @@ fun BaseFragment<*>.installOnActionResultHandler(
                             }.show()
 
                             moreActionsHelper.downloadResult.postIdle()
-                        } catch (e: IOException) { /* do nothing */
+                        } catch (e: IOException) {
+                            /* do nothing */
                         }
                     }
                     .onFailure {

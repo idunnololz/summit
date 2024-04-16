@@ -24,8 +24,7 @@ class LruDataCache(private val diskLruCache: DiskLruCache) : IDataCache {
         editor.commit()
     }
 
-    override fun hasCache(key: String): Boolean =
-        diskLruCache.get(key) != null
+    override fun hasCache(key: String): Boolean = diskLruCache.get(key) != null
 
     override fun hasFreshCache(key: String): Boolean {
         TODO("Not yet implemented")

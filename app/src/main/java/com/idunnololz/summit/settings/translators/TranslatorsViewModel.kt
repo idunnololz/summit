@@ -9,9 +9,9 @@ import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.Types
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class TranslatorsViewModel @Inject constructor(
@@ -38,7 +38,8 @@ class TranslatorsViewModel @Inject constructor(
 
             val translationStatsObject = adapter.fromJson(json)
 
-            val languageToTranslators = mutableMapOf<String, MutableList<TranslationTranslatorStats>>()
+            val languageToTranslators =
+                mutableMapOf<String, MutableList<TranslationTranslatorStats>>()
 
             for (item in translationStatsObject ?: listOf()) {
                 for ((locale, v) in item.entries) {

@@ -45,7 +45,6 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
-import com.idunnololz.summit.lemmy.utils.mentions.MentionsResultAdapter
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -215,7 +214,9 @@ class CreateOrEditPostFragment :
             binding.toolbar.menu.findItem(R.id.update_post)?.isVisible = false
         }
         binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-        binding.toolbar.setNavigationIconTint(context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+        binding.toolbar.setNavigationIconTint(
+            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+        )
         binding.toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
@@ -303,11 +304,31 @@ class CreateOrEditPostFragment :
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)
-                        addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
-                        addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
-                        addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
-                        addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
-                        addItemWithIcon(R.id.use_a_saved_image, R.string.use_a_saved_image, R.drawable.baseline_save_24)
+                        addItemWithIcon(
+                            R.id.from_camera,
+                            R.string.take_a_photo,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery,
+                            R.string.choose_from_gallery,
+                            R.drawable.baseline_image_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_camera_with_editor,
+                            R.string.take_a_photo_with_editor,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery_with_editor,
+                            R.string.choose_from_gallery_with_editor,
+                            R.drawable.baseline_image_24,
+                        )
+                        addItemWithIcon(
+                            R.id.use_a_saved_image,
+                            R.string.use_a_saved_image,
+                            R.drawable.baseline_save_24,
+                        )
 
                         setOnMenuItemClickListener {
                             when (it.id) {
@@ -344,7 +365,10 @@ class CreateOrEditPostFragment :
                                         .apply {
                                             arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
                                         }
-                                        .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")
+                                        .showAllowingStateLoss(
+                                            childFragmentManager,
+                                            "ChooseSavedImageDialogFragment",
+                                        )
                                 }
                             }
                         }
@@ -394,11 +418,31 @@ class CreateOrEditPostFragment :
         binding.url.setEndIconOnClickListener {
             val bottomMenu = BottomMenu(context).apply {
                 setTitle(R.string.insert_image)
-                addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
-                addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
-                addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
-                addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
-                addItemWithIcon(R.id.use_a_saved_image, R.string.use_a_saved_image, R.drawable.baseline_save_24)
+                addItemWithIcon(
+                    R.id.from_camera,
+                    R.string.take_a_photo,
+                    R.drawable.baseline_photo_camera_24,
+                )
+                addItemWithIcon(
+                    R.id.from_gallery,
+                    R.string.choose_from_gallery,
+                    R.drawable.baseline_image_24,
+                )
+                addItemWithIcon(
+                    R.id.from_camera_with_editor,
+                    R.string.take_a_photo_with_editor,
+                    R.drawable.baseline_photo_camera_24,
+                )
+                addItemWithIcon(
+                    R.id.from_gallery_with_editor,
+                    R.string.choose_from_gallery_with_editor,
+                    R.drawable.baseline_image_24,
+                )
+                addItemWithIcon(
+                    R.id.use_a_saved_image,
+                    R.string.use_a_saved_image,
+                    R.drawable.baseline_save_24,
+                )
 
                 setOnMenuItemClickListener {
                     when (it.id) {
@@ -437,7 +481,10 @@ class CreateOrEditPostFragment :
                                         "for_link",
                                     ).toBundle()
                                 }
-                                .showAllowingStateLoss(childFragmentManager, "ChooseSavedImageDialogFragment")
+                                .showAllowingStateLoss(
+                                    childFragmentManager,
+                                    "ChooseSavedImageDialogFragment",
+                                )
                         }
                     }
                 }
@@ -851,17 +898,16 @@ class CreateOrEditPostFragment :
         textFormatToolbar?.isEnabled = !isLoading
     }
 
-    private fun Post.getCrossPostContent(): String =
-        buildString {
-            appendLine(getString(R.string.cross_posted_from_format, ap_id))
-            appendLine()
+    private fun Post.getCrossPostContent(): String = buildString {
+        appendLine(getString(R.string.cross_posted_from_format, ap_id))
+        appendLine()
 
-            body ?: return@buildString
+        body ?: return@buildString
 
-            body.split("\n").forEach {
-                appendLine("> $it")
-            }
+        body.split("\n").forEach {
+            appendLine("> $it")
         }
+    }
 
     private fun showSearch() {
         if (!isBindingAvailable()) return
@@ -893,8 +939,7 @@ class CreateOrEditPostFragment :
         }
     }
 
-    private fun isEdit() =
-        args.post != null
+    private fun isEdit() = args.post != null
 
     override fun onBackPressed(): Boolean {
         if (isBindingAvailable()) {
@@ -961,13 +1006,12 @@ class CreateOrEditPostFragment :
         }
     }
 
-    private fun Post.toOriginalPostData(): OriginalPostData =
-        OriginalPostData(
-            this.name,
-            this.body,
-            this.url,
-            this.nsfw,
-        )
+    private fun Post.toOriginalPostData(): OriginalPostData = OriginalPostData(
+        this.name,
+        this.body,
+        this.url,
+        this.nsfw,
+    )
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
         when (tag) {

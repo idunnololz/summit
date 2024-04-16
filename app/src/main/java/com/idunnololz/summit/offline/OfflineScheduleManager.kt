@@ -98,10 +98,10 @@ class OfflineScheduleManager(
         Log.d(
             TAG,
             "Alarm set for ${
-            SimpleDateFormat(
-                "dd/MM/yy hh:mm aa",
-                Locale.US,
-            ).format(Date(calendar.timeInMillis))
+                SimpleDateFormat(
+                    "dd/MM/yy hh:mm aa",
+                    Locale.US,
+                ).format(Date(calendar.timeInMillis))
             }",
         )
     }

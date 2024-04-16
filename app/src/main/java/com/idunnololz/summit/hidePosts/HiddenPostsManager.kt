@@ -3,10 +3,10 @@ package com.idunnololz.summit.hidePosts
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.Preferences
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 @Singleton
 class HiddenPostsManager @Inject constructor(
@@ -68,8 +68,7 @@ class HiddenPostsManager @Inject constructor(
         }
     }
 
-    suspend fun getHiddenPostsCount() =
-        hiddenPostsDao.count()
+    suspend fun getHiddenPostsCount() = hiddenPostsDao.count()
 
     suspend fun getHiddenPostEntries(instance: String): Set<PostId> =
         getHiddenPostEntriesInternal(instance)

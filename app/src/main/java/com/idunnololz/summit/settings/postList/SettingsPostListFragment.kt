@@ -264,12 +264,23 @@ class SettingsPostListFragment :
                 preferences.showFilteredPosts = it
             },
         )
+        settings.homeFabQuickAction.bindTo(
+            binding.homeFabQuickAction,
+            { preferences.homeFabQuickAction },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "homeFabQuickAction")
+            },
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {
             settings.defaultCommunitySortOrder.id -> {
                 preferences.defaultCommunitySortOrder = idToSortOrder(value as Int)
+            }
+            settings.homeFabQuickAction.id -> {
+                preferences.homeFabQuickAction = value as Int
             }
         }
 

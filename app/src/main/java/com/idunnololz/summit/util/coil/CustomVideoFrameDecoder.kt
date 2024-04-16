@@ -95,7 +95,13 @@ class CustomVideoFrameDecoder(
 
         val (dstWidth, dstHeight) = dstSize
         val rawBitmap: Bitmap? = if (SDK_INT >= 27 && dstWidth is Pixels && dstHeight is Pixels) {
-            retriever.getScaledFrameAtTime(frameMicros, option, dstWidth.px, dstHeight.px, options.config)
+            retriever.getScaledFrameAtTime(
+                frameMicros,
+                option,
+                dstWidth.px,
+                dstHeight.px,
+                options.config,
+            )
         } else {
             retriever.getFrameAtTime(frameMicros, option, options.config)?.also {
                 srcWidth = it.width
@@ -234,7 +240,11 @@ class CustomVideoFrameDecoder(
 
     class Factory : Decoder.Factory {
 
-        override fun create(result: SourceResult, options: Options, imageLoader: ImageLoader): Decoder? {
+        override fun create(
+            result: SourceResult,
+            options: Options,
+            imageLoader: ImageLoader,
+        ): Decoder? {
             if (!isApplicable(result.mimeType)) return null
             return CustomVideoFrameDecoder(result.source, options)
         }

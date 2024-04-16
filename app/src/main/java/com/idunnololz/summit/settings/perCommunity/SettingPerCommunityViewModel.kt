@@ -13,9 +13,9 @@ import com.idunnololz.summit.settings.SubgroupItem
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingPerCommunityViewModel @Inject constructor(
@@ -95,11 +95,10 @@ class SettingPerCommunityViewModel @Inject constructor(
         )
     }
 
-    private fun makeBaseSettings() =
-        listOf(
-            settings.usePerCommunitySettings,
-            settings.clearPerCommunitySettings,
-        )
+    private fun makeBaseSettings() = listOf(
+        settings.usePerCommunitySettings,
+        settings.clearPerCommunitySettings,
+    )
 
     fun onSettingClick(setting: SettingItem) {
         when (setting.id) {

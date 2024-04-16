@@ -5,12 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class DraftsViewModel @Inject constructor(
@@ -98,7 +98,8 @@ class DraftsViewModel @Inject constructor(
                     is DraftData.PostDraftData ->
                         items.add(ViewModelItem.PostDraftItem(draft, draft.data))
 
-                    null -> { /* do nothing */
+                    null -> {
+                        /* do nothing */
                     }
                 }
             }

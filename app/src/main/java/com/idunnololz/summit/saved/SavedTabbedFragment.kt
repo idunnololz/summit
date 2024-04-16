@@ -67,7 +67,10 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
 
 //            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 //            insetViewExceptTopAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.viewPager)
-            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.coordinatorLayoutContainer)
+            insetViewAutomaticallyByPaddingAndNavUi(
+                viewLifecycleOwner,
+                binding.coordinatorLayoutContainer,
+            )
         }
 
         with(binding) {

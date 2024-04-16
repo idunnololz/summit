@@ -32,14 +32,14 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.LinkedList
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.pow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.LinkedList
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.pow
 
 class PendingActionsRunner @AssistedInject constructor(
     @ApplicationContext private val context: Context,
@@ -51,8 +51,14 @@ class PendingActionsRunner @AssistedInject constructor(
     @Assisted private val actionsContext: CoroutineContext,
 
     @Assisted private val delayAction: suspend (action: LemmyAction, nextRefreshMs: Long) -> Unit,
-    @Assisted private val completeActionError: suspend (action: LemmyAction, failureReason: LemmyActionFailureReason) -> Unit,
-    @Assisted private val completeActionSuccess: suspend (action: LemmyAction, result: LemmyActionResult<*, *>) -> Unit,
+    @Assisted private val completeActionError: suspend (
+        action: LemmyAction,
+        failureReason: LemmyActionFailureReason,
+    ) -> Unit,
+    @Assisted private val completeActionSuccess: suspend (
+        action: LemmyAction,
+        result: LemmyActionResult<*, *>,
+    ) -> Unit,
 ) {
     @AssistedFactory
     interface Factory {
@@ -60,10 +66,15 @@ class PendingActionsRunner @AssistedInject constructor(
             actions: LinkedList<LemmyAction>,
             coroutineScope: CoroutineScope,
             actionsContext: CoroutineContext,
-
             delayAction: suspend (action: LemmyAction, nextRefreshMs: Long) -> Unit,
-            completeActionError: suspend (action: LemmyAction, failureReason: LemmyActionFailureReason) -> Unit,
-            completeActionSuccess: suspend (action: LemmyAction, result: LemmyActionResult<*, *>) -> Unit,
+            completeActionError: suspend (
+                action: LemmyAction,
+                failureReason: LemmyActionFailureReason,
+            ) -> Unit,
+            completeActionSuccess: suspend (
+                action: LemmyAction,
+                result: LemmyActionResult<*, *>,
+            ) -> Unit,
         ): PendingActionsRunner
     }
 

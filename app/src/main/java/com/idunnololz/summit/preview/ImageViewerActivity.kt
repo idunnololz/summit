@@ -21,11 +21,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.navArgs
-import androidx.transition.TransitionManager
 import coil.imageLoader
 import coil.request.ImageRequest
-import coil.size.OriginalSize
-import coil.size.Scale
 import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -51,7 +48,6 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAboveCutout
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
-import com.idunnololz.summit.util.makeTransition
 import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
@@ -253,7 +249,7 @@ class ImageViewerActivity :
 
         binding.imageView.postDelayed({
             startPostponedEnterTransition()
-        }, 50,)
+        }, 50)
 
         moreActionsHelper.downloadResult.observe(this) {
             when (it) {
@@ -273,7 +269,8 @@ class ImageViewerActivity :
                                 val uri = downloadResult.uri
                                 val mimeType = downloadResult.mimeType
 
-                                val snackbarMsg = getString(R.string.image_saved_format, downloadResult.uri)
+                                val snackbarMsg =
+                                    getString(R.string.image_saved_format, downloadResult.uri)
                                 Snackbar.make(
                                     getSnackbarContainer(),
                                     snackbarMsg,
@@ -289,7 +286,8 @@ class ImageViewerActivity :
                                         },
                                     )
                                 }.show()
-                            } catch (e: IOException) { /* do nothing */
+                            } catch (e: IOException) {
+                                /* do nothing */
                             }
                         }
                         .onFailure {
@@ -337,7 +335,6 @@ class ImageViewerActivity :
             )(R.id.download)
         }
         binding.moreButton.setOnClickListener {
-
             showAdvancedLinkOptions(
                 args.url,
                 moreActionsHelper,
@@ -534,7 +531,10 @@ class ImageViewerActivity :
                         override fun onSuccess(result: Drawable) {
                             super.onSuccess(result)
 
-                            Log.d(TAG, "Image drawable size: w${result.intrinsicWidth} h${result.intrinsicHeight}")
+                            Log.d(
+                                TAG,
+                                "Image drawable size: w${result.intrinsicWidth} h${result.intrinsicHeight}",
+                            )
 
                             startPostponedEnterTransition()
                             binding.loadingView.hideAll()
@@ -546,7 +546,6 @@ class ImageViewerActivity :
                                 result.start()
                             }
                         }
-
                     },
                 )
                 .size(coil.size.Size.ORIGINAL)
@@ -556,7 +555,7 @@ class ImageViewerActivity :
             binding.loadingView.showDefaultErrorMessageFor(
                 it,
             )
-        },)
+        })
     }
 
     private fun showActionBar() {

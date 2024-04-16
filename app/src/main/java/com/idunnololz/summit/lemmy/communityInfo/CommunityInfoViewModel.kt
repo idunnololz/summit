@@ -1,10 +1,12 @@
 package com.idunnololz.summit.lemmy.communityInfo
 
 import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
@@ -22,6 +24,8 @@ import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.lang.RuntimeException
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,8 +33,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import java.lang.RuntimeException
-import javax.inject.Inject
 
 @HiltViewModel
 class CommunityInfoViewModel @Inject constructor(
@@ -62,7 +64,9 @@ class CommunityInfoViewModel @Inject constructor(
             }
             val result = it.data.response.getOrNull() ?: return@a
             if (result.community_view.subscribed == SubscribedType.Pending) {
-                pollCommunityInfoForSubscribedStatus(result.community_view.community.toCommunityRef())
+                pollCommunityInfoForSubscribedStatus(
+                    result.community_view.community.toCommunityRef(),
+                )
             }
         }
     }
@@ -78,6 +82,10 @@ class CommunityInfoViewModel @Inject constructor(
             } else if (communityRef is CommunityRef.ModeratedCommunities) {
                 siteOrCommunity.setIdle()
                 fetchModeratedCommunities(communityRef)
+                return@launch
+            } else if (communityRef is CommunityRef.Subscribed) {
+                siteOrCommunity.setIdle()
+                fetchSubscribedCommunities(communityRef)
                 return@launch
             }
 
@@ -102,7 +110,7 @@ class CommunityInfoViewModel @Inject constructor(
                     }
                 }
                 is CommunityRef.Subscribed -> {
-                    Either.Left(apiClient.fetchSiteWithRetry(force))
+                    error("unreachable code")
                 }
                 is CommunityRef.MultiCommunity -> error("unreachable code")
                 is CommunityRef.ModeratedCommunities -> error("unreachable code")
@@ -116,7 +124,7 @@ class CommunityInfoViewModel @Inject constructor(
                                 SiteOrCommunityResult(
                                     response = Either.Left(it),
                                     force = force,
-                                )
+                                ),
                             )
                         }
                         .onFailure {
@@ -130,7 +138,7 @@ class CommunityInfoViewModel @Inject constructor(
                                 SiteOrCommunityResult(
                                     response = Either.Right(it),
                                     force = force,
-                                )
+                                ),
                             )
                         }
                         .onFailure {
@@ -140,7 +148,9 @@ class CommunityInfoViewModel @Inject constructor(
         }
     }
 
-    private fun pollCommunityInfoForSubscribedStatus(communityRef: CommunityRef.CommunityRefByName) {
+    private fun pollCommunityInfoForSubscribedStatus(
+        communityRef: CommunityRef.CommunityRefByName,
+    ) {
         Log.d(TAG, "polling community info")
 
         pollCommunityInfoJob?.cancel()
@@ -200,8 +210,51 @@ class CommunityInfoViewModel @Inject constructor(
         multiCommunity.setValue(
             MultiCommunityData(
                 communityRef = communityRef,
-                communitiesData = successResults
-            )
+                instance = instance,
+                icon = R.drawable.outline_shield_24,
+                communitiesData = successResults,
+            ),
+        )
+    }
+
+    private suspend fun fetchSubscribedCommunities(communityRef: CommunityRef) {
+        multiCommunity.setIsLoading()
+        val fullAccount = accountInfoManager.currentFullAccount.value
+
+        if (fullAccount == null) {
+            multiCommunity.setError(NotAuthenticatedException())
+            return
+        }
+
+        val results = flow {
+            val subscriptions = fullAccount
+                .accountInfo
+                .subscriptions
+                ?: listOf()
+            subscriptions.forEach { subscription ->
+                val result = apiClient
+                    .fetchCommunityWithRetry(Either.Left(subscription.id), false)
+                emit(result)
+            }
+        }.flowOn(Dispatchers.Default).toList()
+
+        val successResults = mutableListOf<GetCommunityResponse>()
+        for (result in results) {
+            if (result.isSuccess) {
+                successResults.add(result.getOrThrow())
+            } else {
+                multiCommunity.setError(requireNotNull(result.exceptionOrNull()))
+                return
+            }
+        }
+
+        multiCommunity.setValue(
+            MultiCommunityData(
+                communityRef = communityRef,
+                instance = instance,
+                icon = R.drawable.baseline_subscriptions_24,
+                communitiesData = successResults,
+            ),
         )
     }
 
@@ -222,9 +275,9 @@ class CommunityInfoViewModel @Inject constructor(
                                     response = Either.Right(
                                         communityView.copy(
                                             community_view = it,
-                                        )
-                                    )
-                                )
+                                        ),
+                                    ),
+                                ),
                             )
                         }
                     }
@@ -257,8 +310,8 @@ class CommunityInfoViewModel @Inject constructor(
                 DeleteCommunity(
                     community_id = communityId,
                     deleted = delete,
-                    auth = ""
-                )
+                    auth = "",
+                ),
             )
                 .onFailure {
                     deleteCommunityResult.postError(it)
@@ -280,6 +333,8 @@ class CommunityInfoViewModel @Inject constructor(
 
     data class MultiCommunityData(
         val communityRef: CommunityRef,
+        val instance: String,
+        @DrawableRes val icon: Int,
         val communitiesData: List<GetCommunityResponse>,
     )
 }

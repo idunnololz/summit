@@ -24,9 +24,9 @@ import com.idunnololz.summit.settings.SettingItem
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsWebViewModel @Inject constructor(
@@ -74,9 +74,7 @@ class SettingsWebViewModel @Inject constructor(
         }
     }
 
-    fun save(
-        updatedValues: Map<Int, Any?>,
-    ) {
+    fun save(updatedValues: Map<Int, Any?>) {
         val accountData = accountData.valueOrNull ?: return
         val myUser = accountData.accountInfo.my_user ?: return
         val localUser = myUser.local_user_view.local_user

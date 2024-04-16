@@ -90,8 +90,7 @@ sealed interface InboxItem : Parcelable {
             isRead = reply.comment_reply.read,
         )
 
-        override fun toString(): String =
-            "ReplyInboxItem { content = $content }"
+        override fun toString(): String = "ReplyInboxItem { content = $content }"
     }
 
     @JsonClass(generateAdapter = true)
@@ -141,8 +140,7 @@ sealed interface InboxItem : Parcelable {
             isRead = mention.person_mention.read,
         )
 
-        override fun toString(): String =
-            "MentionInboxItem { content = $content }"
+        override fun toString(): String = "MentionInboxItem { content = $content }"
     }
 
     @JsonClass(generateAdapter = true)
@@ -185,8 +183,7 @@ sealed interface InboxItem : Parcelable {
             targetUserName = message.recipient.name,
         )
 
-        override fun toString(): String =
-            "MessageInboxItem { content = $content }"
+        override fun toString(): String = "MessageInboxItem { content = $content }"
     }
 
     @JsonClass(generateAdapter = true)
@@ -227,8 +224,7 @@ sealed interface InboxItem : Parcelable {
             isRead = message.private_message.read,
         )
 
-        override fun toString(): String =
-            "ReportInboxItem { content = $content }"
+        override fun toString(): String = "ReportInboxItem { content = $content }"
     }
 
     @JsonClass(generateAdapter = true)
@@ -260,7 +256,9 @@ sealed interface InboxItem : Parcelable {
             title = reportView.post.name,
             content = reportView.post_report.reason,
             lastUpdate = reportView.post_report.updated ?: reportView.post_report.published,
-            lastUpdateTs = dateStringToTs(reportView.post_report.updated ?: reportView.post_report.published),
+            lastUpdateTs = dateStringToTs(
+                reportView.post_report.updated ?: reportView.post_report.published,
+            ),
             score = reportView.counts.score,
             isDeleted = false,
             isRemoved = false,
@@ -268,8 +266,7 @@ sealed interface InboxItem : Parcelable {
             reportedPostId = reportView.post_report.post_id,
         )
 
-        override fun toString(): String =
-            "ReplyInboxItem { content = $content }"
+        override fun toString(): String = "ReplyInboxItem { content = $content }"
     }
 
     @JsonClass(generateAdapter = true)
@@ -304,7 +301,9 @@ sealed interface InboxItem : Parcelable {
             title = reportView.post.name,
             content = reportView.comment_report.reason,
             lastUpdate = reportView.comment_report.updated ?: reportView.comment_report.published,
-            lastUpdateTs = dateStringToTs(reportView.comment_report.updated ?: reportView.comment_report.published),
+            lastUpdateTs = dateStringToTs(
+                reportView.comment_report.updated ?: reportView.comment_report.published,
+            ),
             score = reportView.counts.score,
             isDeleted = false,
             isRemoved = false,
@@ -314,8 +313,7 @@ sealed interface InboxItem : Parcelable {
             reportedCommentPath = reportView.comment.path,
         )
 
-        override fun toString(): String =
-            "ReplyInboxItem { content = $content }"
+        override fun toString(): String = "ReplyInboxItem { content = $content }"
     }
 
     val commentId: Int?
@@ -329,17 +327,12 @@ sealed interface InboxItem : Parcelable {
         }
 }
 
-fun CommentReplyView.toInboxItem() =
-    InboxItem.ReplyInboxItem(this)
+fun CommentReplyView.toInboxItem() = InboxItem.ReplyInboxItem(this)
 
-fun PersonMentionView.toInboxItem() =
-    InboxItem.MentionInboxItem(this)
+fun PersonMentionView.toInboxItem() = InboxItem.MentionInboxItem(this)
 
-fun PrivateMessageView.toInboxItem() =
-    InboxItem.MessageInboxItem(this)
+fun PrivateMessageView.toInboxItem() = InboxItem.MessageInboxItem(this)
 
-fun CommentReportView.toInboxItem() =
-    InboxItem.ReportCommentInboxItem(this)
+fun CommentReportView.toInboxItem() = InboxItem.ReportCommentInboxItem(this)
 
-fun PostReportView.toInboxItem() =
-    InboxItem.ReportPostInboxItem(this)
+fun PostReportView.toInboxItem() = InboxItem.ReportPostInboxItem(this)

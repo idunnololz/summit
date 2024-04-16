@@ -12,8 +12,8 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
-import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.AdvancedLink
@@ -48,16 +48,28 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                 setTitle(
                     context.getString(
                         R.string.link_actions_format,
-                        context.getString(R.string.link_type_image_link)
-                    )
+                        context.getString(R.string.link_type_image_link),
+                    ),
                 )
 
                 if (mainActivity != null) {
-                    addItemWithIcon(R.id.preview_image, R.string.preview_image, R.drawable.baseline_image_24)
+                    addItemWithIcon(
+                        R.id.preview_image,
+                        R.string.preview_image,
+                        R.drawable.baseline_image_24,
+                    )
                 }
 
-                addItemWithIcon(R.id.download, R.string.download_image, R.drawable.baseline_download_24)
-                addItemWithIcon(R.id.share_image, R.string.share_image, R.drawable.baseline_share_24)
+                addItemWithIcon(
+                    R.id.download,
+                    R.string.download_image,
+                    R.drawable.baseline_download_24,
+                )
+                addItemWithIcon(
+                    R.id.share_image,
+                    R.string.share_image,
+                    R.drawable.baseline_share_24,
+                )
 
                 addDivider()
             }
@@ -66,16 +78,18 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
             is AdvancedLink.PageLink ->
                 when (val pageRef = advancedLink.pageRef) {
                     is CommentRef ->
-                        setTitle(context.getString(
-                            R.string.link_actions_format,
-                            context.getString(R.string.link_type_comment_link))
+                        setTitle(
+                            context.getString(
+                                R.string.link_actions_format,
+                                context.getString(R.string.link_type_comment_link),
+                            ),
                         )
                     is CommunityRef.CommunityRefByName -> {
                         setTitle(
                             context.getString(
                                 R.string.link_actions_format,
-                                context.getString(R.string.link_type_community_link)
-                            )
+                                context.getString(R.string.link_type_community_link),
+                            ),
                         )
                         if (mainActivity != null) {
                             addItemWithIcon(
@@ -107,13 +121,19 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                             if (moreActionsHelper.fullAccount?.isCommunityBlocked(pageRef) == true) {
                                 addItemWithIcon(
                                     id = R.id.unblock_community,
-                                    title = context.getString(R.string.unblock_this_community_format, pageRef.name),
+                                    title = context.getString(
+                                        R.string.unblock_this_community_format,
+                                        pageRef.name,
+                                    ),
                                     icon = R.drawable.ic_community_default,
                                 )
                             } else {
                                 addItemWithIcon(
                                     id = R.id.block_community,
-                                    title = context.getString(R.string.block_this_community_format, pageRef.name),
+                                    title = context.getString(
+                                        R.string.block_this_community_format,
+                                        pageRef.name,
+                                    ),
                                     icon = R.drawable.baseline_block_24,
                                 )
                             }
@@ -124,10 +144,13 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                     is CommunityRef.Local,
                     is CommunityRef.All,
                     is CommunityRef.ModeratedCommunities,
-                    is CommunityRef.Subscribed -> {
-                        setTitle(context.getString(
-                            R.string.link_actions_format,
-                            context.getString(R.string.link_type_instance_link))
+                    is CommunityRef.Subscribed,
+                    -> {
+                        setTitle(
+                            context.getString(
+                                R.string.link_actions_format,
+                                context.getString(R.string.link_type_instance_link),
+                            ),
                         )
                         if (mainActivity != null) {
                             addItemWithIcon(
@@ -144,8 +167,8 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                         setTitle(
                             context.getString(
                                 R.string.link_actions_format,
-                                context.getString(R.string.link_type_user_link)
-                            )
+                                context.getString(R.string.link_type_user_link),
+                            ),
                         )
                         if (mainActivity != null) {
                             addItemWithIcon(
@@ -162,13 +185,19 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                             if (moreActionsHelper.fullAccount?.isPersonBlocked(pageRef) == true) {
                                 addItemWithIcon(
                                     id = R.id.unblock_user,
-                                    title = context.getString(R.string.unblock_this_user_format, pageRef.name),
+                                    title = context.getString(
+                                        R.string.unblock_this_user_format,
+                                        pageRef.name,
+                                    ),
                                     icon = R.drawable.baseline_person_24,
                                 )
                             } else {
                                 addItemWithIcon(
                                     id = R.id.block_user,
-                                    title = context.getString(R.string.block_this_user_format, pageRef.name),
+                                    title = context.getString(
+                                        R.string.block_this_user_format,
+                                        pageRef.name,
+                                    ),
                                     icon = R.drawable.baseline_person_off_24,
                                 )
                             }
@@ -183,19 +212,27 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                         }
                     }
                     is PostRef ->
-                        setTitle(context.getString(
-                            R.string.link_actions_format,
-                            context.getString(R.string.link_type_post_link))
+                        setTitle(
+                            context.getString(
+                                R.string.link_actions_format,
+                                context.getString(R.string.link_type_post_link),
+                            ),
                         )
                 }
             is AdvancedLink.VideoLink ->
-                setTitle(context.getString(
-                    R.string.link_actions_format,
-                    context.getString(R.string.link_type_video_link))
+                setTitle(
+                    context.getString(
+                        R.string.link_actions_format,
+                        context.getString(R.string.link_type_video_link),
+                    ),
                 )
         }
 
-        addItemWithIcon(R.id.copy_link, R.string.copy_link_address, R.drawable.baseline_content_copy_24)
+        addItemWithIcon(
+            R.id.copy_link,
+            R.string.copy_link_address,
+            R.drawable.baseline_content_copy_24,
+        )
         if (textOrFileName != null) {
             addItemWithIcon(
                 R.id.copy_link_text,
@@ -204,8 +241,16 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
             )
         }
         addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
-        addItemWithIcon(R.id.open_in_browser, R.string.open_in_browser, R.drawable.baseline_public_24)
-        addItemWithIcon(R.id.open_link_incognito, R.string.open_in_incognito, R.drawable.ic_incognito_24)
+        addItemWithIcon(
+            R.id.open_in_browser,
+            R.string.open_in_browser,
+            R.drawable.baseline_public_24,
+        )
+        addItemWithIcon(
+            R.id.open_link_incognito,
+            R.string.open_in_incognito,
+            R.drawable.ic_incognito_24,
+        )
         addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
 
         setOnMenuItemClickListener {
@@ -229,14 +274,13 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
     fragmentManager: FragmentManager,
     textOrFileName: String? = null,
     mimeType: String? = null,
-): (Int) -> Unit =
-    createImageOrLinkActionsHandler(
-        advancedLink = LinkUtils.analyzeLink(url, moreActionsHelper.apiInstance),
-        moreActionsHelper = moreActionsHelper,
-        fragmentManager = fragmentManager,
-        textOrFileName = textOrFileName,
-        mimeType = mimeType,
-    )
+): (Int) -> Unit = createImageOrLinkActionsHandler(
+    advancedLink = LinkUtils.analyzeLink(url, moreActionsHelper.apiInstance),
+    moreActionsHelper = moreActionsHelper,
+    fragmentManager = fragmentManager,
+    textOrFileName = textOrFileName,
+    mimeType = mimeType,
+)
 
 fun BottomMenuContainer.createImageOrLinkActionsHandler(
     advancedLink: AdvancedLink,
@@ -273,7 +317,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
                 appBar = null,
                 title = null,
                 url = url,
-                mimeType = mimeType
+                mimeType = mimeType,
             )
         }
         R.id.download -> {
@@ -343,7 +387,8 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
             }
         }
         R.id.block_user,
-        R.id.unblock_user -> {
+        R.id.unblock_user,
+        -> {
             (advancedLink as? AdvancedLink.PageLink)?.let {
                 (it.pageRef as? PersonRef)?.let {
                     moreActionsHelper.blockPerson(it, block = id == R.id.block_user)
@@ -351,7 +396,8 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
             }
         }
         R.id.block_community,
-        R.id.unblock_community -> {
+        R.id.unblock_community,
+        -> {
             (advancedLink as? AdvancedLink.PageLink)?.let {
                 (it.pageRef as? CommunityRef.CommunityRefByName)?.let {
                     moreActionsHelper.blockCommunity(it, block = id == R.id.block_community)
@@ -361,17 +407,17 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         R.id.more_user_options -> {
             (advancedLink as? AdvancedLink.PageLink)?.let {
                 (it.pageRef as? PersonRef)?.let {
-
                 }
             }
         }
         R.id.subscribe,
-        R.id.unsubscribe -> {
+        R.id.unsubscribe,
+        -> {
             (advancedLink as? AdvancedLink.PageLink)?.let {
                 (it.pageRef as? CommunityRef.CommunityRefByName)?.let {
                     moreActionsHelper.updateSubscription(
                         communityRef = it,
-                        subscribe = id == R.id.subscribe
+                        subscribe = id == R.id.subscribe,
                     )
                 }
             }

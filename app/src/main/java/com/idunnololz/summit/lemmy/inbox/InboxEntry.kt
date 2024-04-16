@@ -41,12 +41,11 @@ class InboxEntryConverters(private val moshi: Moshi) {
     }
 
     @TypeConverter
-    fun stringToInboxItem(value: String): InboxItem? =
-        try {
-            moshi.adapter(InboxItem::class.java).fromJson(value)
-        } catch (e: Exception) {
-            Log.e(TAG, "", e)
-            FirebaseCrashlytics.getInstance().recordException(e)
-            null
-        }
+    fun stringToInboxItem(value: String): InboxItem? = try {
+        moshi.adapter(InboxItem::class.java).fromJson(value)
+    } catch (e: Exception) {
+        Log.e(TAG, "", e)
+        FirebaseCrashlytics.getInstance().recordException(e)
+        null
+    }
 }

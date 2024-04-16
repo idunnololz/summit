@@ -30,5 +30,4 @@ sealed interface PersonRef : Parcelable, PageRef {
             }
 }
 
-fun Person.toPersonRef() =
-    PersonRef.PersonRefByName(name, instance)
+fun Person.toPersonRef() = PersonRef.PersonRefByName(name, instance)

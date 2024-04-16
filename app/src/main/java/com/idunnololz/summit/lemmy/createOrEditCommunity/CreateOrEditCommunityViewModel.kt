@@ -15,11 +15,11 @@ import com.idunnololz.summit.api.dto.LanguageId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class CreateOrEditCommunityViewModel @Inject constructor(
@@ -92,7 +92,10 @@ class CreateOrEditCommunityViewModel @Inject constructor(
         }
     }
 
-    private fun setCommunityIfNotSet(community: GetCommunityResponse?, allLanguages: List<Language>) {
+    private fun setCommunityIfNotSet(
+        community: GetCommunityResponse?,
+        allLanguages: List<Language>,
+    ) {
         if (currentCommunityData.isInitialized) {
             return
         }
@@ -139,7 +142,7 @@ class CreateOrEditCommunityViewModel @Inject constructor(
         val curCommunityData = currentCommunityData.value ?: return
 
         currentCommunityData.value = curCommunityData.copy(
-            discussionLanguages = selectedLanguages
+            discussionLanguages = selectedLanguages,
         )
     }
 

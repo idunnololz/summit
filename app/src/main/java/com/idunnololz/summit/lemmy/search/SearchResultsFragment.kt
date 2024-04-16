@@ -75,10 +75,10 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
@@ -339,7 +339,11 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private val onLoadPage: (Int) -> Unit,
         private val onImageClick: (View?, String) -> Unit,
         private val onPostImageClick: (PostView, View?, String) -> Unit,
-        private val onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+        private val onVideoClick: (
+            url: String,
+            videoType: VideoType,
+            videoState: VideoState?,
+        ) -> Unit,
         private val onVideoLongClickListener: (url: String) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
@@ -645,14 +649,12 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             ) { _, _, _ -> }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

@@ -9,16 +9,16 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.isHomeTab
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.collections.HashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.collections.HashMap
 
 @Singleton
 class UserCommunitiesManager @Inject constructor(
@@ -158,32 +158,30 @@ class UserCommunitiesManager @Inject constructor(
         newCommunityItem
     }
 
-    private suspend fun removeCommunityInternal(
-        community: UserCommunityItem,
-    ) = withContext(dbContext) {
-        if (community.id == FIRST_FRAGMENT_TAB_ID) {
-            return@withContext
+    private suspend fun removeCommunityInternal(community: UserCommunityItem) =
+        withContext(dbContext) {
+            if (community.id == FIRST_FRAGMENT_TAB_ID) {
+                return@withContext
+            }
+
+            idToUserCommunity.remove(community.id)
+            userCommunityItems.remove(community)
+
+            userCommunitiesDao.delete(community.id)
+
+            userCommunitiesChangedFlow.emit(Unit)
         }
-
-        idToUserCommunity.remove(community.id)
-        userCommunityItems.remove(community)
-
-        userCommunitiesDao.delete(community.id)
-
-        userCommunitiesChangedFlow.emit(Unit)
-    }
 
     private fun resetTabsDataInternal() {
         idToUserCommunity.clear()
         userCommunityItems.clear()
     }
 
-    private fun makeHomeTab(): UserCommunityItem =
-        UserCommunityItem(
-            FIRST_FRAGMENT_TAB_ID,
-            FIRST_FRAGMENT_SORT_ID,
-            communityRef = preferences.getDefaultPage(),
-        )
+    private fun makeHomeTab(): UserCommunityItem = UserCommunityItem(
+        FIRST_FRAGMENT_TAB_ID,
+        FIRST_FRAGMENT_SORT_ID,
+        communityRef = preferences.getDefaultPage(),
+    )
 
     private suspend fun onDefaultPageChanged(newValue: CommunityRef) {
         addCommunityOrUpdateInternal(makeHomeTab())
@@ -192,6 +190,5 @@ class UserCommunitiesManager @Inject constructor(
         userCommunitiesChangedFlow.emit(Unit)
     }
 
-    fun getHomeItem(): UserCommunityItem =
-        makeHomeTab()
+    fun getHomeItem(): UserCommunityItem = makeHomeTab()
 }

@@ -64,5 +64,4 @@ enum class TextFieldToolbarOption(
         R.drawable.ic_app_link,
         R.string.add_link_to_app,
     ),
-    ;
 }

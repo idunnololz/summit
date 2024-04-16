@@ -100,10 +100,7 @@ class LemmyAppBarController(
         }
     }
 
-    fun setPageIndex(
-        pageIndex: Int,
-        onPageSelectedListener: (pageIndex: Int) -> Unit,
-    ) {
+    fun setPageIndex(pageIndex: Int, onPageSelectedListener: (pageIndex: Int) -> Unit) {
         binding.communitySortOrder.visibility = View.GONE
 
         pageTextView.text = context.getString(R.string.page_format, (pageIndex + 1).toString())

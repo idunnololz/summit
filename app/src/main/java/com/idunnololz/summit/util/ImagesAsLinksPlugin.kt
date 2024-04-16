@@ -12,7 +12,11 @@ class ImagesAsLinksPlugin : AbstractMarkwonPlugin() {
 
     override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
         builder.setFactory(Image::class.java) { configuration, props ->
-            LinkSpan(configuration.theme(), ImageProps.DESTINATION.require(props), configuration.linkResolver())
+            LinkSpan(
+                configuration.theme(),
+                ImageProps.DESTINATION.require(props),
+                configuration.linkResolver(),
+            )
         }
     }
 

@@ -243,7 +243,11 @@ class SettingsWebFragment :
                                         }
                                     }
                                     .cameraOnly()
-                                    .maxResultSize(1024, 1024, true)	// Final image resolution will be less than 1080 x 1080(Optional)
+                                    .maxResultSize(
+                                        1024,
+                                        1024,
+                                        true,
+                                    )	// Final image resolution will be less than 1080 x 1080(Optional)
                                     .createIntent()
                                 launcher.launch(intent)
                             }
@@ -258,7 +262,11 @@ class SettingsWebFragment :
                                         }
                                     }
                                     .galleryOnly()
-                                    .maxResultSize(1024, 1024, true)	// Final image resolution will be less than 1080 x 1080(Optional)
+                                    .maxResultSize(
+                                        1024,
+                                        1024,
+                                        true,
+                                    )	// Final image resolution will be less than 1080 x 1080(Optional)
                                     .createIntent()
                                 launcher.launch(intent)
                             }

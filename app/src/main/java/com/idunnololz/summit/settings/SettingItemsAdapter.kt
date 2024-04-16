@@ -260,7 +260,11 @@ class SettingItemsAdapter(
             val settingItem = item.settingItem
 
             b.root.tag = settingItem
-            settingItem.bindTo(b, { item.value ?: settingItem.minValue }, { onSettingClickListener })
+            settingItem.bindTo(
+                b,
+                { item.value ?: settingItem.minValue },
+                { onSettingClickListener },
+            )
         }
         addItemType(
             clazz = Item.DescriptionItem::class,
@@ -287,14 +291,12 @@ class SettingItemsAdapter(
         refreshItems()
     }
 
-    override fun getItemViewType(position: Int): Int =
-        adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun getItemCount(): Int =
-        adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
         adapterHelper.onBindViewHolder(holder, position)
@@ -309,14 +311,13 @@ class SettingItemsAdapter(
         adapterHelper.setItems(newItems, this, onItemsUpdated)
     }
 
-    private fun getCurrentValue(key: Int): Any? =
-        if (_updatedSettingValues.contains(key)) {
-            _updatedSettingValues[key]
-        } else if (defaultSettingValues.contains(key)) {
-            defaultSettingValues[key]
-        } else {
-            null
-        }
+    private fun getCurrentValue(key: Int): Any? = if (_updatedSettingValues.contains(key)) {
+        _updatedSettingValues[key]
+    } else if (defaultSettingValues.contains(key)) {
+        defaultSettingValues[key]
+    } else {
+        null
+    }
 
     private fun addRecursive(settingItem: SettingItem, out: MutableList<Item>) {
         when (settingItem) {

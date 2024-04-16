@@ -85,7 +85,9 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=com.idunnololz.summit"),
+                        Uri.parse(
+                            "https://play.google.com/store/apps/details?id=com.idunnololz.summit",
+                        ),
                     ),
                 )
             }
@@ -94,7 +96,11 @@ class SettingAboutFragment : BaseFragment<FragmentSettingAboutBinding>() {
         aboutSettings.giveFeedback.bindTo(binding.giveFeedback) {
             val bottomMenu = BottomMenu(requireContext()).apply {
                 setTitle(R.string.give_feedback)
-                addItemWithIcon(R.id.summit_community, R.string.through_the_community, R.drawable.ic_logo_mono_24)
+                addItemWithIcon(
+                    R.id.summit_community,
+                    R.string.through_the_community,
+                    R.drawable.ic_logo_mono_24,
+                )
                 addItemWithIcon(R.id.email, R.string.by_email, R.drawable.baseline_email_24)
 
                 setOnMenuItemClickListener {

@@ -83,11 +83,7 @@ class StatefulLiveData<T> {
     }
 
     @Suppress("unused")
-    fun postIsLoading(
-        statusDesc: String? = null,
-        progress: Int = 0,
-        maxProgress: Int = 0,
-    ) {
+    fun postIsLoading(statusDesc: String? = null, progress: Int = 0, maxProgress: Int = 0) {
         data.postValue(
             StatefulData.Loading(
                 statusDesc = statusDesc,
@@ -159,5 +155,4 @@ sealed class StatefulData<T> {
     class Error<T>(val error: Throwable) : StatefulData<T>()
 }
 
-fun StatefulData<*>.isLoading() =
-    this is StatefulData.Loading<*>
+fun StatefulData<*>.isLoading() = this is StatefulData.Loading<*>

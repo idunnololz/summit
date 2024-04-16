@@ -14,8 +14,8 @@ import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -85,7 +85,9 @@ class LoginViewModel @Inject constructor(
             val luv = site.my_user?.local_user_view
 
             if (luv == null) {
-                accountLiveData.postError(RuntimeException("Login success but local_user_view is null."))
+                accountLiveData.postError(
+                    RuntimeException("Login success but local_user_view is null."),
+                )
                 return@launch
             }
 

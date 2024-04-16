@@ -109,10 +109,26 @@ class RichTextValueDialogFragment :
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)
-                        addItemWithIcon(R.id.from_camera, R.string.take_a_photo, R.drawable.baseline_photo_camera_24)
-                        addItemWithIcon(R.id.from_gallery, R.string.choose_from_gallery, R.drawable.baseline_image_24)
-                        addItemWithIcon(R.id.from_camera_with_editor, R.string.take_a_photo_with_editor, R.drawable.baseline_photo_camera_24)
-                        addItemWithIcon(R.id.from_gallery_with_editor, R.string.choose_from_gallery_with_editor, R.drawable.baseline_image_24)
+                        addItemWithIcon(
+                            R.id.from_camera,
+                            R.string.take_a_photo,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery,
+                            R.string.choose_from_gallery,
+                            R.drawable.baseline_image_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_camera_with_editor,
+                            R.string.take_a_photo_with_editor,
+                            R.drawable.baseline_photo_camera_24,
+                        )
+                        addItemWithIcon(
+                            R.id.from_gallery_with_editor,
+                            R.string.choose_from_gallery_with_editor,
+                            R.drawable.baseline_image_24,
+                        )
 
                         setOnMenuItemClickListener {
                             when (it.id) {

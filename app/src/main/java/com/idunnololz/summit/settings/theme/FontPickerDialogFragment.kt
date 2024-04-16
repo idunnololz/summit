@@ -33,10 +33,9 @@ class FontPickerDialogFragment :
     FullscreenDialogFragment {
 
     companion object {
-        fun newInstance(account: Account?) =
-            FontPickerDialogFragment().apply {
-                arguments = FontPickerDialogFragmentArgs(account).toBundle()
-            }
+        fun newInstance(account: Account?) = FontPickerDialogFragment().apply {
+            arguments = FontPickerDialogFragmentArgs(account).toBundle()
+        }
     }
 
     private val args: FontPickerDialogFragmentArgs by navArgs()
@@ -120,7 +119,11 @@ class FontPickerDialogFragment :
                 b.sampleText.text = context.getString(R.string.font_sample_text)
 
                 CalligraphyUtils.applyFontToTextView(context, b.title, item.fontId.toFontAsset())
-                CalligraphyUtils.applyFontToTextView(context, b.sampleText, item.fontId.toFontAsset())
+                CalligraphyUtils.applyFontToTextView(
+                    context,
+                    b.sampleText,
+                    item.fontId.toFontAsset(),
+                )
 
                 if (preferences.globalFont == item.fontId) {
                     b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
@@ -148,14 +151,12 @@ class FontPickerDialogFragment :
             refreshItems()
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

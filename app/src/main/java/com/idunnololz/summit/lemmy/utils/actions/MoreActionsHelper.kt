@@ -31,6 +31,8 @@ import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.video.VideoDownloadManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,8 +40,6 @@ import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class MoreActionsHelper @Inject constructor(
@@ -135,7 +135,7 @@ class MoreActionsHelper @Inject constructor(
                         BlockInstanceResult(
                             blocked = block,
                             instanceId = id,
-                        )
+                        ),
                     )
                 }
                 .onFailure {
@@ -204,7 +204,7 @@ class MoreActionsHelper @Inject constructor(
                         SavePostResult(
                             postId = id,
                             save = save,
-                        )
+                        ),
                     )
                     savedManager.onPostSaveChanged()
                 }
@@ -222,7 +222,7 @@ class MoreActionsHelper @Inject constructor(
                         SaveCommentResult(
                             commentId = id,
                             save = save,
-                        )
+                        ),
                     )
                     savedManager.onCommentSaveChanged()
                 }
@@ -253,10 +253,7 @@ class MoreActionsHelper @Inject constructor(
         currentPageInstance = instance
     }
 
-    fun downloadVideo(
-        context: Context,
-        url: String,
-    ) {
+    fun downloadVideo(context: Context, url: String) {
         downloadVideoResult.setIsLoading()
 
         coroutineScope.launch {
@@ -368,7 +365,7 @@ class MoreActionsHelper @Inject constructor(
                     SubscribeResult(
                         subscribe = subscribe,
                         communityId = communityId,
-                    )
+                    ),
                 )
 
                 accountInfoManager.refreshAccountInfo()
@@ -390,7 +387,7 @@ class MoreActionsHelper @Inject constructor(
                         blocked = block,
                         personFullName = it.person.toPersonRef().fullName,
                         personId = id,
-                    )
+                    ),
                 )
             }
     }
@@ -402,7 +399,7 @@ class MoreActionsHelper @Inject constructor(
                     BlockCommunityResult(
                         blocked = block,
                         communityId = id,
-                    )
+                    ),
                 )
             }
             .onFailure {

@@ -153,13 +153,13 @@ class GalleryImageView : ShapeableImageView {
                     velocityY: Float,
                 ): Boolean {
                     if (e1 != null && (
-                        abs(
+                            abs(
                                 e1.x - e2.x,
                             ) > 50 || abs(e1.y - e2.y) > 50
-                        ) && (
+                            ) && (
                             abs(velocityX) > 500 || Math.abs(
-                                    velocityY,
-                                ) > 500
+                                velocityY,
+                            ) > 500
                             ) && !isZooming
                     ) {
                         val scrollSpeedX: Float = -velocityX * 0.2f

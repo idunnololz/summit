@@ -57,8 +57,8 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class AddOrEditCommentFragment :
@@ -425,7 +425,9 @@ class AddOrEditCommentFragment :
             if (replyTargetTs != null &&
                 (System.currentTimeMillis() - replyTargetTs) > thresholdMs
             ) {
-                viewModel.addMessage(AddOrEditCommentViewModel.Message.ReplyTargetTooOld(replyTargetTs))
+                viewModel.addMessage(
+                    AddOrEditCommentViewModel.Message.ReplyTargetTooOld(replyTargetTs),
+                )
             }
 
             binding.commentEditText.requestFocus()
@@ -674,13 +676,12 @@ class AddOrEditCommentFragment :
         }
     }
 
-    private fun CommentView.toOriginalCommentData(): OriginalCommentData =
-        OriginalCommentData(
-            postRef = PostRef(args.instance, this.post.id),
-            commentId = this.comment.id,
-            content = this.comment.content,
-            parentCommentId = args.commentView?.comment?.id,
-        )
+    private fun CommentView.toOriginalCommentData(): OriginalCommentData = OriginalCommentData(
+        postRef = PostRef(args.instance, this.post.id),
+        commentId = this.comment.id,
+        content = this.comment.content,
+        parentCommentId = args.commentView?.comment?.id,
+    )
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
         when (tag) {

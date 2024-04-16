@@ -22,8 +22,7 @@ class InboxRepository @Inject constructor(
         private val apiClient: AccountAwareLemmyClient,
         private val accountInfoManager: AccountInfoManager,
     ) {
-        fun create() =
-            InboxRepository(apiClient, accountInfoManager)
+        fun create() = InboxRepository(apiClient, accountInfoManager)
     }
 
     companion object {

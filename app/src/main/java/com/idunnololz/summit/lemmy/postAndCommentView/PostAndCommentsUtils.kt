@@ -42,7 +42,12 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
             CommentsThreadStyle.LegacyWithColors ->
                 OldThreadLinesDecoration(context, preferences.hideCommentActions, colorful = true)
             CommentsThreadStyle.LegacyWithColorsAndDividers ->
-                OldThreadLinesDecoration(context, preferences.hideCommentActions, colorful = true, dividers = true)
+                OldThreadLinesDecoration(
+                    context,
+                    preferences.hideCommentActions,
+                    colorful = true,
+                    dividers = true,
+                )
             else -> {
                 ModernThreadLinesDecoration(context, preferences.hideCommentActions)
             }
@@ -68,11 +73,23 @@ fun BaseFragment<*>.showMoreCommentOptions(
         addItemWithIcon(R.id.ca_reply, R.string.reply, R.drawable.baseline_reply_24)
 
         if (commentView.creator.id == currentAccount?.id) {
-            addItemWithIcon(R.id.ca_edit_comment, R.string.edit_comment, R.drawable.baseline_edit_24)
-            addItemWithIcon(R.id.ca_delete_comment, R.string.delete_comment, R.drawable.baseline_delete_24)
+            addItemWithIcon(
+                R.id.ca_edit_comment,
+                R.string.edit_comment,
+                R.drawable.baseline_edit_24,
+            )
+            addItemWithIcon(
+                R.id.ca_delete_comment,
+                R.string.delete_comment,
+                R.drawable.baseline_delete_24,
+            )
         }
         if (commentView.saved) {
-            addItemWithIcon(R.id.ca_remove_from_saved, R.string.remove_from_saved, R.drawable.baseline_bookmark_remove_24)
+            addItemWithIcon(
+                R.id.ca_remove_from_saved,
+                R.string.remove_from_saved,
+                R.drawable.baseline_bookmark_remove_24,
+            )
         } else {
             addItemWithIcon(R.id.ca_save, R.string.save, R.drawable.baseline_bookmark_add_24)
         }
@@ -146,7 +163,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
         addDivider()
 
         addItemWithIcon(R.id.ca_view_source, R.string.view_raw, R.drawable.baseline_code_24)
-        addItemWithIcon(R.id.ca_detailed_view, R.string.detailed_view, R.drawable.baseline_open_in_full_24)
+        addItemWithIcon(
+            R.id.ca_detailed_view,
+            R.string.detailed_view,
+            R.drawable.baseline_open_in_full_24,
+        )
 
         setOnMenuItemClickListener {
             createCommentActionHandler(

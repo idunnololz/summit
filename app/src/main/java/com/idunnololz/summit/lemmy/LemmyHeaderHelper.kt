@@ -368,7 +368,7 @@ class LemmyHeaderHelper(
         if (displayFullName) {
             val fullNameEnd = nameEnd + 1 + creatorInstance.length
             sb.appendLink(
-                text = "${creatorName}@$creatorInstance",
+                text = "$creatorName@$creatorInstance",
                 url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
                 underline = false,
             )
@@ -523,27 +523,26 @@ class LemmyHeaderHelper(
         onPageClick: (PageRef) -> Unit,
         onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
-    ) =
-        CustomLinkMovementMethod().apply {
-            onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
-            onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
-                override fun onClick(
-                    textView: TextView,
-                    url: String,
-                    text: String,
-                    rect: RectF,
-                ): Boolean {
-                    val pageRef = LinkResolver.parseUrl(url, instance)
+    ) = CustomLinkMovementMethod().apply {
+        onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
+        onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+            override fun onClick(
+                textView: TextView,
+                url: String,
+                text: String,
+                rect: RectF,
+            ): Boolean {
+                val pageRef = LinkResolver.parseUrl(url, instance)
 
-                    if (pageRef != null) {
-                        onPageClick(pageRef)
-                    } else {
-                        onLinkClick(url, text, LinkContext.Text)
-                    }
-                    return true
+                if (pageRef != null) {
+                    onPageClick(pageRef)
+                } else {
+                    onLinkClick(url, text, LinkContext.Text)
                 }
+                return true
             }
         }
+    }
 }
 
 @Suppress("NOTHING_TO_INLINE")

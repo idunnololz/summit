@@ -85,6 +85,8 @@ import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.util.LinkUtils
+import java.io.File
+import java.util.concurrent.TimeUnit
 import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.MultipartBody
@@ -103,8 +105,6 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.QueryMap
 import retrofit2.http.Url
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 private const val TAG = "LemmyApi"
 
@@ -159,9 +159,7 @@ interface LemmyApi {
      */
     @POST("user/login")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-    fun login(
-        @Body form: Login,
-    ): Call<LoginResponse>
+    fun login(@Body form: Login): Call<LoginResponse>
 
     /**
      * Like / vote on a post.
@@ -737,7 +735,9 @@ interface LemmyApi {
 
         private fun hasNetwork(context: Context): Boolean {
             var isConnected = false // Initial Value
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = context.getSystemService(
+                Context.CONNECTIVITY_SERVICE,
+            ) as ConnectivityManager
             val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
             if (activeNetwork != null && activeNetwork.isConnected) {
                 isConnected = true
@@ -764,10 +764,7 @@ interface LemmyApi {
             return buildApi(context, instance, userAgent)
         }
 
-        private fun getOkHttpClient(
-            context: Context,
-            userAgent: String,
-        ): OkHttpClient {
+        private fun getOkHttpClient(context: Context, userAgent: String): OkHttpClient {
             okHttpClient?.let {
                 return it
             }
@@ -795,20 +792,20 @@ interface LemmyApi {
                     }
 
                     /*
-                    *  Leveraging the advantage of using Kotlin,
-                    *  we initialize the request and change its header depending on whether
-                    *  the device is connected to Internet or not.
-                    */
+                     *  Leveraging the advantage of using Kotlin,
+                     *  we initialize the request and change its header depending on whether
+                     *  the device is connected to Internet or not.
+                     */
                     request = if (hasNetwork(context)) {
                         val cacheControl = CacheControl.Builder()
                             .maxStale(10, TimeUnit.MINUTES)
                             .build()
                             /*
-                    *  If there is Internet, get the cache that was stored 5 seconds ago.
-                    *  If the cache is older than 5 seconds, then discard it,
-                    *  and indicate an error in fetching the response.
-                    *  The 'max-age' attribute is responsible for this behavior.
-                    */
+                             *  If there is Internet, get the cache that was stored 5 seconds ago.
+                             *  If the cache is older than 5 seconds, then discard it,
+                             *  and indicate an error in fetching the response.
+                             *  The 'max-age' attribute is responsible for this behavior.
+                             */
                         request.newBuilder()
                             .header(
                                 CACHE_CONTROL_HEADER,

@@ -74,7 +74,9 @@ class NavBarController(
             if (useBottomNavBar) {
                 if (useNavigationRail) {
                     if (navBarContainer.width == 0) {
-                        activity.getDimen(com.google.android.material.R.dimen.m3_navigation_rail_default_width)
+                        activity.getDimen(
+                            com.google.android.material.R.dimen.m3_navigation_rail_default_width,
+                        )
                     } else {
                         navBarContainer.width
                     }
@@ -213,12 +215,7 @@ class NavBarController(
         }
     }
 
-    fun onInsetsChanged(
-        leftInset: Int,
-        topInset: Int,
-        rightInset: Int,
-        bottomInset: Int,
-    ) {
+    fun onInsetsChanged(leftInset: Int, topInset: Int, rightInset: Int, bottomInset: Int) {
         val isRtl = navBar.layoutDirection == FrameLayout.LAYOUT_DIRECTION_RTL
 
         if (useNavigationRail) {
@@ -275,7 +272,10 @@ class NavBarController(
             return
         }
 
-        Log.d(TAG, "showBottomNav() bottomNavigationView.height: ${navBarContainer.height} bottomNavOpenness: $bottomNavOpenPercent")
+        Log.d(
+            TAG,
+            "showBottomNav() bottomNavigationView.height: ${navBarContainer.height} bottomNavOpenness: $bottomNavOpenPercent",
+        )
 
         val navigationBarOffset =
             if (supportOpenness) {
@@ -359,7 +359,9 @@ class NavBarController(
     fun updatePaddingForNavBar(contentContainer: View) {
         if (useNavigationRail) {
             val width = if (navBarContainer.width == 0) {
-                activity.getDimen(com.google.android.material.R.dimen.m3_navigation_rail_default_width)
+                activity.getDimen(
+                    com.google.android.material.R.dimen.m3_navigation_rail_default_width,
+                )
             } else {
                 navBarContainer.width
             }

@@ -19,6 +19,12 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.UrlUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.lang.Exception
+import java.util.concurrent.Executor
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.coroutines.resume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,12 +32,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.lang.Exception
-import java.util.concurrent.Executor
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.coroutines.resume
 
 private typealias DownloadId = String
 
@@ -49,7 +49,8 @@ class VideoDownloadManager @Inject constructor(
 
     private val databaseProvider = StandaloneDatabaseProvider(context)
 
-    private val downloadCache = SimpleCache(directoryHelper.videosDir, NoOpCacheEvictor(), databaseProvider)
+    private val downloadCache =
+        SimpleCache(directoryHelper.videosDir, NoOpCacheEvictor(), databaseProvider)
 
     private val dataSourceFactory = DefaultHttpDataSource.Factory()
     private val downloadExecutor = Executor(Runnable::run)
@@ -58,7 +59,13 @@ class VideoDownloadManager @Inject constructor(
     private val downloadRequestsContext = Dispatchers.IO.limitedParallelism(1)
 
     private val downloadManager =
-        DownloadManager(context, databaseProvider, downloadCache, dataSourceFactory, downloadExecutor)
+        DownloadManager(
+            context,
+            databaseProvider,
+            downloadCache,
+            dataSourceFactory,
+            downloadExecutor,
+        )
 
     private val downloadRequests = mutableMapOf<DownloadId, DownloadVideoRequest>()
 
@@ -74,7 +81,10 @@ class VideoDownloadManager @Inject constructor(
                 ) {
                     super.onDownloadChanged(downloadManager, download, finalException)
 
-                    Log.d(TAG, "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException")
+                    Log.d(
+                        TAG,
+                        "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException",
+                    )
 
                     if (download.state == Download.STATE_COMPLETED) {
                         onDownloadComplete(download.request)
@@ -95,7 +105,10 @@ class VideoDownloadManager @Inject constructor(
                     super.onDownloadsPausedChanged(downloadManager, downloadsPaused)
                 }
 
-                override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
+                override fun onDownloadRemoved(
+                    downloadManager: DownloadManager,
+                    download: Download,
+                ) {
                     super.onDownloadRemoved(downloadManager, download)
                 }
 
@@ -108,7 +121,11 @@ class VideoDownloadManager @Inject constructor(
                     requirements: Requirements,
                     notMetRequirements: Int,
                 ) {
-                    super.onRequirementsStateChanged(downloadManager, requirements, notMetRequirements)
+                    super.onRequirementsStateChanged(
+                        downloadManager,
+                        requirements,
+                        notMetRequirements,
+                    )
                 }
             },
         )

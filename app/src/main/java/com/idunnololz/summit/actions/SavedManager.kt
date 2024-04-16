@@ -1,8 +1,8 @@
 package com.idunnololz.summit.actions
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Singleton
 class SavedManager @Inject constructor() {

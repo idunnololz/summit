@@ -14,9 +14,9 @@ import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class MessageViewModel @Inject constructor(
@@ -82,7 +82,10 @@ class MessageViewModel @Inject constructor(
                 return@launch
             }
 
-            val tree = CommentTreeBuilder(accountManager, contentFiltersManager).buildCommentsTreeListView(
+            val tree = CommentTreeBuilder(
+                accountManager,
+                contentFiltersManager,
+            ).buildCommentsTreeListView(
                 post = null,
                 comments = commentResult?.getOrNull(),
                 parentComment = true,

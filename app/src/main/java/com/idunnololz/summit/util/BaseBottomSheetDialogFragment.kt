@@ -47,9 +47,10 @@ open class BaseBottomSheetDialogFragment<T : ViewBinding>() : BottomSheetDialogF
 
                 try {
                     r.run()
-                } catch (e: IllegalStateException) { /* do nothing */
+                } catch (e: IllegalStateException) {
+                    /* do nothing */
                 }
-            },)
+            })
         }
     }
 

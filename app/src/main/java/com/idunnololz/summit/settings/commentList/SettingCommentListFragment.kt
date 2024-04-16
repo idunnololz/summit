@@ -201,38 +201,36 @@ class SettingCommentListFragment :
         }
     }
 
-    private fun convertAutoCollapseCommentToOptionId(value: Float) =
-        when {
-            value >= 0.499f -> {
-                R.id.auto_collapse_comment_threshold_50
-            }
-            value >= 0.399f -> {
-                R.id.auto_collapse_comment_threshold_40
-            }
-            value >= 0.299f -> {
-                R.id.auto_collapse_comment_threshold_30
-            }
-            value >= 0.199f -> {
-                R.id.auto_collapse_comment_threshold_20
-            }
-            value >= 0f -> {
-                R.id.auto_collapse_comment_threshold_10
-            }
-            else -> {
-                R.id.auto_collapse_comment_threshold_never_collapse
-            }
+    private fun convertAutoCollapseCommentToOptionId(value: Float) = when {
+        value >= 0.499f -> {
+            R.id.auto_collapse_comment_threshold_50
         }
+        value >= 0.399f -> {
+            R.id.auto_collapse_comment_threshold_40
+        }
+        value >= 0.299f -> {
+            R.id.auto_collapse_comment_threshold_30
+        }
+        value >= 0.199f -> {
+            R.id.auto_collapse_comment_threshold_20
+        }
+        value >= 0f -> {
+            R.id.auto_collapse_comment_threshold_10
+        }
+        else -> {
+            R.id.auto_collapse_comment_threshold_never_collapse
+        }
+    }
 
-    private fun convertOptionIdToAutoCollapseCommentThreshold(@IdRes id: Int) =
-        when (id) {
-            R.id.auto_collapse_comment_threshold_50 -> 0.5f
-            R.id.auto_collapse_comment_threshold_40 -> 0.4f
-            R.id.auto_collapse_comment_threshold_30 -> 0.3f
-            R.id.auto_collapse_comment_threshold_20 -> 0.2f
-            R.id.auto_collapse_comment_threshold_10 -> 0.1f
-            R.id.auto_collapse_comment_threshold_never_collapse -> -1f
-            else -> null
-        }
+    private fun convertOptionIdToAutoCollapseCommentThreshold(@IdRes id: Int) = when (id) {
+        R.id.auto_collapse_comment_threshold_50 -> 0.5f
+        R.id.auto_collapse_comment_threshold_40 -> 0.4f
+        R.id.auto_collapse_comment_threshold_30 -> 0.3f
+        R.id.auto_collapse_comment_threshold_20 -> 0.2f
+        R.id.auto_collapse_comment_threshold_10 -> 0.1f
+        R.id.auto_collapse_comment_threshold_never_collapse -> -1f
+        else -> null
+    }
 
     override fun updateValue(key: Int, value: Any?) {
         when (key) {

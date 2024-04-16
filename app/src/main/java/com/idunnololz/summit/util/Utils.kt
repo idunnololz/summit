@@ -251,7 +251,8 @@ object Utils {
             if (dir.isDirectory) {
                 deleteDir(dir)
             }
-        } catch (e: Exception) { /* Do nothing */
+        } catch (e: Exception) {
+            /* Do nothing */
         }
     }
 
@@ -394,7 +395,10 @@ object Utils {
                     .build()
 
                 if (openNewIncognitoTab) {
-                    intent.intent.putExtra("com.google.android.apps.chrome.EXTRA_OPEN_NEW_INCOGNITO_TAB", true)
+                    intent.intent.putExtra(
+                        "com.google.android.apps.chrome.EXTRA_OPEN_NEW_INCOGNITO_TAB",
+                        true,
+                    )
                 }
 
                 intent.launchUrl(context, Uri.parse(url))
@@ -562,7 +566,9 @@ object Utils {
             putExtra(Intent.EXTRA_TEXT, link)
             type = "text/plain"
         }
-        context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.share_link)))
+        context.startActivity(
+            Intent.createChooser(sendIntent, context.getString(R.string.share_link)),
+        )
     }
 
     fun startIntentToRateApp(activity: Activity) {
@@ -730,19 +736,19 @@ object Utils {
  */
 fun assertMainThread() {
     if (BuildConfig.DEBUG) {
-        require(Looper.myLooper() == Looper.getMainLooper()) { "You must call this method on the main thread" }
+        require(Looper.myLooper() == Looper.getMainLooper()) {
+            "You must call this method on the main thread"
+        }
     }
 }
 
-fun convertSpToPixel(sp: Float): Float =
-    TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_SP,
-        sp,
-        Utils.displayMetrics,
-    )
+fun convertSpToPixel(sp: Float): Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_SP,
+    sp,
+    Utils.displayMetrics,
+)
 
-fun Context.isLightTheme(): Boolean =
-    resources.getBoolean(R.bool.isLightTheme)
+fun Context.isLightTheme(): Boolean = resources.getBoolean(R.bool.isLightTheme)
 
 private const val EMAIL_FEEDBACK = "feedback@idunnololz.com"
 fun startFeedbackIntent(context: Context) {

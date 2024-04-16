@@ -13,14 +13,13 @@ object GlobalFontSizeId {
 
     const val Xxxl = 6
 
-    fun getFontSizeMultiplier(fontSize: Int) =
-        when (fontSize) {
-            Small -> 0.9f
-            Normal -> 1f
-            Large -> 1.143f
-            ExtraLarge -> 1.22f
-            Xxl -> 1.5f
-            Xxxl -> 1.8f
-            else -> 1f
-        }
+    fun getFontSizeMultiplier(fontSize: Int) = when (fontSize) {
+        Small -> 0.9f
+        Normal -> 1f
+        Large -> 1.143f
+        ExtraLarge -> 1.22f
+        Xxl -> 1.5f
+        Xxxl -> 1.8f
+        else -> 1f
+    }
 }

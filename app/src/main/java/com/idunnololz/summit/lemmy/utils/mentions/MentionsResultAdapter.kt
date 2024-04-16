@@ -1,18 +1,15 @@
 package com.idunnololz.summit.lemmy.utils.mentions
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.MentionQueryResultItemBinding
 import com.idunnololz.summit.databinding.MentionsEmptyItemBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.SinglePostsDataSource
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.AssistedFactory
@@ -55,7 +52,8 @@ class MentionsResultAdapter @AssistedInject constructor(
             }
             b.text.text = item.communityView.community.fullName
             val mauString = LemmyUtils.abbrevNumber(
-                item.communityView.counts.users_active_month.toLong())
+                item.communityView.counts.users_active_month.toLong(),
+            )
             @Suppress("SetTextI18n")
             b.subtitle.text = "${b.root.context.getString(R.string.community)} " +
                 "● ${b.root.context.getString(R.string.mau_format, mauString)}"
@@ -85,14 +83,12 @@ class MentionsResultAdapter @AssistedInject constructor(
         }
     }
 
-    override fun getItemViewType(position: Int): Int =
-        adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun getItemCount(): Int =
-        adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         adapterHelper.onBindViewHolder(holder, position)

@@ -50,9 +50,7 @@ class CustomPlayerView : PlayerView {
         }
     }
 
-    fun getRotateControl(): ImageButton =
-        findViewById(R.id.exo_rotate_control)
+    fun getRotateControl(): ImageButton = findViewById(R.id.exo_rotate_control)
 
-    fun getVideoState(): VideoState? =
-        player?.getVideoState()
+    fun getVideoState(): VideoState? = player?.getVideoState()
 }

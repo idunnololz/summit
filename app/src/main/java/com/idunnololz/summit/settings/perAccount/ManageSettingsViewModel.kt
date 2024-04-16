@@ -10,8 +10,8 @@ import com.idunnololz.summit.settings.SettingItem
 import com.idunnololz.summit.settings.backupAndRestore.ImportSettingsViewModel
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ManageSettingsViewModel @Inject constructor(

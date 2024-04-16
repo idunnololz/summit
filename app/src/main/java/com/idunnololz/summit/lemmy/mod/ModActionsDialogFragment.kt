@@ -51,10 +51,7 @@ class ModActionsDialogFragment :
 
     companion object {
 
-        fun show(
-            postView: PostView,
-            fragmentManager: FragmentManager,
-        ) {
+        fun show(postView: PostView, fragmentManager: FragmentManager) {
             show(
                 communityId = postView.community.id,
                 commentId = -1,
@@ -65,10 +62,7 @@ class ModActionsDialogFragment :
             )
         }
 
-        fun show(
-            commentView: CommentView,
-            fragmentManager: FragmentManager,
-        ) {
+        fun show(commentView: CommentView, fragmentManager: FragmentManager) {
             show(
                 communityId = commentView.community.id,
                 commentId = commentView.comment.id,

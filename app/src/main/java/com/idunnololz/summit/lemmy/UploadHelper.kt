@@ -11,13 +11,13 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.DirectoryHelper
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import javax.inject.Inject
 
 class UploadHelper @Inject constructor(
     private val context: Application,

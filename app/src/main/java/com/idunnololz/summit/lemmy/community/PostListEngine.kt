@@ -138,7 +138,10 @@ class PostListEngine(
 
         cachedPages?.let {
             // We need to use let here because Google's lint rule doesn't support smart cast
-            Log.d(TAG, "Restoration successful! Restored ${cachedPages.size} page(s) totalling ${it.sumOf { it.posts.size }} posts.")
+            Log.d(
+                TAG,
+                "Restoration successful! Restored ${cachedPages.size} page(s) totalling ${it.sumOf { it.posts.size }} posts.",
+            )
             _pages = it
         }
     }

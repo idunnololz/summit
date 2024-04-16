@@ -8,8 +8,8 @@ import com.idunnololz.summit.filterLists.FilterEntry
 import com.idunnololz.summit.filterLists.FilterTypeId
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsFilterListViewModel @Inject constructor(

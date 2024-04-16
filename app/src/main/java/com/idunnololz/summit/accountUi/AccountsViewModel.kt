@@ -9,10 +9,10 @@ import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class AccountsViewModel @Inject constructor(

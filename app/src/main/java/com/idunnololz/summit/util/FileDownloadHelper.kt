@@ -12,16 +12,16 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import com.idunnololz.summit.R
 import com.idunnololz.summit.preferences.Preferences
+import java.io.File
+import java.io.OutputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.runInterruptible
 import okhttp3.Request
 import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import okio.source
-import java.io.File
-import java.io.OutputStream
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class FileDownloadHelper @Inject constructor(
@@ -150,7 +150,9 @@ class FileDownloadHelper @Inject constructor(
                     )
                 }
             } else {
-                val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                val downloadManager = context.getSystemService(
+                    Context.DOWNLOAD_SERVICE,
+                ) as DownloadManager
 
                 @Suppress("DEPRECATION")
                 val id = downloadManager.addCompletedDownload(

@@ -56,7 +56,9 @@ class ImportSettingItemPreviewDialogFragment : BaseDialogFragment<DialogFragment
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentImportSettingItemPreviewBinding.inflate(inflater, container, false))
+        setBinding(
+            DialogFragmentImportSettingItemPreviewBinding.inflate(inflater, container, false),
+        )
 
         return binding.root
     }

@@ -44,13 +44,9 @@ class InboxSwipeToActionCallback(
         intrinsicHeight = deleteDrawable.intrinsicHeight
     }
 
-    fun ViewHolder.isSwipeEnabled() =
-        this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
+    fun ViewHolder.isSwipeEnabled() = this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
 
-    override fun getMovementFlags(
-        recyclerView: RecyclerView,
-        viewHolder: ViewHolder,
-    ): Int {
+    override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int {
         return if (viewHolder.isSwipeEnabled()) {
             makeMovementFlags(0, ItemTouchHelper.LEFT)
         } else {
@@ -91,7 +87,15 @@ class InboxSwipeToActionCallback(
                 itemView.bottom,
             )
             disabledBackground.draw(c)
-            super.onChildDraw(c, recyclerView, viewHolder, finalDx, dY, actionState, isCurrentlyActive)
+            super.onChildDraw(
+                c,
+                recyclerView,
+                viewHolder,
+                finalDx,
+                dY,
+                actionState,
+                isCurrentlyActive,
+            )
             return
         }
 

@@ -115,6 +115,11 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.InputStream
+import java.io.InterruptedIOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -123,11 +128,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.Call
-import java.io.InputStream
-import java.io.InterruptedIOException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-import javax.inject.Inject
 
 const val COMMENTS_DEPTH_MAX = 6
 
@@ -256,11 +256,14 @@ class LemmyApiClient(
             GetPost(id = it, auth = account?.jwt)
         }, {
             GetPost(comment_id = it, auth = account?.jwt)
-        },)
+        })
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPostNoCache(authorization = account?.bearer, form = postForm.serializeToMap())
+                api.getPostNoCache(
+                    authorization = account?.bearer,
+                    form = postForm.serializeToMap(),
+                )
             } else {
                 api.getPost(authorization = account?.bearer, form = postForm.serializeToMap())
             }
@@ -274,11 +277,7 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun markPostAsRead(
-        postId: PostId,
-        read: Boolean,
-        account: Account,
-    ): Result<PostView> {
+    suspend fun markPostAsRead(postId: PostId, read: Boolean, account: Account): Result<PostView> {
         val form = MarkPostAsRead(
             post_id = postId,
             read = read,
@@ -402,7 +401,7 @@ class LemmyApiClient(
                 sort = sort,
                 auth = account?.jwt,
             )
-        },)
+        })
 
         return retrofitErrorHandler {
             if (force) {
@@ -444,7 +443,10 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getCommunityNoCache(authorization = account?.bearer, form = form.serializeToMap())
+                api.getCommunityNoCache(
+                    authorization = account?.bearer,
+                    form = form.serializeToMap(),
+                )
             } else {
                 api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
             }
@@ -467,11 +469,14 @@ class LemmyApiClient(
             GetCommunity(id = id, auth = account?.jwt)
         }, { name ->
             GetCommunity(name = name, auth = account?.jwt)
-        },)
+        })
 
         return retrofitErrorHandler {
             if (force) {
-                api.getCommunityNoCache(authorization = account?.bearer, form = form.serializeToMap())
+                api.getCommunityNoCache(
+                    authorization = account?.bearer,
+                    form = form.serializeToMap(),
+                )
             } else {
                 api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
             }
@@ -629,15 +634,15 @@ class LemmyApiClient(
             )
     }
 
-    suspend fun fetchSiteWithRetry(
-        auth: String?,
-        force: Boolean,
-    ): Result<GetSiteResponse> = retry {
+    suspend fun fetchSiteWithRetry(auth: String?, force: Boolean): Result<GetSiteResponse> = retry {
         val form = GetSite(auth = auth)
 
         retrofitErrorHandler {
             if (force) {
-                api.getSiteNoCache(authorization = auth?.toBearer(), form = form.serializeToMap())
+                api.getSiteNoCache(
+                    authorization = auth?.toBearer(),
+                    form = form.serializeToMap(),
+                )
             } else {
                 api.getSite(authorization = auth?.toBearer(), form = form.serializeToMap())
             }
@@ -699,27 +704,24 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun likePostWithRetry(
-        postId: Int,
-        score: Int,
-        account: Account,
-    ): Result<PostView> = retry {
-        val form = CreatePostLike(
-            post_id = postId,
-            score = score,
-            auth = account.jwt,
-        )
-
-        retrofitErrorHandler { api.likePost(authorization = account?.bearer, form) }
-            .fold(
-                onSuccess = {
-                    Result.success(it.post_view)
-                },
-                onFailure = {
-                    Result.failure(it)
-                },
+    suspend fun likePostWithRetry(postId: Int, score: Int, account: Account): Result<PostView> =
+        retry {
+            val form = CreatePostLike(
+                post_id = postId,
+                score = score,
+                auth = account.jwt,
             )
-    }
+
+            retrofitErrorHandler { api.likePost(authorization = account?.bearer, form) }
+                .fold(
+                    onSuccess = {
+                        Result.success(it.post_view)
+                    },
+                    onFailure = {
+                        Result.failure(it)
+                    },
+                )
+        }
 
     suspend fun likeCommentWithRetry(
         commentId: Int,
@@ -897,10 +899,7 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun deleteComment(
-        account: Account,
-        commentId: CommentId,
-    ): Result<CommentView> {
+    suspend fun deleteComment(account: Account, commentId: CommentId): Result<CommentView> {
         val form = DeleteComment(
             auth = account.jwt,
             comment_id = commentId,
@@ -1021,11 +1020,7 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun lockPost(
-        account: Account,
-        id: PostId,
-        locked: Boolean,
-    ): Result<PostView> {
+    suspend fun lockPost(account: Account, id: PostId, locked: Boolean): Result<PostView> {
         val form = LockPost(
             post_id = id,
             locked = locked,
@@ -1277,7 +1272,10 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPrivateMessagesNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getPrivateMessagesNoCache(
+                    authorization = account?.bearer,
+                    form.serializeToMap(),
+                )
             } else {
                 api.getPrivateMessages(authorization = account?.bearer, form.serializeToMap())
             }
@@ -1495,9 +1493,7 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun markAllAsRead(
-        account: Account,
-    ): Result<GetRepliesResponse> {
+    suspend fun markAllAsRead(account: Account): Result<GetRepliesResponse> {
         val form = MarkAllAsRead(
             account.jwt,
         )
@@ -1535,11 +1531,7 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun savePost(
-        postId: PostId,
-        save: Boolean,
-        account: Account,
-    ): Result<PostView> {
+    suspend fun savePost(postId: PostId, save: Boolean, account: Account): Result<PostView> {
         val form = SavePost(postId, save, account.jwt)
 
         return retrofitErrorHandler {
@@ -1632,10 +1624,7 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun resolveObject(
-        q: String,
-        account: Account,
-    ): Result<ResolveObjectResponse> {
+    suspend fun resolveObject(q: String, account: Account): Result<ResolveObjectResponse> {
         val form = ResolveObject(
             q = q,
             auth = account.jwt,
@@ -1805,7 +1794,8 @@ class LemmyApiClient(
         communityId: CommunityId? = null,
         page: Int? = null,
         limit: Int? = null,
-        actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ = null,
+        actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ =
+            null,
         otherPersonId: PersonId? = null,
         account: Account? = null,
         force: Boolean,
@@ -1837,9 +1827,7 @@ class LemmyApiClient(
 
     val instanceFlow = MutableStateFlow<String>(api.instance)
 
-    private suspend fun <T> retrofitErrorHandler(
-        call: () -> Call<T>,
-    ): Result<T> {
+    private suspend fun <T> retrofitErrorHandler(call: () -> Call<T>): Result<T> {
         val res = try {
             runInterruptible(Dispatchers.IO) {
                 call().execute()
@@ -1929,8 +1917,7 @@ class LemmyApiClient(
     private val Account.bearer: String
         get() = "Bearer $jwt"
 
-    private fun String.toBearer(): String =
-        "Bearer $this"
+    private fun String.toBearer(): String = "Bearer $this"
 }
 
 class UploadImageResult(

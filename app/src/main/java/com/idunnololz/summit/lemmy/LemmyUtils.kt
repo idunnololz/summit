@@ -150,24 +150,19 @@ object LemmyUtils {
         )
     }
 
-    fun isUrlReddit(url: String): Boolean =
-        isUriReddit(Uri.parse(url))
+    fun isUrlReddit(url: String): Boolean = isUriReddit(Uri.parse(url))
 
-    fun isUriReddit(uri: Uri): Boolean =
-        uri.host == "www.reddit.com" ||
-            uri.host == "reddit.com" ||
-            uri.host == "oauth.reddit.com" ||
-            uri.host == "redd.it" ||
-            uri.host == "amp.reddit.com"
+    fun isUriReddit(uri: Uri): Boolean = uri.host == "www.reddit.com" ||
+        uri.host == "reddit.com" ||
+        uri.host == "oauth.reddit.com" ||
+        uri.host == "redd.it" ||
+        uri.host == "amp.reddit.com"
 
-    fun isUrlRedirect(url: String): Boolean =
-        isUriRedirect(Uri.parse(url))
+    fun isUrlRedirect(url: String): Boolean = isUriRedirect(Uri.parse(url))
 
-    fun isUriRedirect(uri: Uri): Boolean =
-        uri.host == "redd.it"
+    fun isUriRedirect(uri: Uri): Boolean = uri.host == "redd.it"
 
-    fun isUriGallery(uri: Uri): Boolean =
-        uri.pathSegments[0] == "gallery"
+    fun isUriGallery(uri: Uri): Boolean = uri.pathSegments[0] == "gallery"
 
     fun findGiphyLinks(s: String): List<String> {
         val matcher = GIPHY_REGEX.matcher(s)
@@ -182,15 +177,13 @@ object LemmyUtils {
     }
 }
 
-fun Int.toLemmyPageIndex() =
-    this + 1 // lemmy pages are 1 indexed
+fun Int.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
 
-fun SearchType.toLocalizedString(context: Context) =
-    when (this) {
-        SearchType.All -> context.getString(R.string.all)
-        SearchType.Comments -> context.getString(R.string.comments)
-        SearchType.Posts -> context.getString(R.string.posts)
-        SearchType.Communities -> context.getString(R.string.communities)
-        SearchType.Users -> context.getString(R.string.users)
-        SearchType.Url -> context.getString(R.string.urls)
-    }
+fun SearchType.toLocalizedString(context: Context) = when (this) {
+    SearchType.All -> context.getString(R.string.all)
+    SearchType.Comments -> context.getString(R.string.comments)
+    SearchType.Posts -> context.getString(R.string.posts)
+    SearchType.Communities -> context.getString(R.string.communities)
+    SearchType.Users -> context.getString(R.string.users)
+    SearchType.Url -> context.getString(R.string.urls)
+}

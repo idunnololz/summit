@@ -173,11 +173,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         )
     }
 
-    private fun dispatchUrlClick(
-        textView: TextView,
-        clickableSpan: Any,
-        bounds: RectF,
-    ) {
+    private fun dispatchUrlClick(textView: TextView, clickableSpan: Any, bounds: RectF) {
         if (clickableSpan is DetailsClickableSpan) {
             clickableSpan.onClick(textView)
         } else if (clickableSpan is ClickableSpan) {
@@ -204,11 +200,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
         }
     }
 
-    private fun dispatchUrlLongClick(
-        textView: TextView,
-        clickableSpan: Any,
-        bounds: RectF,
-    ) {
+    private fun dispatchUrlLongClick(textView: TextView, clickableSpan: Any, bounds: RectF) {
         if (clickableSpan is ClickableSpan) {
             val clickableSpanWithText =
                 ClickableSpanWithText.ofSpan(textView, clickableSpan)
@@ -271,11 +263,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
     /**
      * Adds a background color span at <var>clickableSpan</var>'s location.
      */
-    private fun highlightUrl(
-        textView: TextView,
-        clickableSpan: Any?,
-        text: Spannable,
-    ) {
+    private fun highlightUrl(textView: TextView, clickableSpan: Any?, text: Spannable) {
         if (isUrlHighlighted) {
             return
         }

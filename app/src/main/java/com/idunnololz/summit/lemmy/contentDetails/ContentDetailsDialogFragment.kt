@@ -29,18 +29,14 @@ import com.idunnololz.summit.util.dateStringToFullDateTime
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import dagger.hilt.android.AndroidEntryPoint
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @AndroidEntryPoint
 class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDetailsBinding>() {
 
     companion object {
-        fun show(
-            fragmentManager: FragmentManager,
-            instance: String,
-            commentView: CommentView,
-        ) {
+        fun show(fragmentManager: FragmentManager, instance: String, commentView: CommentView) {
             ContentDetailsDialogFragment().apply {
                 arguments = ContentDetailsDialogFragmentArgs(
                     instance = instance,
@@ -50,11 +46,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             }.show(fragmentManager, "CommentDetailsDialogFragment")
         }
 
-        fun show(
-            fragmentManager: FragmentManager,
-            instance: String,
-            postView: PostView,
-        ) {
+        fun show(fragmentManager: FragmentManager, instance: String, postView: PostView) {
             ContentDetailsDialogFragment().apply {
                 arguments = ContentDetailsDialogFragmentArgs(
                     instance = instance,
@@ -101,12 +93,12 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 fullDetails = buildString {
                     appendLine(
                         "Published on ${
-                        dateStringToFullDateTime(commentView.comment.published)}",
+                            dateStringToFullDateTime(commentView.comment.published)}",
                     )
                     if (commentView.comment.updated != null) {
                         appendLine(
                             "Updated on ${
-                            dateStringToFullDateTime(commentView.comment.updated)}",
+                                dateStringToFullDateTime(commentView.comment.updated)}",
                         )
                     }
 
@@ -143,12 +135,12 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 fullDetails = buildString {
                     appendLine(
                         "Published on ${
-                        dateStringToFullDateTime(postView.post.published)}",
+                            dateStringToFullDateTime(postView.post.published)}",
                     )
                     if (postView.post.updated != null) {
                         appendLine(
                             "Updated on ${
-                            dateStringToFullDateTime(postView.post.updated)}",
+                                dateStringToFullDateTime(postView.post.updated)}",
                         )
                     }
 
@@ -302,37 +294,33 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
         }
     }
 
-    private fun CommentAggregates.toCounts(): Counts =
-        Counts(
-            id = id,
-            score = score,
-            upvotes = upvotes,
-            downvotes = downvotes,
-            published = published,
-            childCount = child_count,
-        )
+    private fun CommentAggregates.toCounts(): Counts = Counts(
+        id = id,
+        score = score,
+        upvotes = upvotes,
+        downvotes = downvotes,
+        published = published,
+        childCount = child_count,
+    )
 
-    private fun PostAggregates.toCounts(): Counts =
-        Counts(
-            id = id,
-            score = score,
-            upvotes = upvotes,
-            downvotes = downvotes,
-            published = published,
-            childCount = comments,
-        )
+    private fun PostAggregates.toCounts(): Counts = Counts(
+        id = id,
+        score = score,
+        upvotes = upvotes,
+        downvotes = downvotes,
+        published = published,
+        childCount = comments,
+    )
 
-    private fun Comment.toContent(): Content =
-        Content(
-            content = content,
-            imageUrl = null,
-        )
+    private fun Comment.toContent(): Content = Content(
+        content = content,
+        imageUrl = null,
+    )
 
-    private fun Post.toContent(): Content =
-        Content(
-            content = body,
-            imageUrl = this.thumbnail_url ?: this.url,
-        )
+    private fun Post.toContent(): Content = Content(
+        content = body,
+        imageUrl = this.thumbnail_url ?: this.url,
+    )
 
     data class ObjectView(
         val counts: Counts,
