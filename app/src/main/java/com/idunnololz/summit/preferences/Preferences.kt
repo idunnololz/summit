@@ -930,7 +930,7 @@ class Preferences(
         }
 
     var showEditedDate: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_EDITED_DATE, false)
+        get() = prefs.getBoolean(KEY_SHOW_EDITED_DATE, true)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_EDITED_DATE, value)
