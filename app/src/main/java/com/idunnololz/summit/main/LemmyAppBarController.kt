@@ -41,6 +41,7 @@ class LemmyAppBarController(
         onAccountClick: (currentAccount: Account?) -> Unit,
         onSortOrderClick: () -> Unit,
         onChangeInstanceClick: () -> Unit,
+        onCommunityLongClick: (currentCommunity: CommunityRef?, text: String?) -> Boolean,
     ) {
         fun showCommunitySelectorInternal() {
             val controller = mainActivity.showCommunitySelector(currentCommunity)
@@ -54,6 +55,9 @@ class LemmyAppBarController(
         }
         communityTextView.setOnClickListener {
             showCommunitySelectorInternal()
+        }
+        communityTextView.setOnLongClickListener {
+            onCommunityLongClick(currentCommunity, communityTextView.text?.toString())
         }
         customActionBar.setOnClickListener {
             showCommunitySelectorInternal()

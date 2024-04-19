@@ -97,6 +97,7 @@ class CommunityViewModel @Inject constructor(
     class PostUpdateInfo(
         val isReadPostUpdate: Boolean = false,
         val scrollToTop: Boolean = false,
+        val hideReadCount: Int? = null,
     )
 
     private var pagePositions = arrayListOf<PageScrollState>()
@@ -410,6 +411,7 @@ class CommunityViewModel @Inject constructor(
         force: Boolean,
         clearPagesOnSuccess: Boolean = false,
         scrollToTop: Boolean = false,
+        includeHideReadCount: Boolean = false,
     ) {
         if (fetchingPages.contains(pageToFetch)) {
             return
@@ -444,7 +446,14 @@ class CommunityViewModel @Inject constructor(
                     postListEngine.addPage(pageData)
                     postListEngine.createItems()
 
-                    loadedPostsData.postValue(PostUpdateInfo(scrollToTop = scrollToTop))
+                    loadedPostsData.postValue(PostUpdateInfo(
+                        scrollToTop = scrollToTop,
+                        hideReadCount = if (includeHideReadCount) {
+                            postsRepository.hideReadCount
+                        } else {
+                            null
+                        },
+                    ))
 
                     withContext(Dispatchers.Main) {
                         fetchingPages.remove(pageToFetch)
@@ -749,8 +758,10 @@ class CommunityViewModel @Inject constructor(
         updateStateMaintainingPosition(
             {
                 this.hideRead = true
+                this.hideReadCount = 0
             },
             anchors,
+            includeHideReadCount = true,
         )
     }
 
@@ -797,6 +808,7 @@ class CommunityViewModel @Inject constructor(
     private fun updateStateMaintainingPosition(
         changeState: PostsRepository.() -> Unit,
         anchors: Set<Int>?,
+        includeHideReadCount: Boolean = false,
     ) {
         loadedPostsData.setIsLoading()
 
@@ -832,10 +844,10 @@ class CommunityViewModel @Inject constructor(
                     if (infinity) {
                         postListEngine.clearPages()
                         for (index in 0..it.pageIndex) {
-                            fetchPageInternal(index, force = false, scrollToTop = scrollToTop)
+                            fetchPageInternal(index, force = false, scrollToTop = scrollToTop, includeHideReadCount = includeHideReadCount)
                         }
                     } else {
-                        fetchPageInternal(it.pageIndex, force = false)
+                        fetchPageInternal(it.pageIndex, force = false, includeHideReadCount = includeHideReadCount)
                     }
                 }
                 .onFailure {

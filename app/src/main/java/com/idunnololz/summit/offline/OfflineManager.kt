@@ -315,10 +315,14 @@ class OfflineManager @Inject constructor(
         destDir = imagesDir,
         force = false,
         saveToFileFn = { destFile ->
-            val req = Request.Builder()
-                .header("User-Agent", USER_AGENT)
-                .url(url)
-                .build()
+            val req = try {
+                Request.Builder()
+                    .header("User-Agent", USER_AGENT)
+                    .url(url)
+                    .build()
+            } catch (e: Exception) {
+                return@fetchGeneric Result.failure(e)
+            }
 
             try {
                 val response = Client.get().newCall(req).execute()

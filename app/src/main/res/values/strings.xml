@@ -1705,6 +1705,15 @@
     <string name="home_fab_quick_action">FAB quick action</string>
     <string name="home_fab_quick_action_desc">Choose an action to perform when the floating action button on the post list screen (button near the bottom of the screen) is long pressed.</string>
     <string name="no_action">No action</string>
+    <string name="multi_community_actions">Multi-community actions</string>
+    <string name="moderated_communities_info">Moderated communities info</string>
+    <string name="subscribed_communities_info">Subscribed communities info</string>
+    <string name="posts_hidden_format">%1$s posts hidden.</string>
+    <string name="resolving_link">Resolving link…</string>
+    <string name="show_edited_time">Show edited time</string>
+    <string name="show_edited_time_desc">Show edited time in the header for posts/comments.</string>
+    <string name="warn_image_downscaled">The original image is too large to preview. A downscaled version is shown instead.</string>
+    <string name="error_image_too_large_to_preview">Image is too large to preview. Download the image and preview it in another app.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

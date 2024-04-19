@@ -48,7 +48,7 @@ fun CommunityRef.toUri(apiInstance: String): Uri {
         is CommunityRef.Local -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Local"
         is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
         is CommunityRef.Subscribed -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Subscribed"
-        is CommunityRef.MultiCommunity -> throw MultiCommunityException()
+        is CommunityRef.MultiCommunity -> "https://${apiInstance}/#!${moshi.adapter(CommunityRef::class.java).toJson(community)}"
         is CommunityRef.ModeratedCommunities -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=ModeratorView"
     }
 

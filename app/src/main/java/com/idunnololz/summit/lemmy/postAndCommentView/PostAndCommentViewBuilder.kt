@@ -55,7 +55,7 @@ import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.LinkResolver
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
@@ -66,6 +66,7 @@ import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -168,17 +169,14 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var commentsShowInlineMediaAsLinks: Boolean = preferences.commentsShowInlineMediaAsLinks
     private var postQuickActions: PostQuickActionsSettings = preferences.postQuickActions
         ?: PostQuickActionsSettings()
+    private var showEditedDate: Boolean = preferences.showEditedDate
 
-    private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>()
+    private val viewRecycler: ViewRecycler<View> = ViewRecycler()
 
     private val tempSize = Size()
 
-    private val selectableItemBackground =
-        context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackground)
     private val selectableItemBackgroundBorderless =
         context.getResIdFromAttribute(androidx.appcompat.R.attr.selectableItemBackgroundBorderless)
-    private val backgroundColor =
-        context.getColorFromAttribute(com.google.android.material.R.attr.backgroundColor)
 
     private val paddingHalf = context.getDimen(R.dimen.padding_half)
     private val paddingFull = context.getDimen(R.dimen.padding)
@@ -215,6 +213,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         useMultilinePostHeaders = preferences.useMultilinePostHeaders
         indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
         showProfileIcons = preferences.showProfileIcons
+        showEditedDate = preferences.showEditedDate
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
@@ -324,6 +323,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             } else {
                 false
             },
+            showEditedDate = showEditedDate,
         )
 
         LemmyTextHelper.bindText(
@@ -615,11 +615,15 @@ class PostAndCommentViewBuilder @Inject constructor(
             } else {
                 false
             },
+            showEditedDate = showEditedDate,
         )
 
         if (showProfileIcons) {
             val iconImageView = headerView.getIconImageView()
             avatarHelper.loadAvatar(iconImageView, commentView.creator)
+            iconImageView.setOnClickListener {
+                onPageClick(commentView.creator.toPersonRef())
+            }
         }
 
         if (commentView.comment.deleted || isDeleting) {
@@ -837,6 +841,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             } else {
                 false
             },
+            showEditedDate = showEditedDate,
+            wrapHeader = true,
         )
 
         expandSectionButton.setOnClickListener {
@@ -1752,6 +1758,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             } else {
                 false
             },
+            showEditedDate = showEditedDate,
         )
     }
 

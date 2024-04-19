@@ -112,21 +112,24 @@ fun BaseFragment<*>.showMoreVideoOptions(
                     val mimeType = downloadResult.mimeType
 
                     val snackbarMsg = getString(R.string.video_saved_format, downloadResult.uri)
-                    Snackbar.make(
-                        parent.getSnackbarContainer(),
-                        snackbarMsg,
-                        Snackbar.LENGTH_LONG,
-                    ).setAction(R.string.view) {
-                        Utils.safeLaunchExternalIntentWithErrorDialog(
-                            context,
-                            childFragmentManager,
-                            Intent(Intent.ACTION_VIEW).apply {
-                                flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                setDataAndType(uri, mimeType)
-                            },
+                    Snackbar
+                        .make(
+                            parent.getSnackbarContainer(),
+                            snackbarMsg,
+                            Snackbar.LENGTH_LONG,
                         )
-                    }.show()
+                        .setAction(R.string.view) {
+                            Utils.safeLaunchExternalIntentWithErrorDialog(
+                                context,
+                                childFragmentManager,
+                                Intent(Intent.ACTION_VIEW).apply {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    setDataAndType(uri, mimeType)
+                                },
+                            )
+                        }
+                        .show()
                 } catch (e: IOException) {
                     /* do nothing */
                 }

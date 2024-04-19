@@ -22,12 +22,10 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
     private val snackBarBottomMargin = context.resources.getDimensionPixelSize(R.dimen.padding)
 
     fun updateBottomNavHeight(height: Float) {
-        Log.d("HAHA", "updateBottomNavHeight: $height")
         bottomNavHeight = height
     }
 
     fun updateBottomInset(bottomInset: Int) {
-        Log.d("HAHA", "bottomInset: $bottomInset")
         this.bottomInset = bottomInset
     }
 
@@ -56,7 +54,13 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
         dependency: View,
     ): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
-            snackbarHeight = dependency.height.toFloat() + snackBarBottomMargin
+            Log.d("HAHA", "anim: ${dependency.alpha} vis: ${dependency.visibility}")
+            val alpha = if (dependency.visibility == View.VISIBLE) {
+                dependency.alpha
+            } else {
+                0f
+            }
+            snackbarHeight = alpha * (dependency.height.toFloat() + snackBarBottomMargin)
         }
 
         return updateFab(child)

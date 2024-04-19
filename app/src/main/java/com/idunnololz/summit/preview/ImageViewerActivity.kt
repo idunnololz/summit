@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Animatable
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -23,6 +24,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.navArgs
 import coil.imageLoader
 import coil.request.ImageRequest
+import coil.size.Dimension
 import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -52,6 +54,8 @@ import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 @AndroidEntryPoint
 class ImageViewerActivity :
@@ -63,6 +67,8 @@ class ImageViewerActivity :
         private const val TAG = "ImageViewerActivity"
 
         private const val EXIT_OFFSET_DP = 60f
+
+        private const val MAX_BITMAP_SIZE = 100 * 1024 * 1024 // 100 MB
 
         const val ErrorCustomDownloadLocation = 1234
     }
@@ -255,11 +261,14 @@ class ImageViewerActivity :
             when (it) {
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Error -> {
-                    Snackbar.make(
-                        getSnackbarContainer(),
-                        R.string.error_downloading_image,
-                        Snackbar.LENGTH_LONG,
-                    ).show()
+                    Snackbar
+                        .make(
+                            getSnackbarContainer(),
+                            R.string.error_downloading_image,
+                            Snackbar.LENGTH_LONG,
+                        )
+                        .setAnchorView(binding.bottomBar)
+                        .show()
                 }
                 is StatefulData.Loading -> {}
                 is StatefulData.Success -> {
@@ -271,21 +280,25 @@ class ImageViewerActivity :
 
                                 val snackbarMsg =
                                     getString(R.string.image_saved_format, downloadResult.uri)
-                                Snackbar.make(
-                                    getSnackbarContainer(),
-                                    snackbarMsg,
-                                    Snackbar.LENGTH_LONG,
-                                ).setAction(R.string.view) {
-                                    Utils.safeLaunchExternalIntentWithErrorDialog(
-                                        context,
-                                        supportFragmentManager,
-                                        Intent(Intent.ACTION_VIEW).apply {
-                                            flags =
-                                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                            setDataAndType(uri, mimeType)
-                                        },
+                                Snackbar
+                                    .make(
+                                        getSnackbarContainer(),
+                                        snackbarMsg,
+                                        Snackbar.LENGTH_LONG,
                                     )
-                                }.show()
+                                    .setAction(R.string.view) {
+                                        Utils.safeLaunchExternalIntentWithErrorDialog(
+                                            context,
+                                            supportFragmentManager,
+                                            Intent(Intent.ACTION_VIEW).apply {
+                                                flags =
+                                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                                setDataAndType(uri, mimeType)
+                                            },
+                                        )
+                                    }
+                                    .setAnchorView(binding.bottomBar)
+                                    .show()
                             } catch (e: IOException) {
                                 /* do nothing */
                             }
@@ -302,6 +315,7 @@ class ImageViewerActivity :
                                         setResult(ErrorCustomDownloadLocation)
                                         finish()
                                     }
+                                    .setAnchorView(binding.bottomBar)
                                     .show()
                             } else {
                                 FirebaseCrashlytics.getInstance().recordException(it)
@@ -311,6 +325,7 @@ class ImageViewerActivity :
                                         R.string.error_downloading_image,
                                         Snackbar.LENGTH_LONG,
                                     )
+                                    .setAnchorView(binding.bottomBar)
                                     .show()
                             }
                         }
@@ -505,7 +520,7 @@ class ImageViewerActivity :
         ).show(WindowInsetsCompat.Type.systemBars())
     }
 
-    private fun loadImageFromUrl(url: String) {
+    private fun loadImageFromUrl(url: String, forceSize: Size? = null) {
         Log.d(TAG, "loadImageFromUrl: $url")
 
         offlineManager.fetchImageWithError(binding.root, url, {
@@ -536,11 +551,43 @@ class ImageViewerActivity :
                                 "Image drawable size: w${result.intrinsicWidth} h${result.intrinsicHeight}",
                             )
 
+                            if (result is BitmapDrawable) {
+                                val bitmap = result.bitmap
+                                if (bitmap.byteCount >= MAX_BITMAP_SIZE && forceSize == null) {
+                                    val maxPixels = 24000000
+                                    val pixelsInBitmap = bitmap.width * bitmap.height
+
+                                    if (pixelsInBitmap > maxPixels) {
+                                        val scale = sqrt(pixelsInBitmap / maxPixels.toDouble())
+                                        loadImageFromUrl(
+                                            url,
+                                            Size(
+                                                (bitmap.width / scale).roundToInt(),
+                                                (bitmap.height / scale).roundToInt(),
+                                            )
+                                        )
+
+                                        Snackbar
+                                            .make(
+                                                getSnackbarContainer(),
+                                                R.string.warn_image_downscaled,
+                                                Snackbar.LENGTH_LONG
+                                            )
+                                            .setAnchorView(binding.bottomBar)
+                                            .show()
+                                    } else {
+                                        binding.loadingView
+                                            .showErrorText(R.string.error_image_too_large_to_preview)
+                                    }
+                                    return
+                                }
+                            }
+
                             startPostponedEnterTransition()
                             binding.loadingView.hideAll()
 
-                            binding.imageView.setImageDrawable(result)
                             binding.dummyImageView.setImageDrawable(result)
+                            binding.imageView.setImageDrawable(result)
 
                             if (result is Animatable) {
                                 result.start()
@@ -548,7 +595,13 @@ class ImageViewerActivity :
                         }
                     },
                 )
-                .size(coil.size.Size.ORIGINAL)
+                .apply {
+                    if (forceSize != null) {
+                        size(Dimension(forceSize.width), Dimension(forceSize.height))
+                    } else {
+                        size(coil.size.Size.ORIGINAL)
+                    }
+                }
                 .build()
             binding.imageView.context.imageLoader.enqueue(request)
         }, {

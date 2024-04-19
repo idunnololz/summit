@@ -14,6 +14,7 @@ import coil.imageLoader
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.util.CoilImagesPlugin
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo

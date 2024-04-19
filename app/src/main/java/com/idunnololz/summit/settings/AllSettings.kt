@@ -68,6 +68,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
@@ -1655,6 +1656,12 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.customize_post_quick_actions),
         context.getString(R.string.customize_post_quick_actions_desc),
     )
+    val showEditedDate = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_edited_time),
+        context.getString(R.string.show_edited_time_desc),
+        relatedKeys = listOf(KEY_SHOW_EDITED_DATE),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
@@ -1667,6 +1674,7 @@ class MiscSettings @Inject constructor(
         usePredictiveBack,
         perCommunitySettings,
         largeScreenSupport,
+        showEditedDate,
     )
 }
 

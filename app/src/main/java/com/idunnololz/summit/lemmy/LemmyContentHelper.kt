@@ -35,6 +35,7 @@ import com.idunnololz.summit.lemmy.postListView.FullContentConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel.PostViewType
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
@@ -56,7 +57,7 @@ class LemmyContentHelper(
     private val context: Context,
     private val offlineManager: OfflineManager,
     private val exoPlayerManager: ExoPlayerManager,
-    private val viewRecycler: ViewRecycler<View> = ViewRecycler<View>(),
+    private val viewRecycler: ViewRecycler<View> = ViewRecycler(),
 ) {
 
     companion object {
@@ -537,21 +538,17 @@ class LemmyContentHelper(
                         )
                         if (bestSize.y > 0) {
                             containerView.layoutParams = containerView.layoutParams.apply {
-                                // width = bestSize.x
                                 height = bestSize.y
                             }
                             playerView.layoutParams = playerView.layoutParams.apply {
-                                // width = bestSize.x
                                 height = bestSize.y
                             }
                         } else {
                             containerView.layoutParams = containerView.layoutParams.apply {
-                                // width = bestSize.x
-                                height = LayoutParams.WRAP_CONTENT
+                                height = WRAP_CONTENT
                             }
                             playerView.layoutParams = playerView.layoutParams.apply {
-                                // width = bestSize.x
-                                height = LayoutParams.WRAP_CONTENT
+                                height = WRAP_CONTENT
                             }
                         }
                         rootView.requestLayout()

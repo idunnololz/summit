@@ -22,8 +22,11 @@ data class DetailsStartSpan(
     val title: CharSequence,
     var isExpanded: Boolean = false,
     var isProcessed: Boolean = false,
-    var spoilerText: SpannableStringBuilder? = null,
-)
+) {
+    // Don't generate hashCode due to stackoverflow from self reference
+    var spoilerText: SpannableStringBuilder? = null
+}
+
 class DetailsEndSpan
 
 private const val TAG = "SpoilerPlugin"
@@ -102,7 +105,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                     val spoilerContent =
                         spanned.subSequence(
                             spanned.getSpanEnd(detailsStartSpan) + 1,
-                            spoilerEnd - 3,
+                            spoilerEnd - 4,
                         ) as SpannableStringBuilder
 
                     if (spoilerContent.last() != '\n') {
