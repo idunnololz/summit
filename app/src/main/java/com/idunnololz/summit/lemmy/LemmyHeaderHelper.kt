@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
@@ -66,6 +67,7 @@ class LemmyHeaderHelper(
         useMultilineHeader: Boolean,
         wrapHeader: Boolean,
         isCurrentUser: Boolean,
+        showEditedDate: Boolean,
     ) {
         var currentTextView = headerContainer.textView1
 
@@ -199,6 +201,12 @@ class LemmyHeaderHelper(
             sb.append(it)
         }
 
+        if (showEditedDate && postView.post.updated != null) {
+            dateStringToPretty(context, postView.post.published).let {
+                sb.append(" ($it)")
+            }
+        }
+
         if (wrapHeader) {
 //            currentTextView.setSingleLineAvoidingRelayout(false)
             if (currentTextView.maxLines != 2) {
@@ -311,6 +319,7 @@ class LemmyHeaderHelper(
         showUpvotePercentage: Boolean,
         useMultilineHeader: Boolean,
         isCurrentUser: Boolean,
+        showEditedDate: Boolean,
         detailed: Boolean = false,
         childrenCount: Int? = null,
         wrapHeader: Boolean = false,
@@ -454,6 +463,12 @@ class LemmyHeaderHelper(
         sb.append(
             dateStringToPretty(context, commentView.comment.published),
         )
+
+        if (showEditedDate && commentView.comment.updated != null) {
+            dateStringToPretty(context, commentView.comment.published).let {
+                sb.append(" ($it)")
+            }
+        }
         headerContainer.getFlairView().visibility = View.GONE
 
         if (detailed) {

@@ -19,7 +19,7 @@ import com.idunnololz.summit.databinding.FragmentHistoryBinding
 import com.idunnololz.summit.databinding.HistoryEntryItemBinding
 import com.idunnololz.summit.databinding.HistoryHeaderItemBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.LinkResolver
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins

@@ -62,6 +62,7 @@ class PostsRepository @Inject constructor(
     private var postsPerPage = DEFAULT_POSTS_PER_PAGE
 
     var hideRead = false
+    var hideReadCount = 0
 
     var showLinkPosts = true
     var showImagePosts = true
@@ -409,6 +410,7 @@ class PostsRepository @Inject constructor(
             var filterReason: FilterReason? = null
 
             if (hideRead && (post.read || postReadManager.isPostRead(apiInstance, post.post.id))) {
+                hideReadCount++
                 continue
             }
             if (!showNsfwPosts && post.post.nsfw) {
@@ -502,6 +504,7 @@ class PostsRepository @Inject constructor(
 
     fun clearHideRead() {
         hideRead = false
+        hideReadCount = 0
     }
 
     fun addSeenPosts(posts: List<PostView>) {

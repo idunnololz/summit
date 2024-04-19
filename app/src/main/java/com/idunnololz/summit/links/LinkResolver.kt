@@ -1,7 +1,13 @@
-package com.idunnololz.summit.lemmy
+package com.idunnololz.summit.links
 
 import android.net.Uri
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.util.moshi
 
 object LinkResolver {
 
@@ -59,6 +65,25 @@ object LinkResolver {
                         return CommunityRef.All(instance)
                     } else if (listingType.equals("local", ignoreCase = true)) {
                         return CommunityRef.Local(instance)
+                    } else if (listingType.equals("subscribed", ignoreCase = true)) {
+                        return CommunityRef.Subscribed(instance)
+                    } else if (listingType.equals("moderatorview", ignoreCase = true)) {
+                        return CommunityRef.ModeratedCommunities(instance)
+                    }
+                }
+
+                val fragment = uri.fragment
+                if (fragment != null && fragment.startsWith("!")) {
+                    // this is likely a multi-community url
+                    val communityRef: CommunityRef? = try {
+                        moshi.adapter(CommunityRef::class.java).fromJson(fragment.drop(1))
+                    } catch (e: Exception) {
+                        // best effort
+                        null
+                    }
+
+                    if (communityRef != null) {
+                        return communityRef
                     }
                 }
 

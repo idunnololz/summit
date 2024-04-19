@@ -58,6 +58,7 @@ import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toId
+import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
@@ -77,6 +78,7 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -531,6 +533,15 @@ class CommunityFragment :
                 onChangeInstanceClick = {
                     InstancePickerDialogFragment.show(childFragmentManager)
                 },
+                onCommunityLongClick = { communityRef, text ->
+                    val url = communityRef?.toUrl(viewModel.apiInstance)
+                    if (url != null) {
+                        showMoreLinkOptions(url, text)
+                        true
+                    } else {
+                        false
+                    }
+                }
             )
         }
 
@@ -684,6 +695,8 @@ class CommunityFragment :
 
             insets.observe(viewLifecycleOwner) {
                 binding.coordinatorLayout.post {
+                    if (!isBindingAvailable()) return@post
+
                     customFabBehavior?.updateBottomNavHeight(getBottomNavHeight().toFloat())
                     customFabBehavior?.updateBottomInset(it.bottomInset)
                     customFabBehavior?.onDependentViewChanged(
@@ -828,6 +841,18 @@ class CommunityFragment :
 
                     val adapter = adapter ?: return@a
 
+                    if (it.data.hideReadCount != null) {
+                        Snackbar
+                            .make(
+                                binding.coordinatorLayout,
+                                getString(
+                                    R.string.posts_hidden_format,
+                                    PrettyPrintUtils.defaultDecimalFormat.format(it.data.hideReadCount)),
+                                Snackbar.LENGTH_LONG,
+                            )
+                            .show()
+                    }
+
                     if (it.data.isReadPostUpdate) {
                         adapter.onItemsChanged(animate = false)
                     } else {
@@ -875,7 +900,7 @@ class CommunityFragment :
 
             Snackbar
                 .make(
-                    requireMainActivity().getSnackbarContainer(),
+                    binding.coordinatorLayout,
                     R.string.post_hidden,
                     Snackbar.LENGTH_LONG,
                 )
@@ -1426,7 +1451,7 @@ class CommunityFragment :
                 viewModel.setDefaultPage(currentCommunityRef)
 
                 Snackbar.make(
-                    requireMainActivity().getSnackbarContainer(),
+                    binding.coordinatorLayout,
                     R.string.home_page_set,
                     Snackbar.LENGTH_LONG,
                 ).show()

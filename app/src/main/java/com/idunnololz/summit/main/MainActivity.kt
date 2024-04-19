@@ -22,7 +22,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Pair
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -46,7 +45,7 @@ import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.LinkResolver
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -56,6 +55,8 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.links.LinkFixer
+import com.idunnololz.summit.links.ResolvingLinkDialog
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity.Companion.ErrorCustomDownloadLocation
@@ -80,6 +81,7 @@ import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -156,6 +158,9 @@ class MainActivity :
 
     @Inject
     lateinit var accountManager: AccountManager
+
+    @Inject
+    lateinit var linkFixer: LinkFixer
 
     private val imageViewerLauncher = registerForActivityResult(
         ImageViewerContract(),
@@ -577,6 +582,42 @@ class MainActivity :
         switchToNativeInstance: Boolean = false,
         preferMainFragment: Boolean = false,
     ) {
+        Log.d(TAG, "launchPage(): $page")
+
+
+        val pageRefResult = linkFixer.fixPageRefSync(page)
+
+        if (pageRefResult.isSuccess) {
+            launchPageInternal(pageRefResult.getOrNull() ?: page, switchToNativeInstance, preferMainFragment)
+            return
+        }
+
+        var job: Job? = null
+
+        val alertDialog = ResolvingLinkDialog.show(this@MainActivity)
+            ?.apply {
+                setOnCancelListener {
+                    job?.cancel()
+                }
+            }
+
+        job = lifecycleScope.launch {
+            val pageRef = linkFixer.fixPageRef(page) ?: page
+
+            withContext(Dispatchers.Main) {
+                alertDialog?.hide()
+                launchPageInternal(pageRef, switchToNativeInstance, preferMainFragment)
+            }
+        }
+    }
+
+    private fun launchPageInternal(
+        page: PageRef,
+        switchToNativeInstance: Boolean = false,
+        preferMainFragment: Boolean = false,
+    ) {
+        Log.d(TAG, "launchPageInternal(): $page")
+
         val isMainFragment = navBarController.navBar.selectedItemId == R.id.mainFragment &&
             currentNavController?.currentDestination?.id == R.id.mainFragment
 
@@ -799,27 +840,6 @@ class MainActivity :
                     rightMargin = navBarController.newRightInset
                     bottomMargin = bottomPadding + additionalPaddingBottom
                 }
-            }
-        }
-    }
-
-    fun insetViewExceptTopAutomaticallyByPaddingAndNavUi(
-        lifecycleOwner: LifecycleOwner,
-        rootView: View,
-        additionalPaddingBottom: Int = 0,
-    ) {
-        insets.observe(lifecycleOwner) { insets ->
-            rootView.post {
-                var bottomPadding = getBottomNavHeight()
-                if (bottomPadding == 0) {
-                    bottomPadding = insets.bottomInset
-                }
-
-                rootView.updatePadding(
-                    left = insets.leftInset,
-                    right = insets.rightInset,
-                    bottom = bottomPadding + additionalPaddingBottom,
-                )
             }
         }
     }

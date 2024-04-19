@@ -124,7 +124,9 @@ class PostListViewBuilder @Inject constructor(
     private var leftHandMode: Boolean = preferences.leftHandMode
     private var showPostUpvotePercentage: Boolean = preferences.showPostUpvotePercentage
     private var useMultilinePostHeaders: Boolean = preferences.useMultilinePostHeaders
-    private var indicateCurrentUser: Boolean = preferences.indicatePostsAndCommentsCreatedByCurrentUser
+    private var indicateCurrentUser: Boolean =
+        preferences.indicatePostsAndCommentsCreatedByCurrentUser
+    private var showEditedDate: Boolean = preferences.showEditedDate
 
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
 
@@ -168,6 +170,7 @@ class PostListViewBuilder @Inject constructor(
         showPostUpvotePercentage = preferences.showPostUpvotePercentage
         useMultilinePostHeaders = preferences.useMultilinePostHeaders
         indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
+        showEditedDate = preferences.showEditedDate
     }
 
     /**
@@ -524,6 +527,7 @@ class PostListViewBuilder @Inject constructor(
                     } else {
                         false
                     },
+                    showEditedDate = showEditedDate,
                 )
 
                 fun showDefaultImage() {

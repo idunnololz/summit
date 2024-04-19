@@ -86,6 +86,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WATERMARK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_LINK_POSTS
@@ -925,6 +926,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putInt(KEY_HOME_FAB_QUICK_ACTION, value)
+                .apply()
+        }
+
+    var showEditedDate: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_EDITED_DATE, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_SHOW_EDITED_DATE, value)
                 .apply()
         }
 

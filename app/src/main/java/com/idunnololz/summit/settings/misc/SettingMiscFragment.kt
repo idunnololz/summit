@@ -203,6 +203,13 @@ class SettingMiscFragment :
                 .actionSettingMiscFragmentToPostQuickActionsFragment()
             findNavController().navigateSafe(directions)
         }
+        settings.showEditedDate.bindTo(
+            binding.showEditedDate,
+            { preferences.showEditedDate },
+            {
+                preferences.showEditedDate = it
+            },
+        )
 
         if (BuildConfig.DEBUG) {
             settings.rotateInstanceOnUploadFail.bindTo(

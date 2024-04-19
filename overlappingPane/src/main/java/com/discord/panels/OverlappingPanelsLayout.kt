@@ -136,15 +136,6 @@ open class OverlappingPanelsLayout : FrameLayout {
         initialize(attrs)
     }
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
-        context,
-        attrs,
-        defStyleAttr,
-        defStyleRes,
-    ) {
-        initialize(attrs)
-    }
-
     private fun initialize(attrs: AttributeSet?) {
         val locale = LocaleProvider.getPrimaryLocale(context)
         isLeftToRight = TextUtils.getLayoutDirectionFromLocale(locale) == View.LAYOUT_DIRECTION_LTR

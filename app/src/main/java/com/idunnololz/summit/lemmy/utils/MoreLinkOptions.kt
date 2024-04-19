@@ -42,6 +42,8 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
         textOrFileName
     }
 
+    var addLinkOptions = true
+
     val bottomMenu = BottomMenu(context).apply {
         when (advancedLink) {
             is AdvancedLink.ImageLink -> {
@@ -142,10 +144,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                         }
                     }
                     is CommunityRef.Local,
-                    is CommunityRef.All,
-                    is CommunityRef.ModeratedCommunities,
-                    is CommunityRef.Subscribed,
-                    -> {
+                    is CommunityRef.All -> {
                         setTitle(
                             context.getString(
                                 R.string.link_actions_format,
@@ -162,7 +161,50 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                             addDivider()
                         }
                     }
-                    is CommunityRef.MultiCommunity -> setTitle(R.string.link_actions)
+                    is CommunityRef.ModeratedCommunities -> {
+                        setTitle(
+                            context.getString(
+                                R.string.link_actions_format,
+                                context.getString(R.string.link_type_instance_link),
+                            ),
+                        )
+                        if (mainActivity != null) {
+                            addItemWithIcon(
+                                id = R.id.community_info,
+                                title = R.string.moderated_communities_info,
+                                icon = R.drawable.ic_community_24,
+                            )
+
+                            addDivider()
+                        }
+                    }
+                    is CommunityRef.Subscribed -> {
+                        setTitle(
+                            context.getString(
+                                R.string.link_actions_format,
+                                context.getString(R.string.link_type_instance_link),
+                            ),
+                        )
+                        if (mainActivity != null) {
+                            addItemWithIcon(
+                                id = R.id.community_info,
+                                title = R.string.subscribed_communities_info,
+                                icon = R.drawable.ic_community_24,
+                            )
+
+                            addDivider()
+                        }
+                    }
+                    is CommunityRef.MultiCommunity -> {
+                        addLinkOptions = false
+
+                        setTitle(R.string.multi_community_actions)
+                        addItemWithIcon(
+                            id = R.id.community_info,
+                            title = R.string.multi_community_info,
+                            icon = R.drawable.baseline_dynamic_feed_24,
+                        )
+                    }
                     is PersonRef.PersonRefByName -> {
                         setTitle(
                             context.getString(
@@ -228,30 +270,36 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                 )
         }
 
-        addItemWithIcon(
-            R.id.copy_link,
-            R.string.copy_link_address,
-            R.drawable.baseline_content_copy_24,
-        )
-        if (textOrFileName != null) {
+        if (addLinkOptions) {
             addItemWithIcon(
-                R.id.copy_link_text,
-                R.string.copy_link_text,
+                R.id.copy_link,
+                R.string.copy_link_address,
                 R.drawable.baseline_content_copy_24,
             )
+            if (textOrFileName != null) {
+                addItemWithIcon(
+                    R.id.copy_link_text,
+                    R.string.copy_link_text,
+                    R.drawable.baseline_content_copy_24,
+                )
+            }
+            addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
+            addItemWithIcon(
+                R.id.open_in_browser,
+                R.string.open_in_browser,
+                R.drawable.baseline_public_24,
+            )
+            addItemWithIcon(
+                R.id.open_link_incognito,
+                R.string.open_in_incognito,
+                R.drawable.ic_incognito_24,
+            )
+            addItemWithIcon(
+                R.id.preview_link,
+                R.string.preview_link,
+                R.drawable.baseline_preview_24
+            )
         }
-        addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
-        addItemWithIcon(
-            R.id.open_in_browser,
-            R.string.open_in_browser,
-            R.drawable.baseline_public_24,
-        )
-        addItemWithIcon(
-            R.id.open_link_incognito,
-            R.string.open_in_incognito,
-            R.drawable.ic_incognito_24,
-        )
-        addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
 
         setOnMenuItemClickListener {
             createImageOrLinkActionsHandler(

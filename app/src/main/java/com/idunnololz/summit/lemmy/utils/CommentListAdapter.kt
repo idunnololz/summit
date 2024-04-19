@@ -28,7 +28,7 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.FilteredCommentItem
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.LinkResolver
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.VisibleCommentItem
 import com.idunnololz.summit.lemmy.appendSeparator
