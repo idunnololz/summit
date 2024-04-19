@@ -905,4 +905,17 @@
     <string name="no_bio">Nessuna bio</string>
     <string name="keep_typing_to_see_suggestions">Continua a digitare per vedere i suggerimenti</string>
     <string name="preview_image">Anteprima immagine</string>
+    <string name="feed_info">Informazioni feed</string>
+    <string name="home_fab_quick_action">azione rapida FAB</string>
+    <string name="no_action">Nessuna azione</string>
+    <string name="multi_community_actions">Azioni multi-comunità</string>
+    <string name="moderated_communities_info">Informazioni comunità moderate</string>
+    <string name="subscribed_communities_info">Informazioni comunità cui si è iscritti</string>
+    <string name="posts_hidden_format">%1$s post nascosti.</string>
+    <string name="resolving_link">Risoluzione link…</string>
+    <string name="show_edited_time">Visualizza data modifica</string>
+    <string name="show_edited_time_desc">Visualizza la data di modifica nell\'intestazione di post/commenti.</string>
+    <string name="error_image_too_large_to_preview">L\'immagine è troppo grande per visualizzare l\'anteprima. Scaricare l\'immagine e aprire l\'anteprima in un\'altra app.</string>
+    <string name="home_fab_quick_action_desc">Seleziona un\'azione da eseguire alla pressione prolungata sul pulsante azione nella schermata elenco post (pulsante flottante nella parte inferiore dello schermo).</string>
+    <string name="warn_image_downscaled">L\'immagine originale è troppo grande per visualizzare l\'anteprima. Verrà visualizzata una versione scalata.</string>
 </resources>
