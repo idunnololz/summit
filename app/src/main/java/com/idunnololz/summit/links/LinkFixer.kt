@@ -32,6 +32,10 @@ class LinkFixer @Inject constructor(
     private val apiClient: LemmyApiClient,
 ) {
 
+    companion object {
+        private const val TAG = "LinkFixer"
+    }
+
     private val coroutineScope = coroutineScopeFactory.create()
     private var knownInstances: Set<String> = setOf(
         "lemmy.world",
@@ -199,7 +203,10 @@ class LinkFixer @Inject constructor(
             val possibleInstance = tokens.joinToString(separator = ".")
             val result = fetchVersionObject(possibleInstance)
 
+            Log.d(TAG, "Evaluating $possibleInstance")
+
             if (result.isSuccess) {
+                Log.d(TAG, "$possibleInstance is a lemmy instance!")
                 knownInstances = knownInstances + possibleInstance
 
                 hostToInstance = hostToInstance + (instance to possibleInstance)
@@ -208,7 +215,7 @@ class LinkFixer @Inject constructor(
             } else {
                 val exception = result.exceptionOrNull()
                 if (exception !is ClientApiException) {
-                    return@a null
+                    break
                 }
 
                 tokens = tokens.drop(1)
@@ -263,7 +270,7 @@ class LinkFixer @Inject constructor(
             } catch (e: JSONException) {
                 Result.failure(ClientApiException("API returns a different object than expected.", 0))
             } catch (e: Exception) {
-                Log.e("HAHA", "error", e)
+                Log.e(TAG, "error", e)
                 Result.failure(e)
             }
         }

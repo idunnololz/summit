@@ -584,7 +584,6 @@ class MainActivity :
     ) {
         Log.d(TAG, "launchPage(): $page")
 
-
         val pageRefResult = linkFixer.fixPageRefSync(page)
 
         if (pageRefResult.isSuccess) {
@@ -605,7 +604,7 @@ class MainActivity :
             val pageRef = linkFixer.fixPageRef(page) ?: page
 
             withContext(Dispatchers.Main) {
-                alertDialog?.hide()
+                alertDialog?.dismiss()
                 launchPageInternal(pageRef, switchToNativeInstance, preferMainFragment)
             }
         }
