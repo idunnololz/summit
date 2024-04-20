@@ -202,7 +202,7 @@ class LemmyHeaderHelper(
         }
 
         if (showEditedDate && postView.post.updated != null) {
-            dateStringToPretty(context, postView.post.published).let {
+            dateStringToPretty(context, postView.post.updated).let {
                 sb.append(" ($it)")
             }
         }
@@ -465,7 +465,7 @@ class LemmyHeaderHelper(
         )
 
         if (showEditedDate && commentView.comment.updated != null) {
-            dateStringToPretty(context, commentView.comment.published).let {
+            dateStringToPretty(context, commentView.comment.updated).let {
                 sb.append(" ($it)")
             }
         }
