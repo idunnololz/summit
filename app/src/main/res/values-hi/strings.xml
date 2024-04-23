@@ -898,4 +898,17 @@
     <string name="no_bio">कोई जीवनी नहीं</string>
     <string name="keep_typing_to_see_suggestions">सुझाव देखने के लिए टाइप करते रहें</string>
     <string name="preview_image">छवि का पूर्वावलोकन करें</string>
+    <string name="no_action">कोई कार्रवाई नहीं</string>
+    <string name="multi_community_actions">बहु-समुदाय कार्रवाई</string>
+    <string name="subscribed_communities_info">सदस्यता प्राप्त समुदायों की जानकारी</string>
+    <string name="posts_hidden_format">%1$s पोस्ट छिपी हुई हैं।</string>
+    <string name="resolving_link">लिंक का समाधान हो रहा ह…</string>
+    <string name="show_edited_time_desc">पोस्ट/टिप्पणियों के लिए शीर्षलेख में संपादित समय दिखाएं।</string>
+    <string name="warn_image_downscaled">मूल छवि पूर्वावलोकन के लिए बहुत बड़ी है। इसके बजाय एक छोटा संस्करण दिखाया गया है।</string>
+    <string name="error_image_too_large_to_preview">पूर्वावलोकन के लिए छवि बहुत बड़ी है. छवि डाउनलोड करें और किसी अन्य ऐप में उसका पूर्वावलोकन करें।</string>
+    <string name="feed_info">फ़ीड जानकारी</string>
+    <string name="home_fab_quick_action">FAB त्वरित कार्रवाई</string>
+    <string name="show_edited_time">संपादित समय दिखाएं</string>
+    <string name="home_fab_quick_action_desc">जब पोस्ट सूची स्क्रीन पर फ्लोटिंग एक्शन बटन (स्क्रीन के नीचे वाला बटन) लंबे समय तक दबाया जाए तो निष्पादित करने के लिए एक क्रिया चुनें।</string>
+    <string name="moderated_communities_info">संचालित समुदायों की जानकारी</string>
 </resources>
