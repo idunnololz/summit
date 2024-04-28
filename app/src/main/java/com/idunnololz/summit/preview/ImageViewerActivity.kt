@@ -35,6 +35,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.BaseActivity
@@ -94,6 +95,9 @@ class ImageViewerActivity :
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override val context: Context
         get() = this
@@ -356,6 +360,12 @@ class ImageViewerActivity :
                 supportFragmentManager,
                 args.mimeType,
             )
+        }
+
+        if (preferences.imagePreviewHideUiByDefault) {
+            binding.root.post {
+                hideUi()
+            }
         }
     }
 

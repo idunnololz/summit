@@ -47,7 +47,7 @@ class ModeratedCommunitiesDataSource(
         sortType: SortType?,
         page: Int,
         force: Boolean,
-    ): Result<List<PostView>> = getDataSource().fold(
+    ): Result<List<FetchedPost>> = getDataSource().fold(
         onSuccess = {
             if (it.sourcesCount == 0) {
                 Result.failure(NoModeratedCommunitiesException())
@@ -86,10 +86,12 @@ class ModeratedCommunitiesDataSource(
             }
         }.flowOn(Dispatchers.Default).toList()
 
-        return dataSourceFactory.create(fullAccount.account.instance, communityRefs).let {
-            this.dataSource = it
-            Result.success(it)
-        }
+        return dataSourceFactory
+            .create(fullAccount.account.instance, communityRefs)
+            .let {
+                this.dataSource = it
+                Result.success(it)
+            }
     }
 }
 

@@ -136,7 +136,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 onImageClick = { view, url ->
                     getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
                 },
-                onPostImageClick = { _, view, url ->
+                onPostImageClick = { _, _, view, url ->
                     getMainActivity()?.openImage(view, null, null, url, null)
                 },
                 onVideoClick = { url, videoType, state ->
@@ -338,7 +338,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private val postListViewBuilder: PostListViewBuilder,
         private val onLoadPage: (Int) -> Unit,
         private val onImageClick: (View?, String) -> Unit,
-        private val onPostImageClick: (PostView, View?, String) -> Unit,
+        private val onPostImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
         private val onVideoClick: (
             url: String,
             videoType: VideoType,
@@ -401,8 +401,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         old.communityView.community.id ==
                             (new as Item.CommunityItem).communityView.community.id
                     is Item.PostItem ->
-                        old.postView.post.id ==
-                            (new as Item.PostItem).postView.post.id
+                        old.fetchedPost.postView.post.id ==
+                            (new as Item.PostItem).fetchedPost.postView.post.id
                     is Item.UserItem ->
                         old.personView.person.id ==
                             (new as Item.UserItem).personView.person.id
@@ -583,16 +583,16 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         b.root.setTag(R.id.view_holder, it)
                     }
                 }
-                val isRevealed = revealedItems.contains(item.postView.getUniqueKey())
+                val isRevealed = revealedItems.contains(item.fetchedPost.postView.getUniqueKey())
                 val isActionsExpanded = true
                 val isExpanded = false
 
-                h.root.setTag(R.id.post_view, item.postView)
+                h.root.setTag(R.id.fetched_post, item.fetchedPost)
                 h.root.setTag(R.id.swipeable, true)
 
                 postListViewBuilder.bind(
                     holder = h,
-                    postView = item.postView,
+                    fetchedPost = item.fetchedPost,
                     instance = item.instance,
                     isRevealed = isRevealed,
                     contentMaxWidth = contentMaxWidth,
@@ -604,25 +604,43 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     updateContent = true,
                     highlight = false,
                     highlightForever = false,
+                    themeColor = null,
                     onRevealContentClickedFn = {
-                        revealedItems.add(item.postView.getUniqueKey())
+                        revealedItems.add(item.fetchedPost.postView.getUniqueKey())
                         notifyItemChanged(h.absoluteAdapterPosition)
                     },
                     onImageClick = onPostImageClick,
-                    onShowMoreOptions = {
-                        onPostActionClick(it, R.id.pa_more)
+                    onShowMoreOptions = { _, postView ->
+                        onPostActionClick(postView, R.id.pa_more)
                     },
                     onVideoClick = onVideoClick,
                     onVideoLongClickListener = onVideoLongClickListener,
-                    onPageClick = onPageClick,
-                    onItemClick = onItemClick,
+                    onPageClick = { accountId, pageRef ->
+                        onPageClick(pageRef)
+                    },
+                    onItemClick = { accountId: Long?, instance: String, id: Int, currentCommunity: CommunityRef?, post: PostView, jumpToComments: Boolean, reveal: Boolean, videoState: VideoState? ->
+                        onItemClick(
+                            instance,
+                            id,
+                            currentCommunity,
+                            post,
+                            jumpToComments,
+                            reveal,
+                            videoState,
+                        )
+
+                    },
                     toggleItem = {},
                     toggleActions = {},
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
                     onHighlightComplete = {},
-                    onLinkClick = onLinkClick,
-                    onLinkLongClick = onLinkLongClick,
+                    onLinkClick = { accountId, url, text, linkContext ->
+                        onLinkClick(url, text, linkContext)
+                    },
+                    onLinkLongClick = { accountId, url, text ->
+                        onLinkLongClick(url, text)
+                    },
                 )
             }
             addItemType(Item.UserItem::class, UserItemBinding::inflate) { item, b, _ ->

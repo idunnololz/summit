@@ -377,7 +377,7 @@
         <item name="cornerSize">@dimen/padding_half</item>
     </style>
     <style name="CardImageViewAppearanceOverlay">
-        <item name="cornerSize">@dimen/padding</item>
+        <item name="cornerSize">12dp</item>
     </style>
 
     <style name="BottomSheetAnimations">

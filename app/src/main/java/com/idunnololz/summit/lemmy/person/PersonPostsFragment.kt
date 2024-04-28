@@ -73,7 +73,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     .setNegativeButton(R.string.go_to_account_instance)
                     .createAndShow(childFragmentManager, "onInstanceMismatch")
             },
-            onImageClick = { postView, sharedElementView, url ->
+            onImageClick = { _, postView, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
                     appBar = parentFragment.binding.appBar,
@@ -88,10 +88,11 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
             onVideoLongClickListener = { url ->
                 showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
             },
-            onPageClick = {
-                getMainActivity()?.launchPage(it)
+            onPageClick = { accountId, pageRef ->
+                getMainActivity()?.launchPage(pageRef)
             },
             onItemClick = {
+                    accountId,
                     instance,
                     id,
                     currentCommunity,
@@ -110,17 +111,22 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     videoState = videoState,
                 )
             },
-            onShowMoreActions = {
-                showMorePostOptions(parentFragment.viewModel.instance, it, parentFragment.moreActionsHelper, childFragmentManager)
+            onShowMoreActions = { accountId, postView ->
+                showMorePostOptions(
+                    instance = parentFragment.viewModel.instance,
+                    postView = postView,
+                    moreActionsHelper = parentFragment.moreActionsHelper,
+                    fragmentManager = childFragmentManager,
+                )
             },
-            onPostRead = {},
+            onPostRead = { _, _ -> },
             onLoadPage = {
                 viewModel.fetchPage(it)
             },
-            onLinkClick = { url, text, linkType ->
+            onLinkClick = { accountId, url, text, linkType ->
                 onLinkClick(url, text, linkType)
             },
-            onLinkLongClick = { url, text ->
+            onLinkLongClick = { accountId, url, text ->
                 getMainActivity()?.showMoreLinkOptions(url, text)
             },
         ).apply {

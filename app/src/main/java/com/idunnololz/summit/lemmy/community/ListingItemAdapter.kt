@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
@@ -30,6 +31,9 @@ import com.idunnololz.summit.databinding.PostListEndItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.multicommunity.Source
+import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.links.LinkContext
@@ -48,11 +52,12 @@ class ListingItemAdapter(
     private val onPrevClick: () -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
-    private val onImageClick: (PostView, View?, String) -> Unit,
+    private val onImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onVideoLongClickListener: (url: String) -> Unit,
-    private val onPageClick: (PageRef) -> Unit,
+    private val onPageClick: (accountId: Long?, PageRef) -> Unit,
     private val onItemClick: (
+        accountId: Long?,
         instance: String,
         id: Int,
         currentCommunity: CommunityRef?,
@@ -61,14 +66,16 @@ class ListingItemAdapter(
         reveal: Boolean,
         videoState: VideoState?,
     ) -> Unit,
-    private val onShowMoreActions: (PostView) -> Unit,
-    private val onPostRead: (PostView) -> Unit,
+    private val onShowMoreActions: (accountId: Long?, PostView) -> Unit,
+    private val onPostRead: (accountId: Long?, PostView) -> Unit,
     private val onLoadPage: (Int) -> Unit,
-    private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
-    private val onLinkLongClick: (url: String, text: String?) -> Unit,
+    private val onLinkClick:
+        (accountId: Long?, url: String, text: String?, linkContext: LinkContext) -> Unit,
+    private val onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val inflater = LayoutInflater.from(context)
+    private val accountImageGenerator = AccountImageGenerator(context)
 
     var markPostsAsReadOnScroll: Boolean = false
     var alwaysRenderAsUnread: Boolean = false
@@ -181,16 +188,31 @@ class ListingItemAdapter(
                     super.onBindViewHolder(holder, position, payloads)
                 } else {
                     val h: ListingItemViewHolder = holder as ListingItemViewHolder
-                    val isRevealed = revealedItems.contains(item.postView.getUniqueKey()) ||
+                    val isRevealed = revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
                         !blurNsfwPosts
                     val isActionsExpanded = item.isActionExpanded
                     val isExpanded = item.isExpanded
 
-                    h.root.setTag(R.id.post_view, item.postView)
+                    h.root.setTag(R.id.fetched_post, item.fetchedPost)
+
+                    val source = item.fetchedPost.source
+                    val accountId: Long?
+                    val themeColor: Int?
+                    if (source is Source.AccountSource) {
+                        themeColor = accountImageGenerator.getColorForPerson(
+                            source.name,
+                            source.id,
+                            source.instance,
+                        )
+                        accountId = source.id
+                    } else {
+                        themeColor = null
+                        accountId = null
+                    }
 
                     postListViewBuilder.bind(
                         holder = h,
-                        postView = item.postView,
+                        fetchedPost = item.fetchedPost,
                         instance = item.instance,
                         isRevealed = isRevealed,
                         contentMaxWidth = contentMaxWidth,
@@ -202,8 +224,9 @@ class ListingItemAdapter(
                         updateContent = false,
                         highlight = item.highlight,
                         highlightForever = item.highlightForever,
+                        themeColor = themeColor,
                         onRevealContentClickedFn = {
-                            revealedItems.add(item.postView.getUniqueKey())
+                            revealedItems.add(item.fetchedPost.postView.getUniqueKey())
                             notifyItemChanged(h.absoluteAdapterPosition)
                         },
                         onImageClick = onImageClick,
@@ -241,7 +264,10 @@ class ListingItemAdapter(
                         if (markPostsAsReadOnScroll) {
                             seenItemPositions.forEach {
                                 (items.getOrNull(it) as? Item.VisiblePostItem)?.let {
-                                    onPostRead(it.postView)
+                                    onPostRead(
+                                        it.fetchedPost.source.accountId,
+                                        it.fetchedPost.postView
+                                    )
                                 }
                             }
                         }
@@ -261,17 +287,32 @@ class ListingItemAdapter(
             }
             is Item.VisiblePostItem -> {
                 val h: ListingItemViewHolder = holder as ListingItemViewHolder
-                val isRevealed = revealedItems.contains(item.postView.getUniqueKey()) ||
+                val isRevealed = revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
                     !blurNsfwPosts
                 val isActionsExpanded = item.isActionExpanded
                 val isExpanded = item.isExpanded
 
-                h.root.setTag(R.id.post_view, item.postView)
+                h.root.setTag(R.id.fetched_post, item.fetchedPost)
                 h.root.setTag(R.id.swipeable, true)
+
+                val source = item.fetchedPost.source
+                val accountId: Long?
+                val themeColor: Int?
+                if (source is Source.AccountSource) {
+                    themeColor = accountImageGenerator.getColorForPerson(
+                        source.name,
+                        source.id,
+                        source.instance,
+                    )
+                    accountId = source.id
+                } else {
+                    themeColor = null
+                    accountId = null
+                }
 
                 postListViewBuilder.bind(
                     holder = h,
-                    postView = item.postView,
+                    fetchedPost = item.fetchedPost,
                     instance = item.instance,
                     isRevealed = isRevealed,
                     contentMaxWidth = contentMaxWidth,
@@ -283,8 +324,9 @@ class ListingItemAdapter(
                     updateContent = true,
                     highlight = item.highlight,
                     highlightForever = item.highlightForever,
+                    themeColor = themeColor,
                     onRevealContentClickedFn = {
-                        revealedItems.add(item.postView.getUniqueKey())
+                        revealedItems.add(item.fetchedPost.postView.getUniqueKey())
                         notifyItemChanged(h.absoluteAdapterPosition)
                     },
                     onImageClick = onImageClick,
@@ -307,9 +349,23 @@ class ListingItemAdapter(
 
             is Item.FilteredPostItem -> {
                 val b = holder.getBinding<FilteredPostItemBinding>()
+
+                val source = item.fetchedPost.source
+                val themeColor = if (source is Source.AccountSource) {
+                    accountImageGenerator.getColorForPerson(
+                        source.name,
+                        source.id,
+                        source.instance,
+                    )
+                } else {
+                    null
+                }
+
+//                b.themeColorBar.
+
                 b.text.text = context.getString(R.string.post_filtered_format, item.filterReason)
                 b.root.setOnClickListener {
-                    postListEngine.unfilter(item.postView.post.id)
+                    postListEngine.unfilter(item.fetchedPost.postView.post.id)
                     postListEngine.createItems()
                     refreshItems(true)
                 }
@@ -387,27 +443,33 @@ class ListingItemAdapter(
             )
 
             if (markPostsAsReadOnScroll) {
-                val postView = holder.root.getTag(R.id.post_view) as? PostView
-                if (postView != null && seenItemPositions.contains(position)) {
-                    onPostRead(postView)
+                val fetchedPost = holder.root.getTag(R.id.fetched_post) as? FetchedPost
+                if (fetchedPost != null && seenItemPositions.contains(position)) {
+                    onPostRead(
+                        fetchedPost.source.accountId,
+                        fetchedPost.postView,
+                    )
                 }
             }
         }
     }
 
-    private fun toggleItem(postView: PostView) {
-        val isExpanded = postListEngine.toggleItem(postView)
+    private fun toggleItem(fetchedPost: FetchedPost) {
+        val isExpanded = postListEngine.toggleItem(fetchedPost.postView)
 
         if (isExpanded) {
-            onPostRead(postView)
+            onPostRead(
+                fetchedPost.source.accountId,
+                fetchedPost.postView,
+            )
         }
 
         postListEngine.createItems()
         refreshItems(animate = true)
     }
 
-    private fun toggleActions(postView: PostView) {
-        postListEngine.toggleActions(postView)
+    private fun toggleActions(fetchedPost: FetchedPost) {
+        postListEngine.toggleActions(fetchedPost.postView)
         postListEngine.createItems()
         refreshItems(animate = true)
     }
@@ -458,8 +520,8 @@ class ListingItemAdapter(
                     return oldItem::class == newItem::class && when (oldItem) {
                         is Item.FooterItem -> true
                         is Item.PostItem ->
-                            oldItem.postView.getUniqueKey() ==
-                                (newItem as Item.PostItem).postView.getUniqueKey()
+                            oldItem.fetchedPost.postView.getUniqueKey() ==
+                                (newItem as Item.PostItem).fetchedPost.postView.getUniqueKey()
                         is Item.AutoLoadItem ->
                             oldItem.pageToLoad ==
                                 (newItem as Item.AutoLoadItem).pageToLoad

@@ -343,7 +343,7 @@
     <!-- Keep short. Button/title text for the post and comments settings page. -->
     <string name="post_and_comments_appearance">Post and comments appearance</string>
     <!-- Setting description text. Describes what the post and comment settings do. -->
-    <string name="post_and_comments_settings_desc">Customize how post and comments look</string>
+    <string name="post_and_comments_settings_desc">Customize the post and comments screen</string>
     <!-- Title of section that contains settings to customize the appearance of comments. -->
     <string name="comment_settings">Comment settings</string>
     <!-- Title of section that contains settings to customize the appearance of posts. -->
@@ -405,9 +405,9 @@
     <!-- Setting title text. -->
     <string name="indentation_per_level">Indentation per level</string>
     <!-- Setting title text. -->
-    <string name="post_list">Post list</string>
+    <string name="post_list">Posts feed</string>
     <!-- Setting body text. -->
-    <string name="setting_post_list_desc">Customize the community post list</string>
+    <string name="setting_post_list_desc">Customize the community posts feed</string>
     <!-- Setting title text. -->
     <string name="about_summit">About Summit</string>
     <!-- Setting body text. -->
@@ -1714,6 +1714,13 @@
     <string name="show_edited_time_desc">Show edited time in the header for posts/comments.</string>
     <string name="warn_image_downscaled">The original image is too large to preview. A downscaled version is shown instead.</string>
     <string name="error_image_too_large_to_preview">Image is too large to preview. Download the image and preview it in another app.</string>
+    <string name="vote_colors">Vote colors</string>
+    <string name="post_and_comments">Post and comments</string>
+    <string name="post_and_comments_appearance_settings_desc">Customize the appearance of the post and comments screen</string>
+    <string name="image_preview_hide_ui_by_default">Hide UI by default in image viewer</string>
+    <string name="all_subscribed">All subscribed</string>
+    <string name="all_subscribed_feed_actions">All subscribed feed actions</string>
+    <string name="all_subscribed_feed_info">All subscribed feed info</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

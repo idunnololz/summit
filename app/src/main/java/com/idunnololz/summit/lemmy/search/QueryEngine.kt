@@ -11,6 +11,8 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.util.StatefulData
 import info.debatty.java.stringsimilarity.NGram
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +24,7 @@ import kotlinx.coroutines.withContext
 
 sealed class Item {
     data class PostItem(
-        val postView: PostView,
+        val fetchedPost: FetchedPost,
         val instance: String,
         val pageIndex: Int,
     ) : Item()
@@ -65,7 +67,7 @@ class QueryEngine(
     sealed interface SearchResultView {
         val isUrlResult: Boolean
         data class PostResultView(
-            val postView: PostView,
+            val fetchedPost: FetchedPost,
             override val isUrlResult: Boolean,
         ) : SearchResultView
 
@@ -257,7 +259,13 @@ class QueryEngine(
                             val items = mutableListOf<SearchResultView>()
 
                             it.posts.mapTo(items) {
-                                SearchResultView.PostResultView(it, false)
+                                SearchResultView.PostResultView(
+                                    FetchedPost(
+                                        it,
+                                        Source.StandardSource()
+                                    ),
+                                    false,
+                                )
                             }
                             it.comments.mapTo(items) {
                                 SearchResultView.CommentResultView(it, false)
@@ -285,7 +293,8 @@ class QueryEngine(
                                                 )
                                             }
                                             is SearchResultView.PostResultView -> {
-                                                val toMatch = it.postView.post.name + " " + it.postView.post.body
+                                                val post = it.fetchedPost.postView.post
+                                                val toMatch = post.name + " " + post.body
                                                 trigram.distance(toMatch, currentQuery)
                                             }
                                             is SearchResultView.UserResultView ->
@@ -360,7 +369,13 @@ class QueryEngine(
                             val items = mutableListOf<SearchResultView>()
 
                             it.posts.mapTo(items) {
-                                SearchResultView.PostResultView(it, true)
+                                SearchResultView.PostResultView(
+                                    FetchedPost(
+                                        it,
+                                        Source.StandardSource()
+                                    ),
+                                    true,
+                                )
                             }
                             it.comments.mapTo(items) {
                                 SearchResultView.CommentResultView(it, true)
@@ -388,7 +403,7 @@ class QueryEngine(
                                                 )
                                             is SearchResultView.PostResultView ->
                                                 trigram.distance(
-                                                    view.postView.post.ap_id,
+                                                    view.fetchedPost.postView.post.ap_id,
                                                     currentQuery,
                                                 )
                                             is SearchResultView.UserResultView ->
@@ -473,7 +488,7 @@ class QueryEngine(
                             is SearchResultView.CommunityResultView ->
                                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
                             is SearchResultView.PostResultView ->
-                                Item.PostItem(it.postView, instance, page.pageIndex)
+                                Item.PostItem(it.fetchedPost, instance, page.pageIndex)
                             is SearchResultView.UserResultView ->
                                 Item.UserItem(it.personView, instance, page.pageIndex)
                         }
@@ -487,7 +502,7 @@ class QueryEngine(
                             is SearchResultView.CommunityResultView ->
                                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
                             is SearchResultView.PostResultView ->
-                                Item.PostItem(it.postView, instance, page.pageIndex)
+                                Item.PostItem(it.fetchedPost, instance, page.pageIndex)
                             is SearchResultView.UserResultView ->
                                 Item.UserItem(it.personView, instance, page.pageIndex)
                         }
@@ -502,7 +517,14 @@ class QueryEngine(
                     }
                 is QueryResultsPage.PostResultsPage ->
                     page.results.mapTo(newItems) {
-                        Item.PostItem(it, instance, page.pageIndex)
+                        Item.PostItem(
+                            fetchedPost = FetchedPost(
+                                it,
+                                Source.StandardSource()
+                            ),
+                            instance = instance,
+                            pageIndex = page.pageIndex
+                        )
                     }
                 is QueryResultsPage.UserResultsPage ->
                     page.results.mapTo(newItems) {

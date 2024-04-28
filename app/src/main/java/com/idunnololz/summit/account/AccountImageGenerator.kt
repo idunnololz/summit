@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.Person
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getDrawableCompat
@@ -58,7 +59,11 @@ class AccountImageGenerator @Inject constructor(
 
         with(Canvas(bitmap)) {
             val bgPaint = Paint().apply {
-                color = getColorForKey("${person.name}@${person.id}@${person.instance}")
+                color = getColorForPerson(
+                    person.name,
+                    person.id,
+                    person.instance,
+                )
             }
 
             drawRect(0f, 0f, accountImageSize.toFloat(), accountImageSize.toFloat(), bgPaint)
@@ -89,6 +94,10 @@ class AccountImageGenerator @Inject constructor(
             personDrawable?.draw(this)
         }
         return BitmapDrawable(context.resources, bitmap)
+    }
+
+    fun getColorForPerson(personName: String, personId: PersonId, personInstance: String): Int {
+        return getColorForKey("${personName}@${personId}@${personInstance}")
     }
 
     private fun generateImageForAccount(account: Account): Bitmap {

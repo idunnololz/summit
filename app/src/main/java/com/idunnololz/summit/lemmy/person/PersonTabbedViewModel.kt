@@ -25,6 +25,7 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
@@ -151,7 +152,7 @@ class PersonTabbedViewModel @Inject constructor(
 
                     if (postListEngine.hasMore || force) {
                         val posts = result.posts.map {
-                            LocalPostView(postView = it, filterReason = null)
+                            LocalPostView(fetchedPost = it.toFetchedPost(), filterReason = null)
                         }
                         postListEngine.addPage(
                             LoadedPostsData(

@@ -44,6 +44,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_LAYOUT_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HOME_FAB_QUICK_ACTION
+import com.idunnololz.summit.util.PreferenceUtil.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
@@ -112,8 +113,8 @@ object SettingPath {
                 context.getString(R.string.about_summit)
             CacheSettings::class ->
                 context.getString(R.string.cache)
-            CommentListSettings::class ->
-                context.getString(R.string.comment_list)
+            PostAndCommentsSettings::class ->
+                context.getString(R.string.post_and_comments)
             GestureSettings::class ->
                 context.getString(R.string.gestures)
             HiddenPostsSettings::class ->
@@ -122,15 +123,15 @@ object SettingPath {
                 context.getString(R.string.lemmy_web_preferences)
             MainSettings::class ->
                 context.getString(R.string.settings)
-            PostAndCommentsSettings::class ->
+            PostAndCommentsAppearanceSettings::class ->
                 context.getString(R.string.post_and_comments_appearance)
-            PostListSettings::class ->
+            PostsFeedSettings::class ->
                 context.getString(R.string.post_list)
             ThemeSettings::class ->
                 context.getString(R.string.theme)
             MiscSettings::class ->
                 context.getString(R.string.misc)
-            ViewTypeSettings::class ->
+            PostsFeedAppearanceSettings::class ->
                 context.getString(R.string.post_appearance)
             LoggingSettings::class ->
                 context.getString(R.string.logging)
@@ -170,14 +171,9 @@ class MainSettings @Inject constructor(
         context.getString(R.string.theme),
         context.getString(R.string.theme_settings_desc),
     )
-    val settingViewType = BasicSettingItem(
-        R.drawable.baseline_view_agenda_24,
-        context.getString(R.string.post_appearance),
-        context.getString(R.string.view_type_settings_desc),
-    )
-    val settingPostAndComment = BasicSettingItem(
-        R.drawable.baseline_mode_comment_24,
-        context.getString(R.string.post_and_comments_appearance),
+    val settingPostAndComments = BasicSettingItem(
+        R.drawable.baseline_comment_24,
+        context.getString(R.string.post_and_comments),
         context.getString(R.string.post_and_comments_settings_desc),
     )
     val settingLemmyWeb = BasicSettingItem(
@@ -205,7 +201,7 @@ class MainSettings @Inject constructor(
         context.getString(R.string.hidden_posts),
         context.getString(R.string.hidden_posts_desc),
     )
-    val settingPostList = BasicSettingItem(
+    val settingPostsFeed = BasicSettingItem(
         R.drawable.baseline_pages_24,
         context.getString(R.string.post_list),
         context.getString(R.string.setting_post_list_desc),
@@ -273,10 +269,8 @@ class MainSettings @Inject constructor(
             context.getString(R.string.look_and_feel),
             listOf(
                 settingTheme,
-                settingPostList,
-                commentListSettings,
-                settingViewType,
-                settingPostAndComment,
+                settingPostsFeed,
+                settingPostAndComments,
                 settingGestures,
                 miscSettings,
             ),
@@ -300,6 +294,11 @@ class MainSettings @Inject constructor(
                 downloadSettings,
                 notificationSettings,
                 backupAndRestoreSettings,
+            ),
+        ),
+        SubgroupItem(
+            context.getString(R.string.about),
+            listOf(
                 settingAbout,
                 settingSummitCommunity,
             ),
@@ -619,11 +618,17 @@ class GestureSettings @Inject constructor(
 }
 
 @Singleton
-class PostListSettings @Inject constructor(
+class PostsFeedSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
+    )
+
+    val settingsPostFeedAppearance = BasicSettingItem(
+        R.drawable.baseline_view_agenda_24,
+        context.getString(R.string.post_appearance),
+        context.getString(R.string.view_type_settings_desc),
     )
     val infinity = OnOffSettingItem(
         null,
@@ -806,11 +811,21 @@ class PostListSettings @Inject constructor(
 }
 
 @Singleton
-class CommentListSettings @Inject constructor(
+class PostAndCommentsSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
+    )
+    val settingPostAndCommentsAppearance = BasicSettingItem(
+        R.drawable.baseline_comment_24,
+        context.getString(R.string.post_and_comments_appearance),
+        context.getString(R.string.post_and_comments_appearance_settings_desc),
+    )
+    val customizePostQuickActions = BasicSettingItem(
+        null,
+        context.getString(R.string.customize_post_quick_actions),
+        context.getString(R.string.customize_post_quick_actions_desc),
     )
     val defaultCommentsSortOrder = RadioGroupSettingItem(
         null,
@@ -988,15 +1003,17 @@ class CommentListSettings @Inject constructor(
         hideCommentScores,
         useVolumeButtonNavigation,
         commentHeaderLayout,
+        settingPostAndCommentsAppearance,
     )
 }
 
 @Singleton
-class PostAndCommentsSettings @Inject constructor(
+class PostAndCommentsAppearanceSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
+        PostAndCommentsSettings::class,
     )
 
     val resetPostStyles = BasicSettingItem(
@@ -1282,6 +1299,13 @@ class ThemeSettings @Inject constructor(
         relatedKeys = listOf(KEY_DOWNVOTE_COLOR),
     )
 
+    val transparentNotificationBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.transparent_notification_bar),
+        null,
+        relatedKeys = listOf(KEY_TRANSPARENT_NOTIFICATION_BAR),
+    )
+
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
     )
@@ -1295,11 +1319,12 @@ class ThemeSettings @Inject constructor(
         fontColor,
         upvoteColor,
         downvoteColor,
+        transparentNotificationBar,
     )
 }
 
 @Singleton
-class ViewTypeSettings @Inject constructor(
+class PostsFeedAppearanceSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
 
@@ -1341,6 +1366,7 @@ class ViewTypeSettings @Inject constructor(
 
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
+        PostsFeedSettings::class,
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1511,13 +1537,6 @@ class MiscSettings @Inject constructor(
         relatedKeys = listOf(KEY_LEFT_HAND_MODE),
     )
 
-    val transparentNotificationBar = OnOffSettingItem(
-        null,
-        context.getString(R.string.transparent_notification_bar),
-        null,
-        relatedKeys = listOf(KEY_TRANSPARENT_NOTIFICATION_BAR),
-    )
-
     val previewLinks = RadioGroupSettingItem(
         null,
         context.getString(R.string.preview_links),
@@ -1651,16 +1670,17 @@ class MiscSettings @Inject constructor(
         "Beep",
         relatedKeys = listOf(KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL),
     )
-    val customizePostQuickActions = BasicSettingItem(
-        null,
-        context.getString(R.string.customize_post_quick_actions),
-        context.getString(R.string.customize_post_quick_actions_desc),
-    )
     val showEditedDate = OnOffSettingItem(
         null,
         context.getString(R.string.show_edited_time),
         context.getString(R.string.show_edited_time_desc),
         relatedKeys = listOf(KEY_SHOW_EDITED_DATE),
+    )
+    val imagePreviewHideUiByDefault = OnOffSettingItem(
+        null,
+        context.getString(R.string.image_preview_hide_ui_by_default),
+        null,
+        relatedKeys = listOf(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1669,12 +1689,12 @@ class MiscSettings @Inject constructor(
         showUpAndDownVotes,
         retainLastPost,
         leftHandMode,
-        transparentNotificationBar,
         previewLinks,
         usePredictiveBack,
         perCommunitySettings,
         largeScreenSupport,
         showEditedDate,
+        imagePreviewHideUiByDefault,
     )
 }
 
@@ -2165,14 +2185,14 @@ class AllSettings @Inject constructor(
     mainSettings: MainSettings,
     lemmyWebSettings: LemmyWebSettings,
     gestureSettings: GestureSettings,
-    postListSettings: PostListSettings,
-    commentListSettings: CommentListSettings,
+    postsFeedSettings: PostsFeedSettings,
+    postAndCommentsSettings: PostAndCommentsSettings,
     aboutSettings: AboutSettings,
     cacheSettings: CacheSettings,
     hiddenPostsSettings: HiddenPostsSettings,
-    postAndCommentsSettings: PostAndCommentsSettings,
+    postAndCommentsAppearanceSettings: PostAndCommentsAppearanceSettings,
     themeSettings: ThemeSettings,
-    viewTypeSettings: ViewTypeSettings,
+    postsFeedAppearanceSettings: PostsFeedAppearanceSettings,
     miscSettings: MiscSettings,
     loggingSettings: LoggingSettings,
     historySettings: HistorySettings,
@@ -2188,14 +2208,14 @@ class AllSettings @Inject constructor(
         mainSettings,
         lemmyWebSettings,
         gestureSettings,
-        postListSettings,
-        commentListSettings,
+        postsFeedSettings,
+        postAndCommentsSettings,
         aboutSettings,
         cacheSettings,
         hiddenPostsSettings,
-        postAndCommentsSettings,
+        postAndCommentsAppearanceSettings,
         themeSettings,
-        viewTypeSettings,
+        postsFeedAppearanceSettings,
         miscSettings,
         loggingSettings,
         historySettings,

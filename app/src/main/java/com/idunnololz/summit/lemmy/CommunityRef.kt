@@ -106,6 +106,12 @@ sealed interface CommunityRef : PageRef, Parcelable {
         val instance: String?,
     ) : CommunityRef
 
+
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    @TypeLabel("8")
+    class AllSubscribed() : CommunityRef
+
     fun getName(context: Context): String = when (this) {
         is Local -> context.getString(R.string.local)
         is All -> context.getString(R.string.all)
@@ -113,6 +119,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
         is Subscribed -> context.getString(R.string.subscribed)
         is MultiCommunity -> this.name
         is ModeratedCommunities -> context.getString(R.string.moderated_communities)
+        is AllSubscribed -> context.getString(R.string.all_subscribed)
     }
 
     fun getLocalizedFullName(context: Context): String = when (this) {
@@ -124,6 +131,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
         is ModeratedCommunities -> "${context.getString(
             R.string.moderated_communities,
         )}@${this.instance}"
+        is AllSubscribed -> context.getString(R.string.all_subscribed)
     }
 
     fun getKey(): String = when (this) {
@@ -155,6 +163,8 @@ sealed interface CommunityRef : PageRef, Parcelable {
             } else {
                 "mc"
             }
+
+        is AllSubscribed -> "allSubscribed"
     }
 }
 

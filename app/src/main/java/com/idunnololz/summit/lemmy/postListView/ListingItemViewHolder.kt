@@ -34,6 +34,7 @@ class ListingItemViewHolder(
     val fullContentContainerView: ViewGroup?,
     val highlightBg: View,
     val layoutShowsFullContent: Boolean,
+    val themeColorBar: View,
     val createCommentButton: View?,
     val moreButton: View? = null,
     val linkText: TextView? = null,
@@ -69,6 +70,7 @@ class ListingItemViewHolder(
             highlightBg = binding.highlightBg,
             layoutShowsFullContent = false,
             createCommentButton = null,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: SearchResultPostItemBinding) = ListingItemViewHolder(
@@ -89,6 +91,7 @@ class ListingItemViewHolder(
             highlightBg = binding.highlightBg,
             layoutShowsFullContent = false,
             createCommentButton = null,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: ListingItemLargeListBinding) = ListingItemViewHolder(
@@ -113,6 +116,7 @@ class ListingItemViewHolder(
             linkText = binding.linkText,
             linkIcon = binding.linkIcon,
             linkOverlay = binding.linkOverlay,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: ListingItemCardBinding) = ListingItemViewHolder(
@@ -137,6 +141,7 @@ class ListingItemViewHolder(
             linkText = binding.linkText,
             linkIcon = binding.linkIcon,
             linkOverlay = binding.linkOverlay,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: ListingItemCard2Binding) = ListingItemViewHolder(
@@ -161,6 +166,7 @@ class ListingItemViewHolder(
             linkText = binding.linkText,
             linkIcon = binding.linkIcon,
             linkOverlay = binding.linkOverlay,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: ListingItemCard3Binding) = ListingItemViewHolder(
@@ -185,6 +191,7 @@ class ListingItemViewHolder(
             linkText = binding.linkText,
             linkIcon = binding.linkIcon,
             linkOverlay = binding.linkOverlay,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: ListingItemFullBinding) = ListingItemViewHolder(
@@ -205,6 +212,7 @@ class ListingItemViewHolder(
             highlightBg = binding.highlightBg,
             layoutShowsFullContent = true,
             createCommentButton = null,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: ListingItemCompactBinding) = ListingItemViewHolder(
@@ -226,6 +234,7 @@ class ListingItemViewHolder(
             layoutShowsFullContent = false,
             createCommentButton = null,
             moreButton = binding.moreButton,
+            themeColorBar = binding.themeColorBar,
         )
 
         fun fromBinding(binding: ListingItemListWithCardsBinding) = ListingItemViewHolder(
@@ -246,6 +255,7 @@ class ListingItemViewHolder(
             highlightBg = binding.highlightBg,
             layoutShowsFullContent = false,
             createCommentButton = null,
+            themeColorBar = binding.themeColorBar,
         )
     }
 }

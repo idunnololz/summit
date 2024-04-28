@@ -37,7 +37,7 @@ safeargs.
     </dialog>
     <dialog
         android:id="@+id/addOrEditFilterDialogFragment"
-        android:name="com.idunnololz.summit.settings.postList.AddOrEditFilterDialogFragment"
+        android:name="com.idunnololz.summit.settings.postsFeed.AddOrEditFilterDialogFragment"
         android:label="AddOrEditFilterDialogFragment" >
         <argument
             android:name="filterToEdit"

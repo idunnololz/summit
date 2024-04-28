@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
@@ -13,6 +14,7 @@ import com.idunnololz.summit.api.utils.getDominantType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -30,6 +32,7 @@ class PostsRepository @Inject constructor(
     private val contentFiltersManager: ContentFiltersManager,
     private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
     private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
+    private val accountManager: AccountManager,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -38,7 +41,7 @@ class PostsRepository @Inject constructor(
     }
 
     private data class PostData(
-        val post: PostView,
+        val post: FetchedPost,
         val postPageIndexInternal: Int,
         val filterReason: FilterReason? = null,
     ) {
@@ -123,7 +126,9 @@ class PostsRepository @Inject constructor(
             }
 
             // try to find our anchors
-            val anchorsMatched = pageResult.posts.count { anchors.contains(it.postView.post.id) }
+            val anchorsMatched = pageResult.posts.count {
+                anchors.contains(it.fetchedPost.postView.post.id)
+            }
             if (anchorsMatched > 0) {
                 return result
             }
@@ -190,7 +195,7 @@ class PostsRepository @Inject constructor(
                         .slice(startIndex until min(endIndex, allPosts.size))
                         .map {
                             LocalPostView(
-                                postView = transformPostWithLocalData(it.post),
+                                fetchedPost = transformPostWithLocalData(it.post),
                                 filterReason = it.filterReason,
                             )
                         },
@@ -212,6 +217,7 @@ class PostsRepository @Inject constructor(
                 is CommunityRef.MultiCommunity ->
                     communityRef.communities.firstOrNull()?.instance ?: apiClient.instance
                 is CommunityRef.ModeratedCommunities -> apiClient.instance
+                is CommunityRef.AllSubscribed -> apiClient.instance
             }
 
     val apiInstance: String
@@ -220,7 +226,7 @@ class PostsRepository @Inject constructor(
     val apiInstanceFlow
         get() = apiClient.instanceFlow
 
-    fun setCommunity(communityRef: CommunityRef?) {
+    suspend fun setCommunity(communityRef: CommunityRef?) {
         this.communityRef = communityRef ?: CommunityRef.All()
 
         when (communityRef) {
@@ -258,6 +264,18 @@ class PostsRepository @Inject constructor(
                     listingType = ListingType.Subscribed,
                 )
                 postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+                apiClient.defaultInstance()
+            }
+
+            is CommunityRef.AllSubscribed -> {
+                val allAccounts = accountManager.getAccounts()
+
+                currentDataSource = multiCommunityDataSourceFactory.createForSubscriptions(
+                    apiInstance,
+                    allAccounts,
+                )
+                postsPerPage = 15
 
                 apiClient.defaultInstance()
             }
@@ -331,7 +349,7 @@ class PostsRepository @Inject constructor(
         seenPosts = mutableSetOf()
     }
 
-    fun onAccountChanged() {
+    suspend fun onAccountChanged() {
         reset()
 
         if (communityRef is CommunityRef.ModeratedCommunities) {
@@ -342,14 +360,14 @@ class PostsRepository @Inject constructor(
 
     suspend fun onHiddenPostsChange() {
         val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
-        allPosts.retainAll { !hiddenPosts.contains(it.post.post.id) }
+        allPosts.retainAll { !hiddenPosts.contains(it.post.postView.post.id) }
     }
 
-    private fun transformPostWithLocalData(postView: PostView): PostView {
+    private fun transformPostWithLocalData(postView: FetchedPost): FetchedPost {
         val accountInstance = apiInstance
-        val localRead = postReadManager.isPostRead(accountInstance, postView.post.id)
-        if (localRead && !postView.read) {
-            return postView.copy(read = true)
+        val localRead = postReadManager.isPostRead(accountInstance, postView.postView.post.id)
+        if (localRead && !postView.postView.read) {
+            return postView.copy(postView = postView.postView.copy(read = true))
         }
         return postView
     }
@@ -373,7 +391,7 @@ class PostsRepository @Inject constructor(
         return newPostResults.fold(
             onSuccess = { newPosts ->
                 if (newPosts.isNotEmpty()) {
-                    if (newPosts.first().community.nsfw &&
+                    if (newPosts.first().postView.community.nsfw &&
                         communityRef is CommunityRef.CommunityRefByName &&
                         !showNsfwPosts
                     ) {
@@ -400,12 +418,13 @@ class PostsRepository @Inject constructor(
     }
 
     private fun addPosts(
-        newPosts: List<PostView>,
+        newPosts: List<FetchedPost>,
         pageIndex: Int,
         hiddenPosts: Set<PostId>,
         force: Boolean,
     ) {
-        for (post in newPosts) {
+        for (fetchedPost in newPosts) {
+            val post = fetchedPost.postView
             val uniquePostKey = post.getUniqueKey()
             var filterReason: FilterReason? = null
 
@@ -471,7 +490,7 @@ class PostsRepository @Inject constructor(
             if (seenPosts.add(uniquePostKey)) {
                 allPosts.add(
                     PostData(
-                        post = post,
+                        post = fetchedPost,
                         postPageIndexInternal = pageIndex,
                         filterReason = filterReason,
                     ),
@@ -484,7 +503,7 @@ class PostsRepository @Inject constructor(
         allPosts.retainAll {
             val keep = it.postPageIndexInternal < minPageInternal
             if (!keep) {
-                seenPosts.remove(it.post.getUniqueKey())
+                seenPosts.remove(it.post.postView.getUniqueKey())
             }
             keep
         }
@@ -497,7 +516,7 @@ class PostsRepository @Inject constructor(
     fun update(posts: List<LocalPostView>): List<LocalPostView> {
         return posts.map {
             it.copy(
-                postView = transformPostWithLocalData(it.postView),
+                fetchedPost = transformPostWithLocalData(it.fetchedPost),
             )
         }
     }

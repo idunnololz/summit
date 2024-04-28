@@ -248,6 +248,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                             loadIcon(R.drawable.ic_subreddit_home)
                         is CommunityRef.MultiCommunity ->
                             loadIcon(R.drawable.baseline_dynamic_feed_24)
+                        is CommunityRef.AllSubscribed ->
+                            loadIcon(R.drawable.baseline_subscriptions_24)
                         is CommunityRef.Subscribed ->
                             loadIcon(R.drawable.baseline_subscriptions_24)
                         is CommunityRef.ModeratedCommunities ->

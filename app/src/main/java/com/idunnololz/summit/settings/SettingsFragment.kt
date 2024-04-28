@@ -92,19 +92,13 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                     context = context,
                     onSettingClick = {
                         when (it.id) {
-                            mainSettings.settingViewType.id -> {
-                                val directions = SettingsFragmentDirections
-                                    .actionSettingsFragmentToSettingViewTypeFragment()
-                                findNavController().navigateSafe(directions)
-                                true
-                            }
                             mainSettings.settingTheme.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingThemeFragment()
                                 findNavController().navigateSafe(directions)
                                 true
                             }
-                            mainSettings.settingPostAndComment.id -> {
+                            mainSettings.settingPostAndComments.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingPostAndCommentsFragment()
                                 findNavController().navigateSafe(directions)
@@ -126,7 +120,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 findNavController().navigateSafe(directions)
                                 true
                             }
-                            mainSettings.settingPostList.id -> {
+                            mainSettings.settingPostsFeed.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingsContentFragment()
                                 findNavController().navigateSafe(directions)
@@ -255,7 +249,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 context = context,
                 onResultClick = {
                     when (viewModel.searchIdToPage[it.id]) {
-                        is CommentListSettings -> {
+                        is PostAndCommentsSettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingCommentListFragment()
                             findNavController().navigateSafe(directions)
@@ -273,7 +267,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                         is MainSettings -> {
                             hideSearch()
                         }
-                        is PostListSettings -> {
+                        is PostsFeedSettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingsContentFragment()
                             findNavController().navigateSafe(directions)
@@ -293,7 +287,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 .actionSettingsFragmentToSettingHiddenPostsFragment()
                             findNavController().navigateSafe(directions)
                         }
-                        is PostAndCommentsSettings -> {
+                        is PostAndCommentsAppearanceSettings -> {
                             val directions = SettingsFragmentDirections
                                 .actionSettingsFragmentToSettingPostAndCommentsFragment()
                             findNavController().navigateSafe(directions)
@@ -303,9 +297,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 .actionSettingsFragmentToSettingThemeFragment()
                             findNavController().navigateSafe(directions)
                         }
-                        is ViewTypeSettings -> {
+                        is PostsFeedAppearanceSettings -> {
                             val directions = SettingsFragmentDirections
-                                .actionSettingsFragmentToSettingViewTypeFragment()
+                                .actionGlobalSettingViewTypeFragment()
                             findNavController().navigateSafe(directions)
                         }
                         is MiscSettings -> {

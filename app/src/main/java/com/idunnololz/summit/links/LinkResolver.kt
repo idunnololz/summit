@@ -74,16 +74,22 @@ object LinkResolver {
 
                 val fragment = uri.fragment
                 if (fragment != null && fragment.startsWith("!")) {
-                    // this is likely a multi-community url
-                    val communityRef: CommunityRef? = try {
-                        moshi.adapter(CommunityRef::class.java).fromJson(fragment.drop(1))
-                    } catch (e: Exception) {
-                        // best effort
-                        null
-                    }
+                    if (fragment.startsWith("!mc=")) {
+                        // this is likely a multi-community url
+                        val communityRef: CommunityRef? = try {
+                            moshi.adapter(CommunityRef::class.java).fromJson(fragment.drop(4))
+                        } catch (e: Exception) {
+                            // best effort
+                            null
+                        }
 
-                    if (communityRef != null) {
-                        return communityRef
+                        if (communityRef != null) {
+                            return communityRef
+                        }
+                    } else if (fragment.startsWith("!as=")) {
+                        return CommunityRef.AllSubscribed()
+                    } else {
+                        return null
                     }
                 }
 
@@ -123,6 +129,10 @@ object LinkResolver {
                 val postIdStr = uri.pathSegments.getOrNull(1)
                     ?: return defaultResult
                 val postId = postIdStr.toIntOrNull()
+
+                if (uri.pathSegments.size > 2) {
+                    return null
+                }
 
                 if (postIdStr.isNotBlank() && postId == null) {
                     return null

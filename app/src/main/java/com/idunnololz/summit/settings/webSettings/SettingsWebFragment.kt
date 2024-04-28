@@ -19,7 +19,7 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.databinding.FragmentSettingWebBinding
+import com.idunnololz.summit.databinding.FragmentSettingsWebBinding
 import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -38,7 +38,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsWebFragment :
-    BaseFragment<FragmentSettingWebBinding>(),
+    BaseFragment<FragmentSettingsWebBinding>(),
     SettingValueUpdateCallback,
     AlertDialogFragment.AlertDialogFragmentListener {
 
@@ -75,7 +75,7 @@ class SettingsWebFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingWebBinding.inflate(inflater, container, false))
+        setBinding(FragmentSettingsWebBinding.inflate(inflater, container, false))
 
         return binding.root
     }

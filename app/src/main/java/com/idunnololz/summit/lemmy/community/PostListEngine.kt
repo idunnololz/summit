@@ -7,6 +7,7 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.FilterReason
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.util.DirectoryHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,11 +15,11 @@ import kotlinx.coroutines.launch
 sealed interface Item {
 
     sealed interface PostItem : Item {
-        val postView: PostView
+        val fetchedPost: FetchedPost
     }
 
     data class VisiblePostItem(
-        override val postView: PostView,
+        override val fetchedPost: FetchedPost,
         val instance: String,
         val isExpanded: Boolean,
         val isActionExpanded: Boolean,
@@ -28,7 +29,7 @@ sealed interface Item {
     ) : PostItem
 
     data class FilteredPostItem(
-        override val postView: PostView,
+        override val fetchedPost: FetchedPost,
         val instance: String,
         val isExpanded: Boolean,
         val isActionExpanded: Boolean,
@@ -207,29 +208,30 @@ class PostListEngine(
             } else {
                 page.posts
                     .mapTo(items) {
-                        val key = it.postView.getUniqueKey()
+                        val postView = it.fetchedPost.postView
+                        val key = postView.getUniqueKey()
                         val isActionsExpanded = actionsExpandedItems.contains(key)
                         val isExpanded = expandedItems.contains(key)
 
-                        if (it.filterReason != null && !unfilteredItems.contains(it.postView.post.id)) {
+                        if (it.filterReason != null && !unfilteredItems.contains(postView.post.id)) {
                             Item.FilteredPostItem(
-                                postView = it.postView,
+                                fetchedPost = it.fetchedPost,
                                 instance = page.instance,
                                 isExpanded = isExpanded,
                                 isActionExpanded = isActionsExpanded,
-                                highlight = postToHighlight?.id == it.postView.post.id,
-                                highlightForever = postToHighlightForever?.id == it.postView.post.id,
+                                highlight = postToHighlight?.id == postView.post.id,
+                                highlightForever = postToHighlightForever?.id == postView.post.id,
                                 pageIndex = page.pageIndex,
                                 filterReason = it.filterReason,
                             )
                         } else {
                             Item.VisiblePostItem(
-                                postView = it.postView,
+                                fetchedPost = it.fetchedPost,
                                 instance = page.instance,
                                 isExpanded = isExpanded,
                                 isActionExpanded = isActionsExpanded,
-                                highlight = postToHighlight?.id == it.postView.post.id,
-                                highlightForever = postToHighlightForever?.id == it.postView.post.id,
+                                highlight = postToHighlight?.id == postView.post.id,
+                                highlightForever = postToHighlightForever?.id == postView.post.id,
                                 pageIndex = page.pageIndex,
                             )
                         }
@@ -304,7 +306,7 @@ class PostListEngine(
                 Item.FooterSpacerItem -> false
                 is Item.ErrorItem -> false
                 is Item.PostItem ->
-                    it.postView.post.id == postToHighlight.id
+                    it.fetchedPost.postView.post.id == postToHighlight.id
                 is Item.PersistentErrorItem -> false
                 is Item.ManualLoadItem -> false
                 is Item.PageTitle -> false
@@ -323,7 +325,7 @@ class PostListEngine(
                 Item.FooterSpacerItem -> false
                 is Item.ErrorItem -> false
                 is Item.PostItem ->
-                    it.postView.post.id == postToHighlight.id
+                    it.fetchedPost.postView.post.id == postToHighlight.id
                 is Item.PersistentErrorItem -> false
                 is Item.ManualLoadItem -> false
                 is Item.PageTitle -> false
@@ -387,17 +389,17 @@ class PostListEngine(
         }
     }
 
-    fun getPostsCloseBy(): MutableList<PostView> {
+    fun getPostsCloseBy(): MutableList<FetchedPost> {
         val start = (displayFirstItemsIndex - 1).coerceAtLeast(0)
         val end = (start + 10).coerceAtMost(_items.size)
 
-        val results = mutableListOf<PostView>()
+        val results = mutableListOf<FetchedPost>()
 
         for (i in start until end) {
             val item = _items[i]
 
             if (item is Item.VisiblePostItem) {
-                results.add(item.postView)
+                results.add(item.fetchedPost)
             }
         }
 
@@ -405,7 +407,7 @@ class PostListEngine(
     }
 
     fun getCommunityIcon(): String? =
-        pages.firstOrNull()?.posts?.firstOrNull()?.postView?.community?.icon
+        pages.firstOrNull()?.posts?.firstOrNull()?.fetchedPost?.postView?.community?.icon
 
     fun setKey(tag: String?) {
         key = tag
@@ -419,12 +421,14 @@ class PostListEngine(
         val postId = newPost.post.id
         val pages = _pages.toMutableList()
         for ((index, page) in pages.withIndex()) {
-            if (page.posts.any { it.postView.post.id == postId }) {
+            if (page.posts.any { it.fetchedPost.postView.post.id == postId }) {
                 pages[index] = page.copy(
                     posts = page.posts.map {
-                        if (it.postView.post.id == postId) {
+                        if (it.fetchedPost.postView.post.id == postId) {
                             it.copy(
-                                postView = newPost,
+                                fetchedPost = it.fetchedPost.copy(
+                                    postView = newPost
+                                ),
                             )
                         } else {
                             it
@@ -439,8 +443,10 @@ class PostListEngine(
     fun removePost(id: PostId) {
         val pages = _pages.toMutableList()
         for ((index, page) in pages.withIndex()) {
-            if (page.posts.any { it.postView.post.id == id }) {
-                pages[index] = page.copy(posts = page.posts.filter { it.postView.post.id != id })
+            if (page.posts.any { it.fetchedPost.postView.post.id == id }) {
+                pages[index] = page.copy(
+                    posts = page.posts.filter { it.fetchedPost.postView.post.id != id }
+                )
             }
         }
         _pages = pages
