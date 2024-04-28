@@ -169,6 +169,10 @@
             android:name="switchToNativeInstance"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="accountId"
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
     <fragment
         android:id="@+id/communityInfoFragment"

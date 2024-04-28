@@ -26,6 +26,7 @@ import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
@@ -54,6 +55,7 @@ import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.accountId
+import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -126,6 +128,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var postListViewBuilder: PostListViewBuilder
+
+    @Inject
+    lateinit var accountManager: AccountManager
 
     @Inject
     lateinit var accountInfoManager: AccountInfoManager
@@ -286,7 +291,7 @@ class CommunityFragment :
             adapter = ListingItemAdapter(
                 postListViewBuilder = postListViewBuilder,
                 context = context,
-                viewModel.postListEngine,
+                postListEngine = viewModel.postListEngine,
                 onNextClick = {
                     viewModel.fetchNextPage(clearPagePosition = true)
                 },
@@ -330,7 +335,7 @@ class CommunityFragment :
                     getMainActivity()?.launchPage(pageRef)
                 },
                 onItemClick = {
-                          accountId,
+                        accountId,
                         instance,
                         id,
                         currentCommunity,
@@ -346,6 +351,7 @@ class CommunityFragment :
                         post = post,
                         jumpToComments = jumpToComments,
                         currentCommunity = currentCommunity,
+                        accountId = accountId,
                         videoState = videoState,
                     )
                 },
@@ -403,6 +409,7 @@ class CommunityFragment :
                         reveal = false,
                         post = result,
                         jumpToComments = false,
+                        accountId = null,
                         currentCommunity = args.communityRef,
                         videoState = null,
                     )
@@ -955,12 +962,13 @@ class CommunityFragment :
 
                         PostGestureAction.Reply -> {
                             slidingPaneController?.openPost(
-                                instance = viewModel.apiInstance,
+                                instance = fetchedPost.source.instance ?: viewModel.apiInstance,
                                 id = postView.post.id,
                                 reveal = false,
                                 post = postView,
                                 jumpToComments = false,
                                 currentCommunity = viewModel.currentCommunityRef.value,
+                                accountId = fetchedPost.source.accountId,
                                 videoState = null,
                             )
 

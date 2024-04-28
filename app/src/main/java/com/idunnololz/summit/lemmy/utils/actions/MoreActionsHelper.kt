@@ -163,7 +163,7 @@ class MoreActionsHelper @Inject constructor(
         }
     }
 
-    fun vote(postView: PostView, dir: Int, toggle: Boolean = false) {
+    fun vote(postView: PostView, dir: Int, toggle: Boolean = false, accountId: Long? = null) {
         val ref = VotableRef.PostRef(postView.post.id)
         val finalDir = if (toggle) {
             val curScore = accountActionsManager.getVote(ref)
@@ -176,10 +176,15 @@ class MoreActionsHelper @Inject constructor(
         } else {
             dir
         }
-        accountActionsManager.vote(apiClient.instance, ref, finalDir)
+        accountActionsManager.vote(
+            instance = apiClient.instance,
+            ref = ref,
+            dir = finalDir,
+            accountId = accountId
+        )
     }
 
-    fun vote(commentView: CommentView, dir: Int, toggle: Boolean = false): Result<Unit> {
+    fun vote(commentView: CommentView, dir: Int, toggle: Boolean = false, accountId: Long? = null): Result<Unit> {
         val ref = VotableRef.CommentRef(commentView.comment.id)
         val finalDir = if (toggle) {
             val curScore = accountActionsManager.getVote(ref)
@@ -192,7 +197,12 @@ class MoreActionsHelper @Inject constructor(
         } else {
             dir
         }
-        return accountActionsManager.vote(apiClient.instance, ref, finalDir)
+        return accountActionsManager.vote(
+            instance = apiClient.instance,
+            ref = ref,
+            dir = finalDir,
+            accountId = accountId
+        )
     }
 
     fun savePost(id: PostId, save: Boolean) {

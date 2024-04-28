@@ -111,6 +111,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                     post = post,
                     jumpToComments = jumpToComments,
                     currentCommunity = currentCommunity,
+                    accountId = accountId,
                     videoState = videoState,
                 )
             },

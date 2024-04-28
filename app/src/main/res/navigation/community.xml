@@ -87,6 +87,10 @@
             android:name="switchToNativeInstance"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="accountId"
+            app:argType="long"
+            android:defaultValue="0L" />
         <action
             android:id="@+id/action_postFragment_to_subredditFragment"
             app:destination="@id/communityFragment" />

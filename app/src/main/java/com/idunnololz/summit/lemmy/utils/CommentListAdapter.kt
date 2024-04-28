@@ -228,6 +228,7 @@ class CommentListAdapter(
                     scoreView = scoreCount,
                     upvoteCount = upvoteCount,
                     downvoteCount = downvoteCount,
+                    accountId = null,
                     onUpdate = null,
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
