@@ -34,6 +34,7 @@ interface VoteUiHandler {
         scoreView: TextView,
         upvoteCount: TextView?,
         downvoteCount: TextView?,
+        accountId: Long?,
         registration: AccountActionsManager.Registration,
     )
     fun unbindVoteUi(scoreView: View)
@@ -54,6 +55,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
+    accountId: Long?,
     onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
@@ -71,6 +73,7 @@ fun VoteUiHandler.bind(
         scoreView = scoreView,
         upvoteCount = upvoteCount,
         downvoteCount = downvoteCount,
+        accountId = accountId,
         onUpdate = onUpdate,
         onSignInRequired = onSignInRequired,
         onInstanceMismatch = onInstanceMismatch,
@@ -86,6 +89,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
+    accountId: Long?,
     onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
@@ -103,6 +107,7 @@ fun VoteUiHandler.bind(
         scoreView = scoreView,
         upvoteCount = upvoteCount,
         downvoteCount = downvoteCount,
+        accountId = accountId,
         onUpdate = onUpdate,
         onSignInRequired = onSignInRequired,
         onInstanceMismatch = onInstanceMismatch,
@@ -118,6 +123,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
+    accountId: Long?,
     onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
@@ -135,6 +141,7 @@ fun VoteUiHandler.bind(
         scoreView = scoreView,
         upvoteCount = upvoteCount,
         downvoteCount = downvoteCount,
+        accountId = accountId,
         onUpdate = onUpdate,
         onSignInRequired = onSignInRequired,
         onInstanceMismatch = onInstanceMismatch,
@@ -154,6 +161,7 @@ fun VoteUiHandler.bind(
     scoreView: TextView,
     upvoteCount: TextView?,
     downvoteCount: TextView?,
+    accountId: Long?,
     onUpdate: ((vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) -> Unit)?,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
@@ -232,6 +240,7 @@ fun VoteUiHandler.bind(
         scoreView,
         upvoteCount,
         downvoteCount,
+        accountId,
         object : AccountActionsManager.Registration {
             override fun voteCurrent(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
                 update(vote, totalScore, upvotes, downvotes)

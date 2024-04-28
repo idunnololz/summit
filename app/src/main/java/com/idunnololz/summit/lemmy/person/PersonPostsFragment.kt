@@ -108,6 +108,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     post = post,
                     jumpToComments = jumpToComments,
                     currentCommunity = currentCommunity,
+                    accountId = accountId,
                     videoState = videoState,
                 )
             },

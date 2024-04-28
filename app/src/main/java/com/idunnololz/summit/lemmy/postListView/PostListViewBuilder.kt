@@ -51,7 +51,9 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.accountId
+import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -220,9 +222,21 @@ class PostListViewBuilder @Inject constructor(
         onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
     ) {
         val postView = fetchedPost.postView
-        val accountId = fetchedPost.source.accountId
+        val accountId: Long?
+        val accountInstance: String?
         val url = postView.post.url
         val thumbnailUrl = postView.post.thumbnail_url
+
+        when (val source = fetchedPost.source) {
+            is Source.AccountSource -> {
+                accountId = source.accountId
+                accountInstance = source.instance
+            }
+            is Source.StandardSource -> {
+                accountId = null
+                accountInstance = null
+            }
+        }
 
         with(holder) {
 
@@ -509,7 +523,7 @@ class PostListViewBuilder @Inject constructor(
                 }
                 onItemClick(
                     accountId,
-                    instance,
+                    accountInstance ?: instance,
                     postView.post.id,
                     postView.community.toCommunityRef(),
                     postView,
@@ -853,7 +867,7 @@ class PostListViewBuilder @Inject constructor(
             commentButton?.setOnClickListener {
                 onItemClick(
                     accountId,
-                    instance,
+                    accountInstance ?: instance,
                     postView.post.id,
                     postView.community.toCommunityRef(),
                     postView,
@@ -879,17 +893,18 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 voteUiHandler.bind(
-                    viewLifecycleOwner,
-                    instance,
-                    postView,
-                    upvoteButton,
-                    downvoteButton,
-                    scoreCount,
-                    upvoteCount,
-                    downvoteCount,
+                    lifecycleOwner = viewLifecycleOwner,
+                    instance = accountInstance ?: instance,
+                    postView = postView,
+                    upVoteView = upvoteButton,
+                    downVoteView = downvoteButton,
+                    scoreView = scoreCount,
+                    upvoteCount = upvoteCount,
+                    downvoteCount = downvoteCount,
+                    accountId = accountId,
                     onUpdate = null,
                     onSignInRequired = onSignInRequired,
-                    onInstanceMismatch,
+                    onInstanceMismatch = onInstanceMismatch,
                 )
             }
 

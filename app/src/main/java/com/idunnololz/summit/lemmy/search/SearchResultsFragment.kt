@@ -223,6 +223,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         post = post,
                         jumpToComments = jumpToComments,
                         currentCommunity = currentCommunity,
+                        accountId = null,
                         videoState = videoState,
                     )
                 },
@@ -535,6 +536,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         scoreView = scoreCount,
                         upvoteCount = upvoteCount,
                         downvoteCount = downvoteCount,
+                        accountId = null,
                         onUpdate = null,
                         onSignInRequired = onSignInRequired,
                         onInstanceMismatch = onInstanceMismatch,

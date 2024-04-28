@@ -45,3 +45,11 @@ val Source.accountId: Long?
             is Source.StandardSource -> null
         }
     }
+
+val Source.instance: String?
+    get() {
+        return when (this) {
+            is Source.AccountSource -> this.instance
+            is Source.StandardSource -> null
+        }
+    }

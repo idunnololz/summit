@@ -165,6 +165,11 @@ class PostFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val accountId = accountId
+        if (accountId != null) {
+            viewModel.forceAccount(accountId)
+        }
+
         preferences = viewModel.preferences
         moreActionsHelper.apiClient = viewModel.lemmyApiClient
 
@@ -955,11 +960,11 @@ class PostFragment :
 
                     when (action.id) {
                         CommentGestureAction.Upvote -> {
-                            result = moreActionsHelper.vote(commentView, dir = 1, toggle = true)
+                            result = moreActionsHelper.vote(commentView, dir = 1, toggle = true, accountId = accountId)
                         }
 
                         CommentGestureAction.Downvote -> {
-                            result = moreActionsHelper.vote(commentView, dir = -1, toggle = true)
+                            result = moreActionsHelper.vote(commentView, dir = -1, toggle = true, accountId = accountId)
                         }
 
                         CommentGestureAction.Bookmark -> {
@@ -1011,11 +1016,11 @@ class PostFragment :
     private fun performPostAction(id: Int, postView: PostView) {
         when (id) {
             PostGestureAction.Upvote -> {
-                moreActionsHelper.vote(postView, 1, toggle = true)
+                moreActionsHelper.vote(postView, 1, toggle = true, accountId = accountId)
             }
 
             PostGestureAction.Downvote -> {
-                moreActionsHelper.vote(postView, -1, toggle = true)
+                moreActionsHelper.vote(postView, -1, toggle = true, accountId = accountId)
             }
 
             PostGestureAction.Bookmark -> {
@@ -1163,4 +1168,12 @@ class PostFragment :
     }
 
     fun getAdapter() = adapter
+
+    private val accountId
+        get() =
+            if (args.accountId != 0L) {
+                args.accountId
+            } else {
+                null
+            }
 }

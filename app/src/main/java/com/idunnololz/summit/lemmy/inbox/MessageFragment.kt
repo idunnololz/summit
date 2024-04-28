@@ -262,15 +262,16 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         when (inboxItem) {
             is CommentBackedItem -> {
                 postAndCommentViewBuilder.voteUiHandler.bind(
-                    viewLifecycleOwner,
-                    args.instance,
-                    inboxItem,
-                    null,
-                    null,
-                    binding.score,
-                    null,
-                    null,
-                    { vote, _, _, _ ->
+                    lifecycleOwner = viewLifecycleOwner,
+                    instance = args.instance,
+                    inboxItem = inboxItem,
+                    upVoteView = null,
+                    downVoteView = null,
+                    scoreView = binding.score,
+                    upvoteCount = null,
+                    downvoteCount = null,
+                    accountId = null,
+                    onUpdate = { vote, _, _, _ ->
                         if (vote > 0) {
                             binding.score.setTextColor(upvoteColor)
                         } else if (vote == 0) {

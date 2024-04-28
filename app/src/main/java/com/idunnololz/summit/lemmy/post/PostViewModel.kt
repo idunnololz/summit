@@ -12,6 +12,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingCommentView
@@ -81,6 +82,7 @@ class PostViewModel @Inject constructor(
             state["postRef"] = value?.leftOrNull()
             state["commentRef"] = value?.getOrNull()
         }
+    var currentAccountIdOverride: Long? = null
     val onPostOrCommentRefChange = MutableLiveData<Either<PostRef, CommentRef>>()
 
     val currentAccountView = MutableLiveData<AccountView?>()
@@ -149,14 +151,8 @@ class PostViewModel @Inject constructor(
             accountManager.currentAccount.collect {
                 val account = it as? Account
 
-                withContext(Dispatchers.Main) {
-                    preferences = preferenceManager.currentPreferences
-
-                    if (account != null) {
-                        currentAccountView.value = accountInfoManager.getAccountViewForAccount(account)
-                    } else {
-                        currentAccountView.value = null
-                    }
+                if (currentAccountIdOverride == null) {
+                    onAccountChanged(account)
                 }
             }
         }
@@ -169,6 +165,18 @@ class PostViewModel @Inject constructor(
         }
     }
 
+    private suspend fun onAccountChanged(account: Account?) {
+        withContext(Dispatchers.Main) {
+            preferences = preferenceManager.currentPreferences
+
+            if (account != null) {
+                currentAccountView.value = accountInfoManager.getAccountViewForAccount(account)
+            } else {
+                currentAccountView.value = null
+            }
+        }
+    }
+
     val apiInstance: String
         get() = lemmyApiClient.instance
 
@@ -178,6 +186,16 @@ class PostViewModel @Inject constructor(
         } else {
             null
         }
+
+    fun forceAccount(accountId: Long) {
+        currentAccountIdOverride = accountId
+
+        lemmyApiClient.forceUseAccount(accountId)
+
+        viewModelScope.launch {
+            onAccountChanged(accountManager.getAccountById(accountId))
+        }
+    }
 
     fun updatePostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
         this.postOrCommentRef = postOrCommentRef

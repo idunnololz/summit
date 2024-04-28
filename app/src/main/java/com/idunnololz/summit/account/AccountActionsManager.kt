@@ -42,6 +42,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 
 @Singleton
@@ -97,6 +98,7 @@ class AccountActionsManager @Inject constructor(
             scoreView: TextView,
             upvoteCount: TextView?,
             downvoteCount: TextView?,
+            accountId: Long?,
             registration: Registration,
         ) {
             votesManager.setVoteIfNoneSet(ref, currentVote)
@@ -109,7 +111,12 @@ class AccountActionsManager @Inject constructor(
                 unregisterVoteHandler(existingRegId as Long)
             }
 
-            val account = accountManager.currentAccount.value as? Account
+            fun getAccount() =
+                if (accountId == null) {
+                    accountManager.currentAccount.value as? Account
+                } else {
+                    runBlocking { accountManager.getAccountById(accountId) }
+                }
 
             upVoteView?.setOnClickListener {
                 val curVote = votesManager.getVote(ref) ?: 0
@@ -123,7 +130,7 @@ class AccountActionsManager @Inject constructor(
                     1
                 }
 
-                voteOn(instance, ref, newScore, account)
+                voteOn(instance, ref, newScore, getAccount())
                     .onFailure {
                         registration.voteFailed(curVote, curScore, curUpvotes, curDownvotes, it)
                     }
@@ -140,7 +147,7 @@ class AccountActionsManager @Inject constructor(
                     -1
                 }
 
-                voteOn(instance, ref, newScore, account)
+                voteOn(instance, ref, newScore, getAccount())
                     .onFailure {
                         registration.voteFailed(curVote, curScore, curUpvotes, curDownvotes, it)
                     }
@@ -436,8 +443,8 @@ class AccountActionsManager @Inject constructor(
         )
     }
 
-    fun vote(instance: String, ref: VotableRef, dir: Int): Result<Unit> {
-        val account = accountManager.currentAccount.asAccount
+    fun vote(instance: String, ref: VotableRef, dir: Int, accountId: Long? = null): Result<Unit> {
+        val account = runBlocking { accountOrDefault(accountId) }
             ?: return Result.failure(NotAuthenticatedException())
         return voteOn(instance, ref, dir, account)
     }

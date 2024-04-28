@@ -421,6 +421,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 scoreView = scoreCount,
                 upvoteCount = upvoteCount,
                 downvoteCount = downvoteCount,
+                accountId = null,
                 onUpdate = null,
                 onSignInRequired = onSignInRequired,
                 onInstanceMismatch = onInstanceMismatch,
@@ -726,6 +727,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 scoreView = scoreCount,
                 upvoteCount = upvoteCount,
                 downvoteCount = downvoteCount,
+                accountId = null,
                 onUpdate = { vote, totalScore, upvotes, downvotes ->
                     if (vote < 0) {
                         if (downvoteCount2 == null || upvoteCount2 == null) {
@@ -1077,17 +1079,18 @@ class PostAndCommentViewBuilder @Inject constructor(
                 b.score.visibility = View.VISIBLE
 
                 voteUiHandler.bind(
-                    viewLifecycleOwner,
-                    instance,
-                    item,
-                    upvoteButton,
-                    downvoteButton,
-                    b.score,
-                    null,
-                    null,
-                    null,
-                    onSignInRequired,
-                    onInstanceMismatch,
+                    lifecycleOwner = viewLifecycleOwner,
+                    instance = instance,
+                    inboxItem = item,
+                    upVoteView = upvoteButton,
+                    downVoteView = downvoteButton,
+                    scoreView = b.score,
+                    upvoteCount = null,
+                    downvoteCount = null,
+                    accountId = null,
+                    onUpdate = null,
+                    onSignInRequired = onSignInRequired,
+                    onInstanceMismatch = onInstanceMismatch,
                 )
                 upvoteButton.isEnabled = true
                 downvoteButton.isEnabled = true

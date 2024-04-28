@@ -7,6 +7,7 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.BanPersonResponse
@@ -82,19 +83,24 @@ class AccountAwareLemmyClient @Inject constructor(
     }
 
     private val coroutineScope = coroutineScopeFactory.create()
+    private var forcedAccountId: Long? = null
     private var currentAccount: Account? = null
 
     init {
         accountManager.addOnAccountChangedListener(
             object : AccountManager.OnAccountChangedListener {
                 override suspend fun onAccountChanged(newAccount: Account?) {
-                    setAccount(newAccount, accountChanged = true)
+                    if (forcedAccountId == null) {
+                        setAccount(newAccount, accountChanged = true)
+                    }
                 }
             },
         )
         coroutineScope.launch {
             accountManager.currentAccount.collect {
-                setAccount(it as? Account, accountChanged = false)
+                if (forcedAccountId == null) {
+                    setAccount(it as? Account, accountChanged = false)
+                }
             }
         }
     }
@@ -943,6 +949,18 @@ class AccountAwareLemmyClient @Inject constructor(
         }
 
         return Result.failure(NotAuthenticatedException())
+    }
+
+    fun forceUseAccount(accountId: Long) {
+        this.forcedAccountId = accountId
+
+        coroutineScope.launch {
+            val account = accountManager.getAccountById(accountId)
+            setAccount(
+                account = account,
+                accountChanged = accountManager.currentAccount.asAccount?.id != accountId
+            )
+        }
     }
 
     fun setAccount(account: Account?, accountChanged: Boolean) {

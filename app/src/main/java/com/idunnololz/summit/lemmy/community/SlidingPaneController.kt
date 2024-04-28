@@ -153,6 +153,7 @@ class SlidingPaneController(
         instance: String,
         id: Int,
         currentCommunity: CommunityRef?,
+        accountId: Long?,
         post: PostView? = null,
         jumpToComments: Boolean = false,
         reveal: Boolean = false,
@@ -191,6 +192,7 @@ class SlidingPaneController(
                 jumpToComments = jumpToComments,
                 currentCommunity = currentCommunity,
                 videoState = videoState,
+                accountId = accountId ?: 0L,
             ).toBundle(),
             Either.Left(PostRef(instance, id)),
         )
