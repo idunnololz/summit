@@ -18,7 +18,7 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
 
     private var bottomNavHeight: Float = 0f
     private var snackbarHeight: Float = 0f
-    private var bottomInset: Int = 0
+    private var bottomInset: Float = 0f
     private val snackBarBottomMargin = context.resources.getDimensionPixelSize(R.dimen.padding)
 
     fun updateBottomNavHeight(height: Float) {
@@ -26,7 +26,7 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
     }
 
     fun updateBottomInset(bottomInset: Int) {
-        this.bottomInset = bottomInset
+        this.bottomInset = bottomInset.toFloat()
     }
 
     override fun getInsetDodgeRect(
@@ -82,8 +82,14 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
     }
 
     private fun updateFab(fab: View): Boolean {
+        val bottomInset = if (bottomNavHeight == 0f) {
+            bottomInset
+        } else {
+            bottomNavHeight
+        }
+
         val oldTranslation = fab.translationY
-        val newTranslation = -bottomNavHeight - snackbarHeight
+        val newTranslation = -bottomInset - snackbarHeight
         fab.translationY = newTranslation
 
         return oldTranslation != newTranslation

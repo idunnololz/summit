@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingHiddenPostsFragment"
-        android:name="com.idunnololz.summit.settings.hiddenPosts.SettingHiddenPostsFragment"
+        android:name="com.idunnololz.summit.settings.hiddenPosts.SettingsHiddenPostsFragment"
         android:label="SettingHiddenPostsFragment" >
         <action
             android:id="@+id/action_settingHiddenPostsFragment_to_hiddenPostsFragment"
@@ -59,13 +59,6 @@
             app:argType="string"
             app:nullable="true" />
         <action
-            android:id="@+id/action_settingsFragment_to_settingViewTypeFragment"
-            app:destination="@id/settingViewTypeFragment"
-            app:enterAnim="@anim/slide_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out" />
-        <action
             android:id="@+id/action_settingsFragment_to_settingThemeFragment"
             app:destination="@id/settingThemeFragment"
             app:enterAnim="@anim/slide_in"
@@ -74,7 +67,7 @@
             app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_settingsFragment_to_settingPostAndCommentsFragment"
-            app:destination="@id/settingPostAndCommentsFragment"
+            app:destination="@id/settingsPostAndCommentsFragment"
             app:enterAnim="@anim/slide_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -130,7 +123,7 @@
             app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_settingsFragment_to_settingCommentListFragment"
-            app:destination="@id/settingCommentListFragment"
+            app:destination="@id/settingsPostAndCommentsFragment"
             app:enterAnim="@anim/slide_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -196,7 +189,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
-        android:name="com.idunnololz.summit.settings.about.SettingAboutFragment"
+        android:name="com.idunnololz.summit.settings.about.SettingsAboutFragment"
         android:label="SettingAboutFragment" >
         <action
             android:id="@+id/action_settingAboutFragment_to_patreonFragment"
@@ -211,23 +204,23 @@
     </fragment>
     <fragment
         android:id="@+id/settingGesturesFragment"
-        android:name="com.idunnololz.summit.settings.gestures.SettingGesturesFragment"
+        android:name="com.idunnololz.summit.settings.gestures.SettingsGesturesFragment"
         android:label="SettingGesturesFragment" />
     <fragment
         android:id="@+id/settingCacheFragment"
-        android:name="com.idunnololz.summit.settings.cache.SettingCacheFragment"
+        android:name="com.idunnololz.summit.settings.cache.SettingsCacheFragment"
         android:label="SettingCacheFragment" />
     <fragment
         android:id="@+id/settingHistoryFragment"
-        android:name="com.idunnololz.summit.settings.history.SettingHistoryFragment"
+        android:name="com.idunnololz.summit.settings.history.SettingsHistoryFragment"
         android:label="SettingHistoryFragment" />
     <fragment
         android:id="@+id/settingViewTypeFragment"
-        android:name="com.idunnololz.summit.settings.viewType.SettingViewTypeFragment"
+        android:name="com.idunnololz.summit.settings.viewType.SettingsViewTypeFragment"
         android:label="SettingViewTypeFragment" />
     <fragment
         android:id="@+id/settingThemeFragment"
-        android:name="com.idunnololz.summit.settings.theme.SettingThemeFragment"
+        android:name="com.idunnololz.summit.settings.theme.SettingsThemeFragment"
         android:label="SettingThemeFragment" >
         <argument
             android:name="account"
@@ -236,12 +229,12 @@
             android:defaultValue="@null" />
     </fragment>
     <fragment
-        android:id="@+id/settingPostAndCommentsFragment"
-        android:name="com.idunnololz.summit.settings.postAndComments.SettingPostAndCommentsFragment"
-        android:label="SettingPostAndCommentsFragment" />
+        android:id="@+id/settingsPostAndCommentsAppearanceFragment"
+        android:name="com.idunnololz.summit.settings.postAndCommentsAppearance.SettingsPostAndCommentsAppearanceFragment"
+        android:label="SettingsPostAndCommentsAppearanceFragment" />
     <fragment
         android:id="@+id/settingsContentFragment"
-        android:name="com.idunnololz.summit.settings.postList.SettingsPostListFragment"
+        android:name="com.idunnololz.summit.settings.postsFeed.SettingsPostsFeedFragment"
         android:label="SettingsContentFragment" >
         <action
             android:id="@+id/action_settingsContentFragment_to_settingsFilterListFragment"
@@ -255,6 +248,9 @@
             app:argType="com.idunnololz.summit.account.Account"
             app:nullable="true"
             android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_settingsContentFragment_to_settingViewTypeFragment"
+            app:destination="@id/settingViewTypeFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsCommunityBlockListFragment"
@@ -266,7 +262,7 @@
         android:label="SettingsUserBlockListFragment" />
     <fragment
         android:id="@+id/settingsFilterListFragment"
-        android:name="com.idunnololz.summit.settings.postList.SettingsFilterListFragment"
+        android:name="com.idunnololz.summit.settings.postsFeed.SettingsFilterListFragment"
         android:label="SettingsFilterListFragment" >
         <argument
             android:name="contentType"
@@ -279,9 +275,9 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/settingCommentListFragment"
-        android:name="com.idunnololz.summit.settings.commentList.SettingCommentListFragment"
-        android:label="SettingCommentListFragment" >
+        android:id="@+id/settingsPostAndCommentsFragment"
+        android:name="com.idunnololz.summit.settings.postAndComments.SettingsPostAndCommentsFragment"
+        android:label="SettingsPostAndCommentsFragment" >
         <action
             android:id="@+id/action_settingCommentListFragment_to_customQuickActionsFragment"
             app:destination="@id/customQuickActionsFragment"
@@ -297,6 +293,12 @@
         <action
             android:id="@+id/action_settingCommentListFragment_to_settingsFilterListFragment"
             app:destination="@id/settingsFilterListFragment" />
+        <action
+            android:id="@+id/action_settingsPostAndCommentsFragment_to_settingsPostAndCommentsAppearanceFragment"
+            app:destination="@id/settingsPostAndCommentsAppearanceFragment" />
+        <action
+            android:id="@+id/action_settingsPostAndCommentsFragment_to_postQuickActionsFragment"
+            app:destination="@id/postQuickActionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/patreonFragment"
@@ -304,7 +306,7 @@
         android:label="PatreonFragment" />
     <fragment
         android:id="@+id/settingMiscFragment"
-        android:name="com.idunnololz.summit.settings.misc.SettingMiscFragment"
+        android:name="com.idunnololz.summit.settings.misc.SettingsMiscFragment"
         android:label="SettingMiscFragment" >
         <action
             android:id="@+id/action_settingMiscFragment_to_settingPerCommunityFragment"
@@ -313,13 +315,10 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"  />
-        <action
-            android:id="@+id/action_settingMiscFragment_to_postQuickActionsFragment"
-            app:destination="@id/postQuickActionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingLoggingFragment"
-        android:name="com.idunnololz.summit.settings.logging.SettingLoggingFragment"
+        android:name="com.idunnololz.summit.settings.logging.SettingsLoggingFragment"
         android:label="SettingLoggingFragment" />
     <fragment
         android:id="@+id/historyFragment2"
@@ -327,7 +326,7 @@
         android:label="HistoryFragment" />
     <fragment
         android:id="@+id/settingNavigationFragment"
-        android:name="com.idunnololz.summit.settings.navigation.SettingNavigationFragment"
+        android:name="com.idunnololz.summit.settings.navigation.SettingsNavigationFragment"
         android:label="SettingNavigationFragment" />
     <fragment
         android:id="@+id/actionsTabbedFragment"
@@ -339,7 +338,7 @@
         android:label="HiddenPostsFragment" />
     <fragment
         android:id="@+id/settingAccountsFragment"
-        android:name="com.idunnololz.summit.settings.accounts.SettingAccountsFragment"
+        android:name="com.idunnololz.summit.settings.accounts.SettingsAccountsFragment"
         android:label="SettingAccountsFragment" >
         <action
             android:id="@+id/action_settingAccountsFragment_to_settingPerAccountFragment"
@@ -351,7 +350,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingPerAccountFragment"
-        android:name="com.idunnololz.summit.settings.perAccount.SettingPerAccountFragment"
+        android:name="com.idunnololz.summit.settings.perAccount.SettingsPerAccountFragment"
         android:label="SettingPerAccountFragment" >
         <argument
             android:name="accountId"
@@ -377,7 +376,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingBackupAndRestoreFragment"
-        android:name="com.idunnololz.summit.settings.backupAndRestore.SettingBackupAndRestoreFragment"
+        android:name="com.idunnololz.summit.settings.backupAndRestore.SettingsBackupAndRestoreFragment"
         android:label="SettingBackupAndRestoreFragment" >
         <action
             android:id="@+id/action_settingBackupAndRestoreFragment_to_manageInternalSettingsBackupsDialogFragment"
@@ -403,11 +402,11 @@
     </fragment>
     <fragment
         android:id="@+id/settingDownloadsFragment"
-        android:name="com.idunnololz.summit.settings.downloads.SettingDownloadsFragment"
+        android:name="com.idunnololz.summit.settings.downloads.SettingsDownloadsFragment"
         android:label="SettingDownloadsFragment" />
     <fragment
         android:id="@+id/settingPerCommunityFragment"
-        android:name="com.idunnololz.summit.settings.perCommunity.SettingPerCommunityFragment"
+        android:name="com.idunnololz.summit.settings.perCommunity.SettingsPerCommunityFragment"
         android:label="SettingPerCommunityFragment" />
     <fragment
         android:id="@+id/customQuickActionsFragment"
@@ -429,4 +428,5 @@
         android:id="@+id/translatorsFragment"
         android:name="com.idunnololz.summit.settings.translators.TranslatorsFragment"
         android:label="TranslatorsFragment" />
+    <action android:id="@+id/action_global_settingViewTypeFragment" app:destination="@id/settingViewTypeFragment" />
 </navigation>

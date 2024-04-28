@@ -68,6 +68,7 @@ fun OnOffSettingItem.bindTo(
     // Unbind previous binding
     b.switchView.setOnCheckedChangeListener(null)
     b.switchView.isChecked = getCurrentValue()
+    b.switchView.jumpDrawablesToCurrentState()
     b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
         onValueChanged(newValue)
 

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/footer_spacer_height"
+                android:clipToPadding="false">
+
+                <include
+                    android:id="@+id/post_and_comments_appearance"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/SettingsDivider"/>
+
+                <include
+                    android:id="@+id/relay_style_navigation"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/customize_post_quick_actions"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/comments_title"
+                    android:text="@string/comments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingBottom="@dimen/padding"
+                    android:paddingTop="@dimen/padding_three"
+                    style="@style/SettingHeaderStyle"/>
+
+                <include
+                    android:id="@+id/default_comments_sort_order"
+                    layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/use_volume_button_navigation"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/collapse_child_comments_by_default"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/hide_comment_scores"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/auto_collapse_comments"
+                    layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                
+                <include
+                    android:id="@+id/show_comment_upvote_percentage"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/show_inline_media_as_links"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/customize_comment_quick_actions"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+
+                <include
+                    android:id="@+id/comment_header"
+                    layout="@layout/subgroup_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/show_profile_icons"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/comment_header_layout"
+                    layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/filters_title"
+                    android:text="@string/filters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/padding"
+                    android:paddingBottom="@dimen/padding"
+                    android:paddingTop="@dimen/padding_three"
+                    style="@style/SettingHeaderStyle"/>
+
+                <include
+                    android:id="@+id/keyword_filters"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/instance_filters"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/user_filters"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

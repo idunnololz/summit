@@ -20,6 +20,7 @@ import arrow.core.Either
 import coil.dispose
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
@@ -445,6 +446,10 @@ class CommunitySelectorController @AssistedInject constructor(
                     is CommunityRef.ModeratedCommunities -> {
                         b.instance.text = item.communityRef.getName(context)
                     }
+
+                    is CommunityRef.AllSubscribed -> {
+                        b.instance.text = context.getString(R.string.all_subscribed)
+                    }
                 }
 
                 b.moreInfo.visibility = View.GONE
@@ -763,6 +768,16 @@ class CommunitySelectorController @AssistedInject constructor(
                                 context.getString(R.string.moderated_communities),
                                 R.drawable.outline_shield_24,
                                 CommunityRef.ModeratedCommunities(null),
+                            ),
+                        )
+                    }
+
+                    if (BuildConfig.DEBUG) {
+                        newItems.add(
+                            Item.StaticChildItem(
+                                context.getString(R.string.all_subscribed),
+                                R.drawable.baseline_subscriptions_24,
+                                CommunityRef.AllSubscribed(),
                             ),
                         )
                     }

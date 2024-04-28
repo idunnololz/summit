@@ -114,6 +114,7 @@ class CommunityInfoViewModel @Inject constructor(
                 }
                 is CommunityRef.MultiCommunity -> error("unreachable code")
                 is CommunityRef.ModeratedCommunities -> error("unreachable code")
+                is CommunityRef.AllSubscribed -> TODO()
             }
 
             result

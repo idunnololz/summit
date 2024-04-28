@@ -41,4 +41,5 @@
 
     <dimen name="sliding_pane_first_child_width">420dp</dimen>
     <dimen name="sliding_pane_second_child_width">300dp</dimen>
+    <dimen name="theme_color_bar_width">4dp</dimen>
 </resources>

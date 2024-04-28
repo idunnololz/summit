@@ -164,8 +164,11 @@ class MainActivityViewModel @Inject constructor(
                 }
                 is CommunityRef.MultiCommunity ->
                     Either.Left(Result.failure(RuntimeException()))
+                is CommunityRef.AllSubscribed ->
+                    Either.Left(Result.failure(RuntimeException()))
                 is CommunityRef.ModeratedCommunities ->
                     Either.Left(Result.failure(RuntimeException()))
+
             }
 
             result

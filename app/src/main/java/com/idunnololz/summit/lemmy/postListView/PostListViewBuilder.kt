@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
@@ -23,6 +24,7 @@ import coil.dispose
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -48,6 +50,8 @@ import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -178,7 +182,7 @@ class PostListViewBuilder @Inject constructor(
      */
     fun bind(
         holder: ListingItemViewHolder,
-        postView: PostView,
+        fetchedPost: FetchedPost,
         instance: String,
         isRevealed: Boolean,
         contentMaxWidth: Int,
@@ -190,12 +194,14 @@ class PostListViewBuilder @Inject constructor(
         updateContent: Boolean,
         highlight: Boolean,
         highlightForever: Boolean,
+        themeColor: Int?,
         onRevealContentClickedFn: () -> Unit,
-        onImageClick: (PostView, sharedElementView: View?, String) -> Unit,
+        onImageClick: (accountId: Long?, PostView, sharedElementView: View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onVideoLongClickListener: (url: String) -> Unit,
-        onPageClick: (PageRef) -> Unit,
+        onPageClick: (accountId: Long?, PageRef) -> Unit,
         onItemClick: (
+            accountId: Long?,
             instance: String,
             id: Int,
             currentCommunity: CommunityRef?,
@@ -204,18 +210,22 @@ class PostListViewBuilder @Inject constructor(
             reveal: Boolean,
             videoState: VideoState?,
         ) -> Unit,
-        onShowMoreOptions: (PostView) -> Unit,
-        toggleItem: (postView: PostView) -> Unit,
-        toggleActions: (postView: PostView) -> Unit,
+        onShowMoreOptions: (accountId: Long?, PostView) -> Unit,
+        toggleItem: (fetchedPost: FetchedPost) -> Unit,
+        toggleActions: (fetchedPost: FetchedPost) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
-        onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
-        onLinkLongClick: (url: String, text: String?) -> Unit,
+        onLinkClick: (accountId: Long?, url: String, text: String?, linkContext: LinkContext) -> Unit,
+        onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
     ) {
+        val postView = fetchedPost.postView
+        val accountId = fetchedPost.source.accountId
         val url = postView.post.url
         val thumbnailUrl = postView.post.thumbnail_url
+
         with(holder) {
+
             if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {
                 when (val rb = rawBinding) {
                     is ListingItemCompactBinding -> {
@@ -498,6 +508,7 @@ class PostListViewBuilder @Inject constructor(
                     }
                 }
                 onItemClick(
+                    accountId,
                     instance,
                     postView.post.id,
                     postView.community.toCommunityRef(),
@@ -514,9 +525,15 @@ class PostListViewBuilder @Inject constructor(
                     headerContainer = headerContainer,
                     postView = postView,
                     instance = instance,
-                    onPageClick = onPageClick,
-                    onLinkClick = onLinkClick,
-                    onLinkLongClick = onLinkLongClick,
+                    onPageClick = {
+                      onPageClick(accountId, it)
+                    },
+                    onLinkClick = { url, text, linkContext ->
+                        onLinkClick(accountId, url, text, linkContext)
+                    },
+                    onLinkLongClick = { url, text ->
+                        onLinkLongClick(accountId, url, text)
+                    },
                     displayInstanceStyle = displayInstanceStyle,
                     showUpvotePercentage = showPostUpvotePercentage,
                     useMultilineHeader = false,
@@ -636,7 +653,7 @@ class PostListViewBuilder @Inject constructor(
                         if (isUrlMp4) {
                             onVideoClick(imageUrl, VideoType.Mp4, null)
                         } else {
-                            onImageClick(postView, imageView, imageUrl)
+                            onImageClick(accountId, postView, imageView, imageUrl)
                         }
                     }
 
@@ -646,11 +663,11 @@ class PostListViewBuilder @Inject constructor(
                             if (singleTapToViewImage) {
                                 showImageOrVideo()
                             } else {
-                                toggleItem(postView)
+                                toggleItem(fetchedPost)
                             }
                         } else {
                             if (url != null && (postType == PostType.Text || postType == PostType.Link)) {
-                                onLinkClick(url, null, LinkContext.Rich)
+                                onLinkClick(accountId, url, null, LinkContext.Rich)
                             } else {
                                 showImageOrVideo()
                             }
@@ -660,7 +677,7 @@ class PostListViewBuilder @Inject constructor(
                     if (fullContentContainerView != null) {
                         imageView.setOnLongClickListener {
                             if (singleTapToViewImage) {
-                                toggleItem(postView)
+                                toggleItem(fetchedPost)
                             } else {
                                 showImageOrVideo()
                             }
@@ -668,7 +685,7 @@ class PostListViewBuilder @Inject constructor(
                         }
                     } else {
                         imageView.setOnLongClickListener {
-                            onLinkLongClick(imageUrl, null)
+                            onLinkLongClick(accountId, imageUrl, null)
                             true
                         }
                     }
@@ -695,10 +712,10 @@ class PostListViewBuilder @Inject constructor(
                         fullContentContainerView = fullContentContainerView,
                         contentMaxLines = contentMaxLines,
                         onFullImageViewClickListener = { v, url ->
-                            onImageClick(postView, v, url)
+                            onImageClick(accountId, postView, v, url)
                         },
                         onImageClickListener = {
-                            onImageClick(postView, null, it)
+                            onImageClick(accountId, postView, null, it)
                         },
                         onVideoClickListener = onVideoClick,
                         onVideoLongClickListener = onVideoLongClickListener,
@@ -708,9 +725,15 @@ class PostListViewBuilder @Inject constructor(
                         onRevealContentClickedFn = {
                             onRevealContentClickedFn()
                         },
-                        onLemmyUrlClick = onPageClick,
-                        onLinkClick = onLinkClick,
-                        onLinkLongClick = onLinkLongClick,
+                        onLemmyUrlClick = {
+                            onPageClick(accountId, it)
+                        },
+                        onLinkClick = { url, text, linkContext ->
+                            onLinkClick(accountId, url, text, linkContext)
+                        },
+                        onLinkLongClick = { url, text ->
+                            onLinkLongClick(accountId, url, text)
+                        },
                     )
                 }
 
@@ -732,7 +755,7 @@ class PostListViewBuilder @Inject constructor(
                         iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_24)
                         iconImage?.setOnClickListener {
                             if (fullContentContainerView != null) {
-                                toggleItem(postView)
+                                toggleItem(fetchedPost)
                             } else {
                                 onItemClick()
                             }
@@ -758,7 +781,7 @@ class PostListViewBuilder @Inject constructor(
                                 showDefaultImage()
                                 iconImage?.setOnClickListener {
                                     if (fullContentContainerView != null) {
-                                        toggleItem(postView)
+                                        toggleItem(fetchedPost)
                                     } else {
                                         onItemClick()
                                     }
@@ -795,14 +818,20 @@ class PostListViewBuilder @Inject constructor(
                 postView.post.name,
                 instance,
                 onImageClick = {
-                    onImageClick(postView, null, it)
+                    onImageClick(accountId, postView, null, it)
                 },
                 onVideoClick = {
                     onVideoClick(it, VideoType.Unknown, null)
                 },
-                onPageClick = onPageClick,
-                onLinkClick = onLinkClick,
-                onLinkLongClick = onLinkLongClick,
+                onPageClick = {
+                    onPageClick(accountId, it)
+                },
+                onLinkClick = { url, text, linkContext ->
+                    onLinkClick(accountId, url, text, linkContext)
+                },
+                onLinkLongClick = { url, text ->
+                    onLinkLongClick(accountId, url, text)
+                },
             )
 
             if (postView.read && !alwaysRenderAsUnread) {
@@ -823,6 +852,7 @@ class PostListViewBuilder @Inject constructor(
             }
             commentButton?.setOnClickListener {
                 onItemClick(
+                    accountId,
                     instance,
                     postView.post.id,
                     postView.community.toCommunityRef(),
@@ -883,7 +913,7 @@ class PostListViewBuilder @Inject constructor(
             }
 
             moreButton?.setOnClickListener {
-                onShowMoreOptions(postView)
+                onShowMoreOptions(accountId, postView)
             }
 
             if (rawBinding is ListingItemCardBinding ||
@@ -906,10 +936,10 @@ class PostListViewBuilder @Inject constructor(
                         val t = Uri.parse(url).host ?: url
                         linkText?.text = t
                         linkOverlay?.setOnClickListener {
-                            onLinkClick(url, null, LinkContext.Rich)
+                            onLinkClick(accountId, url, null, LinkContext.Rich)
                         }
                         linkOverlay?.setOnLongClickListener {
-                            onLinkLongClick(url, t)
+                            onLinkLongClick(accountId, url, t)
                             true
                         }
                     } else {
@@ -918,7 +948,7 @@ class PostListViewBuilder @Inject constructor(
                         linkIcon?.visibility = View.GONE
                         linkOverlay?.visibility = View.GONE
                         openLinkButton?.setOnClickListener {
-                            onLinkClick(url, null, LinkContext.Action)
+                            onLinkClick(accountId, url, null, LinkContext.Action)
                         }
                     }
                 }
@@ -940,18 +970,34 @@ class PostListViewBuilder @Inject constructor(
                     }
 
                     rb.root.setOnLongClickListener {
-                        toggleActions(postView)
+                        toggleActions(fetchedPost)
                         true
                     }
                 }
                 else -> {
                     rb.root.setOnLongClickListener {
-                        onShowMoreOptions(postView)
+                        onShowMoreOptions(accountId, postView)
                         true
                     }
                 }
             }
-        }
+
+            if (themeColor != null) {
+                themeColorBar.visibility = View.VISIBLE
+                themeColorBar.setBackgroundResource(R.drawable.post_color_bar)
+                ViewCompat.setBackgroundTintList(
+                    themeColorBar,
+                    ColorStateList.valueOf(themeColor)
+                )
+//                if (root is MaterialCardView) {
+//                    root.setCardBackgroundColor(themeColor)
+//                } else {
+//                    root.setBackgroundColor(themeColor)
+//                }
+            } else {
+                themeColorBar.visibility = View.GONE
+            }
+        } // with(holder)
     }
 
     private fun ListingItemViewHolder.scaleTextSizes() {

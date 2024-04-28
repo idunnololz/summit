@@ -16,7 +16,7 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.databinding.FragmentSettingNotificationsBinding
+import com.idunnololz.summit.databinding.FragmentSettingsNotificationsBinding
 import com.idunnololz.summit.databinding.OnOffSettingItemBinding
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.NotificationSettings
@@ -35,7 +35,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsNotificationsFragment :
-    BaseFragment<FragmentSettingNotificationsBinding>(),
+    BaseFragment<FragmentSettingsNotificationsBinding>(),
     SettingValueUpdateCallback {
 
     @Inject
@@ -44,7 +44,7 @@ class SettingsNotificationsFragment :
     @Inject
     lateinit var settings: NotificationSettings
 
-    private val viewModel: SettingNotificationsViewModel by viewModels()
+    private val viewModel: SettingsNotificationsViewModel by viewModels()
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -62,7 +62,7 @@ class SettingsNotificationsFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingNotificationsBinding.inflate(inflater, container, false))
+        setBinding(FragmentSettingsNotificationsBinding.inflate(inflater, container, false))
 
         return binding.root
     }

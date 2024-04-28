@@ -9,6 +9,8 @@ import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.api.dto.PostAggregates
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SubscribedType
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.multicommunity.Source
 
 object LemmyFakeModels {
 
@@ -121,6 +123,11 @@ object LemmyFakeModels {
         creator_blocked = false,
         my_vote = null,
         unread_comments = 0,
+    )
+
+    val fakeFetchedPost = FetchedPost(
+        fakePostView,
+        Source.StandardSource(),
     )
 
     val fakeCommentView1 = CommentView(

@@ -205,6 +205,16 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                             icon = R.drawable.baseline_dynamic_feed_24,
                         )
                     }
+                    is CommunityRef.AllSubscribed -> {
+                        addLinkOptions = false
+
+                        setTitle(R.string.all_subscribed_feed_actions)
+                        addItemWithIcon(
+                            id = R.id.community_info,
+                            title = R.string.all_subscribed_feed_info,
+                            icon = R.drawable.baseline_subscriptions_24,
+                        )
+                    }
                     is PersonRef.PersonRefByName -> {
                         setTitle(
                             context.getString(

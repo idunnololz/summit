@@ -442,8 +442,8 @@ class AccountActionsManager @Inject constructor(
         return voteOn(instance, ref, dir, account)
     }
 
-    suspend fun markPostAsRead(instance: String, id: PostId, read: Boolean) {
-        val account = accountManager.currentAccount.asAccount ?: return
+    suspend fun markPostAsRead(instance: String, id: PostId, read: Boolean, accountId: Long? = null) {
+        val account = accountOrDefault(accountId) ?: return
         pendingActionsManager.markPostAsRead(
             PostRef(instance, id),
             read,
@@ -578,4 +578,11 @@ class AccountActionsManager @Inject constructor(
             }
         }
     }
+
+    private suspend fun accountOrDefault(accountId: Long?) =
+        if (accountId == null) {
+            accountManager.currentAccount.asAccount
+        } else {
+            accountManager.getAccountById(accountId)
+        }
 }

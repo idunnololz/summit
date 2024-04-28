@@ -16,7 +16,7 @@ import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.cache.SettingCacheFragment
+import com.idunnololz.summit.settings.cache.SettingsCacheFragment
 import kotlin.reflect.KClass
 
 inline fun <reified T> BaseFragment<*>.setupForFragment(animate: Boolean = true) {
@@ -48,7 +48,7 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                     navBarController.hideNavBar(animate)
                     hideNotificationBarBg()
                 }
-                SettingCacheFragment::class -> {
+                SettingsCacheFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()
                     navBarController.showBottomNav()
                     showNotificationBarBg()

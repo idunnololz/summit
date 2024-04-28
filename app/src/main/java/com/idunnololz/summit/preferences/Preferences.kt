@@ -56,6 +56,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HOME_FAB_QUICK_ACTION
+import com.idunnololz.summit.util.PreferenceUtil.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_INFINITY_PAGE_INDICATOR
@@ -934,6 +935,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_EDITED_DATE, value)
+                .apply()
+        }
+
+    var imagePreviewHideUiByDefault: Boolean
+        get() = prefs.getBoolean(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT, value)
                 .apply()
         }
 

@@ -51,7 +51,9 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
+import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -308,7 +310,7 @@ class CommunityFragment :
                         .setNegativeButton(R.string.go_to_account_instance)
                         .createAndShow(childFragmentManager, "onInstanceMismatch")
                 },
-                onImageClick = { postView, sharedElementView, url ->
+                onImageClick = { accountId, postView, sharedElementView, url ->
                     getMainActivity()?.openImage(
                         sharedElement = sharedElementView,
                         appBar = binding.customAppBar.root,
@@ -316,7 +318,7 @@ class CommunityFragment :
                         url = url,
                         mimeType = null,
                     )
-                    viewModel.onPostRead(postView)
+                    viewModel.onPostRead(postView, accountId)
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
@@ -324,10 +326,11 @@ class CommunityFragment :
                 onVideoLongClickListener = { url ->
                     showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
                 },
-                onPageClick = {
-                    getMainActivity()?.launchPage(it)
+                onPageClick = { accountId, pageRef ->
+                    getMainActivity()?.launchPage(pageRef)
                 },
                 onItemClick = {
+                          accountId,
                         instance,
                         id,
                         currentCommunity,
@@ -346,24 +349,24 @@ class CommunityFragment :
                         videoState = videoState,
                     )
                 },
-                onShowMoreActions = {
+                onShowMoreActions = { accountId, postView ->
                     showMorePostOptions(
                         instance = viewModel.apiInstance,
-                        postView = it,
+                        postView = postView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
                     )
                 },
-                onPostRead = { postView ->
-                    viewModel.onPostRead(postView)
+                onPostRead = { accountId, postView ->
+                    viewModel.onPostRead(postView, accountId)
                 },
                 onLoadPage = {
                     viewModel.fetchPage(it)
                 },
-                onLinkClick = { url, text, linkType ->
+                onLinkClick = { accountId, url, text, linkType ->
                     onLinkClick(url, text, linkType)
                 },
-                onLinkLongClick = { url, text ->
+                onLinkLongClick = { accountId, url, text ->
                     getMainActivity()?.showMoreLinkOptions(url, text)
                 },
             ).apply {
@@ -933,8 +936,9 @@ class CommunityFragment :
                 context,
                 binding.recyclerView,
                 onActionSelected = { action, vh ->
-                    val postView = vh.itemView.getTag(R.id.post_view) as? PostView
+                    val fetchedPost = vh.itemView.getTag(R.id.fetched_post) as? FetchedPost
                         ?: return@LemmySwipeActionCallback
+                    val postView = fetchedPost.postView
 
                     when (action.id) {
                         PostGestureAction.Upvote -> {
@@ -972,7 +976,11 @@ class CommunityFragment :
                         }
 
                         PostGestureAction.MarkAsRead -> {
-                            viewModel.onPostRead(postView, delayMs = 250)
+                            viewModel.onPostRead(
+                                postView = postView,
+                                accountId = fetchedPost.source.accountId,
+                                delayMs = 250
+                            )
                         }
                     }
                 },
@@ -1212,6 +1220,13 @@ class CommunityFragment :
                         icon = R.drawable.baseline_dynamic_feed_24,
                     )
                 }
+                is CommunityRef.AllSubscribed -> {
+                    addItemWithIcon(
+                        id = R.id.feed_info,
+                        title = R.string.feed_info,
+                        icon = R.drawable.baseline_dynamic_feed_24,
+                    )
+                }
                 is CommunityRef.Local,
                 is CommunityRef.All,
                 null,
@@ -1400,6 +1415,7 @@ class CommunityFragment :
                     is CommunityRef.Subscribed -> {}
                     is CommunityRef.MultiCommunity -> {}
                     is CommunityRef.ModeratedCommunities -> {}
+                    is CommunityRef.AllSubscribed -> {}
                     null -> {}
                 }
 
@@ -1437,7 +1453,8 @@ class CommunityFragment :
                     it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
                 }
                 range?.mapNotNullTo(anchors) {
-                    (adapter?.items?.getOrNull(it) as? Item.VisiblePostItem)?.postView?.post?.id
+                    (adapter?.items?.getOrNull(it) as? Item.VisiblePostItem)
+                        ?.fetchedPost?.postView?.post?.id
                 }
                 viewModel.onHideRead(anchors)
             }
@@ -1484,6 +1501,7 @@ class CommunityFragment :
                         is CommunityRef.ModeratedCommunities,
                         is CommunityRef.MultiCommunity,
                         is CommunityRef.Subscribed,
+                        is CommunityRef.AllSubscribed,
                         -> null
                     },
                 )

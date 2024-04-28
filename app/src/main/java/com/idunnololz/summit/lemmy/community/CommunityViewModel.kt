@@ -161,7 +161,9 @@ class CommunityViewModel @Inject constructor(
         postsRepository.showNsfwPosts = preferences.showNsfwPosts
 
         currentCommunityRef.value?.let {
-            postsRepository.setCommunity(it)
+            viewModelScope.launch {
+                postsRepository.setCommunity(it)
+            }
         }
 
         currentCommunityRef.observeForever(communityRefChangeObserver)
@@ -486,7 +488,14 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
+
     fun changeCommunity(communityRef: CommunityRef?) {
+        viewModelScope.launch {
+            changeCommunityInternal(communityRef)
+        }
+    }
+
+    private suspend fun changeCommunityInternal(communityRef: CommunityRef?) {
         if (communityRef == null) {
             return
         }
@@ -506,6 +515,7 @@ class CommunityViewModel @Inject constructor(
             is CommunityRef.ModeratedCommunities -> communityRefSafe.instance
             is CommunityRef.MultiCommunity -> currentAccount?.instance
             is CommunityRef.Subscribed -> communityRefSafe.instance
+            is CommunityRef.AllSubscribed -> currentAccount?.instance
         }
         val instanceChange = newApiInstance != null && newApiInstance != apiInstance
 
@@ -571,7 +581,7 @@ class CommunityViewModel @Inject constructor(
                         it.copy(
                             posts = it.allPosts.filter {
                                 !hiddenPosts.contains(
-                                    it.postView.post.id,
+                                    it.fetchedPost.postView.post.id,
                                 )
                             },
                             isReadPostUpdate = false,
@@ -675,10 +685,12 @@ class CommunityViewModel @Inject constructor(
     }
 
     fun resetToAccountInstance() {
-        val account = accountManager.currentAccount.value as Account? ?: return
-        changeCommunity(CommunityRef.All(account.instance))
+        viewModelScope.launch {
+            val account = accountManager.currentAccount.value as Account? ?: return@launch
+            changeCommunityInternal(CommunityRef.All(account.instance))
 
-        reset(resetScrollPosition = true)
+            reset(resetScrollPosition = true)
+        }
     }
 
     fun onBlockSettingsChanged() {
@@ -739,7 +751,7 @@ class CommunityViewModel @Inject constructor(
         )
     }
 
-    fun onPostRead(postView: PostView, delayMs: Long = 0) {
+    fun onPostRead(postView: PostView, accountId: Long?, delayMs: Long = 0, ) {
         if (postView.read) {
             return
         }
@@ -748,7 +760,12 @@ class CommunityViewModel @Inject constructor(
             if (delayMs > 0) {
                 delay(delayMs)
             }
-            accountActionsManager.markPostAsRead(apiInstance, postView.post.id, read = true)
+            accountActionsManager.markPostAsRead(
+                instance = apiInstance,
+                id = postView.post.id,
+                read = true,
+                accountId = accountId
+            )
         }
     }
 
@@ -814,7 +831,7 @@ class CommunityViewModel @Inject constructor(
 
         val anchorPosts = if (anchors.isNullOrEmpty()) {
             postListEngine.getPostsCloseBy()
-                .mapTo(mutableSetOf<Int>()) { it.post.id }
+                .mapTo(mutableSetOf<Int>()) { it.postView.post.id }
         } else {
             anchors
         }
@@ -829,7 +846,7 @@ class CommunityViewModel @Inject constructor(
                 .onSuccess {
                     val position = it.posts.indexOfFirst {
                         anchorPosts.contains(
-                            it.postView.post.id,
+                            it.fetchedPost.postView.post.id,
                         )
                     }
                     var scrollToTop = false

@@ -6,6 +6,8 @@ import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
+import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.multicommunity.Source
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -15,7 +17,7 @@ interface PostsDataSource {
         sortType: SortType? = null,
         page: Int,
         force: Boolean,
-    ): Result<List<PostView>>
+    ): Result<List<FetchedPost>>
 }
 
 class SinglePostsDataSource @AssistedInject constructor(
@@ -30,16 +32,20 @@ class SinglePostsDataSource @AssistedInject constructor(
     }
 
     override suspend fun fetchPosts(sortType: SortType?, page: Int, force: Boolean) =
-        apiClient.fetchPosts(
-            if (communityName == null) {
-                null
-            } else {
-                Either.Right(communityName)
-            },
-            sortType,
-            listingType ?: ListingType.All,
-            page.toLemmyPageIndex(),
-            DEFAULT_PAGE_SIZE,
-            force,
-        )
+        apiClient
+            .fetchPosts(
+                if (communityName == null) {
+                    null
+                } else {
+                    Either.Right(communityName)
+                },
+                sortType,
+                listingType ?: ListingType.All,
+                page.toLemmyPageIndex(),
+                DEFAULT_PAGE_SIZE,
+                force,
+            )
+            .map {
+                it.map { FetchedPost(it, Source.StandardSource()) }
+            }
 }
