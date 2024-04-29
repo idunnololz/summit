@@ -29,8 +29,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class AddOrEditCommentViewModel @Inject constructor(
     private val context: Application,
-    private val authedApiClient: AccountAwareLemmyClient,
-    private val accountManager: AccountManager,
+    private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
+    val accountManager: AccountManager,
     private val accountActionsManager: AccountActionsManager,
     private val state: SavedStateHandle,
     private val preferences: Preferences,
@@ -47,6 +47,11 @@ class AddOrEditCommentViewModel @Inject constructor(
         ) : Message
     }
 
+    /**
+     * Create a new instance so we can change the instance without screwing up app state
+     */
+    val lemmyApiClient = lemmyApiClientFactory.create()
+
     val currentAccount = accountManager.currentAccount.asAccountLiveData()
 
     val commentSentEvent = StatefulLiveData<Unit>()
@@ -54,10 +59,6 @@ class AddOrEditCommentViewModel @Inject constructor(
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
 
     val messages = MutableLiveData<List<Message>>(listOf())
-
-    fun editComment() {
-        accountActionsManager
-    }
 
     fun sendComment(account: Account, postRef: PostRef, parentId: CommentId?, content: String) {
         viewModelScope.launch {
@@ -75,6 +76,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                 postRef,
                 parentId,
                 content,
+                account.id,
             )
 
             commentSentEvent.postValue(Unit)
@@ -98,6 +100,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                     PostRef(instance, inboxItem.postId),
                     inboxItem.commentId,
                     content,
+                    account.id,
                 )
 
                 commentSentEvent.postValue(Unit)
@@ -110,7 +113,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                     is InboxItem.ReportPostInboxItem,
                     -> error("Should never happen!")
                     is InboxItem.MessageInboxItem -> {
-                        authedApiClient
+                        lemmyApiClient
                             .createPrivateMessage(
                                 content = content,
                                 recipient = inboxItem.authorId,
@@ -128,21 +131,23 @@ class AddOrEditCommentViewModel @Inject constructor(
         }
     }
 
-    fun updateComment(postRef: PostRef, commentId: CommentId, content: String) {
+    fun updateComment(account: Account, postRef: PostRef, commentId: CommentId, content: String) {
         viewModelScope.launch {
             accountActionsManager.editComment(
                 postRef,
                 commentId,
                 content,
+                account.id,
             )
 
             commentSentEvent.postValue(Unit)
         }
     }
 
-    fun sendComment(personRef: PersonRef, content: String) {
+    fun sendComment(account: Account, personRef: PersonRef, content: String) {
         viewModelScope.launch {
-            authedApiClient
+            lemmyApiClient.setAccount(account, accountChanged = true)
+            lemmyApiClient
                 .fetchPersonByNameWithRetry(
                     name = personRef.fullName,
                     sortType = SortType.New,
@@ -152,6 +157,7 @@ class AddOrEditCommentViewModel @Inject constructor(
                 )
                 .onSuccess {
                     sendComment(
+                        account,
                         it.person_view.person.id,
                         content,
                     )
@@ -162,9 +168,10 @@ class AddOrEditCommentViewModel @Inject constructor(
         }
     }
 
-    fun sendComment(personId: PersonId, content: String) {
+    fun sendComment(account: Account, personId: PersonId, content: String) {
         viewModelScope.launch {
-            authedApiClient
+            lemmyApiClient.setAccount(account, accountChanged = true)
+            lemmyApiClient
                 .createPrivateMessage(
                     content = content,
                     recipient = personId,

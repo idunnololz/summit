@@ -27,6 +27,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
 fun BaseFragment<*>.showMorePostOptions(
     instance: String,
+    accountId: Long?,
     postView: PostView,
     moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
@@ -196,6 +197,7 @@ fun BaseFragment<*>.showMorePostOptions(
         setOnMenuItemClickListener {
             createPostActionHandler(
                 instance = instance,
+                accountId = accountId,
                 postView = postView,
                 moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,
@@ -212,6 +214,7 @@ fun BaseFragment<*>.showMorePostOptions(
 
 fun BaseFragment<*>.createPostActionHandler(
     instance: String,
+    accountId: Long?,
     postView: PostView,
     moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
@@ -234,6 +237,7 @@ fun BaseFragment<*>.createPostActionHandler(
                 instance = instance,
                 postOrCommentView = Either.Left(postView),
                 fragmentManager = childFragmentManager,
+                accountId = accountId,
             )
         }
         R.id.edit_post -> {
@@ -255,16 +259,16 @@ fun BaseFragment<*>.createPostActionHandler(
         }
         R.id.pa_save_toggle -> {
             if (postView.saved) {
-                moreActionsHelper.savePost(postView.post.id, save = false)
+                moreActionsHelper.savePost(postView.post.id, save = false, accountId = accountId)
             } else {
-                moreActionsHelper.savePost(postView.post.id, save = true)
+                moreActionsHelper.savePost(postView.post.id, save = true, accountId = accountId)
             }
         }
         R.id.pa_save -> {
-            moreActionsHelper.savePost(postView.post.id, save = true)
+            moreActionsHelper.savePost(postView.post.id, save = true, accountId = accountId)
         }
         R.id.pa_remove_from_saved -> {
-            moreActionsHelper.savePost(postView.post.id, save = false)
+            moreActionsHelper.savePost(postView.post.id, save = false, accountId = accountId)
         }
         R.id.pa_community_info -> {
             getMainActivity()?.showCommunityInfo(postView.community.toCommunityRef())
@@ -360,6 +364,7 @@ fun BaseFragment<*>.createPostActionHandler(
         R.id.pa_more -> {
             showMorePostOptions(
                 instance = instance,
+                accountId = accountId,
                 postView = postView,
                 moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,

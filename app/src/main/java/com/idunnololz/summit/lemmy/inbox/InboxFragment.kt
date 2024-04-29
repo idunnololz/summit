@@ -444,11 +444,11 @@ class InboxFragment :
                 AddOrEditCommentFragment().apply {
                     arguments =
                         AddOrEditCommentFragmentArgs(
-                            viewModel.instance,
-                            null,
-                            null,
-                            null,
-                            inboxItem,
+                            instance = viewModel.instance,
+                            commentView = null,
+                            postView = null,
+                            editCommentView = null,
+                            inboxItem = inboxItem,
                         ).toBundle()
                 }.show(childFragmentManager, "asdf")
             },

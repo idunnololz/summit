@@ -171,7 +171,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
 
         setOnMenuItemClickListener {
             createCommentActionHandler(
-                instance = instance,
+                apiInstance = instance,
                 commentView = commentView,
                 moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,
@@ -186,7 +186,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
 }
 
 fun BaseFragment<*>.createCommentActionHandler(
-    instance: String,
+    apiInstance: String,
     commentView: CommentView,
     moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
@@ -207,7 +207,7 @@ fun BaseFragment<*>.createCommentActionHandler(
         AddOrEditCommentFragment().apply {
             arguments =
                 AddOrEditCommentFragmentArgs(
-                    currentAccount.instance,
+                    apiInstance,
                     null,
                     null,
                     it,
@@ -255,7 +255,7 @@ fun BaseFragment<*>.createCommentActionHandler(
         R.id.ca_share -> {
             Utils.shareLink(
                 context,
-                LinkUtils.getLinkForComment(instance, commentView.comment.id),
+                LinkUtils.getLinkForComment(apiInstance, commentView.comment.id),
             )
         }
         R.id.ca_share_fediverse_link -> {
@@ -277,7 +277,7 @@ fun BaseFragment<*>.createCommentActionHandler(
         }
         R.id.ca_detailed_view -> {
             ContentDetailsDialogFragment
-                .show(childFragmentManager, instance, commentView)
+                .show(childFragmentManager, apiInstance, commentView)
         }
         R.id.ca_admin_tools,
         R.id.ca_mod_tools,
@@ -292,9 +292,10 @@ fun BaseFragment<*>.createCommentActionHandler(
             }
 
             AddOrEditCommentFragment.showReplyDialog(
-                instance = instance,
+                instance = apiInstance,
                 postOrCommentView = Either.Right(commentView),
                 fragmentManager = childFragmentManager,
+                accountId = null,
             )
         }
         R.id.ca_block_user -> {
@@ -305,7 +306,7 @@ fun BaseFragment<*>.createCommentActionHandler(
                 childFragmentManager,
                 null,
                 CommentRef(
-                    instance,
+                    apiInstance,
                     commentView.comment.id,
                 ),
             )
@@ -318,7 +319,7 @@ fun BaseFragment<*>.createCommentActionHandler(
         }
         R.id.ca_more -> {
             showMoreCommentOptions(
-                instance = instance,
+                instance = apiInstance,
                 commentView = commentView,
                 moreActionsHelper = moreActionsHelper,
                 fragmentManager = fragmentManager,

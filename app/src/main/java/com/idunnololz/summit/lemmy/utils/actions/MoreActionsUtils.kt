@@ -21,7 +21,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
     snackbarContainer: View,
     onSavePostChanged: ((SavePostResult) -> Unit)? = null,
     onSaveCommentChanged: ((SaveCommentResult) -> Unit)? = null,
-    onPostUpdated: ((PostId) -> Unit)? = null,
+    onPostUpdated: ((PostId, accountId: Long?) -> Unit)? = null,
     onCommentUpdated: ((CommentId) -> Unit)? = null,
     onBlockInstanceChanged: (() -> Unit)? = null,
     onBlockCommunityChanged: (() -> Unit)? = null,
@@ -42,7 +42,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
                 onCommentUpdated?.invoke(updatedObject.commentId)
             }
             is ModActionResult.UpdatedObject.PostObject -> {
-                onPostUpdated?.invoke(updatedObject.postId)
+                onPostUpdated?.invoke(updatedObject.postId, updatedObject.accountId)
             }
             null -> { /* do nothing */ }
         }
@@ -76,7 +76,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
                     .show()
 
                 onSavePostChanged?.invoke(it.data)
-                onPostUpdated?.invoke(it.data.postId)
+                onPostUpdated?.invoke(it.data.postId, it.data.accountId)
             }
         }
     }

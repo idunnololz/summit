@@ -103,6 +103,10 @@ safeargs.
         <argument
             android:name="community_instance"
             app:argType="string" />
+        <argument
+            android:name="accountId"
+            app:argType="long"
+            android:defaultValue="0L" />
     </dialog>
     <dialog
         android:id="@+id/multiCommunityEditorDialogFragment"

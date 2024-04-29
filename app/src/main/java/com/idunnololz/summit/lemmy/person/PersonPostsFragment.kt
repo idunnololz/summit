@@ -115,6 +115,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
             onShowMoreActions = { accountId, postView ->
                 showMorePostOptions(
                     instance = parentFragment.viewModel.instance,
+                    accountId = accountId,
                     postView = postView,
                     moreActionsHelper = parentFragment.moreActionsHelper,
                     fragmentManager = childFragmentManager,

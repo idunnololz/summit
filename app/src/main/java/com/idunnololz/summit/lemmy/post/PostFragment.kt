@@ -190,7 +190,7 @@ class PostFragment :
 
             if (result != null) {
                 viewModel.fetchPostData(force = true)
-                (parentFragment as? CommunityFragment)?.updatePost(result.post.id)
+                (parentFragment as? CommunityFragment)?.updatePost(result.post.id, accountId)
             }
         }
 
@@ -331,6 +331,7 @@ class PostFragment :
             if (postView != null) {
                 showMorePostOptions(
                     instance = viewModel.apiInstance,
+                    accountId = accountId,
                     postView = postView,
                     moreActionsHelper = moreActionsHelper,
                     fragmentManager = childFragmentManager,
@@ -359,6 +360,7 @@ class PostFragment :
                 containerView = binding.recyclerView,
                 lifecycleOwner = this,
                 instance = getInstance(),
+                accountId = accountId,
                 revealAll = args.reveal,
                 useFooter = false,
                 isEmbedded = false,
@@ -385,6 +387,7 @@ class PostFragment :
                         instance = getInstance(),
                         postOrCommentView = postOrComment,
                         fragmentManager = childFragmentManager,
+                        accountId = accountId,
                     )
                 },
                 onImageClick = { postOrCommentView, imageView, url ->
@@ -415,6 +418,7 @@ class PostFragment :
                 onPostActionClick = { postView, itemId, actionId ->
                     createPostActionHandler(
                         instance = viewModel.apiInstance,
+                        accountId = accountId,
                         postView = postView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
@@ -426,7 +430,7 @@ class PostFragment :
                 },
                 onCommentActionClick = { commentView, itemId, actionId ->
                     createCommentActionHandler(
-                        instance = viewModel.apiInstance,
+                        apiInstance = viewModel.apiInstance,
                         commentView = commentView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
@@ -462,9 +466,12 @@ class PostFragment :
         installOnActionResultHandler(
             moreActionsHelper = moreActionsHelper,
             snackbarContainer = binding.fabSnackbarCoordinatorLayout,
-            onPostUpdated = {
+            onPostUpdated = { postId, accountId ->
                 viewModel.fetchPostData(force = true)
-                (parentFragment as? CommunityFragment)?.updatePost(it)
+                (parentFragment as? CommunityFragment)?.updatePost(
+                    postId = postId,
+                    accountId = accountId
+                )
             },
             onCommentUpdated = {
                 viewModel.fetchMoreComments(it, 1, true)
@@ -976,6 +983,7 @@ class PostFragment :
                                 instance = getInstance(),
                                 postOrCommentView = Either.Right(commentView),
                                 fragmentManager = childFragmentManager,
+                                accountId = accountId,
                             )
                         }
 
@@ -1038,6 +1046,7 @@ class PostFragment :
                     instance = viewModel.apiInstance,
                     postOrCommentView = Either.Left(postView),
                     fragmentManager = childFragmentManager,
+                    accountId = accountId,
                 )
             }
 
@@ -1103,6 +1112,7 @@ class PostFragment :
                     instance = getInstance(),
                     postOrCommentView = Either.Left(postView.post),
                     fragmentManager = childFragmentManager,
+                    accountId = accountId,
                 )
             }
             R.id.action_edit_comment -> {
@@ -1112,6 +1122,7 @@ class PostFragment :
                     instance = getInstance(),
                     postOrCommentView = Either.Left(postView.post),
                     fragmentManager = childFragmentManager,
+                    accountId = accountId,
                 )
             }
         }
@@ -1148,7 +1159,11 @@ class PostFragment :
             CONFIRM_DELETE_COMMENT_TAG -> {
                 val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
                 if (commentId != null) {
-                    viewModel.deleteComment(PostRef(getInstance(), args.id), commentId.toInt())
+                    viewModel.deleteComment(
+                        accountId = accountId,
+                        postRef = PostRef(getInstance(), args.id),
+                        commentId = commentId.toInt()
+                    )
                 }
             }
             "instance_mismatch" -> {

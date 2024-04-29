@@ -38,6 +38,7 @@ import com.idunnololz.summit.databinding.CommunitySelectorCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorCurrentCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
+import com.idunnololz.summit.databinding.CommunitySelectorRecentItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorViewBinding
 import com.idunnololz.summit.databinding.CurrentInstanceItemBinding
@@ -596,12 +597,10 @@ class CommunitySelectorController @AssistedInject constructor(
             }
             addItemType(
                 clazz = Item.RecentChildItem::class,
-                inflateFn = CommunitySelectorStaticCommunityItemBinding::inflate,
+                inflateFn = CommunitySelectorRecentItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.setImageResource(0)
-                b.icon.visibility = View.GONE
-
-                b.textView.text = item.text
+                b.title.text = item.communityRef.getName(b.title.context)
+                b.subtitle.text = item.text
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
                         this@CommunitySelectorController,
@@ -772,15 +771,13 @@ class CommunitySelectorController @AssistedInject constructor(
                         )
                     }
 
-                    if (BuildConfig.DEBUG) {
-                        newItems.add(
-                            Item.StaticChildItem(
-                                context.getString(R.string.all_subscribed),
-                                R.drawable.baseline_subscriptions_24,
-                                CommunityRef.AllSubscribed(),
-                            ),
-                        )
-                    }
+                    newItems.add(
+                        Item.StaticChildItem(
+                            context.getString(R.string.all_subscribed),
+                            R.drawable.baseline_groups_24,
+                            CommunityRef.AllSubscribed(),
+                        ),
+                    )
                 } else {
                     newItems.add(
                         Item.StaticChildItem(

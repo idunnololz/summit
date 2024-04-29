@@ -158,6 +158,7 @@ class ModActionsDialogFragment :
                             launchModActionWithReason(
                                 RemovePost(
                                     args.postId,
+                                    accountId,
                                 ),
                             )
                         }
@@ -165,6 +166,7 @@ class ModActionsDialogFragment :
                             launchModActionWithReason(
                                 UndoRemovePost(
                                     args.postId,
+                                    accountId,
                                 ),
                             )
                         }
@@ -264,6 +266,7 @@ class ModActionsDialogFragment :
                             launchModActionWithReason(
                                 PurgePost(
                                     args.postId,
+                                    accountId,
                                 ),
                             )
                         }
@@ -349,6 +352,7 @@ class ModActionsDialogFragment :
                 updatedObject = {
                     UpdatedObject.PostObject(
                         args.postId,
+                        accountId,
                     )
                 },
             )
@@ -359,6 +363,7 @@ class ModActionsDialogFragment :
                 updatedObject = {
                     UpdatedObject.PostObject(
                         args.postId,
+                        accountId,
                     )
                 },
             )
@@ -369,6 +374,7 @@ class ModActionsDialogFragment :
                 updatedObject = {
                     UpdatedObject.PostObject(
                         args.postId,
+                        accountId,
                     )
                 },
             )
@@ -377,7 +383,7 @@ class ModActionsDialogFragment :
                 { getString(R.string.error_unable_to_ban_user) },
                 {
                     if (args.postId != -1) {
-                        UpdatedObject.PostObject(args.postId)
+                        UpdatedObject.PostObject(args.postId, accountId)
                     } else if (args.commentId != -1) {
                         UpdatedObject.CommentObject(args.commentId)
                     } else {
@@ -389,7 +395,10 @@ class ModActionsDialogFragment :
                 { getString(R.string.error_unable_to_add_user_as_moderator) },
                 {
                     if (args.postId != -1) {
-                        UpdatedObject.PostObject(args.postId)
+                        UpdatedObject.PostObject(
+                            args.postId,
+                            accountId,
+                        )
                     } else if (args.commentId != -1) {
                         UpdatedObject.CommentObject(args.commentId)
                     } else {
@@ -409,7 +418,10 @@ class ModActionsDialogFragment :
                 { getString(R.string.error_unable_to_ban_user) },
                 {
                     if (args.postId != -1) {
-                        UpdatedObject.PostObject(args.postId)
+                        UpdatedObject.PostObject(
+                            args.postId,
+                            accountId,
+                        )
                     } else if (args.commentId != -1) {
                         UpdatedObject.CommentObject(args.commentId)
                     } else {
@@ -428,7 +440,7 @@ class ModActionsDialogFragment :
             )
             actionsViewModel.purgePostResult.handleStateChange(
                 { getString(R.string.error_purge_post) },
-                { UpdatedObject.PostObject(args.postId) },
+                { UpdatedObject.PostObject(args.postId, accountId) },
             )
             actionsViewModel.purgeCommentResult.handleStateChange(
                 { getString(R.string.error_purge_comment) },
@@ -673,4 +685,12 @@ class ModActionsDialogFragment :
             binding.recyclerView.requestLayout()
         }
     }
+
+    private val accountId
+        get() =
+            if (args.accountId != 0L) {
+                args.accountId
+            } else {
+                null
+            }
 }

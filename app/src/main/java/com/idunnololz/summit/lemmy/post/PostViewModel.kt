@@ -875,9 +875,9 @@ class PostViewModel @Inject constructor(
         commentsSortOrderLiveData.value = sortOrder
     }
 
-    fun deleteComment(postRef: PostRef, commentId: Int) {
+    fun deleteComment(accountId: Long?, postRef: PostRef, commentId: Int) {
         viewModelScope.launch {
-            accountActionsManager.deleteComment(postRef, commentId)
+            accountActionsManager.deleteComment(postRef, commentId, accountId)
         }
     }
 
