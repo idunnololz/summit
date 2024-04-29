@@ -24,6 +24,7 @@ object ModActionResult {
         @Parcelize
         data class PostObject(
             val postId: Int,
+            val accountId: Long?,
         ) : UpdatedObject
 
         @Parcelize

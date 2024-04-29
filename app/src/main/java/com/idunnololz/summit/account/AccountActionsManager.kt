@@ -115,7 +115,7 @@ class AccountActionsManager @Inject constructor(
                 if (accountId == null) {
                     accountManager.currentAccount.value as? Account
                 } else {
-                    runBlocking { accountManager.getAccountById(accountId) }
+                    accountManager.getAccountByIdBlocking(accountId)
                 }
 
             upVoteView?.setOnClickListener {
@@ -414,32 +414,38 @@ class AccountActionsManager @Inject constructor(
         pendingActionsManager.addActionCompleteListener(onActionChangedListener)
     }
 
-    suspend fun createComment(postRef: PostRef, parentId: CommentId?, content: String) {
-        val account = accountManager.currentAccount.asAccount ?: return
+    suspend fun createComment(postRef: PostRef, parentId: CommentId?, content: String, accountId: Long? = null) {
+        val finalAccountId = accountId
+            ?: accountOrDefault(null)?.id
+            ?: return
         pendingActionsManager.comment(
             postRef,
             parentId,
             content,
-            account.id,
+            finalAccountId,
         )
     }
 
-    suspend fun editComment(postRef: PostRef, commentId: CommentId, content: String) {
-        val account = accountManager.currentAccount.asAccount ?: return
+    suspend fun editComment(postRef: PostRef, commentId: CommentId, content: String, accountId: Long? = null) {
+        val finalAccountId = accountId
+            ?: accountOrDefault(null)?.id
+            ?: return
         pendingActionsManager.editComment(
             postRef,
             commentId,
             content,
-            account.id,
+            finalAccountId,
         )
     }
 
-    suspend fun deleteComment(postRef: PostRef, commentId: CommentId) {
-        val account = accountManager.currentAccount.asAccount ?: return
+    suspend fun deleteComment(postRef: PostRef, commentId: CommentId, accountId: Long? = null) {
+        val finalAccountId = accountId
+            ?: accountOrDefault(null)?.id
+            ?: return
         pendingActionsManager.deleteComment(
             postRef,
             commentId,
-            account.id,
+            finalAccountId,
         )
     }
 

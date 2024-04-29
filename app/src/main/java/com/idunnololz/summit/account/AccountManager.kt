@@ -44,6 +44,8 @@ class AccountManager @Inject constructor(
 
     private val _currentAccount = MutableStateFlow<GuestOrUserAccount?>(null)
 
+    private val accountByIdCache = mutableMapOf<Long, Account?>()
+
     val currentAccount: StateFlow<GuestOrUserAccount?> = _currentAccount
     val currentAccountOnChange = _currentAccount.asSharedFlow().drop(1)
 
@@ -128,6 +130,27 @@ class AccountManager @Inject constructor(
         return accountDao.getAccountById(id)
     }
 
+    suspend fun getAccountByIdOrDefault(accountId: Long?): Account? =
+        if (accountId == null) {
+            currentAccount.asAccount
+        } else {
+            getAccountById(accountId)
+        }
+
+    fun getAccountByIdBlocking(id: Long): Account? {
+        val cachedAccount = accountByIdCache[id]
+        if (cachedAccount != null) {
+            return cachedAccount
+        }
+
+        return runBlocking {
+            val account = getAccountById(id)
+            accountByIdCache[id] = account
+
+            account
+        }
+    }
+
     fun addOnAccountChangedListener(onAccountChangeListener: OnAccountChangedListener) {
         onAccountChangeListeners.add(onAccountChangeListener)
     }
@@ -167,8 +190,12 @@ class AccountManager @Inject constructor(
     }
 
     private suspend fun doSignOutWork(account: Account) {
-        val listeners = withContext(Dispatchers.Main) {
-            onAccountChangeListeners.toList()
+        val listeners: List<OnAccountChangedListener>
+
+        withContext(Dispatchers.Main) {
+            accountByIdCache.remove(account.id)
+
+            listeners = onAccountChangeListeners.toList()
         }
         listeners.forEach {
             it.onAccountSigningOut(account)

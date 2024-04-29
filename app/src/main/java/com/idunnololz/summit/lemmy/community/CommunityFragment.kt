@@ -358,6 +358,7 @@ class CommunityFragment :
                 onShowMoreActions = { accountId, postView ->
                     showMorePostOptions(
                         instance = viewModel.apiInstance,
+                        accountId = accountId,
                         postView = postView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
@@ -485,8 +486,8 @@ class CommunityFragment :
         installOnActionResultHandler(
             moreActionsHelper = moreActionsHelper,
             snackbarContainer = binding.coordinatorLayout,
-            onPostUpdated = {
-                updatePost(it)
+            onPostUpdated = { postId, accountId ->
+                updatePost(postId, accountId)
             },
             onBlockInstanceChanged = {
                 viewModel.onBlockSettingsChanged()
@@ -670,8 +671,8 @@ class CommunityFragment :
         return position == 0 && viewModel.currentPageIndex.value == 0
     }
 
-    fun updatePost(postId: PostId) {
-        viewModel.updatePost(postId)
+    fun updatePost(postId: PostId, accountId: Long?) {
+        viewModel.updatePost(postId, accountId)
     }
 
     private fun onReady() {
@@ -973,9 +974,10 @@ class CommunityFragment :
                             )
 
                             AddOrEditCommentFragment.showReplyDialog(
-                                viewModel.apiInstance,
-                                Either.Left(postView),
-                                childFragmentManager,
+                                instance = viewModel.apiInstance,
+                                postOrCommentView = Either.Left(postView),
+                                fragmentManager = childFragmentManager,
+                                accountId = fetchedPost.source.accountId,
                             )
                         }
 

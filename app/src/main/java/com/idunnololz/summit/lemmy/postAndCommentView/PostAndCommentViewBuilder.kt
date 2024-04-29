@@ -247,6 +247,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         binding: PostHeaderItemBinding,
         container: View,
         postView: PostView,
+        accountId: Long?,
         instance: String,
         isRevealed: Boolean,
         contentMaxWidth: Int,
@@ -421,7 +422,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 scoreView = scoreCount,
                 upvoteCount = upvoteCount,
                 downvoteCount = downvoteCount,
-                accountId = null,
+                accountId = accountId,
                 onUpdate = null,
                 onSignInRequired = onSignInRequired,
                 onInstanceMismatch = onInstanceMismatch,
@@ -508,6 +509,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         depth: Int,
         maxDepth: Int,
         commentView: CommentView,
+        accountId: Long?,
         isDeleting: Boolean,
         isRemoved: Boolean,
         content: String,
@@ -727,7 +729,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 scoreView = scoreCount,
                 upvoteCount = upvoteCount,
                 downvoteCount = downvoteCount,
-                accountId = null,
+                accountId = accountId,
                 onUpdate = { vote, totalScore, upvotes, downvotes ->
                     if (vote < 0) {
                         if (downvoteCount2 == null || upvoteCount2 == null) {
@@ -1087,7 +1089,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     scoreView = b.score,
                     upvoteCount = null,
                     downvoteCount = null,
-                    accountId = null,
+                    accountId = accountId,
                     onUpdate = null,
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,

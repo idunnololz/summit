@@ -76,6 +76,7 @@ class CommunityViewModel @Inject constructor(
     val hiddenPostsManager: HiddenPostsManager,
     private val tabsManager: TabsManager,
     private val apiClient: AccountAwareLemmyClient,
+    private val apiClientFactory: AccountAwareLemmyClient.Factory,
     private val guestAccountManager: GuestAccountManager,
     private val perCommunityPreferences: PerCommunityPreferences,
     val basePreferences: Preferences,
@@ -703,8 +704,11 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun updatePost(postId: PostId) {
+    fun updatePost(postId: PostId, accountId: Long?) {
         viewModelScope.launch(Dispatchers.Default) {
+            val apiClient = apiClientFactory.create()
+            val account = accountManager.getAccountByIdOrDefault(accountId)
+            apiClient.setAccount(account, accountChanged = true)
             apiClient.fetchPostWithRetry(Either.Left(postId), true)
                 .onSuccess {
                     postListEngine.updatePost(it)

@@ -424,6 +424,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 containerView = binding.recyclerView,
                 lifecycleOwner = viewLifecycleOwner,
                 instance = args.instance,
+                accountId = null,
                 revealAll = false,
                 useFooter = false,
                 isEmbedded = true,
@@ -459,6 +460,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         instance = args.instance,
                         postOrCommentView = postOrComment,
                         fragmentManager = childFragmentManager,
+                        accountId = null,
                     )
                 },
                 onImageClick = { _, view, url ->
@@ -476,6 +478,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 onPostActionClick = { postView, _, actionId ->
                     showMorePostOptions(
                         instance = viewModel.apiInstance,
+                        accountId = null,
                         postView = postView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
@@ -483,7 +486,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 },
                 onCommentActionClick = { commentView, _, actionId ->
                     createCommentActionHandler(
-                        instance = viewModel.apiInstance,
+                        apiInstance = viewModel.apiInstance,
                         commentView = commentView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,

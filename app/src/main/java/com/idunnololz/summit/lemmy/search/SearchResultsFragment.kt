@@ -159,11 +159,13 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         instance = parentFragment.viewModel.instance,
                         postOrCommentView = postOrComment,
                         fragmentManager = childFragmentManager,
+                        accountId = null,
                     )
                 },
                 onPostActionClick = { postView, actionId ->
                     createPostActionHandler(
                         instance = parentFragment.viewModel.instance,
+                        accountId = null,
                         postView = postView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
@@ -171,7 +173,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 },
                 onCommentActionClick = { commentView, actionId ->
                     createCommentActionHandler(
-                        instance = parentFragment.viewModel.instance,
+                        apiInstance = parentFragment.viewModel.instance,
                         commentView = commentView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,

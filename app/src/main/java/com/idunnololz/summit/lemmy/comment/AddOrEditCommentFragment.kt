@@ -72,10 +72,15 @@ class AddOrEditCommentFragment :
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
         const val REQUEST_KEY_RESULT = "result"
 
+        /**
+         * @param accountId The account to use for sending the reply/message.
+         * Null to use the current account.
+         */
         fun showReplyDialog(
             instance: String,
             postOrCommentView: Either<PostView, CommentView>,
             fragmentManager: FragmentManager,
+            accountId: Long?,
         ) {
             AddOrEditCommentFragment().apply {
                 arguments = AddOrEditCommentFragmentArgs(
@@ -83,6 +88,7 @@ class AddOrEditCommentFragment :
                     commentView = postOrCommentView.getOrNull(),
                     postView = postOrCommentView.leftOrNull(),
                     editCommentView = null,
+                    accountId = accountId ?: 0L,
                 ).toBundle()
             }.showAllowingStateLoss(fragmentManager, "AddOrEditCommentFragment")
         }
@@ -436,13 +442,21 @@ class AddOrEditCommentFragment :
     }
 
     private fun updateComment() {
-        if (viewModel.currentAccount.value == null) {
+        val accountId = accountId
+        val account = if (accountId == null) {
+            viewModel.currentAccount.value
+        } else {
+            viewModel.accountManager.getAccountByIdBlocking(accountId)
+        }
+
+        if (account == null) {
             PreAuthDialogFragment()
                 .showAllowingStateLoss(childFragmentManager, "DF")
             return
         }
 
         viewModel.updateComment(
+            account,
             PostRef(
                 args.instance,
                 requireNotNull(args.editCommentView?.post?.id) {
@@ -455,7 +469,13 @@ class AddOrEditCommentFragment :
     }
 
     private fun sendComment() {
-        val account = viewModel.currentAccount.value
+        val accountId = accountId
+        val account = if (accountId == null) {
+            viewModel.currentAccount.value
+        } else {
+            viewModel.accountManager.getAccountByIdBlocking(accountId)
+        }
+
         if (account == null) {
             PreAuthDialogFragment()
                 .showAllowingStateLoss(childFragmentManager, "AS")
@@ -467,11 +487,13 @@ class AddOrEditCommentFragment :
         val personRef = args.personRef
         if (personId != 0L) {
             viewModel.sendComment(
+                account,
                 personId,
                 binding.commentEditor.editText?.text.toString(),
             )
         } else if (personRef != null) {
             viewModel.sendComment(
+                account,
                 personRef,
                 binding.commentEditor.editText?.text.toString(),
             )
@@ -699,4 +721,12 @@ class AddOrEditCommentFragment :
 
     private val isDm: Boolean
         get() = args.personId != 0L || args.personRef != null
+
+    private val accountId
+        get() =
+            if (args.accountId != 0L) {
+                args.accountId
+            } else {
+                null
+            }
 }

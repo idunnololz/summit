@@ -44,7 +44,7 @@ import okio.source
 @Singleton
 class MoreActionsHelper @Inject constructor(
     @ApplicationContext private val context: Context,
-    var apiClient: AccountAwareLemmyClient,
+    private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
     val accountManager: AccountManager,
     val accountInfoManager: AccountInfoManager,
     val accountActionsManager: AccountActionsManager,
@@ -57,6 +57,7 @@ class MoreActionsHelper @Inject constructor(
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
+    var apiClient = lemmyApiClientFactory.create()
 
     val currentAccount: Account?
         get() = apiClient.accountForInstance()
@@ -157,9 +158,9 @@ class MoreActionsHelper @Inject constructor(
         }
     }
 
-    fun deleteComment(postRef: PostRef, commentId: Int) {
+    fun deleteComment(postRef: PostRef, commentId: Int, accountId: Long? = null) {
         coroutineScope.launch {
-            accountActionsManager.deleteComment(postRef, commentId)
+            accountActionsManager.deleteComment(postRef, commentId, accountId)
         }
     }
 
@@ -184,7 +185,12 @@ class MoreActionsHelper @Inject constructor(
         )
     }
 
-    fun vote(commentView: CommentView, dir: Int, toggle: Boolean = false, accountId: Long? = null): Result<Unit> {
+    fun vote(
+        commentView: CommentView,
+        dir: Int,
+        toggle: Boolean = false,
+        accountId: Long? = null,
+    ): Result<Unit> {
         val ref = VotableRef.CommentRef(commentView.comment.id)
         val finalDir = if (toggle) {
             val curScore = accountActionsManager.getVote(ref)
@@ -205,15 +211,20 @@ class MoreActionsHelper @Inject constructor(
         )
     }
 
-    fun savePost(id: PostId, save: Boolean) {
+    fun savePost(id: PostId, save: Boolean, accountId: Long? = null,) {
         savePostResult.setIsLoading()
         coroutineScope.launch {
+            val apiClient = lemmyApiClientFactory.create()
+            val account = accountManager.getAccountByIdOrDefault(accountId)
+            apiClient.setAccount(account, accountChanged = true)
+
             ensureRightInstance { apiClient.savePost(id, save) }
                 .onSuccess {
                     savePostResult.postValueAndClear(
                         SavePostResult(
                             postId = id,
                             save = save,
+                            accountId = accountId,
                         ),
                     )
                     savedManager.onPostSaveChanged()
@@ -477,4 +488,5 @@ data class SaveCommentResult(
 data class SavePostResult(
     val postId: PostId,
     val save: Boolean,
+    val accountId: Long?,
 )

@@ -118,6 +118,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
             onShowMoreActions = { accountId, postView ->
                 showMorePostOptions(
                     instance = parentFragment.viewModel.instance,
+                    accountId = null,
                     postView = postView,
                     moreActionsHelper = parentFragment.moreActionsHelper,
                     fragmentManager = childFragmentManager,
