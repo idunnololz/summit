@@ -22,7 +22,7 @@
     <string name="font_size">फ़ॉन्ट आकार</string>
     <string name="black_theme">काली थीम</string>
     <string name="black_theme_desc">पृष्ठभूमि रंग के रूप में शुद्ध काले का उपयोग करता है</string>
-    <string name="post_and_comments_settings_desc">अनुकूलित करें कि पोस्ट और टिप्पणियाँ कैसी दिखें</string>
+    <string name="post_and_comments_settings_desc">पोस्ट और टिप्पणियाँ स्क्रीन को अनुकूलित करें</string>
     <string name="account_block_settings_desc">चुनें कि किस समुदाय/खाते को अवरुद्ध करना है</string>
     <string name="error_account_instance_mismatch">जिस इंस्टेंस पर खाता बनाया गया था (%1$s) और जिस इंस्टेंस पर कार्रवाई की गई है (%2$s) के बीच एक बेमेल है।
 \nआप इसे %2$s इंस्टेंस पर किसी खाते में साइन इन करके या %1$s इंस्टेंस से इस पेज को लोड करके ठीक कर सकते हैं।</string>
@@ -172,8 +172,8 @@
     <string name="account_settings">खाता सेटिंग्स</string>
     <string name="tap_comment_to_collapse">टिप्पणी को संक्षिप्त करने के लिए टैप करें</string>
     <string name="indentation_per_level">प्रति स्तर खरोज</string>
-    <string name="post_list">पोस्ट सूची</string>
-    <string name="setting_post_list_desc">समुदाय पोस्ट सूची को अनुकूलित करें</string>
+    <string name="post_list">पोस्ट फीड</string>
+    <string name="setting_post_list_desc">सामुदायिक पोस्ट फीड को अनुकूलित करें</string>
     <string name="about_summit">Summit के बारे में</string>
     <string name="version_code">संस्करण कोड %1$s</string>
     <string name="give_feedback">प्रतिक्रिया दें</string>
@@ -911,4 +911,11 @@
     <string name="show_edited_time">संपादित समय दिखाएं</string>
     <string name="home_fab_quick_action_desc">जब पोस्ट सूची स्क्रीन पर फ्लोटिंग एक्शन बटन (स्क्रीन के नीचे वाला बटन) लंबे समय तक दबाया जाए तो निष्पादित करने के लिए एक क्रिया चुनें।</string>
     <string name="moderated_communities_info">संचालित समुदायों की जानकारी</string>
+    <string name="vote_colors">वोट के रंग</string>
+    <string name="post_and_comments">पोस्ट और टिप्पणियाँ</string>
+    <string name="post_and_comments_appearance_settings_desc">पोस्ट और टिप्पणियाँ स्क्रीन का स्वरूप अनुकूलित करें</string>
+    <string name="image_preview_hide_ui_by_default">छवि दर्शक में तयशुदा रूप से यूआई छिपाएँ</string>
+    <string name="all_subscribed">सभी सदस्यता प्राप्त</string>
+    <string name="all_subscribed_feed_actions">सभी सदस्यता प्राप्त फीड क्रियाएं</string>
+    <string name="all_subscribed_feed_info">सभी सदस्यता प्राप्त फीड जानकारी</string>
 </resources>
