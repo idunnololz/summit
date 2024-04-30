@@ -1064,7 +1064,11 @@ class PostFragment :
             }
 
             PostGestureAction.MarkAsRead -> {
-                moreActionsHelper.onPostRead(postView, delayMs = 250)
+                moreActionsHelper.onPostRead(
+                    postView = postView,
+                    delayMs = 250,
+                    accountId = accountId,
+                )
             }
         }
     }
