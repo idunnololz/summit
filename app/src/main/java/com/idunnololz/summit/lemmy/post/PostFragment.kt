@@ -39,6 +39,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -579,6 +580,14 @@ class PostFragment :
             it.loadProfileImageOrDefault(binding.accountImageView)
         }
         binding.accountImageView.setOnClickListener {
+            if (accountId != null) {
+                AlertDialogFragment.Builder()
+                    .setTitle(R.string.account_switching_disabled)
+                    .setMessage(R.string.account_switching_disabled_desc)
+                    .createAndShow(childFragmentManager, "asfg")
+                return@setOnClickListener
+            }
+
             AccountsAndSettingsDialogFragment.newInstance(dontSwitchAccount = true)
                 .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
         }
