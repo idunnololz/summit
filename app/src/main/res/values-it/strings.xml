@@ -925,4 +925,6 @@
     <string name="all_subscribed">Tutte le iscrizioni</string>
     <string name="all_subscribed_feed_actions">Azioni feed tutte le iscrizioni</string>
     <string name="all_subscribed_feed_info">Informazioni feed tutte le iscrizioni</string>
+    <string name="account_switching_disabled">Cambio account disabilitato</string>
+    <string name="account_switching_disabled_desc">Non è possibile cambiare account durante la visualizzazione di un post specifico per account.</string>
 </resources>
