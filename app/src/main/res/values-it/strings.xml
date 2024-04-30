@@ -158,7 +158,7 @@
     <string name="theme_config">Configurazione del tema</string>
     <string name="error_dynamic_color_not_supported">Material You non è supportato dal tuo dispositivo.</string>
     <string name="post_and_comments_appearance">Aspetto post e commenti</string>
-    <string name="post_and_comments_settings_desc">Personalizza l\'aspetto di post e commenti</string>
+    <string name="post_and_comments_settings_desc">Personalizza aspetto schermata post e commenti</string>
     <string name="comment_settings">Impostazioni commenti</string>
     <string name="post_settings">Impostazioni post</string>
     <string name="reset_post_styles">Reset stile post</string>
@@ -215,8 +215,8 @@
     <string name="blank">Vuoto</string>
     <string name="about_summit">Informazioni su Summit</string>
     <string name="give_feedback">Invia feedback</string>
-    <string name="post_list">Elenco post</string>
-    <string name="setting_post_list_desc">Personalizza l\'elenco post</string>
+    <string name="post_list">Feed post</string>
+    <string name="setting_post_list_desc">Personalizza feed post della comunità</string>
     <string name="comment_actions">Azioni commenti</string>
     <string name="account_block_settings">Impostazioni account bloccati</string>
     <string name="account_block_settings_desc">Scegli quali comunità/account bloccare</string>
@@ -828,7 +828,7 @@
     <string name="guest_or_signed_out">Ospite (accesso non effettuato)</string>
     <string name="current_instance">Istanza attuale</string>
     <string name="suggestions">Suggerimenti</string>
-    <string name="user_profile">Profilo utente</string>
+    <string name="user_profile">Profilo</string>
     <string name="guest_or_signed_out_desc">Esplora istanze diverse senza bisogno di un account.</string>
     <string name="show_all_drafts">Mostra tutte le bozze</string>
     <string name="post_draft">Bozza post</string>
@@ -905,4 +905,24 @@
     <string name="no_bio">Nessuna bio</string>
     <string name="keep_typing_to_see_suggestions">Continua a digitare per vedere i suggerimenti</string>
     <string name="preview_image">Anteprima immagine</string>
+    <string name="feed_info">Informazioni feed</string>
+    <string name="home_fab_quick_action">azione rapida FAB</string>
+    <string name="no_action">Nessuna azione</string>
+    <string name="multi_community_actions">Azioni multi-comunità</string>
+    <string name="moderated_communities_info">Informazioni comunità moderate</string>
+    <string name="subscribed_communities_info">Informazioni comunità cui si è iscritti</string>
+    <string name="posts_hidden_format">%1$s post nascosti.</string>
+    <string name="resolving_link">Risoluzione link…</string>
+    <string name="show_edited_time">Visualizza data modifica</string>
+    <string name="show_edited_time_desc">Visualizza la data di modifica nell\'intestazione di post/commenti.</string>
+    <string name="error_image_too_large_to_preview">L\'immagine è troppo grande per visualizzare l\'anteprima. Scaricare l\'immagine e aprire l\'anteprima in un\'altra app.</string>
+    <string name="home_fab_quick_action_desc">Seleziona un\'azione da eseguire alla pressione prolungata sul pulsante azione nella schermata elenco post (pulsante flottante nella parte inferiore dello schermo).</string>
+    <string name="warn_image_downscaled">L\'immagine originale è troppo grande per visualizzare l\'anteprima. Verrà visualizzata una versione scalata.</string>
+    <string name="vote_colors">Colori voto</string>
+    <string name="post_and_comments">Post e commenti</string>
+    <string name="post_and_comments_appearance_settings_desc">Personalizza l\'aspetto delle schermate post e commenti</string>
+    <string name="image_preview_hide_ui_by_default">Nascondi UI di default nel visualizzatore immagini</string>
+    <string name="all_subscribed">Tutte le iscrizioni</string>
+    <string name="all_subscribed_feed_actions">Azioni feed tutte le iscrizioni</string>
+    <string name="all_subscribed_feed_info">Informazioni feed tutte le iscrizioni</string>
 </resources>
