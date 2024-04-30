@@ -1721,6 +1721,8 @@
     <string name="all_subscribed">All subscribed</string>
     <string name="all_subscribed_feed_actions">All subscribed feed actions</string>
     <string name="all_subscribed_feed_info">All subscribed feed info</string>
+    <string name="account_switching_disabled">Account switching disabled</string>
+    <string name="account_switching_disabled_desc">Account switching cannot be performed when viewing an account specific post.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
