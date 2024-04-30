@@ -211,7 +211,7 @@ class MoreActionsHelper @Inject constructor(
         )
     }
 
-    fun savePost(id: PostId, save: Boolean, accountId: Long? = null,) {
+    fun savePost(id: PostId, save: Boolean, accountId: Long? = null) {
         savePostResult.setIsLoading()
         coroutineScope.launch {
             val apiClient = lemmyApiClientFactory.create()
@@ -257,7 +257,7 @@ class MoreActionsHelper @Inject constructor(
         hiddenPostsManager.hidePost(id, apiClient.instance)
     }
 
-    fun onPostRead(postView: PostView, delayMs: Long) {
+    fun onPostRead(postView: PostView, delayMs: Long, accountId: Long? = null) {
         if (postView.read) {
             return
         }
@@ -266,7 +266,12 @@ class MoreActionsHelper @Inject constructor(
             if (delayMs > 0) {
                 delay(delayMs)
             }
-            accountActionsManager.markPostAsRead(apiClient.instance, postView.post.id, read = true)
+            accountActionsManager.markPostAsRead(
+                instance = apiClient.instance,
+                id = postView.post.id,
+                read = true,
+                accountId = accountId,
+            )
         }
     }
 

@@ -325,7 +325,7 @@ class InboxViewModel @Inject constructor(
         val inboxStaleTimeMs = System.currentTimeMillis() - lastInboxUnreadLoadTimeMs.value
         if (isUserOnInboxScreen.value && inboxStaleTimeMs < 10_000) {
             clearInboxNotificationsJob = viewModelScope.launch {
-                delay(2000)
+                delay(1_000)
 
                 Log.d(TAG, "User has been on inbox screen for long enough. Clearing inbox notifications.")
                 clearInboxNotifications()

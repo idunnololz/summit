@@ -16,6 +16,7 @@ import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
+import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
@@ -363,13 +364,13 @@ class PostsRepository @Inject constructor(
         allPosts.retainAll { !hiddenPosts.contains(it.post.postView.post.id) }
     }
 
-    private fun transformPostWithLocalData(postView: FetchedPost): FetchedPost {
-        val accountInstance = apiInstance
-        val localRead = postReadManager.isPostRead(accountInstance, postView.postView.post.id)
-        if (localRead && !postView.postView.read) {
-            return postView.copy(postView = postView.postView.copy(read = true))
+    private fun transformPostWithLocalData(fetchedPost: FetchedPost): FetchedPost {
+        val accountInstance = fetchedPost.source.instance ?: apiInstance
+        val localRead = postReadManager.isPostRead(accountInstance, fetchedPost.postView.post.id)
+        if (localRead && !fetchedPost.postView.read) {
+            return fetchedPost.copy(postView = fetchedPost.postView.copy(read = true))
         }
-        return postView
+        return fetchedPost
     }
 
     /**
@@ -427,8 +428,9 @@ class PostsRepository @Inject constructor(
             val post = fetchedPost.postView
             val uniquePostKey = post.getUniqueKey()
             var filterReason: FilterReason? = null
+            val instance = fetchedPost.source.instance ?: apiInstance
 
-            if (hideRead && (post.read || postReadManager.isPostRead(apiInstance, post.post.id))) {
+            if (hideRead && (post.read || postReadManager.isPostRead(instance, post.post.id))) {
                 hideReadCount++
                 continue
             }
