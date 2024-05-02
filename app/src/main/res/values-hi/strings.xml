@@ -513,7 +513,7 @@
     <string name="url_optional">URL (वैकल्पिक)</string>
     <string name="required">आवश्यक</string>
     <string name="no_options">कोई विकल्प नहीं</string>
-    <string name="delete_post">पोस्ट हटाएं</string>
+    <string name="delete_post">पोस्ट मिटाएं</string>
     <string name="community_info">समुदाय की जानकारी</string>
     <string name="more_actions">अधिक कार्रवाई</string>
     <string name="proceed_anyways">फिर भी आगे बढ़ें</string>
