@@ -438,7 +438,7 @@
     <string name="time_frame_last_hour">Ultima ora</string>
     <string name="time_frame_last_hours_format">Ultime %1$s ore</string>
     <string name="time_frame_last_months_format">Ultimi %1$s mesi</string>
-    <string name="inbox">Posta in arrivo</string>
+    <string name="inbox">Inbox</string>
     <string name="replies">Risposte</string>
     <string name="mentions">Menzioni</string>
     <string name="messages">Messaggi</string>
