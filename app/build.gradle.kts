@@ -154,6 +154,8 @@ dependencies {
     implementation(libs.process.phoenix)
     implementation(libs.media3.transformer)
 
+    implementation(libs.exifinterface)
+
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
 

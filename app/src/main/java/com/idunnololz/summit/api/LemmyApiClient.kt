@@ -988,10 +988,10 @@ class LemmyApiClient(
         )
     }
 
-    suspend fun deletePost(account: Account, id: PostId): Result<PostView> {
+    suspend fun deletePost(account: Account, id: PostId, delete: Boolean): Result<PostView> {
         val form = DeletePost(
             post_id = id,
-            deleted = true,
+            deleted = delete,
             auth = account.jwt,
         )
 

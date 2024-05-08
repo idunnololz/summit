@@ -86,7 +86,7 @@ class ModernThreadLinesDecoration(
             }
             val previousTag = previousChild?.tag
             val drawDividerAbove =
-                if (previousChild != null && previousTag !is ThreadLinesData) {
+                if (previousChild == null || previousTag !is ThreadLinesData) {
                     // Do not overdraw above if the element above is not a comment!
                     false
                 } else {

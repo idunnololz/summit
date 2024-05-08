@@ -278,4 +278,12 @@ safeargs.
             android:name="personRef"
             app:argType="com.idunnololz.summit.lemmy.PersonRef" />
     </dialog>
+    <dialog
+        android:id="@+id/imageInfoDialogFragment"
+        android:name="com.idunnololz.summit.image.ImageInfoDialogFragment"
+        android:label="ImageInfoDialogFragment">
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </dialog>
 </navigation>

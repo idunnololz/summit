@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.utils.actions
 
 import android.content.Intent
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
@@ -14,6 +15,9 @@ import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.getParcelableCompat
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 fun BaseFragment<*>.installOnActionResultHandler(
@@ -77,6 +81,37 @@ fun BaseFragment<*>.installOnActionResultHandler(
 
                 onSavePostChanged?.invoke(it.data)
                 onPostUpdated?.invoke(it.data.postId, it.data.accountId)
+            }
+        }
+    }
+    moreActionsHelper.deletePostResult.observe(viewLifecycleOwner) {
+        when (it) {
+            is StatefulData.Error -> {
+                Snackbar.make(
+                    snackbarContainer,
+                    R.string.error_unable_to_delete_post,
+                    Snackbar.LENGTH_LONG,
+                ).show()
+            }
+            is StatefulData.Loading -> {}
+            is StatefulData.NotStarted -> {}
+            is StatefulData.Success -> {
+                onPostUpdated?.invoke(it.data.postId, it.data.accountId)
+
+                Snackbar
+                    .make(
+                        snackbarContainer,
+                        if (it.data.delete) {
+                            R.string.post_deleted
+                        } else {
+                            R.string.post_restored
+                        },
+                        Snackbar.LENGTH_LONG,
+                    )
+                    .setAction(R.string.undo) { _ ->
+                        moreActionsHelper.deletePost(it.data.postId, !it.data.delete)
+                    }
+                    .show()
             }
         }
     }
@@ -303,6 +338,22 @@ fun BaseFragment<*>.installOnActionResultHandler(
                         }
                     }
             }
+        }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+        moreActionsHelper.nsfwModeEnabledFlow.drop(1).collect {
+            Snackbar
+                .make(
+                    snackbarContainer,
+                    if (it) {
+                        R.string.nsfw_mode_enabled
+                    } else {
+                        R.string.nsfw_mode_disabled
+                    },
+                    Snackbar.LENGTH_LONG,
+                )
+                .show()
         }
     }
 }

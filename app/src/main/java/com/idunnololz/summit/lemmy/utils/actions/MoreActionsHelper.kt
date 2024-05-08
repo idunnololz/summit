@@ -26,6 +26,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
@@ -53,6 +54,7 @@ class MoreActionsHelper @Inject constructor(
     private val videoDownloadManager: VideoDownloadManager,
     private val fileDownloadHelper: FileDownloadHelper,
     private val offlineManager: OfflineManager,
+    private val nsfwModeManager: NsfwModeManager,
     coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
@@ -71,12 +73,15 @@ class MoreActionsHelper @Inject constructor(
     val blockInstanceResult = StatefulLiveData<BlockInstanceResult>()
     val saveCommentResult = StatefulLiveData<SaveCommentResult>()
     val savePostResult = StatefulLiveData<SavePostResult>()
-    val deletePostResult = StatefulLiveData<PostView>()
+    val deletePostResult = StatefulLiveData<DeletePostResult>()
     val subscribeResult = StatefulLiveData<SubscribeResult>()
 
     val downloadVideoResult = StatefulLiveData<FileDownloadHelper.DownloadResult>()
     val downloadAndShareFile = StatefulLiveData<Uri>()
     val downloadResult = StatefulLiveData<Result<FileDownloadHelper.DownloadResult>>()
+
+    val nsfwModeEnabledFlow
+        get() = nsfwModeManager.nsfwModeEnabled
 
     private var currentPageInstance: String? = null
 
@@ -145,12 +150,12 @@ class MoreActionsHelper @Inject constructor(
         }
     }
 
-    fun deletePost(postId: PostId) {
+    fun deletePost(postId: PostId, delete: Boolean, accountId: Long? = null) {
         deletePostResult.setIsLoading()
         coroutineScope.launch {
-            ensureRightInstance { apiClient.deletePost(postId) }
+            ensureRightInstance { apiClient.deletePost(postId, delete) }
                 .onSuccess {
-                    deletePostResult.postValueAndClear(it)
+                    deletePostResult.postValueAndClear(DeletePostResult(postId, delete, accountId))
                 }
                 .onFailure {
                     deletePostResult.postErrorAndClear(it)
@@ -493,5 +498,11 @@ data class SaveCommentResult(
 data class SavePostResult(
     val postId: PostId,
     val save: Boolean,
+    val accountId: Long?,
+)
+
+data class DeletePostResult(
+    val postId: PostId,
+    val delete: Boolean,
     val accountId: Long?,
 )

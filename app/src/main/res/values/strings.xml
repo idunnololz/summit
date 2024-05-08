@@ -1723,6 +1723,23 @@
     <string name="all_subscribed_feed_info">All subscribed feed info</string>
     <string name="account_switching_disabled">Account switching disabled</string>
     <string name="account_switching_disabled_desc">Account switching cannot be performed when viewing an account specific post.</string>
+    <string name="image_info">Image info</string>
+    <string name="file_created">File created</string>
+    <string name="url">Url</string>
+    <string name="copy_value">Copy value</string>
+    <string name="file_size">File size</string>
+    <string name="file_type">File type</string>
+    <string name="unknown">Unknown</string>
+    <string name="image_size">Image size</string>
+    <string name="restore_post">Restore post</string>
+    <string name="error_unable_to_delete_post">Unable to delete/restore post</string>
+    <string name="post_deleted">Post deleted</string>
+    <string name="post_restored">Post restored</string>
+    <string name="enable_nsfw_mode">Enable NSFW mode</string>
+    <string name="disable_nsfw_mode">Disable NSFW mode</string>
+    <string name="toggle_nsfw">Toggle NSFW mode</string>
+    <string name="nsfw_mode_enabled">NSFW mode enabled</string>
+    <string name="nsfw_mode_disabled">NSFW mode disabled</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

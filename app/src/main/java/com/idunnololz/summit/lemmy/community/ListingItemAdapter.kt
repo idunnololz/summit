@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -37,6 +38,7 @@ import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
@@ -80,6 +82,7 @@ class ListingItemAdapter(
     var markPostsAsReadOnScroll: Boolean = false
     var alwaysRenderAsUnread: Boolean = false
     var blurNsfwPosts: Boolean = true
+    var nsfwMode: Boolean = false
 
     var items: List<Item> = listOf()
         private set
@@ -188,8 +191,10 @@ class ListingItemAdapter(
                     super.onBindViewHolder(holder, position, payloads)
                 } else {
                     val h: ListingItemViewHolder = holder as ListingItemViewHolder
-                    val isRevealed = revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
-                        !blurNsfwPosts
+                    val isRevealed =
+                        revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
+                            !blurNsfwPosts ||
+                            nsfwMode
                     val isActionsExpanded = item.isActionExpanded
                     val isExpanded = item.isExpanded
 
@@ -288,7 +293,8 @@ class ListingItemAdapter(
             is Item.VisiblePostItem -> {
                 val h: ListingItemViewHolder = holder as ListingItemViewHolder
                 val isRevealed = revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
-                    !blurNsfwPosts
+                    !blurNsfwPosts ||
+                    nsfwMode
                 val isActionsExpanded = item.isActionExpanded
                 val isExpanded = item.isExpanded
 
@@ -575,6 +581,18 @@ class ListingItemAdapter(
     fun updateWithPreferences(preferences: Preferences) {
         markPostsAsReadOnScroll = preferences.markPostsAsReadOnScroll
         blurNsfwPosts = preferences.blurNsfwPosts
+    }
+
+    fun updateNsfwMode(nsfwModeManager: NsfwModeManager) {
+        val newValue = nsfwModeManager.nsfwModeEnabled.value
+        if (nsfwMode == newValue) {
+            return
+        }
+
+        nsfwMode = newValue
+
+        @Suppress("NotifyDataSetChanged")
+        notifyDataSetChanged()
     }
 
     fun clearHighlight() {
