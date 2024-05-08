@@ -215,4 +215,9 @@
     <item name="community_info" type="id" />
     <item name="sort" type="id" />
     <item name="set_as_default" type="id" />
+    <item name="delete_undo" type="id" />
+    <item name="nsfw_mode" type="id" />
+    <item name="enable_nsfw_mode" type="id" />
+    <item name="disable_nsfw_mode" type="id" />
+    <item name="toggle_nsfw_mode" type="id" />
 </resources>

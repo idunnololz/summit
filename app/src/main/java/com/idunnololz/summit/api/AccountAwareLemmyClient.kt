@@ -427,12 +427,13 @@ class AccountAwareLemmyClient @Inject constructor(
 
     suspend fun deletePost(
         id: PostId,
+        delete: Boolean,
         account: Account? = accountForInstance(),
     ): Result<PostView> {
         return if (account == null) {
             createAccountErrorResult()
         } else {
-            apiClient.deletePost(account, id)
+            apiClient.deletePost(account, id, delete)
                 .autoSignOut(account)
         }
     }

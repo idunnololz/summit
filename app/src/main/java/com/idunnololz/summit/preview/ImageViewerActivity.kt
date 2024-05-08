@@ -31,6 +31,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
+import com.idunnololz.summit.image.ImageInfoDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
@@ -352,6 +353,9 @@ class ImageViewerActivity :
                 supportFragmentManager,
                 args.mimeType,
             )(R.id.download)
+        }
+        binding.infoButton.setOnClickListener {
+            ImageInfoDialogFragment.show(supportFragmentManager, args.url)
         }
         binding.moreButton.setOnClickListener {
             showAdvancedLinkOptions(

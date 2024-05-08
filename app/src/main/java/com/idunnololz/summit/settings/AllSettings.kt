@@ -784,6 +784,12 @@ class PostsFeedSettings @Inject constructor(
                 null,
                 null,
             ),
+            RadioGroupSettingItem.RadioGroupOption(
+                HomeFabQuickActionIds.ToggleNsfwMode,
+                context.getString(R.string.toggle_nsfw),
+                null,
+                null,
+            ),
         ),
         relatedKeys = listOf(KEY_HOME_FAB_QUICK_ACTION),
     )

@@ -70,6 +70,7 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/isLightTheme</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="summitTextButton">@style/MyApp.Widget.MaterialComponents.Button.TextButton.Icon</item>
+
     </style>
 
     <style name="OverlayThemeRegular">
@@ -171,6 +172,13 @@
 
         <!-- Necessary or else background will be messed up? -->
         <item name="android:windowElevation">@dimen/abc_floating_window_z</item>
+
+        <item name="popupMenuStyle">@style/Theme.App.Widget.Material3.PopupMenu.Overflow</item>
+        <item name="android:popupMenuStyle">@style/Theme.App.Widget.Material3.PopupMenu.Overflow</item>
+    </style>
+
+    <style name="Theme.App.Widget.Material3.PopupMenu.Overflow" parent="Widget.Material3.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/popup_background</item>
     </style>
 
     <style name="DialogAnimationStyle">

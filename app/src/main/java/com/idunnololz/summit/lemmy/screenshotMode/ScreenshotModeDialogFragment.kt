@@ -313,19 +313,23 @@ class ScreenshotModeDialogFragment :
         adapter.screenshotMaxWidth = screenshotWidth
         adapter.isScreenshoting = true
 
+        var hasPost = false
         var hasNonPosts = false
         for (position in 0 until adapter.itemCount) {
             val isSelectedForScreenshot = adapter.isSelectedForScreenshot(position)
             if (!isSelectedForScreenshot) {
                 continue
             }
-            if (!adapter.isPost(position)) {
+            val isPost = adapter.isPost(position)
+            if (isPost) {
+                hasPost = true
+            } else {
                 hasNonPosts = true
             }
         }
 
         val screenshotConfig = viewModel.screenshotConfig.value?.copy(
-            showPostDivider = hasNonPosts,
+            showPostDivider = hasPost && hasNonPosts,
         )
 
         adapter.screenshotConfig = screenshotConfig

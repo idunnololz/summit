@@ -8,6 +8,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.fragment.navArgs
 import coil.load
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
@@ -82,7 +83,13 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
         }
 
         with(binding) {
-            preview.load(args.fileUri)
+            preview.load(args.fileUri) {
+                listener { request, result ->
+                    BottomSheetBehavior.from(bottomSheet).apply {
+                        state = BottomSheetBehavior.STATE_EXPANDED
+                    }
+                }
+            }
 
             createPost.setOnClickListener {
                 val account = accountManager.currentAccount.asAccount

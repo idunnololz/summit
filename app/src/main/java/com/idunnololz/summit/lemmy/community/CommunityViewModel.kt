@@ -38,6 +38,7 @@ import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
@@ -79,6 +80,7 @@ class CommunityViewModel @Inject constructor(
     private val apiClientFactory: AccountAwareLemmyClient.Factory,
     private val guestAccountManager: GuestAccountManager,
     private val perCommunityPreferences: PerCommunityPreferences,
+    private val nsfwModeManager: NsfwModeManager,
     val basePreferences: Preferences,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
@@ -155,11 +157,11 @@ class CommunityViewModel @Inject constructor(
     private var fetchPageJob: Job? = null
 
     init {
-
         isHideReadEnabled.value?.let {
             postsRepository.hideRead = it
         }
         postsRepository.showNsfwPosts = preferences.showNsfwPosts
+        postsRepository.nsfwMode = nsfwModeManager.nsfwModeEnabled.value
 
         currentCommunityRef.value?.let {
             viewModelScope.launch {
@@ -183,6 +185,7 @@ class CommunityViewModel @Inject constructor(
 
                     withContext(Dispatchers.Main) {
                         recheckPreferences()
+                        recheckNsfwMode()
                     }
                 }
             },
@@ -802,6 +805,10 @@ class CommunityViewModel @Inject constructor(
         updatePreferencesState()
     }
 
+    fun recheckNsfwMode() {
+        updateNsfwMode()
+    }
+
     private fun updatePreferencesState() {
         if (postsRepository.showLinkPosts == preferences.showLinkPosts &&
             postsRepository.showImagePosts == preferences.showImagePosts &&
@@ -814,7 +821,7 @@ class CommunityViewModel @Inject constructor(
         }
 
         updateStateMaintainingPosition(
-            {
+            changeState = {
                 this.showLinkPosts = preferences.showLinkPosts
                 this.showImagePosts = preferences.showImagePosts
                 this.showVideoPosts = preferences.showVideoPosts
@@ -822,7 +829,21 @@ class CommunityViewModel @Inject constructor(
                 this.showNsfwPosts = preferences.showNsfwPosts
                 this.showFilteredPosts = preferences.showFilteredPosts
             },
-            null,
+            anchors = null,
+        )
+    }
+
+    private fun updateNsfwMode() {
+        val newNsfwMode = nsfwModeManager.nsfwModeEnabled.value
+        if (postsRepository.nsfwMode == newNsfwMode) {
+            return
+        }
+
+        updateStateMaintainingPosition(
+            changeState = {
+                this.nsfwMode = newNsfwMode
+            },
+            anchors = null,
         )
     }
 

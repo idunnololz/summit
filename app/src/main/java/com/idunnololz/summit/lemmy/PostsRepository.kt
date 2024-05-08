@@ -73,6 +73,7 @@ class PostsRepository @Inject constructor(
     var showVideoPosts = true
     var showTextPosts = true
     var showNsfwPosts = true
+    var nsfwMode = false
 
     var showFilteredPosts = false
 
@@ -394,7 +395,8 @@ class PostsRepository @Inject constructor(
                 if (newPosts.isNotEmpty()) {
                     if (newPosts.first().postView.community.nsfw &&
                         communityRef is CommunityRef.CommunityRefByName &&
-                        !showNsfwPosts
+                        !showNsfwPosts &&
+                        !nsfwMode
                     ) {
                         return@fold Result.failure(LoadNsfwCommunityWhenNsfwDisabled())
                     }
@@ -434,7 +436,7 @@ class PostsRepository @Inject constructor(
                 hideReadCount++
                 continue
             }
-            if (!showNsfwPosts && post.post.nsfw) {
+            if (!showNsfwPosts && post.post.nsfw && !nsfwMode) {
                 if (showFilteredPosts) {
                     filterReason = FilterReason.Nsfw
                 } else {

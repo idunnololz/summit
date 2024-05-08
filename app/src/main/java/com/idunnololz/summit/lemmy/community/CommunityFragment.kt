@@ -72,6 +72,7 @@ import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
+import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction
@@ -137,6 +138,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var perCommunityPreferences: PerCommunityPreferences
+
+    @Inject
+    lateinit var nsfwModeManager: NsfwModeManager
 
     lateinit var preferences: Preferences
 
@@ -380,6 +384,7 @@ class CommunityFragment :
                 stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
                 updateWithPreferences(preferences)
+                updateNsfwMode(nsfwModeManager)
             }
             onSelectedLayoutChanged()
         }
@@ -582,6 +587,12 @@ class CommunityFragment :
                 HomeFabQuickActionIds.HideRead -> {
                     createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
                         R.id.hide_read,
+                    )
+                    true
+                }
+                HomeFabQuickActionIds.ToggleNsfwMode -> {
+                    createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+                        R.id.toggle_nsfw_mode,
                     )
                     true
                 }
@@ -1054,10 +1065,12 @@ class CommunityFragment :
             }
 
             adapter?.updateWithPreferences(preferences)
+            adapter?.updateNsfwMode(nsfwModeManager)
 
             onSelectedLayoutChanged()
 
             viewModel.recheckPreferences()
+            viewModel.recheckNsfwMode()
         }
 
         runAfterLayout {
@@ -1335,6 +1348,21 @@ class CommunityFragment :
                 )
             }
 
+            addDivider()
+            if (nsfwModeManager.nsfwModeEnabled.value) {
+                addItemWithIcon(
+                    id = R.id.disable_nsfw_mode,
+                    title = getString(R.string.disable_nsfw_mode),
+                    icon = R.drawable.ic_no_nsfw_24,
+                )
+            } else {
+                addItemWithIcon(
+                    id = R.id.enable_nsfw_mode,
+                    title = getString(R.string.enable_nsfw_mode),
+                    icon = R.drawable.ic_nsfw_24,
+                )
+            }
+
             if (currentCommunityRef != null) {
                 addDivider()
                 addItemWithIcon(
@@ -1580,6 +1608,22 @@ class CommunityFragment :
                         actionId == R.id.subscribe,
                     )
                 }
+            }
+            R.id.enable_nsfw_mode,
+            R.id.disable_nsfw_mode,
+            R.id.toggle_nsfw_mode -> {
+                val newValue = if (actionId == R.id.enable_nsfw_mode) {
+                    true
+                } else if (actionId == R.id.disable_nsfw_mode) {
+                    false
+                } else {
+                    !nsfwModeManager.nsfwModeEnabled.value
+                }
+
+                nsfwModeManager.nsfwModeEnabled.value = newValue
+
+                adapter?.updateNsfwMode(nsfwModeManager)
+                viewModel.recheckNsfwMode()
             }
         }
     }

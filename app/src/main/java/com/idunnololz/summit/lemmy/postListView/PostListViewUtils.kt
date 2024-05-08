@@ -74,7 +74,12 @@ fun BaseFragment<*>.showMorePostOptions(
 
         if (postView.post.creator_id == moreActionsHelper.accountManager.currentAccount.asAccount?.id) {
             addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
-            addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
+
+            if (postView.post.deleted) {
+                addItemWithIcon(R.id.delete_undo, R.string.restore_post, R.drawable.baseline_delete_24)
+            } else {
+                addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
+            }
         }
 
         val fullAccount = moreActionsHelper.accountInfoManager.currentFullAccount.value
@@ -252,7 +257,10 @@ fun BaseFragment<*>.createPostActionHandler(
                 .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
         }
         R.id.delete -> {
-            moreActionsHelper.deletePost(postView.post.id)
+            moreActionsHelper.deletePost(postView.post.id, delete = true)
+        }
+        R.id.delete_undo -> {
+            moreActionsHelper.deletePost(postView.post.id, delete = false)
         }
         R.id.hide_post -> {
             moreActionsHelper.hidePost(postView.post.id)
