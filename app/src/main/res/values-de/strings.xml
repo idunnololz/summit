@@ -32,7 +32,7 @@
     <string name="enable">Aktivieren</string>
     <string name="search">Suche</string>
     <string name="sign_out">Abmelden</string>
-    <string name="theme">Design</string>
+    <string name="theme">Modus</string>
     <string name="locked_post_message">Dieser Beitrag wurde von den Moderatoren von %1$s gesperrt. Neue Kommentare können nicht gepostet werden.</string>
     <string name="sort_order_hot">Angesagt</string>
     <string name="sort_order_new">Neu</string>
@@ -139,4 +139,17 @@
     <string name="delete_comment">Kommentar löschen</string>
     <string name="error_account_instance_mismatch">Es gibt eine Abweichung zwischen der Instanz, auf der das Konto erstellt wurde (%1$s) und der Instanz, auf der die Aktion ausgeführt wird (%2$s).
 \nSie können dies beheben, indem Sie sich entweder bei einem Konto auf der Instanz %2$s anmelden oder diese Seite von der Instanz %1$s laden.</string>
+    <string name="reset_view_styles">Ansichtsstile zurücksetzen</string>
+    <string name="prefer_image_at_the_end">Bild am Ende bevorzugen</string>
+    <string name="dark_theme_settings">Einstellungen für den dunklen Modus</string>
+    <string name="lemmy_web_preferences_desc">Lemmy Web-Einstellungen konfigurieren</string>
+    <string name="display_name">Anzeigename</string>
+    <string name="default_sort_type">Standard-Sortierart</string>
+    <string name="show_nsfw">NSFW zeigen</string>
+    <string name="black_theme">Schwarzer Modus</string>
+    <string name="lemmy_web_preferences">Lemmy Web-Einstellungen</string>
+    <string name="settings_saved">Einstellungen gespeichert</string>
+    <string name="error_no_settings_changed">Keine Einstellungen geändert</string>
+    <string name="black_theme_desc">Verwendet reines Schwarz als Hintergrundfarbe</string>
+    <string name="error_no_settings_changed_desc">Da Sie keine Änderungen an den Einstellungen vorgenommen haben, wurde nichts gespeichert.</string>
 </resources>
