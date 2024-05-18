@@ -24,8 +24,8 @@
     <string name="black_theme_desc">पृष्ठभूमि रंग के रूप में शुद्ध काले का उपयोग करता है</string>
     <string name="post_and_comments_settings_desc">पोस्ट और टिप्पणियां स्क्रीन को अनुकूलित करें</string>
     <string name="account_block_settings_desc">चुनें कि किस समुदाय/खाते को अवरुद्ध करना है</string>
-    <string name="error_account_instance_mismatch">जिस इंस्टेंस पर खाता बनाया गया था (%1$s) और जिस इंस्टेंस पर कार्रवाई की गई है (%2$s) के बीच एक बेमेल है।
-\nआप इसे %2$s इंस्टेंस पर किसी खाते में साइन इन करके या %1$s इंस्टेंस से इस पेज को लोड करके ठीक कर सकते हैं।</string>
+    <string name="error_account_instance_mismatch">जिस इंस्टैंस पर खाता बनाया गया था (%1$s) और जिस इंस्टैंस पर कार्रवाई की गई है (%2$s) के बीच एक बेमेल है।
+\nआप इसे %2$s इंस्टैंस पर किसी खाते में साइन इन करके या %1$s इंस्टैंस से इस पेज को लोड करके ठीक कर सकते हैं।</string>
     <string name="preview">पूर्वावलोकन</string>
     <string name="base_view_type">आधार दृश्य प्रकार</string>
     <string name="lemmy_web_preferences">Lemmy वेब प्राथमिकताएं</string>
@@ -45,7 +45,7 @@
     <string name="error_no_settings_changed_desc">आपने किसी भी सेटिंग में बदलाव नहीं किया इसलिए कुछ भी सहेजा नहीं गया।</string>
     <string name="less_dark_background_theme_desc">पृष्ठभूमि रंग के रूप में उज्जवल रंग का उपयोग करता है</string>
     <string name="post_and_comments_appearance">पोस्ट और टिप्पणियां की दिखावट</string>
-    <string name="comment_instance_filters_desc">इंस्टेंस नाम के आधार पर टिप्पणियां फिल्टर करें</string>
+    <string name="comment_instance_filters_desc">इंस्टैंस नाम के आधार पर टिप्पणियां फिल्टर करें</string>
     <string name="tap_comment_to_collapse_desc">तयशुदा रूप से, टिप्पणी शीर्षलेख पर टैप करने से टिप्पणी संक्षिप्त हो जाएगी। किसी टिप्पणी के मुख्य भाग पर टैप करने से \"हमेशा कार्रवाइयां दिखाएं\" अक्षम होने पर गतिविधियां विस्तृत/संक्षिप्त हो जाएंगी। इस सेटिंग को सक्षम करने से टिप्पणी के किसी भी हिस्से पर टैप करने से टिप्पणी संक्षिप्त हो जाएगी। कार्रवाइयों को लंबे प्रेस के माध्यम से टॉगल किया जा सकता है।</string>
     <string name="color_scheme">रंग योजना</string>
     <string name="hide_comment_scores">टिप्पणी स्कोर छिपाएं</string>
@@ -109,9 +109,9 @@
     <string name="saved">सहेजा गया</string>
     <string name="error_downloading_image_permission_denied">छवि डाउनलोड करने में असमर्थ। स्टोरेज की अनुमति अस्वीकृत।</string>
     <string name="help">सहायता</string>
-    <string name="go_to_account_instance">खाता इंस्टेंस पर जाएं</string>
-    <string name="instance">इंस्टेंस</string>
-    <string name="error_account_instance_mismatch_title">असंगत खाता इंस्टेंस</string>
+    <string name="go_to_account_instance">खाता इंस्टैंस पर जाएं</string>
+    <string name="instance">इंस्टैंस</string>
+    <string name="error_account_instance_mismatch_title">असंगत खाता इंस्टैंस</string>
     <string name="error_server_timeout">सर्वर की प्रतीक्षा में समय समाप्त। सर्वर ओवरलोड होने की संभावना है।</string>
     <string name="add_account">खाता जोड़ें</string>
     <string name="add_another_account">अन्य खाता जोड़ें</string>
@@ -186,8 +186,8 @@
     <string name="blocked_communities">अवरुद्ध समुदाय</string>
     <string name="filters">फिल्टर</string>
     <string name="keyword_filters">खोजशब्द फिल्टर</string>
-    <string name="instance_filters">इंस्टेंस फिल्टर</string>
-    <string name="instance_filters_desc">इंस्टेंस नाम के आधार पर पोस्ट फिल्टर करें</string>
+    <string name="instance_filters">इंस्टैंस फिल्टर</string>
+    <string name="instance_filters_desc">इंस्टैंस नाम के आधार पर पोस्ट फिल्टर करें</string>
     <string name="community_filters">सामुदायिक फिल्टर</string>
     <string name="user_filters">उपयोक्ता फिल्टर</string>
     <string name="user_filters_desc">OP के नाम के आधार पर पोस्ट फिल्टर करें</string>
@@ -259,7 +259,7 @@
     <string name="sort_order_active">सक्रिय</string>
     <string name="compact">सघन</string>
     <string name="users">उपयोक्ता</string>
-    <string name="display_instance_names_desc">चुनें कि इंस्टेंस नाम कैसे प्रदर्शित किए जाएं</string>
+    <string name="display_instance_names_desc">चुनें कि इंस्टैंस नाम कैसे प्रदर्शित किए जाएं</string>
     <string name="default_posts_sort_order">तयशुदा पोस्ट क्रमबद्ध क्रम</string>
     <string name="collapse_or_expand">संक्षिप्त या विस्तृत</string>
     <string name="always_show_link_below_post_desc">यदि सक्षम किया गया है, तो पोस्ट के नीचे एक लिंक बटन हमेशा दिखाया जाता है।</string>
@@ -284,7 +284,7 @@
     </plurals>
     <string name="view_image_on_single_tap_desc">यदि सक्षम किया गया है, तो थंबनेल पर टैप करने से छवि दर्शक में छवि खुल जाएगी। यदि अक्षम किया गया है, तो छवि को लंबे समय तक दबाने से छवि दर्शक में खुलेगी।</string>
     <string name="open_links_in_external_browser_desc">लिंक ऐप के बजाय ब्राउज़र में खुलेंगे।</string>
-    <string name="unblock_this_instance_format">इस इंस्टेंस को अनवरुद्ध करें (%1$s)</string>
+    <string name="unblock_this_instance_format">इस इंस्टैंस को अनवरुद्ध करें (%1$s)</string>
     <string name="preview_links_desc">किसी लिंक पर टैप करने से लिंक के खुलने से पहले ही पूर्वावलोकन खुल जाता है।</string>
     <string name="use_firebase">Google Firebase पर क्रैश लॉग करें</string>
     <string name="view_hidden_posts">छुपी हुई पोस्ट देखें</string>
@@ -298,12 +298,12 @@
     <string name="there_doesnt_seem_to_be_anything_here">यहां कुछ भी नहीं लगता</string>
     <string name="caused_by_format">%1$s के कारण</string>
     <string name="please_enter_2fa_code">कृपया 2FA कोड दर्ज करें</string>
-    <string name="error_unable_to_block_instance">इंस्टेंस को अवरुद्ध करने में विफल।</string>
+    <string name="error_unable_to_block_instance">इंस्टैंस को अवरुद्ध करने में विफल।</string>
     <plurals name="children_count_format">
         <item quantity="one">(%1$d उप)</item>
         <item quantity="other">(%1$d उप)</item>
     </plurals>
-    <string name="only_for_different_instances">केवल विभिन्न इंस्टेंस के लिए</string>
+    <string name="only_for_different_instances">केवल विभिन्न इंस्टैंस के लिए</string>
     <string name="manage_internal_settings_backups">आंतरिक सेटिंग्स बैकअप प्रबंधित करें</string>
     <string name="go_to_post">पोस्ट पर जाएं</string>
     <string name="spoiler_text">स्पॉइलर पाठ</string>
@@ -333,7 +333,7 @@
     <string name="edit">संपादित करें</string>
     <string name="error_no_moderated_communities">उपयोक्ता किसी भी समुदाय का मॉडरेटर नहीं है।</string>
     <string name="screenshot_width">स्क्रीनशॉट की चौड़ाई</string>
-    <string name="switching_instance">इंस्टेंस बदल रहे हैं…</string>
+    <string name="switching_instance">इंस्टैंस बदल रहे हैं…</string>
     <string name="create_multi_community">बहु-समुदाय बनाएं</string>
     <string name="error_no_communities_selected_desc">बहु-समुदाय बनाने के लिए कृपया कम से कम एक समुदाय का चयन करें।</string>
     <string name="delete_all">सभी हटाएं</string>
@@ -348,7 +348,7 @@
     <string name="default_comments_sort_order">तयशुदा टिप्पणी क्रमबद्ध क्रम</string>
     <string name="save_drafts_automatically_desc">सक्षम होने पर, यदि आप भेजें दबाए बिना पोस्ट/टिप्पणी बनाएं/संपादित करें स्क्रीन से दूर जाते हैं तो पोस्ट/टिप्पणियों के मसौदे स्वचालित रूप से सहेजे जाते हैं।</string>
     <string name="show_filtered_posts_desc">सक्षम होने पर, फिल्टरिंग नियमों द्वारा फिल्टर किए गए पोस्ट एक संक्षिप्त वस्तु के रूप में दिखाई देंगे।</string>
-    <string name="error_content_type_filter_too_aggressive">आपके सामग्री प्रकार फिल्टर इस समुदाय/इंस्टेंस के लिए बहुत आक्रामक हैं। कृपया अपने सामग्री प्रकार फिल्टर में ढील दें या कोई भिन्न समुदाय/इंस्टेंस चुनें।</string>
+    <string name="error_content_type_filter_too_aggressive">आपके सामग्री प्रकार फिल्टर इस समुदाय/इंस्टैंस के लिए बहुत आक्रामक हैं। कृपया अपने सामग्री प्रकार फिल्टर में ढील दें या कोई भिन्न समुदाय/इंस्टैंस चुनें।</string>
     <string name="error_no_preview_image">कोई पूर्वावलोकन छवि उपलब्ध नहीं है</string>
     <string name="error_purge_user">उपयोक्ता को मिटाने में असमर्थ।</string>
     <string name="save_to_internal_backups">आंतरिक बैकअप में सहेजें</string>
@@ -359,7 +359,7 @@
     <string name="mod_tools">मॉड औजार</string>
     <string name="mod_actions">मॉड कार्रवाइयां</string>
     <string name="navigation_options">नेविगेशन विकल्प</string>
-    <string name="block_this_instance_format">इस इंस्टेंस को अवरुद्ध करें (%1$s)</string>
+    <string name="block_this_instance_format">इस इंस्टैंस को अवरुद्ध करें (%1$s)</string>
     <string name="sort_order_scaled_short">गर्म (समुचित)</string>
     <string name="yes">हाँ</string>
     <string name="download_video">वीडियो डाउनलोड करें</string>
@@ -370,22 +370,22 @@
     <string name="warn_when_replying_to_old_post_or_comment_desc">सक्षम होने पर, किसी पुरानी पोस्ट या टिप्पणी में टिप्पणी जोड़ते समय एक चेतावनी दिखाई जाती है। यह किसी पोस्ट के आकस्मिक पुनरुद्धार से बचने में सहायक है।</string>
     <string name="per_account_settings_desc">आपके द्वारा यहां बदली गई सेटिंग्स प्रति-खाता पेज के बाहर सेट की गई सेटिंग्स को ओवरराइड कर देंगी। ये ओवरराइड केवल तभी प्रभावी होंगे जब संबद्ध खाता चालू खाता हो। आप \"सेटिंग्स प्रबंधित करें\" पृष्ठ में किसी भी ओवरराइड सेटिंग्स को रीसेट कर सकते हैं।</string>
     <string name="customize_post_quick_actions">पोस्ट की त्वरित कार्रवाइयों को अनुकूलित करें</string>
-    <string name="error_filter_too_aggressive">आपके फिल्टर इस समुदाय/इंस्टेंस के लिए बहुत आक्रामक हैं। एक अत्यधिक आक्रामक फिल्टर बहुत सारे पोस्ट को फिल्टर कर देता है जिसके परिणामस्वरूप बहुत कम या कोई परिणाम नहीं मिलता है। एक आक्रामक फिल्टर भी प्रदर्शन पर नकारात्मक प्रभाव डाल सकता है। कृपया अपने फिल्टर को कम आक्रामक बनाने के लिए संपादित करें या कोई भिन्न इंस्टेंस/समुदाय चुनें।</string>
+    <string name="error_filter_too_aggressive">आपके फिल्टर इस समुदाय/इंस्टैंस के लिए बहुत आक्रामक हैं। एक अत्यधिक आक्रामक फिल्टर बहुत सारे पोस्ट को फिल्टर कर देता है जिसके परिणामस्वरूप बहुत कम या कोई परिणाम नहीं मिलता है। एक आक्रामक फिल्टर भी प्रदर्शन पर नकारात्मक प्रभाव डाल सकता है। कृपया अपने फिल्टर को कम आक्रामक बनाने के लिए संपादित करें या कोई भिन्न इंस्टैंस/समुदाय चुनें।</string>
     <string name="undo_remove_comment">टिप्पणी को से हटायें पूर्ववत करें</string>
     <string name="purge_community_body">मिटाने से यह वस्तु और इसके सभी उप-वस्तु डेटाबेस से हट जाएंगे। आप डेटा को पुनर्प्राप्त नहीं कर पाएंगे। अत्यधिक सावधानी के साथ प्रयोग करें।</string>
     <string name="app_restart_required_desc">सेटिंग्स सफलतापूर्वक आयात की गई हैं। कुछ सेटिंग्स लागू करने के लिए ऐप को पुनरारंभ करना आवश्यक है। अब पुनःचालू करें?</string>
     <string name="unlocked_post_format">समुदाय %2$s में पोस्ट %1$s को खोल दिया गया।</string>
-    <string name="removed_community_format">इंस्टेंस %2$s से समुदाय %1$s को हटा दिया गया।</string>
+    <string name="removed_community_format">इंस्टैंस %2$s से समुदाय %1$s को हटा दिया गया।</string>
     <string name="warn_community_removed">इस समुदाय को व्यवस्थापक द्वारा हटा दिया गया है। यह नियमित उपयोक्ताओं को दिखाई नहीं देगी।</string>
     <string name="save_for_later_desc">आप कोई टिप्पणी या पोस्ट बनाते समय सहेजी गई छवियों का उपयोग कर सकते हैं।</string>
     <string name="download_image">छवि डाउनलोड करें</string>
     <string name="show_inline_media_as_links_desc">सक्षम होने पर, पाठ के भीतर छवियां/GIF\'s/वीडियो पाठ लिंक के रूप में दिखाए जाएंगे।</string>
     <string name="no_icons">कोई आइकन नहीं मिला। कुछ समुदायों का चयन करें।</string>
-    <string name="error_new_api_format">यह सुविधा आपके Lemmy इंस्टेंस द्वारा समर्थित नहीं है। ऐसा संभवतः इसलिए है क्योंकि आपका इंस्टेंस संस्करण बहुत कम है। इस सुविधा के लिए इंस्टेंस का %1$s या उससे ऊपर होना आवश्यक है।</string>
+    <string name="error_new_api_format">यह सुविधा आपके Lemmy इंस्टैंस द्वारा समर्थित नहीं है। ऐसा संभवतः इसलिए है क्योंकि आपका इंस्टैंस संस्करण बहुत कम है। इस सुविधा के लिए इंस्टैंस का %1$s या उससे ऊपर होना आवश्यक है।</string>
     <string name="community_actions">सामुदायिक कार्रवाइयां</string>
-    <string name="unbanned_person_from_site_format">इंस्टेंस %2$s से %1$s पर प्रतिबंध पूर्ववत करें।</string>
+    <string name="unbanned_person_from_site_format">इंस्टैंस %2$s से %1$s पर प्रतिबंध पूर्ववत करें।</string>
     <string name="unremoved_post_format">समुदाय %2$s से पोस्ट %1$s को हटाना पूर्ववत करें।</string>
-    <string name="change_instance">इंस्टेंस बदलें</string>
+    <string name="change_instance">इंस्टैंस बदलें</string>
     <string name="undo_remove_community">समुदाय को हटाना पूर्ववत करें</string>
     <plurals name="new_items_in_inbox_format">
         <item quantity="one">%1$s आपके इनबॉक्स में नया वस्तु</item>
@@ -402,7 +402,7 @@
     <string name="about_summit_desc">Summit for Lemmy के बारे में जानकारी</string>
     <string name="summit_community_desc">Summit समुदाय से जुड़ें!</string>
     <string name="view_on_the_play_store">Google Play पर देखें</string>
-    <string name="blocked_instances">अवरुद्ध इंस्टेंस</string>
+    <string name="blocked_instances">अवरुद्ध इंस्टैंस</string>
     <string name="look_and_feel">रूप और शैली</string>
     <string name="error_multi_community_limit_reached">इस बहु-समुदाय के लिए बहुत सारे समुदाय चुने गए हैं। प्रति बहु-समुदाय समुदायों की अधिकतम संख्या %1$s है।</string>
     <string name="purge_comment">टिप्पणी मिटायें</string>
@@ -423,7 +423,7 @@
     <string name="no_limit">कोई सीमा नहीं</string>
     <string name="open_links_in_external_browser">बाहरी ब्राउज़र में लिंक खोलें</string>
     <string name="show_up_and_down_votes">ऊपर और नीचे वोट दिखाएं</string>
-    <string name="display_instance_names">इंस्टेंस नाम प्रदर्शित करें</string>
+    <string name="display_instance_names">इंस्टैंस नाम प्रदर्शित करें</string>
     <string name="post_gesture_size">पोस्ट इशारे का आकार</string>
     <string name="comment_gesture_size">टिप्पणी इशारे का आकार</string>
     <string name="never">कभी नहीं</string>
@@ -454,7 +454,7 @@
     <string name="search_settings">सेटिंग्स खोजें</string>
     <string name="user_actions">उपयोक्ता कार्रवाइयां</string>
     <string name="user_actions_desc">इस डिवाइस पर उपयोक्ता द्वारा की गई कार्रवाइयों की स्थिति देखें।</string>
-    <string name="post_hidden_format"><b>%2$s</b> इंस्टेंस से <b>%1$s</b> पोस्ट।</string>
+    <string name="post_hidden_format"><b>%2$s</b> इंस्टैंस से <b>%1$s</b> पोस्ट।</string>
     <string name="auto_load_more_posts">अधिक पोस्ट स्वतः लोड करें</string>
     <string name="auto_load_more_posts_desc">सक्षम होने पर, जब आप सूची के अंत तक पहुंचने के करीब होंगे तो अधिक पोस्ट स्वचालित रूप से लोड हो जाएंगी।</string>
     <string name="choose_an_account">एक खाता चुनें</string>
@@ -668,7 +668,7 @@
     <string name="feature_comment">फीचर टिप्पणी</string>
     <string name="remove_feature_comment">फीचर टिप्पणी हटाएं</string>
     <string name="error_cannot_share_multi_community">बहु-समुदायों को साझा नहीं किया जा सकता। बहु-समुदाय विशुद्ध रूप से क्लाइंट-पक्षीय होते हैं।</string>
-    <string name="error_community_not_found_on_instance">इस इंस्टेंस पर समुदाय \'%1$s\' नहीं मिला।</string>
+    <string name="error_community_not_found_on_instance">इस इंस्टैंस पर समुदाय \'%1$s\' नहीं मिला।</string>
     <string name="unban_user">उपयोक्ता से प्रतिबंध हटाएं</string>
     <string name="error_unable_to_block_community">समुदाय को अवरुद्ध करने में विफल</string>
     <string name="error_unable_to_block_person">व्यक्ति को अवरुद्ध करने में विफल</string>
@@ -743,7 +743,7 @@
     <string name="removed_moderator_for_community_format">समुदाय %2$s के लिए मॉडरेटर के रूप में %1$s को हटा दिया गया।</string>
     <string name="removed_moderator_for_site_format">%2$s उदाहरण के लिए %1$s को मॉडरेटर के रूप में हटा दिया गया।</string>
     <string name="banned_person_from_community_format">%1$s को %2$s समुदाय से प्रतिबंधित कर दिया गया।</string>
-    <string name="banned_person_from_site_format">%2$s इंस्टेंस से %1$s को प्रतिबंधित कर दिया गया।</string>
+    <string name="banned_person_from_site_format">%2$s इंस्टैंस से %1$s को प्रतिबंधित कर दिया गया।</string>
     <string name="restore_settings">आयात सेटिंग्स</string>
     <string name="error_generating_backup">सेटिंग्स निर्यात करने में त्रुटि।</string>
     <string name="key">कुंजी</string>
@@ -756,7 +756,7 @@
     <string name="choose_a_backup">बैकअप चुनें</string>
     <string name="view_raw">रॉ देखें</string>
     <string name="detailed_view">विस्तृत विवरण</string>
-    <string name="instance_info">इंस्टेंस जानकारी</string>
+    <string name="instance_info">इंस्टैंस जानकारी</string>
     <string name="view_mod_logs">मॉड लॉग देखें</string>
     <string name="mod_logs">मॉड लॉग</string>
     <string name="mod_action_format">%1$s कार्रवाई</string>
@@ -772,7 +772,7 @@
     <string name="locked_post_format">समुदाय %2$s में पोस्ट %1$s पर ताला लगा दिया गया।</string>
     <string name="removed_comment_format">पोस्ट %2$s से टिप्पणी %1$s हटा दी गई।</string>
     <string name="unremoved_comment_format">पोस्ट %2$s से टिप्पणी %1$s को हटाना पूर्ववत करें।</string>
-    <string name="unremoved_community_format">इंस्टेंस %2$s से समुदाय %1$s को हटाना पूर्ववत करें।</string>
+    <string name="unremoved_community_format">इंस्टैंस %2$s से समुदाय %1$s को हटाना पूर्ववत करें।</string>
     <string name="removed_post_format">समुदाय %2$s से पोस्ट %1$s को हटा दिया गया।</string>
     <string name="transferred_ownership_of_community_format">समुदाय का स्वामित्व %1$s को %2$s में स्थानांतरित कर दिया गया।</string>
     <string name="reason_format">कारण: %1$s</string>
@@ -780,7 +780,7 @@
     <string name="warn_upload_in_progress">एक अपलोड प्रगति पर है। क्या आप फिर भी आगे बढ़ना चाहते हैं?</string>
     <string name="cb_date">तारीख</string>
     <string name="cb_watermark">वॉटरमार्क</string>
-    <string name="undo_user_ban_from_instance">इंस्टेंस से उपयोक्ता प्रतिबंध पूर्ववत करें</string>
+    <string name="undo_user_ban_from_instance">इंस्टैंस से उपयोक्ता प्रतिबंध पूर्ववत करें</string>
     <string name="remove_community">समुदाय हटाएं</string>
     <string name="undo_hide_community">समुदाय को छुपना पूर्ववत करें</string>
     <string name="hide_community">समुदाय छिपाएं</string>
@@ -796,11 +796,11 @@
     <string name="use_a_saved_image">सहेजी गई छवि का उपयोग करें</string>
     <string name="choose_a_saved_image">सहेजी गई छवि चुनें</string>
     <string name="guest_or_signed_out">अतिथि (साइन आउट हुऐ)</string>
-    <string name="error_switch_instance_failed_format">इंस्टेंस बदलने विफल। कारण: %1$s।</string>
-    <string name="current_instance">वर्तमान इंस्टेंस</string>
+    <string name="error_switch_instance_failed_format">इंस्टैंस बदलने विफल। कारण: %1$s।</string>
+    <string name="current_instance">वर्तमान इंस्टैंस</string>
     <string name="suggestions">सुझाव</string>
     <string name="user_profile">उपयोक्ता प्रोफाइल</string>
-    <string name="guest_or_signed_out_desc">बिना किसी खाते के अलग-अलग इंस्टेंस ब्राउज़ करें।</string>
+    <string name="guest_or_signed_out_desc">बिना किसी खाते के अलग-अलग इंस्टैंस ब्राउज़ करें।</string>
     <string name="error_user_has_no_profile_image">उपयोक्ता के पास कोई प्रोफाइल छवि निर्धारित नहीं है। आप जो प्रोफाइल छवि देख रहे हैं वह Summit द्वारा डाला गया स्थानधारक है।</string>
     <string name="show_all_drafts">सभी मसौदे दिखाएं</string>
     <string name="post_draft">पोस्ट का मसौदा</string>
@@ -874,7 +874,7 @@
     <string name="warn_community_deleted">इस समुदाय को इसके निर्माता द्वारा हटा दिया गया है। यह नियमित उपयोगकर्ताओं को दिखाई नहीं देगा।</string>
     <string name="community_options">समुदाय विकल्प</string>
     <string name="error_unable_to_update_subscription">सदस्यता अपडेट करने में असमर्थ</string>
-    <string name="instance_options">इंस्टेंस विकल्प</string>
+    <string name="instance_options">इंस्टैंस विकल्प</string>
     <string name="bookmark_feed">फीड को बुकमार्क करें</string>
     <string name="unsubscribed">सदस्यता छोड़ी गई</string>
     <string name="multi_community_info">बहु-समुदाय जानकारी</string>
@@ -883,7 +883,7 @@
     <string name="message_from_format">प्रेषक: %1$s</string>
     <string name="prompt_delete_multicommunity_desc">किसी बहु-समुदाय से बुकमार्क हटाने से बहु-समुदाय हट जाएगा।</string>
     <string name="link_actions_format">लिंक कार्रवाइयां (%1$s)</string>
-    <string name="link_type_instance_link">इंस्टेंस लिंक</string>
+    <string name="link_type_instance_link">इंस्टैंस लिंक</string>
     <string name="link_type_image_link">छवि लिंक</string>
     <string name="link_type_video_link">वीडियो लिंक</string>
     <string name="link_type_comment_link">टिप्पणी लिंक</string>
@@ -894,7 +894,7 @@
     <string name="instance_blocked">इंस्टैंस अवरुद्ध किया गया</string>
     <string name="community_blocked">समुदाय अवरुद्ध</string>
     <string name="community_unblocked">समुदाय अनवरोधित</string>
-    <string name="instance_unblocked">इंस्टेंस अनवरोधित</string>
+    <string name="instance_unblocked">इंस्टैंस अनवरोधित</string>
     <string name="no_bio">कोई जीवनी नहीं</string>
     <string name="keep_typing_to_see_suggestions">सुझाव देखने के लिए टाइप करते रहें</string>
     <string name="preview_image">छवि का पूर्वावलोकन करें</string>
@@ -920,4 +920,21 @@
     <string name="all_subscribed_feed_info">सभी सदस्यता प्राप्त फीड जानकारी</string>
     <string name="account_switching_disabled">खाता बदलना अक्षम</string>
     <string name="account_switching_disabled_desc">खाता विशिष्ट पोस्ट देखते समय खाता नहीं बदला जा सकता।</string>
+    <string name="image_info">छवि जानकारी</string>
+    <string name="file_created">फाइल बनाई गई</string>
+    <string name="url">URL</string>
+    <string name="copy_value">मान कॉपी करें</string>
+    <string name="file_size">फाइल आकार</string>
+    <string name="file_type">फाइल प्रकार</string>
+    <string name="unknown">अज्ञात</string>
+    <string name="image_size">छवि आकार</string>
+    <string name="restore_post">पोस्ट पुनर्स्थापित करें</string>
+    <string name="error_unable_to_delete_post">पोस्ट को मिटाने/पुनर्स्थापित करने में असमर्थ</string>
+    <string name="post_deleted">पोस्ट मिटाई गई</string>
+    <string name="post_restored">पोस्ट बहाल</string>
+    <string name="enable_nsfw_mode">NSFW मोड सक्षम करें</string>
+    <string name="disable_nsfw_mode">NSFW मोड अक्षम करें</string>
+    <string name="toggle_nsfw">NSFW मोड टॉगल करें</string>
+    <string name="nsfw_mode_enabled">NSFW मोड सक्षम</string>
+    <string name="nsfw_mode_disabled">NSFW मोड अक्षम</string>
 </resources>

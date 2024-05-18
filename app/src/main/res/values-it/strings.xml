@@ -927,4 +927,21 @@
     <string name="all_subscribed_feed_info">Informazioni feed tutte le iscrizioni</string>
     <string name="account_switching_disabled">Cambio account disabilitato</string>
     <string name="account_switching_disabled_desc">Non è possibile cambiare account durante la visualizzazione di un post specifico per account.</string>
+    <string name="image_info">Informazioni immagine</string>
+    <string name="file_created">File creato</string>
+    <string name="url">URL</string>
+    <string name="copy_value">Copia valore</string>
+    <string name="file_size">Dimensione file</string>
+    <string name="unknown">Sconosciuto</string>
+    <string name="image_size">Dimensione immagine</string>
+    <string name="restore_post">Ripristina post</string>
+    <string name="post_deleted">Post eliminato</string>
+    <string name="post_restored">Post ripristinato</string>
+    <string name="enable_nsfw_mode">Abilita modalità NSFW</string>
+    <string name="disable_nsfw_mode">Disabilita modalità NSFW</string>
+    <string name="toggle_nsfw">Abilita/disabilita modalità NSFW</string>
+    <string name="nsfw_mode_enabled">Modalità NSFW abilitata</string>
+    <string name="file_type">Tipo file</string>
+    <string name="error_unable_to_delete_post">Non è stato possibile eliminare/ripristinare il post</string>
+    <string name="nsfw_mode_disabled">Modalità NSFW disabilitata</string>
 </resources>
