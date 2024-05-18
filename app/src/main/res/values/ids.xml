@@ -220,4 +220,6 @@
     <item name="enable_nsfw_mode" type="id" />
     <item name="disable_nsfw_mode" type="id" />
     <item name="toggle_nsfw_mode" type="id" />
+    <item name="generate_community_icon_job" type="id" />
+    <item name="show_community_icon" type="id" />
 </resources>

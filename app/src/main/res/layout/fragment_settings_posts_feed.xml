@@ -101,6 +101,12 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/prefetch_posts"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/home_fab_quick_action"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"

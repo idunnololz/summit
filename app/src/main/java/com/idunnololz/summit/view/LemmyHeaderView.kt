@@ -2,6 +2,7 @@ package com.idunnololz.summit.view
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
@@ -39,6 +40,8 @@ class LemmyHeaderView : FrameLayout {
 
             requestLayout()
         }
+
+    var iconSize = Utils.convertDpToPixel(36f).toInt()
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -134,8 +137,8 @@ class LemmyHeaderView : FrameLayout {
         iconImageView.setPadding(strokeWidthHalf, strokeWidthHalf, strokeWidthHalf, strokeWidthHalf)
 
         iconImageView.updateLayoutParams<LayoutParams> {
-            width = Utils.convertDpToPixel(36f).toInt()
-            height = Utils.convertDpToPixel(36f).toInt()
+            width = iconSize
+            height = iconSize
             marginEnd = Utils.convertDpToPixel(8f).toInt()
         }
         this.iconImageView = iconImageView
@@ -151,6 +154,11 @@ class LemmyHeaderView : FrameLayout {
             fun getViewHeight(view: View): Int {
                 val layoutParams = view.layoutParams as LayoutParams
                 return view.measuredHeight + layoutParams.topMargin + layoutParams.bottomMargin
+            }
+
+            fun getViewWidth(view: View): Int {
+                val layoutParams = view.layoutParams as LayoutParams
+                return view.measuredWidth + layoutParams.leftMargin + layoutParams.rightMargin
             }
 
             if (textView1.visibility != View.GONE) {
@@ -171,13 +179,18 @@ class LemmyHeaderView : FrameLayout {
             totalTextHeight += max(textView2Height, textView3Height)
 
             var viewHeight = totalTextHeight
+            var viewWidth = 0
             if (iconImageView != null) {
                 val iconImageViewHeight = getViewHeight(iconImageView)
                 viewHeight = max(viewHeight, iconImageViewHeight)
+
+                viewWidth += getViewWidth(iconImageView)
             }
 
+            viewWidth += max(getViewWidth(textView1), getViewWidth(textView2))
+
             setMeasuredDimension(
-                measuredWidth,
+                viewWidth,
                 viewHeight + paddingTop + paddingBottom,
             )
         }

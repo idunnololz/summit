@@ -79,6 +79,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_QUICK_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
@@ -943,6 +944,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT, value)
+                .apply()
+        }
+
+    var prefetchPosts: Boolean
+        get() = prefs.getBoolean(KEY_PREFETCH_POSTS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_PREFETCH_POSTS, value)
                 .apply()
         }
 

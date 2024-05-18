@@ -271,6 +271,13 @@ class SettingsPostsFeedFragment :
                 preferences.showFilteredPosts = it
             },
         )
+        settings.prefetchPosts.bindTo(
+            binding.prefetchPosts,
+            { preferences.prefetchPosts },
+            {
+                preferences.prefetchPosts = it
+            },
+        )
         settings.homeFabQuickAction.bindTo(
             binding.homeFabQuickAction,
             { preferences.homeFabQuickAction },

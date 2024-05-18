@@ -17,6 +17,7 @@ data class PostInListUiConfig(
     val preferFullSizeImages: Boolean = true,
     val preferTitleText: Boolean = false,
     val contentMaxLines: Int = -1,
+    val showCommunityIcon: Boolean = true,
 ) {
     fun updateTextSizeMultiplier(it: Float): PostInListUiConfig = this.copy(
         textSizeMultiplier = it,

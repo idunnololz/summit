@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.View.LAYOUT_DIRECTION_LTR
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.ImageView
@@ -30,6 +31,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
+import coil.load
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -64,8 +66,10 @@ import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostAndCommentsUiConfig
+import com.idunnololz.summit.lemmy.postListView.PostInListUiConfig
 import com.idunnololz.summit.lemmy.postListView.PostUiConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
@@ -120,6 +124,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     private var preferences = preferenceManager.currentPreferences
 
+    var postInListUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
     var uiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()
         set(value) {
             field = value
@@ -225,6 +230,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         commentsShowInlineMediaAsLinks = preferences.commentsShowInlineMediaAsLinks
         postQuickActions = preferences.postQuickActions
             ?: PostQuickActionsSettings()
+
+        postInListUiConfig = preferences.getPostInListUiConfig()
     }
 
     class PostViewHolder(
@@ -268,6 +275,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
     ) = with(binding) {
+        val showCommunityIcon = postInListUiConfig.showCommunityIcon
+        val useMultilineHeader = showCommunityIcon
+
         val viewHolder =
             root.getTag(R.id.view_holder) as? PostViewHolder
                 ?: run {
@@ -316,8 +326,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             displayInstanceStyle = displayInstanceStyle,
             listAuthor = true,
             showUpvotePercentage = showPostUpvotePercentage,
-            useMultilineHeader = false,
-            wrapHeader = useMultilinePostHeaders,
+            useMultilineHeader = useMultilineHeader,
+            wrapHeader = useMultilinePostHeaders && !useMultilineHeader,
             isCurrentUser = if (indicateCurrentUser) {
                 currentUser?.id == postView.creator.id &&
                     currentUser?.instance == postView.creator.instance
@@ -326,6 +336,29 @@ class PostAndCommentViewBuilder @Inject constructor(
             },
             showEditedDate = showEditedDate,
         )
+
+        if (showCommunityIcon) {
+            headerContainer.iconSize = Utils.convertDpToPixel(32f).toInt()
+            val iconImageView = headerContainer.getIconImageView()
+            avatarHelper.loadIcon(iconImageView, postView.community)
+            iconImageView.setOnClickListener {
+                onPageClick(postView.community.toCommunityRef())
+            }
+        }
+
+        if ((title.getTag(R.id.show_community_icon) as? Boolean) != showCommunityIcon) {
+            if (showCommunityIcon) {
+                title.updateLayoutParams<MarginLayoutParams> {
+                    topMargin = context.resources.getDimensionPixelSize(R.dimen.padding)
+                }
+            } else {
+                title.updateLayoutParams<MarginLayoutParams> {
+                    topMargin = context.resources.getDimensionPixelSize(R.dimen.padding_half)
+                }
+            }
+
+            title.setTag(R.id.show_community_icon, showCommunityIcon)
+        }
 
         LemmyTextHelper.bindText(
             title,

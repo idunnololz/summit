@@ -768,12 +768,16 @@ class CommunityFragment :
 
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 
-        fun fetchPageIfLoadItem(position: Int) {
-            (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
-                ?.pageToLoad
-                ?.let {
-                    viewModel.fetchPage(it)
-                }
+        fun fetchPageIfLoadItem(vararg positions: Int) {
+            val items = adapter?.items ?: return
+
+            for (p in positions) {
+                val pageToFetch = (items.getOrNull(p) as? Item.AutoLoadItem)
+                    ?.pageToLoad
+                    ?: continue
+
+                viewModel.fetchPage(pageToFetch)
+            }
         }
 
         binding.recyclerView.addOnScrollListener(
@@ -784,10 +788,13 @@ class CommunityFragment :
                     val firstPos = layoutManager.findFirstVisibleItemPosition()
                     val lastPos = layoutManager.findLastVisibleItemPosition()
                     if (newState == SCROLL_STATE_IDLE) {
-                        fetchPageIfLoadItem(firstPos)
-                        fetchPageIfLoadItem(firstPos - 1)
-                        fetchPageIfLoadItem(lastPos)
-                        fetchPageIfLoadItem(lastPos + 1)
+                        fetchPageIfLoadItem(
+                            firstPos,
+                            firstPos - 1,
+                            lastPos - 1,
+                            lastPos,
+                            lastPos + 1
+                        )
                     }
                 }
 
@@ -810,10 +817,13 @@ class CommunityFragment :
                         }
 
                     if (viewModel.infinity) {
-                        fetchPageIfLoadItem(firstPos)
-                        fetchPageIfLoadItem(firstPos - 1)
-                        fetchPageIfLoadItem(lastPos)
-                        fetchPageIfLoadItem(lastPos + 1)
+                        fetchPageIfLoadItem(
+                            firstPos,
+                            firstPos - 1,
+                            lastPos - 1,
+                            lastPos,
+                            lastPos + 1
+                        )
                     }
 
                     viewModel.postListEngine.updateViewingPosition(firstPos, lastPos)

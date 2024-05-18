@@ -120,81 +120,81 @@ abstract class MainDatabase : RoomDatabase() {
 }
 
 val MIGRATION_19_20 = object : Migration(19, 20) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS tabs;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS tabs;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `user_communities` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sortOrder` INTEGER NOT NULL, `communitySortOrder` TEXT NOT NULL, `ref` TEXT)",
         )
     }
 }
 
 val MIGRATION_21_22 = object : Migration(21, 22) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS lemmy_failed_actions;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS lemmy_failed_actions;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `lemmy_failed_actions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `cts` INTEGER NOT NULL, `fts` INTEGER NOT NULL, `error` TEXT NOT NULL, `info` TEXT)",
         )
     }
 }
 
 val MIGRATION_22_24 = object : Migration(22, 24) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS account_info;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS account_info;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, PRIMARY KEY(`account_id`))",
         )
     }
 }
 
 val MIGRATION_23_24 = object : Migration(23, 24) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS account_info;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS account_info;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, PRIMARY KEY(`account_id`))",
         )
     }
 }
 
 val MIGRATION_24_26 = object : Migration(24, 26) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS account_info;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS account_info;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, `misc_account_info` TEXT, PRIMARY KEY(`account_id`))",
         )
     }
 }
 
 val MIGRATION_25_26 = object : Migration(24, 26) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS account_info;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS account_info;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `account_info` (`account_id` INTEGER NOT NULL, `subscriptions` TEXT, `misc_account_info` TEXT, PRIMARY KEY(`account_id`))",
         )
     }
 }
 
 val MIGRATION_28_29 = object : Migration(28, 29) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS drafts;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS drafts;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `drafts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cts` INTEGER NOT NULL, `uts` INTEGER NOT NULL, `draft_type` INTEGER NOT NULL, `data` TEXT)",
         )
     }
 }
 
 val MIGRATION_30_31 = object : Migration(30, 31) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS lemmy_completed_actions;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS lemmy_completed_actions;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `lemmy_completed_actions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `cts` INTEGER NOT NULL, `info` TEXT)",
         )
     }
 }
 
 val MIGRATION_33_34 = object : Migration(33, 34) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS inbox_entries;")
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS inbox_entries;")
+        db.execSQL(
             "CREATE TABLE IF NOT EXISTS `inbox_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `item_id` INTEGER NOT NULL, `notification_id` INTEGER NOT NULL, `account_full_name` TEXT NOT NULL, `inbox_item` TEXT)",
         )
     }

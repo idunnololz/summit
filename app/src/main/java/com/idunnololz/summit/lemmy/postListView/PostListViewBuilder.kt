@@ -35,6 +35,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
@@ -66,6 +67,7 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.VideoWatermarkTransformation
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
@@ -87,6 +89,7 @@ class PostListViewBuilder @Inject constructor(
     private val themeManager: ThemeManager,
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val avatarHelper: AvatarHelper,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -226,6 +229,8 @@ class PostListViewBuilder @Inject constructor(
         val accountInstance: String?
         val url = postView.post.url
         val thumbnailUrl = postView.post.thumbnail_url
+        val showCommunityIcon = postUiConfig.showCommunityIcon
+        val useMultilineHeader = showCommunityIcon
 
         when (val source = fetchedPost.source) {
             is Source.AccountSource -> {
@@ -296,7 +301,7 @@ class PostListViewBuilder @Inject constructor(
                     is ListingItemCard3Binding -> {
                         ensureActionButtons(rb.constraintLayout, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            topToBottom = R.id.header_view
+                            topToBottom = R.id.header_container
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
                             bottomToTop = ConstraintLayout.LayoutParams.UNSET
                         }
@@ -444,7 +449,7 @@ class PostListViewBuilder @Inject constructor(
                                 this.topToTop = ConstraintLayout.LayoutParams.UNSET
                                 this.topToBottom = rb.bottomBarrier.id
                             }
-                            rb.headerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            rb.headerContainer.updateLayoutParams<ConstraintLayout.LayoutParams> {
                                 this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
                             }
                         }
@@ -550,8 +555,8 @@ class PostListViewBuilder @Inject constructor(
                     },
                     displayInstanceStyle = displayInstanceStyle,
                     showUpvotePercentage = showPostUpvotePercentage,
-                    useMultilineHeader = false,
-                    wrapHeader = useMultilinePostHeaders,
+                    useMultilineHeader = useMultilineHeader,
+                    wrapHeader = useMultilinePostHeaders && !useMultilineHeader,
                     isCurrentUser = if (indicateCurrentUser) {
                         currentUser?.id == postView.creator.id &&
                             currentUser?.instance == postView.creator.instance
@@ -560,6 +565,15 @@ class PostListViewBuilder @Inject constructor(
                     },
                     showEditedDate = showEditedDate,
                 )
+
+                if (showCommunityIcon) {
+                    headerContainer.iconSize = Utils.convertDpToPixel(32f).toInt()
+                    val iconImageView = headerContainer.getIconImageView()
+                    avatarHelper.loadIcon(iconImageView, postView.community)
+                    iconImageView.setOnClickListener {
+                        onPageClick(accountId, postView.community.toCommunityRef())
+                    }
+                }
 
                 fun showDefaultImage() {
                     imageView?.visibility = View.GONE

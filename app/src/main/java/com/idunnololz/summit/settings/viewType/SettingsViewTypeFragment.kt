@@ -182,6 +182,16 @@ class SettingsViewTypeFragment :
                 updateRendering()
             },
         )
+        settings.preferCommunityIcon.bindTo(
+            binding.preferCommunityIcon,
+            { viewModel.currentPostUiConfig.showCommunityIcon },
+            {
+                viewModel.currentPostUiConfig =
+                    viewModel.currentPostUiConfig.copy(showCommunityIcon = it)
+
+                updateRendering()
+            },
+        )
         settings.contentMaxLines.bindTo(
             requireMainActivity(),
             binding.contentMaxLines,
