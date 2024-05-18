@@ -152,4 +152,7 @@
     <string name="error_no_settings_changed">Keine Einstellungen geändert</string>
     <string name="black_theme_desc">Verwendet reines Schwarz als Hintergrundfarbe</string>
     <string name="error_no_settings_changed_desc">Da Sie keine Änderungen an den Einstellungen vorgenommen haben, wurde nichts gespeichert.</string>
+    <string name="dark_theme">Dunkler Modus</string>
+    <string name="material_you">Material You</string>
+    <string name="personalized_theming_based_on_your_wallpaper">Personalisierter Modus basierend auf Ihrem Hintergrundbild</string>
 </resources>
