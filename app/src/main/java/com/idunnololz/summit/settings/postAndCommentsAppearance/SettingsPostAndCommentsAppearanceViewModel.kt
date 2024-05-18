@@ -15,7 +15,8 @@ class SettingsPostAndCommentsAppearanceViewModel @Inject constructor(
     val preferences: Preferences,
 ) : ViewModel() {
 
-    var currentPostAndCommentUiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()
+    var currentPostAndCommentUiConfig: PostAndCommentsUiConfig =
+        preferences.getPostAndCommentsUiConfig()
         set(value) {
             field = value
 

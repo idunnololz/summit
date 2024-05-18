@@ -22,11 +22,11 @@ import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.databinding.FragmentModLogsBinding
 import com.idunnololz.summit.databinding.ModEventItemBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment

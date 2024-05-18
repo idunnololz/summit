@@ -39,7 +39,6 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
-import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -145,7 +144,10 @@ class PostFragment :
     private var layoutManager: LinearLayoutManager? = null
 
     private val scrollOffsetTop
-        get() = ((requireMainActivity().insets.value?.topInset ?: 0) + Utils.convertDpToPixel(56f)).toInt()
+        get() = (
+            (requireMainActivity().insets.value?.topInset ?: 0) +
+                Utils.convertDpToPixel(56f)
+            ).toInt()
 
     private val _sortByMenu: BottomMenu by lazy {
         BottomMenu(requireContext()).apply {
@@ -253,7 +255,8 @@ class PostFragment :
                             requireContext(),
                             parentFragmentManager,
                             Intent(Intent.ACTION_VIEW).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
                                 setDataAndType(uri, mimeType)
                             },
                         )
@@ -471,7 +474,7 @@ class PostFragment :
                 viewModel.fetchPostData(force = true)
                 (parentFragment as? CommunityFragment)?.updatePost(
                     postId = postId,
-                    accountId = accountId
+                    accountId = accountId,
                 )
             },
             onCommentUpdated = {
@@ -661,7 +664,8 @@ class PostFragment :
 
                 highlightMatch(match)
                 adapter?.currentMatch = match
-                binding.foundCount.text = "${match.matchIndex + 1} / ${viewModel.queryMatchHelper.matchCount}"
+                binding.foundCount.text = "${match.matchIndex + 1} / " +
+                    "${viewModel.queryMatchHelper.matchCount}"
             }
         }
         viewModel.screenshotMode.observe(viewLifecycleOwner) {
@@ -1175,7 +1179,7 @@ class PostFragment :
                     viewModel.deleteComment(
                         accountId = accountId,
                         postRef = PostRef(getInstance(), args.id),
-                        commentId = commentId.toInt()
+                        commentId = commentId.toInt(),
                     )
                 }
             }

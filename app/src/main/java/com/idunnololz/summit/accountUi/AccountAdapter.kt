@@ -45,7 +45,8 @@ class AccountAdapter(
     private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
         old::class == new::class && when (old) {
             is Item.CurrentAccountItem ->
-                old.accountView.account.id == (new as Item.CurrentAccountItem).accountView.account.id
+                old.accountView.account.id ==
+                    (new as Item.CurrentAccountItem).accountView.account.id
             is Item.AccountItem ->
                 old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
             is Item.AddAccountItem -> true

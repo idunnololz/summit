@@ -959,7 +959,7 @@ class AccountAwareLemmyClient @Inject constructor(
             val account = accountManager.getAccountById(accountId)
             setAccount(
                 account = account,
-                accountChanged = accountManager.currentAccount.asAccount?.id != accountId
+                accountChanged = accountManager.currentAccount.asAccount?.id != accountId,
             )
         }
     }

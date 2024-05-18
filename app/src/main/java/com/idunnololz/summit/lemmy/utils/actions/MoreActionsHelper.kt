@@ -186,7 +186,7 @@ class MoreActionsHelper @Inject constructor(
             instance = apiClient.instance,
             ref = ref,
             dir = finalDir,
-            accountId = accountId
+            accountId = accountId,
         )
     }
 
@@ -212,7 +212,7 @@ class MoreActionsHelper @Inject constructor(
             instance = apiClient.instance,
             ref = ref,
             dir = finalDir,
-            accountId = accountId
+            accountId = accountId,
         )
     }
 

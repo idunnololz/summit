@@ -8,8 +8,10 @@ import kotlinx.coroutines.delay
 
 suspend fun <T> retry(
     times: Int = 6,
-    initialDelay: Long = 500, // 0.5 second
-    maxDelay: Long = 16_000, // 16 second
+    // 0.5 second
+    initialDelay: Long = 500,
+    // 16 second
+    maxDelay: Long = 16_000,
     factor: Double = 2.0,
     retry: (Throwable) -> Boolean = {
         // Only retry server exceptions

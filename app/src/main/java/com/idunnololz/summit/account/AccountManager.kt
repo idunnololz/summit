@@ -130,12 +130,11 @@ class AccountManager @Inject constructor(
         return accountDao.getAccountById(id)
     }
 
-    suspend fun getAccountByIdOrDefault(accountId: Long?): Account? =
-        if (accountId == null) {
-            currentAccount.asAccount
-        } else {
-            getAccountById(accountId)
-        }
+    suspend fun getAccountByIdOrDefault(accountId: Long?): Account? = if (accountId == null) {
+        currentAccount.asAccount
+    } else {
+        getAccountById(accountId)
+    }
 
     fun getAccountByIdBlocking(id: Long): Account? {
         val cachedAccount = accountByIdCache[id]

@@ -15,10 +15,10 @@ import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.getParcelableCompat
+import java.io.IOException
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 fun BaseFragment<*>.installOnActionResultHandler(
     moreActionsHelper: MoreActionsHelper,

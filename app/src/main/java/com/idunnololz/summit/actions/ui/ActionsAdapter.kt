@@ -70,7 +70,12 @@ class ActionsAdapter(
                         append(" commented on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
-                        append(LinkUtils.postIdToLink(actionInfo.postRef.instance, actionInfo.postRef.id))
+                        append(
+                            LinkUtils.postIdToLink(
+                                instance = actionInfo.postRef.instance,
+                                postId = actionInfo.postRef.id,
+                            ),
+                        )
                         append(")")
                         append(".")
                     }
@@ -81,7 +86,12 @@ class ActionsAdapter(
                         append(" deleted comment on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
-                        append(LinkUtils.postIdToLink(actionInfo.postRef.instance, actionInfo.postRef.id))
+                        append(
+                            LinkUtils.postIdToLink(
+                                instance = actionInfo.postRef.instance,
+                                postId = actionInfo.postRef.id,
+                            ),
+                        )
                         append(")")
                         append(".")
                     }
@@ -92,7 +102,12 @@ class ActionsAdapter(
                         append(" edited comment on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
-                        append(LinkUtils.postIdToLink(actionInfo.postRef.instance, actionInfo.postRef.id))
+                        append(
+                            LinkUtils.postIdToLink(
+                                instance = actionInfo.postRef.instance,
+                                postId = actionInfo.postRef.id,
+                            ),
+                        )
                         append(")")
                         append(".")
                     }
@@ -103,7 +118,12 @@ class ActionsAdapter(
                         append(" marked a post as read (")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
-                        append(LinkUtils.postIdToLink(actionInfo.postRef.instance, actionInfo.postRef.id))
+                        append(
+                            LinkUtils.postIdToLink(
+                                instance = actionInfo.postRef.instance,
+                                postId = actionInfo.postRef.id,
+                            ),
+                        )
                         append(")")
                         append(").")
                     }
@@ -125,14 +145,24 @@ class ActionsAdapter(
                                 append("comment ")
                                 append("[${actionInfo.ref.commentId}@${actionInfo.instance}]")
                                 append("(")
-                                append(LinkUtils.getLinkForComment(actionInfo.instance, actionInfo.ref.commentId))
+                                append(
+                                    LinkUtils.getLinkForComment(
+                                        instance = actionInfo.instance,
+                                        commentId = actionInfo.ref.commentId,
+                                    ),
+                                )
                                 append(")")
                             }
                             is VotableRef.PostRef -> {
                                 append("post ")
                                 append("[${actionInfo.ref.postId}@${actionInfo.instance}]")
                                 append("(")
-                                append(LinkUtils.postIdToLink(actionInfo.instance, actionInfo.ref.postId))
+                                append(
+                                    LinkUtils.postIdToLink(
+                                        instance = actionInfo.instance,
+                                        postId = actionInfo.ref.postId,
+                                    ),
+                                )
                                 append(")")
                             }
                         }
@@ -182,9 +212,15 @@ class ActionsAdapter(
                             LemmyActionFailureReason.ServerError ->
                                 append("There was an error on the server side.")
                             is LemmyActionFailureReason.TooManyRequests ->
-                                append("This client was blocked by the server for issuing too many requests.")
+                                append(
+                                    "This client was blocked by the server for issuing too " +
+                                        "many requests.",
+                                )
                             is LemmyActionFailureReason.UnknownError ->
-                                append("Unknown error. Code '${details.reason.errorCode}'. Key '${details.reason.errorMessage}'.")
+                                append(
+                                    "Unknown error. Code '${details.reason.errorCode}'. " +
+                                        "Key '${details.reason.errorMessage}'.",
+                                )
                         }
                     }
                 }

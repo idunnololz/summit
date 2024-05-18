@@ -45,7 +45,6 @@ import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -56,6 +55,7 @@ import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFrag
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkFixer
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.ResolvingLinkDialog
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
@@ -587,7 +587,11 @@ class MainActivity :
         val pageRefResult = linkFixer.fixPageRefSync(page)
 
         if (pageRefResult.isSuccess) {
-            launchPageInternal(pageRefResult.getOrNull() ?: page, switchToNativeInstance, preferMainFragment)
+            launchPageInternal(
+                pageRefResult.getOrNull() ?: page,
+                switchToNativeInstance,
+                preferMainFragment,
+            )
             return
         }
 
@@ -905,13 +909,13 @@ class MainActivity :
             val sharedElements = mutableListOf<Pair<View, String>>()
             sharedElements += Pair.create(sharedElement, transitionName)
             if (appBar != null) {
-                sharedElements += Pair.create(appBar, SharedElementNames.AppBar)
+                sharedElements += Pair.create(appBar, SharedElementNames.APP_BAR)
             }
 
             if (navBarController.useBottomNavBar && !navBarController.useNavigationRail) {
                 sharedElements += Pair.create(
                     navBarController.navBar,
-                    SharedElementNames.NavBar,
+                    SharedElementNames.NAV_BAR,
                 )
             }
 

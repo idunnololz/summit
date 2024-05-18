@@ -76,7 +76,11 @@ fun BaseFragment<*>.showMorePostOptions(
             addItemWithIcon(R.id.edit_post, R.string.edit_post, R.drawable.baseline_edit_24)
 
             if (postView.post.deleted) {
-                addItemWithIcon(R.id.delete_undo, R.string.restore_post, R.drawable.baseline_delete_24)
+                addItemWithIcon(
+                    R.id.delete_undo,
+                    R.string.restore_post,
+                    R.drawable.baseline_delete_24,
+                )
             } else {
                 addItemWithIcon(R.id.delete, R.string.delete_post, R.drawable.baseline_delete_24)
             }

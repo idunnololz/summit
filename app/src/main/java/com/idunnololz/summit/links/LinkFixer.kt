@@ -14,17 +14,17 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.JsonClass
+import java.io.InterruptedIOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.jsoup.HttpStatusException
-import java.io.InterruptedIOException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class LinkFixer @Inject constructor(
@@ -245,16 +245,17 @@ class LinkFixer @Inject constructor(
 
     private suspend fun fetchVersionObject(instance: String): Result<VersionObject> =
         withContext(Dispatchers.Default) {
-
             try {
                 val json =
                     runInterruptible(Dispatchers.IO) {
-                        LinkUtils.downloadSite("https://${instance}/version", cache = true)
+                        LinkUtils.downloadSite("https://$instance/version", cache = true)
                     }
                 val versionObject = moshi.adapter(VersionObject::class.java).fromJson(json)
 
                 if (versionObject == null) {
-                    Result.failure(ClientApiException("API returns a different object than expected.", 0))
+                    Result.failure(
+                        ClientApiException("API returns a different object than expected.", 0),
+                    )
                 } else {
                     Result.success(versionObject)
                 }
@@ -271,7 +272,9 @@ class LinkFixer @Inject constructor(
                     Result.failure(ServerApiException(e.statusCode))
                 }
             } catch (e: JSONException) {
-                Result.failure(ClientApiException("API returns a different object than expected.", 0))
+                Result.failure(
+                    ClientApiException("API returns a different object than expected.", 0),
+                )
             } catch (e: Exception) {
                 Log.e(TAG, "error", e)
                 Result.failure(e)

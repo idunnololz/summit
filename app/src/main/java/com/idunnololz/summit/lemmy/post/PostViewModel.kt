@@ -12,7 +12,6 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
-import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingCommentView
@@ -605,21 +604,25 @@ class PostViewModel @Inject constructor(
                         for (completedPendingComment in completedPendingComments) {
                             val commentId = completedPendingComment.commentId
                             if (commentId != null) {
-                                val oldComment = oldComments.firstOrNull { it.comment.id == commentId }
+                                val oldComment = oldComments
+                                    .firstOrNull { it.comment.id == commentId }
                                     ?: continue
-                                val newComment = newComments.firstOrNull { it.comment.id == commentId }
+                                val newComment = newComments
+                                    .firstOrNull { it.comment.id == commentId }
                                     ?: continue
 
                                 if (oldComment.comment.updated == newComment.comment.updated) {
                                     Log.d(
                                         TAG,
-                                        "1 completed pending comment was not updated on the server.",
+                                        "1 completed pending comment was not " +
+                                            "updated on the server.",
                                     )
                                     allCommentsUpdates = false
                                 } else {
                                     Log.d(
                                         TAG,
-                                        "1 completed pending comment was updated on the server. New content: '${newComment.comment.content}'",
+                                        "1 completed pending comment was updated on the " +
+                                            "server. New content: '${newComment.comment.content}'",
                                     )
                                 }
                             }
@@ -667,7 +670,8 @@ class PostViewModel @Inject constructor(
                                     }
                                 }
                                 .firstOrNull {
-                                    it.comment.creator_id == accountManager.currentAccount.asAccount?.id
+                                    it.comment.creator_id ==
+                                        accountManager.currentAccount.asAccount?.id
                                 }
                                 ?.comment?.id
                         }

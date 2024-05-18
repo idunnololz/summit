@@ -2,7 +2,6 @@ package com.idunnololz.summit.image
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,13 +12,12 @@ import com.idunnololz.summit.util.FormatSizeUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
-
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ImageInfoViewModel @Inject constructor(
@@ -116,10 +114,11 @@ class ImageInfoViewModel @Inject constructor(
     }
 
     private fun guessContentType(inputStream: InputStream): String? {
-        val bufferedStream = if (inputStream is BufferedInputStream)
+        val bufferedStream = if (inputStream is BufferedInputStream) {
             inputStream
-        else
+        } else {
             BufferedInputStream(inputStream)
+        }
 
         return try {
             guessContentTypeFromStream(bufferedStream)
@@ -165,10 +164,20 @@ class ImageInfoViewModel @Inject constructor(
             return "application/x-java-serialized-object"
         }
         if (c1 == '<'.code) {
-            if ((c2 == '!'.code || c2 == 'h'.code && (c3 == 't'.code && c4 == 'm'.code && c5 == 'l'.code ||
-                    c3 == 'e'.code && c4 == 'a'.code && c5 == 'd'.code) || c2 == 'b'.code && c3 == 'o'.code && c4 == 'd'.code && c5 == 'y'.code ||
-                    ((c2 == 'H'.code && (c3 == 'T'.code && c4 == 'M'.code && c5 == 'L'.code ||
-                        c3 == 'E'.code && c4 == 'A'.code && c5 == 'D'.code) || c2 == 'B'.code && c3 == 'O'.code && c4 == 'D'.code && c5 == 'Y'.code)))
+            if ((
+                c2 == '!'.code || c2 == 'h'.code && (
+                    c3 == 't'.code && c4 == 'm'.code && c5 == 'l'.code ||
+                        c3 == 'e'.code && c4 == 'a'.code && c5 == 'd'.code
+                    ) || c2 == 'b'.code && c3 == 'o'.code && c4 == 'd'.code && c5 == 'y'.code ||
+                    (
+                        (
+                            c2 == 'H'.code && (
+                                c3 == 'T'.code && c4 == 'M'.code && c5 == 'L'.code ||
+                                    c3 == 'E'.code && c4 == 'A'.code && c5 == 'D'.code
+                                ) || c2 == 'B'.code && c3 == 'O'.code && c4 == 'D'.code && c5 == 'Y'.code
+                            )
+                        )
+                )
             ) {
                 return "text/html"
             }
@@ -187,14 +196,16 @@ class ImageInfoViewModel @Inject constructor(
         // big and little endian UTF-16 encodings, with byte order mark
         if (c1 == 0xfe && c2 == 0xff) {
             if ((c3 == 0) && (c4 == '<'.code) && (c5 == 0) && (c6 == '?'.code) && (
-                    c7 == 0) && (c8 == 'x'.code)
+                    c7 == 0
+                    ) && (c8 == 'x'.code)
             ) {
                 return "application/xml"
             }
         }
         if (c1 == 0xff && c2 == 0xfe) {
             if ((c3 == '<'.code) && (c4 == 0) && (c5 == '?'.code) && (c6 == 0) && (
-                    c7 == 'x'.code) && (c8 == 0)
+                    c7 == 'x'.code
+                    ) && (c8 == 0)
             ) {
                 return "application/xml"
             }
@@ -203,16 +214,20 @@ class ImageInfoViewModel @Inject constructor(
         // big and little endian UTF-32 encodings, with BOM
         if ((c1 == 0x00) && (c2 == 0x00) && (c3 == 0xfe) && (c4 == 0xff)) {
             if ((c5 == 0) && (c6 == 0) && (c7 == 0) && (c8 == '<'.code) && (
-                    c9 == 0) && (c10 == 0) && (c11 == 0) && (c12 == '?'.code) && (
-                    c13 == 0) && (c14 == 0) && (c15 == 0) && (c16 == 'x'.code)
+                    c9 == 0
+                    ) && (c10 == 0) && (c11 == 0) && (c12 == '?'.code) && (
+                    c13 == 0
+                    ) && (c14 == 0) && (c15 == 0) && (c16 == 'x'.code)
             ) {
                 return "application/xml"
             }
         }
         if ((c1 == 0xff) && (c2 == 0xfe) && (c3 == 0x00) && (c4 == 0x00)) {
             if ((c5 == '<'.code) && (c6 == 0) && (c7 == 0) && (c8 == 0) && (
-                    c9 == '?'.code) && (c10 == 0) && (c11 == 0) && (c12 == 0) && (
-                    c13 == 'x'.code) && (c14 == 0) && (c15 == 0) && (c16 == 0)
+                    c9 == '?'.code
+                    ) && (c10 == 0) && (c11 == 0) && (c12 == 0) && (
+                    c13 == 'x'.code
+                    ) && (c14 == 0) && (c15 == 0) && (c16 == 0)
             ) {
                 return "application/xml"
             }
@@ -224,13 +239,16 @@ class ImageInfoViewModel @Inject constructor(
             return "image/x-bitmap"
         }
         if ((c1 == '!'.code) && (c2 == ' '.code) && (c3 == 'X'.code) && (c4 == 'P'.code) && (
-                c5 == 'M'.code) && (c6 == '2'.code)
+                c5 == 'M'.code
+                ) && (c6 == '2'.code)
         ) {
             return "image/x-pixmap"
         }
         if ((c1 == 137) && (c2 == 80) && (c3 == 78) && (
-                c4 == 71) && (c5 == 13) && (c6 == 10) && (
-                c7 == 26) && (c8 == 10)
+                c4 == 71
+                ) && (c5 == 13) && (c6 == 10) && (
+                c7 == 26
+                ) && (c8 == 10)
         ) {
             return "image/png"
         }
@@ -245,15 +263,20 @@ class ImageInfoViewModel @Inject constructor(
              * http://www.pima.net/standards/it10/PIMA15740/Exif_2-1.PDF
              */
             if ((c4 == 0xE1) &&
-                ((c7 == 'E'.code) && (c8 == 'x'.code) && (c9 == 'i'.code) && (c10 == 'f'.code) && (
-                    c11 == 0))
+                (
+                    (c7 == 'E'.code) && (c8 == 'x'.code) && (c9 == 'i'.code) && (c10 == 'f'.code) && (
+                        c11 == 0
+                        )
+                    )
             ) {
                 return "image/jpeg"
             }
             return "image/jpeg"
         }
-        if ((((c1 == 0x49) && (c2 == 0x49) && (c3 == 0x2a) && (c4 == 0x00))
-                || ((c1 == 0x4d) && (c2 == 0x4d) && (c3 == 0x00) && (c4 == 0x2a)))
+        if ((
+            ((c1 == 0x49) && (c2 == 0x49) && (c3 == 0x2a) && (c4 == 0x00)) ||
+                ((c1 == 0x4d) && (c2 == 0x4d) && (c3 == 0x00) && (c4 == 0x2a))
+            )
         ) {
             return "image/tiff"
         }
@@ -265,9 +288,11 @@ class ImageInfoViewModel @Inject constructor(
         }
         return if ((c1 == 'R'.code) && (c2 == 'I'.code) && (c3 == 'F'.code) && (c4 == 'F'.code)) {
             /* I don't know if this is official but evidence
-                 * suggests that .wav files start with "RIFF" - brown
-                 */
+             * suggests that .wav files start with "RIFF" - brown
+             */
             "audio/x-wav"
-        } else null
+        } else {
+            null
+        }
     }
 }

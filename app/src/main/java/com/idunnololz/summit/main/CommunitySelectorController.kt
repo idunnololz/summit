@@ -20,7 +20,6 @@ import arrow.core.Either
 import coil.dispose
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount

@@ -1,6 +1,5 @@
 package com.idunnololz.summit.image
 
-import androidx.exifinterface.media.ExifInterface
 import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -21,10 +20,7 @@ object ExifInterfaceUtils {
         sFormatterSecondary.timeZone = TimeZone.getTimeZone("UTC")
     }
 
-    fun parseDateTime(
-        dateTimeString: String?, subSecs: String?,
-        offsetString: String?,
-    ): Long? {
+    fun parseDateTime(dateTimeString: String?, subSecs: String?, offsetString: String?): Long? {
         if (dateTimeString == null || !NON_ZERO_TIME_PATTERN.matcher(dateTimeString)
                 .matches()
         ) {
@@ -49,7 +45,8 @@ object ExifInterfaceUtils {
                 if (("+" == sign || "-" == sign) && ":" == offsetString.substring(
                         3,
                         4,
-                    ) && hour <= 14 /* max UTC hour value */) {
+                    ) && hour <= 14 /* max UTC hour value */
+                ) {
                     msecs += ((hour * 60 + min) * 60 * 1000 * if ("-" == sign) 1 else -1).toLong()
                 }
             }

@@ -111,12 +111,11 @@ class AccountActionsManager @Inject constructor(
                 unregisterVoteHandler(existingRegId as Long)
             }
 
-            fun getAccount() =
-                if (accountId == null) {
-                    accountManager.currentAccount.value as? Account
-                } else {
-                    accountManager.getAccountByIdBlocking(accountId)
-                }
+            fun getAccount() = if (accountId == null) {
+                accountManager.currentAccount.value as? Account
+            } else {
+                accountManager.getAccountByIdBlocking(accountId)
+            }
 
             upVoteView?.setOnClickListener {
                 val curVote = votesManager.getVote(ref) ?: 0
@@ -414,7 +413,12 @@ class AccountActionsManager @Inject constructor(
         pendingActionsManager.addActionCompleteListener(onActionChangedListener)
     }
 
-    suspend fun createComment(postRef: PostRef, parentId: CommentId?, content: String, accountId: Long? = null) {
+    suspend fun createComment(
+        postRef: PostRef,
+        parentId: CommentId?,
+        content: String,
+        accountId: Long? = null,
+    ) {
         val finalAccountId = accountId
             ?: accountOrDefault(null)?.id
             ?: return
@@ -426,7 +430,12 @@ class AccountActionsManager @Inject constructor(
         )
     }
 
-    suspend fun editComment(postRef: PostRef, commentId: CommentId, content: String, accountId: Long? = null) {
+    suspend fun editComment(
+        postRef: PostRef,
+        commentId: CommentId,
+        content: String,
+        accountId: Long? = null,
+    ) {
         val finalAccountId = accountId
             ?: accountOrDefault(null)?.id
             ?: return
@@ -455,7 +464,12 @@ class AccountActionsManager @Inject constructor(
         return voteOn(instance, ref, dir, account)
     }
 
-    suspend fun markPostAsRead(instance: String, id: PostId, read: Boolean, accountId: Long? = null) {
+    suspend fun markPostAsRead(
+        instance: String,
+        id: PostId,
+        read: Boolean,
+        accountId: Long? = null,
+    ) {
         val account = accountOrDefault(accountId) ?: return
         pendingActionsManager.markPostAsRead(
             PostRef(instance, id),
@@ -592,10 +606,9 @@ class AccountActionsManager @Inject constructor(
         }
     }
 
-    private suspend fun accountOrDefault(accountId: Long?) =
-        if (accountId == null) {
-            accountManager.currentAccount.asAccount
-        } else {
-            accountManager.getAccountById(accountId)
-        }
+    private suspend fun accountOrDefault(accountId: Long?) = if (accountId == null) {
+        accountManager.currentAccount.asAccount
+    } else {
+        accountManager.getAccountById(accountId)
+    }
 }

@@ -106,7 +106,6 @@ sealed interface CommunityRef : PageRef, Parcelable {
         val instance: String?,
     ) : CommunityRef
 
-
     @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("8")

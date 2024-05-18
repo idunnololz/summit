@@ -1,6 +1,5 @@
 package com.idunnololz.summit.links
 
-import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
@@ -17,10 +16,8 @@ class ResolvingLinkDialog {
                         LayoutInflater.from(context),
                     )
                     setView(binding.root)
-
                 }
                 .show()
         }
     }
-
 }

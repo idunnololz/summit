@@ -168,7 +168,6 @@ class MainActivityViewModel @Inject constructor(
                     Either.Left(Result.failure(RuntimeException()))
                 is CommunityRef.ModeratedCommunities ->
                     Either.Left(Result.failure(RuntimeException()))
-
             }
 
             result

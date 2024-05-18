@@ -23,11 +23,7 @@ object FormatSizeUtils {
         return result
     }
 
-    private fun format(
-        value: Long,
-        divider: Long,
-        unit: String,
-    ): String {
+    private fun format(value: Long, divider: Long, unit: String): String {
         val result = if (divider > 1) value.toDouble() / divider.toDouble() else value.toDouble()
         return DecimalFormat("#,##0.#").format(result) + " " + unit
     }

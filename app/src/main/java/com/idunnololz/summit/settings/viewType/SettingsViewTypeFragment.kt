@@ -23,9 +23,9 @@ import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
+import com.idunnololz.summit.settings.PostsFeedAppearanceSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.PostsFeedAppearanceSettings
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins

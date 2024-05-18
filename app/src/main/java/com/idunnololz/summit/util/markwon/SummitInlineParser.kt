@@ -613,7 +613,10 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
             var openerFound = false
             var potentialOpenerFound = false
             var opener = closer.previous
-            while (opener != null && opener !== stackBottom && opener !== openersBottom[delimiterChar]) {
+            while (opener != null &&
+                opener !== stackBottom &&
+                opener !== openersBottom[delimiterChar]
+            ) {
                 if (opener.canOpen && opener.delimiterChar == openingDelimiterChar) {
                     potentialOpenerFound = true
                     useDelims = delimiterProcessor.getDelimiterUse(opener, closer)

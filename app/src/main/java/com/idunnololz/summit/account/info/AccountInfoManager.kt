@@ -146,6 +146,7 @@ class AccountInfoManager @Inject constructor(
     }
 
     suspend fun updateAccountInfoWith(account: Account, response: GetSiteResponse) {
+        val localUserView = response.my_user?.local_user_view
         val accountInfo = AccountInfo(
             accountId = account.id,
             subscriptions = response.my_user
@@ -153,9 +154,9 @@ class AccountInfoManager @Inject constructor(
                 ?.map { it.community.toAccountSubscription() }
                 ?: listOf(),
             miscAccountInfo = MiscAccountInfo(
-                avatar = response.my_user?.local_user_view?.person?.avatar,
-                defaultCommunitySortType = response.my_user?.local_user_view?.local_user?.default_sort_type,
-                showReadPosts = response.my_user?.local_user_view?.local_user?.show_read_posts,
+                avatar = localUserView?.person?.avatar,
+                defaultCommunitySortType = localUserView?.local_user?.default_sort_type,
+                showReadPosts = localUserView?.local_user?.show_read_posts,
                 modCommunityIds = response.my_user?.moderates?.map { it.community.id },
                 isAdmin = response.admins.firstOrNull { it.person.id == account.id } != null,
                 blockedPersons = response.my_user?.person_blocks?.map {

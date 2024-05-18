@@ -78,7 +78,7 @@ class SettingsPostAndCommentsFragment :
 
     private fun updateRendering() {
         settings.settingPostAndCommentsAppearance.bindTo(
-            binding.postAndCommentsAppearance
+            binding.postAndCommentsAppearance,
         ) {
             val direction = SettingsPostAndCommentsFragmentDirections
                 .actionSettingsPostAndCommentsFragmentToSettingsPostAndCommentsAppearanceFragment()

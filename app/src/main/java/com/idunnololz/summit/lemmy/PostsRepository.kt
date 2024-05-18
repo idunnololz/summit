@@ -19,9 +19,9 @@ import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import kotlin.math.min
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -132,73 +132,72 @@ class PostsRepository @Inject constructor(
     suspend fun getPage(
         pageIndex: Int,
         force: Boolean = false,
-        dispatcher: CoroutineDispatcher = Dispatchers.Default
-    ): Result<PageResult> =
-        withContext(dispatcher) {
-            val startIndex = pageIndex * postsPerPage
-            val endIndex = startIndex + postsPerPage
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    ): Result<PageResult> = withContext(dispatcher) {
+        val startIndex = pageIndex * postsPerPage
+        val endIndex = startIndex + postsPerPage
 
-            if (force) {
-                // delete all cached data for the given page
-                val minPageInternal = allPosts
-                    .slice(startIndex until min(endIndex, allPosts.size))
-                    .minOfOrNull { it.postPageIndexInternal } ?: 0
+        if (force) {
+            // delete all cached data for the given page
+            val minPageInternal = allPosts
+                .slice(startIndex until min(endIndex, allPosts.size))
+                .minOfOrNull { it.postPageIndexInternal } ?: 0
 
-                deleteFromPage(minPageInternal)
-                endReached = false
-            }
-
-            var hasMore = true
-
-            while (true) {
-                if (allPosts.size >= endIndex) {
-                    break
-                }
-
-                if (endReached) {
-                    hasMore = false
-                    break
-                }
-
-                val hasMoreResult = retry {
-                    fetchPage(
-                        pageIndex = currentPageInternal,
-                        sortType = sortOrder.value.toApiSortOrder(),
-                        force = force,
-                    )
-                }
-
-                if (hasMoreResult.isFailure) {
-                    return@withContext Result.failure(
-                        requireNotNull(hasMoreResult.exceptionOrNull()),
-                    )
-                } else {
-                    hasMore = hasMoreResult.getOrThrow()
-                    currentPageInternal++
-                }
-
-                if (!hasMore) {
-                    endReached = true
-                    break
-                }
-            }
-
-            return@withContext Result.success(
-                PageResult(
-                    posts = allPosts
-                        .slice(startIndex until min(endIndex, allPosts.size))
-                        .map {
-                            LocalPostView(
-                                fetchedPost = transformPostWithLocalData(it.post),
-                                filterReason = it.filterReason,
-                            )
-                        },
-                    pageIndex = pageIndex,
-                    instance = apiClient.instance,
-                    hasMore = hasMore,
-                ),
-            )
+            deleteFromPage(minPageInternal)
+            endReached = false
         }
+
+        var hasMore = true
+
+        while (true) {
+            if (allPosts.size >= endIndex) {
+                break
+            }
+
+            if (endReached) {
+                hasMore = false
+                break
+            }
+
+            val hasMoreResult = retry {
+                fetchPage(
+                    pageIndex = currentPageInternal,
+                    sortType = sortOrder.value.toApiSortOrder(),
+                    force = force,
+                )
+            }
+
+            if (hasMoreResult.isFailure) {
+                return@withContext Result.failure(
+                    requireNotNull(hasMoreResult.exceptionOrNull()),
+                )
+            } else {
+                hasMore = hasMoreResult.getOrThrow()
+                currentPageInternal++
+            }
+
+            if (!hasMore) {
+                endReached = true
+                break
+            }
+        }
+
+        return@withContext Result.success(
+            PageResult(
+                posts = allPosts
+                    .slice(startIndex until min(endIndex, allPosts.size))
+                    .map {
+                        LocalPostView(
+                            fetchedPost = transformPostWithLocalData(it.post),
+                            filterReason = it.filterReason,
+                        )
+                    },
+                pageIndex = pageIndex,
+                instance = apiClient.instance,
+                hasMore = hasMore,
+            ),
+        )
+    }
 
     val communityInstance: String
         get() =

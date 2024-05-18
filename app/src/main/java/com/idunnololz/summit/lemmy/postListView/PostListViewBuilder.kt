@@ -24,7 +24,6 @@ import coil.dispose
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -221,7 +220,12 @@ class PostListViewBuilder @Inject constructor(
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
         onHighlightComplete: () -> Unit,
-        onLinkClick: (accountId: Long?, url: String, text: String?, linkContext: LinkContext) -> Unit,
+        onLinkClick: (
+            accountId: Long?,
+            url: String,
+            text: String?,
+            linkContext: LinkContext,
+        ) -> Unit,
         onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
     ) {
         val postView = fetchedPost.postView
@@ -244,7 +248,6 @@ class PostListViewBuilder @Inject constructor(
         }
 
         with(holder) {
-
             if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {
                 when (val rb = rawBinding) {
                     is ListingItemCompactBinding -> {
@@ -545,7 +548,7 @@ class PostListViewBuilder @Inject constructor(
                     postView = postView,
                     instance = instance,
                     onPageClick = {
-                      onPageClick(accountId, it)
+                        onPageClick(accountId, it)
                     },
                     onLinkClick = { url, text, linkContext ->
                         onLinkClick(accountId, url, text, linkContext)
@@ -1016,7 +1019,7 @@ class PostListViewBuilder @Inject constructor(
                 themeColorBar.setBackgroundResource(R.drawable.post_color_bar)
                 ViewCompat.setBackgroundTintList(
                     themeColorBar,
-                    ColorStateList.valueOf(themeColor)
+                    ColorStateList.valueOf(themeColor),
                 )
 //                if (root is MaterialCardView) {
 //                    root.setCardBackgroundColor(themeColor)

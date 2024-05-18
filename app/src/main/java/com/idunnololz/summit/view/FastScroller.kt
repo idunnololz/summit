@@ -143,11 +143,19 @@ class FastScroller : LinearLayout {
 
         val handleWidth =
             res.getDimensionPixelSize(
-                if (isVertical()) R.dimen.fastscroll__handle_clickable_width else R.dimen.fastscroll__handle_height,
+                if (isVertical()) {
+                    R.dimen.fastscroll__handle_clickable_width
+                } else {
+                    R.dimen.fastscroll__handle_height
+                },
             )
         val handleHeight =
             res.getDimensionPixelSize(
-                if (isVertical()) R.dimen.fastscroll__handle_height else R.dimen.fastscroll__handle_clickable_width,
+                if (isVertical()) {
+                    R.dimen.fastscroll__handle_height
+                } else {
+                    R.dimen.fastscroll__handle_clickable_width
+                },
             )
         handle.layoutParams = ViewGroup.LayoutParams(handleWidth, handleHeight)
         addView(handle)
@@ -397,7 +405,8 @@ class FastScroller : LinearLayout {
 
     private fun isRecyclerViewScrollable(): Boolean {
         return recyclerView?.let {
-            it.computeHorizontalScrollRange() > it.width || it.computeVerticalScrollRange() > it.height
+            it.computeHorizontalScrollRange() > it.width ||
+                it.computeVerticalScrollRange() > it.height
         } ?: false
     }
 

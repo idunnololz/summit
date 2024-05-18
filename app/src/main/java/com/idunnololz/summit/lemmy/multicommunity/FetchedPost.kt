@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.multicommunity
 
 import android.os.Parcelable
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.squareup.moshi.JsonClass
@@ -15,11 +14,10 @@ data class FetchedPost(
     val source: Source,
 ) : Parcelable
 
-fun PostView.toFetchedPost() =
-    FetchedPost(
-        postView = this,
-        source = Source.StandardSource()
-    )
+fun PostView.toFetchedPost() = FetchedPost(
+    postView = this,
+    source = Source.StandardSource(),
+)
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface Source : Parcelable {

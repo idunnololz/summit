@@ -3,16 +3,16 @@ package com.idunnololz.summit.prefetcher
 import android.util.Log
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostsRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class PostFeedPrefetcher @Inject constructor(
-    coroutineScopeFactory: CoroutineScopeFactory
+    coroutineScopeFactory: CoroutineScopeFactory,
 ) {
     companion object {
         private const val TAG = "PostFeedPrefetcher"

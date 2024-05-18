@@ -112,7 +112,7 @@ class BottomMenu(
                 id,
                 context.getString(title),
                 icon = MenuIcon.ResourceIcon(icon),
-                modifier = ModifierIds.Danger,
+                modifier = ModifierIds.DANGER,
             ),
         )
     }
@@ -338,7 +338,7 @@ class BottomMenu(
                 if (menuItem.id == checked) {
                     b.title.setTextColor(checkedTextColor)
                     b.title.setTypeface(b.title.typeface, Typeface.BOLD)
-                } else if (menuItem.modifier == ModifierIds.Danger) {
+                } else if (menuItem.modifier == ModifierIds.DANGER) {
                     b.title.setTextColor(dangerTextColor)
                     b.title.setTypeface(b.title.typeface, Typeface.NORMAL)
                 } else {
@@ -346,7 +346,7 @@ class BottomMenu(
                     b.title.setTypeface(b.title.typeface, Typeface.NORMAL)
                 }
 
-                if (menuItem.modifier == ModifierIds.Danger) {
+                if (menuItem.modifier == ModifierIds.DANGER) {
                     ImageViewCompat.setImageTintList(
                         b.icon,
                         ColorStateList.valueOf(dangerTextColor),
@@ -402,7 +402,7 @@ class BottomMenu(
             @IdRes id: Int,
             @StringRes title: Int,
             @DrawableRes icon: Int,
-            modifier: Int = ModifierIds.None,
+            modifier: Int = ModifierIds.NONE,
         ) {
             addItemWithIcon(id, context.getString(title), icon, modifier)
         }
@@ -411,7 +411,7 @@ class BottomMenu(
             @IdRes id: Int,
             title: String,
             @DrawableRes icon: Int,
-            modifier: Int = ModifierIds.None,
+            modifier: Int = ModifierIds.NONE,
         ) {
             menuItems.add(
                 MenuItem.ActionItem(
@@ -459,8 +459,8 @@ class BottomMenu(
     }
 
     object ModifierIds {
-        const val None = 0
-        const val Danger = 1
+        const val NONE = 0
+        const val DANGER = 1
     }
 
     sealed interface MenuItem {
@@ -469,7 +469,7 @@ class BottomMenu(
             val title: String,
             val icon: MenuIcon? = null,
             @DrawableRes val checkIcon: Int = 0,
-            val modifier: Int = ModifierIds.None,
+            val modifier: Int = ModifierIds.NONE,
         ) : MenuItem
         data object DividerItem : MenuItem
     }

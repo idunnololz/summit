@@ -102,7 +102,10 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
             }
             MotionEvent.ACTION_UP -> {
                 // Register a click only if the touch started and ended on the same URL.
-                if (!wasLongPressRegistered && touchStartedOverAClickableSpan && clickableSpanUnderTouch === clickableSpanUnderTouchOnActionDown) {
+                if (!wasLongPressRegistered &&
+                    touchStartedOverAClickableSpan &&
+                    clickableSpanUnderTouch === clickableSpanUnderTouchOnActionDown
+                ) {
                     if (clickableSpanUnderTouch != null) {
                         dispatchUrlClick(
                             textView,

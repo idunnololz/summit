@@ -8,10 +8,10 @@ import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @Singleton
 class PostPrefetcher @Inject constructor(
@@ -40,7 +40,7 @@ class PostPrefetcher @Inject constructor(
                     postOrCommentRef.fold(
                         { it.instance },
                         { it.instance },
-                    )
+                    ),
                 )
                 val commentsFetcher = CommentsFetcher(apiClient)
 

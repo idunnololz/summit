@@ -80,7 +80,10 @@ class FileDownloadHelper @Inject constructor(
             // Insert into the database
             val contentResolver = context.contentResolver
 
-            uriOrFilePath = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)?.toString() ?: run {
+            uriOrFilePath = contentResolver.insert(
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                contentValues,
+            )?.toString() ?: run {
                 return Result.failure(RuntimeException("Unable to insert into content resolver"))
             }
             uriOrFilePath.let {

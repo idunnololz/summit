@@ -83,7 +83,8 @@ class VideoDownloadManager @Inject constructor(
 
                     Log.d(
                         TAG,
-                        "onDownloadChanged(): ${download.request.uri} - s: ${download.state} ${download.percentDownloaded} - $finalException",
+                        "onDownloadChanged(): ${download.request.uri} - " +
+                            "s: ${download.state} ${download.percentDownloaded} - $finalException",
                     )
 
                     if (download.state == Download.STATE_COMPLETED) {

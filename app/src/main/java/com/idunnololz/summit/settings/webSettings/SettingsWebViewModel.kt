@@ -200,7 +200,8 @@ class SettingsWebViewModel @Inject constructor(
                     lemmyWebSettings.showReadPostsSetting.id to localUser.show_read_posts,
                     lemmyWebSettings.botAccountSetting.id to person.bot_account,
                     lemmyWebSettings.showBotAccountsSetting.id to localUser.show_bot_accounts,
-                    lemmyWebSettings.sendNotificationsToEmailSetting.id to localUser.send_notifications_to_email,
+                    lemmyWebSettings.sendNotificationsToEmailSetting.id to
+                        localUser.send_notifications_to_email,
                     lemmyWebSettings.blockSettings.id to Unit,
                 ),
             ),

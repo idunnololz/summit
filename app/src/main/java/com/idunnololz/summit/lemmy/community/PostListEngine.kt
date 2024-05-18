@@ -427,7 +427,7 @@ class PostListEngine(
                         if (it.fetchedPost.postView.post.id == postId) {
                             it.copy(
                                 fetchedPost = it.fetchedPost.copy(
-                                    postView = newPost
+                                    postView = newPost,
                                 ),
                             )
                         } else {
@@ -445,7 +445,7 @@ class PostListEngine(
         for ((index, page) in pages.withIndex()) {
             if (page.posts.any { it.fetchedPost.postView.post.id == id }) {
                 pages[index] = page.copy(
-                    posts = page.posts.filter { it.fetchedPost.postView.post.id != id }
+                    posts = page.posts.filter { it.fetchedPost.postView.post.id != id },
                 )
             }
         }

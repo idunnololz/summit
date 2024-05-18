@@ -557,7 +557,7 @@ class CommunityFragment :
                     } else {
                         false
                     }
-                }
+                },
             )
         }
 
@@ -793,7 +793,7 @@ class CommunityFragment :
                             firstPos - 1,
                             lastPos - 1,
                             lastPos,
-                            lastPos + 1
+                            lastPos + 1,
                         )
                     }
                 }
@@ -822,7 +822,7 @@ class CommunityFragment :
                             firstPos - 1,
                             lastPos - 1,
                             lastPos,
-                            lastPos + 1
+                            lastPos + 1,
                         )
                     }
 
@@ -879,7 +879,10 @@ class CommunityFragment :
                                 binding.coordinatorLayout,
                                 getString(
                                     R.string.posts_hidden_format,
-                                    PrettyPrintUtils.defaultDecimalFormat.format(it.data.hideReadCount)),
+                                    PrettyPrintUtils.defaultDecimalFormat.format(
+                                        it.data.hideReadCount,
+                                    ),
+                                ),
                                 Snackbar.LENGTH_LONG,
                             )
                             .show()
@@ -1010,7 +1013,7 @@ class CommunityFragment :
                             viewModel.onPostRead(
                                 postView = postView,
                                 accountId = fetchedPost.source.accountId,
-                                delayMs = 250
+                                delayMs = 250,
                             )
                         }
                     }
@@ -1621,7 +1624,8 @@ class CommunityFragment :
             }
             R.id.enable_nsfw_mode,
             R.id.disable_nsfw_mode,
-            R.id.toggle_nsfw_mode -> {
+            R.id.toggle_nsfw_mode,
+            -> {
                 val newValue = if (actionId == R.id.enable_nsfw_mode) {
                     true
                 } else if (actionId == R.id.disable_nsfw_mode) {
