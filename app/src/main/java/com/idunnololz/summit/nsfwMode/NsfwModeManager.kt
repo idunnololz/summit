@@ -1,8 +1,8 @@
 package com.idunnololz.summit.nsfwMode
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Singleton
 class NsfwModeManager @Inject constructor() {

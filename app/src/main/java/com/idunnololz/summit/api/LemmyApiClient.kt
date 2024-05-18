@@ -110,13 +110,10 @@ import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
-import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.InputStream
 import java.io.InterruptedIOException
@@ -186,8 +183,7 @@ class LemmyApiClient(
         private val apiListenerManager: ApiListenerManager,
         private val preferences: Preferences,
     ) {
-        fun create() =
-            LemmyApiClient(context, apiListenerManager, preferences)
+        fun create() = LemmyApiClient(context, apiListenerManager, preferences)
     }
 
     @Inject constructor(

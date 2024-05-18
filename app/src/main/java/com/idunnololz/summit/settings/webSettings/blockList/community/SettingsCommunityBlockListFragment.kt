@@ -25,7 +25,8 @@ import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunityBlockListBinding>() {
+class SettingsCommunityBlockListFragment :
+    BaseFragment<FragmentSettingsCommunityBlockListBinding>() {
 
     private val viewModel: SettingsAccountBlockListViewModel by viewModels()
 
@@ -36,7 +37,10 @@ class SettingsCommunityBlockListFragment : BaseFragment<FragmentSettingsCommunit
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsCommunityBlockListBinding.inflate(inflater, container, false))
+        setBinding(
+            FragmentSettingsCommunityBlockListBinding
+                .inflate(inflater, container, false),
+        )
 
         return binding.root
     }

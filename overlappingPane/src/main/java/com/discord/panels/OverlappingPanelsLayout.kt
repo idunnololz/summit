@@ -144,7 +144,8 @@ open class OverlappingPanelsLayout : FrameLayout {
         scrollingSlopPx = configuration.scaledTouchSlop.toFloat()
         homeGestureFromBottomThreshold =
             resources.getDimension(R.dimen.overlapping_panels_home_gesture_from_bottom_threshold)
-        minFlingPxPerSecond = resources.getDimension(R.dimen.overlapping_panels_min_fling_dp_per_second)
+        minFlingPxPerSecond =
+            resources.getDimension(R.dimen.overlapping_panels_min_fling_dp_per_second)
 
         val portraitModeWidth =
             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -690,7 +691,8 @@ open class OverlappingPanelsLayout : FrameLayout {
     private fun shouldHandleActionMoveEvent(event: MotionEvent): Boolean {
         val targetedX = getTargetedX(event)
         val normalizedX = getNormalizedX(targetedX)
-        val greaterThanMinChange = abs(normalizedX - centerPanel.x) > resources.displayMetrics.density
+        val greaterThanMinChange =
+            abs(normalizedX - centerPanel.x) > resources.displayMetrics.density
 
         return normalizedX == 0f ||
             normalizedX == startPanelOpenedCenterPanelX ||
@@ -780,7 +782,8 @@ open class OverlappingPanelsLayout : FrameLayout {
             }
         }
 
-        val isCenterPanelClosed = x == endPanelOpenedCenterPanelX || x == startPanelOpenedCenterPanelX
+        val isCenterPanelClosed = x == endPanelOpenedCenterPanelX ||
+            x == startPanelOpenedCenterPanelX
         centerPanel.setEnabledAlpha(enabled = !isCenterPanelClosed, disabledAlpha = 0.5f)
 
         // Hide the center panel from TalkBack if it's closed. This ensures

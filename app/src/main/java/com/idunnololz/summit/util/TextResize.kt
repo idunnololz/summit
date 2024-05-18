@@ -451,10 +451,23 @@ class TextResize : Transition {
             scale: Float,
         ): Float {
             return when (gravity) {
-                Gravity.CENTER_HORIZONTAL, Gravity.CENTER_VERTICAL -> (start + end - dim * scale) / 2f
-                Gravity.RIGHT, Gravity.BOTTOM -> end - dim * scale
-                Gravity.LEFT, Gravity.TOP -> start
-                else -> start
+                Gravity.CENTER_HORIZONTAL,
+                Gravity.CENTER_VERTICAL,
+                ->
+                    (start + end - dim * scale) / 2f
+
+                Gravity.RIGHT,
+                Gravity.BOTTOM,
+                ->
+                    end - dim * scale
+
+                Gravity.LEFT,
+                Gravity.TOP,
+                ->
+                    start
+
+                else ->
+                    start
             }
         }
 
@@ -502,7 +515,8 @@ class TextResize : Transition {
         private const val FONT_SIZE = "TextResize:fontSize"
         private const val DATA = "TextResize:data"
         private val PROPERTIES =
-            arrayOf( // We only care about FONT_SIZE. If anything else changes, we don't
+            arrayOf(
+                // We only care about FONT_SIZE. If anything else changes, we don't
                 // want this transition to be called to create an Animator.
                 FONT_SIZE,
             )

@@ -56,7 +56,7 @@ class AvatarHelper @Inject constructor(
             val job = coroutineScope.launch {
                 val d = accountImageGenerator.generateDrawableForGeneric(
                     community.fullName,
-                    context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24)
+                    context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
                 )
 
                 withContext(Dispatchers.Main) {

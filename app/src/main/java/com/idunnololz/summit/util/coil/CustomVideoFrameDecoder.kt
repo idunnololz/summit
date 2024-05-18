@@ -160,7 +160,8 @@ class CustomVideoFrameDecoder(
 
         val framePercent = options.parameters.videoFramePercent()
         if (framePercent != null) {
-            val durationMillis = retriever.extractMetadata(METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+            val durationMillis =
+                retriever.extractMetadata(METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
             return 1000 * (framePercent * durationMillis).roundToLong()
         }
 

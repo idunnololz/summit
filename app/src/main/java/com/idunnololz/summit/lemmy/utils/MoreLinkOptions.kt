@@ -144,7 +144,8 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                         }
                     }
                     is CommunityRef.Local,
-                    is CommunityRef.All -> {
+                    is CommunityRef.All,
+                    -> {
                         setTitle(
                             context.getString(
                                 R.string.link_actions_format,
@@ -307,7 +308,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
             addItemWithIcon(
                 R.id.preview_link,
                 R.string.preview_link,
-                R.drawable.baseline_preview_24
+                R.drawable.baseline_preview_24,
             )
         }
 

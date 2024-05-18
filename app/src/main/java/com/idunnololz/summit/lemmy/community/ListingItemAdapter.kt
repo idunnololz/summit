@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.community
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -71,8 +70,12 @@ class ListingItemAdapter(
     private val onShowMoreActions: (accountId: Long?, PostView) -> Unit,
     private val onPostRead: (accountId: Long?, PostView) -> Unit,
     private val onLoadPage: (Int) -> Unit,
-    private val onLinkClick:
-        (accountId: Long?, url: String, text: String?, linkContext: LinkContext) -> Unit,
+    private val onLinkClick: (
+        accountId: Long?,
+        url: String,
+        text: String?,
+        linkContext: LinkContext,
+    ) -> Unit,
     private val onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -271,7 +274,7 @@ class ListingItemAdapter(
                                 (items.getOrNull(it) as? Item.VisiblePostItem)?.let {
                                     onPostRead(
                                         it.fetchedPost.source.accountId,
-                                        it.fetchedPost.postView
+                                        it.fetchedPost.postView,
                                     )
                                 }
                             }

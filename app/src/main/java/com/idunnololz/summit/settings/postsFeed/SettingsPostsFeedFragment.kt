@@ -90,7 +90,7 @@ class SettingsPostsFeedFragment :
 
     private fun updateRendering() {
         settings.settingsPostFeedAppearance.bindTo(
-            binding.postsFeedAppearance
+            binding.postsFeedAppearance,
         ) {
             val direction = SettingsPostsFeedFragmentDirections
                 .actionSettingsContentFragmentToSettingViewTypeFragment()

@@ -4,7 +4,6 @@ import arrow.core.Either
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.toCommunityRef

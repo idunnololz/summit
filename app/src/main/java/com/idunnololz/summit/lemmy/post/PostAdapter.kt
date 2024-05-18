@@ -959,7 +959,8 @@ class PostAdapter(
                                         comment = commentView.comment,
                                         depth = commentItem.depth,
                                         baseDepth = 0,
-                                        isExpanded = !collapsedItemIds.contains(commentView.id) || isCurrentMatchThisComment,
+                                        isExpanded = !collapsedItemIds.contains(commentView.id) ||
+                                            isCurrentMatchThisComment,
                                         isPending = false,
                                         view = commentView,
                                         childrenCount = commentItem.children.size,
@@ -1008,7 +1009,8 @@ class PostAdapter(
                                         screenshotMode,
                                     )
                                 }
-                            absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
+                            absolutionPositionToTopLevelCommentPosition +=
+                                lastTopLevelCommentPosition
                         }
                         is PostViewModel.ListView.PendingCommentListView -> {
                             depth = commentItem.depth
@@ -1046,7 +1048,8 @@ class PostAdapter(
                                     baseDepth = 0,
                                     screenshotMode,
                                 )
-                                absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
+                                absolutionPositionToTopLevelCommentPosition +=
+                                    lastTopLevelCommentPosition
                             }
                         }
 
@@ -1136,7 +1139,8 @@ class PostAdapter(
         }
 
         this.topLevelCommentIndices = topLevelCommentIndices
-        this.absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
+        this.absolutionPositionToTopLevelCommentPosition =
+            absolutionPositionToTopLevelCommentPosition
 
         cb()
     }

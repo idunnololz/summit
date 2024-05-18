@@ -4,11 +4,11 @@ import android.net.Uri
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.MainActivity
 import okhttp3.CacheControl
 import okhttp3.Request

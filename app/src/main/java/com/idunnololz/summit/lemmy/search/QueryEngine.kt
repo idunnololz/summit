@@ -262,7 +262,7 @@ class QueryEngine(
                                 SearchResultView.PostResultView(
                                     FetchedPost(
                                         it,
-                                        Source.StandardSource()
+                                        Source.StandardSource(),
                                     ),
                                     false,
                                 )
@@ -372,7 +372,7 @@ class QueryEngine(
                                 SearchResultView.PostResultView(
                                     FetchedPost(
                                         it,
-                                        Source.StandardSource()
+                                        Source.StandardSource(),
                                     ),
                                     true,
                                 )
@@ -520,10 +520,10 @@ class QueryEngine(
                         Item.PostItem(
                             fetchedPost = FetchedPost(
                                 it,
-                                Source.StandardSource()
+                                Source.StandardSource(),
                             ),
                             instance = instance,
-                            pageIndex = page.pageIndex
+                            pageIndex = page.pageIndex,
                         )
                     }
                 is QueryResultsPage.UserResultsPage ->

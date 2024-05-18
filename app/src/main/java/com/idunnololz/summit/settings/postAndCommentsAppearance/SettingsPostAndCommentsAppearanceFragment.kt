@@ -63,8 +63,13 @@ class SettingsPostAndCommentsAppearanceFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsPostAndCommentsAppearanceBinding.inflate(
-            inflater, container, false))
+        setBinding(
+            FragmentSettingsPostAndCommentsAppearanceBinding.inflate(
+                inflater,
+                container,
+                false,
+            ),
+        )
 
         return binding.root
     }

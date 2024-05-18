@@ -115,7 +115,10 @@ class ModActionWithReasonDialogFragment :
                             getString(R.string.error_unable_to_remove_post)
                         },
                         getUpdatedObject = {
-                            ModActionResult.UpdatedObject.PostObject(modAction.postId, modAction.accountId)
+                            ModActionResult.UpdatedObject.PostObject(
+                                modAction.postId,
+                                modAction.accountId,
+                            )
                         },
                     )
                 }
@@ -134,7 +137,10 @@ class ModActionWithReasonDialogFragment :
                             getString(R.string.error_unable_to_remove_post)
                         },
                         getUpdatedObject = {
-                            ModActionResult.UpdatedObject.PostObject(modAction.postId, modAction.accountId)
+                            ModActionResult.UpdatedObject.PostObject(
+                                modAction.postId,
+                                modAction.accountId,
+                            )
                         },
                     )
                 }
@@ -204,7 +210,12 @@ class ModActionWithReasonDialogFragment :
                     }
                     actionsViewModel.purgePostResult.handleResult(
                         { getString(R.string.error_purge_post) },
-                        { ModActionResult.UpdatedObject.PostObject(modAction.postId, modAction.accountId) },
+                        {
+                            ModActionResult.UpdatedObject.PostObject(
+                                modAction.postId,
+                                modAction.accountId,
+                            )
+                        },
                     )
                 }
                 is ModActionWithReason.UndoBanUserFromCommunity -> {

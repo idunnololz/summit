@@ -130,8 +130,8 @@ class ImageViewerActivity :
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.title = ""
 
-        binding.dummyAppBar.transitionName = SharedElementNames.AppBar
-        binding.bottomNavigationView.transitionName = SharedElementNames.NavBar
+        binding.dummyAppBar.transitionName = SharedElementNames.APP_BAR
+        binding.bottomNavigationView.transitionName = SharedElementNames.NAV_BAR
 
         onInsetsChanged = { insets ->
             binding.toolbar.layoutParams = binding.toolbar.layoutParams.apply {
@@ -578,20 +578,22 @@ class ImageViewerActivity :
                                             Size(
                                                 (bitmap.width / scale).roundToInt(),
                                                 (bitmap.height / scale).roundToInt(),
-                                            )
+                                            ),
                                         )
 
                                         Snackbar
                                             .make(
                                                 getSnackbarContainer(),
                                                 R.string.warn_image_downscaled,
-                                                Snackbar.LENGTH_LONG
+                                                Snackbar.LENGTH_LONG,
                                             )
                                             .setAnchorView(binding.bottomBar)
                                             .show()
                                     } else {
                                         binding.loadingView
-                                            .showErrorText(R.string.error_image_too_large_to_preview)
+                                            .showErrorText(
+                                                R.string.error_image_too_large_to_preview,
+                                            )
                                     }
                                     return
                                 }

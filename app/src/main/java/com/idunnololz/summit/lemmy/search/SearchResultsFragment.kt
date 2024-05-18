@@ -44,7 +44,6 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -60,6 +59,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
@@ -632,7 +632,6 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                             reveal,
                             videoState,
                         )
-
                     },
                     toggleItem = {},
                     toggleActions = {},

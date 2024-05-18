@@ -179,7 +179,9 @@ class ExoPlayerManager(
                             super.onEvents(player, events)
 
                             if (events.containsAny(Player.EVENT_REPEAT_MODE_CHANGED)) {
-                                if (!player.isPlaying && player.repeatMode != Player.REPEAT_MODE_OFF) {
+                                if (!player.isPlaying &&
+                                    player.repeatMode != Player.REPEAT_MODE_OFF
+                                ) {
                                     Util.handlePlayPauseButtonAction(player)
                                 }
                             }
@@ -192,7 +194,8 @@ class ExoPlayerManager(
 
         Log.d(
             TAG,
-            "Allocating another player. Alloced: ${allocatedPlayers.size} Total: ${allocatedPlayers.size + players.size}",
+            "Allocating another player. Alloced: ${allocatedPlayers.size} " +
+                "Total: ${allocatedPlayers.size + players.size}",
         )
     }
 

@@ -78,7 +78,12 @@ class AccountImageGenerator @Inject constructor(
         return generateDrawableForGeneric(key)
     }
 
-    fun generateDrawableForGeneric(key: String, drawable: Drawable? = context.getDrawableCompat(R.drawable.lemmy_profile_4)): Drawable {
+    fun generateDrawableForGeneric(
+        key: String,
+        drawable: Drawable? = context.getDrawableCompat(
+            R.drawable.lemmy_profile_4,
+        ),
+    ): Drawable {
         val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
         val bitmap = Bitmap.createBitmap(
             accountImageSize,
@@ -100,7 +105,7 @@ class AccountImageGenerator @Inject constructor(
     }
 
     fun getColorForPerson(personName: String, personId: PersonId, personInstance: String): Int {
-        return getColorForKey("${personName}@${personId}@${personInstance}")
+        return getColorForKey("$personName@$personId@$personInstance")
     }
 
     private fun generateImageForAccount(account: Account): Bitmap {

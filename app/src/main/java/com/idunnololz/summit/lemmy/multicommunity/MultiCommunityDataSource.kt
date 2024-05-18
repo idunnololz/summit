@@ -56,7 +56,7 @@ class MultiCommunityDataSource(
                         apiClient
                             .fetchPosts(
                                 communityIdOrName =
-                                    Either.Right(communityRef.getServerId(apiClient.instance)),
+                                Either.Right(communityRef.getServerId(apiClient.instance)),
                                 sortType = sortOrder,
                                 listingType = ListingType.All,
                                 page = page,
@@ -166,7 +166,7 @@ class MultiCommunityDataSource(
         ).fold(
             onSuccess = {
                 Result.success(
-                    it.posts
+                    it.posts,
                 )
             },
             onFailure = {

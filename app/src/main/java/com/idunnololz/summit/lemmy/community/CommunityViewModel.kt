@@ -22,14 +22,12 @@ import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
-import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
@@ -39,7 +37,6 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.multicommunity.instance
-import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -460,14 +457,16 @@ class CommunityViewModel @Inject constructor(
                     postListEngine.addPage(pageData)
                     postListEngine.createItems()
 
-                    loadedPostsData.postValue(PostUpdateInfo(
-                        scrollToTop = scrollToTop,
-                        hideReadCount = if (includeHideReadCount) {
-                            postsRepository.hideReadCount
-                        } else {
-                            null
-                        },
-                    ))
+                    loadedPostsData.postValue(
+                        PostUpdateInfo(
+                            scrollToTop = scrollToTop,
+                            hideReadCount = if (includeHideReadCount) {
+                                postsRepository.hideReadCount
+                            } else {
+                                null
+                            },
+                        ),
+                    )
 
                     withContext(Dispatchers.Main) {
                         fetchingPages.remove(pageToFetch)
@@ -527,7 +526,6 @@ class CommunityViewModel @Inject constructor(
             }
         }
     }
-
 
     fun changeCommunity(communityRef: CommunityRef?) {
         viewModelScope.launch {
@@ -794,7 +792,7 @@ class CommunityViewModel @Inject constructor(
         )
     }
 
-    fun onPostRead(postView: PostView, accountId: Long?, delayMs: Long = 0, ) {
+    fun onPostRead(postView: PostView, accountId: Long?, delayMs: Long = 0) {
         if (postView.read) {
             return
         }
@@ -807,7 +805,7 @@ class CommunityViewModel @Inject constructor(
                 instance = apiInstance,
                 id = postView.post.id,
                 read = true,
-                accountId = accountId
+                accountId = accountId,
             )
         }
     }
@@ -922,10 +920,19 @@ class CommunityViewModel @Inject constructor(
                     if (infinity) {
                         postListEngine.clearPages()
                         for (index in 0..it.pageIndex) {
-                            fetchPageInternal(index, force = false, scrollToTop = scrollToTop, includeHideReadCount = includeHideReadCount)
+                            fetchPageInternal(
+                                index,
+                                force = false,
+                                scrollToTop = scrollToTop,
+                                includeHideReadCount = includeHideReadCount,
+                            )
                         }
                     } else {
-                        fetchPageInternal(it.pageIndex, force = false, includeHideReadCount = includeHideReadCount)
+                        fetchPageInternal(
+                            it.pageIndex,
+                            force = false,
+                            includeHideReadCount = includeHideReadCount,
+                        )
                     }
                 }
                 .onFailure {

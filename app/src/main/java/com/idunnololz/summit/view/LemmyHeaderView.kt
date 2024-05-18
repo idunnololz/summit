@@ -2,7 +2,6 @@ package com.idunnololz.summit.view
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View

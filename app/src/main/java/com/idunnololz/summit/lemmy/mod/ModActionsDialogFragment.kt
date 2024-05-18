@@ -648,7 +648,7 @@ class ModActionsDialogFragment :
                 id = R.id.purge_user,
                 title = R.string.purge_user,
                 icon = R.drawable.outline_person_remove_24,
-                modifier = BottomMenu.ModifierIds.Danger,
+                modifier = BottomMenu.ModifierIds.DANGER,
             )
 
             if (data.modStates.any { it is PostModState }) {
@@ -656,7 +656,7 @@ class ModActionsDialogFragment :
                     id = R.id.purge_post,
                     title = R.string.purge_post,
                     icon = R.drawable.baseline_delete_24,
-                    modifier = BottomMenu.ModifierIds.Danger,
+                    modifier = BottomMenu.ModifierIds.DANGER,
                 )
             }
 
@@ -665,7 +665,7 @@ class ModActionsDialogFragment :
                     id = R.id.purge_comment,
                     title = R.string.purge_comment,
                     icon = R.drawable.baseline_delete_24,
-                    modifier = BottomMenu.ModifierIds.Danger,
+                    modifier = BottomMenu.ModifierIds.DANGER,
                 )
             }
 
@@ -674,7 +674,7 @@ class ModActionsDialogFragment :
                     id = R.id.purge_community,
                     title = R.string.purge_community,
                     icon = R.drawable.baseline_delete_24,
-                    modifier = BottomMenu.ModifierIds.Danger,
+                    modifier = BottomMenu.ModifierIds.DANGER,
                 )
             }
 

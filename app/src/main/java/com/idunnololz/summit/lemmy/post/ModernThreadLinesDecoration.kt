@@ -114,7 +114,8 @@ class ModernThreadLinesDecoration(
             threadLinesData ?: continue
 
             val totalDepth = threadLinesData.depth - threadLinesData.baseDepth
-            val indent = ((totalDepth.coerceAtMost(threadLinesData.maxDepth)).toFloat() - 1f) * distanceBetweenLinesUnit *
+            val indent = ((totalDepth.coerceAtMost(threadLinesData.maxDepth)).toFloat() - 1f) *
+                distanceBetweenLinesUnit *
                 threadLinesData.indentationPerLevel
             val x = view.left + indent + startingPadding + (linePaint.strokeWidth / 2)
 

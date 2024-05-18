@@ -47,7 +47,8 @@ class CenteredImageSpan @JvmOverloads constructor(
         val d = cachedDrawable
         val rect = d!!.bounds
         val fmi = paint.fontMetricsInt
-        if (rect.bottom - (fmi.descent - fmi.ascent) >= 0) { // Stores the initial descent and computes the margin available
+        if (rect.bottom - (fmi.descent - fmi.ascent) >= 0) {
+            // Stores the initial descent and computes the margin available
             initialDescent = fmi.descent
             extraSpace = rect.bottom - (fmi.descent - fmi.ascent)
         }

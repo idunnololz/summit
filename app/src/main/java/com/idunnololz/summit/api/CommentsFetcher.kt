@@ -1,7 +1,6 @@
 package com.idunnololz.summit.api
 
 import arrow.core.Either
-import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView

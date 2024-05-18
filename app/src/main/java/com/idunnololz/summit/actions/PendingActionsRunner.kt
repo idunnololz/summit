@@ -171,7 +171,8 @@ class PendingActionsRunner @AssistedInject constructor(
                         is TooManyRequests ->
                             if (result.failureReason.retries < PendingActionsManager.MAX_RETRIES) {
                                 // Prob just sending too fast...
-                                val delay = (2.0.pow(result.failureReason.retries + 1) * 1000).toLong()
+                                val delay =
+                                    (2.0.pow(result.failureReason.retries + 1) * 1000).toLong()
                                 Log.d(TAG, "429. Retrying after $delay...")
 
                                 delayAction(action, delay)

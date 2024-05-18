@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -18,17 +17,16 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentImageInfoBinding
 import com.idunnololz.summit.databinding.ImageInfoInfoItemBinding
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
-import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ImageInfoDialogFragment : BaseBottomSheetDialogFragment<DialogFragmentImageInfoBinding>(),
+class ImageInfoDialogFragment :
+    BaseBottomSheetDialogFragment<DialogFragmentImageInfoBinding>(),
     FullscreenDialogFragment {
 
     companion object {
@@ -129,9 +127,8 @@ class ImageInfoDialogFragment : BaseBottomSheetDialogFragment<DialogFragmentImag
                         b.root,
                         Gravity.NO_GRAVITY,
                         0,
-                        R.style.Theme_App_Widget_Material3_PopupMenu_Overflow
+                        R.style.Theme_App_Widget_Material3_PopupMenu_Overflow,
                     ).apply {
-
                         inflate(R.menu.image_info)
 
                         setOnMenuItemClickListener {
@@ -177,6 +174,5 @@ class ImageInfoDialogFragment : BaseBottomSheetDialogFragment<DialogFragmentImag
         private fun refreshItems(cb: () -> Unit) {
             adapterHelper.setItems(items, this, cb)
         }
-
     }
 }
