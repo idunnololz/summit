@@ -25,25 +25,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <HorizontalScrollView
-        android:id="@+id/header_view"
-        android:layout_width="0dp"
+    <com.idunnololz.summit.view.LemmyHeaderView
+        android:id="@+id/header_container"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding"
         android:paddingStart="@dimen/reddit_content_horizontal_padding"
         android:paddingEnd="@dimen/reddit_content_horizontal_padding"
-        android:fadingEdge="horizontal"
-        android:requiresFadingEdge="horizontal"
-        android:scrollbars="none"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.idunnololz.summit.view.LemmyHeaderView
-            android:id="@+id/header_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </HorizontalScrollView>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.idunnololz.summit.view.LinkifyTextView
         android:id="@+id/title"
@@ -53,7 +45,7 @@
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
         android:layout_marginTop="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/header_view"
+        app:layout_constraintTop_toBottomOf="@+id/header_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

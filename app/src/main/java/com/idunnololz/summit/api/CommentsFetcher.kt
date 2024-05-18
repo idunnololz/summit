@@ -9,7 +9,6 @@ import com.idunnololz.summit.api.dto.PostId
 
 class CommentsFetcher(
     private val apiClient: AccountAwareLemmyClient,
-    private val accountActionsManager: AccountActionsManager,
 ) {
 
     suspend fun fetchCommentsWithRetry(

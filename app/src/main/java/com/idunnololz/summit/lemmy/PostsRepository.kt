@@ -19,6 +19,7 @@ import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
@@ -89,19 +90,6 @@ class PostsRepository @Inject constructor(
         savedStateHandle["PostsRepository.sortOrder"] = sortOrder
     }
 
-    suspend fun hideReadPosts(anchors: Set<PostId>, maxPage: Int): Result<PageResult> =
-        updateStateMaintainingPosition({
-            hideRead = true
-        }, anchors, maxPage)
-
-    suspend fun updateShowNsfwReadPosts(
-        showNsfw: Boolean,
-        anchors: Set<PostId>,
-        maxPage: Int,
-    ): Result<PageResult> = updateStateMaintainingPosition({
-        this.showNsfwPosts = showNsfw
-    }, anchors, maxPage)
-
     suspend fun updateStateMaintainingPosition(
         performChanges: PostsRepository.() -> Unit,
         anchors: Set<PostId>,
@@ -141,8 +129,12 @@ class PostsRepository @Inject constructor(
         return getPage(0)
     }
 
-    suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
-        return withContext(Dispatchers.Default) {
+    suspend fun getPage(
+        pageIndex: Int,
+        force: Boolean = false,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default
+    ): Result<PageResult> =
+        withContext(dispatcher) {
             val startIndex = pageIndex * postsPerPage
             val endIndex = startIndex + postsPerPage
 
@@ -207,7 +199,6 @@ class PostsRepository @Inject constructor(
                 ),
             )
         }
-    }
 
     val communityInstance: String
         get() =
@@ -396,6 +387,7 @@ class PostsRepository @Inject constructor(
                     if (newPosts.first().postView.community.nsfw &&
                         communityRef is CommunityRef.CommunityRefByName &&
                         !showNsfwPosts &&
+
                         !nsfwMode
                     ) {
                         return@fold Result.failure(LoadNsfwCommunityWhenNsfwDisabled())

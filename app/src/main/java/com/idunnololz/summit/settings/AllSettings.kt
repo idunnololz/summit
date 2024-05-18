@@ -64,6 +64,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
@@ -761,6 +762,12 @@ class PostsFeedSettings @Inject constructor(
         context.getString(R.string.show_filtered_posts_desc),
         relatedKeys = listOf(KEY_SHOW_FILTERED_POSTS),
     )
+    val prefetchPosts = OnOffSettingItem(
+        null,
+        context.getString(R.string.prefetch_posts),
+        context.getString(R.string.prefetch_posts_desc),
+        relatedKeys = listOf(KEY_PREFETCH_POSTS),
+    )
     val homeFabQuickAction = RadioGroupSettingItem(
         null,
         context.getString(R.string.home_fab_quick_action),
@@ -813,6 +820,7 @@ class PostsFeedSettings @Inject constructor(
         lockBottomBar,
         showFilteredPosts,
         homeFabQuickAction,
+        prefetchPosts,
     )
 }
 
@@ -1364,6 +1372,12 @@ class PostsFeedAppearanceSettings @Inject constructor(
         null,
     )
 
+    val preferCommunityIcon = OnOffSettingItem(
+        null,
+        context.getString(R.string.prefer_community_icon),
+        null,
+    )
+
     val contentMaxLines =
         TextOnlySettingItem(
             context.getString(R.string.full_content_max_lines),
@@ -1381,6 +1395,7 @@ class PostsFeedAppearanceSettings @Inject constructor(
         preferImageAtEnd,
         preferFullImage,
         preferTitleText,
+        preferCommunityIcon,
     )
 }
 

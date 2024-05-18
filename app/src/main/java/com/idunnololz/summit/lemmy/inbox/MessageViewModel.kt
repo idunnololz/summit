@@ -21,12 +21,11 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class MessageViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
-    private val accountActionsManager: AccountActionsManager,
     private val contentFiltersManager: ContentFiltersManager,
     val accountManager: AccountManager,
 ) : ViewModel() {
 
-    private val commentsFetcher = CommentsFetcher(apiClient, accountActionsManager)
+    private val commentsFetcher = CommentsFetcher(apiClient)
 
     val apiInstance: String
         get() = apiClient.instance

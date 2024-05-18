@@ -87,25 +87,17 @@
             app:layout_constraintBottom_toBottomOf="@+id/image"
             app:layout_constraintEnd_toEndOf="@+id/image"
             app:tint="?colorControlNormal" />
-
-        <HorizontalScrollView
-            android:id="@+id/header_view"
-            android:layout_width="0dp"
+        
+        <com.idunnololz.summit.view.LemmyHeaderView
+            android:id="@+id/header_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_half"
             android:paddingStart="@dimen/reddit_content_horizontal_padding"
             android:paddingEnd="@dimen/reddit_content_horizontal_padding"
-            android:fadingEdge="horizontal"
-            android:requiresFadingEdge="horizontal"
-            android:scrollbars="none"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintTop_toBottomOf="@+id/image"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <com.idunnololz.summit.view.LemmyHeaderView
-                android:id="@+id/header_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </HorizontalScrollView>
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

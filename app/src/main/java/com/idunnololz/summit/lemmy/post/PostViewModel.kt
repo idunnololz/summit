@@ -114,7 +114,7 @@ class PostViewModel @Inject constructor(
      */
     private var supplementaryComments = mutableMapOf<Int, CommentView>()
 
-    private val commentsFetcher = CommentsFetcher(lemmyApiClient, accountActionsManager)
+    private val commentsFetcher = CommentsFetcher(lemmyApiClient)
 
     var preferences: Preferences = preferenceManager.currentPreferences
 

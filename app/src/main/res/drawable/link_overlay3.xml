@@ -9,7 +9,7 @@ android:color="@color/colorOnSurface">
                 android:color="@color/colorOverlay"/>
 
             <corners
-                android:radius="16dp"/>
+                android:radius="12dp"/>
 
         </shape>
     </item>
@@ -17,7 +17,7 @@ android:color="@color/colorOnSurface">
     <shape>
         <solid android:color="@color/white"/>
         <corners
-            android:radius="16dp"/>
+            android:radius="12dp"/>
     </shape>
 </item>
 </ripple>

@@ -75,13 +75,16 @@ class AccountImageGenerator @Inject constructor(
     }
 
     fun generateDrawableForKey(key: String): Drawable {
+        return generateDrawableForGeneric(key)
+    }
+
+    fun generateDrawableForGeneric(key: String, drawable: Drawable? = context.getDrawableCompat(R.drawable.lemmy_profile_4)): Drawable {
         val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
         val bitmap = Bitmap.createBitmap(
             accountImageSize,
             accountImageSize,
             Bitmap.Config.ARGB_8888,
         )
-        val personDrawable = context.getDrawableCompat(R.drawable.lemmy_profile_4)
 
         with(Canvas(bitmap)) {
             val bgPaint = Paint().apply {
@@ -90,8 +93,8 @@ class AccountImageGenerator @Inject constructor(
 
             drawRect(0f, 0f, accountImageSize.toFloat(), accountImageSize.toFloat(), bgPaint)
 
-            personDrawable?.setBounds(0, 0, accountImageSize, accountImageSize)
-            personDrawable?.draw(this)
+            drawable?.setBounds(0, 0, accountImageSize, accountImageSize)
+            drawable?.draw(this)
         }
         return BitmapDrawable(context.resources, bitmap)
     }

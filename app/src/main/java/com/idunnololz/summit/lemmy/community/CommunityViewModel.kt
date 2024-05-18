@@ -22,12 +22,14 @@ import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
@@ -36,12 +38,16 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.multicommunity.instance
+import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
+import com.idunnololz.summit.prefetcher.PostFeedPrefetcher
+import com.idunnololz.summit.prefetcher.PostPrefetcher
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.DirectoryHelper
@@ -81,6 +87,8 @@ class CommunityViewModel @Inject constructor(
     private val guestAccountManager: GuestAccountManager,
     private val perCommunityPreferences: PerCommunityPreferences,
     private val nsfwModeManager: NsfwModeManager,
+    private val postFeedPrefetcher: PostFeedPrefetcher,
+    private val postPrefetcher: PostPrefetcher,
     val basePreferences: Preferences,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
@@ -489,6 +497,34 @@ class CommunityViewModel @Inject constructor(
                         fetchingPages.remove(pageToFetch)
                     }
                 }
+
+            result.onSuccess {
+                if (preferences.prefetchPosts) {
+                    postFeedPrefetcher.prefetchPage(
+                        pageToFetch + 1,
+                        postsRepository,
+                        viewModelScope,
+                    )
+                }
+
+//                postPrefetcher.prefetchPosts(
+//                    postOrCommentRefs =
+//                    it.posts.map {
+//                        Either.Left(
+//                            PostRef(
+//                        it.fetchedPost.source.instance ?: apiInstance,
+//                                it.fetchedPost.postView.post.id,
+//                            )
+//                        )
+//                    },
+//                    sortOrder = (preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top).toApiSortOrder(),
+//                    maxDepth = if (preferences.collapseChildCommentsByDefault) {
+//                        1
+//                    } else {
+//                        null
+//                    }
+//                )
+            }
         }
     }
 

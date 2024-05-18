@@ -215,6 +215,7 @@ class LemmyHeaderHelper(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
             }
+            currentTextView.isSingleLine = false
             headerContainer.multiline = false
         } else if (useMultilineHeader) {
             currentTextView.movementMethod = makeMovementMethod(
@@ -224,12 +225,14 @@ class LemmyHeaderHelper(
                 onLinkLongClick = onLinkLongClick,
             )
             currentTextView.text = sb
+            currentTextView.isSingleLine = true
 //            currentTextView.setSingleLineAvoidingRelayout(true)
             headerContainer.multiline = true
 
             currentTextView = headerContainer.textView2
             sb = SpannableStringBuilder()
         } else {
+            currentTextView.isSingleLine = true
             headerContainer.multiline = false
         }
 
