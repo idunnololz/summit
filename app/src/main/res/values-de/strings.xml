@@ -155,4 +155,21 @@
     <string name="dark_theme">Dunkler Modus</string>
     <string name="material_you">Material You</string>
     <string name="personalized_theming_based_on_your_wallpaper">Personalisierter Modus basierend auf Ihrem Hintergrundbild</string>
+    <string name="comment_settings">Einstellungen für Kommentare</string>
+    <string name="removed_hidden_posts_format">%1$s versteckte Beiträge entfernt</string>
+    <string name="post_and_comments_appearance">Aussehen von Beiträgen und Kommentaren</string>
+    <string name="post_and_comments_settings_desc">Anpassen der Ansicht von Beiträgen und Kommentaren</string>
+    <string name="theme_settings_desc">Ändern und Anpassen des App-Modus</string>
+    <string name="base_theme">Grundmodus</string>
+    <string name="use_system_theme">Systemstandard verwenden</string>
+    <string name="light_theme">Heller Modus</string>
+    <string name="theme_config">Modus-Einstellungen</string>
+    <string name="error_dynamic_color_not_supported">Material You wird von Ihrem Gerät nicht unterstützt.</string>
+    <string name="post_settings">Einstellungen für Beiträge</string>
+    <string name="reset_post_styles">Einstellungen für Beiträge zurücksetzen</string>
+    <string name="reset_comment_styles">Einstellungen für Kommentare zurücksetzen</string>
+    <string name="prefer_full_size_image">Bild in voller Größe bevorzugen</string>
+    <string name="hidden_posts">Ausgeblendete Beiträge</string>
+    <string name="hidden_posts_desc">Ausgeblendete Beiträge zurücksetzen &amp; mehr</string>
+    <string name="reset_hidden_posts">Ausgeblendete Beiträge zurücksetzen</string>
 </resources>
