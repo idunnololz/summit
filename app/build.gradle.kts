@@ -149,12 +149,15 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    kapt(libs.hilt.compiler)
 
     implementation(libs.zoom.layout)
     implementation(libs.process.phoenix)
     implementation(libs.media3.transformer)
 
     implementation(libs.exifinterface)
+
+    implementation(libs.datastore.preferences)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

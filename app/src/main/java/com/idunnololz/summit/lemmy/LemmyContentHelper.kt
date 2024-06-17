@@ -24,6 +24,7 @@ import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
+import com.idunnololz.summit.api.utils.getImageUrl
 import com.idunnololz.summit.api.utils.getPreviewInfo
 import com.idunnololz.summit.api.utils.getThumbnailPreviewInfo
 import com.idunnololz.summit.api.utils.getThumbnailUrl
@@ -111,8 +112,6 @@ class LemmyContentHelper(
         }
 
         val context = rootView.context
-        // Handles crossposts
-        val targetPostView = postView
 
         val postViewType = screenshotConfig?.postViewType
         val showText = postViewType != PostViewType.ImageOnly &&
@@ -218,7 +217,7 @@ class LemmyContentHelper(
             fullImageView.load(null)
             textView.textSize = config.bodyTextSizeSp.toTextSize()
 
-            val imageUrl = targetPostView.post.url ?: postView.getThumbnailUrl(false)
+            val imageUrl = postView.getImageUrl(false)
 
             fun updateLayoutParams() {
                 imageUrl ?: return
@@ -381,7 +380,7 @@ class LemmyContentHelper(
                     onVideoClickListener(url, VideoType.Unknown, customPlayerView?.getVideoState())
                 } else if (uri.host == "gfycat.com") {
                     val keyLowerCase = uri.path?.substring(1)?.split("-")?.get(0) ?: ""
-                    val thumbnailUrl = requireNotNull(targetPostView.post.thumbnail_url)
+                    val thumbnailUrl = requireNotNull(postView.post.thumbnail_url)
                     val startIndex = thumbnailUrl.indexOf(keyLowerCase, ignoreCase = true)
                     if (startIndex > -1 && keyLowerCase.isNotBlank()) {
                         val key =
@@ -517,8 +516,8 @@ class LemmyContentHelper(
             when (postType) {
                 PostType.Image -> {
                     insertAndLoadFullImage(
-                        originalImageUrl = requireNotNull(targetPostView.post.url),
-                        fallback = targetPostView.post.thumbnail_url,
+                        originalImageUrl = requireNotNull(postView.post.url),
+                        fallback = postView.post.thumbnail_url,
                     )
                 }
                 PostType.Video -> {
@@ -527,7 +526,7 @@ class LemmyContentHelper(
 
                     customPlayerView = playerView
 
-                    val videoInfo = targetPostView.getVideoInfo()
+                    val videoInfo = postView.getVideoInfo()
                     if (videoInfo != null) {
                         val videoType = getVideoType(videoInfo.videoUrl)
 
@@ -582,7 +581,7 @@ class LemmyContentHelper(
                     }
                 }
                 PostType.Text, PostType.Link -> {
-                    val thumbnail = targetPostView.post.thumbnail_url
+                    val thumbnail = postView.post.thumbnail_url
                     if (thumbnail != null && ContentUtils.isUrlImage(thumbnail)) {
                         insertAndLoadFullImage(thumbnail)
                     }
@@ -615,12 +614,12 @@ class LemmyContentHelper(
                         postType == PostType.Text
                     ) && showLink
             ) {
-                if (targetPostView.post.embed_video_url != null) {
-                    appendUiForExternalOrInternalUrl(targetPostView.post.embed_video_url)
-                } else if (targetPostView.post.url != null &&
-                    targetPostView.post.thumbnail_url != targetPostView.post.url
+                if (postView.post.embed_video_url != null) {
+                    appendUiForExternalOrInternalUrl(postView.post.embed_video_url)
+                } else if (postView.post.url != null &&
+                    postView.post.thumbnail_url != postView.post.url
                 ) {
-                    appendUiForExternalOrInternalUrl(targetPostView.post.url)
+                    appendUiForExternalOrInternalUrl(postView.post.url)
                 }
             }
         }

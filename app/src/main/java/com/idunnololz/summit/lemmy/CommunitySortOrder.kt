@@ -64,6 +64,8 @@ sealed interface CommunitySortOrder : Parcelable {
     }
 }
 
+val DefaultSortOrder = CommunitySortOrder.Active
+
 fun idToSortOrder(id: Int) = when (id) {
     R.id.sort_order_active ->
         CommunitySortOrder.Active

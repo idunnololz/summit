@@ -13,6 +13,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
+import com.idunnololz.summit.lemmy.DefaultSortOrder
 import com.squareup.moshi.Moshi
 import kotlinx.parcelize.Parcelize
 
@@ -57,7 +58,7 @@ data class UserCommunityEntry(
 data class UserCommunityItem(
     val id: Long = 0L,
     val sortOrder: Long = 0L,
-    val communitySortOrder: CommunitySortOrder = CommunitySortOrder.Active,
+    val communitySortOrder: CommunitySortOrder = DefaultSortOrder,
     val communityRef: CommunityRef,
     val iconUrl: String? = null,
 ) : Parcelable
@@ -90,9 +91,9 @@ class UserCommunitiesConverters(private val moshi: Moshi) {
     @TypeConverter
     fun stringToCommunitySortOrder(value: String): CommunitySortOrder = try {
         moshi.adapter(CommunitySortOrder::class.java).fromJson(value)
-            ?: CommunitySortOrder.Active
+            ?: DefaultSortOrder
     } catch (e: Exception) {
-        CommunitySortOrder.Active
+        DefaultSortOrder
     }
 
     @TypeConverter
