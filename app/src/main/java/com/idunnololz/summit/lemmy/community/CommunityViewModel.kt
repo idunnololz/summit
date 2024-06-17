@@ -39,6 +39,7 @@ import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
@@ -66,7 +67,7 @@ import kotlinx.parcelize.Parcelize
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
     private val context: Application,
-    private val postsRepository: PostsRepository,
+    private val postsRepositoryFactory: PostsRepository.Factory,
     private val recentCommunityManager: RecentCommunityManager,
     private val accountManager: AccountManager,
     private val userCommunitiesManager: UserCommunitiesManager,
@@ -108,6 +109,7 @@ class CommunityViewModel @Inject constructor(
         val hideReadCount: Int? = null,
     )
 
+    private val postsRepository = postsRepositoryFactory.create(state)
     private var pagePositions = arrayListOf<PageScrollState>()
 
     val currentCommunityRef = state.getLiveData<CommunityRef?>("currentCommunityRef")
@@ -969,33 +971,12 @@ class CommunityViewModel @Inject constructor(
             fullAccount?.account,
         )
 
-        fun getSortOrder(): CommunitySortOrder? {
-            val currentCommunityRef = currentCommunityRef.value
-            if (currentCommunityRef != null) {
-                val config = perCommunityPreferences.getCommunityConfig(currentCommunityRef)
-                val sortOrder = config?.sortOrder
-
-                if (sortOrder != null) {
-                    return sortOrder
-                }
-            }
-
-            if (preferences.defaultCommunitySortOrder != null) {
-                return preferences.defaultCommunitySortOrder
-            }
-
-            if (fullAccount != null) {
-                return fullAccount
-                    .accountInfo
-                    .miscAccountInfo
-                    ?.defaultCommunitySortType
-                    ?.toSortOrder()
-            }
-
-            return null
-        }
-
-        val sortOrder = getSortOrder()
+        val sortOrder = getSortOrderForCommunity(
+            currentCommunityRef.value,
+            preferences,
+            perCommunityPreferences,
+            fullAccount,
+        )
 
         if (sortOrder != null) {
             setSortOrder(sortOrder)

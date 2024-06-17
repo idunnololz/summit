@@ -1743,6 +1743,7 @@
     <string name="prefetch_posts">Prefetch posts</string>
     <string name="prefetch_posts_desc">When enabled, the post feed will prefetch posts before they are needed to improve loading performance. This is recommended if you have a good internet connection.</string>
     <string name="prefer_community_icon">Prefer community icon</string>
+    <string name="make_available_offline">Make available offline</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

@@ -27,6 +27,18 @@ fun PostView.getLowestResHiddenPreviewInfo(): PreviewInfo? {
     )
 }
 
+fun PostView.getImageUrl(reveal: Boolean): String? = if (shouldHideItem()) {
+    if (reveal) {
+        post.url
+            ?: getThumbnailUrl(reveal)
+    } else {
+        getLowestResHiddenPreviewInfo()?.getUrl()
+    }
+} else {
+    post.url
+        ?: getThumbnailUrl(reveal)
+}
+
 fun PostView.getThumbnailUrl(reveal: Boolean): String? = if (shouldHideItem()) {
     if (reveal) {
         post.thumbnail_url

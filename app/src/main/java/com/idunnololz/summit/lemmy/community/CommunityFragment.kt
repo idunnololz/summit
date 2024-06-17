@@ -21,10 +21,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -74,6 +78,7 @@ import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.offline.OfflinePostFeedWork
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
@@ -1376,6 +1381,14 @@ class CommunityFragment :
                 )
             }
 
+            if (BuildConfig.DEBUG) {
+                addItemWithIcon(
+                    id = R.id.make_available_offline,
+                    title = getString(R.string.make_available_offline),
+                    icon = R.drawable.baseline_download_for_offline_24,
+                )
+            }
+
             if (currentCommunityRef != null) {
                 addDivider()
                 addItemWithIcon(
@@ -1638,6 +1651,17 @@ class CommunityFragment :
 
                 adapter?.updateNsfwMode(nsfwModeManager)
                 viewModel.recheckNsfwMode()
+            }
+            R.id.make_available_offline -> {
+                if (currentCommunityRef != null) {
+                    val request = OneTimeWorkRequestBuilder<OfflinePostFeedWork>()
+                        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                        .setInputData(OfflinePostFeedWork.makeInputData(currentCommunityRef))
+                        .build()
+
+                    WorkManager.getInstance(context)
+                        .enqueue(request)
+                }
             }
         }
     }

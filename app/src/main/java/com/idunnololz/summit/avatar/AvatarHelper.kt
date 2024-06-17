@@ -1,6 +1,7 @@
 package com.idunnololz.summit.avatar
 
 import android.content.Context
+import android.util.Log
 import android.widget.ImageView
 import coil.dispose
 import coil.load
@@ -51,6 +52,8 @@ class AvatarHelper @Inject constructor(
 
     fun loadIcon(imageView: ImageView, community: Community) {
         (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
+
+        Log.d("HAHA", "ICON: ${community.icon}")
 
         if (community.icon.isNullOrBlank()) {
             val job = coroutineScope.launch {

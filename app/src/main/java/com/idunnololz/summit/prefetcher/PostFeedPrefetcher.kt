@@ -29,7 +29,14 @@ class PostFeedPrefetcher @Inject constructor(
         Log.d(TAG, "Prefetching page $pageIndex")
 
         prefetchingJob = coroutineScope.launch(Dispatchers.IO) {
-            postsRepository.getPage(pageIndex, dispatcher = Dispatchers.IO)
+            suspendPrefetchPage(pageIndex = pageIndex, postsRepository = postsRepository)
         }
+    }
+
+    suspend fun suspendPrefetchPage(
+        pageIndex: Int,
+        postsRepository: PostsRepository,
+    ): Result<PostsRepository.PageResult> {
+        return postsRepository.getPage(pageIndex, dispatcher = Dispatchers.IO)
     }
 }

@@ -18,6 +18,9 @@ import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.util.retry
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 import kotlin.math.min
@@ -25,9 +28,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@ViewModelScoped
-class PostsRepository @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+class PostsRepository @AssistedInject constructor(
+    @Assisted private val savedStateHandle: SavedStateHandle,
     private val apiClient: AccountAwareLemmyClient,
     private val postReadManager: PostReadManager,
     private val hiddenPostsManager: HiddenPostsManager,
@@ -40,6 +42,11 @@ class PostsRepository @Inject constructor(
         private val TAG = PostsRepository::class.simpleName
 
         private const val DEFAULT_POSTS_PER_PAGE = 20
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(savedStateHandle: SavedStateHandle): PostsRepository
     }
 
     private data class PostData(
@@ -83,7 +90,7 @@ class PostsRepository @Inject constructor(
 
     var sortOrder = savedStateHandle.getStateFlow<CommunitySortOrder>(
         "PostsRepository.sortOrder",
-        CommunitySortOrder.Active,
+        DefaultSortOrder,
     )
 
     fun setSortOrder(sortOrder: CommunitySortOrder) {
@@ -523,10 +530,6 @@ class PostsRepository @Inject constructor(
 
     fun addSeenPosts(posts: List<PostView>) {
         seenPosts.addAll(posts.map { it.getUniqueKey() })
-    }
-
-    interface Factory {
-        fun create(instance: String): PostsRepository
     }
 
     class PageResult(
