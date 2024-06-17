@@ -947,4 +947,5 @@
     <string name="prefetch_posts">Pre-carica post</string>
     <string name="prefetch_posts_desc">Se abilitata, l\'elenco dei post pre-caricherà gli elementi prima del necessario per migliorare le performance. Si consiglia di attivare in condizioni ottimali di connettività Internet.</string>
     <string name="prefer_community_icon">Preferisci icona comunità</string>
+    <string name="make_available_offline">Rendi disponibile offline</string>
 </resources>
