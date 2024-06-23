@@ -940,4 +940,5 @@
     <string name="prefetch_posts">पोस्ट पूर्व-प्राप्त करें</string>
     <string name="prefetch_posts_desc">सक्षम होने पर, पोस्ट फीड लोडिंग प्रदर्शन को बेहतर बनाने के लिए आवश्यक होने से पहले पोस्ट को पूर्व-प्राप्त कर लेगा। यदि आपके पास अच्छा इंटरनेट कनेक्शन है तो इसकी अनुशंसा की जाती है।</string>
     <string name="prefer_community_icon">समुदाय आइकन को प्राथमिकता दें</string>
+    <string name="make_available_offline">ऑफ़लाइन उपलब्ध कराएं</string>
 </resources>
