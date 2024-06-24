@@ -230,7 +230,9 @@ class PostViewModel @Inject constructor(
 
         return viewModelScope.launch(Dispatchers.Default) {
             if (switchToNativeInstance) {
+                switchAccountState.postIsLoading(context.getString(R.string.switching_instance))
                 translatePostToCurrentInstance()
+                switchAccountState.postIdle()
             }
 
             val postOrCommentRef = postOrCommentRef ?: return@launch
@@ -261,7 +263,12 @@ class PostViewModel @Inject constructor(
                 Result.success(this@PostViewModel.postView)
             }
 
-            this@PostViewModel.postView = postResult.getOrNull()
+            this@PostViewModel.postView = if (force) {
+                postResult.getOrNull()
+            } else {
+                postResult.getOrNull()
+                    ?: this@PostViewModel.postView
+            }
 
             val commentsResult = if (fetchCommentData) {
                 postOrCommentRef
@@ -321,17 +328,25 @@ class PostViewModel @Inject constructor(
             }
 
             if (post == null || comments == null) {
-                postResult
-                    .onFailure {
-                        postData.postError(it)
-                    }
-                    .onSuccess {}
+                // see if we can recover gracefully
 
-                commentsResult
-                    .onFailure {
-                        postData.postError(it)
-                    }
-                    .onSuccess {}
+                val postView = postView
+                if (postView != null && comments != null && !force) {
+                    // lets recover!
+                    updateData()
+                } else {
+                    postResult
+                        .onFailure {
+                            postData.postError(it)
+                        }
+                        .onSuccess {}
+
+                    commentsResult
+                        .onFailure {
+                            postData.postError(it)
+                        }
+                        .onSuccess {}
+                }
             } else {
                 updateData()
             }
@@ -726,9 +741,22 @@ class PostViewModel @Inject constructor(
             newlyPostedCommentId = newlyPostedCommentId,
             selectedCommentId = postOrCommentRef?.getOrNull()?.id,
             isSingleComment = postOrCommentRef?.getOrNull() != null,
+            isNativePost = isNativePost(),
+            accountInstance = currentAccountView.value?.account?.instance,
         )
 
         postData.postValue(postDataValue)
+    }
+
+    fun isNativePost(): Boolean {
+        val postOrCommentRef = postOrCommentRef ?: return true
+        val currentAccount = currentAccountView.value ?: return true
+
+        val instance = postOrCommentRef.fold(
+            { it.instance },
+            { it.instance },
+        )
+        return instance == currentAccount.account.instance
     }
 
     fun fetchMoreComments(parentId: CommentId?, depth: Int? = null, force: Boolean = false) {
@@ -817,6 +845,8 @@ class PostViewModel @Inject constructor(
         val newlyPostedCommentId: CommentId?,
         val selectedCommentId: CommentId?,
         val isSingleComment: Boolean,
+        val isNativePost: Boolean,
+        val accountInstance: String?,
     )
 
     sealed interface ListView {
@@ -905,6 +935,11 @@ class PostViewModel @Inject constructor(
     override fun onCleared() {
         Log.d(TAG, "onCleared()")
         super.onCleared()
+    }
+
+    fun updatePostViewIfNeeded(post: PostView?) {
+        post ?: return
+        postView = post
     }
 
     class ObjectResolverFailedException : Exception()

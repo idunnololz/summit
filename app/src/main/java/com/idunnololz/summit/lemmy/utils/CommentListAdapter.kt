@@ -126,8 +126,9 @@ class CommentListAdapter(
                 }
 
             postAndCommentViewBuilder.ensureCommentsActionButtons(
-                viewHolder,
-                viewHolder.root,
+                vh = viewHolder,
+                root = viewHolder.root,
+                isSaved = item.commentView.saved,
             )
 
             b.postInfo.text = buildSpannedString {

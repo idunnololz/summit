@@ -1309,7 +1309,6 @@ class PostListViewBuilder @Inject constructor(
                     result.drawable.getSize(size)
 
                     if (size.width > 0 && size.height > 0) {
-                        Log.d("HAHA", "setting image size: $size")
                         offlineManager.setImageSizeHint(
                             imageUrl,
                             size.width,

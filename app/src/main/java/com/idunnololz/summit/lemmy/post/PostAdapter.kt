@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
@@ -27,11 +28,13 @@ import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
+import com.idunnololz.summit.databinding.PostNotNativeInstanceItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.ScreenshotModeOptionsBinding
 import com.idunnololz.summit.databinding.ViewAllCommentsBinding
 import com.idunnololz.summit.lemmy.CommentNodeData
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.flatten
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.FooterItem
@@ -83,6 +86,7 @@ class PostAdapter(
     private val onLoadPost: (PostId) -> Unit,
     private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
+    private val switchToNativeInstance: (instance: String) -> Unit,
 ) : RecyclerView.Adapter<ViewHolder>() {
 
     interface ScreenshotOptions
@@ -90,6 +94,14 @@ class PostAdapter(
     private sealed class Item(
         open val id: String,
     ) {
+
+        data class NotNativeInstanceItem(
+            val accountInstance: String,
+            val postInstance: String,
+        ) : Item(
+            "not_native_instance@",
+        ),
+            ScreenshotOptions
 
         data class HeaderItem(
             val postView: PostView,
@@ -284,6 +296,8 @@ class PostAdapter(
             refreshItems()
         }
 
+    var hideNonNativeInstanceWarning = false
+
     override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
         is HeaderItem -> R.layout.post_header_item
         is Item.VisibleCommentItem ->
@@ -309,6 +323,7 @@ class PostAdapter(
         is FooterItem -> R.layout.generic_space_footer_item
         is Item.ViewAllComments -> R.layout.view_all_comments
         is Item.MissingCommentItem -> R.layout.post_missing_comment_item
+        is Item.NotNativeInstanceItem -> R.layout.post_not_native_instance_item
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -384,6 +399,8 @@ class PostAdapter(
                 ViewBindingViewHolder(ViewAllCommentsBinding.bind(v))
             R.layout.post_missing_comment_item ->
                 ViewBindingViewHolder(PostMissingCommentItemBinding.bind(v))
+            R.layout.post_not_native_instance_item ->
+                ViewBindingViewHolder(PostNotNativeInstanceItemBinding.bind(v))
             else -> throw RuntimeException("ViewType: $viewType")
         }
     }
@@ -782,6 +799,30 @@ class PostAdapter(
                     },
                 )
             }
+            is Item.NotNativeInstanceItem -> {
+                val b = holder.getBinding<PostNotNativeInstanceItemBinding>()
+
+                b.title.text = context.getString(R.string.non_native_post_warning_title)
+                b.text.text = LemmyTextHelper.getSpannable(
+                    context,
+                    context.getString(
+                        R.string.non_native_post_warning_desc,
+                        item.postInstance,
+                        item.accountInstance,
+                    )
+                )
+                b.changeInstance.text = context.getString(
+                    R.string.view_in_my_instance_format,
+                    item.accountInstance
+                )
+                b.changeInstance.setOnClickListener {
+                    switchToNativeInstance(item.accountInstance)
+                }
+                b.dismiss.setOnClickListener {
+                    hideNonNativeInstanceWarning = true
+                    refreshItems()
+                }
+            }
         }
     }
 
@@ -907,6 +948,17 @@ class PostAdapter(
 
                 val postView = rawData.postView
                 val commentItems = rawData.commentTree.flatten(collapsedItemIds)
+
+                if (!rawData.isNativePost &&
+                    !hideNonNativeInstanceWarning &&
+                    rawData.accountInstance != null) {
+
+                    finalItems += Item.NotNativeInstanceItem(
+                        accountInstance = rawData.accountInstance,
+                        postInstance = postView.post.community.instance,
+                    )
+                }
+
                 finalItems += HeaderItem(
                     postView = postView.post,
                     videoState = videoState,
@@ -953,8 +1005,7 @@ class PostAdapter(
                                 if (show) {
                                     Item.VisibleCommentItem(
                                         commentId = commentId,
-                                        content =
-                                        commentView.pendingCommentView?.content
+                                        content = commentView.pendingCommentView?.content
                                             ?: commentView.comment.comment.content,
                                         comment = commentView.comment,
                                         depth = commentItem.depth,
@@ -1199,6 +1250,7 @@ class PostAdapter(
             FooterItem -> false
             is Item.ViewAllComments -> false
             is Item.MissingCommentItem -> false
+            is Item.NotNativeInstanceItem -> false
         }
     }
 
@@ -1238,7 +1290,13 @@ class PostAdapter(
         }
 
         error = null
+
+        val oldData = rawData
         rawData = data
+
+        if (oldData?.postView?.post?.post?.id != data.postView.post.post.id) {
+            hideNonNativeInstanceWarning = false
+        }
 
         refreshItems()
     }
@@ -1290,6 +1348,7 @@ class PostAdapter(
             is MoreCommentsItem,
             is ProgressOrErrorItem,
             is Item.ViewAllComments,
+            is Item.NotNativeInstanceItem,
             -> {}
         }
 
@@ -1309,6 +1368,7 @@ class PostAdapter(
             is MoreCommentsItem,
             is ProgressOrErrorItem,
             is Item.ViewAllComments,
+            is Item.NotNativeInstanceItem,
             -> {}
         }
 
@@ -1338,6 +1398,7 @@ class PostAdapter(
             is MoreCommentsItem,
             is ProgressOrErrorItem,
             is Item.ViewAllComments,
+            is Item.NotNativeInstanceItem,
             -> null
         }
 
@@ -1398,6 +1459,7 @@ class PostAdapter(
 
             items.withIndex().forEach { (index, item) ->
                 when (item) {
+                    is Item.NotNativeInstanceItem -> {}
                     is Item.VisibleCommentItem -> {
                         count(item.comment.comment.content, finalQuery) {
                             occurrences.add(

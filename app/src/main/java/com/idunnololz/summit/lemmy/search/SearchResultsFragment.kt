@@ -440,6 +440,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 postAndCommentViewBuilder.ensureCommentsActionButtons(
                     vh = viewHolder,
                     root = viewHolder.root,
+                    isSaved = item.commentView.saved,
                 )
 
                 b.postInfo.text = buildSpannedString {

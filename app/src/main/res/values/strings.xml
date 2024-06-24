@@ -1744,6 +1744,15 @@
     <string name="prefetch_posts_desc">When enabled, the post feed will prefetch posts before they are needed to improve loading performance. This is recommended if you have a good internet connection.</string>
     <string name="prefer_community_icon">Prefer community icon</string>
     <string name="make_available_offline">Make available offline</string>
+    <string name="non_native_post_warning_title">Instance mismatch</string>
+    <string name="non_native_post_warning_desc">You are viewing this post on the instance **%1$s** but you are currently signed in on **%2$s**.</string>
+    <string name="view_in_my_instance_format">View in my instance (%1$s)</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="offline_starting">Starting…</string>
+    <string name="offline_fetching_post_feed">Fetching post feed…</string>
+    <string name="offline_fetching_posts">Fetching posts…</string>
+    <string name="offline_fetching_extras">Fetching extras…</string>
+    <string name="offline_done">Done!</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

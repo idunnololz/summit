@@ -79,6 +79,7 @@ import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.OfflinePostFeedWork
+import com.idunnololz.summit.offline.dialog.MakeOfflineDialogFragment
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
@@ -1381,13 +1382,11 @@ class CommunityFragment :
                 )
             }
 
-            if (BuildConfig.DEBUG) {
-                addItemWithIcon(
-                    id = R.id.make_available_offline,
-                    title = getString(R.string.make_available_offline),
-                    icon = R.drawable.baseline_download_for_offline_24,
-                )
-            }
+            addItemWithIcon(
+                id = R.id.make_available_offline,
+                title = getString(R.string.make_available_offline),
+                icon = R.drawable.baseline_download_for_offline_24,
+            )
 
             if (currentCommunityRef != null) {
                 addDivider()
@@ -1654,13 +1653,8 @@ class CommunityFragment :
             }
             R.id.make_available_offline -> {
                 if (currentCommunityRef != null) {
-                    val request = OneTimeWorkRequestBuilder<OfflinePostFeedWork>()
-                        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                        .setInputData(OfflinePostFeedWork.makeInputData(currentCommunityRef))
-                        .build()
-
-                    WorkManager.getInstance(context)
-                        .enqueue(request)
+                    MakeOfflineDialogFragment.newInstance(currentCommunityRef)
+                        .show(childFragmentManager, "MakeOfflineDialogFragment")
                 }
             }
         }
