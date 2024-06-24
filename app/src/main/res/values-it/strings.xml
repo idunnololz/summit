@@ -944,4 +944,8 @@
     <string name="file_type">Tipo file</string>
     <string name="error_unable_to_delete_post">Non è stato possibile eliminare/ripristinare il post</string>
     <string name="nsfw_mode_disabled">Modalità NSFW disabilitata</string>
+    <string name="prefetch_posts">Pre-carica post</string>
+    <string name="prefetch_posts_desc">Se abilitata, l\'elenco dei post pre-caricherà gli elementi prima del necessario per migliorare le performance. Si consiglia di attivare in condizioni ottimali di connettività Internet.</string>
+    <string name="prefer_community_icon">Preferisci icona comunità</string>
+    <string name="make_available_offline">Rendi disponibile offline</string>
 </resources>
