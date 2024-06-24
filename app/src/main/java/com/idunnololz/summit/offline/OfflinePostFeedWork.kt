@@ -44,6 +44,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -76,6 +78,15 @@ class OfflinePostFeedWork @AssistedInject constructor(
     }
 
     @Parcelize
+    enum class ProgressPhase(val index: Int): Parcelable {
+        Start(0),
+        FetchingPostFeed(1),
+        FetchingPosts(2),
+        FetchingExtras(3),
+        Complete(4),
+    }
+
+    @Parcelize
     private class BoxedCommunityRef(
         val communityRef: CommunityRef
     ) : Parcelable
@@ -84,6 +95,11 @@ class OfflinePostFeedWork @AssistedInject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
+        Log.d("HAHA", "doWork()")
+        val progressTracker = ProgressTracker()
+
+        setProgress(progressTracker.getProgressData())
+
         val communityRef =
             inputData.getParcelable<BoxedCommunityRef>(ARG_COMMUNITY_REF)?.communityRef
 
@@ -102,11 +118,15 @@ class OfflinePostFeedWork @AssistedInject constructor(
         postsRepository.setCommunity(communityRef)
         postsRepository.setSortOrder(sortOrder)
 
-
         val allPosts = mutableListOf<LocalPostView>()
         val offlinePostCount = preferenceManager.currentPreferences.getOfflinePostCount()
         var postsLoaded = 0
         var index = 0
+
+        setProgress(progressTracker.apply {
+            currentPhase = ProgressPhase.FetchingPostFeed
+            subMax = offlinePostCount.toDouble()
+        }.getProgressData())
 
         while (true) {
             val result = postFeedPrefetcher.suspendPrefetchPage(index, postsRepository)
@@ -124,7 +144,9 @@ class OfflinePostFeedWork @AssistedInject constructor(
 
             postsLoaded += postCount
 
-            Log.d("HAHA", "posts loaded: $postsLoaded")
+            setProgress(progressTracker.apply {
+                subCount = postsLoaded.toDouble()
+            }.getProgressData())
 
             if (postsLoaded >= offlinePostCount) {
                 break
@@ -133,31 +155,45 @@ class OfflinePostFeedWork @AssistedInject constructor(
             index++
         }
 
-        for (post in allPosts) {
-            postPrefetcher.prefetchPosts(
-                allPosts.map {
-                    Either.Left(
-                        PostRef(
-                            post.fetchedPost.source.instance
-                                ?: post.fetchedPost.postView.instance,
-                            post.fetchedPost.postView.post.id
-                        )
-                    )
-                },
-                (preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top).toApiSortOrder(),
-                if (preferences.collapseChildCommentsByDefault) {
-                    1
-                } else {
-                    null
-                }
-            )
-        }
+        setProgress(progressTracker.apply {
+            currentPhase = ProgressPhase.FetchingPosts
+            subMax = allPosts.size.toDouble()
+        }.getProgressData())
 
+        postPrefetcher.prefetchPosts(
+            postOrCommentRefs = allPosts.map { post ->
+                Either.Left(
+                    PostRef(
+                        post.fetchedPost.source.instance
+                            ?: post.fetchedPost.postView.instance,
+                        post.fetchedPost.postView.post.id
+                    )
+                )
+            },
+            sortOrder = (preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top).toApiSortOrder(),
+            maxDepth = if (preferences.collapseChildCommentsByDefault) {
+                1
+            } else {
+                null
+            },
+            account = fullAccount?.account,
+            onProgress = { count: Int, maxCount: Int ->
+                setProgress(progressTracker.apply {
+                    subCount = count.toDouble()
+                }.getProgressData())
+            }
+        )
+
+        setProgress(progressTracker.apply {
+            currentPhase = ProgressPhase.FetchingExtras
+            subMax = allPosts.size.toDouble()
+        }.getProgressData())
         coroutineScope {
-            val fetchImageJobs = mutableListOf<Deferred<Unit>>()
+            var doneCount = 0
+            val fetchImageJobs = mutableListOf<Job>()
 
             for (post in allPosts) {
-                fetchImageJobs += async {
+                fetchImageJobs += launch {
                     val postView = post.fetchedPost.postView
                     val imageUrl = postView.getImageUrl(false)
                     if (imageUrl != null) {
@@ -180,10 +216,19 @@ class OfflinePostFeedWork @AssistedInject constructor(
                             }
                         }
                     }
+
+                    doneCount++
+                    setProgress(progressTracker.apply {
+                        subCount = doneCount.toDouble()
+                    }.getProgressData())
                 }
             }
 
-            fetchImageJobs.awaitAll()
+            setProgress(progressTracker.apply {
+                currentPhase = ProgressPhase.Complete
+            }.getProgressData())
+
+            fetchImageJobs.joinAll()
         }
 
         return Result.success()
@@ -214,5 +259,42 @@ class OfflinePostFeedWork @AssistedInject constructor(
             .setContentText("Updating widget")
             .build()
         return ForegroundInfo(NOTIFICATION_ID, notification)
+    }
+
+    class ProgressTracker {
+
+        companion object {
+            private const val PROGRESS_PHASE = "PROGRESS_1"
+            private const val PROGRESS_SUB_COUNT = "PROGRESS_2"
+            private const val PROGRESS_SUB_MAX = "PROGRESS_3"
+
+            fun fromData(data: Data) =
+                ProgressTracker().apply {
+                    currentPhase = ProgressPhase.entries[data.getInt(PROGRESS_PHASE, 0)]
+                    subCount = data.getDouble(PROGRESS_SUB_COUNT, 0.0)
+                    subMax = data.getDouble(PROGRESS_SUB_MAX, 0.0)
+                }
+        }
+
+        var currentPhase: ProgressPhase = ProgressPhase.Start
+            set(value) {
+                field = value
+                subCount = 0.0
+                subMax = 1.0
+            }
+        var subCount: Double = 0.0
+        var subMax: Double = 0.0
+
+        val progressPercent
+            get() = (currentPhase.index / ((ProgressPhase.entries.size - 1).toDouble()))
+        val subProgressPercent
+            get() = subCount / subMax
+
+        fun getProgressData() =
+            workDataOf(
+                PROGRESS_PHASE to currentPhase.ordinal,
+                PROGRESS_SUB_COUNT to subCount,
+                PROGRESS_SUB_MAX to subMax,
+            )
     }
 }

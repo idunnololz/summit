@@ -513,6 +513,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showMoreLinkOptions(url, text)
                 },
+                switchToNativeInstance = {},
             ).apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
@@ -530,11 +531,13 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
             adapter.setData(
                 PostViewModel.PostData(
-                    PostViewModel.ListView.PostListView(data.post),
-                    listOfNotNull(data.commentTree),
-                    null,
-                    null,
-                    false,
+                    postView = PostViewModel.ListView.PostListView(data.post),
+                    commentTree = listOfNotNull(data.commentTree),
+                    newlyPostedCommentId = null,
+                    selectedCommentId = null,
+                    isSingleComment = false,
+                    isNativePost = true,
+                    accountInstance = viewModel.apiInstance,
                 ),
             )
 

@@ -300,6 +300,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 leftHandMode = leftHandMode,
                 showUpAndDownVotes = showUpAndDownVotes,
                 actions = listOf(PostQuickActionIds.Voting),
+                isSaved = postView.saved,
                 fullWidth = false,
             )
         } else {
@@ -308,6 +309,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 leftHandMode = leftHandMode,
                 showUpAndDownVotes = showUpAndDownVotes,
                 actions = postQuickActions.actions + PostQuickActionIds.More,
+                isSaved = postView.saved,
                 fullWidth = false,
             )
         }
@@ -604,6 +606,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                         ensureCommentsActionButtons(
                             vh = this,
                             root = rb.root,
+                            isSaved = commentView.saved,
                             fullWidth = false,
                         )
                     }
@@ -612,12 +615,14 @@ class PostAndCommentViewBuilder @Inject constructor(
                             ensureCommentsActionButtons(
                                 vh = this,
                                 root = root,
+                                isSaved = commentView.saved,
                                 fullWidth = false,
                             )
                         } else {
                             ensureCommentsActionButtons(
                                 vh = this,
                                 root = root,
+                                isSaved = commentView.saved,
                                 removeOnly = true,
                             )
                         }
@@ -1318,6 +1323,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     fun ensureCommentsActionButtons(
         vh: QuickActionsViewHolder,
         root: ViewGroup,
+        isSaved: Boolean,
         removeOnly: Boolean = false,
         fullWidth: Boolean = true,
     ) {
@@ -1327,6 +1333,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             showUpAndDownVotes = showUpAndDownVotes,
             actions = commentQuickActions.actions + CommentQuickActionIds.More,
             removeOnly = removeOnly,
+            isSaved = isSaved,
             fullWidth = fullWidth,
         )
     }
@@ -1336,6 +1343,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         leftHandMode: Boolean,
         showUpAndDownVotes: Boolean,
         actions: List<Int>,
+        isSaved: Boolean,
         removeOnly: Boolean = false,
         fullWidth: Boolean = true,
     ) {
@@ -1499,14 +1507,22 @@ class PostAndCommentViewBuilder @Inject constructor(
                 }
                 PostQuickActionIds.Save -> {
                     makeCommentActionButton(R.id.pa_save_toggle).apply {
-                        setImageResource(R.drawable.baseline_bookmark_24)
+                        if (isSaved) {
+                            setImageResource(R.drawable.baseline_bookmark_24)
+                        } else {
+                            setImageResource(R.drawable.outline_bookmark_border_24)
+                        }
                         quickActionsBar.addView(this)
                         actionButtons.add(this)
                     }
                 }
                 CommentQuickActionIds.Save -> {
                     makeCommentActionButton(R.id.ca_save_toggle).apply {
-                        setImageResource(R.drawable.baseline_bookmark_24)
+                        if (isSaved) {
+                            setImageResource(R.drawable.baseline_bookmark_24)
+                        } else {
+                            setImageResource(R.drawable.outline_bookmark_border_24)
+                        }
                         quickActionsBar.addView(this)
                         actionButtons.add(this)
                     }

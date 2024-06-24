@@ -177,6 +177,7 @@ class PostFragment :
         moreActionsHelper.apiClient = viewModel.lemmyApiClient
 
         if (savedInstanceState == null) {
+            viewModel.updatePostViewIfNeeded(args.post)
             viewModel.updatePostOrCommentRef(args.postOrCommentRef())
         }
 
@@ -460,6 +461,9 @@ class PostFragment :
                 },
                 onLinkLongClick = { url, text ->
                     getMainActivity()?.showMoreLinkOptions(url, text)
+                },
+                switchToNativeInstance = {
+                    viewModel.switchToNativeInstance()
                 },
             ).apply {
                 stateRestorationPolicy =
@@ -849,11 +853,13 @@ class PostFragment :
         args.post?.let { post ->
             adapter.setStartingData(
                 PostViewModel.PostData(
-                    PostViewModel.ListView.PostListView(post),
-                    listOf(),
-                    null,
-                    null,
-                    false,
+                    postView = PostViewModel.ListView.PostListView(post),
+                    commentTree = listOf(),
+                    newlyPostedCommentId = null,
+                    selectedCommentId = null,
+                    isSingleComment = false,
+                    isNativePost = viewModel.isNativePost(),
+                    accountInstance = viewModel.currentAccountView.value?.account?.instance,
                 ),
             )
             onMainListingItemRetrieved(post)
