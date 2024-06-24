@@ -948,4 +948,13 @@
     <string name="prefetch_posts_desc">Se abilitata, l\'elenco dei post pre-caricherà gli elementi prima del necessario per migliorare le performance. Si consiglia di attivare in condizioni ottimali di connettività Internet.</string>
     <string name="prefer_community_icon">Preferisci icona comunità</string>
     <string name="make_available_offline">Rendi disponibile offline</string>
+    <string name="view_in_my_instance_format">Visualizza sulla mia istanza (%1$s)</string>
+    <string name="dismiss">Ignora</string>
+    <string name="offline_starting">Inizializzazione…</string>
+    <string name="offline_fetching_post_feed">Download feed post…</string>
+    <string name="offline_fetching_posts">Dowload post…</string>
+    <string name="offline_fetching_extras">Download dati aggiuntivi…</string>
+    <string name="non_native_post_warning_title">Istanza non corrispondente</string>
+    <string name="offline_done">Terminato!</string>
+    <string name="non_native_post_warning_desc">Stai visualizzando questo post dall\'istanza **%1$s** ma attualmente hai effettuato il login su **%2$s**.</string>
 </resources>
