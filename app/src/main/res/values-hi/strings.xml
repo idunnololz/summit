@@ -13,7 +13,7 @@
     <string name="error_network_timeout">नेटवर्क त्रुटि। अनुरोध में बहुत लंबा समय लगा। कृपया पुन: प्रयास करें।</string>
     <string name="error_server_maintenance">सर्वर रखरखाव के अंतर्गत है। कृपया बाद में पुन: प्रयास करें।</string>
     <string name="all">सभी</string>
-    <string name="removed_by_op_message">यह पोस्ट उस व्यक्ति द्वारा हटा दी गई जिसने इसे मूल रूप से पोस्ट किया था।</string>
+    <string name="removed_by_op_message">यह पोस्ट उस व्यक्ति द्वारा मिटा दी गई जिसने इसे मूल रूप से पोस्ट किया था।</string>
     <string name="community_state_format">%1$s - पेज %2$s</string>
     <string name="error_unable_to_handle_link">लिंक %1$s को संभालने में असमर्थ</string>
     <string name="home_page_set">अगले ऐप प्रारंभ पर होम पेज बदल दिया जाएगा।</string>
@@ -336,7 +336,7 @@
     <string name="switching_instance">इंस्टैंस बदल रहे हैं…</string>
     <string name="create_multi_community">बहु-समुदाय बनाएं</string>
     <string name="error_no_communities_selected_desc">बहु-समुदाय बनाने के लिए कृपया कम से कम एक समुदाय का चयन करें।</string>
-    <string name="delete_all">सभी हटाएं</string>
+    <string name="delete_all">सभी मिटाएं</string>
     <string name="save_backup">सेटिंग्स सहेजें</string>
     <string name="settings_code">सेटिंग्स कोड</string>
     <string name="settings_code_missing">सेटिंग्स कोड गायब है</string>
@@ -474,7 +474,7 @@
     <string name="use_multiline_post_header">बहुपंक्ति शीर्षलेख का प्रयोग करें</string>
     <string name="save_drafts_automatically">मसौदे स्वचालित रूप से सहेजें</string>
     <string name="show_profile_icons">प्रोफाइल आइकन दिखाएं</string>
-    <string name="delete_setting_override_for_setting_format">\"%1$s\" सेटिंग के लिए सेटिंग ओवरराइड हटाएं?</string>
+    <string name="delete_setting_override_for_setting_format">\"%1$s\" सेटिंग के लिए सेटिंग ओवरराइड मिटाएं?</string>
     <string name="delete">मिटाएं</string>
     <string name="manage_settings">सेटिंग्स प्रबंधित करें</string>
     <string name="auto">ऑटो</string>
@@ -505,7 +505,7 @@
     <string name="send_comment">टिप्पणी भेजें</string>
     <string name="refresh">ताज़ा करें</string>
     <string name="update_comment">टिप्पणी अपडेट करें</string>
-    <string name="delete_comment_confirm">टिप्पणी हटाएं?</string>
+    <string name="delete_comment_confirm">टिप्पणी मिटाएं?</string>
     <string name="update_post">पोस्ट अपडेट करें</string>
     <string name="create_post">पोस्ट बनाएं</string>
     <string name="edit_post">पोस्ट संपादित करें</string>
@@ -628,7 +628,7 @@
     <string name="community">समुदाय</string>
     <string name="person">व्यक्ति</string>
     <string name="post">पोस्ट</string>
-    <string name="delete_suggest">सुझाव हटाएं?</string>
+    <string name="delete_suggest">सुझाव मिटाएं?</string>
     <string name="unlock_post">पोस्ट अनलॉक करें</string>
     <string name="lock_post">पोस्ट लॉक करें</string>
     <string name="error_unable_to_lock_post">पोस्ट को लॉक/अनलॉक करने में असमर्थ।</string>
@@ -684,7 +684,7 @@
     <string name="find_in_page">पेज में खोजें</string>
     <string name="draft_saved">मसौदा सहेजा गया</string>
     <string name="drafts">मसौदे</string>
-    <string name="warn_delete_all_drafts">सभी मसौदे हटाएं?</string>
+    <string name="warn_delete_all_drafts">सभी मसौदे मिटाएं?</string>
     <string name="filter_by_community">समुदाय द्वारा फिल्टर करें</string>
     <string name="user_hint">उपयोक्ता</string>
     <string name="update_complete_message">ऐप को v%1$s पर अपडेट किया गया!</string>
@@ -731,7 +731,7 @@
     <string name="error_purge_community">समुदाय को मिटाने में असमर्थ।</string>
     <string name="error_purge_post">पोस्ट को मिटाने में असमर्थ।</string>
     <string name="error_purge_comment">टिप्पणी मिटाने में असमर्थ।</string>
-    <string name="delete_backup">बैकअप हटाएं</string>
+    <string name="delete_backup">बैकअप मिटाएं</string>
     <string name="subscribers_format">%1$s सदस्य</string>
     <string name="upvotes">अपवोट</string>
     <string name="downvotes">डाउनवोट</string>
@@ -847,9 +847,9 @@
     <string name="supporters">समर्थक</string>
     <string name="create_community">समुदाय बनाएं</string>
     <string name="icon">आइकन</string>
-    <string name="delete_icon">आइकन हटाएं</string>
+    <string name="delete_icon">आइकन मिटाएं</string>
     <string name="banner">बैनर</string>
-    <string name="delete_banner">बैनर हटाएं</string>
+    <string name="delete_banner">बैनर मिटाएं</string>
     <string name="publish">प्रकाशित करें</string>
     <string name="error_update_community">समुदाय अपडेट करने में असमर्थ।</string>
     <string name="edit_icon">आइकन संपादन</string>
@@ -871,17 +871,17 @@
     <string name="delete_community">समुदाय मिटाएं</string>
     <string name="undo_delete_community">मिटाए गए समुदाय को पूर्ववत करें</string>
     <string name="error_unable_to_delete_community">समुदाय मिटने/पुनर्स्थापित करने में असमर्थ</string>
-    <string name="warn_community_deleted">इस समुदाय को इसके निर्माता द्वारा हटा दिया गया है। यह नियमित उपयोगकर्ताओं को दिखाई नहीं देगा।</string>
+    <string name="warn_community_deleted">इस समुदाय को इसके निर्माता द्वारा मिटा दिया गया है। यह नियमित उपयोगकर्ताओं को दिखाई नहीं देगा।</string>
     <string name="community_options">समुदाय विकल्प</string>
     <string name="error_unable_to_update_subscription">सदस्यता अपडेट करने में असमर्थ</string>
     <string name="instance_options">इंस्टैंस विकल्प</string>
     <string name="bookmark_feed">फीड को बुकमार्क करें</string>
     <string name="unsubscribed">सदस्यता छोड़ी गई</string>
     <string name="multi_community_info">बहु-समुदाय जानकारी</string>
-    <string name="prompt_delete_multicommunity">बहु-समुदाय हटाएं?</string>
+    <string name="prompt_delete_multicommunity">बहु-समुदाय मिटाएं?</string>
     <string name="message_to_format">प्रति: %1$s</string>
     <string name="message_from_format">प्रेषक: %1$s</string>
-    <string name="prompt_delete_multicommunity_desc">किसी बहु-समुदाय से बुकमार्क हटाने से बहु-समुदाय हट जाएगा।</string>
+    <string name="prompt_delete_multicommunity_desc">किसी बहु-समुदाय से बुकमार्क हटाने से बहु-समुदाय मिट जाएगा।</string>
     <string name="link_actions_format">लिंक कार्रवाइयां (%1$s)</string>
     <string name="link_type_instance_link">इंस्टैंस लिंक</string>
     <string name="link_type_image_link">छवि लिंक</string>
@@ -937,4 +937,8 @@
     <string name="toggle_nsfw">NSFW मोड टॉगल करें</string>
     <string name="nsfw_mode_enabled">NSFW मोड सक्षम</string>
     <string name="nsfw_mode_disabled">NSFW मोड अक्षम</string>
+    <string name="prefetch_posts">पोस्ट पूर्व-प्राप्त करें</string>
+    <string name="prefetch_posts_desc">सक्षम होने पर, पोस्ट फीड लोडिंग प्रदर्शन को बेहतर बनाने के लिए आवश्यक होने से पहले पोस्ट को पूर्व-प्राप्त कर लेगा। यदि आपके पास अच्छा इंटरनेट कनेक्शन है तो इसकी अनुशंसा की जाती है।</string>
+    <string name="prefer_community_icon">समुदाय आइकन को प्राथमिकता दें</string>
+    <string name="make_available_offline">ऑफ़लाइन उपलब्ध कराएं</string>
 </resources>
