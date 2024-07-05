@@ -32,7 +32,7 @@
     <string name="hidden_posts">छुपी हुई पोस्टें</string>
     <string name="banner_image">बैनर छवि</string>
     <string name="bot_account">बॉट खाता</string>
-    <string name="error_socket_timeout">सर्वर तक पहुँचने का प्रयास करने में समय समाप्त हो गया। सर्वर या तो ओवरलोड है या आपके इंटरनेट कनेक्शन में कोई समस्या है।</string>
+    <string name="error_socket_timeout">सर्वर तक पहुंचने का प्रयास करने में समय समाप्त हो गया। सर्वर या तो ओवरलोड है या आपके इंटरनेट कनेक्शन में कोई समस्या है।</string>
     <string name="reset_view_to_default_styles">दृश्य को तयशुदा शैलियों पर रीसेट करें?</string>
     <string name="dark_theme_settings">गहरी थीम सेटिंग्स</string>
     <string name="post_actions">पोस्ट कार्रवाइयां</string>
@@ -941,4 +941,13 @@
     <string name="prefetch_posts_desc">सक्षम होने पर, पोस्ट फीड लोडिंग प्रदर्शन को बेहतर बनाने के लिए आवश्यक होने से पहले पोस्ट को पूर्व-प्राप्त कर लेगा। यदि आपके पास अच्छा इंटरनेट कनेक्शन है तो इसकी अनुशंसा की जाती है।</string>
     <string name="prefer_community_icon">समुदाय आइकन को प्राथमिकता दें</string>
     <string name="make_available_offline">ऑफ़लाइन उपलब्ध कराएं</string>
+    <string name="non_native_post_warning_title">इंस्टैंस बेमेल</string>
+    <string name="non_native_post_warning_desc">आप इस पोस्ट को **%1$s** इंस्टैंस पर देख रहे हैं लेकिन आप वर्तमान में **%2$s** पर साइन इन हैं।</string>
+    <string name="view_in_my_instance_format">मेरे इंस्टैंस में देखें (%1$s)</string>
+    <string name="dismiss">खारिज करें</string>
+    <string name="offline_starting">आरंभ कर रहा है…</string>
+    <string name="offline_fetching_post_feed">पोस्ट फ़ीड प्राप्त किया जा रहा है…</string>
+    <string name="offline_fetching_posts">पोस्ट लायी जा रही हैं…</string>
+    <string name="offline_fetching_extras">अतिरिक्त सामग्री लायी जा रही है…</string>
+    <string name="offline_done">संपन्न!</string>
 </resources>
