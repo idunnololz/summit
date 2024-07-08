@@ -15,7 +15,7 @@ internal data class Site(
     val actor_id: String,
     val last_refreshed_at: String,
     val inbox_url: String,
-    val private_key: String? = null,
     val public_key: String,
     val instance_id: InstanceId,
+    val content_warning: String? = null,
 )

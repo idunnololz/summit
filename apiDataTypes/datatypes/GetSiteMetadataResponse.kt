@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class GetSiteMetadataResponse(
-    val metadata: SiteMetadata,
+    val metadata: LinkMetadata,
 )
