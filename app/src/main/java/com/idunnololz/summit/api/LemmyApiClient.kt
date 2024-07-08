@@ -288,6 +288,7 @@ class LemmyApiClient(
     suspend fun markPostAsRead(postId: PostId, read: Boolean, account: Account): Result<PostView> {
         val form = MarkPostAsRead(
             post_id = postId,
+            post_ids = listOf(postId),
             read = read,
             auth = account.jwt,
         )
