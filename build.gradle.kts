@@ -26,6 +26,7 @@ allprojects {
         maven { url = uri("https://maven.google.com") }
         maven { url = uri("https://jcenter.bintray.com") }
         maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots") }
     }
 }
 
