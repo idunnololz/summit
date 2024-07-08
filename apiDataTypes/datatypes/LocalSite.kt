@@ -1,5 +1,7 @@
 package it.vercruysse.lemmyapi.v0.x19.x3.datatypes
 
+import it.vercruysse.lemmyapi.dto.SortType
+import it.vercruysse.lemmyapi.dto.PostListingMode
 import it.vercruysse.lemmyapi.dto.RegistrationMode
 import it.vercruysse.lemmyapi.dto.ListingType
 import kotlinx.serialization.Serializable
@@ -30,4 +32,6 @@ internal data class LocalSite(
     val registration_mode: RegistrationMode /* "Closed" | "RequireApplication" | "Open" */,
     val reports_email_admins: Boolean,
     val federation_signed_fetch: Boolean,
+    val default_post_listing_mode: PostListingMode /* "List" | "Card" | "SmallCard" */,
+    val default_sort_type: SortType /* "Active" | "Hot" | "New" | "Old" | "TopDay" | "TopWeek" | "TopMonth" | "TopYear" | "TopAll" | "MostComments" | "NewComments" | "TopHour" | "TopSixHour" | "TopTwelveHour" | "TopThreeMonths" | "TopSixMonths" | "TopNineMonths" | "Controversial" | "Scaled" */,
 )

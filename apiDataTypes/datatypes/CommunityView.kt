@@ -9,4 +9,5 @@ internal data class CommunityView(
     val subscribed: SubscribedType /* "Subscribed" | "NotSubscribed" | "Pending" */,
     val blocked: Boolean,
     val counts: CommunityAggregates,
+    val banned_from_community: Boolean,
 )

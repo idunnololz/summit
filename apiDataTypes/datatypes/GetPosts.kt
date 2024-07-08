@@ -15,5 +15,6 @@ internal data class GetPosts(
     val saved_only: Boolean? = null,
     val liked_only: Boolean? = null,
     val disliked_only: Boolean? = null,
+    val show_hidden: Boolean? = null,
     val page_cursor: PaginationCursor? = null,
 )

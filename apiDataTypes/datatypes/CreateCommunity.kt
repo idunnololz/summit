@@ -12,4 +12,5 @@ internal data class CreateCommunity(
     val nsfw: Boolean? = null,
     val posting_restricted_to_mods: Boolean? = null,
     val discussion_languages: List<LanguageId>? = null,
+    val visibility: String? /* "Public" | "LocalOnly" */ = null,
 )
