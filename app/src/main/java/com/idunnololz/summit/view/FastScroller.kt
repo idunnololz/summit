@@ -3,6 +3,7 @@ package com.idunnololz.summit.view
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
@@ -47,8 +48,8 @@ class FastScroller : LinearLayout {
         }
 
         private fun getValueInRange(min: Float, max: Float, value: Float): Float {
-            val minimum = Math.max(min, value)
-            return Math.min(minimum, max)
+            val minimum = min.coerceAtLeast(value)
+            return minimum.coerceAtMost(max)
         }
     }
 
@@ -285,6 +286,7 @@ class FastScroller : LinearLayout {
     }
 
     private fun initHandleMovement() {
+        @Suppress("ClickableViewAccessibility")
         handle.setOnTouchListener { _, event ->
             requestDisallowInterceptTouchEvent(true)
 

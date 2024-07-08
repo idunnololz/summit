@@ -305,18 +305,14 @@ class ListingItemAdapter(
                 h.root.setTag(R.id.swipeable, true)
 
                 val source = item.fetchedPost.source
-                val accountId: Long?
-                val themeColor: Int?
-                if (source is Source.AccountSource) {
-                    themeColor = accountImageGenerator.getColorForPerson(
+                val themeColor: Int? = if (source is Source.AccountSource) {
+                    accountImageGenerator.getColorForPerson(
                         source.name,
                         source.id,
                         source.instance,
                     )
-                    accountId = source.id
                 } else {
-                    themeColor = null
-                    accountId = null
+                    null
                 }
 
                 postListViewBuilder.bind(

@@ -874,7 +874,6 @@ class MainActivity :
                         binding.root.viewTreeObserver.removeOnPreDrawListener(this)
 
                         cb()
-
                         return false
                     }
                 },

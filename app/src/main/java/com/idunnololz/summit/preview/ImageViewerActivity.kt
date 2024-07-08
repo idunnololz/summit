@@ -447,7 +447,7 @@ class ImageViewerActivity :
         }
 
         binding.imageView.callback = object : GalleryImageView.Callback {
-            override fun togggleUi() {
+            override fun toggleUi() {
                 this@ImageViewerActivity.togggleUi()
             }
 

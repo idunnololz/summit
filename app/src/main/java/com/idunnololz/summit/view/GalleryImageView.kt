@@ -31,7 +31,7 @@ class GalleryImageView : ShapeableImageView {
     }
 
     interface Callback {
-        fun togggleUi()
+        fun toggleUi()
         fun showUi()
         fun hideUi()
 
@@ -241,7 +241,7 @@ class GalleryImageView : ShapeableImageView {
                 }
 
                 override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                    callback?.togggleUi()
+                    callback?.toggleUi()
                     return true
                 }
             },
