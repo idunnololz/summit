@@ -6,6 +6,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.CouldntFindObjectError
 import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NewApiException
 import com.idunnololz.summit.api.NoInternetException
@@ -39,6 +40,10 @@ fun Throwable.toErrorMessage(context: Context): String {
 
                         is NewApiException -> {
                             context.getString(R.string.error_new_api_format, t.minVersion)
+                        }
+
+                        is CouldntFindObjectError -> {
+                            context.getString(R.string.error_couldnt_find_object)
                         }
 
                         else -> {

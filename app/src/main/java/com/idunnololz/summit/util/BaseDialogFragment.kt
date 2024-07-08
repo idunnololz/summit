@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.DialogFragment
@@ -69,13 +70,15 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (this is BackPressHandler) {
-            val dialog = object : Dialog(requireActivity(), theme) {
-                override fun onBackPressed() {
-                    (this@BaseDialogFragment as BackPressHandler).onBackPressed()
+            requireActivity().onBackPressedDispatcher.addCallback(this,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        (this@BaseDialogFragment as BackPressHandler).onBackPressed()
+                    }
                 }
-            }
+            )
 
-            return dialog
+            return super.onCreateDialog(savedInstanceState)
         }
 
         return super.onCreateDialog(savedInstanceState)

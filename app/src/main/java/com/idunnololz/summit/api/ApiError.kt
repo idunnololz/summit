@@ -44,3 +44,5 @@ class NoInternetException() : NetworkException("No internet")
 sealed class NetworkException(msg: String) : RuntimeException(msg)
 
 class NotAModOrAdmin() : ClientApiException("Not a mod or admin", 400)
+
+class CouldntFindObjectError() : ClientApiException("Couldn't find object", 400)

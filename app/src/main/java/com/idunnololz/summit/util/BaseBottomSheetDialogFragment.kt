@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -69,13 +70,15 @@ open class BaseBottomSheetDialogFragment<T : ViewBinding>() : BottomSheetDialogF
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (this is BackPressHandler) {
-            val dialog = object : Dialog(requireActivity(), theme) {
-                override fun onBackPressed() {
-                    (this@BaseBottomSheetDialogFragment as BackPressHandler).onBackPressed()
+            requireActivity().onBackPressedDispatcher.addCallback(this,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        (this@BaseBottomSheetDialogFragment as BackPressHandler).onBackPressed()
+                    }
                 }
-            }
+            )
 
-            return dialog
+            return super.onCreateDialog(savedInstanceState)
         }
 
         return super.onCreateDialog(savedInstanceState)
@@ -117,11 +120,6 @@ open class BaseBottomSheetDialogFragment<T : ViewBinding>() : BottomSheetDialogF
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         MyLog.d(logTag, "Lifecycle: onViewCreated()")
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        MyLog.d(logTag, "Lifecycle: onActivityCreated()")
-        super.onActivityCreated(savedInstanceState)
     }
 
     override fun onDestroyView() {

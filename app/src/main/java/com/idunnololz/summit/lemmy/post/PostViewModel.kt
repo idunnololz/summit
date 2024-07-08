@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.post
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,6 +37,7 @@ import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -203,8 +205,27 @@ class PostViewModel @Inject constructor(
     }
 
     fun switchToNativeInstance() {
+        val currentInstance = lemmyApiClient.instance
         val nativeInstance = currentAccountView.value?.account?.instance
             ?: return
+
+        switchAccountState.observeForever(
+            object : Observer<StatefulData<Unit>> {
+                override fun onChanged(value: StatefulData<Unit>) {
+                    when (value) {
+                        is StatefulData.Error -> {
+                            switchAccountState.removeObserver(this)
+                            lemmyApiClient.changeInstance(currentInstance)
+                        }
+                        is StatefulData.Loading -> {}
+                        is StatefulData.NotStarted -> {}
+                        is StatefulData.Success -> {
+                            switchAccountState.removeObserver(this)
+                        }
+                    }
+                }
+            }
+        )
 
         lemmyApiClient.changeInstance(nativeInstance)
         fetchPostData(force = true, switchToNativeInstance = true)
@@ -231,8 +252,16 @@ class PostViewModel @Inject constructor(
         return viewModelScope.launch(Dispatchers.Default) {
             if (switchToNativeInstance) {
                 switchAccountState.postIsLoading(context.getString(R.string.switching_instance))
-                translatePostToCurrentInstance()
-                switchAccountState.postIdle()
+
+                val result = translatePostToCurrentInstance()
+
+                result
+                    .onSuccess {
+                        switchAccountState.postIdle()
+                    }
+                    .onFailure {
+                        switchAccountState.postError(it)
+                    }
             }
 
             val postOrCommentRef = postOrCommentRef ?: return@launch
@@ -466,9 +495,9 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    private suspend fun translatePostToCurrentInstance() {
-        val postOrCommentRef = postOrCommentRef ?: return
-        val currentAccount = currentAccountView.value?.account ?: return
+    private suspend fun translatePostToCurrentInstance(): Result<Unit> {
+        val postOrCommentRef = postOrCommentRef ?: return Result.success(Unit)
+        val currentAccount = currentAccountView.value?.account ?: return Result.success(Unit)
 
         val instance = postOrCommentRef.fold(
             { it.instance },
@@ -476,7 +505,7 @@ class PostViewModel @Inject constructor(
         )
         val isNativePost = instance == apiInstance
 
-        if (isNativePost) return
+        if (isNativePost) return Result.success(Unit)
 
         unauthedApiClient.changeInstance(instance)
 
@@ -518,7 +547,7 @@ class PostViewModel @Inject constructor(
                 },
             )
 
-        linkToResolve
+        return linkToResolve
             .fold(
                 onSuccess = {
                     Log.d(
@@ -558,9 +587,12 @@ class PostViewModel @Inject constructor(
                             fetchPostData(fetchPostData = true, force = true)
                         }?.join()
                     }
+
+                    Result.success(Unit)
                 },
                 onFailure = {
                     Log.e(TAG, "Error resolving object.", it)
+                    Result.failure(it)
                 },
             )
     }

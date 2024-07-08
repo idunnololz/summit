@@ -1586,7 +1586,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.createPostReport(authorization = account?.bearer, form)
+            api.createPostReport(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1897,6 +1897,9 @@ class LemmyApiClient(
             }
             if (errMsg == "not_a_mod_or_admin") {
                 return Result.failure(NotAModOrAdmin())
+            }
+            if (errMsg == "couldnt_find_object") {
+                return Result.failure(CouldntFindObjectError())
             }
             // TODO: Remove these checks once v0.19 is out for everyone.
             if (errMsg?.contains("unknown variant") == true || (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))) {
