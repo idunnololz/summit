@@ -675,9 +675,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getUnreadCountNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getUnreadCountNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getUnreadCount(authorization = account?.bearer, form.serializeToMap())
+                api.getUnreadCount(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
