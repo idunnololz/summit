@@ -70,15 +70,13 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (this is BackPressHandler) {
-            requireActivity().onBackPressedDispatcher.addCallback(this,
-                object : OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        (this@BaseDialogFragment as BackPressHandler).onBackPressed()
-                    }
+            val dialog = object : Dialog(requireActivity(), theme) {
+                override fun onBackPressed() {
+                    (this@BaseDialogFragment as BackPressHandler).onBackPressed()
                 }
-            )
+            }
 
-            return super.onCreateDialog(savedInstanceState)
+            return dialog
         }
 
         return super.onCreateDialog(savedInstanceState)
