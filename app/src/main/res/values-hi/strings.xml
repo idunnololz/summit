@@ -950,4 +950,5 @@
     <string name="offline_fetching_posts">पोस्ट लायी जा रही हैं…</string>
     <string name="offline_fetching_extras">अतिरिक्त सामग्री लायी जा रही है…</string>
     <string name="offline_done">संपन्न!</string>
+    <string name="error_couldnt_find_object">इस इंस्टैंस पर पोस्ट/टिप्पणी नहीं मिल सकी।</string>
 </resources>
