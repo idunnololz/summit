@@ -28,3 +28,12 @@ To run the linter do
 
 To fix lint issues do
 `./gradlew clean ktlintFormat`
+
+## Updating API version
+
+I diffed:
+```ps
+$dir1 = Get-ChildItem -Recurse -path C:\Users\idunnololz\Downloads\LemmyBackwardsCompatibleAPI-master\app\src\commonMain\kotlin\it\vercruysse\lemmyapi\v0\x19\x3
+$dir2 = Get-ChildItem -Recurse -path C:\Users\idunnololz\Downloads\LemmyBackwardsCompatibleAPI-master\app\src\commonMain\kotlin\it\vercruysse\lemmyapi\v0\x19\x4
+Compare-Object -ReferenceObject $dir1 -DifferenceObject $dir2
+```

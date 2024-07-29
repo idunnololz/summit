@@ -19,9 +19,11 @@
         app:boxStrokeWidthFocused="0dp"
         app:hintEnabled="false"
         app:endIconMinSize="44dp"
-        app:endIconMode="clear_text">
+        app:endIconMode="clear_text"
+        app:startIconDrawable="@drawable/baseline_search_24"
+        app:startIconTint="?colorControlNormal">
 
-        <com.idunnololz.summit.view.PrefixedEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
