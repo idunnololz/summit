@@ -42,8 +42,8 @@ class InboxTabbedViewModel @Inject constructor(
     init {
         addFrag(
             InboxFragment::class.java,
-            InboxViewModel.PageType.All.getName(context),
-            InboxFragmentArgs(InboxViewModel.PageType.All).toBundle(),
+            PageType.All.getName(context),
+            InboxFragmentArgs(PageType.All).toBundle(),
         )
     }
 

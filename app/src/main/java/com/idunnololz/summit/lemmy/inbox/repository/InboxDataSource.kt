@@ -1,19 +1,25 @@
 package com.idunnololz.summit.lemmy.inbox.repository
 
+import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
+import com.idunnololz.summit.util.ext.hasInternet
 import com.idunnololz.summit.util.retry
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.math.min
 
 class InboxSource<O>(
+    @ApplicationContext context: Context,
     defaultSortOrder: O,
     private val fetchObjects: suspend (
         pageIndex: Int,
         sortOrder: O,
         limit: Int,
         force: Boolean,
-    ) -> Result<List<InboxItem>>,
-) : LemmyListSource<InboxItem, O>(
+    ) -> Result<List<LiteInboxItem>>,
+) : LemmyListSource<LiteInboxItem, O>(
+    context,
     {
         id
     },
@@ -22,7 +28,7 @@ class InboxSource<O>(
     source = this,
 ) {
 
-    fun markAsRead(id: Int, read: Boolean): InboxItem? {
+    fun markAsRead(id: Int, read: Boolean): LiteInboxItem? {
         val position = allObjects.indexOfFirst {
             it.obj.id == id
         }
@@ -30,26 +36,13 @@ class InboxSource<O>(
             return null
         }
         val item = allObjects[position]
-        val newItem = when (item.obj) {
-            is InboxItem.MentionInboxItem ->
-                item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.MessageInboxItem ->
-                item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.ReplyInboxItem ->
-                item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.ReportMessageInboxItem ->
-                item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.ReportCommentInboxItem ->
-                item.copy(obj = item.obj.copy(isRead = read))
-            is InboxItem.ReportPostInboxItem ->
-                item.copy(obj = item.obj.copy(isRead = read))
-        }
+        val newItem = item.copy(obj = item.obj.updateIsRead(isRead = read))
         allObjects[position] = newItem
 
         return newItem.obj
     }
 
-    fun removeItemWithId(id: Int): ObjectData<InboxItem>? {
+    fun removeItemWithId(id: Int): ObjectData<LiteInboxItem>? {
         val position = allObjects.indexOfFirst {
             it.obj.id == id
         }
@@ -62,6 +55,7 @@ class InboxSource<O>(
 }
 
 open class LemmyListSource<T, O>(
+    @ApplicationContext private val context: Context,
     private val id: T.() -> Int,
     defaultSortOrder: O,
     private val fetchObjects: suspend (
@@ -164,7 +158,7 @@ open class LemmyListSource<T, O>(
             }
 
             val hasMoreResult = retry {
-                val finalForce = invalidatedPages.contains(currentPageInternal) || force
+                val finalForce = (context.hasInternet() && invalidatedPages.contains(currentPageInternal)) || force
                 fetchPage(currentPageInternal, sortOrder, pageSize, finalForce)
             }
 

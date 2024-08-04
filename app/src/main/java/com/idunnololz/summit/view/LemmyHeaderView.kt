@@ -189,7 +189,7 @@ class LemmyHeaderView : FrameLayout {
             viewWidth += max(getViewWidth(textView1), getViewWidth(textView2))
 
             setMeasuredDimension(
-                viewWidth,
+                viewWidth + paddingStart + paddingEnd,
                 viewHeight + paddingTop + paddingBottom,
             )
         }

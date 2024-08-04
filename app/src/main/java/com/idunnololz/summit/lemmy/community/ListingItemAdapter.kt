@@ -366,8 +366,6 @@ class ListingItemAdapter(
                     null
                 }
 
-//                b.themeColorBar.
-
                 b.text.text = context.getString(R.string.post_filtered_format, item.filterReason)
                 b.root.setOnClickListener {
                     postListEngine.unfilter(item.fetchedPost.postView.post.id)
@@ -504,7 +502,7 @@ class ListingItemAdapter(
     }
 
     fun endHighlightForever() {
-        val index = postListEngine.endendHighlightForever()
+        val index = postListEngine.endHighlightForever()
 
         if (index >= 0) {
             postListEngine.createItems()

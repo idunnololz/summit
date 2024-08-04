@@ -138,6 +138,8 @@ class SlidingPaneController(
 
                 if (slidingPaneLayout.isOpen) {
                     slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
+                } else {
+                    slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
                 }
             }
         }
@@ -168,7 +170,11 @@ class SlidingPaneController(
                 val args = PostFragmentArgs.fromBundle(requireNotNull(lastPostFragment.arguments))
 
                 if (id == args.post?.post?.id) {
-                    openPostInternal(Bundle(), null, lastPostFragment)
+                    openPostInternal(
+                        args = Bundle(),
+                        itemRef = Either.Left(PostRef(instance, id)),
+                        postFragmentOverride = lastPostFragment
+                    )
                     return
                 } else {
                     this.lastPostFragment = null
@@ -184,7 +190,7 @@ class SlidingPaneController(
         }
 
         openPostInternal(
-            PostFragmentArgs(
+            args = PostFragmentArgs(
                 instance = instance,
                 id = id,
                 reveal = reveal,
@@ -194,7 +200,7 @@ class SlidingPaneController(
                 videoState = videoState,
                 accountId = accountId ?: 0L,
             ).toBundle(),
-            Either.Left(PostRef(instance, id)),
+            itemRef = Either.Left(PostRef(instance, id)),
         )
     }
 

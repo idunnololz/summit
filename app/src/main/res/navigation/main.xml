@@ -93,7 +93,7 @@
         android:label="InboxFragment" >
         <argument
             android:name="pageType"
-            app:argType="com.idunnololz.summit.lemmy.inbox.InboxViewModel$PageType" />
+            app:argType="com.idunnololz.summit.lemmy.inbox.PageType" />
     </fragment>
     <activity
         android:id="@+id/imageViewerActivity"

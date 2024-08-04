@@ -650,6 +650,8 @@ class PostAdapter(
                         isUpdating = item.isUpdating,
                         commentView = item.comment,
                         instance = instance,
+                        accountId = accountId,
+                        viewLifecycleOwner = lifecycleOwner,
                         expandSection = ::expandSection,
                         onPageClick = onPageClick,
                         onLinkClick = onLinkClick,

@@ -326,6 +326,7 @@ class LemmyHeaderHelper(
         detailed: Boolean = false,
         childrenCount: Int? = null,
         wrapHeader: Boolean = false,
+        scoreColor: Int? = null,
     ) {
         val creatorInstance = commentView.creator.instance
         val currentTextView = headerContainer.textView1
@@ -478,6 +479,7 @@ class LemmyHeaderHelper(
             sb.appendSeparator()
 
             if (score != null) {
+                val scoreStart = sb.length
                 sb.append(
                     headerContainer.context.resources.getQuantityString(
                         R.plurals.point_count_format,
@@ -485,6 +487,15 @@ class LemmyHeaderHelper(
                         LemmyUtils.abbrevNumber(score.toLong()),
                     ),
                 )
+
+                if (scoreColor != null) {
+                    sb.setSpan(
+                        ForegroundColorSpan(scoreColor),
+                        scoreStart,
+                        sb.length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                    )
+                }
             }
 
             if (childrenCount != null) {

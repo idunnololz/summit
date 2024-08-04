@@ -27,9 +27,9 @@ interface CommentBackedItem {
 sealed interface ReportItem
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
-sealed interface InboxItem : Parcelable {
+sealed interface InboxItem : Parcelable, LiteInboxItem {
 
-    val id: Int
+    override val id: Int
     val authorId: PersonId
     val authorName: String
     val authorInstance: String
@@ -37,7 +37,7 @@ sealed interface InboxItem : Parcelable {
     val title: String
     val content: String
     val lastUpdate: String
-    val lastUpdateTs: Long
+    override val lastUpdateTs: Long
     val score: Int?
     val isDeleted: Boolean
     val isRemoved: Boolean
@@ -91,6 +91,9 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String = "ReplyInboxItem { content = $content }"
+
+        override fun updateIsRead(isRead: Boolean): LiteInboxItem =
+            copy(isRead = isRead)
     }
 
     @JsonClass(generateAdapter = true)
@@ -141,6 +144,9 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String = "MentionInboxItem { content = $content }"
+
+        override fun updateIsRead(isRead: Boolean): LiteInboxItem =
+            copy(isRead = isRead)
     }
 
     @JsonClass(generateAdapter = true)
@@ -184,6 +190,9 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String = "MessageInboxItem { content = $content }"
+
+        override fun updateIsRead(isRead: Boolean): LiteInboxItem =
+            copy(isRead = isRead)
     }
 
     @JsonClass(generateAdapter = true)
@@ -225,6 +234,9 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String = "ReportInboxItem { content = $content }"
+
+        override fun updateIsRead(isRead: Boolean): LiteInboxItem =
+            copy(isRead = isRead)
     }
 
     @JsonClass(generateAdapter = true)
@@ -267,6 +279,9 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String = "ReplyInboxItem { content = $content }"
+
+        override fun updateIsRead(isRead: Boolean): LiteInboxItem =
+            copy(isRead = isRead)
     }
 
     @JsonClass(generateAdapter = true)
@@ -314,6 +329,9 @@ sealed interface InboxItem : Parcelable {
         )
 
         override fun toString(): String = "ReplyInboxItem { content = $content }"
+
+        override fun updateIsRead(isRead: Boolean): LiteInboxItem =
+            copy(isRead = isRead)
     }
 
     val commentId: Int?

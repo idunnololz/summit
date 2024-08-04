@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.modlogs
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,11 +15,13 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ModLogsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val apiClient: AccountAwareLemmyClient,
     private val noAuthApiClient: LemmyApiClient,
     private val accountManager: AccountManager,
@@ -97,6 +100,7 @@ class ModLogsViewModel @Inject constructor(
             }
 
             val modSource = modSource ?: MultiModEventDataSource.create(
+                context,
                 noAuthApiClient,
                 communityIdOrNull.getOrThrow(),
                 noAuthApiClient.instance,

@@ -585,12 +585,21 @@ class AccountAwareLemmyClient @Inject constructor(
         unreadOnly: Boolean? = null,
         page: Int? = 0,
         limit: Int? = 20,
+        senderId: PersonId? = null,
         account: Account? = accountForInstance(),
         force: Boolean,
     ) = if (account == null) {
         createAccountErrorResult()
     } else {
-        apiClient.fetchPrivateMessages(unreadOnly, page, limit, account, force)
+        apiClient
+            .fetchPrivateMessages(
+                unreadOnly = unreadOnly,
+                page = page,
+                limit = limit,
+                senderId = senderId,
+                account = account,
+                force = force
+            )
             .autoSignOut(account)
     }
 

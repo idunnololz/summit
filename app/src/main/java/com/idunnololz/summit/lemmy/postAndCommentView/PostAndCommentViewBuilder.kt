@@ -855,6 +855,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         isUpdating: Boolean,
         commentView: CommentView,
         instance: String,
+        accountId: Long?,
+        viewLifecycleOwner: LifecycleOwner,
         expandSection: (position: Int) -> Unit,
         onPageClick: (PageRef) -> Unit,
         onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -862,29 +864,34 @@ class PostAndCommentViewBuilder @Inject constructor(
     ) = with(binding) {
         scaleTextSizes()
 
+        fun updateText(scoreColor: Int? = null) {
+            lemmyHeaderHelper.populateHeaderSpan(
+                headerContainer = headerView,
+                commentView = commentView,
+                instance = instance,
+                score = accountActionsManager.getScore(VotableRef.CommentRef(commentView.comment.id)),
+                onPageClick = onPageClick,
+                detailed = true,
+                childrenCount = childrenCount,
+                onLinkClick = onLinkClick,
+                onLinkLongClick = onLinkLongClick,
+                displayInstanceStyle = displayInstanceStyle,
+                showUpvotePercentage = showCommentUpvotePercentage,
+                useMultilineHeader = false,
+                isCurrentUser = if (indicateCurrentUser) {
+                    currentUser?.id == commentView.creator.id &&
+                        currentUser?.instance == commentView.creator.instance
+                } else {
+                    false
+                },
+                showEditedDate = showEditedDate,
+                wrapHeader = true,
+                scoreColor = scoreColor,
+            )
+        }
+
         threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
-        lemmyHeaderHelper.populateHeaderSpan(
-            headerContainer = headerView,
-            commentView = commentView,
-            instance = instance,
-            score = accountActionsManager.getScore(VotableRef.CommentRef(commentView.comment.id)),
-            onPageClick = onPageClick,
-            detailed = true,
-            childrenCount = childrenCount,
-            onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick,
-            displayInstanceStyle = displayInstanceStyle,
-            showUpvotePercentage = showCommentUpvotePercentage,
-            useMultilineHeader = false,
-            isCurrentUser = if (indicateCurrentUser) {
-                currentUser?.id == commentView.creator.id &&
-                    currentUser?.instance == commentView.creator.instance
-            } else {
-                false
-            },
-            showEditedDate = showEditedDate,
-            wrapHeader = true,
-        )
+        updateText()
 
         expandSectionButton.setOnClickListener {
             expandSection(h.absoluteAdapterPosition)
@@ -918,6 +925,31 @@ class PostAndCommentViewBuilder @Inject constructor(
             baseDepth = baseDepth,
             maxDepth = maxDepth,
             indentationPerLevel = commentUiConfig.indentationPerLevelDp,
+        )
+
+        voteUiHandler.bind(
+            lifecycleOwner = viewLifecycleOwner,
+            instance = instance,
+            commentView = commentView,
+            upVoteView = null,
+            downVoteView = null,
+            scoreView = dummyTextView,
+            upvoteCount = null,
+            downvoteCount = null,
+            accountId = accountId,
+            onUpdate = { vote, totalScore, upvotes, downvotes ->
+                updateText(
+                    scoreColor = if (vote < 0) {
+                        downvoteColor
+                    } else if (vote > 0) {
+                        upvoteColor
+                    } else {
+                        null
+                    }
+                )
+            },
+            onSignInRequired = {},
+            onInstanceMismatch = { _, _ -> },
         )
     }
 

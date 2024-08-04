@@ -4,6 +4,8 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -59,4 +61,16 @@ fun Context.getPlainTextFromClipboard(): String? {
     }
 
     return null
+}
+
+fun Context.hasInternet(): Boolean {
+    var isConnected = false // Initial Value
+    val connectivityManager = getSystemService(
+        Context.CONNECTIVITY_SERVICE,
+    ) as ConnectivityManager
+    val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+    if (activeNetwork != null && activeNetwork.isConnected) {
+        isConnected = true
+    }
+    return isConnected
 }

@@ -14,7 +14,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
     android:layout_gravity="bottom"
     android:layoutDirection="ltr"
@@ -80,9 +79,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-
-
-    <FrameLayout android:id="@id/exo_bottom_bar"
+    <FrameLayout
+        android:id="@id/exo_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/exo_styled_bottom_bar_height"
         android:layout_marginTop="@dimen/exo_styled_bottom_bar_margin_top"

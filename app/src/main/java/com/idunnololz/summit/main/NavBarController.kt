@@ -245,8 +245,6 @@ class NavBarController(
     fun updateOpenness(navOpenness: Float) {
         if (!useBottomNavBar) return
 
-        Log.d(TAG, "updateOpenness(): $navOpenness")
-
         if (useNavigationRail) {
             navBarContainer.translationX = -navOpenness * navBarContainer.width
         } else {
