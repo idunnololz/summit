@@ -27,7 +27,6 @@ import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getImageUrl
 import com.idunnololz.summit.api.utils.getPreviewInfo
 import com.idunnololz.summit.api.utils.getThumbnailPreviewInfo
-import com.idunnololz.summit.api.utils.getThumbnailUrl
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getVideoInfo
 import com.idunnololz.summit.api.utils.shouldHideItem

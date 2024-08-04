@@ -70,12 +70,13 @@ open class BaseBottomSheetDialogFragment<T : ViewBinding>() : BottomSheetDialogF
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (this is BackPressHandler) {
-            requireActivity().onBackPressedDispatcher.addCallback(this,
+            requireActivity().onBackPressedDispatcher.addCallback(
+                this,
                 object : OnBackPressedCallback(true) {
                     override fun handleOnBackPressed() {
                         (this@BaseBottomSheetDialogFragment as BackPressHandler).onBackPressed()
                     }
-                }
+                },
             )
 
             return super.onCreateDialog(savedInstanceState)

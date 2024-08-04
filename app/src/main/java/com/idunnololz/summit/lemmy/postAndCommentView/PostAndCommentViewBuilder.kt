@@ -869,7 +869,9 @@ class PostAndCommentViewBuilder @Inject constructor(
                 headerContainer = headerView,
                 commentView = commentView,
                 instance = instance,
-                score = accountActionsManager.getScore(VotableRef.CommentRef(commentView.comment.id)),
+                score = accountActionsManager.getScore(
+                    VotableRef.CommentRef(commentView.comment.id),
+                ),
                 onPageClick = onPageClick,
                 detailed = true,
                 childrenCount = childrenCount,
@@ -945,7 +947,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                         upvoteColor
                     } else {
                         null
-                    }
+                    },
                 )
             },
             onSignInRequired = {},

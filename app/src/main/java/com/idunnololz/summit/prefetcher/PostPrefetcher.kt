@@ -11,8 +11,6 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 @Singleton
 class PostPrefetcher @Inject constructor(

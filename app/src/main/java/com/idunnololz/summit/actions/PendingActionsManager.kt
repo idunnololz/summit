@@ -21,6 +21,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,7 +58,7 @@ class PendingActionsManager @Inject constructor(
 
     private val failedActions = LinkedList<LemmyFailedAction>()
 
-    @OptIn(DelicateCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val actionsContext = newSingleThreadContext("CounterContext")
 
     private val onActionChangedListeners = arrayListOf<OnActionChangedListener>()
@@ -141,7 +142,7 @@ class PendingActionsManager @Inject constructor(
     /**
      * Posts a comment/reply to another comment.
      * @param parentId what to comment on
-     * @param text text to post
+     * @param content text to post
      */
     suspend fun comment(
         postRef: PostRef,
@@ -164,8 +165,8 @@ class PendingActionsManager @Inject constructor(
 
     /**
      * Edit the body text of a comment or self-post.
-     * @param thingId what to edit
-     * @param text text to post
+     * @param commentId what to edit
+     * @param content text to post
      */
     suspend fun editComment(
         postRef: PostRef,

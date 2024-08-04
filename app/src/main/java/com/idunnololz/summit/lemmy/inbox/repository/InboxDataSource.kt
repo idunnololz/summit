@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.inbox.repository
 
 import android.content.Context
 import android.util.Log
-import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
 import com.idunnololz.summit.util.ext.hasInternet
 import com.idunnololz.summit.util.retry

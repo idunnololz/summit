@@ -1,7 +1,6 @@
 package com.idunnololz.summit.avatar
 
 import android.content.Context
-import android.util.Log
 import android.widget.ImageView
 import coil.dispose
 import coil.load
@@ -12,6 +11,7 @@ import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,7 +44,7 @@ class AvatarHelper @Inject constructor(
             imageView.setTag(R.id.generate_profile_icon_job, job)
         } else {
             imageView.load(person.avatar) {
-                placeholder(R.drawable.thumbnail_placeholder_square)
+                placeholder(newShimmerDrawableSquare(context))
                 allowHardware(false)
             }
         }
@@ -52,8 +52,6 @@ class AvatarHelper @Inject constructor(
 
     fun loadIcon(imageView: ImageView, community: Community) {
         (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
-
-        Log.d("HAHA", "ICON: ${community.icon}")
 
         if (community.icon.isNullOrBlank()) {
             val job = coroutineScope.launch {
@@ -70,7 +68,7 @@ class AvatarHelper @Inject constructor(
             imageView.setTag(R.id.generate_profile_icon_job, job)
         } else {
             imageView.load(community.icon) {
-                placeholder(R.drawable.thumbnail_placeholder_square)
+                placeholder(newShimmerDrawableSquare(context))
                 allowHardware(false)
             }
         }

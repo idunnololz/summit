@@ -173,7 +173,7 @@ class SlidingPaneController(
                     openPostInternal(
                         args = Bundle(),
                         itemRef = Either.Left(PostRef(instance, id)),
-                        postFragmentOverride = lastPostFragment
+                        postFragmentOverride = lastPostFragment,
                     )
                     return
                 } else {

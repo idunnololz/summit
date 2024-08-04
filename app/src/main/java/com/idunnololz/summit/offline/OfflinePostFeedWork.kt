@@ -18,7 +18,6 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.utils.getImageUrl
-import com.idunnololz.summit.api.utils.getThumbnailUrl
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -37,12 +36,9 @@ import com.idunnololz.summit.util.ext.getParcelable
 import com.idunnololz.summit.util.ext.toByteArray
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -74,11 +70,10 @@ class OfflinePostFeedWork @AssistedInject constructor(
 
         fun makeInputData(communityRef: CommunityRef): Data =
             workDataOf(ARG_COMMUNITY_REF to BoxedCommunityRef(communityRef).toByteArray())
-
     }
 
     @Parcelize
-    enum class ProgressPhase(val index: Int): Parcelable {
+    enum class ProgressPhase(val index: Int) : Parcelable {
         Start(0),
         FetchingPostFeed(1),
         FetchingPosts(2),
@@ -88,7 +83,7 @@ class OfflinePostFeedWork @AssistedInject constructor(
 
     @Parcelize
     private class BoxedCommunityRef(
-        val communityRef: CommunityRef
+        val communityRef: CommunityRef,
     ) : Parcelable
 
     private val postsRepository = postsRepositoryFactory.create(SavedStateHandle())
@@ -123,10 +118,12 @@ class OfflinePostFeedWork @AssistedInject constructor(
         var postsLoaded = 0
         var index = 0
 
-        setProgress(progressTracker.apply {
-            currentPhase = ProgressPhase.FetchingPostFeed
-            subMax = offlinePostCount.toDouble()
-        }.getProgressData())
+        setProgress(
+            progressTracker.apply {
+                currentPhase = ProgressPhase.FetchingPostFeed
+                subMax = offlinePostCount.toDouble()
+            }.getProgressData(),
+        )
 
         while (true) {
             val result = postFeedPrefetcher.suspendPrefetchPage(index, postsRepository)
@@ -144,9 +141,11 @@ class OfflinePostFeedWork @AssistedInject constructor(
 
             postsLoaded += postCount
 
-            setProgress(progressTracker.apply {
-                subCount = postsLoaded.toDouble()
-            }.getProgressData())
+            setProgress(
+                progressTracker.apply {
+                    subCount = postsLoaded.toDouble()
+                }.getProgressData(),
+            )
 
             if (postsLoaded >= offlinePostCount) {
                 break
@@ -155,10 +154,12 @@ class OfflinePostFeedWork @AssistedInject constructor(
             index++
         }
 
-        setProgress(progressTracker.apply {
-            currentPhase = ProgressPhase.FetchingPosts
-            subMax = allPosts.size.toDouble()
-        }.getProgressData())
+        setProgress(
+            progressTracker.apply {
+                currentPhase = ProgressPhase.FetchingPosts
+                subMax = allPosts.size.toDouble()
+            }.getProgressData(),
+        )
 
         postPrefetcher.prefetchPosts(
             postOrCommentRefs = allPosts.map { post ->
@@ -166,8 +167,8 @@ class OfflinePostFeedWork @AssistedInject constructor(
                     PostRef(
                         post.fetchedPost.source.instance
                             ?: post.fetchedPost.postView.instance,
-                        post.fetchedPost.postView.post.id
-                    )
+                        post.fetchedPost.postView.post.id,
+                    ),
                 )
             },
             sortOrder = (preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top).toApiSortOrder(),
@@ -178,16 +179,20 @@ class OfflinePostFeedWork @AssistedInject constructor(
             },
             account = fullAccount?.account,
             onProgress = { count: Int, maxCount: Int ->
-                setProgress(progressTracker.apply {
-                    subCount = count.toDouble()
-                }.getProgressData())
-            }
+                setProgress(
+                    progressTracker.apply {
+                        subCount = count.toDouble()
+                    }.getProgressData(),
+                )
+            },
         )
 
-        setProgress(progressTracker.apply {
-            currentPhase = ProgressPhase.FetchingExtras
-            subMax = allPosts.size.toDouble()
-        }.getProgressData())
+        setProgress(
+            progressTracker.apply {
+                currentPhase = ProgressPhase.FetchingExtras
+                subMax = allPosts.size.toDouble()
+            }.getProgressData(),
+        )
         coroutineScope {
             var doneCount = 0
             val fetchImageJobs = mutableListOf<Job>()
@@ -218,15 +223,19 @@ class OfflinePostFeedWork @AssistedInject constructor(
                     }
 
                     doneCount++
-                    setProgress(progressTracker.apply {
-                        subCount = doneCount.toDouble()
-                    }.getProgressData())
+                    setProgress(
+                        progressTracker.apply {
+                            subCount = doneCount.toDouble()
+                        }.getProgressData(),
+                    )
                 }
             }
 
-            setProgress(progressTracker.apply {
-                currentPhase = ProgressPhase.Complete
-            }.getProgressData())
+            setProgress(
+                progressTracker.apply {
+                    currentPhase = ProgressPhase.Complete
+                }.getProgressData(),
+            )
 
             fetchImageJobs.joinAll()
         }
@@ -242,7 +251,7 @@ class OfflinePostFeedWork @AssistedInject constructor(
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
                 NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_HIGH,
             )
             notificationManager.createNotificationChannel(channel)
         }
@@ -268,12 +277,11 @@ class OfflinePostFeedWork @AssistedInject constructor(
             private const val PROGRESS_SUB_COUNT = "PROGRESS_2"
             private const val PROGRESS_SUB_MAX = "PROGRESS_3"
 
-            fun fromData(data: Data) =
-                ProgressTracker().apply {
-                    currentPhase = ProgressPhase.entries[data.getInt(PROGRESS_PHASE, 0)]
-                    subCount = data.getDouble(PROGRESS_SUB_COUNT, 0.0)
-                    subMax = data.getDouble(PROGRESS_SUB_MAX, 0.0)
-                }
+            fun fromData(data: Data) = ProgressTracker().apply {
+                currentPhase = ProgressPhase.entries[data.getInt(PROGRESS_PHASE, 0)]
+                subCount = data.getDouble(PROGRESS_SUB_COUNT, 0.0)
+                subMax = data.getDouble(PROGRESS_SUB_MAX, 0.0)
+            }
         }
 
         var currentPhase: ProgressPhase = ProgressPhase.Start
@@ -290,11 +298,10 @@ class OfflinePostFeedWork @AssistedInject constructor(
         val subProgressPercent
             get() = subCount / subMax
 
-        fun getProgressData() =
-            workDataOf(
-                PROGRESS_PHASE to currentPhase.ordinal,
-                PROGRESS_SUB_COUNT to subCount,
-                PROGRESS_SUB_MAX to subMax,
-            )
+        fun getProgressData() = workDataOf(
+            PROGRESS_PHASE to currentPhase.ordinal,
+            PROGRESS_SUB_COUNT to subCount,
+            PROGRESS_SUB_MAX to subMax,
+        )
     }
 }

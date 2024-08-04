@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.inbox
 
 import android.content.Context
-import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -341,9 +340,7 @@ class InboxViewModel @Inject constructor(
     }
 }
 
-private fun LemmyListSource.PageResult<LiteInboxItem>.toInboxItemResult(
-
-): LemmyListSource.PageResult<InboxItem> =
+private fun LemmyListSource.PageResult<LiteInboxItem>.toInboxItemResult(): LemmyListSource.PageResult<InboxItem> =
     LemmyListSource.PageResult(
         pageIndex = pageIndex,
         items = items.filterIsInstance<InboxItem>(),

@@ -811,11 +811,11 @@ class PostAdapter(
                         R.string.non_native_post_warning_desc,
                         item.postInstance,
                         item.accountInstance,
-                    )
+                    ),
                 )
                 b.changeInstance.text = context.getString(
                     R.string.view_in_my_instance_format,
-                    item.accountInstance
+                    item.accountInstance,
                 )
                 b.changeInstance.setOnClickListener {
                     switchToNativeInstance(item.accountInstance)
@@ -953,8 +953,8 @@ class PostAdapter(
 
                 if (!rawData.isNativePost &&
                     !hideNonNativeInstanceWarning &&
-                    rawData.accountInstance != null) {
-
+                    rawData.accountInstance != null
+                ) {
                     finalItems += Item.NotNativeInstanceItem(
                         accountInstance = rawData.accountInstance,
                         postInstance = postView.post.community.instance,

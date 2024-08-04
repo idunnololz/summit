@@ -54,7 +54,6 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.accountId
-import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -72,6 +71,7 @@ import com.idunnololz.summit.util.coil.VideoWatermarkTransformation
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.ext.getSize
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -737,7 +737,7 @@ class PostListViewBuilder @Inject constructor(
                     iconImage?.visibility = View.GONE
 
                     imageView.dispose()
-                    imageView.setImageResource(R.drawable.thumbnail_placeholder_16_9)
+                    imageView.setImageDrawable(newShimmerDrawable16to9(context))
 
                     fun loadImage(useBackupUrl: Boolean = false) {
                         val urlToLoad = if (useBackupUrl) {
@@ -1334,8 +1334,7 @@ class PostListViewBuilder @Inject constructor(
                     Log.d("HAHA", "w: $w h: $h")
                     this.size(w, h)
                 }
-                placeholder(R.drawable.thumbnail_placeholder_16_9)
-                // fallback(R.drawable.thumbnail_placeholder_16_9)
+                placeholder(newShimmerDrawable16to9(context))
 
                 if (shouldBlur) {
                     val sampling = (imageViewWidth * 0.04f).coerceAtLeast(10f)
