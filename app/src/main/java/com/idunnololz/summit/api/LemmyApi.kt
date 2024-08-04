@@ -85,6 +85,7 @@ import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.ext.hasInternet
 import java.io.File
 import java.util.concurrent.TimeUnit
 import okhttp3.Cache
@@ -733,18 +734,6 @@ interface LemmyApi {
         private const val CACHE_CONTROL_HEADER = "Cache-Control"
         private const val CACHE_CONTROL_NO_CACHE = "no-cache"
 
-        private fun hasNetwork(context: Context): Boolean {
-            var isConnected = false // Initial Value
-            val connectivityManager = context.getSystemService(
-                Context.CONNECTIVITY_SERVICE,
-            ) as ConnectivityManager
-            val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-            if (activeNetwork != null && activeNetwork.isConnected) {
-                isConnected = true
-            }
-            return isConnected
-        }
-
         fun getInstance(context: Context, instance: String = DEFAULT_INSTANCE): LemmyApiWithSite {
             return apis[instance] ?: buildInstance(context, instance).also {
                 apis[instance] = it
@@ -796,7 +785,7 @@ interface LemmyApi {
                      *  we initialize the request and change its header depending on whether
                      *  the device is connected to Internet or not.
                      */
-                    request = if (hasNetwork(context)) {
+                    request = if (context.hasInternet()) {
                         val cacheControl = CacheControl.Builder()
                             .maxStale(10, TimeUnit.MINUTES)
                             .build()

@@ -333,7 +333,7 @@ class PostListEngine(
         }
     }
 
-    fun endendHighlightForever(): Int {
+    fun endHighlightForever(): Int {
         val postToHighlight = postToHighlightForever
 
         return if (postToHighlight != null) {

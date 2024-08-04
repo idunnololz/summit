@@ -1,10 +1,12 @@
 package com.idunnololz.summit.lemmy.modlogs
 
+import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -19,6 +21,7 @@ class MultiModEventDataSource(
         private const val TAG = "MultiModEventDataSource"
 
         fun create(
+            @ApplicationContext context: Context,
             apiClient: LemmyApiClient,
             communityIdOrNull: Int?,
             instance: String,
@@ -44,6 +47,7 @@ class MultiModEventDataSource(
 
             val sources = types.map { type ->
                 LemmyListSource<ModEvent, Unit>(
+                    context,
                     { this.id },
                     Unit,
                     { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->

@@ -32,7 +32,7 @@
 
     <color name="toolbarColor">@color/colorBackground</color>
 
-    <color name="colorOverlay">@color/black50</color>
+    <color name="colorOverlay">@color/white50</color>
 
     <color name="appBarBackground">@color/colorSurface</color>
 

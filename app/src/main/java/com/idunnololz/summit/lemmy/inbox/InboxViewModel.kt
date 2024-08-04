@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.parcelize.Parcelize
 
 @HiltViewModel
 class InboxViewModel @Inject constructor(
@@ -180,7 +179,7 @@ class InboxViewModel @Inject constructor(
 
             result
                 .onSuccess {
-                    addData(it)
+                    addData(it.toInboxItemResult())
 
                     inboxUpdate.setValue(
                         InboxUpdate(
@@ -340,25 +339,25 @@ class InboxViewModel @Inject constructor(
             notificationsManager.removeAllInboxNotificationsForAccount(it)
         }
     }
-
-    @Parcelize
-    enum class PageType : Parcelable {
-        Unread,
-        All,
-        Replies,
-        Mentions,
-        Messages,
-        Reports,
-    }
 }
 
-fun InboxViewModel.PageType.getName(context: Context) = when (this) {
-    InboxViewModel.PageType.Unread -> context.getString(R.string.unread)
-    InboxViewModel.PageType.All -> context.getString(R.string.all)
-    InboxViewModel.PageType.Replies -> context.getString(R.string.replies)
-    InboxViewModel.PageType.Mentions -> context.getString(R.string.mentions)
-    InboxViewModel.PageType.Messages -> context.getString(R.string.messages)
-    InboxViewModel.PageType.Reports -> context.getString(R.string.reports)
+private fun LemmyListSource.PageResult<LiteInboxItem>.toInboxItemResult(
+
+): LemmyListSource.PageResult<InboxItem> =
+    LemmyListSource.PageResult(
+        pageIndex = pageIndex,
+        items = items.filterIsInstance<InboxItem>(),
+        hasMore = hasMore,
+    )
+
+fun PageType.getName(context: Context) = when (this) {
+    PageType.Unread -> context.getString(R.string.unread)
+    PageType.All -> context.getString(R.string.all)
+    PageType.Replies -> context.getString(R.string.replies)
+    PageType.Mentions -> context.getString(R.string.mentions)
+    PageType.Messages -> context.getString(R.string.messages)
+    PageType.Reports -> context.getString(R.string.reports)
+    PageType.Conversation -> context.getString(R.string.messages)
 }
 
 data class InboxUpdate(

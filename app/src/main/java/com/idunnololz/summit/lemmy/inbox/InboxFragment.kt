@@ -154,30 +154,31 @@ class InboxFragment :
             getMainActivity()?.supportActionBar?.title = it.getName(context)
             binding.itemHighlighter.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 when (it) {
-                    InboxViewModel.PageType.Unread -> {
+                    PageType.Unread -> {
                         topToTop = R.id.unread
                         bottomToBottom = R.id.unread
                     }
-                    InboxViewModel.PageType.All -> {
+                    PageType.All -> {
                         topToTop = R.id.all
                         bottomToBottom = R.id.all
                     }
-                    InboxViewModel.PageType.Replies -> {
+                     PageType.Replies -> {
                         topToTop = R.id.replies
                         bottomToBottom = R.id.replies
                     }
-                    InboxViewModel.PageType.Mentions -> {
+                     PageType.Mentions -> {
                         topToTop = R.id.mentions
                         bottomToBottom = R.id.mentions
                     }
-                    InboxViewModel.PageType.Messages -> {
+                     PageType.Messages -> {
                         topToTop = R.id.messages
                         bottomToBottom = R.id.messages
                     }
-                    InboxViewModel.PageType.Reports -> {
+                     PageType.Reports -> {
                         topToTop = R.id.reports
                         bottomToBottom = R.id.reports
                     }
+                    PageType.Conversation -> error("unreachable")
                 }
             }
 
@@ -273,7 +274,7 @@ class InboxFragment :
                     viewModel.markAsRead(
                         inboxItem = inboxItem,
                         read = true,
-                        delete = viewModel.pageType.value == InboxViewModel.PageType.Unread,
+                        delete = viewModel.pageType.value ==  PageType.Unread,
                     )
                 }
             },
@@ -326,27 +327,27 @@ class InboxFragment :
 
         with(binding) {
             unread.setOnClickListener {
-                viewModel.pageTypeFlow.value = InboxViewModel.PageType.Unread
+                viewModel.pageTypeFlow.value =  PageType.Unread
                 paneLayout.closePanels()
             }
             all.setOnClickListener {
-                viewModel.pageTypeFlow.value = InboxViewModel.PageType.All
+                viewModel.pageTypeFlow.value =  PageType.All
                 paneLayout.closePanels()
             }
             replies.setOnClickListener {
-                viewModel.pageTypeFlow.value = InboxViewModel.PageType.Replies
+                viewModel.pageTypeFlow.value =  PageType.Replies
                 paneLayout.closePanels()
             }
             mentions.setOnClickListener {
-                viewModel.pageTypeFlow.value = InboxViewModel.PageType.Mentions
+                viewModel.pageTypeFlow.value =  PageType.Mentions
                 paneLayout.closePanels()
             }
             messages.setOnClickListener {
-                viewModel.pageTypeFlow.value = InboxViewModel.PageType.Messages
+                viewModel.pageTypeFlow.value =  PageType.Messages
                 paneLayout.closePanels()
             }
             reports.setOnClickListener {
-                viewModel.pageTypeFlow.value = InboxViewModel.PageType.Reports
+                viewModel.pageTypeFlow.value =  PageType.Reports
                 paneLayout.closePanels()
             }
         }
@@ -383,7 +384,7 @@ class InboxFragment :
             }
         }
 
-        if (args.pageType == InboxViewModel.PageType.Reports) {
+        if (args.pageType ==  PageType.Reports) {
             binding.fab.visibility = View.GONE
         }
         binding.fab.setup(preferences)
@@ -525,8 +526,8 @@ class InboxFragment :
                     }
                 }
 
-                if (viewModel.pageType.value == InboxViewModel.PageType.All ||
-                    viewModel.pageType.value == InboxViewModel.PageType.Unread
+                if (viewModel.pageType.value ==  PageType.All ||
+                    viewModel.pageType.value ==  PageType.Unread
                 ) {
                     viewModel.lastInboxUnreadLoadTimeMs.value = System.currentTimeMillis()
                 }

@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.multicommunity
 
+import android.content.Context
 import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
@@ -17,6 +18,7 @@ import com.idunnololz.summit.lemmy.utils.getControversialRank
 import com.idunnololz.summit.lemmy.utils.getHotRank
 import com.idunnololz.summit.lemmy.utils.getScaledRank
 import com.idunnololz.summit.util.dateStringToTs
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +43,7 @@ class MultiCommunityDataSource(
     }
 
     class Factory @Inject constructor(
+        @ApplicationContext private val context: Context,
         private val apiClient: AccountAwareLemmyClient,
         private val apiClientFactory: LemmyApiClient.Factory,
     ) {
@@ -50,9 +53,10 @@ class MultiCommunityDataSource(
         ): MultiCommunityDataSource {
             val sources = communities.map { communityRef ->
                 LemmyListSource(
-                    { postView.post.id },
-                    SortType.Active,
-                    { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
+                    context = context,
+                    id = { postView.post.id },
+                    defaultSortOrder = SortType.Active,
+                    fetchObjects = { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
                         apiClient
                             .fetchPosts(
                                 communityIdOrName =
@@ -72,8 +76,8 @@ class MultiCommunityDataSource(
                                 }
                             }
                     },
-                    DEFAULT_PAGE_SIZE,
-                    communityRef,
+                    pageSize = DEFAULT_PAGE_SIZE,
+                    source = communityRef,
                 )
             }.take(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
 
@@ -88,9 +92,10 @@ class MultiCommunityDataSource(
                 val apiClient = apiClientFactory.create()
                 apiClient.changeInstance(account.instance)
                 LemmyListSource(
-                    { postView.post.id },
-                    SortType.Active,
-                    { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
+                    context = context,
+                    id = { postView.post.id },
+                    defaultSortOrder = SortType.Active,
+                    fetchObjects = { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
                         apiClient
                             .fetchPosts(
                                 account = account,
@@ -114,8 +119,8 @@ class MultiCommunityDataSource(
                                 }
                             }
                     },
-                    DEFAULT_PAGE_SIZE,
-                    account,
+                    pageSize = DEFAULT_PAGE_SIZE,
+                    source = account,
                 )
             }.take(MULTI_COMMUNITY_DATA_SOURCE_LIMIT)
 

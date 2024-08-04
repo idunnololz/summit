@@ -116,7 +116,8 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                         BlockQuoteSpan(LemmyTextHelper.getMarkwonTheme(textView.context)),
                         0,
                         spoilerContent.length,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        // SPAN_PRIORITY makes sure this span has highest priority, so it is always applied first
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
                     )
 
                     detailsStartSpan.spoilerText = spoilerContent

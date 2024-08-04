@@ -228,20 +228,20 @@ fun VoteUiHandler.bind(
         onUpdate?.invoke(vote, totalScore, upvotes, downvotes)
     }
     bindVoteUi(
-        lifecycleOwner,
-        currentVote,
-        currentScore,
-        upvotes,
-        downvotes,
-        instance,
-        ref,
-        upVoteView,
-        downVoteView,
-        scoreView,
-        upvoteCount,
-        downvoteCount,
-        accountId,
-        object : AccountActionsManager.Registration {
+        lifecycleOwner = lifecycleOwner,
+        currentVote = currentVote,
+        currentScore = currentScore,
+        upVotes = upvotes,
+        downVotes = downvotes,
+        instance = instance,
+        ref = ref,
+        upVoteView = upVoteView,
+        downVoteView = downVoteView,
+        scoreView = scoreView,
+        upvoteCount = upvoteCount,
+        downvoteCount = downvoteCount,
+        accountId = accountId,
+        registration = object : AccountActionsManager.Registration {
             override fun voteCurrent(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
                 update(vote, totalScore, upvotes, downvotes)
                 scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())

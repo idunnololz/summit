@@ -21,6 +21,18 @@ safeargs.
             android:name="instance"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/conversationFragment"
+        android:name="com.idunnololz.summit.lemmy.inbox.conversation.ConversationFragment"
+        android:label="ConversationFragment" >
+        <argument
+            android:name="inboxItem"
+            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem" />
+        <argument
+            android:name="instance"
+            app:argType="string" />
+    </fragment>
     <dialog
         android:id="@+id/errorDialogFragment"
         android:name="com.idunnololz.summit.error.ErrorDialogFragment"

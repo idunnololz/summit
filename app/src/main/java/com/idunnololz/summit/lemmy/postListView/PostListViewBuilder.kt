@@ -43,6 +43,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
+import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyContentHelper
@@ -284,6 +285,9 @@ class PostListViewBuilder @Inject constructor(
                     is ListingItemListBinding -> {
                         ensureActionButtons(rb.root, leftHandMode)
                     }
+                    is ListingItemListWithCardsBinding -> {
+                        ensureActionButtons(rb.constraintLayout, leftHandMode)
+                    }
                     is ListingItemCardBinding -> {
                         ensureActionButtons(rb.constraintLayout, leftHandMode)
                         rb.bottomBarrier.referencedIds = intArrayOf(commentButton!!.id)
@@ -349,6 +353,14 @@ class PostListViewBuilder @Inject constructor(
                                 ),
                             )
                         }
+                        is ListingItemListWithCardsBinding -> {
+                            TextViewCompat.setTextAppearance(
+                                rb.title,
+                                context.getResIdFromAttribute(
+                                    com.google.android.material.R.attr.textAppearanceTitleMedium,
+                                ),
+                            )
+                        }
                         is ListingItemCompactBinding -> {
                             TextViewCompat.setTextAppearance(
                                 rb.title,
@@ -361,6 +373,14 @@ class PostListViewBuilder @Inject constructor(
                 } else {
                     when (val rb = rawBinding) {
                         is ListingItemListBinding -> {
+                            TextViewCompat.setTextAppearance(
+                                rb.title,
+                                context.getResIdFromAttribute(
+                                    com.google.android.material.R.attr.textAppearanceBodyMedium,
+                                ),
+                            )
+                        }
+                        is ListingItemListWithCardsBinding -> {
                             TextViewCompat.setTextAppearance(
                                 rb.title,
                                 context.getResIdFromAttribute(
@@ -388,6 +408,29 @@ class PostListViewBuilder @Inject constructor(
                 if (postUiConfig.preferImagesAtEnd) {
                     when (val rb = rawBinding) {
                         is ListingItemListBinding -> {
+                            rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                                this.marginEnd = padding
+                            }
+                            rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                                this.marginEnd = padding
+                            }
+                            rb.iconGoneSpacer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                            }
+                            rb.leftBarrier.type = Barrier.START
+                            rb.title.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                                this.endToStart = rb.leftBarrier.id
+                                this.marginStart = padding
+                                this.marginEnd = paddingHalf
+                            }
+                        }
+                        is ListingItemListWithCardsBinding -> {
                             rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
                                 this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
                                 this.startToStart = ConstraintLayout.LayoutParams.UNSET
@@ -542,6 +585,47 @@ class PostListViewBuilder @Inject constructor(
             }
 
             val postType = postView.getType()
+
+            if (rawBinding is ListingItemCardBinding ||
+                rawBinding is ListingItemCard2Binding ||
+                rawBinding is ListingItemCard3Binding ||
+                rawBinding is ListingItemLargeListBinding
+            ) {
+                if (url == null) {
+                    openLinkButton?.visibility = View.GONE
+                    linkText?.visibility = View.GONE
+                    linkIcon?.visibility = View.GONE
+                    linkOverlay?.visibility = View.GONE
+                } else {
+                    if ((postType == PostType.Link || postType == PostType.Text) && thumbnailUrl != null) {
+                        openLinkButton?.visibility = View.GONE
+                        linkText?.visibility = View.VISIBLE
+                        linkIcon?.visibility = View.VISIBLE
+                        linkOverlay?.visibility = View.VISIBLE
+
+                        val t = Uri.parse(url).host ?: url
+                        linkText?.text = t
+                        linkOverlay?.setOnClickListener {
+                            onLinkClick(accountId, url, null, LinkContext.Rich)
+                        }
+                        linkOverlay?.setOnLongClickListener {
+                            onLinkLongClick(accountId, url, t)
+                            true
+                        }
+                    } else {
+                        openLinkButton?.visibility = View.VISIBLE
+                        linkText?.visibility = View.GONE
+                        linkIcon?.visibility = View.GONE
+                        linkOverlay?.visibility = View.GONE
+                        openLinkButton?.setOnClickListener {
+                            onLinkClick(accountId, url, null, LinkContext.Action)
+                        }
+                    }
+                }
+            } else {
+                openLinkButton?.visibility = View.GONE
+            }
+
             if (updateContent) {
                 lemmyHeaderHelper.populateHeaderSpan(
                     headerContainer = headerContainer,
@@ -948,45 +1032,6 @@ class PostListViewBuilder @Inject constructor(
                 onShowMoreOptions(accountId, postView)
             }
 
-            if (rawBinding is ListingItemCardBinding ||
-                rawBinding is ListingItemCard2Binding ||
-                rawBinding is ListingItemCard3Binding ||
-                rawBinding is ListingItemLargeListBinding
-            ) {
-                if (url == null) {
-                    openLinkButton?.visibility = View.GONE
-                    linkText?.visibility = View.GONE
-                    linkIcon?.visibility = View.GONE
-                    linkOverlay?.visibility = View.GONE
-                } else {
-                    if ((postType == PostType.Link || postType == PostType.Text) && thumbnailUrl != null) {
-                        openLinkButton?.visibility = View.GONE
-                        linkText?.visibility = View.VISIBLE
-                        linkIcon?.visibility = View.VISIBLE
-                        linkOverlay?.visibility = View.VISIBLE
-
-                        val t = Uri.parse(url).host ?: url
-                        linkText?.text = t
-                        linkOverlay?.setOnClickListener {
-                            onLinkClick(accountId, url, null, LinkContext.Rich)
-                        }
-                        linkOverlay?.setOnLongClickListener {
-                            onLinkLongClick(accountId, url, t)
-                            true
-                        }
-                    } else {
-                        openLinkButton?.visibility = View.VISIBLE
-                        linkText?.visibility = View.GONE
-                        linkIcon?.visibility = View.GONE
-                        linkOverlay?.visibility = View.GONE
-                        openLinkButton?.setOnClickListener {
-                            onLinkClick(accountId, url, null, LinkContext.Action)
-                        }
-                    }
-                }
-            } else {
-                openLinkButton?.visibility = View.GONE
-            }
             when (val rb = rawBinding) {
                 is ListingItemCompactBinding -> {
                     if (isActionsExpanded) {

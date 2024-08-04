@@ -7,6 +7,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
+import android.text.style.SubscriptSpan
 import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView
@@ -31,6 +32,7 @@ import io.noties.markwon.Markwon
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.html.span.SubScriptSpan
 import io.noties.markwon.html.span.SuperScriptSpan
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
@@ -313,6 +315,13 @@ object LemmyTextHelper {
                 SimpleExtPlugin.create().apply {
                     addExtension(1, '^') { _, _ ->
                         SuperScriptSpan()
+                    }
+                },
+            )
+            .usePlugin(
+                SimpleExtPlugin.create().apply {
+                    addExtension(1, '~') { _, _ ->
+                        SubScriptSpan()
                     }
                 },
             )

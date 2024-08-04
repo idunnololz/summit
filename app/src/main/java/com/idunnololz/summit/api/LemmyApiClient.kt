@@ -1270,14 +1270,16 @@ class LemmyApiClient(
         unreadOnly: Boolean? = null,
         page: Int? = null,
         limit: Int? = null,
+        senderId: PersonId? = null,
         account: Account,
         force: Boolean,
     ): Result<List<PrivateMessageView>> {
         val form = GetPrivateMessages(
-            unreadOnly,
-            page,
-            limit,
-            account.jwt,
+            unread_only = unreadOnly,
+            page = page,
+            limit = limit,
+            creator_id = senderId,
+            auth = account.jwt,
         )
 
         return retrofitErrorHandler {

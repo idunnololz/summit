@@ -62,10 +62,11 @@ object LemmyUtils {
         // find limiting factor
         val scale = availableW.toDouble() / w
         val scaledH = h * scale
-        if (scaledH > availableH) {
-            return Point((availableH.toDouble() / h * w).toInt(), availableH)
+
+        return if (scaledH > availableH) {
+            Point((availableH.toDouble() / h * w).toInt(), availableH)
         } else {
-            return Point(availableW, scaledH.toInt())
+            Point(availableW, scaledH.toInt())
         }
     }
 
