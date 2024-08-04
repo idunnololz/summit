@@ -21,14 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkManager
 import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -78,7 +74,6 @@ import com.idunnololz.summit.main.LemmyAppBarController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
-import com.idunnololz.summit.offline.OfflinePostFeedWork
 import com.idunnololz.summit.offline.dialog.MakeOfflineDialogFragment
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction

@@ -224,7 +224,7 @@ class PostViewModel @Inject constructor(
                         }
                     }
                 }
-            }
+            },
         )
 
         lemmyApiClient.changeInstance(nativeInstance)

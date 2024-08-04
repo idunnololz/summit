@@ -7,7 +7,6 @@ import com.idunnololz.summit.lemmy.toSortOrder
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 
-
 fun getSortOrderForCommunity(
     communityRef: CommunityRef?,
     preferences: Preferences,

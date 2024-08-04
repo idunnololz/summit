@@ -39,6 +39,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -294,7 +295,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                 } else {
                     b.banner.visibility = View.VISIBLE
 
-                    b.banner.load(R.drawable.thumbnail_placeholder_16_9)
+                    b.banner.load(newShimmerDrawable16to9(context))
                     offlineManager.fetchImageWithError(
                         rootView,
                         community.community.banner,

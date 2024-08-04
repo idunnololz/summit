@@ -6,16 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.DialogFragmentErrorBinding
 import com.idunnololz.summit.databinding.DialogFragmentMakeOfflineBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.offline.OfflinePostFeedWork
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,13 +21,12 @@ class MakeOfflineDialogFragment : BaseDialogFragment<DialogFragmentMakeOfflineBi
     companion object {
         private const val ARG_COMMUNITY_REF = "ARG_COMMUNITY_REF"
 
-        fun newInstance(communityRef: CommunityRef) =
-            MakeOfflineDialogFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putParcelable(ARG_COMMUNITY_REF, communityRef)
-                    }
+        fun newInstance(communityRef: CommunityRef) = MakeOfflineDialogFragment()
+            .apply {
+                arguments = Bundle().apply {
+                    putParcelable(ARG_COMMUNITY_REF, communityRef)
                 }
+            }
     }
 
     private val viewModel: MakeOfflineViewModel by viewModels()

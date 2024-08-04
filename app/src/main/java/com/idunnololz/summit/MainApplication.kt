@@ -189,8 +189,12 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         Coil.setImageLoader(
             ImageLoader.Builder(context)
-                .transitionFactory(CrossfadeTransition.Factory())
-                .crossfade(IMAGE_LOAD_CROSS_FADE_DURATION_MS.toInt())
+                .transitionFactory(
+                    CrossfadeTransition.Factory(
+                        durationMillis = IMAGE_LOAD_CROSS_FADE_DURATION_MS.toInt(),
+                        preferExactIntrinsicSize = true,
+                    ),
+                )
                 .okHttpClient(Client.get())
                 .components {
                     if (SDK_INT >= 28) {

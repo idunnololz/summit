@@ -27,14 +27,13 @@ class InboxRepository @Inject constructor(
         private val apiClient: AccountAwareLemmyClient,
         private val accountInfoManager: AccountInfoManager,
     ) {
-        fun create(
-            conversationSource: InboxMultiDataSource = InboxMultiDataSource(listOf())
-        ) = InboxRepository(
-            context = context,
-            apiClient = apiClient,
-            accountInfoManager = accountInfoManager,
-            conversationSource = conversationSource
-        )
+        fun create(conversationSource: InboxMultiDataSource = InboxMultiDataSource(listOf())) =
+            InboxRepository(
+                context = context,
+                apiClient = apiClient,
+                accountInfoManager = accountInfoManager,
+                conversationSource = conversationSource,
+            )
     }
 
     companion object {

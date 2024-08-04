@@ -7,7 +7,6 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
-import android.text.style.SubscriptSpan
 import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView

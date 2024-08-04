@@ -1,8 +1,6 @@
 package com.idunnololz.summit.api
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient.Companion.API_VERSION
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE

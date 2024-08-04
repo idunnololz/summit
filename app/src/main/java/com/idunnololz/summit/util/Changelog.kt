@@ -8,7 +8,7 @@ import com.idunnololz.summit.main.MainActivity
  */
 
 fun MainActivity.launchChangelog() {
-    launchPage(PostRef("lemmy.world", 16865154), switchToNativeInstance = true)
+    launchPage(PostRef("lemmy.world", 18269112), switchToNativeInstance = true)
 }
 fun BaseFragment<*>.launchChangelog() {
     getMainActivity()?.launchChangelog()

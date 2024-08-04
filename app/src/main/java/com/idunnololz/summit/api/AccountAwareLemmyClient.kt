@@ -598,7 +598,7 @@ class AccountAwareLemmyClient @Inject constructor(
                 limit = limit,
                 senderId = senderId,
                 account = account,
-                force = force
+                force = force,
             )
             .autoSignOut(account)
     }

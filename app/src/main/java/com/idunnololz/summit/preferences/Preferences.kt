@@ -127,15 +127,13 @@ import com.idunnololz.summit.util.ext.putMoshiValue
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import java.time.Duration
+import kotlinx.coroutines.flow.first
 import org.json.JSONObject
 
 private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = "offlineModePreferences"
+    name = "offlineModePreferences",
 )
-
 
 class Preferences(
     @ApplicationContext private val context: Context,

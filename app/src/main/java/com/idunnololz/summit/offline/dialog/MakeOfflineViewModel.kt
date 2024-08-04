@@ -1,6 +1,5 @@
 package com.idunnololz.summit.offline.dialog
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -10,7 +9,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.offline.OfflinePostFeedWork
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,11 +40,11 @@ class MakeOfflineViewModel @Inject constructor(
                             progress.postValue(
                                 OfflinePostFeedWork.ProgressTracker().apply {
                                     this.currentPhase = OfflinePostFeedWork.ProgressPhase.Complete
-                                }
+                                },
                             )
                         } else {
                             progress.postValue(
-                                OfflinePostFeedWork.ProgressTracker.fromData(workInfo.progress)
+                                OfflinePostFeedWork.ProgressTracker.fromData(workInfo.progress),
                             )
                         }
                     }

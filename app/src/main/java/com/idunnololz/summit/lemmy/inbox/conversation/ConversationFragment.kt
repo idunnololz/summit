@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentConversationBinding
 import com.idunnololz.summit.util.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +35,5 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
     }
 }
