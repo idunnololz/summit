@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_unknown">Bilinmeyen hata. Lütfen tekrar deneyin.</string>
+    <string name="home">Ana Sayfa</string>
+    <string name="view">Görüş</string>
+    <string name="image_saved_format">Resim %1$s a kaydedildi.</string>
+    <string name="prev">Önceki</string>
+    <string name="next">Sonraki</string>
+    <string name="page_format">Sayfa %1$s</string>
+    <string name="nsfw">NSFW</string>
+    <string name="all">Tümü</string>
+    <string name="local">Lokal</string>
+    <string name="subscribed">Abone olundu</string>
+    <string name="moderated_communities">Denetlenen topluluklar</string>
+    <string name="feeds">Yayınlar</string>
+    <string name="communities">Topluluklar</string>
+    <string name="reveal_warning_nsfw">Bu içerik NSFW olarak işaretli</string>
+    <string name="reveal_warning_default">Bu gönderi kaldırılmış</string>
+    <string name="show_post">Gönderiyi göster</string>
+    <string name="share">Paylaş</string>
+    <string name="error_network">Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</string>
+    <string name="save">Kaydet</string>
+    <string name="save_success_format">Dosya %1$s konumuna kaydedildi</string>
+    <string name="error_network_timeout">Ağ hatası. Talep çok uzun sürdü. Lütfen tekrar deneyin.</string>
+    <string name="recents">Son zamanlar</string>
+</resources>
