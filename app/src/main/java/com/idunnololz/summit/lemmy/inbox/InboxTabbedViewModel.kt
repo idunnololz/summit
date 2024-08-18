@@ -14,6 +14,9 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.inbox.inbox.InboxFragment
+import com.idunnololz.summit.lemmy.inbox.inbox.InboxFragmentArgs
+import com.idunnololz.summit.lemmy.inbox.inbox.getName
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.util.PageItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +34,7 @@ class InboxTabbedViewModel @Inject constructor(
     class InboxItemWithInstance(
         val inboxItem: InboxItem,
         val instance: String,
+        val accountId: Long,
     )
 
     var pageItems = MutableLiveData<List<PageItem>>()
@@ -83,6 +87,7 @@ class InboxTabbedViewModel @Inject constructor(
                         InboxItemWithInstance(
                             inboxItem,
                             inboxItemAccount.instance,
+                            inboxItemAccount.id,
                         ),
                     )
                 }

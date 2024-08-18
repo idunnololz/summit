@@ -1,6 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="?backgroundColor">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:layout_collapseMode="pin">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolbar_content_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/icon"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginVertical="@dimen/padding_half"
+                    android:padding="1dp"
+                    android:foreground="@drawable/account_ripple_2"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center_vertical|start"
+                    style="@style/CircleImageView"
+                    app:strokeColor="?colorOnSurface"
+                    app:strokeWidth="1dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/padding"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:textAppearance="?attr/textAppearanceTitleLarge"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/icon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/subtitle"/>
+
+                <TextView
+                    android:id="@+id/subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/padding"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    app:layout_constraintStart_toEndOf="@+id/icon"
+                    app:layout_constraintTop_toBottomOf="@+id/title"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="@dimen/padding"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/comment_container">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"/>
+
+                <com.idunnololz.summit.view.LoadingView
+                    android:id="@+id/loading_view"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </FrameLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/comment_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:layout_marginBottom="@dimen/padding"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/send_button">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/comment_editor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
+
+                    <com.idunnololz.summit.view.CustomTextInputEditText
+                        android:id="@+id/comment_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="vertical"
+                        android:maxLines="4"
+                        android:autofillHints="no"
+                        android:hint="@string/reply"
+                        android:padding="@dimen/padding"
+                        android:background="@null"
+                        android:gravity="start|top"
+                        android:inputType="textMultiLine|textCapSentences"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <ImageButton
+                android:id="@+id/send_button"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/outline_send_24"
+                android:background="@drawable/conversation_send_bg"
+                android:layout_marginBottom="@dimen/padding"
+                android:layout_marginEnd="@dimen/padding"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

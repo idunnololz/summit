@@ -328,7 +328,11 @@ class CommunityFragment :
                         url = url,
                         mimeType = null,
                     )
-                    viewModel.onPostRead(postView, accountId)
+                    moreActionsHelper.onPostRead(
+                        postView = postView,
+                        delayMs = 0,
+                        accountId = accountId,
+                    )
                 },
                 onVideoClick = { url, videoType, state ->
                     getMainActivity()?.openVideo(url, videoType, state)
@@ -370,7 +374,11 @@ class CommunityFragment :
                     )
                 },
                 onPostRead = { accountId, postView ->
-                    viewModel.onPostRead(postView, accountId)
+                    moreActionsHelper.onPostRead(
+                        postView = postView,
+                        delayMs = 0,
+                        accountId = accountId,
+                    )
                 },
                 onLoadPage = {
                     viewModel.fetchPage(it)
@@ -1011,10 +1019,10 @@ class CommunityFragment :
                         }
 
                         PostGestureAction.MarkAsRead -> {
-                            viewModel.onPostRead(
+                            moreActionsHelper.togglePostRead(
                                 postView = postView,
-                                accountId = fetchedPost.source.accountId,
                                 delayMs = 250,
+                                accountId = fetchedPost.source.accountId,
                             )
                         }
                     }

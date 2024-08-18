@@ -1,18 +1,29 @@
 package com.idunnololz.summit.main
 
 import android.app.Activity
+import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.IdRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.forEach
+import androidx.core.view.iterator
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.FloatingWindow
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.ui.NavigationUI
 import androidx.window.layout.WindowMetricsCalculator
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDivider
@@ -28,6 +39,7 @@ import com.idunnololz.summit.settings.navigation.NavBarConfig
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
+import java.lang.ref.WeakReference
 
 class NavBarController(
     val activity: Activity,
@@ -48,11 +60,11 @@ class NavBarController(
         get() = _useNavigationRail!!
 
     var useBottomNavBar = true
-    var navRailMode = NavigationRailModeId.Auto
-    var globalLayoutMode: GlobalLayoutMode = GlobalLayoutModes.Auto
+    private var navRailMode = NavigationRailModeId.Auto
+    private var globalLayoutMode: GlobalLayoutMode = GlobalLayoutModes.Auto
 
     lateinit var navBar: NavigationBarView
-    lateinit var navBarContainer: View
+    private lateinit var navBarContainer: View
 
     var newLeftInset: Int = 0
     var newRightInset: Int = 0
@@ -69,7 +81,7 @@ class NavBarController(
                 0
             }
 
-    val navRailWidth: Int
+    private val navRailWidth: Int
         get() =
             if (useBottomNavBar) {
                 if (useNavigationRail) {
@@ -96,6 +108,9 @@ class NavBarController(
 
     private var enableBottomNavViewScrolling = false
     private var navBarConfig: NavBarConfig = NavBarConfig()
+
+    private val onNavigationItemReselectedListeners =
+        mutableListOf<NavigationBarView.OnItemReselectedListener>()
 
     init {
         navBarOffsetPercent.observe(lifecycleOwner) {
@@ -472,6 +487,99 @@ class NavBarController(
             navBarContainer.visibility = View.GONE
         }
     }
+
+    fun setupWithNavController(navController: NavController) {
+        setupWithNavController(navBar, navController)
+
+        navBar.setOnItemReselectedListener { menuItem ->
+            Log.d(TAG, "Reselected nav item: ${menuItem.itemId}")
+
+            onNavigationItemReselectedListeners.forEach {
+                it.onNavigationItemReselected(menuItem)
+            }
+        }
+    }
+
+    fun registerOnNavigationItemReselectedListener(
+        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
+    ) {
+        onNavigationItemReselectedListeners.add(onNavigationItemReselectedListener)
+    }
+
+    fun unregisterOnNavigationItemReselectedListener(
+        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
+    ) {
+        onNavigationItemReselectedListeners.remove(onNavigationItemReselectedListener)
+    }
+
+    /**
+     * From [NavigationUI.setupWithNavController]
+     */
+    private fun setupWithNavController(
+        navigationBarView: NavigationBarView,
+        navController: NavController,
+    ) {
+        navigationBarView.setOnItemSelectedListener { item ->
+            NavigationUI.onNavDestinationSelected(
+                item,
+                navController,
+            )
+        }
+
+        val weakReference = WeakReference(navigationBarView)
+        navController.addOnDestinationChangedListener(
+            object : NavController.OnDestinationChangedListener {
+                override fun onDestinationChanged(
+                    controller: NavController,
+                    destination: NavDestination,
+                    arguments: Bundle?,
+                ) {
+                    val view = weakReference.get()
+                    if (view == null) {
+                        navController.removeOnDestinationChangedListener(this)
+                        return
+                    }
+                    if (destination is FloatingWindow) {
+                        return
+                    }
+
+                    // controller.currentBackStack.value.map { it.destination }
+                    var found = false
+                    view.menu.forEach { item ->
+                        if (destination.matchDestination(item.itemId)) {
+                            item.isChecked = true
+                            found = true
+                        }
+                    }
+
+                    val idToItem = mutableMapOf<Int, MenuItem>()
+                    view.menu.forEach {
+                        idToItem[it.itemId] = it
+                    }
+
+                    if (!found) {
+                        for (entry in navController.backQueueInternal().asReversed()) {
+                            if (idToItem.contains(entry.destination.id)) {
+                                idToItem[entry.destination.id]?.isChecked = true
+                                break
+                            }
+                        }
+                    }
+                }
+            },
+        )
+    }
+
+    private fun NavController.backQueueInternal(): ArrayDeque<NavBackStackEntry> {
+        return NavController::class.java.getDeclaredField("backQueue").let { field ->
+            field.isAccessible = true
+            @Suppress("UNCHECKED_CAST")
+            field.get(this@backQueueInternal) as ArrayDeque<NavBackStackEntry>
+        }
+    }
+
+    private fun NavDestination.matchDestination(@IdRes destId: Int): Boolean =
+        hierarchy.any { it.id == destId }
 
     enum class WindowSizeClass { COMPACT, MEDIUM, EXPANDED }
 }

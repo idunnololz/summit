@@ -20,6 +20,11 @@ interface DraftsDao {
     )
     suspend fun getDraftsByType(type: Int, limit: Int, updateTs: Long): List<DraftEntry>
 
+    @Query(
+        "SELECT * FROM drafts WHERE draft_type = :type AND account_id = :accountId AND account_instance = :accountInstance",
+    )
+    suspend fun getAllDraftsByType(type: Int, accountId: Long, accountInstance: String,): List<DraftEntry>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: DraftEntry): Long
 
@@ -31,6 +36,9 @@ interface DraftsDao {
     @Delete
     suspend fun delete(action: DraftEntry)
 
+    @Query("DELETE FROM drafts WHERE id = :entryId")
+    fun deleteWithId(entryId: Long)
+
     @Query("DELETE FROM drafts WHERE draft_type = :type")
     suspend fun deleteAll(type: Int)
 
@@ -38,5 +46,5 @@ interface DraftsDao {
     suspend fun deleteAll()
 
     @Query("SELECT COUNT(*) FROM drafts")
-    abstract suspend fun count(): Int
+    suspend fun count(): Int
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.GuestOrUserAccount
+import com.idunnololz.summit.lemmy.utils.StableAccountId
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,5 +62,13 @@ class PreferenceManager @Inject constructor(
 
     fun getNotificationsSharedPreferences(): SharedPreferences {
         return context.getSharedPreferences("notifications@", Context.MODE_PRIVATE)
+    }
+
+    fun getGlobalStateSharedPreferences(): SharedPreferences {
+        return context.getSharedPreferences("global_state@", Context.MODE_PRIVATE)
+    }
+
+    fun getAccountStateSharedPreferences(stableAccountId: StableAccountId): SharedPreferences {
+        return context.getSharedPreferences("state_$stableAccountId@", Context.MODE_PRIVATE)
     }
 }

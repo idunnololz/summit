@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.personPicker
 import android.content.Context
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -39,6 +40,10 @@ class PersonAdapter(
     private val maxSelectedPersons: Int = 100,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    companion object {
+        private const val TAG = "PersonAdapter"
+    }
+
     private sealed interface Item {
 
         data class GroupHeaderItem(
@@ -65,7 +70,7 @@ class PersonAdapter(
 
     var selectedPersons = LinkedHashSet<PersonRef.PersonRefByName>()
     private var serverResultsInProgress = false
-    private var serverQueryResults: List<PersonView> = listOf()
+    private var serverQueryResults: PersonPickerViewModel.PersonSearchResults? = null
 
     private var query: String? = null
 
@@ -236,15 +241,21 @@ class PersonAdapter(
     }
 
     private fun refreshItems(cb: () -> Unit) {
+        Log.d(TAG, "refreshItems() " +
+            "query: ${serverQueryResults?.query} " +
+            "numResults: ${serverQueryResults?.people?.size} " +
+            "serverResultsInProgress: $serverResultsInProgress")
+
         val query = query
         val isQueryActive = !query.isNullOrBlank()
+        val serverQueryResults = serverQueryResults
 
         val newItems = mutableListOf<Item>()
 
         if (canSelectMultiplePersons) {
-            newItems.add(Item.GroupHeaderItem(context.getString(R.string.selected_communities)))
+            newItems.add(Item.GroupHeaderItem(context.getString(R.string.selected_people)))
             if (selectedPersons.isEmpty()) {
-                newItems += Item.NoResultsItem(context.getString(R.string.no_communities_selected))
+                newItems += Item.NoResultsItem(context.getString(R.string.no_people_selected))
             } else {
                 selectedPersons.forEach {
                     newItems += Item.SelectedPersonItem(
@@ -254,17 +265,21 @@ class PersonAdapter(
             }
         }
 
-        if (isQueryActive) {
+        if (isQueryActive && serverQueryResults != null) {
             newItems.add(
                 Item.GroupHeaderItem(
                     context.getString(R.string.server_results),
                     serverResultsInProgress,
                 ),
             )
-            if (serverQueryResults.isEmpty()) {
-                newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
+            if (serverQueryResults.people.isEmpty()) {
+                if (serverResultsInProgress) {
+                    newItems.add(Item.NoResultsItem(context.getString(R.string.loading)))
+                } else {
+                    newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
+                }
             } else {
-                serverQueryResults.forEach {
+                serverQueryResults.people.forEach {
                     newItems += Item.SearchResultPersonItem(
                         it.person.name,
                         it,
@@ -283,7 +298,7 @@ class PersonAdapter(
         refreshItems(cb)
     }
 
-    fun setQueryServerResults(serverQueryResults: List<PersonView>) {
+    fun setQueryServerResults(serverQueryResults: PersonPickerViewModel.PersonSearchResults?) {
         this.serverQueryResults = serverQueryResults
         serverResultsInProgress = false
 
@@ -291,7 +306,7 @@ class PersonAdapter(
     }
 
     fun setQueryServerResultsInProgress() {
-        serverQueryResults = listOf()
+        serverQueryResults = null
         serverResultsInProgress = true
 
         refreshItems({})

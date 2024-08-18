@@ -8,7 +8,8 @@ object ContentUtils {
         url.endsWith(".png", ignoreCase = true) ||
         url.endsWith(".webp", ignoreCase = true) ||
         url.endsWith(".gif", ignoreCase = true) ||
-        url.endsWith(".svg", ignoreCase = true)
+        url.endsWith(".svg", ignoreCase = true) ||
+        url.contains("/image_proxy?", ignoreCase = true)
 
     fun isUrlVideo(url: String) = isUrlMp4(url) ||
         isUrlWebm(url) ||

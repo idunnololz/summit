@@ -38,8 +38,8 @@ class PostReadManager @Inject constructor(
         }
     }
 
-    fun isPostRead(instance: String, postId: PostId): Boolean {
-        return readPosts[toKey(instance, postId)] ?: false
+    fun isPostRead(instance: String, postId: PostId): Boolean? {
+        return readPosts[toKey(instance, postId)]
     }
 
     fun markPostAsReadLocal(instance: String, postId: PostId, read: Boolean) {

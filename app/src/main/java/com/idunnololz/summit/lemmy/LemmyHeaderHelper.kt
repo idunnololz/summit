@@ -178,16 +178,11 @@ class LemmyHeaderHelper(
         }
 
         if (displayFullName) {
-            sb.appendLink(
-                "${postView.community.name}@$postInstance",
-                LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
-            )
-            val end = sb.length
-            sb.setSpan(
-                ForegroundColorSpan(unimportantColor),
-                end - postInstance.length - 1,
-                end,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            sb.appendNameWithInstance(
+                context = context,
+                name = postView.community.name,
+                instance = postInstance,
+                url = LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
             )
         } else {
             sb.appendLink(
@@ -379,17 +374,11 @@ class LemmyHeaderHelper(
         val nameEnd = nameStart + creatorName.length
 
         if (displayFullName) {
-            val fullNameEnd = nameEnd + 1 + creatorInstance.length
-            sb.appendLink(
-                text = "$creatorName@$creatorInstance",
-                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
-                underline = false,
-            )
-            sb.setSpan(
-                ForegroundColorSpan(unimportantColor),
-                nameEnd,
-                fullNameEnd,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            sb.appendNameWithInstance(
+                context = context,
+                name = creatorName,
+                instance = creatorInstance,
+                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name)
             )
         } else {
             sb.appendLink(

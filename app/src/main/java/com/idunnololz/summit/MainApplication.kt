@@ -224,6 +224,9 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         GlobalSettings.refresh(hiltEntryPoint.preferences())
 
+        hiltEntryPoint.accountInfoManager().init()
+        hiltEntryPoint.conversationsManager().init()
+
         if (hiltEntryPoint.preferences().useFirebase) {
             FirebaseApp.initializeApp(this)
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)

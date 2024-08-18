@@ -297,7 +297,11 @@ class CommunityAdapter(
                 ),
             )
             if (serverQueryResults.isEmpty()) {
-                newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
+                if (serverResultsInProgress) {
+                    newItems.add(Item.NoResultsItem(context.getString(R.string.loading)))
+                } else {
+                    newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
+                }
             } else {
                 serverQueryResults.forEach {
                     newItems += Item.SearchResultCommunityItem(

@@ -957,7 +957,7 @@ class PostAdapter(
                 ) {
                     finalItems += Item.NotNativeInstanceItem(
                         accountInstance = rawData.accountInstance,
-                        postInstance = postView.post.community.instance,
+                        postInstance = postView.post.instance,
                     )
                 }
 

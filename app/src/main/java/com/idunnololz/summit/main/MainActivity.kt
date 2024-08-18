@@ -134,9 +134,6 @@ class MainActivity :
     override val mainApplication: MainApplication
         get() = application as MainApplication
 
-    private val onNavigationItemReselectedListeners =
-        mutableListOf<NavigationBarView.OnItemReselectedListener>()
-
     private var currentBottomMenu: BottomMenu? = null
 
     var lockUiOpenness = false
@@ -372,15 +369,7 @@ class MainActivity :
 
         val navController = navHostFragment.navController
 
-        navBarController.navBar.setupWithNavController(navController)
-
-        navBarController.navBar.setOnItemReselectedListener { menuItem ->
-            Log.d(TAG, "Reselected nav item: ${menuItem.itemId}")
-
-            onNavigationItemReselectedListeners.forEach {
-                it.onNavigationItemReselected(menuItem)
-            }
-        }
+        navBarController.setupWithNavController(navController)
 
         currentNavController = navHostFragment.navController
     }
@@ -388,13 +377,17 @@ class MainActivity :
     fun registerOnNavigationItemReselectedListener(
         onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
     ) {
-        onNavigationItemReselectedListeners.add(onNavigationItemReselectedListener)
+        navBarController.registerOnNavigationItemReselectedListener(
+            onNavigationItemReselectedListener,
+        )
     }
 
     fun unregisterOnNavigationItemReselectedListener(
         onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
     ) {
-        onNavigationItemReselectedListeners.remove(onNavigationItemReselectedListener)
+        navBarController.unregisterOnNavigationItemReselectedListener(
+            onNavigationItemReselectedListener,
+        )
     }
 
     private fun registerInsetsHandler() {

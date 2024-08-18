@@ -363,8 +363,8 @@ class PostsRepository @AssistedInject constructor(
     private fun transformPostWithLocalData(fetchedPost: FetchedPost): FetchedPost {
         val accountInstance = fetchedPost.source.instance ?: apiInstance
         val localRead = postReadManager.isPostRead(accountInstance, fetchedPost.postView.post.id)
-        if (localRead && !fetchedPost.postView.read) {
-            return fetchedPost.copy(postView = fetchedPost.postView.copy(read = true))
+        if (localRead != null && localRead != fetchedPost.postView.read) {
+            return fetchedPost.copy(postView = fetchedPost.postView.copy(read = localRead))
         }
         return fetchedPost
     }
@@ -428,7 +428,7 @@ class PostsRepository @AssistedInject constructor(
             var filterReason: FilterReason? = null
             val instance = fetchedPost.source.instance ?: apiInstance
 
-            if (hideRead && (post.read || postReadManager.isPostRead(instance, post.post.id))) {
+            if (hideRead && (post.read || postReadManager.isPostRead(instance, post.post.id) == true)) {
                 hideReadCount++
                 continue
             }

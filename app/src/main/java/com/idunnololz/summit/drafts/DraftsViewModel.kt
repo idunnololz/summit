@@ -98,6 +98,10 @@ class DraftsViewModel @Inject constructor(
                     is DraftData.PostDraftData ->
                         items.add(ViewModelItem.PostDraftItem(draft, draft.data))
 
+                    is DraftData.MessageDraftData -> {
+                        /* do nothing */
+                    }
+
                     null -> {
                         /* do nothing */
                     }

@@ -1,25 +1,26 @@
-package com.idunnololz.summit.lemmy.inbox
+package com.idunnololz.summit.lemmy.inbox.inbox
 
+import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.idunnololz.summit.R
@@ -29,17 +30,34 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentInboxBinding
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.InboxListLoaderItemBinding
+import com.idunnololz.summit.databinding.ItemConversationBinding
+import com.idunnololz.summit.databinding.ItemInboxHeaderBinding
+import com.idunnololz.summit.databinding.ItemInboxWarningBinding
+import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.InboxSwipeToActionCallback
+import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
+import com.idunnololz.summit.lemmy.inbox.PageType
+import com.idunnololz.summit.lemmy.inbox.ReportItem
+import com.idunnololz.summit.lemmy.inbox.conversation.Conversation
+import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsManager
+import com.idunnololz.summit.lemmy.inbox.conversation.NewConversation
+import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
+import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
@@ -47,15 +65,20 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.CustomDividerItemDecoration
+import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.PrettyPrintStyles
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.tsToShortDate
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -88,6 +111,9 @@ class InboxFragment :
     @Inject
     lateinit var preferences: Preferences
 
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
+
     private var adapter: InboxItemAdapter? = null
 
     private val paneOnBackPressHandler = object : OnBackPressedCallback(true) {
@@ -107,12 +133,28 @@ class InboxFragment :
             }
         }
 
-        setFragmentResultListener(AddOrEditCommentFragment.REQUEST_KEY) { _, _ ->
-//            val result = bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(AddOrEditCommentFragment.REQUEST_KEY_RESULT)
-//
-//            if (result != null) {
-//                viewModel.fetchPostData(args.instance, args.id)
-//            }
+        childFragmentManager.setFragmentResultListener(
+            PersonPickerDialogFragment.REQUEST_KEY,
+            this,
+        ) { key, bundle ->
+            val result = bundle.getParcelableCompat<PersonPickerDialogFragment.Result>(
+                PersonPickerDialogFragment.REQUEST_KEY_RESULT,
+            )
+            val accountId = viewModel.currentAccount.value?.id
+            if (result != null && accountId != null) {
+                (parentFragment as? InboxTabbedFragment)?.openConversation(
+                    accountId = accountId,
+                    conversation = Either.Right(
+                        NewConversation(
+                            result.personId,
+                            result.personRef.instance,
+                            result.personRef.name,
+                            result.icon,
+                        )
+                    ),
+                    instance = viewModel.instance,
+                )
+            }
         }
     }
 
@@ -139,7 +181,7 @@ class InboxFragment :
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-            insetViewAutomaticallyByMarginAndNavUi(
+            insetViewAutomaticallyByPaddingAndNavUi(
                 lifecycleOwner = viewLifecycleOwner,
                 rootView = binding.coordinatorLayout,
                 applyTopInset = false,
@@ -182,6 +224,22 @@ class InboxFragment :
                 }
             }
 
+            when (it) {
+                PageType.Messages -> {
+                    binding.fab.setImageResource(R.drawable.baseline_edit_24)
+                    binding.fab.setOnClickListener {
+                        PersonPickerDialogFragment.show(childFragmentManager)
+                    }
+                }
+                PageType.Conversation -> error("unreachable")
+                else -> {
+                    binding.fab.setImageResource(R.drawable.baseline_done_all_24)
+                    binding.fab.setOnClickListener {
+                        viewModel.markAllAsRead()
+                    }
+                }
+            }
+
             binding.recyclerView.postDelayed({
                 if (isBindingAvailable()) {
                     binding.recyclerView.scrollToPosition(0)
@@ -221,7 +279,7 @@ class InboxFragment :
         }
 
         (viewModel.inboxUpdate.value as? StatefulData.Success)?.data?.let {
-            adapter.setData(it.inboxData)
+            adapter.setData(it.inboxModel)
         }
 
         binding.recyclerView.adapter = adapter
@@ -238,30 +296,12 @@ class InboxFragment :
                     if (layoutManager.findLastVisibleItemPosition() == adapter.itemCount - 1) {
                         if (!viewModel.inboxUpdate.isLoading && adapter.hasMore()) {
                             viewModel.pageIndex++
-                            viewModel.fetchInbox()
+                            viewModel.fetchInboxAsync()
                         }
                     }
                 }
             },
         )
-        binding.recyclerView.addItemDecoration(
-            CustomDividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL,
-            ).apply {
-                setDrawable(
-                    checkNotNull(
-                        ContextCompat.getDrawable(
-                            context,
-                            R.drawable.vertical_divider,
-                        ),
-                    ),
-                )
-            },
-        )
-        binding.fab.setOnClickListener {
-            viewModel.markAllAsRead()
-        }
         ItemTouchHelper(
             InboxSwipeToActionCallback(
                 context,
@@ -274,7 +314,6 @@ class InboxFragment :
                     viewModel.markAsRead(
                         inboxItem = inboxItem,
                         read = true,
-                        delete = viewModel.pageType.value == PageType.Unread,
                     )
                 }
             },
@@ -358,7 +397,7 @@ class InboxFragment :
                     if (!isBindingAvailable()) return@withContext
 
                     viewModel.pageIndex = 0
-                    viewModel.fetchInbox()
+                    viewModel.fetchInboxAsync()
                 }
             }
         }
@@ -389,7 +428,7 @@ class InboxFragment :
         }
         binding.fab.setup(preferences)
 
-        viewModel.fetchInbox()
+        viewModel.fetchInboxAsync()
 
         installOnActionResultHandler(
             moreActionsHelper = moreActionsHelper,
@@ -413,10 +452,12 @@ class InboxFragment :
 
     private fun createAdapter(): InboxItemAdapter {
         return InboxItemAdapter(
+            context = requireContext(),
             accountId = viewModel.currentAccount.value?.id,
-            postAndCommentViewBuilder,
-            viewModel.instance,
-            viewLifecycleOwner,
+            postAndCommentViewBuilder = postAndCommentViewBuilder,
+            instance = viewModel.instance,
+            lifecycleOwner = viewLifecycleOwner,
+            avatarHelper = avatarHelper,
             onImageClick = { url ->
                 getMainActivity()?.openImage(null, binding.appBar, null, url, null)
             },
@@ -430,10 +471,23 @@ class InboxFragment :
                 getMainActivity()?.launchPage(it)
             },
             onMessageClick = {
+                val accountId = viewModel.currentAccount.value?.id ?: return@InboxItemAdapter
                 if (!it.isRead && it !is ReportItem) {
                     markAsRead(it, read = true)
                 }
-                (parentFragment as? InboxTabbedFragment)?.openMessage(it, viewModel.instance)
+                (parentFragment as? InboxTabbedFragment)?.openMessage(
+                    accountId = accountId,
+                    item = it,
+                    instance = viewModel.instance,
+                )
+            },
+            onConversationClick = {
+                val accountId = viewModel.currentAccount.value?.id ?: return@InboxItemAdapter
+                (parentFragment as? InboxTabbedFragment)?.openConversation(
+                    accountId = accountId,
+                    conversation = Either.Left(it),
+                    instance = viewModel.instance,
+                )
             },
             onAddCommentClick = { inboxItem ->
                 if (accountInfoManager.currentFullAccount.value == null) {
@@ -487,6 +541,7 @@ class InboxFragment :
     }
 
     private fun onUpdate() {
+        Log.d(TAG, "onUpdate: ${viewModel.inboxUpdate.value}")
         when (val data = viewModel.inboxUpdate.value) {
             is StatefulData.Error -> {
                 binding.swipeRefreshLayout.isRefreshing = false
@@ -500,7 +555,7 @@ class InboxFragment :
                 }
             }
             is StatefulData.Loading -> {
-                if (adapter?.isEmpty() == true) {
+                if (!binding.swipeRefreshLayout.isRefreshing) {
                     binding.loadingView.showProgressBar()
                 }
             }
@@ -510,19 +565,20 @@ class InboxFragment :
                 binding.swipeRefreshLayout.isRefreshing = false
 
                 val inboxUpdate = data.data
-                val inboxData = inboxUpdate.inboxData
-                val itemCount = inboxData.sumOf { it.items.size }
-                if (itemCount == 0 && (adapter?.itemCount ?: 0) == 0) {
+                val inboxData = inboxUpdate.inboxModel
+                val itemCount = inboxData.items.size
+                val adapter = (binding.recyclerView.adapter as? InboxItemAdapter)
+
+                if (itemCount == 0) {
                     binding.loadingView.showErrorWithRetry(
                         getString(R.string.there_doesnt_seem_to_be_anything_here),
                         getString(R.string.refresh),
                     )
-                } else {
-                    Log.d(TAG, "onUpdate. Got ${inboxData.sumOf { it.items.size }} items!")
-                    (binding.recyclerView.adapter as? InboxItemAdapter)?.setData(inboxData) {
-                        if (inboxUpdate.scrollToTop) {
-                            binding.recyclerView.scrollToPosition(0)
-                        }
+                }
+
+                adapter?.setData(inboxData) {
+                    if (inboxUpdate.scrollToTop) {
+                        binding.recyclerView.scrollToPosition(0)
                     }
                 }
 
@@ -548,10 +604,12 @@ class InboxFragment :
     }
 
     private class InboxItemAdapter(
+        private val context: Context,
         var accountId: Long?,
         private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
         private val instance: String,
         private val lifecycleOwner: LifecycleOwner,
+        private val avatarHelper: AvatarHelper,
         private val onImageClick: (String) -> Unit,
         private val onVideoClick: (
             url: String,
@@ -561,6 +619,7 @@ class InboxFragment :
         private val onMarkAsRead: (InboxItem, Boolean) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onMessageClick: (InboxItem) -> Unit,
+        private val onConversationClick: (Conversation) -> Unit,
         private val onAddCommentClick: (InboxItem) -> Unit,
         private val onOverflowMenuClick: (InboxItem) -> Unit,
         private val onSignInRequired: () -> Unit,
@@ -570,8 +629,20 @@ class InboxFragment :
     ) : RecyclerView.Adapter<ViewHolder>() {
 
         private sealed interface Item {
+
+            data object HeaderItem : Item
+
+            data class TooManyMessagesWarningItem(
+                val earliestMessageTs: Long
+            ) : Item
+
             data class InboxListItem(
                 val inboxItem: InboxItem,
+            ) : Item
+
+            data class ConversationItem(
+                val conversation: Conversation,
+                val draftMessage: DraftData.MessageDraftData?,
             ) : Item
 
             data class LoaderItem(
@@ -579,17 +650,30 @@ class InboxFragment :
             ) : Item
         }
 
-        private var allData: List<LemmyListSource.PageResult<InboxItem>> = listOf()
+        private var inboxModel: InboxModel = InboxModel()
 
         private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
+                    is Item.HeaderItem -> true
                     is Item.InboxListItem ->
                         old.inboxItem.id == (new as Item.InboxListItem).inboxItem.id
+                    is Item.ConversationItem ->
+                        old.conversation.id == (new as Item.ConversationItem).conversation.id
                     is Item.LoaderItem -> true
+                    is Item.TooManyMessagesWarningItem -> true
                 }
             },
         ).apply {
+            addItemType(Item.HeaderItem::class, ItemInboxHeaderBinding::inflate) { item, b, _ -> }
+            addItemType(Item.TooManyMessagesWarningItem::class, ItemInboxWarningBinding::inflate) { item, b, h ->
+                b.message.text = context.getString(
+                    R.string.warn_too_many_messages,
+                    PrettyPrintUtils.defaultDecimalFormat.format(
+                        ConversationsManager.CONVERSATION_MAX_MESSAGE_REFRESH_LIMIT),
+                    tsToShortDate(item.earliestMessageTs)
+                )
+            }
             addItemType(Item.InboxListItem::class, InboxListItemBinding::inflate) { item, b, _ ->
                 postAndCommentViewBuilder.bindMessage(
                     b = b,
@@ -609,6 +693,70 @@ class InboxFragment :
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
+            }
+            addItemType(
+                Item.ConversationItem::class,
+                ItemConversationBinding::inflate,
+            ) { item, b, _ ->
+                val conversation = item.conversation
+                val draftContent = item.draftMessage?.content?.let {
+                    "(${context.getString(R.string.draft)}) $it"
+                }
+
+                if (conversation.isRead && draftContent == null) {
+                    b.title.setTypeface(b.title.typeface, Typeface.NORMAL)
+                    b.content.setTypeface(b.title.typeface, Typeface.NORMAL)
+                    b.title.alpha = 0.6f
+                    b.content.alpha = 0.6f
+                } else {
+                    b.title.setTypeface(b.title.typeface, Typeface.BOLD)
+                    b.content.setTypeface(b.title.typeface, Typeface.BOLD)
+                    b.title.alpha = 1f
+                    b.content.alpha = 1f
+                }
+
+                avatarHelper.loadAvatar(
+                    imageView = b.icon,
+                    imageUrl = conversation.iconUrl,
+                    personName = conversation.personName ?: "name",
+                    personId = conversation.personId,
+                    personInstance = conversation.personInstance ?: "instance",
+                )
+                b.title.text = SpannableStringBuilder().apply {
+                    appendNameWithInstance(
+                        context = context,
+                        name = conversation.personName ?: "",
+                        instance = conversation.personInstance,
+                    )
+                }
+
+                LemmyTextHelper.bindText(
+                    textView = b.content,
+                    text = draftContent
+                        ?: conversation.content
+                        ?: "",
+                    instance = instance,
+                    onImageClick = {
+                        onImageClick(it)
+                    },
+                    onVideoClick = { url ->
+                        onVideoClick(url, VideoType.Unknown, null)
+                    },
+                    onPageClick = onPageClick,
+                    onLinkClick = onLinkClick,
+                    onLinkLongClick = onLinkLongClick,
+                )
+                b.content.addEllipsizeToSpannedOnLayout()
+
+                b.ts.text = dateStringToPretty(
+                    context = context,
+                    ts = conversation.ts,
+                    style = PrettyPrintStyles.SHORT_DYNAMIC
+                )
+                b.root.setOnClickListener {
+                    onConversationClick(conversation)
+                }
+                b.root.setTag(R.id.swipe_enabled, false)
             }
             addItemType(Item.LoaderItem::class, InboxListLoaderItemBinding::inflate) { item, b, _ ->
                 when (val state = item.state) {
@@ -639,14 +787,29 @@ class InboxFragment :
         private fun refreshItems(cb: (() -> Unit)? = null) {
             val newItems = mutableListOf<Item>()
 
-            allData.forEach { data ->
-                data.items.mapTo(newItems) {
-                    Item.InboxListItem(it)
+            newItems.add(Item.HeaderItem)
+
+            val earliestMessageTs = inboxModel.earliestMessageTs
+            if (earliestMessageTs != null) {
+                newItems.add(Item.TooManyMessagesWarningItem(earliestMessageTs))
+            }
+
+            inboxModel.items.map { item ->
+                when (item) {
+                    is InboxListItem.ConversationItem -> {
+                        newItems.add(Item.ConversationItem(
+                            item.conversation,
+                            item.draftMessage,
+                        ))
+                    }
+                    is InboxListItem.RegularInboxItem -> {
+                        newItems.add(Item.InboxListItem(item.item))
+                    }
                 }
             }
 
-            if (allData.isNotEmpty()) {
-                if (allData.last().hasMore) {
+            if (inboxModel.items.isNotEmpty()) {
+                if (inboxModel.hasMore) {
                     newItems.add(Item.LoaderItem(StatefulData.NotStarted()))
                 } else {
                     newItems.add(Item.LoaderItem(StatefulData.Success(Unit)))
@@ -656,22 +819,22 @@ class InboxFragment :
             adapterHelper.setItems(newItems, this, cb)
         }
 
-        fun hasMore(): Boolean = allData.lastOrNull()?.hasMore ?: true
+        fun hasMore(): Boolean = inboxModel.hasMore
 
-        fun isEmpty(): Boolean = allData.isEmpty() || allData.sumOf { it.items.size } == 0
+        fun isEmpty(): Boolean = inboxModel.items.isEmpty()
 
         fun getItemAt(position: Int): InboxItem? =
             when (val item = adapterHelper.items.getOrNull(position)) {
+                is Item.HeaderItem -> null
                 is Item.InboxListItem -> item.inboxItem
+                is Item.ConversationItem -> null
                 is Item.LoaderItem -> null
                 null -> null
+                is Item.TooManyMessagesWarningItem -> null
             }
 
-        fun setData(
-            allData: List<LemmyListSource.PageResult<InboxItem>>,
-            cb: (() -> Unit)? = null,
-        ) {
-            this.allData = allData
+        fun setData(inboxModel: InboxModel, cb: (() -> Unit)? = null) {
+            this.inboxModel = inboxModel
             refreshItems(cb)
         }
     }

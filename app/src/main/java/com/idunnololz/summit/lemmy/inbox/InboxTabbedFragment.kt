@@ -15,11 +15,19 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import arrow.core.Either
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentInboxBinding
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.inbox.conversation.Conversation
+import com.idunnololz.summit.lemmy.inbox.conversation.ConversationFragment
+import com.idunnololz.summit.lemmy.inbox.conversation.ConversationFragmentArgs
+import com.idunnololz.summit.lemmy.inbox.conversation.NewConversation
+import com.idunnololz.summit.lemmy.inbox.inbox.InboxFragment
+import com.idunnololz.summit.lemmy.inbox.inbox.InboxFragmentArgs
+import com.idunnololz.summit.lemmy.inbox.inbox.InboxViewModel
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
@@ -144,12 +152,12 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         viewModel.notificationInboxItem.observe(viewLifecycleOwner) {
             it ?: return@observe
 
-            openMessage(it.inboxItem, it.instance)
+            openMessage(accountId = it.accountId, item = it.inboxItem, instance = it.instance)
 
             val inboxFragment = childFragmentManager.findFragmentById(R.id.inbox_fragment_container)
                 as? InboxFragment
 
-            inboxFragment?.viewModel?.markAsRead(it.inboxItem, read = true, delete = false)
+            inboxFragment?.viewModel?.markAsRead(it.inboxItem, read = true)
         }
 
         if (args.notificationId > 0) {
@@ -171,14 +179,58 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         super.onPause()
     }
 
-    fun openMessage(item: InboxItem, instance: String) {
+    fun openMessage(accountId: Long, item: InboxItem, instance: String) {
         childFragmentManager.commit {
             setReorderingAllowed(true)
+
+            if (item is InboxItem.MessageInboxItem) {
+                replace(
+                    R.id.message_fragment_container,
+                    ConversationFragment::class.java,
+                    ConversationFragmentArgs(
+                        inboxItem = item,
+                        conversationItem = null,
+                        instance = instance,
+                        accountId = accountId,
+                    ).toBundle(),
+                )
+            } else {
+                replace(
+                    R.id.message_fragment_container,
+                    MessageFragment::class.java,
+                    MessageFragmentArgs(item, instance).toBundle(),
+                )
+            }
+
+            // If it's already open and the detail pane is visible, crossfade
+            // between the fragments.
+            if (binding.slidingPaneLayout.isOpen) {
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            }
+        }
+        binding.slidingPaneLayout.open()
+    }
+
+    fun openConversation(
+        accountId: Long,
+        conversation: Either<Conversation, NewConversation>,
+        instance: String
+    ) {
+        childFragmentManager.commit {
+            setReorderingAllowed(true)
+
             replace(
                 R.id.message_fragment_container,
-                MessageFragment::class.java,
-                MessageFragmentArgs(item, instance).toBundle(),
+                ConversationFragment::class.java,
+                ConversationFragmentArgs(
+                    inboxItem = null,
+                    conversationItem = conversation.leftOrNull(),
+                    newConversation = conversation.getOrNull(),
+                    instance = instance,
+                    accountId = accountId,
+                ).toBundle(),
             )
+
             // If it's already open and the detail pane is visible, crossfade
             // between the fragments.
             if (binding.slidingPaneLayout.isOpen) {

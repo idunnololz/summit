@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.person
 
 import android.os.Bundle
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -150,8 +149,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             binding.tabLayoutContainer.visibility = View.GONE
 
             appBar.addOnOffsetChangedListener { appBar, offset ->
-                Log.d("HAHA", "progress: ${offset.toFloat() / appBar.totalScrollRange}")
-
                 val topInset = mainActivity.insets.value?.topInset ?: 0
 
                 val fixedTotalRange = appBar.totalScrollRange - topInset
