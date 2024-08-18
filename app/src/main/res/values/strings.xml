@@ -1754,6 +1754,12 @@
     <string name="offline_fetching_extras">Fetching extras…</string>
     <string name="offline_done">Done!</string>
     <string name="error_couldnt_find_object">Could not find post/comment on this instance.</string>
+    <string name="draft">Draft</string>
+    <string name="warn_too_many_messages">Some conversations may be missing. This account has over %1$s messages and Summit currently only fetches the most recent %1$s messages. Conversations before %2$s will not be shown.</string>
+    <string name="loading">Loading…</string>
+    <string name="selected_people">Selected people</string>
+    <string name="no_people_selected">No people selected</string>
+    <string name="retry">Retry</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

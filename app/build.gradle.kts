@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 34
-        versionCode = 171
-        versionName = "1.39.0"
+        versionCode = 173
+        versionName = "1.40.1"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -87,7 +87,6 @@ dependencies {
 
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
-    implementation(libs.navigation.dynamic.features.fragment)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

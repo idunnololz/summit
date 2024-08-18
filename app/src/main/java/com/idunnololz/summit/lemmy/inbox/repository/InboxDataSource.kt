@@ -11,6 +11,7 @@ import kotlin.math.min
 class InboxSource<O>(
     @ApplicationContext context: Context,
     defaultSortOrder: O,
+    pageSize: Int = DEFAULT_PAGE_SIZE,
     private val fetchObjects: suspend (
         pageIndex: Int,
         sortOrder: O,
@@ -25,6 +26,7 @@ class InboxSource<O>(
     defaultSortOrder,
     fetchObjects,
     source = this,
+    pageSize = pageSize,
 ) {
 
     fun markAsRead(id: Int, read: Boolean): LiteInboxItem? {

@@ -19,6 +19,10 @@ annotation class AccountIdsSharedPreference
 @Retention(AnnotationRetention.BINARY)
 annotation class NotificationsSharedPreference
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class StateSharedPreference
+
 @InstallIn(SingletonComponent::class)
 @Module
 class PreferencesModule {
@@ -43,4 +47,9 @@ class PreferencesModule {
     fun provideNotificationsSharedPreference(
         preferenceManager: PreferenceManager,
     ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
+
+    @StateSharedPreference
+    @Provides
+    fun provideStateSharedPreference(preferenceManager: PreferenceManager): SharedPreferences =
+        preferenceManager.getGlobalStateSharedPreferences()
 }

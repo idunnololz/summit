@@ -50,7 +50,7 @@ class AccountInfoManager @Inject constructor(
     val currentFullAccount = MutableStateFlow<FullAccount?>(null)
     val currentFullAccountOnChange = currentFullAccount.asSharedFlow().drop(1)
 
-    init {
+    fun init() {
         accountManager.addOnAccountChangedListener(
             onAccountChangeListener = object : AccountManager.OnAccountChangedListener {
                 override suspend fun onAccountSigningOut(account: Account) {

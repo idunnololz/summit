@@ -128,7 +128,7 @@ class PersonPickerDialogFragment :
             viewModel.searchResults.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {
-                        adapter?.setQueryServerResults(listOf())
+                        adapter?.setQueryServerResults(null)
                     }
                     is StatefulData.Loading -> {
                         adapter?.setQueryServerResultsInProgress()

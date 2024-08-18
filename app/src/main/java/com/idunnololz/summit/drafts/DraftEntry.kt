@@ -30,6 +30,10 @@ data class DraftEntry(
     val draftType: Int,
     @ColumnInfo(name = "data")
     val data: DraftData?,
+    @ColumnInfo(name = "account_id", defaultValue = "0")
+    val accountId: Long,
+    @ColumnInfo(name = "account_instance", defaultValue = "")
+    val accountInstance: String,
 ) : Parcelable
 
 @ProvidedTypeConverter
@@ -57,10 +61,14 @@ class DraftConverters(private val moshi: Moshi) {
 object DraftTypes {
     const val Post = 1
     const val Comment = 2
+    const val Message = 3
 }
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface DraftData : Parcelable {
+    val accountId: Long
+    val accountInstance: String
+
     @Parcelize
     @TypeLabel("1")
     @JsonClass(generateAdapter = true)
@@ -70,8 +78,8 @@ sealed interface DraftData : Parcelable {
         val body: String?,
         val url: String?,
         val isNsfw: Boolean,
-        val accountId: Long,
-        val accountInstance: String,
+        override val accountId: Long,
+        override val accountInstance: String,
         val targetCommunityFullName: String,
     ) : DraftData
 
@@ -83,8 +91,19 @@ sealed interface DraftData : Parcelable {
         val postRef: PostRef?,
         val parentCommentId: Int?,
         val content: String,
-        val accountId: Long,
-        val accountInstance: String,
+        override val accountId: Long,
+        override val accountInstance: String,
+    ) : DraftData
+
+    @Parcelize
+    @TypeLabel("3")
+    @JsonClass(generateAdapter = true)
+    data class MessageDraftData(
+        val targetAccountId: Long,
+        val targetInstance: String,
+        val content: String,
+        override val accountId: Long,
+        override val accountInstance: String,
     ) : DraftData
 }
 
@@ -92,6 +111,7 @@ val DraftData.type
     get() = when (this) {
         is DraftData.CommentDraftData -> DraftTypes.Comment
         is DraftData.PostDraftData -> DraftTypes.Post
+        is DraftData.MessageDraftData -> DraftTypes.Message
     }
 
 @Parcelize

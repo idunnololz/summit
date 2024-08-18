@@ -1,6 +1,7 @@
 package com.idunnololz.summit.db
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
@@ -8,12 +9,14 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoConverters
 import com.idunnololz.summit.account.info.AccountInfoDao
 import com.idunnololz.summit.drafts.DraftConverters
+import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsDao
 import com.idunnololz.summit.filterLists.ContentFiltersDao
@@ -33,6 +36,8 @@ import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
 import com.idunnololz.summit.lemmy.inbox.InboxEntry
 import com.idunnololz.summit.lemmy.inbox.InboxEntryConverters
+import com.idunnololz.summit.lemmy.inbox.db.ConversationEntriesDao
+import com.idunnololz.summit.lemmy.inbox.db.ConversationEntry
 import com.idunnololz.summit.user.UserCommunitiesConverters
 import com.idunnololz.summit.user.UserCommunitiesDao
 import com.idunnololz.summit.user.UserCommunityEntry
@@ -54,6 +59,7 @@ import com.idunnololz.summit.util.moshi
         FilterEntry::class,
         DraftEntry::class,
         InboxEntry::class,
+        ConversationEntry::class,
     ],
     autoMigrations = [
         AutoMigration(from = 20, to = 21),
@@ -63,7 +69,7 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 31, to = 32),
         AutoMigration(from = 32, to = 33),
     ],
-    version = 34,
+    version = 40,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -80,6 +86,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun contentFiltersDao(): ContentFiltersDao
     abstract fun draftsDao(): DraftsDao
     abstract fun inboxEntriesDao(): InboxEntriesDao
+    abstract fun conversationEntriesDao(): ConversationEntriesDao
 
     companion object {
 
@@ -92,6 +99,12 @@ abstract class MainDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context): MainDatabase {
             val moshi = moshi
+
+//            if (BuildConfig.DEBUG) {
+//                context.deleteDatabase("main.db")
+//                val db = context.openOrCreateDatabase("main.db", 0, null)
+//                db.execSQL("DROP TABLE drafts;")
+//            }
 
             return Room
                 .databaseBuilder(
@@ -114,6 +127,12 @@ abstract class MainDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_28_29)
                 .addMigrations(MIGRATION_30_31)
                 .addMigrations(MIGRATION_33_34)
+                .addMigrations(MIGRATION_34_37)
+                .addMigrations(MIGRATION_36_37)
+                .addMigrations(MIGRATION_37_38)
+                .addMigrations(MIGRATION_38_39)
+                .addMigrations(MIGRATION_39_38)
+                .addMigrations(MIGRATION_39_40)
                 .build()
         }
     }
@@ -164,7 +183,7 @@ val MIGRATION_24_26 = object : Migration(24, 26) {
     }
 }
 
-val MIGRATION_25_26 = object : Migration(24, 26) {
+val MIGRATION_25_26 = object : Migration(25, 26) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("DROP TABLE IF EXISTS account_info;")
         db.execSQL(
@@ -198,4 +217,73 @@ val MIGRATION_33_34 = object : Migration(33, 34) {
             "CREATE TABLE IF NOT EXISTS `inbox_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `item_id` INTEGER NOT NULL, `notification_id` INTEGER NOT NULL, `account_full_name` TEXT NOT NULL, `inbox_item` TEXT)",
         )
     }
+}
+
+val MIGRATION_34_37 = object : Migration(34, 37) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        createConversationsEntriesTable(db)
+    }
+}
+
+val MIGRATION_36_37 = object : Migration(36, 37) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        createConversationsEntriesTable(db)
+    }
+}
+
+val MIGRATION_37_38 = object : Migration(37, 38) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        createConversationsEntriesTable(db)
+    }
+}
+
+val MIGRATION_38_39 = object : Migration(38, 39) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        val cursor = db.query("SELECT id, data FROM drafts;")
+        val draftDataAdapter = moshi.adapter(DraftData::class.java)
+        val toExecute = mutableListOf<String>()
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getLong(0)
+            val data = cursor.getString(1)
+
+            val draftData = draftDataAdapter.fromJson(data)
+                ?: continue
+            val accountId = draftData.accountId
+            val accountInstance = draftData.accountInstance
+
+            toExecute += "UPDATE drafts SET account_id = ${accountId}, " +
+                "account_instance = '${accountInstance}' WHERE id = ${id}"
+        }
+
+        db.execSQL("ALTER TABLE drafts ADD COLUMN account_id INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE drafts ADD COLUMN account_instance TEXT NOT NULL DEFAULT ''")
+
+        for (c in toExecute) {
+            db.execSQL(c)
+        }
+    }
+}
+
+val MIGRATION_39_38 = object : Migration(39, 38) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE drafts DROP COLUMN account_id;")
+        db.execSQL("ALTER TABLE drafts DROP COLUMN account_instance;")
+    }
+}
+
+val MIGRATION_39_40 = object : Migration(39, 40) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS conversation_entries;")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `conversation_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `account_full_name` TEXT NOT NULL, `person_id` INTEGER NOT NULL, `person_instance` TEXT NOT NULL, `person_name` TEXT, `title` TEXT NOT NULL, `icon_url` TEXT, `content` TEXT, `is_read` INTEGER NOT NULL, `most_recent_message_id` INTEGER)",
+        )
+    }
+}
+
+private fun createConversationsEntriesTable(db: SupportSQLiteDatabase) {
+    db.execSQL("DROP TABLE IF EXISTS conversation_entries;")
+    db.execSQL(
+        "CREATE TABLE IF NOT EXISTS `conversation_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `account_full_name` TEXT NOT NULL, `person_id` INTEGER NOT NULL, `person_instance` TEXT, `person_name` TEXT, `title` TEXT NOT NULL, `icon_url` TEXT, `content` TEXT, `is_read` INTEGER NOT NULL, `most_recent_message_id` INTEGER)",
+    )
 }

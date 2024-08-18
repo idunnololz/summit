@@ -19,9 +19,14 @@ class PersonPickerViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
+    data class PersonSearchResults(
+        val people: List<PersonView>,
+        val query: String,
+    )
+
     val instance: String
         get() = apiClient.instance
-    val searchResults = StatefulLiveData<List<PersonView>>()
+    val searchResults = StatefulLiveData<PersonSearchResults>()
     val personName = MutableLiveData<String>()
 
     private var searchJob: Job? = null
@@ -30,7 +35,7 @@ class PersonPickerViewModel @Inject constructor(
         searchResults.setIsLoading()
 
         if (query.isBlank()) {
-            searchResults.setValue(listOf())
+            searchResults.setValue(PersonSearchResults(listOf(), query))
             return
         }
 
@@ -41,11 +46,12 @@ class PersonPickerViewModel @Inject constructor(
                     sortType = SortType.Active,
                     listingType = ListingType.All,
                     searchType = SearchType.Users,
-                    query = query.toString(),
+                    query = query,
                     limit = 20,
                 )
                 .onSuccess {
-                    searchResults.setValue(it.users)
+                    searchResults.setValue(
+                        PersonSearchResults(it.users, query))
                 }
                 .onFailure {
                     searchResults.setError(it)

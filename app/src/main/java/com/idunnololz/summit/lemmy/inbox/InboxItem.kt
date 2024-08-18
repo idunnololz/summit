@@ -165,6 +165,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
         override val isRemoved: Boolean,
         override val isRead: Boolean,
         val targetUserName: String?,
+        val targetAccountId: Long?,
+        val targetAccountAvatar: String?,
+        val targetInstance: String?,
     ) : InboxItem {
 
         constructor(message: PrivateMessageView) : this(
@@ -185,6 +188,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
             isRemoved = false,
             isRead = message.private_message.read,
             targetUserName = message.recipient.name,
+            targetAccountId = message.recipient.id,
+            targetAccountAvatar = message.recipient.avatar,
+            targetInstance = message.recipient.instance,
         )
 
         override fun toString(): String = "MessageInboxItem { content = $content }"

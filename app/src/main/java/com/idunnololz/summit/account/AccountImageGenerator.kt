@@ -9,9 +9,7 @@ import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -48,7 +46,11 @@ class AccountImageGenerator @Inject constructor(
         return File(imageDir, "${account.id}_profile_image.jpg")
     }
 
-    fun generateDrawableForPerson(person: Person): Drawable {
+    fun generateDrawableForPerson(
+        personName: String,
+        personId: PersonId,
+        personInstance: String,
+    ): Drawable {
         val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
         val bitmap = Bitmap.createBitmap(
             accountImageSize,
@@ -60,9 +62,9 @@ class AccountImageGenerator @Inject constructor(
         with(Canvas(bitmap)) {
             val bgPaint = Paint().apply {
                 color = getColorForPerson(
-                    person.name,
-                    person.id,
-                    person.instance,
+                    personName,
+                    personId,
+                    personInstance,
                 )
             }
 

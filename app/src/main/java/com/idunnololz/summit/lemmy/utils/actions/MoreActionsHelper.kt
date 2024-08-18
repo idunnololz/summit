@@ -59,7 +59,7 @@ class MoreActionsHelper @Inject constructor(
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
-    var apiClient = lemmyApiClientFactory.create()
+    val apiClient = lemmyApiClientFactory.create()
 
     val currentAccount: Account?
         get() = apiClient.accountForInstance()
@@ -88,7 +88,7 @@ class MoreActionsHelper @Inject constructor(
     fun blockCommunity(communityRef: CommunityRef.CommunityRefByName, block: Boolean = true) {
         blockCommunityResult.setIsLoading()
         coroutineScope.launch {
-            ensureRightInstance {
+            ensureRightInstance(apiClient) {
                 apiClient.fetchCommunityWithRetry(
                     idOrName = Either.Right(communityRef.getServerId(apiInstance)),
                     force = false,
@@ -113,7 +113,7 @@ class MoreActionsHelper @Inject constructor(
     fun blockPerson(personRef: PersonRef, block: Boolean = true) {
         blockPersonResult.setIsLoading()
         coroutineScope.launch {
-            ensureRightInstance {
+            ensureRightInstance(apiClient) {
                 apiClient.fetchPersonByNameWithRetry(personRef.fullName, force = false)
             }
                 .onFailure {
@@ -135,7 +135,7 @@ class MoreActionsHelper @Inject constructor(
     fun blockInstance(id: InstanceId, block: Boolean = true) {
         blockInstanceResult.setIsLoading()
         coroutineScope.launch {
-            ensureRightInstance { apiClient.blockInstance(id, block) }
+            ensureRightInstance(apiClient) { apiClient.blockInstance(id, block) }
                 .onSuccess {
                     blockInstanceResult.postValueAndClear(
                         BlockInstanceResult(
@@ -153,7 +153,7 @@ class MoreActionsHelper @Inject constructor(
     fun deletePost(postId: PostId, delete: Boolean, accountId: Long? = null) {
         deletePostResult.setIsLoading()
         coroutineScope.launch {
-            ensureRightInstance { apiClient.deletePost(postId, delete) }
+            ensureRightInstance(apiClient) { apiClient.deletePost(postId, delete) }
                 .onSuccess {
                     deletePostResult.postValueAndClear(DeletePostResult(postId, delete, accountId))
                 }
@@ -223,7 +223,7 @@ class MoreActionsHelper @Inject constructor(
             val account = accountManager.getAccountByIdOrDefault(accountId)
             apiClient.setAccount(account, accountChanged = true)
 
-            ensureRightInstance { apiClient.savePost(id, save) }
+            ensureRightInstance(apiClient) { apiClient.savePost(id, save) }
                 .onSuccess {
                     savePostResult.postValueAndClear(
                         SavePostResult(
@@ -242,7 +242,7 @@ class MoreActionsHelper @Inject constructor(
 
     fun saveComment(id: CommentId, save: Boolean) {
         coroutineScope.launch {
-            ensureRightInstance { apiClient.saveComment(id, save) }
+            ensureRightInstance(apiClient) { apiClient.saveComment(id, save) }
                 .onSuccess {
                     saveCommentResult.postValueAndClear(
                         SaveCommentResult(
@@ -275,6 +275,20 @@ class MoreActionsHelper @Inject constructor(
                 instance = apiClient.instance,
                 id = postView.post.id,
                 read = true,
+                accountId = accountId,
+            )
+        }
+    }
+
+    fun togglePostRead(postView: PostView, delayMs: Long, accountId: Long? = null) {
+        coroutineScope.launch {
+            if (delayMs > 0) {
+                delay(delayMs)
+            }
+            accountActionsManager.markPostAsRead(
+                instance = apiClient.instance,
+                id = postView.post.id,
+                read = !postView.read,
                 accountId = accountId,
             )
         }
@@ -366,7 +380,7 @@ class MoreActionsHelper @Inject constructor(
         subscribeResult.setIsLoading()
 
         coroutineScope.launch {
-            ensureRightInstance {
+            ensureRightInstance(apiClient) {
                 apiClient.fetchCommunityWithRetry(
                     idOrName = Either.Right(communityRef.getServerId(apiInstance)),
                     force = false,
@@ -390,7 +404,9 @@ class MoreActionsHelper @Inject constructor(
     }
 
     private suspend fun updateSubscriptionInternal(communityId: Int, subscribe: Boolean) {
-        ensureRightInstance { apiClient.followCommunityWithRetry(communityId, subscribe) }
+        ensureRightInstance(
+            apiClient,
+        ) { apiClient.followCommunityWithRetry(communityId, subscribe) }
             .onSuccess {
                 subscribeResult.postValueAndClear(
                     SubscribeResult(
@@ -407,7 +423,7 @@ class MoreActionsHelper @Inject constructor(
     }
 
     private suspend fun blockPersonInternal(id: PersonId, block: Boolean = true) {
-        ensureRightInstance { apiClient.blockPerson(id, block) }
+        ensureRightInstance(apiClient) { apiClient.blockPerson(id, block) }
             .onFailure {
                 blockPersonResult.postErrorAndClear(it)
             }
@@ -424,7 +440,7 @@ class MoreActionsHelper @Inject constructor(
     }
 
     private suspend fun blockCommunityInternal(id: CommunityId, block: Boolean = true) {
-        ensureRightInstance { apiClient.blockCommunity(id, block) }
+        ensureRightInstance(apiClient) { apiClient.blockCommunity(id, block) }
             .onSuccess {
                 blockCommunityResult.postValueAndClear(
                     BlockCommunityResult(
@@ -439,8 +455,10 @@ class MoreActionsHelper @Inject constructor(
     }
 
     private suspend fun <T> ensureRightInstance(
+        apiClient: AccountAwareLemmyClient,
         onCorrectInstance: suspend () -> Result<T>,
     ): Result<T> {
+        val apiInstance = apiClient.instance
         val currentPageInstance = currentPageInstance
         return if (currentPageInstance != null && currentPageInstance != apiInstance) {
             Result.failure(

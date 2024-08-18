@@ -29,7 +29,16 @@ data class Account(
     val defaultSortType: Int,
 ) : Parcelable, GuestOrUserAccount
 
+/**
+ * Only use for display name. This value is not stable as the name of an account can be changed.
+ */
 val Account.fullName
     get() = "${this.name}@${this.instance}"
+
+/**
+ * [fullName] is not stable as the name of an account can be changed.
+ */
+val Account.stableId
+    get() = "i%${this.id}@${this.instance}"
 
 fun Account.toPersonRef() = PersonRef.PersonRefByName(name = name, instance = instance)

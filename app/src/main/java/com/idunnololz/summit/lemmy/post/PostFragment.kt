@@ -174,7 +174,6 @@ class PostFragment :
         }
 
         preferences = viewModel.preferences
-        moreActionsHelper.apiClient = viewModel.lemmyApiClient
 
         if (savedInstanceState == null) {
             viewModel.updatePostViewIfNeeded(args.post)

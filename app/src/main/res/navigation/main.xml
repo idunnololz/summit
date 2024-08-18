@@ -89,7 +89,7 @@
     </fragment>
     <fragment
         android:id="@+id/inboxFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.InboxFragment"
+        android:name="com.idunnololz.summit.lemmy.inbox.inbox.InboxFragment"
         android:label="InboxFragment" >
         <argument
             android:name="pageType"

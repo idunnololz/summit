@@ -7,15 +7,21 @@ import android.icu.text.CompactDecimalFormat
 import android.icu.text.DecimalFormat
 import android.net.Uri
 import android.os.Build
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.NumberFormatUtil
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.video.VideoSizeHint
 import java.util.Locale
 import java.util.regex.Pattern
@@ -187,4 +193,29 @@ fun SearchType.toLocalizedString(context: Context) = when (this) {
     SearchType.Communities -> context.getString(R.string.communities)
     SearchType.Users -> context.getString(R.string.users)
     SearchType.Url -> context.getString(R.string.urls)
+}
+
+fun SpannableStringBuilder.appendNameWithInstance(
+    context: Context,
+    name: String,
+    instance: String,
+    url: String? = null,
+) {
+    val text = "$name@$instance"
+    if (url != null) {
+        appendLink(
+            text = text,
+            url = url,
+            underline = false,
+        )
+    } else {
+        append(text)
+    }
+    val end = length
+    setSpan(
+        ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorTextFaint)),
+        end - instance.length - 1,
+        end,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+    )
 }

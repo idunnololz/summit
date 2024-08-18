@@ -26,9 +26,6 @@ class DraftsManager @Inject constructor(
     private val dbContext = Dispatchers.IO.limitedParallelism(1)
 
     init {
-        coroutineScope.launch {
-            Log.d("dbdb", "draftsDao: ${draftsDao.count()}")
-        }
     }
 
     fun saveDraftAsync(draftData: DraftData, showToast: Boolean) {
@@ -41,11 +38,13 @@ class DraftsManager @Inject constructor(
         val id = withContext(dbContext) {
             draftsDao.insert(
                 DraftEntry(
-                    0,
-                    System.currentTimeMillis(),
-                    System.currentTimeMillis(),
-                    draftData.type,
-                    draftData,
+                    id = 0,
+                    creationTs = System.currentTimeMillis(),
+                    updatedTs = System.currentTimeMillis(),
+                    draftType = draftData.type,
+                    data = draftData,
+                    accountId = draftData.accountId,
+                    accountInstance = draftData.accountInstance,
                 ),
             )
         }
@@ -60,27 +59,37 @@ class DraftsManager @Inject constructor(
     }
 
     fun updateDraftAsync(entryId: Long, draftData: DraftData, showToast: Boolean) {
+        coroutineScope.launch {
+            updateDraft(
+                entryId,
+                draftData,
+                showToast,
+            )
+        }
+    }
+
+    suspend fun updateDraft(entryId: Long, draftData: DraftData, showToast: Boolean) {
         if (entryId == 0L) {
-            saveDraftAsync(draftData, showToast)
+            saveDraft(draftData, showToast)
             return
         }
 
-        coroutineScope.launch {
+        withContext(dbContext) {
             draftsDao.update(
                 entryId,
                 System.currentTimeMillis(),
                 draftData.type,
                 draftData,
             )
-            if (showToast) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.draft_saved),
-                        Toast.LENGTH_LONG,
-                    )
-                        .show()
-                }
+        }
+        if (showToast) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.draft_saved),
+                    Toast.LENGTH_LONG,
+                )
+                    .show()
             }
         }
     }
@@ -88,11 +97,18 @@ class DraftsManager @Inject constructor(
     suspend fun getDraftsByType(draftType: Int, limit: Int, updateTs: Long) =
         draftsDao.getDraftsByType(draftType, limit, updateTs)
 
+    suspend fun getAllDraftsByType(draftType: Int, accountId: Long, accountInstance: String) =
+        draftsDao.getAllDraftsByType(draftType, accountId, accountInstance)
+
     suspend fun getAllDrafts(limit: Int, updateTs: Long) = draftsDao.getAllDrafts(limit, updateTs)
 
     suspend fun deleteAll(draftType: Int) = draftsDao.deleteAll(draftType)
 
     suspend fun deleteDraft(entry: DraftEntry) = withContext(dbContext) {
         draftsDao.delete(entry)
+    }
+
+    suspend fun deleteDraftWithId(entryId: Long) = withContext(dbContext) {
+        draftsDao.deleteWithId(entryId)
     }
 }

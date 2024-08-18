@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.3.2"
+androidGradlePlugin = "8.5.2"
 arrowCore = "1.2.0"
 colorpickerview = "2.2.4"
 datastorePreferences = "1.1.1"
@@ -44,7 +44,6 @@ moshi-sealed-codegen = { module = "dev.zacsweers.moshix:moshi-sealed-codegen", v
 moshi-sealed-runtime = { module = "dev.zacsweers.moshix:moshi-sealed-runtime", version.ref = "moshiSealedRuntime" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
-navigation-dynamic-features-fragment = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigation" }
 
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }

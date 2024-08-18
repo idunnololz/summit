@@ -1,4 +1,4 @@
-package com.idunnololz.summit.lemmy.inbox
+package com.idunnololz.summit.lemmy.inbox.repository
 
 import android.content.Context
 import android.util.Log
@@ -6,7 +6,9 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAModOrAdmin
 import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.lemmy.inbox.repository.InboxSource
+import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
+import com.idunnololz.summit.lemmy.inbox.PageType
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -39,7 +41,7 @@ class InboxRepository @Inject constructor(
     companion object {
         private const val TAG = "InboxRepository"
 
-        private const val PAGE_SIZE = 20
+        private const val DEFAULT_PAGE_SIZE = 20
     }
 
     private val repliesStatelessSource: InboxSource<CommentSortType> =
@@ -55,18 +57,15 @@ class InboxRepository @Inject constructor(
 
     class InboxMultiDataSource(
         private val sources: List<InboxSource<*>>,
+        private val pageSize: Int = DEFAULT_PAGE_SIZE,
     ) {
 
         val allItems = mutableListOf<LiteInboxItem>()
 
-        suspend fun getPage(
-            pageIndex: Int,
-            pageType: PageType,
-            force: Boolean,
-        ): Result<PageResult<LiteInboxItem>> {
+        suspend fun getPage(pageIndex: Int, force: Boolean): Result<PageResult<LiteInboxItem>> {
             Log.d(
                 TAG,
-                "Page type: $pageType. Index: $pageIndex. Sources: ${sources.size}. Force: $force",
+                "Index: $pageIndex. Sources: ${sources.size}. Force: $force",
             )
 
             if (force) {
@@ -76,8 +75,8 @@ class InboxRepository @Inject constructor(
                 }
             }
 
-            val startIndex = pageIndex * PAGE_SIZE
-            val endIndex = (pageIndex + 1) * PAGE_SIZE
+            val startIndex = pageIndex * pageSize
+            val endIndex = (pageIndex + 1) * pageSize
             var hasMore = true
 
             while (allItems.size < endIndex) {
@@ -196,7 +195,7 @@ class InboxRepository @Inject constructor(
     ): Result<PageResult<LiteInboxItem>> {
         val source = getSource(pageType)
 
-        val result = source.getPage(pageIndex, pageType, force)
+        val result = source.getPage(pageIndex, force)
 
         Log.d(TAG, "Got ${result.getOrNull()?.items?.size} items for page $pageType")
 
@@ -258,7 +257,9 @@ class InboxRepository @Inject constructor(
             force = force,
         ).fold(
             onSuccess = {
-                Result.success(it.map { InboxItem.MessageInboxItem(it) })
+                Result.success(
+                    it.map { InboxItem.MessageInboxItem(it) },
+                )
             },
             onFailure = {
                 Result.failure(it)

@@ -1,6 +1,5 @@
 package com.idunnololz.summit.util
 
-import android.R
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
@@ -175,6 +174,6 @@ constructor(
         const val HORIZONTAL = LinearLayout.HORIZONTAL
         const val VERTICAL = LinearLayout.VERTICAL
         private const val TAG = "DividerItem"
-        private val ATTRS = intArrayOf(R.attr.listDivider)
+        private val ATTRS = intArrayOf(android.R.attr.listDivider)
     }
 }

@@ -23,6 +23,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.inbox.inbox.InboxViewModel
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
@@ -298,10 +299,17 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     },
                 )
 
-                binding.goToPost.setOnClickListener {
+                fun goToPost() {
                     getMainActivity()?.launchPage(
                         PostRef(args.instance, inboxItem.postId),
                     )
+                }
+
+                binding.goToPost.setOnClickListener {
+                    goToPost()
+                }
+                binding.openContextButton.setOnClickListener {
+                    goToPost()
                 }
             }
             is InboxItem.MessageInboxItem -> {
@@ -373,14 +381,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 contextCard.visibility = View.GONE
             } else if (viewModel.isContextShowing) {
                 indicator.setImageResource(R.drawable.baseline_expand_less_18)
-                contextContainer.visibility = View.VISIBLE
-                contextLoadingView.visibility = View.VISIBLE
-                goToPost.visibility = View.VISIBLE
+                contextContent.visibility = View.VISIBLE
             } else {
                 indicator.setImageResource(R.drawable.baseline_expand_more_18)
-                contextContainer.visibility = View.GONE
-                contextLoadingView.visibility = View.GONE
-                goToPost.visibility = View.GONE
+                contextContent.visibility = View.GONE
             }
         }
     }

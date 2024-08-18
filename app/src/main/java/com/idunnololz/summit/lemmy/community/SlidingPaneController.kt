@@ -75,6 +75,8 @@ class SlidingPaneController(
                         lockUiOpenness = false
                         setNavUiOpenPercent(1f - slideOffset)
                     }
+
+                    slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)
                 }
             }
 

@@ -40,24 +40,45 @@ private const val DAY_MILLIS = 24 * HOUR_MILLIS
 private const val MONTH_MILLIS = 30 * DAY_MILLIS
 private const val YEAR_MILLIS = 12 * MONTH_MILLIS
 
+object PrettyPrintStyles {
+    const val SHORT = 1
+
+    /**
+     * Short if it's a "recent date" or long if it's older.
+     */
+    const val SHORT_DYNAMIC = 2
+}
+
 fun dateStringToPretty(context: Context, dateStr: String): String =
     dateStringToPretty(context, dateStringToTs(dateStr))
 
-fun dateStringToPretty(context: Context, ts: Long): String {
+fun dateStringToPretty(
+    context: Context,
+    ts: Long,
+    style: Int = PrettyPrintStyles.SHORT
+): String {
+
     val now = System.currentTimeMillis()
     val diff: Long = now - ts
+    var isRecent = false
 
-    return if (diff < MINUTE_MILLIS) {
+    val shortDate = if (diff < MINUTE_MILLIS) {
+        isRecent = true
         context.getString(R.string.elapsed_time_just_now)
     } else if (diff < 2 * MINUTE_MILLIS) {
+        isRecent = true
         context.getString(R.string.elapsed_time_a_minute_ago)
     } else if (diff < 50 * MINUTE_MILLIS) {
+        isRecent = true
         context.getString(R.string.elapsed_time_minutes_ago, diff / MINUTE_MILLIS)
     } else if (diff < 120 * MINUTE_MILLIS) {
+        isRecent = true
         context.getString(R.string.elapsed_time_an_hour_ago)
     } else if (diff < 24 * HOUR_MILLIS) {
+        isRecent = true
         context.getString(R.string.elapsed_time_hours_ago, diff / HOUR_MILLIS)
     } else if (diff < 48 * HOUR_MILLIS) {
+        isRecent = true
         context.getString(R.string.elapsed_time_yesterday)
     } else if (diff < MONTH_MILLIS) {
         context.getString(R.string.elapsed_time_days_ago, diff / DAY_MILLIS)
@@ -69,6 +90,14 @@ fun dateStringToPretty(context: Context, ts: Long): String {
         context.getString(R.string.elapsed_time_a_year_ago)
     } else {
         context.getString(R.string.elapsed_time_years_ago, diff / YEAR_MILLIS)
+    }
+
+    return if (style == PrettyPrintStyles.SHORT) {
+        shortDate
+    } else if (style == PrettyPrintStyles.SHORT_DYNAMIC && !isRecent) {
+        "$shortDate (${tsToShortDate(ts)})"
+    } else {
+        shortDate
     }
 }
 

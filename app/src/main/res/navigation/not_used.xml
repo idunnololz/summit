@@ -28,10 +28,23 @@ safeargs.
         android:label="ConversationFragment" >
         <argument
             android:name="inboxItem"
-            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem" />
+            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem.MessageInboxItem"
+            app:nullable="true" />
+        <argument
+            android:name="conversationItem"
+            app:argType="com.idunnololz.summit.lemmy.inbox.conversation.Conversation"
+            app:nullable="true" />
         <argument
             android:name="instance"
             app:argType="string" />
+        <argument
+            android:name="accountId"
+            app:argType="long" />
+        <argument
+            android:name="newConversation"
+            app:argType="com.idunnololz.summit.lemmy.inbox.conversation.NewConversation"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <dialog
         android:id="@+id/errorDialogFragment"

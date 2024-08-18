@@ -114,8 +114,10 @@ class DraftsDialogFragment :
                 R.id.show_all_drafts -> {
                     if (viewModel.draftType == null) {
                         viewModel.draftType = args.draftType
+                        it.setIcon(R.drawable.baseline_filter_list_off_24)
                     } else {
                         viewModel.draftType = null
+                        it.setIcon(R.drawable.baseline_filter_list_24)
                     }
                     viewModel.loadMoreDrafts(force = true)
                     true
@@ -147,6 +149,7 @@ class DraftsDialogFragment :
                                         ),
                                     )
                                 is DraftData.PostDraftData -> it
+                                is DraftData.MessageDraftData -> null
                                 null -> null
                             }
                         }
@@ -165,6 +168,7 @@ class DraftsDialogFragment :
                                             accountInstance = it.data.accountInstance,
                                         ),
                                     )
+                                is DraftData.MessageDraftData -> null
                                 null -> null
                             }
                         }

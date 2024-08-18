@@ -1,5 +1,7 @@
 package com.idunnololz.summit
 
+import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsManager
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.preferences.Preferences
@@ -15,4 +17,6 @@ interface AppEntryPoint {
     fun preferences(): Preferences
     fun notificationsManager(): NotificationsManager
     fun notificationsUpdaterFactory(): NotificationsUpdater.Factory
+    fun conversationsManager(): ConversationsManager
+    fun accountInfoManager(): AccountInfoManager
 }

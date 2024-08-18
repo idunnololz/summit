@@ -4,8 +4,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
-import androidx.core.view.ViewCompat
-import androidx.core.view.ViewPropertyAnimatorListenerAdapter
 
 object AnimationUtils {
 
@@ -33,18 +31,15 @@ object AnimationUtils {
         }
 
         view.translationY = Utils.convertDpToPixel(40f)
-        ViewCompat.animate(view)
+        view
+            .animate()
             .setDuration(duration)
             .setStartDelay(startDelay)
             .translationY(0f)
             .alpha(1f)
-            .setListener(
-                object : ViewPropertyAnimatorListenerAdapter() {
-                    override fun onAnimationCancel(view: View) {
-                        view.translationY = 0f
-                    }
-                },
-            )
+            .withEndAction {
+                view.translationY = 0f
+            }
     }
 
     fun animateInInnerViewsWithDelay(rootView: View, toIgnore: Set<View>, duration: Long) {
@@ -160,8 +155,8 @@ object AnimationUtils {
                     view.alpha = 0f
                 }
 
-                val animator = ViewCompat
-                    .animate(view)
+                val animator = view
+                    .animate()
                     .alpha(1f)
                     .withStartAction { }
                 if (duration > 0) {
@@ -197,8 +192,8 @@ object AnimationUtils {
                     return
                 }
 
-                val animator = ViewCompat
-                    .animate(view)
+                val animator = view
+                    .animate()
                     .alpha(0f)
                     .withEndAction { view.visibility = hideVisibility }
                 if (duration > 0) {

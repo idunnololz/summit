@@ -89,7 +89,6 @@ class MentionsController @AssistedInject constructor(
 
             val query = extractQueryIfExists(text, cursorPosition)
 
-            Log.d("HAHA", "cursorPosition changed to $cursorPosition. query: $query")
             if (query != null) {
                 mentionsAutoCompleteRepository.submitQuery(query)
             } else {

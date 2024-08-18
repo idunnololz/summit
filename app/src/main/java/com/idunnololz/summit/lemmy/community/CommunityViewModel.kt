@@ -23,7 +23,6 @@ import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -791,24 +790,6 @@ class CommunityViewModel @Inject constructor(
             scrollToTop = resetScrollPosition,
             force = force,
         )
-    }
-
-    fun onPostRead(postView: PostView, accountId: Long?, delayMs: Long = 0) {
-        if (postView.read) {
-            return
-        }
-
-        viewModelScope.launch {
-            if (delayMs > 0) {
-                delay(delayMs)
-            }
-            accountActionsManager.markPostAsRead(
-                instance = apiInstance,
-                id = postView.post.id,
-                read = true,
-                accountId = accountId,
-            )
-        }
     }
 
     fun onHideRead(anchors: Set<Int>) {

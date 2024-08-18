@@ -585,6 +585,7 @@ class PostListViewBuilder @Inject constructor(
             }
 
             val postType = postView.getType()
+            val hasThumbnail = thumbnailUrl != null && ContentUtils.isUrlImage(thumbnailUrl)
 
             if (rawBinding is ListingItemCardBinding ||
                 rawBinding is ListingItemCard2Binding ||
@@ -592,13 +593,11 @@ class PostListViewBuilder @Inject constructor(
                 rawBinding is ListingItemLargeListBinding
             ) {
                 if (url == null) {
-                    openLinkButton?.visibility = View.GONE
                     linkText?.visibility = View.GONE
                     linkIcon?.visibility = View.GONE
                     linkOverlay?.visibility = View.GONE
                 } else {
-                    if ((postType == PostType.Link || postType == PostType.Text) && thumbnailUrl != null) {
-                        openLinkButton?.visibility = View.GONE
+                    if ((postType == PostType.Link || postType == PostType.Text) && hasThumbnail) {
                         linkText?.visibility = View.VISIBLE
                         linkIcon?.visibility = View.VISIBLE
                         linkOverlay?.visibility = View.VISIBLE
@@ -613,17 +612,11 @@ class PostListViewBuilder @Inject constructor(
                             true
                         }
                     } else {
-                        openLinkButton?.visibility = View.VISIBLE
                         linkText?.visibility = View.GONE
                         linkIcon?.visibility = View.GONE
                         linkOverlay?.visibility = View.GONE
-                        openLinkButton?.setOnClickListener {
-                            onLinkClick(accountId, url, null, LinkContext.Action)
-                        }
                     }
                 }
-            } else {
-                openLinkButton?.visibility = View.GONE
             }
 
             if (updateContent) {
@@ -697,9 +690,7 @@ class PostListViewBuilder @Inject constructor(
                     }
                     val imageView = imageView ?: return
 
-                    val thumbnailImageUrl = if (thumbnailUrl != null &&
-                        ContentUtils.isUrlImage(thumbnailUrl)
-                    ) {
+                    val thumbnailImageUrl = if (hasThumbnail) {
                         thumbnailUrl
                     } else {
                         null
@@ -1331,7 +1322,6 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 if (w != null && h != null) {
-                    Log.d("HAHA", "w: $w h: $h")
                     this.size(w, h)
                 }
                 placeholder(newShimmerDrawable16to9(context))

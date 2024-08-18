@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.doOnLayout
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 
 class TwoPaneOnBackPressedCallback(
@@ -16,6 +17,14 @@ class TwoPaneOnBackPressedCallback(
 
     init {
         slidingPaneLayout.addPanelSlideListener(this)
+
+        slidingPaneLayout.doOnLayout {
+            if (slidingPaneLayout.isOpen) {
+                onPanelOpened(slidingPaneLayout)
+            } else {
+                onPanelClosed(slidingPaneLayout)
+            }
+        }
     }
 
     override fun handleOnBackPressed() {
@@ -28,7 +37,9 @@ class TwoPaneOnBackPressedCallback(
     override fun onPanelOpened(panel: View) {
         // Intercept the system back button when the detail pane becomes
         // visible.
-        isEnabled = true
+        if (slidingPaneLayout.isSlideable) {
+            isEnabled = true
+        }
     }
 
     override fun onPanelClosed(panel: View) {

@@ -470,7 +470,7 @@ class CommunitySelectorController @AssistedInject constructor(
                 if (item.error != null) {
                     b.instance.text = item.error.toErrorMessage(context)
                     b.subscribe.visibility = View.VISIBLE
-                    b.subscribe.text = context.getString(androidx.navigation.dynamicfeatures.fragment.R.string.retry)
+                    b.subscribe.text = context.getString(R.string.retry)
                     b.subscribe.setOnClickListener {
                         viewModel.refetchCommunityOrSite(force = true)
                     }
