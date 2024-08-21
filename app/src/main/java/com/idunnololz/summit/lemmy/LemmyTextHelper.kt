@@ -59,8 +59,8 @@ object LemmyTextHelper {
         onPageClick: (PageRef) -> Unit,
         onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
-    ) {
-        bindLemmyText(textView, text, highlight, showMediaAsLinks)
+    ): SpannableStringBuilder? {
+        val spannable = bindLemmyText(textView, text, highlight, showMediaAsLinks)
         textView.movementMethod = CustomLinkMovementMethod().apply {
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
@@ -92,6 +92,8 @@ object LemmyTextHelper {
                 }
             }
         }
+
+        return spannable
     }
 
     fun getSpannable(context: Context, text: String): Spanned = try {
@@ -111,69 +113,73 @@ object LemmyTextHelper {
         text: String,
         highlight: HighlightTextData?,
         showMediaAsLinks: Boolean,
-    ) {
-        if (showMediaAsLinks) {
+    ): SpannableStringBuilder? {
+        val markwon = if (showMediaAsLinks) {
             getNoMediaMarkwon(textView.context)
         } else {
             getMarkwon(textView.context)
-        }.let {
-            try {
-                val spanned = SpannableStringBuilder(it.toMarkdown(text))
+        }
 
-                if (highlight != null) {
-                    val highlightColor = textView.context.getColorFromAttribute(
-                        com.google.android.material.R.attr.colorSurfaceInverse,
-                    )
-                    val highlightTextColor = textView.context.getColorFromAttribute(
-                        com.google.android.material.R.attr.colorOnSurfaceInverse,
-                    )
-                    val currentQueryColor = textView.context.getColorFromAttribute(
-                        androidx.appcompat.R.attr.colorPrimary,
-                    )
-                    val queryHighlight = highlight.query
-                    val queryLength = queryHighlight.length
-                    var curStartIndex = 0
-                    var matchIndex = 0
-                    while (true) {
-                        val index =
-                            spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
+        return try {
+            val spanned = SpannableStringBuilder(markwon.toMarkdown(text))
 
-                        if (index < 0) {
-                            break
-                        }
+            if (highlight != null) {
+                val highlightColor = textView.context.getColorFromAttribute(
+                    com.google.android.material.R.attr.colorSurfaceInverse,
+                )
+                val highlightTextColor = textView.context.getColorFromAttribute(
+                    com.google.android.material.R.attr.colorOnSurfaceInverse,
+                )
+                val currentQueryColor = textView.context.getColorFromAttribute(
+                    androidx.appcompat.R.attr.colorPrimary,
+                )
+                val queryHighlight = highlight.query
+                val queryLength = queryHighlight.length
+                var curStartIndex = 0
+                var matchIndex = 0
+                while (true) {
+                    val index =
+                        spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
 
-                        if (highlight.matchIndex == matchIndex) {
-                            spanned.setSpan(
-                                BackgroundColorSpan(currentQueryColor),
-                                index,
-                                index + queryLength,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                            )
-                        } else {
-                            spanned.setSpan(
-                                BackgroundColorSpan(highlightColor),
-                                index,
-                                index + queryLength,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                            )
-                            spanned.setSpan(
-                                ForegroundColorSpan(highlightTextColor),
-                                index,
-                                index + queryLength,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                            )
-                        }
-                        curStartIndex = index + queryLength
-
-                        matchIndex++
+                    if (index < 0) {
+                        break
                     }
-                }
 
-                it.setParsedMarkdown(textView, spanned)
-            } catch (e: Exception) {
-                Log.w(TAG, "Error parsing markdown. Falling back to plain text", e)
-                textView.text = text
+                    if (highlight.matchIndex == matchIndex) {
+                        spanned.setSpan(
+                            BackgroundColorSpan(currentQueryColor),
+                            index,
+                            index + queryLength,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                    } else {
+                        spanned.setSpan(
+                            BackgroundColorSpan(highlightColor),
+                            index,
+                            index + queryLength,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                        spanned.setSpan(
+                            ForegroundColorSpan(highlightTextColor),
+                            index,
+                            index + queryLength,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                    }
+                    curStartIndex = index + queryLength
+
+                    matchIndex++
+                }
             }
+
+            markwon.setParsedMarkdown(textView, spanned)
+
+            spanned
+        } catch (e: Exception) {
+            Log.w(TAG, "Error parsing markdown. Falling back to plain text", e)
+            textView.text = text
+
+            null
         }
     }
 

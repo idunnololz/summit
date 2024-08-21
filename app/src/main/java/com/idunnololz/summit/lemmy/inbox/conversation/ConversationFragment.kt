@@ -6,6 +6,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
@@ -15,28 +17,46 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import arrow.core.Either
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.idunnololz.summit.R
+import com.idunnololz.summit.accountUi.PreAuthDialogFragment
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ConversationItemBinding
 import com.idunnololz.summit.databinding.FragmentConversationBinding
 import com.idunnololz.summit.databinding.ItemConversationHeaderBinding
 import com.idunnololz.summit.databinding.ItemConversationLoadMoreBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
+import com.idunnololz.summit.lemmy.inbox.ReportItem
+import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
+import io.noties.markwon.image.AsyncDrawableSpan
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -85,6 +105,29 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
         }
 
+        childFragmentManager.setFragmentResultListener(
+            AddOrEditCommentFragment.REQUEST_KEY,
+            this,
+        ) { _, bundle ->
+            bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(
+                AddOrEditCommentFragment.REQUEST_KEY_RESULT,
+            )?.let { result ->
+                if (result.didUserTapSend) {
+                    if (result.content != null) {
+                        viewModel.sendComment(args.accountId, result.content)
+                    }
+                } else {
+                    if (result.content != null) {
+                        binding.commentEditText.setText(result.content)
+                        binding.commentEditText.setSelection(
+                            result.content.length,
+                            result.content.length,
+                        )
+                    }
+                }
+            }
+        }
+
         with(binding) {
             toolbar.apply {
                 toolbar.setNavigationIcon(
@@ -99,7 +142,25 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             }
 
             val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, true)
-            val adapter = MessagesAdapter(context)
+            val adapter = MessagesAdapter(
+                context = context,
+                instance = args.instance,
+                onImageClick = { url ->
+                    getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+                },
+                onVideoClick = { url, videoType, state ->
+                    getMainActivity()?.openVideo(url, videoType, state)
+                },
+                onPageClick = {
+                    getMainActivity()?.launchPage(it)
+                },
+                onLinkClick = { url, text, linkType ->
+                    onLinkClick(url, text, linkType)
+                },
+                onLinkLongClick = { url, text ->
+                    getMainActivity()?.showMoreLinkOptions(url, text)
+                },
+            )
 
             fun markMessagesAsReadIfNeeded() {
                 val firstPos = layoutManager.findFirstCompletelyVisibleItemPosition()
@@ -143,6 +204,17 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                 },
             )
 
+            expandInputButton.setOnClickListener {
+                viewModel.personId?.let { personId ->
+                    AddOrEditCommentFragment.showMessageDialog(
+                        childFragmentManager,
+                        args.instance,
+                        personId,
+                        commentEditText.text.toString(),
+                        sendAction = AddOrEditCommentFragment.SendAction.ReturnTextAsResult,
+                    )
+                }
+            }
             sendButton.setOnClickListener {
                 val text = commentEditText.text
 
@@ -237,6 +309,16 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
     private class MessagesAdapter(
         private val context: Context,
+        private val instance: String,
+        private val onImageClick: (String) -> Unit,
+        private val onVideoClick: (
+            url: String,
+            videoType: VideoType,
+            videoState: VideoState?,
+        ) -> Unit,
+        private val onPageClick: (PageRef) -> Unit,
+        private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
+        private val onLinkLongClick: (String, String) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         sealed interface Item {
@@ -272,12 +354,69 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                 Item.ConversationItem::class,
                 ConversationItemBinding::inflate,
             ) { item, b, h ->
-                b.text.text = item.messageItem.content
+
+                val spannable = LemmyTextHelper.bindText(
+                    textView = b.text,
+                    text = item.messageItem.content,
+                    instance = instance,
+                    onImageClick = {
+                        onImageClick(it)
+                    },
+                    onVideoClick = { url ->
+                        onVideoClick(url, VideoType.Unknown, null)
+                    },
+                    onPageClick = onPageClick,
+                    onLinkClick = onLinkClick,
+                    onLinkLongClick = onLinkLongClick,
+                )
+
+                val doesTextContainDrawable: Boolean
+
+                if (spannable != null) {
+                    val images = spannable.getSpans(
+                        0,
+                        spannable.length,
+                        AsyncDrawableSpan::class.java,
+                    )
+
+                    if (images.isNotEmpty()) {
+                        // there is an image in the text content. Make the text content fill the
+                        // entire width
+                        doesTextContainDrawable = true
+                    } else {
+                        doesTextContainDrawable = false
+                    }
+                } else {
+                    doesTextContainDrawable = false
+                }
+
                 b.info.text = dateStringToPretty(
                     context = context,
                     ts = item.messageItem.lastUpdateTs,
                     style = PrettyPrintStyles.SHORT_DYNAMIC
                 )
+
+                if (doesTextContainDrawable) {
+                    b.cardView.updateLayoutParams<ViewGroup.LayoutParams> {
+                        width = MATCH_PARENT
+                    }
+                    b.cardViewContent.updateLayoutParams<ViewGroup.LayoutParams> {
+                        width = MATCH_PARENT
+                    }
+                    b.text.updateLayoutParams<ViewGroup.LayoutParams> {
+                        width = MATCH_PARENT
+                    }
+                } else {
+                    b.cardView.updateLayoutParams<ViewGroup.LayoutParams> {
+                        width = WRAP_CONTENT
+                    }
+                    b.cardViewContent.updateLayoutParams<ViewGroup.LayoutParams> {
+                        width = WRAP_CONTENT
+                    }
+                    b.text.updateLayoutParams<ViewGroup.LayoutParams> {
+                        width = WRAP_CONTENT
+                    }
+                }
 
                 if (item.isMe) {
                     b.text.setTextColor(
@@ -302,7 +441,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                     }
                     b.cardView.updateLayoutParams<FrameLayout.LayoutParams> {
                         this.marginStart = context.getDimen(R.dimen.conversation_bubble_padding)
-                        this.marginEnd = context.getDimen(R.dimen.padding)
+                        this.marginEnd = context.getDimen(R.dimen.padding_half)
                         this.gravity = Gravity.END
                         this.bottomMargin = item.bottomMargin
                     }
@@ -328,7 +467,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                         endToEnd = ConstraintLayout.LayoutParams.UNSET
                     }
                     b.cardView.updateLayoutParams<FrameLayout.LayoutParams> {
-                        this.marginStart = context.getDimen(R.dimen.padding)
+                        this.marginStart = context.getDimen(R.dimen.padding_half)
                         this.marginEnd = context.getDimen(R.dimen.conversation_bubble_padding)
                         this.gravity = Gravity.START
                         this.bottomMargin = item.bottomMargin

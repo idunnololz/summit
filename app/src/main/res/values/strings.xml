@@ -1760,6 +1760,7 @@
     <string name="selected_people">Selected people</string>
     <string name="no_people_selected">No people selected</string>
     <string name="retry">Retry</string>
+    <string name="save_as_gif">Save as GIF</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

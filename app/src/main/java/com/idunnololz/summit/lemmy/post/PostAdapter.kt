@@ -215,8 +215,6 @@ class PostAdapter(
 
     private var items: List<Item> = listOf()
 
-    private var parentHeight: Int = 0
-
     /**
      * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
      */
@@ -328,8 +326,6 @@ class PostAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = inflater.inflate(viewType, parent, false)
-
-        parentHeight = parent.height
 
         return when (viewType) {
             R.layout.post_header_item -> ViewBindingViewHolder(PostHeaderItemBinding.bind(v))

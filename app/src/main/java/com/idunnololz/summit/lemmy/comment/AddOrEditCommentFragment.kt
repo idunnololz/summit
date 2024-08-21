@@ -24,6 +24,7 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
@@ -92,7 +93,35 @@ class AddOrEditCommentFragment :
                 ).toBundle()
             }.showAllowingStateLoss(fragmentManager, "AddOrEditCommentFragment")
         }
+
+        fun showMessageDialog(
+            fragmentManager: FragmentManager,
+            instance: String,
+            personId: PersonId,
+            message: String? = null,
+            sendAction: SendAction = SendAction.Send,
+        ) {
+            AddOrEditCommentFragment().apply {
+                arguments = AddOrEditCommentFragmentArgs(
+                    instance = instance,
+                    commentView = null,
+                    postView = null,
+                    editCommentView = null,
+                    inboxItem = null,
+                    personId = personId,
+                    message = message,
+                    sendAction = sendAction,
+                ).toBundle()
+            }.showAllowingStateLoss(fragmentManager, "AddOrEditCommentFragment")
+        }
     }
+
+    @Parcelize
+    data class Result(
+        val wasCommentSent: Boolean,
+        val didUserTapSend: Boolean,
+        val content: String?,
+    ): Parcelable
 
     private val args by navArgs<AddOrEditCommentFragmentArgs>()
 
@@ -122,11 +151,6 @@ class AddOrEditCommentFragment :
     lateinit var mentionsHelper: MentionsHelper
 
     private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
-
-    @Parcelize
-    enum class Result : Parcelable {
-        CommentSent,
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -348,7 +372,11 @@ class AddOrEditCommentFragment :
 
                     setFragmentResult(
                         requestKey = REQUEST_KEY,
-                        result = bundleOf(REQUEST_KEY_RESULT to Result.CommentSent),
+                        result = bundleOf(REQUEST_KEY_RESULT to Result(
+                            wasCommentSent = true,
+                            didUserTapSend = true,
+                            content = null,
+                        )),
                     )
 
                     dismiss()
@@ -390,7 +418,22 @@ class AddOrEditCommentFragment :
                             .createAndShow(this, "send_comment")
                         return@a true
                     }
-                    sendComment()
+                    when (args.sendAction as SendAction) {
+                        SendAction.Send -> {
+                            sendComment()
+                        }
+                        SendAction.ReturnTextAsResult -> {
+                            setFragmentResult(
+                                requestKey = REQUEST_KEY,
+                                result = bundleOf(REQUEST_KEY_RESULT to Result(
+                                    wasCommentSent = true,
+                                    didUserTapSend = true,
+                                    content = binding.commentEditText.text?.toString(),
+                                )),
+                            )
+                            dismiss()
+                        }
+                    }
                     true
                 }
                 R.id.update_comment -> {
@@ -626,6 +669,13 @@ class AddOrEditCommentFragment :
 
             viewModel.currentDraftEntry.postValue(null)
         }
+
+        if (binding.commentEditText.text.isNullOrBlank() &&
+            args.message != null &&
+            savedInstanceState == null) {
+
+            binding.commentEditText.setText(args.message)
+        }
     }
 
     private fun isEdit(): Boolean {
@@ -649,8 +699,19 @@ class AddOrEditCommentFragment :
         }
 
         try {
-            if (preferences.saveDraftsAutomatically) {
-                saveDraft()
+            if (args.sendAction == SendAction.ReturnTextAsResult) {
+                setFragmentResult(
+                    requestKey = REQUEST_KEY,
+                    result = bundleOf(REQUEST_KEY_RESULT to Result(
+                        wasCommentSent = false,
+                        didUserTapSend = false,
+                        content = binding.commentEditText.text?.toString(),
+                    )),
+                )
+            } else {
+                if (preferences.saveDraftsAutomatically) {
+                    saveDraft()
+                }
             }
 
             dismiss()
@@ -729,4 +790,9 @@ class AddOrEditCommentFragment :
             } else {
                 null
             }
+
+    enum class SendAction {
+        Send,
+        ReturnTextAsResult,
+    }
 }

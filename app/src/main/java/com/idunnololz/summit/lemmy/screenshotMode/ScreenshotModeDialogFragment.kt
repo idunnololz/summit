@@ -80,42 +80,17 @@ class ScreenshotModeDialogFragment :
     lateinit var preferences: Preferences
 
     private var uriToSave: Uri? = null
-    private val createDocumentLauncher =
+    private val createPngDocumentLauncher =
         registerForActivityResult(
             ActivityResultContracts.CreateDocument(MimeTypes.PNG),
         ) { result ->
-            result ?: return@registerForActivityResult
-
-            lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                    val uriToSave = uriToSave ?: return@repeatOnLifecycle
-
-                    val context = requireContext()
-                    context.contentResolver.openInputStream(uriToSave).use a@{ ins ->
-                        ins ?: return@a
-                        context.contentResolver.openOutputStream(result).use { out ->
-                            out ?: return@a
-
-                            val buf = ByteArray(8192)
-                            var length: Int
-                            while (ins.read(buf).also { length = it } != -1) {
-                                out.write(buf, 0, length)
-                            }
-                        }
-                    }
-
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        bundleOf(
-                            REQUEST_KEY_RESULT to Result(
-                                uriToSave,
-                                MimeTypes.PNG,
-                            ),
-                        ),
-                    )
-                    dismiss()
-                }
-            }
+            onCreateDocumentResult(result)
+        }
+    private val createGifDocumentLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.CreateDocument(MimeTypes.GIF),
+        ) { result ->
+            onCreateDocumentResult(result)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -237,6 +212,13 @@ class ScreenshotModeDialogFragment :
                             "ScreenshotSettingsDialogFragment",
                         )
                 }
+                R.id.gif -> {
+                    val infographicsView = binding.zoomLayout.children.firstOrNull()
+                    if (infographicsView != null) {
+                        val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+                        viewModel.generateGifToSave(infographicsView, "post_screenshot_$ts")
+                    }
+                }
             }
 
             true
@@ -259,13 +241,23 @@ class ScreenshotModeDialogFragment :
 
                     when (it.data.reason) {
                         ScreenshotModeViewModel.UriResult.Reason.Share ->
-                            shareUri(it.data.uri, MimeTypes.PNG)
+                            when (it.data.fileType) {
+                                ScreenshotModeViewModel.UriResult.FileType.Gif ->
+                                    shareUri(it.data.uri, MimeTypes.GIF)
+                                ScreenshotModeViewModel.UriResult.FileType.Png ->
+                                    shareUri(it.data.uri, MimeTypes.PNG)
+                            }
                         ScreenshotModeViewModel.UriResult.Reason.Save -> {
                             uriToSave = it.data.uri
                             val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
                             val fileName = "post_screenshot_$ts"
 
-                            createDocumentLauncher.launch(fileName)
+                            when (it.data.fileType) {
+                                ScreenshotModeViewModel.UriResult.FileType.Gif ->
+                                    createGifDocumentLauncher.launch(fileName)
+                                ScreenshotModeViewModel.UriResult.FileType.Png ->
+                                    createPngDocumentLauncher.launch(fileName)
+                            }
                         }
                     }
                 }
@@ -427,5 +419,40 @@ class ScreenshotModeDialogFragment :
         binding.zoomLayout.removeAllViews()
         binding.zoomLayout.addView(screenshotStage.root)
         binding.zoomLayout.requestLayout()
+    }
+
+    private fun onCreateDocumentResult(result: Uri?) {
+        result ?: return
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                val uriToSave = uriToSave ?: return@repeatOnLifecycle
+
+                val context = requireContext()
+                context.contentResolver.openInputStream(uriToSave).use a@{ ins ->
+                    ins ?: return@a
+                    context.contentResolver.openOutputStream(result).use { out ->
+                        out ?: return@a
+
+                        val buf = ByteArray(8192)
+                        var length: Int
+                        while (ins.read(buf).also { length = it } != -1) {
+                            out.write(buf, 0, length)
+                        }
+                    }
+                }
+
+                setFragmentResult(
+                    REQUEST_KEY,
+                    bundleOf(
+                        REQUEST_KEY_RESULT to Result(
+                            uriToSave,
+                            MimeTypes.PNG,
+                        ),
+                    ),
+                )
+                dismiss()
+            }
+        }
     }
 }

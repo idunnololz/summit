@@ -135,6 +135,15 @@
             android:name="account_id"
             app:argType="long"
             android:defaultValue="0L" />
+        <argument
+            android:name="message"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="sendAction"
+            app:argType="com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment$SendAction"
+            android:defaultValue="Send" />
         <action
             android:id="@+id/action_addOrEditCommentFragment_to_previewCommentDialogFragment"
             app:destination="@id/previewCommentDialogFragment" />
