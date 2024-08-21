@@ -109,34 +109,54 @@
                 android:id="@+id/comment_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/padding"
+                android:layout_marginHorizontal="@dimen/padding_half"
                 android:layout_marginBottom="@dimen/padding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/send_button">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/comment_editor"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    app:boxStrokeWidth="0dp"
-                    app:boxStrokeWidthFocused="0dp"
-                    app:hintEnabled="false">
+                    android:layout_height="wrap_content">
 
-                    <com.idunnololz.summit.view.CustomTextInputEditText
-                        android:id="@+id/comment_edit_text"
-                        android:layout_width="match_parent"
+                    <ImageButton
+                        android:id="@+id/expand_input_button"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/baseline_fullscreen_24"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/comment_editor"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:scrollbars="vertical"
-                        android:maxLines="4"
-                        android:autofillHints="no"
-                        android:hint="@string/reply"
-                        android:padding="@dimen/padding"
                         android:background="@null"
-                        android:gravity="start|top"
-                        android:inputType="textMultiLine|textCapSentences"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginStart="-16dp"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:hintEnabled="false"
+                        app:layout_constraintStart_toEndOf="@+id/expand_input_button"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <com.idunnololz.summit.view.CustomTextInputEditText
+                            android:id="@+id/comment_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scrollbars="vertical"
+                            android:maxLines="4"
+                            android:autofillHints="no"
+                            android:hint="@string/reply"
+                            android:paddingHorizontal="@dimen/padding_half"
+                            android:paddingVertical="@dimen/padding"
+                            android:background="@null"
+                            android:gravity="start|top"
+                            android:inputType="textMultiLine|textCapSentences"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <ImageButton
@@ -146,7 +166,7 @@
                 android:src="@drawable/outline_send_24"
                 android:background="@drawable/conversation_send_bg"
                 android:layout_marginBottom="@dimen/padding"
-                android:layout_marginEnd="@dimen/padding"
+                android:layout_marginEnd="@dimen/padding_half"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>

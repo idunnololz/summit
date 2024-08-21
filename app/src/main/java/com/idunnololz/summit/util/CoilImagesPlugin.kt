@@ -10,6 +10,7 @@ import coil.ImageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
 import coil.target.Target
+import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory
@@ -154,6 +155,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
                         return ImageRequest.Builder(context)
                             .allowHardware(false) // Needed for the "take screenshot" feature
                             .data(drawable.destination)
+                            .placeholder(newShimmerDrawableSquare(context))
                             .build()
                     }
 

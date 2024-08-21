@@ -333,18 +333,11 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         moreActionsHelper.blockPerson(id = person.id, block = false)
                     }
                     R.id.message -> {
-                        AddOrEditCommentFragment()
-                            .apply {
-                                arguments = AddOrEditCommentFragmentArgs(
-                                    instance = viewModel.instance,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    person.id,
-                                ).toBundle()
-                            }
-                            .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+                        AddOrEditCommentFragment.showMessageDialog(
+                            childFragmentManager,
+                            viewModel.instance,
+                            person.id,
+                        )
                     }
                 }
             }

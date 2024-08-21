@@ -36,7 +36,7 @@ class ConversationViewModel @Inject constructor(
     private var nextPageIndex = 0
     private var lastPageIndex = -1
     private var highestLoadedPageIndex = -1
-    private var personId: Long? = null
+    var personId: Long? = null
     private var draftMessage: String? = null
 
     val conversationInfoModel = MutableLiveData<ConversationInfoModel>()
@@ -247,6 +247,10 @@ class ConversationViewModel @Inject constructor(
     }
 
     fun sendComment(accountId: Long, content: String) {
+        if (content.isBlank()) {
+            return
+        }
+
         commentSentEvent.setIsLoading()
 
         viewModelScope.launch {

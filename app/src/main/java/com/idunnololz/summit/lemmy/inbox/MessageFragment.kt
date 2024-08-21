@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -522,7 +523,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
 
-            adapter.contentMaxWidth = recyclerView.width
+            recyclerView.doOnLayout {
+                adapter.contentMaxWidth = recyclerView.measuredWidth
+            }
 
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
