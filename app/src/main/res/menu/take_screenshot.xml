@@ -19,10 +19,10 @@
         app:iconTint="?attr/colorControlNormal" />
 
     <item
-        android:id="@+id/gif"
-        android:title="@string/save_as_gif"
+        android:id="@+id/record"
+        android:title="@string/save_as_recording"
         android:orderInCategory="400"
-        android:icon="@drawable/sharp_gif_2_24"
+        android:icon="@drawable/baseline_videocam_24"
         app:showAsAction="ifRoom"
         app:iconTint="?attr/colorControlNormal" />
 

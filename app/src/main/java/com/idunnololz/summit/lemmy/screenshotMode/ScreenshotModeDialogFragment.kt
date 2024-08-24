@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
@@ -220,7 +221,7 @@ class ScreenshotModeDialogFragment :
                             "ScreenshotSettingsDialogFragment",
                         )
                 }
-                R.id.gif -> {
+                R.id.record -> {
                     val infographicsView = binding.zoomLayout.children.firstOrNull()
                     if (infographicsView != null) {
                         val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
