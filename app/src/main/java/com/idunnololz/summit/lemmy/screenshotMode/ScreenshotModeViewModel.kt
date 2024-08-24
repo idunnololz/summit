@@ -53,6 +53,62 @@ class ScreenshotModeViewModel @Inject constructor(
         generateGif2(view, name, UriResult.Reason.Save)
     }
 
+    fun recordScreenshot(view: View, name: String, config: RecordScreenshotConfig) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val (outputFile, fileUri) = FileProviderHelper(context)
+                .getTempFile("Summit_$name.mp4")
+
+            val viewRecorder = ViewRecorder()
+            viewRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE)
+            viewRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            viewRecorder.setVideoFrameRate(32) // 5fps
+            viewRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
+            viewRecorder.setVideoSize(720, 1280)
+            viewRecorder.setVideoEncodingBitRate(2000 * 1000)
+            viewRecorder.setOutputFile(outputFile.path)
+            viewRecorder.setOnErrorListener { mr, what, extra -> Log.d(TAG, "Error: $what") }
+
+            viewRecorder.setRecordedView(view)
+            try {
+                viewRecorder.prepare()
+                viewRecorder.start()
+            } catch (e: IOException) {
+                Log.e(TAG, "startRecord failed", e)
+                return@launch
+            }
+
+            withContext(Dispatchers.Default) {
+                delay(3000)
+            }
+
+            withContext(Dispatchers.Main) {
+                try {
+                    viewRecorder.stop()
+                    viewRecorder.reset()
+                    viewRecorder.release()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+
+                val uri = FileProviderHelper(context)
+                    .openTempFile("Summit_$name.gif") {
+                        convertMp4ToGif(outputFile, it)
+                    }
+
+                generatedImageUri.postValue(
+                    UriResult(
+                        uri = uri,
+                        reason = reason,
+                        fileType = UriResult.FileType.Gif,
+                    ),
+                )
+            }
+        }
+    }
+
     private fun generateGif2(view: View, name: String, reason: UriResult.Reason) {
 
         viewModelScope.launch(Dispatchers.Main) {
