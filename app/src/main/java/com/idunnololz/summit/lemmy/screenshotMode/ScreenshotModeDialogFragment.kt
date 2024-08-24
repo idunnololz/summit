@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.screenshotMode
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -40,6 +41,8 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.shareUri
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
@@ -48,8 +51,7 @@ import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
-import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
+
 
 @AndroidEntryPoint
 class ScreenshotModeDialogFragment :
@@ -89,6 +91,12 @@ class ScreenshotModeDialogFragment :
     private val createGifDocumentLauncher =
         registerForActivityResult(
             ActivityResultContracts.CreateDocument(MimeTypes.GIF),
+        ) { result ->
+            onCreateDocumentResult(result)
+        }
+    private val createMp4DocumentLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.CreateDocument(MimeTypes.MP4),
         ) { result ->
             onCreateDocumentResult(result)
         }
@@ -194,6 +202,9 @@ class ScreenshotModeDialogFragment :
             generateScreenshot(adapter)
         }
 
+        binding.bottomAppBar.setNavigationOnClickListener {
+            dismiss()
+        }
         binding.bottomAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.toggle_post_view -> {
@@ -201,9 +212,6 @@ class ScreenshotModeDialogFragment :
                     viewModel.screenshotConfig.value = currentConfig.copy(
                         postViewType = currentConfig.postViewType.nextValue,
                     )
-                }
-                R.id.cancel -> {
-                    dismiss()
                 }
                 R.id.screenshot_settings -> {
                     ScreenshotSettingsDialogFragment()
@@ -246,6 +254,8 @@ class ScreenshotModeDialogFragment :
                                     shareUri(it.data.uri, MimeTypes.GIF)
                                 ScreenshotModeViewModel.UriResult.FileType.Png ->
                                     shareUri(it.data.uri, MimeTypes.PNG)
+                                ScreenshotModeViewModel.UriResult.FileType.Mp4 ->
+                                    shareUri(it.data.uri, MimeTypes.MP4)
                             }
                         ScreenshotModeViewModel.UriResult.Reason.Save -> {
                             uriToSave = it.data.uri
@@ -257,6 +267,8 @@ class ScreenshotModeDialogFragment :
                                     createGifDocumentLauncher.launch(fileName)
                                 ScreenshotModeViewModel.UriResult.FileType.Png ->
                                     createPngDocumentLauncher.launch(fileName)
+                                ScreenshotModeViewModel.UriResult.FileType.Mp4 ->
+                                    createMp4DocumentLauncher.launch(fileName)
                             }
                         }
                     }

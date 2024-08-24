@@ -3,14 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/cancel"
-        android:title="@string/cancel"
-        android:orderInCategory="100"
-        android:icon="@drawable/baseline_close_24"
-        app:showAsAction="always"
-        app:iconTint="?attr/colorControlNormal" />
-
-    <item
         android:id="@+id/toggle_post_view"
         android:title="@string/toggle_post_view"
         android:orderInCategory="200"
@@ -31,7 +23,6 @@
         android:title="@string/save_as_gif"
         android:orderInCategory="400"
         android:icon="@drawable/sharp_gif_2_24"
-        android:visible="false"
         app:showAsAction="ifRoom"
         app:iconTint="?attr/colorControlNormal" />
 

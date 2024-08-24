@@ -11,7 +11,7 @@ class FileProviderHelper(
 ) {
     val fileProviderDir = File(context.cacheDir, "fileprovider")
 
-    fun openTempFile(fileName: String, writeFn: (OutputStream) -> Unit): Uri {
+    suspend fun openTempFile(fileName: String, writeFn: suspend (OutputStream) -> Unit): Uri {
         val file = File(fileProviderDir, fileName)
 
         if (file.isDirectory) {
@@ -20,9 +20,27 @@ class FileProviderHelper(
 
         file.parentFile?.mkdirs()
 
-        file.outputStream().use(writeFn)
+        file.outputStream().use {
+            writeFn(it)
+        }
 
         return FileProvider.getUriForFile(
+            context,
+            context.applicationContext.packageName + ".fileprovider",
+            file,
+        )
+    }
+
+    fun getTempFile(fileName: String): Pair<File, Uri> {
+        val file = File(fileProviderDir, fileName)
+
+        if (file.isDirectory) {
+            file.delete()
+        }
+
+        file.parentFile?.mkdirs()
+
+        return file to FileProvider.getUriForFile(
             context,
             context.applicationContext.packageName + ".fileprovider",
             file,

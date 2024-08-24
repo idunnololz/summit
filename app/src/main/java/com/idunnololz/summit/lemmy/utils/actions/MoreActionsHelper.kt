@@ -330,14 +330,14 @@ class MoreActionsHelper @Inject constructor(
         offlineManager.fetchImage(
             url = url,
             listener = { file ->
-                val fileUri = FileProviderHelper(context)
-                    .openTempFile("img_${file.name}") { os ->
-                        os.sink().buffer().use {
-                            it.writeAll(file.source())
-                        }
-                    }
-
                 coroutineScope.launch {
+                    val fileUri = FileProviderHelper(context)
+                        .openTempFile("img_${file.name}") { os ->
+                            os.sink().buffer().use {
+                                it.writeAll(file.source())
+                            }
+                        }
+
                     downloadAndShareFile.postValueAndClear(fileUri)
                 }
             },
