@@ -223,4 +223,6 @@
     <item name="generate_community_icon_job" type="id" />
     <item name="show_community_icon" type="id" />
     <item name="make_available_offline" type="id" />
+    <item name="pa_mark_post_as_read" type="id" />
+    <item name="pa_mark_post_as_unread" type="id" />
 </resources>

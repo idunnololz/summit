@@ -31,7 +31,7 @@ class FileProviderHelper(
         )
     }
 
-    fun getTempFile(fileName: String): Pair<File, Uri> {
+    fun getTempFile(fileName: String): FileWithUri {
         val file = File(fileProviderDir, fileName)
 
         if (file.isDirectory) {
@@ -40,10 +40,13 @@ class FileProviderHelper(
 
         file.parentFile?.mkdirs()
 
-        return file to FileProvider.getUriForFile(
-            context,
-            context.applicationContext.packageName + ".fileprovider",
-            file,
+        return FileWithUri(
+            file = file,
+            uri = FileProvider.getUriForFile(
+                context,
+                context.applicationContext.packageName + ".fileprovider",
+                file,
+            ),
         )
     }
 }

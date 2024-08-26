@@ -332,6 +332,7 @@ class CommunityFragment :
                         postView = postView,
                         delayMs = 0,
                         accountId = accountId,
+                        read = true,
                     )
                 },
                 onVideoClick = { url, videoType, state ->
@@ -378,6 +379,7 @@ class CommunityFragment :
                         postView = postView,
                         delayMs = 0,
                         accountId = accountId,
+                        read = true,
                     )
                 },
                 onLoadPage = {

@@ -1,5 +1,6 @@
 package com.idunnololz.summit.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.icu.text.CompactDecimalFormat
 import android.os.Build
@@ -126,6 +127,18 @@ fun dateStringToTs(dateString: String): Long = Instant.parse(
         dateString + "Z"
     },
 ).toEpochMilli()
+
+@SuppressLint("DefaultLocale")
+fun durationToPretty(durationMs: Long): String {
+    val s = durationMs / 1000
+    if (s > 3600) {
+        return String.format("%dh%02dm%02ds", s / 3600, (s % 3600) / 60, (s % 60))
+    } else if (s > 60) {
+        return String.format("%dm%02ds", (s % 3600) / 60, (s % 60))
+    } else {
+        return String.format("%ds", (s % 60))
+    }
+}
 
 fun abbrevNumber(number: Long): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

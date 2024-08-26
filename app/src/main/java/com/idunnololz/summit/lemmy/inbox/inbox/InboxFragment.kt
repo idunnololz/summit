@@ -745,6 +745,7 @@ class InboxFragment :
                     onPageClick = onPageClick,
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
+                    showMediaAsLinks = true,
                 )
                 b.content.addEllipsizeToSpannedOnLayout()
 

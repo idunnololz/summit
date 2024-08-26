@@ -311,4 +311,12 @@ safeargs.
             android:name="url"
             app:argType="string" />
     </dialog>
+    <dialog
+        android:id="@+id/recordScreenshotDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.screenshotMode.record.RecordScreenshotDialogFragment"
+        android:label="RecordScreenshotDialogFragment" >
+        <argument
+            android:name="config"
+            app:argType="com.idunnololz.summit.util.viewRecorder.RecordScreenshotConfig" />
+    </dialog>
 </navigation>

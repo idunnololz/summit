@@ -1,12 +1,14 @@
 package com.idunnololz.summit.view
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.AnimationUtils
@@ -21,7 +23,7 @@ class LoadingView : ConstraintLayout {
     private lateinit var container: View
     private lateinit var errorTextView: TextView
     private lateinit var positiveButton: Button
-    private lateinit var progressView: View
+    private lateinit var progressView: CircularProgressIndicator
     private lateinit var negativeButton: Button
     private val rootViewAnimationController: AnimationUtils.AnimationController
     private var onRefreshClickListener: (View) -> Unit = {}
@@ -92,6 +94,21 @@ class LoadingView : ConstraintLayout {
      */
     fun showProgressBar() {
         show(progressBar = true)
+    }
+
+    fun setProgress(progress: Int, max: Int) {
+        progressView.isIndeterminate = false
+        progressView.max = max
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            progressView.setProgress(progress, true)
+        } else {
+            progressView.progress = progress
+        }
+    }
+
+    fun setProgressIndeterminate() {
+        progressView.isIndeterminate = true
     }
 
     fun showProgressBarWithMessage(@StringRes message: Int) {

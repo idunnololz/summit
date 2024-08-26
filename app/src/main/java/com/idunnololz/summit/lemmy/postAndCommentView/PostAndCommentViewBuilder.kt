@@ -827,6 +827,23 @@ class PostAndCommentViewBuilder @Inject constructor(
                     true
                 }
             }
+
+            collapseSectionButton.setOnLongClickListener {
+                toggleActionsExpanded()
+                true
+            }
+            topHotspot.setOnLongClickListener {
+                toggleActionsExpanded()
+                true
+            }
+            leftHotspot.setOnLongClickListener {
+                toggleActionsExpanded()
+                true
+            }
+            headerView.setOnLongClickListener {
+                toggleActionsExpanded()
+                true
+            }
         }
 
         if (isUpdating) {
@@ -1257,6 +1274,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
+            showMediaAsLinks = true,
         )
 
         if (item.isDeleted) {
@@ -1274,6 +1292,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 textView = b.content,
                 text = item.content,
                 instance = instance,
+                showMediaAsLinks = true,
                 onImageClick = {
                     onImageClick(it)
                 },
