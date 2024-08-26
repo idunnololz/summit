@@ -2,7 +2,7 @@ package com.idunnololz.summit.util
 
 import java.text.DecimalFormat
 
-object FormatSizeUtils {
+object FileSizeUtils {
     private val K: Long = 1024
     private val M = K * K
     private val G = M * K
@@ -25,6 +25,6 @@ object FormatSizeUtils {
 
     private fun format(value: Long, divider: Long, unit: String): String {
         val result = if (divider > 1) value.toDouble() / divider.toDouble() else value.toDouble()
-        return DecimalFormat("#,##0.#").format(result) + " " + unit
+        return DecimalFormat("#,##0.##").format(result) + " " + unit
     }
 }

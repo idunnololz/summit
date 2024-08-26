@@ -1,7 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIconTint="?colorControlNormal"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintBottom_toTopOf="@+id/record_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/recording_length_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/recording_length_in_seconds"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/recording_length_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:text="@string/recording_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding"
+                android:textAppearance="?textAppearanceTitleSmall"/>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/recording_type_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding_half"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <Button
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/gif_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/gif" />
+                <Button
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/mp4_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/mp4" />
+                <Button
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/webm_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/webm" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <TextView
+                android:id="@+id/fps_title"
+                android:text="@string/fps_full"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding"
+                android:textAppearance="?textAppearanceTitleSmall"
+                android:drawablePadding="@dimen/padding_quarter"
+                app:drawableTint="@color/colorTextFaint"
+                app:drawableEndCompat="@drawable/outline_help_18" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/fps_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding_half"
+                android:valueFrom="4.0"
+                android:valueTo="120.0"
+                android:stepSize="1.0"/>
+
+            <TextView
+                android:text="@string/quality_factor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding"
+                android:textAppearance="?textAppearanceTitleSmall"/>
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/quality_factor_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding_half"
+                android:valueFrom="0.2"
+                android:valueTo="1.0"/>
+
+            <TextView
+                android:text="@string/resolution_scaling"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding"
+                android:textAppearance="?textAppearanceTitleSmall"/>
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/resolution_scaling_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding_half"
+                android:valueFrom="0.2"
+                android:valueTo="1.0"/>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <Button
+        android:id="@+id/record_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/record"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
+        android:layout_marginBottom="@dimen/dialog_padding"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

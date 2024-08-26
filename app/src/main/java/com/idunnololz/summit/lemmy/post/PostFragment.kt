@@ -1077,6 +1077,7 @@ class PostFragment :
                     postView = postView,
                     delayMs = 250,
                     accountId = accountId,
+                    read = true,
                 )
             }
         }

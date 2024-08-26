@@ -262,8 +262,8 @@ class MoreActionsHelper @Inject constructor(
         hiddenPostsManager.hidePost(id, apiClient.instance)
     }
 
-    fun onPostRead(postView: PostView, delayMs: Long, accountId: Long? = null) {
-        if (postView.read) {
+    fun onPostRead(postView: PostView, delayMs: Long, read: Boolean, accountId: Long? = null) {
+        if (postView.read == read) {
             return
         }
 
@@ -274,7 +274,7 @@ class MoreActionsHelper @Inject constructor(
             accountActionsManager.markPostAsRead(
                 instance = apiClient.instance,
                 id = postView.post.id,
-                read = true,
+                read = read,
                 accountId = accountId,
             )
         }

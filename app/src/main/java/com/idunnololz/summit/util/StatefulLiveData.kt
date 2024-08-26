@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import androidx.annotation.MainThread
+import androidx.datastore.preferences.protobuf.BoolValueOrBuilder
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -70,6 +71,7 @@ class StatefulLiveData<T> {
         statusDesc: String? = null,
         progress: Int = 0,
         maxProgress: Int = 0,
+        isIndeterminate: Boolean = false,
         payload: T? = null,
     ) {
         data.postValue(
@@ -77,18 +79,25 @@ class StatefulLiveData<T> {
                 statusDesc = statusDesc,
                 progress = progress,
                 maxProgress = maxProgress,
+                isIndeterminate = isIndeterminate,
                 payload = payload,
             ),
         )
     }
 
     @Suppress("unused")
-    fun postIsLoading(statusDesc: String? = null, progress: Int = 0, maxProgress: Int = 0) {
+    fun postIsLoading(
+        statusDesc: String? = null,
+        progress: Int = 0,
+        maxProgress: Int = 0,
+        isIndeterminate: Boolean = false,
+    ) {
         data.postValue(
             StatefulData.Loading(
                 statusDesc = statusDesc,
                 progress = progress,
                 maxProgress = maxProgress,
+                isIndeterminate = isIndeterminate,
             ),
         )
     }
@@ -147,6 +156,7 @@ sealed class StatefulData<T> {
         val progress: Int = 0,
         val maxProgress: Int = 0,
         val payload: T? = null,
+        val isIndeterminate: Boolean = true,
     ) : StatefulData<T>() {
         fun requirePayload(): T = requireNotNull(payload)
     }

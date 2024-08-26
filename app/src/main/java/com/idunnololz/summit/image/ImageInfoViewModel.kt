@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskListener
-import com.idunnololz.summit.util.FormatSizeUtils
+import com.idunnololz.summit.util.FileSizeUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -51,7 +51,7 @@ class ImageInfoViewModel @Inject constructor(
                 url,
             )
 
-            val fileSizeString = FormatSizeUtils.convertToStringRepresentation(file.length())
+            val fileSizeString = FileSizeUtils.convertToStringRepresentation(file.length())
             items += ImageInfoModel.InfoItem(
                 title = context.getString(R.string.file_size),
                 value = "$fileSizeString (${file.length()} bytes)",

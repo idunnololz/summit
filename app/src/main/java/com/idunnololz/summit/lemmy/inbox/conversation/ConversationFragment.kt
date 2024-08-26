@@ -355,6 +355,24 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                 ConversationItemBinding::inflate,
             ) { item, b, h ->
 
+
+//                LemmyTextHelper.bindText(
+//                    textView = text,
+//                    text = content,
+//                    instance = instance,
+//                    highlight = highlightTextData,
+//                    onImageClick = {
+//                        onImageClick(Either.Right(commentView), null, it)
+//                    },
+//                    onVideoClick = { url ->
+//                        onVideoClick(url, VideoType.Unknown, null)
+//                    },
+//                    onPageClick = onPageClick,
+//                    onLinkClick = onLinkClick,
+//                    onLinkLongClick = onLinkLongClick,
+//                    showMediaAsLinks = commentsShowInlineMediaAsLinks,
+//                )
+
                 val spannable = LemmyTextHelper.bindText(
                     textView = b.text,
                     text = item.messageItem.content,
@@ -424,6 +442,11 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                             com.google.android.material.R.attr.colorOnPrimary,
                         ),
                     )
+                    b.text.setLinkTextColor(
+                        context.getColorFromAttribute(
+                            com.google.android.material.R.attr.colorOnPrimary,
+                        )
+                    )
                     b.info.setTextColor(
                         context.getColorFromAttribute(
                             com.google.android.material.R.attr.colorOnPrimary,
@@ -450,6 +473,11 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                         context.getColorFromAttribute(
                             com.google.android.material.R.attr.colorOnPrimaryContainer,
                         ),
+                    )
+                    b.text.setLinkTextColor(
+                        context.getColorFromAttribute(
+                            com.google.android.material.R.attr.colorOnPrimaryContainer,
+                        )
                     )
                     b.info.setTextColor(
                         context.getColorFromAttribute(

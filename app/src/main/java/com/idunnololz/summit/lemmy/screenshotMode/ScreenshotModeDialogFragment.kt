@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.screenshotMode
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -10,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
@@ -24,24 +22,32 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentScreenshotModeBinding
 import com.idunnololz.summit.databinding.ScreenshotBottomBarBinding
 import com.idunnololz.summit.databinding.ScreenshotStageBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostFragment
+import com.idunnololz.summit.lemmy.screenshotMode.record.RecordScreenshotDialogFragment
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ScreenshotWatermarkId
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.FileSizeUtils
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.MimeTypes
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.durationToPretty
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.shareUri
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
@@ -57,7 +63,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ScreenshotModeDialogFragment :
     BaseDialogFragment<DialogFragmentScreenshotModeBinding>(),
-    FullscreenDialogFragment {
+    FullscreenDialogFragment,
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "ScreenshotModeDialogFragment_req_key"
@@ -87,19 +94,25 @@ class ScreenshotModeDialogFragment :
         registerForActivityResult(
             ActivityResultContracts.CreateDocument(MimeTypes.PNG),
         ) { result ->
-            onCreateDocumentResult(result)
+            onCreateDocumentResult(result, MimeTypes.PNG)
         }
     private val createGifDocumentLauncher =
         registerForActivityResult(
             ActivityResultContracts.CreateDocument(MimeTypes.GIF),
         ) { result ->
-            onCreateDocumentResult(result)
+            onCreateDocumentResult(result, MimeTypes.GIF)
         }
     private val createMp4DocumentLauncher =
         registerForActivityResult(
             ActivityResultContracts.CreateDocument(MimeTypes.MP4),
         ) { result ->
-            onCreateDocumentResult(result)
+            onCreateDocumentResult(result, MimeTypes.MP4)
+        }
+    private val createWebmDocumentLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.CreateDocument(MimeTypes.WEBM),
+        ) { result ->
+            onCreateDocumentResult(result, MimeTypes.WEBM)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -222,15 +235,51 @@ class ScreenshotModeDialogFragment :
                         )
                 }
                 R.id.record -> {
-                    val infographicsView = binding.zoomLayout.children.firstOrNull()
-                    if (infographicsView != null) {
-                        val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-                        viewModel.generateGifToSave(infographicsView, "post_screenshot_$ts")
-                    }
+                    RecordScreenshotDialogFragment
+                        .show(
+                            requireNotNull(viewModel.recordScreenshotConfig.value),
+                            childFragmentManager
+                        )
                 }
             }
 
             true
+        }
+
+        childFragmentManager.setFragmentResultListener(
+            RecordScreenshotDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            val result = result.getParcelableCompat<RecordScreenshotDialogFragment.Result>(
+                RecordScreenshotDialogFragment.REQUEST_KEY_RESULT
+            )
+
+            if (result != null) {
+                viewModel.recordScreenshotConfig.value = result.config
+
+                if (result.startRecording) {
+                    val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        generateScreenshot(adapter) // resets the gifs...
+
+                        val infographicsView = binding.zoomLayout.children.firstOrNull()
+
+                        infographicsView?.post {
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                delay(300)
+
+                                viewModel.recordScreenshot(
+                                    view = infographicsView,
+                                    name = "post_recording_$ts",
+                                    reason = ScreenshotModeViewModel.UriResult.Reason.Save,
+                                    config = result.config
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         viewModel.generatedImageUri.observe(viewLifecycleOwner) {
@@ -238,13 +287,31 @@ class ScreenshotModeDialogFragment :
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
                     binding.loadingOverlay.visibility = View.GONE
+
+                    ErrorDialogFragment.show(
+                        message = getString(R.string.error_unable_to_create_screenshot),
+                        error = it.error,
+                        fm = childFragmentManager,
+                    )
                 }
                 is StatefulData.Loading -> {
-                    binding.loadingView.showProgressBar()
+                    binding.loadingView.showProgressBarWithMessage(it.statusDesc)
                     binding.loadingOverlay.visibility = View.VISIBLE
+
+                    if (it.isIndeterminate) {
+                        binding.loadingView.setProgressIndeterminate()
+                    } else {
+                        binding.loadingView.setProgress(
+                            it.progress,
+                            it.maxProgress,
+                        )
+                    }
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+
+                    viewModel.generatedImageUri.postIdle()
+
                     binding.loadingOverlay.visibility = View.GONE
                     binding.loadingView.hideAll()
 
@@ -257,6 +324,8 @@ class ScreenshotModeDialogFragment :
                                     shareUri(it.data.uri, MimeTypes.PNG)
                                 ScreenshotModeViewModel.UriResult.FileType.Mp4 ->
                                     shareUri(it.data.uri, MimeTypes.MP4)
+                                ScreenshotModeViewModel.UriResult.FileType.Webm ->
+                                    shareUri(it.data.uri, MimeTypes.WEBM)
                             }
                         ScreenshotModeViewModel.UriResult.Reason.Save -> {
                             uriToSave = it.data.uri
@@ -270,6 +339,8 @@ class ScreenshotModeDialogFragment :
                                     createPngDocumentLauncher.launch(fileName)
                                 ScreenshotModeViewModel.UriResult.FileType.Mp4 ->
                                     createMp4DocumentLauncher.launch(fileName)
+                                ScreenshotModeViewModel.UriResult.FileType.Webm ->
+                                    createWebmDocumentLauncher.launch(fileName)
                             }
                         }
                     }
@@ -434,8 +505,11 @@ class ScreenshotModeDialogFragment :
         binding.zoomLayout.requestLayout()
     }
 
-    private fun onCreateDocumentResult(result: Uri?) {
+    private fun onCreateDocumentResult(result: Uri?, mimeType: String) {
         result ?: return
+
+        viewModel.result = result
+        viewModel.mimeType = mimeType
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -455,17 +529,60 @@ class ScreenshotModeDialogFragment :
                     }
                 }
 
-                setFragmentResult(
-                    REQUEST_KEY,
-                    bundleOf(
-                        REQUEST_KEY_RESULT to Result(
-                            uriToSave,
-                            MimeTypes.PNG,
-                        ),
-                    ),
-                )
-                dismiss()
+                val recordingStats = viewModel.lastRecordingStats
+                if (recordingStats != null) {
+                    val df = PrettyPrintUtils.defaultDecimalFormat
+
+                    AlertDialogFragment.Builder()
+                        .setMessage(
+                            getString(
+                                R.string.desc_recording_stats,
+                                df.format(recordingStats.effectiveFrameRate),
+                                df.format(recordingStats.frameTimeMs),
+                                durationToPretty(recordingStats.totalTimeSpent ?: 0L),
+                                FileSizeUtils.convertToStringRepresentation(recordingStats.fileSize ?: 0L),
+                            )
+                        )
+                        .createAndShow(childFragmentManager, "recording_stats")
+                } else {
+                    setResultIfPossible()
+
+                    dismiss()
+                }
             }
+        }
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        if (tag == "recording_stats") {
+            setResultIfPossible()
+
+            dismiss()
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+        if (tag == "recording_stats") {
+            setResultIfPossible()
+
+            dismiss()
+        }
+    }
+
+    private fun setResultIfPossible() {
+        val uriToSave = uriToSave
+        val mimeType = viewModel.mimeType
+
+        if (uriToSave != null && mimeType != null) {
+            setFragmentResult(
+                REQUEST_KEY,
+                bundleOf(
+                    REQUEST_KEY_RESULT to Result(
+                        uriToSave,
+                        mimeType,
+                    ),
+                ),
+            )
         }
     }
 }

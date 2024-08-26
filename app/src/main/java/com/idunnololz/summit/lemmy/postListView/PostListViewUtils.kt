@@ -124,6 +124,20 @@ fun BaseFragment<*>.showMorePostOptions(
             R.drawable.baseline_hide_24,
         )
 
+        if (postView.read) {
+            addItemWithIcon(
+                R.id.pa_mark_post_as_unread,
+                getString(R.string.mark_as_unread),
+                R.drawable.outline_thread_unread_24,
+            )
+        } else {
+            addItemWithIcon(
+                R.id.pa_mark_post_as_read,
+                getString(R.string.mark_as_read),
+                R.drawable.baseline_check_24,
+            )
+        }
+
         if (postView.saved) {
             addItemWithIcon(
                 R.id.pa_remove_from_saved,
@@ -384,6 +398,22 @@ fun BaseFragment<*>.createPostActionHandler(
                 onRefreshClick = onRefreshClick,
                 onFindInPageClick = onFindInPageClick,
                 onScreenshotClick = onScreenshotClick,
+            )
+        }
+        R.id.pa_mark_post_as_unread -> {
+            moreActionsHelper.onPostRead(
+                postView = postView,
+                delayMs = 0,
+                read = false,
+                accountId = accountId,
+            )
+        }
+        R.id.pa_mark_post_as_read -> {
+            moreActionsHelper.onPostRead(
+                postView = postView,
+                delayMs = 0,
+                read = true,
+                accountId = accountId,
             )
         }
     }

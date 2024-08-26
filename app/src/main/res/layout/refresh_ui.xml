@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/_error" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/_error"
@@ -26,9 +26,9 @@
         android:gravity="center"
         android:visibility="gone"
         android:textAppearance="?textAppearanceBodyMedium"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/_progress_view"
         app:layout_constraintBottom_toTopOf="@+id/_positive_button"
-        app:layout_constraintStart_toEndOf="@+id/_progress_view"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Network error. Please check your internet connection and try again." />
