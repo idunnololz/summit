@@ -951,4 +951,10 @@
     <string name="offline_fetching_extras">अतिरिक्त सामग्री लायी जा रही है…</string>
     <string name="offline_done">संपन्न!</string>
     <string name="error_couldnt_find_object">इस इंस्टैंस पर पोस्ट/टिप्पणी नहीं मिल सकी।</string>
+    <string name="draft">ड्राफ्ट</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="selected_people">चयनित लोग</string>
+    <string name="no_people_selected">कोई लोग चयनित नहीं</string>
+    <string name="retry">पुन: प्रयास करें</string>
+    <string name="warn_too_many_messages">कुछ वार्तालाप गायब हो सकते हैं। इस खाते में %1$s से ज़्यादा संदेश हैं और Summit वर्तमान में केवल सबसे हाल के %1$s संदेश ही प्राप्त करता है। %2$s से पहले के वार्तालाप नहीं दिखाए जाएंगे।</string>
 </resources>
